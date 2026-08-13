@@ -6,6 +6,12 @@
 
 > Una identidad cálida, sofisticada y luminosa, con una conexión natural con el bienestar.
 
+## Language
+
+This project is for Bolivia. Scope is **user-visible text only** — every screen prompt, every generated label, button, tag, and message — in **neutral Spanish**, never English. No regional slang, no Spain-specific vocabulary. The codebase itself (domain terms, `CONTEXT.md`, ADRs, code) stays English, per the existing glossary convention.
+
+Assumed default: informal **"tú"** address (not "usted") — standard for consumer wellness apps in the region. Flag if the studio prefers the formal register.
+
 ## Color Palette
 
 Fixed across all five surfaces (client mobile, trainer mobile, assistant tablet, admin mobile, admin desktop web).

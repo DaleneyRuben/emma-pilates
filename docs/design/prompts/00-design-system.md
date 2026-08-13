@@ -20,6 +20,8 @@ Design a foundational design system for **Emma Pilates Studio**, a warm, sophist
 
 **Typography:** a warm serif for headings, names, and prices; a clean plain sans for body text and UI labels. Comfortable reading size, clear hierarchy.
 
+**Language:** all UI copy is neutral Spanish (this is for Bolivia), informal "tú" address, no regional slang. Any sample text in the type scale or components should be in Spanish, not English.
+
 **Style:**
 - Soft-rounded corners — ~12–16px on cards, ~8px on buttons/inputs. Restrained, not maximal.
 - Thin, single-weight line icons only — no filled glyphs.
