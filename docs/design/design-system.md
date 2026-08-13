@@ -72,3 +72,7 @@ The assistant app is a single responsive mobile app, not a tablet-only design â€
 ### Assistant App Navigation
 
 No tab bar. Client Search is the app's home/root screen â€” an Assistant's work always starts with finding (or creating) the client they're acting on behalf of.
+
+### Admin Mobile App Navigation
+
+No tab bar. Per [ADR-0004](../adr/0004-split-administrator-across-mobile-and-desktop.md), this app carries only two time-critical tasks. Pending Payments is the home/root screen (the one driven by push notifications), with a header action leading into the Cancel Session flow as a secondary path.
