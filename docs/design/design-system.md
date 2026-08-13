@@ -80,3 +80,17 @@ No tab bar. Per [ADR-0004](../adr/0004-split-administrator-across-mobile-and-des
 ### Admin Desktop Web Responsiveness
 
 This is a website, opened in any browser — including a phone's browser — not a native mobile app (that's the separate Admin Mobile App above). It must never break or become unusable at a narrow width: dense tabular views (the income/expense report, Back Office lists) reflow into a stacked/card layout on narrow screens. This does not change ADR-0004's boundary — the work itself (schedule building, Back Office entry, reports) is still designed desktop-first for deliberate, detailed use; a phone browser is a fallback that stays usable, not the intended primary workflow.
+
+### Admin Desktop Web Navigation
+
+A persistent left sidebar (not a mobile tab bar), grouped into five sections:
+
+| Group | Contains |
+|---|---|
+| Horario | Schedule grid, Session form |
+| Catálogo | Planes, Tipos de Clase |
+| Back Office | Insumos, Nómina, Gastos, Categorías de Gasto |
+| Reporte | Income/expense report |
+| Promociones | Promotions carousel management |
+
+A Branch selector sits in the top bar, persistent across every screen except Reporte (which offers its own "todas las sucursales" option since it aggregates), since most Back Office and schedule data is scoped to a single Branch. On narrow/mobile widths (see Admin Desktop Web Responsiveness above), the sidebar collapses into a hamburger-triggered drawer.
