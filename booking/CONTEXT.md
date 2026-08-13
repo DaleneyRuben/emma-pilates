@@ -1,6 +1,6 @@
 # Booking & Membership
 
-Class scheduling, subscriptions, and nutritionist evaluations for clients, trainers, and assistants at a Pilates studio, across one or more branches. Covers the client mobile app and the staff mobile app (shared by Trainers, Assistants, and Administrators, routed by Role).
+Class scheduling, subscriptions, and nutritionist evaluations for clients, trainers, and assistants at a Pilates studio, across one or more branches. Covers the client mobile app and the staff mobile app (shared by Trainers, Assistants, Administrators, and the Nutritionist, routed by Role).
 
 ## Language
 
