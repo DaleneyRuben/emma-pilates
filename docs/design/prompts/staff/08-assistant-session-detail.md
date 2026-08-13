@@ -1,10 +1,10 @@
-# Prompt A06 — Session Detail
+# Prompt S08 — Session Detail (Assistant)
 
-Assistant app. Chains from Prompt A05 (Browse Sessions) — reached by tapping a Session card.
+Staff app, Assistant role. Chains from Prompt S07 (Browse Sessions) — reached by tapping a Session card.
 
 ---
 
-Using the Emma Pilates Studio design system (Prompt 00) and the same structure as the client app's Session Detail screen, design the **Session Detail** screen of the assistant app.
+Using the Emma Pilates Studio design system (Prompt 00) and the same structure as the client app's Session Detail screen, design the **Session Detail** screen of the staff app, as seen by an Assistant.
 
 **Language:** all visible copy is neutral Spanish (Bolivia), informal "tú" address.
 
@@ -20,6 +20,6 @@ Using the Emma Pilates Studio design system (Prompt 00) and the same structure a
 **Show three separate frames for the primary action area, same as the client app:**
 - **Cupos disponibles** — "Reservar" button.
 - **Clase llena** — "Unirme a la lista de espera" button (an Assistant can waitlist a client the same as the client could themselves), with the note "Clase llena. Se avisará al cliente si se libera un cupo."
-- **Sin clases disponibles en el plan** — "Reservar" disabled, with a note "El cliente no tiene clases disponibles en su plan." and a link "Registrar pago" (to Select Plan, Prompt A07).
+- **Sin clases disponibles en el plan** — "Reservar" disabled, with a note "El cliente no tiene clases disponibles en su plan." and a link "Registrar pago" (to Select Plan, Prompt S09).
 
 Generous whitespace, consistent with the rest of the app.

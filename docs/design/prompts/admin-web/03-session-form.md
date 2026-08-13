@@ -18,6 +18,6 @@ Using the Emma Pilates Studio design system (Prompt 00) and the same shell as Ho
 5. Field: "Capacidad" — pre-filled from the selected Class Type's default capacity, editable (e.g. reduced when equipment is out of service).
 6. A "Guardar" primary button (Palo de rosa fill).
 
-**Show two frames**: **Nueva sesión** (empty form) and **Editar sesión** (pre-filled with an existing Session's values, plus a secondary "Cancelar sesión" text link at the bottom in the Error semantic color — the same underlying action as the admin mobile app's emergency cancellation, Prompt AM05: it refunds every affected Booking and notifies the clients. It's reachable here too since an Administrator already editing the schedule at a desk shouldn't have to switch to their phone for it).
+**Show two frames**: **Nueva sesión** (empty form) and **Editar sesión** (pre-filled with an existing Session's values, plus a secondary "Cancelar sesión" text link at the bottom in the Error semantic color — the same underlying action as the staff app's Administrator emergency cancellation, Prompt S14: it refunds every affected Booking and notifies the clients. It's reachable here too since an Administrator already editing the schedule at a desk shouldn't have to switch to their phone for it).
 
 Clean desktop density, consistent with the schedule grid.

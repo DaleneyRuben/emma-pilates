@@ -1,10 +1,10 @@
-# Prompt A05 — Browse Sessions
+# Prompt S07 — Browse Sessions (Assistant)
 
-Assistant app. Chains from Prompt A04 (Client Overview) — reached by tapping "Reservar clase". Prompt A06 (Session Detail) chains from this one.
+Staff app, Assistant role. Chains from Prompt S06 (Client Overview) — reached by tapping "Reservar clase". Prompt S08 (Session Detail) chains from this one.
 
 ---
 
-Using the Emma Pilates Studio design system (Prompt 00) and the same structure as the client app's Browse Sessions screen, design the **Browse Sessions** screen of the assistant app — used by an Assistant to book a Session on behalf of the selected client.
+Using the Emma Pilates Studio design system (Prompt 00) and the same structure as the client app's Browse Sessions screen, design the **Browse Sessions** screen of the staff app, as seen by an Assistant booking a Session on behalf of the selected client.
 
 **Language:** all visible copy is neutral Spanish (Bolivia), informal "tú" address.
 
@@ -18,6 +18,6 @@ Using the Emma Pilates Studio design system (Prompt 00) and the same structure a
 3. Branch selector, date picker, and Class Type filter chips — identical in style to the client app's Browse Sessions.
 4. Session list, one card per Session (time, Class Type, Trainer, spots indicator), identical in style to the client app's.
 
-Tapping a Session card navigates to Session Detail (Prompt A06).
+Tapping a Session card navigates to Session Detail (Prompt S08).
 
 Generous whitespace, soft-rounded cards per the design system.

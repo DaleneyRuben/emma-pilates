@@ -1,10 +1,10 @@
-# Prompt A08 — Confirm Cash Payment
+# Prompt S10 — Confirm Cash Payment (Assistant)
 
-Assistant app. Chains from Prompt A07 (Select Plan) — reached by tapping a Plan card. A cash Payment is confirmed the moment the Assistant records it (unlike the client's transfer flow), so this screen covers both the confirmation step and the instant success result.
+Staff app, Assistant role. Chains from Prompt S09 (Select Plan) — reached by tapping a Plan card. A cash Payment is confirmed the moment the Assistant records it (unlike the client's transfer flow), so this screen covers both the confirmation step and the instant success result.
 
 ---
 
-Using the Emma Pilates Studio design system (Prompt 00) and consistent with Select Plan (Prompt A07), design the **Confirm Cash Payment** screen of the assistant app.
+Using the Emma Pilates Studio design system (Prompt 00) and consistent with Select Plan (Prompt S09), design the **Confirm Cash Payment** screen of the staff app, as seen by an Assistant.
 
 **Language:** all visible copy is neutral Spanish (Bolivia), informal "tú" address.
 
@@ -23,6 +23,6 @@ Using the Emma Pilates Studio design system (Prompt 00) and consistent with Sele
 - A success-colored status icon/illustration.
 - "¡Pago registrado!" as the main message.
 - A summary card of the client's new/renewed Subscription: Plan name, class allowance, and the new paid-through end date.
-- A "Volver al cliente" primary button, returning to Client Overview (Prompt A04).
+- A "Volver al cliente" primary button, returning to Client Overview (Prompt S06).
 
 Generous whitespace, consistent with the rest of the app.

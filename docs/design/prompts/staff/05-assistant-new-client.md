@@ -1,10 +1,10 @@
-# Prompt A03 — New Client
+# Prompt S05 — New Client (Assistant)
 
-Assistant app. Chains from Prompt A02 (Client Search) — reached by tapping "+ Nuevo cliente".
+Staff app, Assistant role. Chains from Prompt S04 (Client Search) — reached by tapping "+ Nuevo cliente".
 
 ---
 
-Using the Emma Pilates Studio design system (Prompt 00) and consistent with Client Search (Prompt A02), design the **New Client** screen of the assistant app, where an Assistant creates a client account on their behalf.
+Using the Emma Pilates Studio design system (Prompt 00) and consistent with Client Search (Prompt S04), design the **New Client** screen of the staff app, as seen by an Assistant, who creates a client account on their behalf.
 
 **Language:** all visible copy is neutral Spanish (Bolivia), informal "tú" address.
 
@@ -19,6 +19,6 @@ Using the Emma Pilates Studio design system (Prompt 00) and consistent with Clie
 4. A read-only "Contraseña temporal" field showing a system-generated temporary password, with a small "Copiar" button next to it — the Assistant relays this to the client directly.
 5. A "Crear cuenta" primary button (Palo de rosa fill).
 
-After creating the account, the Assistant would land on Client Overview (Prompt A04) for the new client — no separate confirmation screen needed.
+After creating the account, the Assistant would land on Client Overview (Prompt S06) for the new client — no separate confirmation screen needed.
 
 Generous whitespace, consistent with the rest of the app.

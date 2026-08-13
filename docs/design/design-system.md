@@ -14,7 +14,7 @@ Assumed default: informal **"tú"** address (not "usted") — standard for consu
 
 ## Color Palette
 
-Fixed across all five surfaces (client mobile, trainer mobile, assistant tablet, admin mobile, admin desktop web).
+Fixed across all three apps: the client mobile app, the staff mobile app (Trainer/Assistant/Administrator, routed by Role), and the admin desktop web app.
 
 | Name | Hex | Role |
 |---|---|---|
@@ -61,25 +61,21 @@ Four tabs, present on every authenticated client screen except Login/Sign Up:
 
 Plans & Payment, Subscription detail, Evaluations, and Referrals are not top-level tabs — they're reached from Home quick-action cards and/or from Perfil, keeping the tab bar at four items.
 
-### Trainer App Navigation
+### Staff App
 
-No tab bar. The trainer app is a narrow, single-purpose tool (view own Sessions, mark Attendance) — My Schedule is the app's home screen, with a simple header + back-arrow pattern for drilling into a Session's roster.
+**One app, three Roles.** Trainers, Assistants, and Administrators share a single mobile app and a single login (Prompt S01) — there is no separate install per Role and no role picker, since every Staff Member has exactly one Role. After authenticating, the app routes straight to the home screen for that account's Role:
 
-### Assistant App Responsiveness
+| Role | Home screen | Scope |
+|---|---|---|
+| Trainer | My Schedule | View own Sessions, mark Attendance. Narrow, single-purpose. |
+| Assistant | Client Search | Find/create a client, book or record a cash Payment on their behalf. Responsive to both phone and tablet — assistants commonly use tablets at the front desk, but the same app must also work well on a phone (mobile-first layout, adapting at tablet width — e.g. a list-only phone layout becoming a side-by-side list-and-detail layout). |
+| Administrator | Pending Payments | Per [ADR-0004](../adr/0004-split-administrator-across-mobile-and-desktop.md), only two time-critical tasks: confirm/reject a pending transfer Payment, and cancel a Session as a last resort. Pending Payments is what a push notification opens directly into, with a header action leading into the Cancel Session flow as a secondary path. |
 
-The assistant app is a single responsive mobile app, not a tablet-only design — assistants commonly use tablets at the front desk, but the same app must also work well on a phone. Screen prompts should describe a mobile-first layout plus how it adapts at tablet width (e.g. a list-only phone layout becoming a side-by-side list-and-detail layout on tablet), not a fixed tablet-only composition.
-
-### Assistant App Navigation
-
-No tab bar. Client Search is the app's home/root screen — an Assistant's work always starts with finding (or creating) the client they're acting on behalf of.
-
-### Admin Mobile App Navigation
-
-No tab bar. Per [ADR-0004](../adr/0004-split-administrator-across-mobile-and-desktop.md), this app carries only two time-critical tasks. Pending Payments is the home/root screen (the one driven by push notifications), with a header action leading into the Cancel Session flow as a secondary path.
+No tab bar for any Role — each is a header + back-arrow drill-down from its home screen, since none of the three needs more than a couple of levels of navigation.
 
 ### Admin Desktop Web Responsiveness
 
-This is a website, opened in any browser — including a phone's browser — not a native mobile app (that's the separate Admin Mobile App above). It must never break or become unusable at a narrow width: dense tabular views (the income/expense report, Back Office lists) reflow into a stacked/card layout on narrow screens. This does not change ADR-0004's boundary — the work itself (schedule building, Back Office entry, reports) is still designed desktop-first for deliberate, detailed use; a phone browser is a fallback that stays usable, not the intended primary workflow.
+This is a website, opened in any browser — including a phone's browser — not the staff mobile app above. It must never break or become unusable at a narrow width: dense tabular views (the income/expense report, Back Office lists) reflow into a stacked/card layout on narrow screens. This does not change ADR-0004's boundary — the work itself (schedule building, Back Office entry, reports) is still designed desktop-first for deliberate, detailed use; a phone browser is a fallback that stays usable, not the intended primary workflow.
 
 ### Admin Desktop Web Navigation
 

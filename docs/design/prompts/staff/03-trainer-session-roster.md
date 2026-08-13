@@ -1,10 +1,10 @@
-# Prompt T03 — Session Roster
+# Prompt S03 — Session Roster (Trainer)
 
-Trainer mobile app. Chains from Prompt T02 (My Schedule) — reached by tapping a Session card. Attendance can only be recorded once the Session has occurred, so this screen has two meaningfully different states.
+Staff app, Trainer role. Chains from Prompt S02 (My Schedule) — reached by tapping a Session card. Attendance can only be recorded once the Session has occurred, so this screen has two meaningfully different states.
 
 ---
 
-Using the Emma Pilates Studio design system (Prompt 00) and consistent with My Schedule (Prompt T02), design the **Session Roster** screen of the trainer mobile app.
+Using the Emma Pilates Studio design system (Prompt 00) and consistent with My Schedule (Prompt S02), design the **Session Roster** screen of the staff app, as seen by a Trainer.
 
 **Language:** all visible copy is neutral Spanish (Bolivia), informal "tú" address.
 

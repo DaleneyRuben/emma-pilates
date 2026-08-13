@@ -1,10 +1,10 @@
-# Prompt AM03 — Payment Review
+# Prompt S12 — Payment Review (Administrator)
 
-Admin mobile app. Chains from Prompt AM02 (Pending Payments) — reached by tapping a pending Payment card.
+Staff app, Administrator role. Chains from Prompt S11 (Pending Payments) — reached by tapping a pending Payment card.
 
 ---
 
-Using the Emma Pilates Studio design system (Prompt 00) and consistent with Pending Payments (Prompt AM02), design the **Payment Review** screen of the admin mobile app — where the Administrator checks a client's transfer receipt against the studio's bank app and confirms or rejects it.
+Using the Emma Pilates Studio design system (Prompt 00) and consistent with Pending Payments (Prompt S11), design the **Payment Review** screen of the staff app, as seen by an Administrator, checking a client's transfer receipt against the studio's bank app and confirming or rejecting it.
 
 **Language:** all visible copy is neutral Spanish (Bolivia), informal "tú" address.
 

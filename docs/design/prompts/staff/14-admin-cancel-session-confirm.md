@@ -1,10 +1,10 @@
-# Prompt AM05 — Cancel Session Confirm
+# Prompt S14 — Cancel Session Confirm (Administrator)
 
-Admin mobile app. Chains from Prompt AM04 (Cancel Session Search) — reached by tapping a Session card. This is a destructive, last-resort action, so the screen leads with the consequences.
+Staff app, Administrator role. Chains from Prompt S13 (Cancel Session Search) — reached by tapping a Session card. This is a destructive, last-resort action, so the screen leads with the consequences.
 
 ---
 
-Using the Emma Pilates Studio design system (Prompt 00) and consistent with Cancel Session Search (Prompt AM04), design the **Cancel Session Confirm** screen of the admin mobile app.
+Using the Emma Pilates Studio design system (Prompt 00) and consistent with Cancel Session Search (Prompt S13), design the **Cancel Session Confirm** screen of the staff app, as seen by an Administrator.
 
 **Language:** all visible copy is neutral Spanish (Bolivia), informal "tú" address.
 
