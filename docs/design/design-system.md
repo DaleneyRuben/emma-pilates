@@ -76,3 +76,7 @@ No tab bar. Client Search is the app's home/root screen — an Assistant's work 
 ### Admin Mobile App Navigation
 
 No tab bar. Per [ADR-0004](../adr/0004-split-administrator-across-mobile-and-desktop.md), this app carries only two time-critical tasks. Pending Payments is the home/root screen (the one driven by push notifications), with a header action leading into the Cancel Session flow as a secondary path.
+
+### Admin Desktop Web Responsiveness
+
+This is a website, opened in any browser — including a phone's browser — not a native mobile app (that's the separate Admin Mobile App above). It must never break or become unusable at a narrow width: dense tabular views (the income/expense report, Back Office lists) reflow into a stacked/card layout on narrow screens. This does not change ADR-0004's boundary — the work itself (schedule building, Back Office entry, reports) is still designed desktop-first for deliberate, detailed use; a phone browser is a fallback that stays usable, not the intended primary workflow.
