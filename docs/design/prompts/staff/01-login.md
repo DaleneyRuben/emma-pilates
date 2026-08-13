@@ -1,12 +1,12 @@
 # Prompt S01 — Login
 
-Staff app. Entry screen, shared by all three Roles (Trainer, Assistant, Administrator) — references Prompt 00 (design system) only.
+Staff app. Entry screen, shared by all four Roles (Trainer, Assistant, Administrator, Nutritionist) — references Prompt 00 (design system) only.
 
-After authenticating, the app routes to the home screen matching the logged-in Staff Member's Role — there is no role picker, since each Staff Member has exactly one Role: Trainer → Schedule (Prompt S02), Assistant → Client Search (Prompt S04), Administrator → Pending Payments (Prompt S11). The Nutritionist role has no screens in this app (they publish Availability and hold Evaluations, handled elsewhere).
+After authenticating, the app routes to the home screen matching the logged-in Staff Member's Role — there is no role picker, since each Staff Member has exactly one Role: Trainer → Schedule (Prompt S02), Assistant → Client Search (Prompt S04), Administrator → Pending Payments (Prompt S11), Nutritionist → Mi Agenda (Prompt S15).
 
 ---
 
-Using the Emma Pilates Studio design system established in Prompt 00, design the **Login** screen for the staff app — the single app used by Trainers, Assistants, and Administrators.
+Using the Emma Pilates Studio design system established in Prompt 00, design the **Login** screen for the staff app — the single app used by Trainers, Assistants, Administrators, and the Nutritionist.
 
 Staff Member accounts are created by an Administrator, never self-registered — so there is **no Sign Up mode**, a single login form only.
 

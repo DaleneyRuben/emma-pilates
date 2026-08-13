@@ -63,15 +63,16 @@ Plans & Payment, Subscription detail, Evaluations, and Referrals are not top-lev
 
 ### Staff App
 
-**One app, three Roles.** Trainers, Assistants, and Administrators share a single mobile app and a single login (Prompt S01) — there is no separate install per Role and no role picker, since every Staff Member has exactly one Role. After authenticating, the app routes straight to the home screen for that account's Role:
+**One app, four Roles.** Trainers, Assistants, Administrators, and the Nutritionist share a single mobile app and a single login (Prompt S01) — there is no separate install per Role and no role picker, since every Staff Member has exactly one Role. After authenticating, the app routes straight to the home screen for that account's Role:
 
 | Role | Home screen | Scope |
 |---|---|---|
 | Trainer | My Schedule | View own Sessions, mark Attendance. Narrow, single-purpose. |
 | Assistant | Client Search | Find/create a client, book or record a cash Payment on their behalf. Responsive to both phone and tablet — assistants commonly use tablets at the front desk, but the same app must also work well on a phone (mobile-first layout, adapting at tablet width — e.g. a list-only phone layout becoming a side-by-side list-and-detail layout). |
 | Administrator | Pending Payments | Per [ADR-0004](../adr/0004-split-administrator-across-mobile-and-desktop.md), only two time-critical tasks: confirm/reject a pending transfer Payment, and cancel a Session as a last resort. Pending Payments is what a push notification opens directly into, with a header action leading into the Cancel Session flow as a secondary path. |
+| Nutritionist | Mi Agenda | See who's booked into upcoming Evaluations, and publish/manage Availability Blocks (the open time ranges Evaluation slots are auto-generated from) as a secondary path. |
 
-No tab bar for any Role — each is a header + back-arrow drill-down from its home screen, since none of the three needs more than a couple of levels of navigation.
+No tab bar for any Role — each is a header + back-arrow drill-down from its home screen, since none of the four needs more than a couple of levels of navigation.
 
 ### Admin Desktop Web Responsiveness
 
