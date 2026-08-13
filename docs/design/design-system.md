@@ -94,3 +94,5 @@ A persistent left sidebar (not a mobile tab bar), grouped into five sections:
 | Promociones | Promotions carousel management |
 
 A Branch selector sits in the top bar, persistent across every screen except Reporte (which offers its own "todas las sucursales" option since it aggregates), since most Back Office and schedule data is scoped to a single Branch. On narrow/mobile widths (see Admin Desktop Web Responsiveness above), the sidebar collapses into a hamburger-triggered drawer.
+
+List pages (Planes, Tipos de Clase, Insumos, Nómina, Gastos, Categorías de Gasto, Promociones) use a dense data table with sortable columns, not mobile-style cards — this is scanned/operated desktop work. Each row opens its Form as a side panel; a "+ Nuevo" button in the page header creates one. On narrow widths, tables reflow into a stacked card-per-row layout per the Admin Desktop Web Responsiveness note.
