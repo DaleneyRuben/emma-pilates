@@ -19,3 +19,25 @@ Fixed across all five surfaces (client mobile, trainer mobile, assistant tablet,
 | Marfil | `#FAF7F2` | Background / light neutral |
 
 Every screen-generation prompt should reference this palette by name and hex so results stay consistent across surfaces.
+
+## Semantic Colors
+
+Status indicators (Booking confirmed/cancelled, Payment pending/confirmed, Subscription active/expired) use dedicated semantic hues, kept separate from the brand accent above so status reads at a glance without borrowing Palo de rosa's meaning.
+
+| Name | Hex | Role |
+|---|---|---|
+| Success | `#7C9473` | Confirmed / active / attended |
+| Warning | `#C99A4E` | Pending |
+| Error | `#B25D4B` | Cancelled / expired / no-show |
+
+## Style Conventions
+
+Applies to every surface unless a surface-specific prompt overrides it.
+
+- **Corners**: soft-rounded — ~12–16px on cards, ~8px on buttons and inputs. Restrained, not maximal.
+- **Icons**: thin, single-weight line icons only. No filled glyphs.
+- **Density**: spacious — generous whitespace between elements, not a dense enterprise layout.
+- **Typography**: a warm serif for headings, class names, and prices; a clean plain sans for body text and UI labels.
+- **Buttons/CTAs**: solid fill in Palo de rosa, rounded rectangle, generous mobile-first tap targets.
+- **Cards**: Marfil/white surface, thin Arena cálida border, soft shadow.
+- **Navigation** (mobile surfaces): bottom tab bar for primary sections.
