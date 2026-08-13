@@ -64,3 +64,11 @@ Plans & Payment, Subscription detail, Evaluations, and Referrals are not top-lev
 ### Trainer App Navigation
 
 No tab bar. The trainer app is a narrow, single-purpose tool (view own Sessions, mark Attendance) — My Schedule is the app's home screen, with a simple header + back-arrow pattern for drilling into a Session's roster.
+
+### Assistant App Responsiveness
+
+The assistant app is a single responsive mobile app, not a tablet-only design — assistants commonly use tablets at the front desk, but the same app must also work well on a phone. Screen prompts should describe a mobile-first layout plus how it adapts at tablet width (e.g. a list-only phone layout becoming a side-by-side list-and-detail layout on tablet), not a fixed tablet-only composition.
+
+### Assistant App Navigation
+
+No tab bar. Client Search is the app's home/root screen — an Assistant's work always starts with finding (or creating) the client they're acting on behalf of.
