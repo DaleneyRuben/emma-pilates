@@ -47,3 +47,16 @@ Applies to every surface unless a surface-specific prompt overrides it.
 - **Buttons/CTAs**: solid fill in Palo de rosa, rounded rectangle, generous mobile-first tap targets.
 - **Cards**: Marfil/white surface, thin Arena cálida border, soft shadow.
 - **Navigation** (mobile surfaces): bottom tab bar for primary sections.
+
+### Client App Tab Bar
+
+Four tabs, present on every authenticated client screen except Login/Sign Up:
+
+| Tab | Leads to |
+|---|---|
+| Inicio | Home dashboard |
+| Reservar | Browse Sessions → Session Detail |
+| Mis Reservas | My Bookings list → Reschedule / Class History |
+| Perfil | Profile, Notifications, Subscription detail, Plans & Payment, Evaluations, Referrals |
+
+Plans & Payment, Subscription detail, Evaluations, and Referrals are not top-level tabs — they're reached from Home quick-action cards and/or from Perfil, keeping the tab bar at four items.
