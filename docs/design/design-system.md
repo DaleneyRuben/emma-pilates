@@ -60,3 +60,7 @@ Four tabs, present on every authenticated client screen except Login/Sign Up:
 | Perfil | Profile, Notifications, Subscription detail, Plans & Payment, Evaluations, Referrals |
 
 Plans & Payment, Subscription detail, Evaluations, and Referrals are not top-level tabs — they're reached from Home quick-action cards and/or from Perfil, keeping the tab bar at four items.
+
+### Trainer App Navigation
+
+No tab bar. The trainer app is a narrow, single-purpose tool (view own Sessions, mark Attendance) — My Schedule is the app's home screen, with a simple header + back-arrow pattern for drilling into a Session's roster.
