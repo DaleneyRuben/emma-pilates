@@ -1,6 +1,6 @@
 # Split the Administrator across a mobile and a desktop surface
 
-Status: accepted
+Status: accepted, payment confirmation extended to desktop by [ADR-0006](./0006-extend-payment-confirmation-to-desktop-admin.md)
 
 The Administrator does two kinds of work that pull in opposite directions, so rather than pick one surface we split them by urgency. **Mobile** carries only the time-critical things that cannot wait for the admin to reach a desk: confirming or rejecting a pending transfer Payment, and cancelling a Session that has Bookings when no substitute Trainer can cover it. **Desktop web** carries the deliberate work: Back Office entry (Supplies, Withdrawals, Salary Payments, Expenses), the income/expense report, building the Session schedule, and managing Promotions and Expense Categories.
 
