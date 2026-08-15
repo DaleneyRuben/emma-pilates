@@ -109,9 +109,9 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 Reference width **1440px**; a 420px narrow-browser variant is drawn for every screen.
 
 - **Top bar**, 44px, white, bottom border `#E4D8CC`: brand wordmark "Emma" (Lora 21) in a 236px cell with a right border, then on the right a **branch selector** (`Sucursal Equipetrol`, pin icon, chevron) and a **user menu** (26px `#D8BDB8` avatar with initials, name, chevron).
-  - The branch selector scopes most pages. Exceptions: **AW11 Nómina** is not branch-scoped; **AW16 Reporte** replaces the top-bar selector with its own selector that adds "Todas las sucursales".
+  - The branch selector scopes most pages. Exceptions: **AW11 Nómina** and **AW28 Pagos** are not branch-scoped (Payments follow the studio-wide Subscription, same as Salary Payments follow a Staff Member rather than a Branch); **AW16 Reporte** replaces the top-bar selector with its own selector that adds "Todas las sucursales".
 - **Sidebar**, 236px, white, right border `#E4D8CC`, padding 18px/12px, 4px gaps. Top-level items are 36px rows with a 15px icon; group labels are 10px uppercase `0.18em` `#A79E9A`; group children are 32px rows indented to 22px left padding. Sections auto-expand; the active group label turns `#B78380`.
-  - Order: **Horario** · *Catálogo* (Tipos de clase, Planes, Sucursales) · *Back Office* (Clientes, Pagos ⟨badge 6⟩, Insumos ⟨badge 3, warning tint⟩, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto) · **Reporte** · *Promociones* (Promociones, Referidos, Créditos, Descuentos).
+  - Order: **Horario** · *Catálogo* (Tipos de clase, Planes, Sucursales) · *Back Office* (Clientes, Pagos ⟨badge 6⟩, Insumos ⟨badge 3, warning tint⟩, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto) · **Reporte** · *Promociones* (Promociones, Referidos, Créditos). Descuentos has been dropped — see "Admin web — known gaps" below.
   - Active item: `#EFE0DC` background, `#8A5D59` text, weight 500. Hover: `#FAF3EC` background, `#B78380` text.
   - Counter badges: 18px tall pill, `#EFE0DC`/`#8A5D59`, or warning `rgba(201,154,78,0.18)`/`#9A7434`.
 - **Main area**: `#FAF7F2`, padding 24px 26px 32px, 18px column gap. Header row = page title (Lora 27) + one-line subtitle (12.5 `#8A807C`) on the left, primary action(s) on the right.
@@ -212,11 +212,12 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 ### Admin web — known gaps
 
-The sidebar shell (AW02–AW18) carries eight nav links with no screen behind them: Sucursales, Clientes, Pagos, Evaluaciones nutricionales, Personal, Referidos, Créditos, Descuentos. Prompts now exist for six of them (`AW19`–`AW27`, in `docs/design/prompts/admin-web/`); screens should be generated from those prompts and added to this bundle, and the six links pointed at the new screens once they land.
+The sidebar shell (AW02–AW18) carries eight nav links with no screen behind them: Sucursales, Clientes, Pagos, Evaluaciones nutricionales, Personal, Referidos, Créditos, Descuentos. Both open questions are now resolved:
 
-The other two links still go nowhere on purpose, pending a decision — do not prompt these yet:
-- **Pagos** — a desktop payments list conflicts with [ADR-0004](../docs/adr/0004-split-administrator-across-mobile-and-desktop.md), which puts payment confirmation on mobile only. Needs either a read-only-history variant that doesn't duplicate the mobile confirm/reject flow, or a deliberate amendment to that ADR.
-- **Descuentos** — no backing domain concept. `booking/CONTEXT.md` lists "Discount" as a term to avoid for `Credit`, and states `Promotion` carries no discount effect. Needs a domain decision (what would a Descuento even be?) before it can be designed.
+- **Pagos** — per [ADR-0006](../docs/adr/0006-extend-payment-confirmation-to-desktop-admin.md), confirming/rejecting a transfer Payment is now available on desktop too (in addition to, not instead of, the mobile flow in Prompts S11/S12). Prompted as `AW28` (list) / `AW29` (review panel).
+- **Descuentos** — no backing domain concept exists (`booking/CONTEXT.md` lists "Discount" as a term to avoid for `Credit`, and states `Promotion` carries no discount effect), so this link should be **removed** from the sidebar, not designed. No prompt was written for it.
+
+Prompts exist for the remaining seven live items — `AW19`–`AW29` (skipping nothing except Descuentos), in `docs/design/prompts/admin-web/`. Screens should be generated from those prompts and added to this bundle; the sidebar links should point at the new screens once they land, and the Descuentos link should be deleted at the same time.
 
 ---
 

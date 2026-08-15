@@ -85,10 +85,10 @@ A persistent left sidebar (not a mobile tab bar), grouped into five sections:
 | Group | Contains |
 |---|---|
 | Horario | Schedule grid, Session form |
-| Catálogo | Planes, Tipos de Clase |
-| Back Office | Insumos, Nómina, Gastos, Categorías de Gasto |
+| Catálogo | Planes, Tipos de Clase, Sucursales |
+| Back Office | Insumos, Nómina, Gastos, Categorías de Gasto, Pagos, Personal, Clientes, Evaluaciones nutricionales |
 | Reporte | Income/expense report |
-| Promociones | Promotions carousel management |
+| Promociones | Promotions carousel management, Referidos, Créditos |
 
 A Branch selector sits in the top bar, persistent across every screen except Reporte (which offers its own "todas las sucursales" option since it aggregates), since most Back Office and schedule data is scoped to a single Branch. On narrow/mobile widths (see Admin Desktop Web Responsiveness above), the sidebar collapses into a hamburger-triggered drawer.
 
