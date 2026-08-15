@@ -210,6 +210,14 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW17` | Promociones | Drag-to-reorder card list (order = carousel order) |
 | `AW18` | Formulario de promoción | Image upload, título, descripción, date range |
 
+### Admin web — known gaps
+
+The sidebar shell (AW02–AW18) carries eight nav links with no screen behind them: Sucursales, Clientes, Pagos, Evaluaciones nutricionales, Personal, Referidos, Créditos, Descuentos. Prompts now exist for six of them (`AW19`–`AW27`, in `docs/design/prompts/admin-web/`); screens should be generated from those prompts and added to this bundle, and the six links pointed at the new screens once they land.
+
+The other two links still go nowhere on purpose, pending a decision — do not prompt these yet:
+- **Pagos** — a desktop payments list conflicts with [ADR-0004](../docs/adr/0004-split-administrator-across-mobile-and-desktop.md), which puts payment confirmation on mobile only. Needs either a read-only-history variant that doesn't duplicate the mobile confirm/reject flow, or a deliberate amendment to that ADR.
+- **Descuentos** — no backing domain concept. `booking/CONTEXT.md` lists "Discount" as a term to avoid for `Credit`, and states `Promotion` carries no discount effect. Needs a domain decision (what would a Descuento even be?) before it can be designed.
+
 ---
 
 ## Interactions & behavior
