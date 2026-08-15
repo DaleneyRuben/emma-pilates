@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  input::placeholder { color: #A79E9A; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 01</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Iniciar sesión · Registrarse</h1>
+    <p style="margin:0;max-width:640px;font-size:15px;line-height:1.6;color:#8A807C;">Entrada previa a la sesión: sin barra de pestañas ni navegación. Un solo marco visual, dos modos enlazados por el texto inferior.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;justify-content:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Iniciar sesión</div>
+          <div style="font-size:12px;color:#8A807C;">Acceso rápido con Face ID</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;justify-content:space-between;gap:40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:24px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" placeholder="tu@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" placeholder="••••••••" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Iniciar sesión</button>
+            <sc-if value="{{ showBiometric }}" hint-placeholder-val="{{ true }}">
+              <button style="height:52px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#4A4A4A;font-size:15px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><path d="M4 9V6.5A2.5 2.5 0 0 1 6.5 4H9"></path><path d="M15 4h2.5A2.5 2.5 0 0 1 20 6.5V9"></path><path d="M20 15v2.5a2.5 2.5 0 0 1-2.5 2.5H15"></path><path d="M9 20H6.5A2.5 2.5 0 0 1 4 17.5V15"></path><line x1="9.2" y1="10" x2="9.2" y2="11.6"></line><line x1="14.8" y1="10" x2="14.8" y2="11.6"></line><path d="M12 10v3.2"></path><path d="M9.6 15.6c1.5 1.1 3.3 1.1 4.8 0"></path></svg>
+                Iniciar sesión con Face ID
+              </button>
+            </sc-if>
+            <a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">¿Olvidaste tu contraseña?</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+            <div style="width:100%;height:1px;background:#EFE7DE;"></div>
+            <div style="font-size:14px;color:#8A807C;">¿No tienes una cuenta? <a href="#" style="color:#B78380;font-weight:500;">Regístrate</a></div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Iniciar sesión</div>
+          <div style="font-size:12px;color:#8A807C;">Acceso rápido con huella digital</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;padding:72px 28px 44px;display:flex;flex-direction:column;justify-content:space-between;gap:40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:24px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" placeholder="tu@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" placeholder="••••••••" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Iniciar sesión</button>
+            <sc-if value="{{ showBiometric }}" hint-placeholder-val="{{ true }}">
+              <button style="height:52px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#4A4A4A;font-size:15px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><path d="M4 8.6a9 9 0 0 1 16 0"></path><path d="M5.5 12.5a6.5 6.5 0 0 1 13 0v3.5"></path><path d="M8.6 12.5a3.4 3.4 0 0 1 6.8 0v5"></path><path d="M12 12.5v6.6"></path></svg>
+                Iniciar sesión con huella digital
+              </button>
+            </sc-if>
+            <a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">¿Olvidaste tu contraseña?</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+            <div style="width:100%;height:1px;background:#EFE7DE;"></div>
+            <div style="font-size:14px;color:#8A807C;">¿No tienes una cuenta? <a href="#" style="color:#B78380;font-weight:500;">Regístrate</a></div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Registrarse</div>
+          <div style="font-size:12px;color:#8A807C;">Código de referido colapsado · toca para desplegar</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;justify-content:space-between;gap:36px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:16px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+              <input type="text" placeholder="Tu nombre y apellido" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" placeholder="tu@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" placeholder="Mínimo 8 caracteres" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <sc-if value="{{ referralClosed }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ toggleReferral }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:14px;cursor:pointer;text-align:left;">
+                ¿Tienes un código de referido?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
+              </button>
+            </sc-if>
+            <sc-if value="{{ referralOpen }}">
+              <label style="display:flex;flex-direction:column;gap:8px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Código de referido</span>
+                <input type="text" placeholder="Ej. EMMA-2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;letter-spacing:0.06em;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              </label>
+            </sc-if>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Crear cuenta</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+            <div style="width:100%;height:1px;background:#EFE7DE;"></div>
+            <div style="font-size:14px;color:#8A807C;">¿Ya tienes una cuenta? <a href="#" style="color:#B78380;font-weight:500;">Inicia sesión</a></div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Registrarse con código</div>
+          <div style="font-size:12px;color:#8A807C;">Estado desplegado del campo opcional</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;justify-content:space-between;gap:32px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+              <input type="text" placeholder="Tu nombre y apellido" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" placeholder="tu@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" placeholder="Mínimo 8 caracteres" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid #D8C9BB;border-radius:12px;background:rgba(216,189,184,0.16);">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Código de referido</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,14.5 12,8.5 18,14.5"></polyline></svg>
+              </div>
+              <input type="text" placeholder="Ej. EMMA-2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;letter-spacing:0.06em;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <span style="font-size:12px;color:#8A807C;line-height:1.5;">Tu amiga y tú reciben una clase de regalo al completar tu primer paquete.</span>
+            </div>
+            <button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Crear cuenta</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+            <div style="width:100%;height:1px;background:#EFE7DE;"></div>
+            <div style="font-size:14px;color:#8A807C;">¿Ya tienes una cuenta? <a href="#" style="color:#B78380;font-weight:500;">Inicia sesión</a></div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Estados de campo</span>Reposo: borde arena. Foco: borde palo de rosa con halo de 3 px. Error: borde #B25D4B y nota bajo el campo.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Biometría</span>Se ofrece solo si el dispositivo la tiene registrada; nunca reemplaza a la contraseña en el primer acceso.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Código de referido</span>Oculto por defecto; el enlace lo despliega. Área táctil de 44 px de alto.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Después de entrar</span>La app abre en Inicio, con la barra de pestañas de la app de cliente.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;showBiometric&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Iniciar sesión&quot;},&quot;fieldStyle&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Blanco&quot;,&quot;Marfil&quot;],&quot;default&quot;:&quot;Blanco&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Campos&quot;}}">
+class Component extends DCLogic {
+  state = { referral: false };
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      showBiometric: this.props.showBiometric ?? true,
+      inputBg: (this.props.fieldStyle ?? "Blanco") === "Marfil" ? "#FFFDFA" : "#FFFFFF",
+      referralOpen: this.state.referral,
+      referralClosed: !this.state.referral,
+      toggleReferral: () => this.setState(s => ({ referral: !s.referral }))
+    };
+  }
+}
+</script>
+</body>
+</html>

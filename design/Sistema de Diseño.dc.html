@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FAF7F2; -webkit-font-smoothing: antialiased; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#FAF7F2;color:#4A4A4A;font-family:'Work Sans',system-ui,sans-serif;padding:64px 48px 96px;">
+<div style="max-width:1080px;margin:0 auto;display:flex;flex-direction:column;gap:{{ sectionGap }};">
+
+  <header style="display:flex;flex-direction:column;gap:20px;padding-bottom:40px;border-bottom:1px solid #D8C9BB;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Sistema de diseño · v1.0</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:52px;line-height:1.08;margin:0;letter-spacing:-0.01em;">Emma Pilates Studio</h1>
+    <div style="font-family:Lora,Georgia,serif;font-style:italic;font-size:20px;color:#8A807C;">Movimiento · Equilibrio · Bienestar</div>
+    <p style="max-width:620px;margin:8px 0 0;font-size:16px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Lenguaje visual compartido para las tres aplicaciones del estudio: app de cliente, app de staff (entrenadora, asistente y administración) y panel web de administración. Una sola marca; cada superficie respeta las convenciones de su dispositivo.</p>
+  </header>
+
+  <section style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">01</div>
+      <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;margin:0;">Color</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#8A807C;max-width:620px;">Paleta de marca cerrada. Palo de rosa se reserva para acciones y estados activos; nunca se usa como fondo amplio.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:132px;border-radius:14px;background:#4A4A4A;border:1px solid rgba(74,74,74,0.10);"></div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:15px;font-weight:500;">Plomo cálido</div>
+          <sc-if value="{{ showSpecs }}" hint-placeholder-val="{{ true }}"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#A79E9A;">#4A4A4A</div></sc-if>
+          <div style="font-size:13px;color:#8A807C;line-height:1.5;">Texto principal</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:132px;border-radius:14px;background:#B78380;border:1px solid rgba(74,74,74,0.06);"></div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:15px;font-weight:500;">Palo de rosa</div>
+          <sc-if value="{{ showSpecs }}" hint-placeholder-val="{{ true }}"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#A79E9A;">#B78380</div></sc-if>
+          <div style="font-size:13px;color:#8A807C;line-height:1.5;">Acento primario</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:132px;border-radius:14px;background:#D8BDB8;border:1px solid rgba(74,74,74,0.06);"></div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:15px;font-weight:500;">Rosa empolvado</div>
+          <sc-if value="{{ showSpecs }}" hint-placeholder-val="{{ true }}"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#A79E9A;">#D8BDB8</div></sc-if>
+          <div style="font-size:13px;color:#8A807C;line-height:1.5;">Acento secundario</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:132px;border-radius:14px;background:#D8C9BB;border:1px solid rgba(74,74,74,0.06);"></div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:15px;font-weight:500;">Arena cálida</div>
+          <sc-if value="{{ showSpecs }}" hint-placeholder-val="{{ true }}"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#A79E9A;">#D8C9BB</div></sc-if>
+          <div style="font-size:13px;color:#8A807C;line-height:1.5;">Bordes y divisores</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="height:132px;border-radius:14px;background:#FAF7F2;border:1px solid #D8C9BB;"></div>
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:15px;font-weight:500;">Marfil</div>
+          <sc-if value="{{ showSpecs }}" hint-placeholder-val="{{ true }}"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#A79E9A;">#FAF7F2</div></sc-if>
+          <div style="font-size:13px;color:#8A807C;line-height:1.5;">Fondo</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:16px;margin-top:12px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Estado · nunca decorativo</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div style="display:flex;align-items:center;gap:14px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:14px;padding:16px;">
+          <div style="width:44px;height:44px;border-radius:10px;background:#7C9473;flex:none;"></div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div style="font-size:15px;font-weight:500;">Éxito</div>
+            <sc-if value="{{ showSpecs }}" hint-placeholder-val="{{ true }}"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#A79E9A;">#7C9473</div></sc-if>
+            <div style="font-size:13px;color:#8A807C;">Confirmado · activo · asistió</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:14px;padding:16px;">
+          <div style="width:44px;height:44px;border-radius:10px;background:#C99A4E;flex:none;"></div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div style="font-size:15px;font-weight:500;">Advertencia</div>
+            <sc-if value="{{ showSpecs }}" hint-placeholder-val="{{ true }}"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#A79E9A;">#C99A4E</div></sc-if>
+            <div style="font-size:13px;color:#8A807C;">Pendiente</div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:14px;padding:16px;">
+          <div style="width:44px;height:44px;border-radius:10px;background:#B25D4B;flex:none;"></div>
+          <div style="display:flex;flex-direction:column;gap:2px;">
+            <div style="font-size:15px;font-weight:500;">Error</div>
+            <sc-if value="{{ showSpecs }}" hint-placeholder-val="{{ true }}"><div style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12px;color:#A79E9A;">#B25D4B</div></sc-if>
+            <div style="font-size:13px;color:#8A807C;">Cancelado · vencido · no asistió</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">02</div>
+      <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;margin:0;">Tipografía</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#8A807C;max-width:620px;">Lora para títulos, nombres propios y precios. Work Sans para cuerpo, etiquetas y controles.</p>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:32px;">
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;">
+        <div style="font-size:12px;color:#A79E9A;line-height:1.5;">Display<br /><span style="font-family:ui-monospace,Menlo,monospace;">Lora 400 · 44/1.1</span></div>
+        <div style="font-family:Lora,Georgia,serif;font-weight:400;font-size:44px;line-height:1.1;letter-spacing:-0.01em;">Reserva tu clase</div>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;">
+        <div style="font-size:12px;color:#A79E9A;line-height:1.5;">Título 1<br /><span style="font-family:ui-monospace,Menlo,monospace;">Lora 500 · 30/1.2</span></div>
+        <div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Reformer intermedio</div>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;">
+        <div style="font-size:12px;color:#A79E9A;line-height:1.5;">Título 2<br /><span style="font-family:ui-monospace,Menlo,monospace;">Lora 500 · 22/1.3</span></div>
+        <div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;">Tus próximas clases</div>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;">
+        <div style="font-size:12px;color:#A79E9A;line-height:1.5;">Precio<br /><span style="font-family:ui-monospace,Menlo,monospace;">Lora 500 · 26 · tabular</span></div>
+        <div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:26px;font-variant-numeric:tabular-nums;">Bs 350 <span style="font-size:15px;color:#8A807C;font-family:'Work Sans',sans-serif;font-weight:400;">/ paquete de 8</span></div>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;">
+        <div style="font-size:12px;color:#A79E9A;line-height:1.5;">Cuerpo grande<br /><span style="font-family:ui-monospace,Menlo,monospace;">Work Sans 400 · 17/1.65</span></div>
+        <div style="font-size:17px;line-height:1.65;max-width:560px;color:#4A4A4A;text-wrap:pretty;">Trabajamos el cuerpo con calma y precisión. Elige el horario que mejor te acomode y llega diez minutos antes de tu primera sesión.</div>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;">
+        <div style="font-size:12px;color:#A79E9A;line-height:1.5;">Cuerpo<br /><span style="font-family:ui-monospace,Menlo,monospace;">Work Sans 400 · 15/1.6</span></div>
+        <div style="font-size:15px;line-height:1.6;max-width:560px;color:#6E6663;text-wrap:pretty;">Puedes cancelar sin costo hasta 6 horas antes del inicio de la clase. Después de ese plazo se descuenta la sesión de tu paquete.</div>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;">
+        <div style="font-size:12px;color:#A79E9A;line-height:1.5;">Etiqueta<br /><span style="font-family:ui-monospace,Menlo,monospace;">Work Sans 500 · 12 · 0.16em</span></div>
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Miércoles 19 de agosto</div>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:grid;grid-template-columns:170px 1fr;gap:24px;align-items:baseline;">
+        <div style="font-size:12px;color:#A79E9A;line-height:1.5;">Nota<br /><span style="font-family:ui-monospace,Menlo,monospace;">Work Sans 400 · 13/1.5</span></div>
+        <div style="font-size:13px;line-height:1.5;color:#8A807C;">Quedan 3 lugares disponibles</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">03</div>
+      <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;margin:0;">Botones</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#8A807C;max-width:620px;">Altura mínima 52 px en móvil, 44 px en secundarios compactos. Radio 8 px. Un solo botón sólido por vista.</p>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:36px;">
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Primario</div>
+        <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap;">
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <button style="min-width:210px;min-height:52px;padding:0 28px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:500;letter-spacing:0.01em;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);transition:background 140ms ease;" style-hover="background:#A87370;">Reservar clase</button>
+            <div style="font-size:12px;color:#8A807C;">Normal</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <button style="min-width:210px;min-height:52px;padding:0 28px;border:none;border-radius:8px;background:#9C6764;color:#FFFFFF;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;box-shadow:inset 0 1px 3px rgba(74,74,74,0.20);transform:translateY(1px);">Reservar clase</button>
+            <div style="font-size:12px;color:#8A807C;">Presionado</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <button disabled="{{ yes }}" style="min-width:210px;min-height:52px;padding:0 28px;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:500;cursor:not-allowed;">Reservar clase</button>
+            <div style="font-size:12px;color:#8A807C;">Deshabilitado</div>
+          </div>
+        </div>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:flex;flex-direction:column;gap:18px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Secundario y terciario</div>
+        <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;">
+          <button style="min-height:52px;padding:0 28px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;transition:background 140ms ease;" style-hover="background:#F6EDEB;">Ver horarios</button>
+          <button style="min-height:52px;padding:0 20px;border:none;border-radius:8px;background:transparent;color:#B78380;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:500;cursor:pointer;" style-hover="color:#9C6764;">Cancelar reserva</button>
+          <button style="min-height:44px;padding:0 20px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;color:#4A4A4A;font-family:'Work Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;">Editar perfil</button>
+          <button style="width:52px;height:52px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">04</div>
+      <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;margin:0;">Píldoras de estado</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#8A807C;max-width:620px;">Fondo al 12 % del color semántico, texto al 100 %. Radio completo, 12 px, mayúsculas suaves. Un punto de 6 px refuerza el estado sin depender del color.</p>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:28px;">
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#7C9473;"></span>Confirmada</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#7C9473;"></span>Asistió</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#7C9473;"></span>Activo</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#C99A4E;"></span>Pendiente</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#C99A4E;"></span>Por pagar</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#B25D4B;"></span>Cancelada</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#B25D4B;"></span>Vencido</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#B25D4B;"></span>No asistió</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(74,74,74,0.07);color:#6E6663;font-size:12px;font-weight:500;letter-spacing:0.04em;"><span style="width:6px;height:6px;border-radius:999px;background:#A79E9A;"></span>Lista de espera</span>
+      </div>
+      <div style="height:1px;background:#EFE7DE;"></div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Variante de contorno · listas densas de escritorio</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;border:1px solid rgba(124,148,115,0.45);color:#5F7457;font-size:12px;font-weight:500;">Confirmada</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;border:1px solid rgba(201,154,78,0.5);color:#9A7434;font-size:12px;font-weight:500;">Pendiente</span>
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;border:1px solid rgba(178,93,75,0.45);color:#94493A;font-size:12px;font-weight:500;">Cancelada</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">05</div>
+      <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;margin:0;">Tarjetas</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#8A807C;max-width:620px;">Superficie blanca o marfil, borde de 1 px en arena cálida, radio 16 px, sombra apenas perceptible. Padding 20–24 px.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;align-items:start;">
+
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:16px;box-shadow:{{ cardShadow }};">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Miércoles 19 · 07:30</div>
+            <div style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">Reformer intermedio</div>
+          </div>
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#7C9473;"></span>Confirmada</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;color:#6E6663;font-size:14px;">
+          <span style="display:inline-flex;align-items:center;gap:7px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+            Emma Vargas
+          </span>
+          <span style="display:inline-flex;align-items:center;gap:7px;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
+            50 min
+          </span>
+        </div>
+        <div style="height:1px;background:#EFE7DE;"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+          <div style="font-size:13px;color:#8A807C;">Quedan 3 lugares</div>
+          <button style="min-height:44px;padding:0 20px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-family:'Work Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;" style-hover="background:#F6EDEB;">Ver detalle</button>
+        </div>
+      </div>
+
+      <div style="background:#FAF7F2;border:1px solid #D8C9BB;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:18px;box-shadow:{{ cardShadow }};">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="width:52px;height:52px;border-radius:999px;background:#D8BDB8;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:19px;color:#FFFFFF;flex:none;">LM</div>
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Lucía Mendoza</div>
+            <div style="font-size:13px;color:#8A807C;">Paquete de 8 · vence el 30 de agosto</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:#6E6663;">
+            <span>5 de 8 sesiones usadas</span>
+            <span style="font-variant-numeric:tabular-nums;">63 %</span>
+          </div>
+          <div style="height:6px;border-radius:999px;background:#EFE4DC;overflow:hidden;">
+            <div style="width:63%;height:100%;background:#B78380;border-radius:999px;"></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;">
+          <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;"><span style="width:6px;height:6px;border-radius:999px;background:#C99A4E;"></span>Por pagar</span>
+          <span style="display:inline-flex;align-items:center;padding:7px 14px;border-radius:999px;background:rgba(74,74,74,0.06);color:#6E6663;font-size:12px;font-weight:500;">Bs 350</span>
+        </div>
+      </div>
+
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:22px;display:flex;flex-direction:column;gap:6px;box-shadow:{{ cardShadow }};">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Ocupación de hoy</div>
+        <div style="font-family:Lora,Georgia,serif;font-size:40px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.15;">84 %</div>
+        <div style="font-size:14px;color:#6E6663;">42 de 50 lugares reservados</div>
+        <div style="display:flex;gap:5px;margin-top:14px;">
+          <div style="flex:1;height:38px;border-radius:5px;background:#B78380;"></div>
+          <div style="flex:1;height:38px;border-radius:5px;background:#C79C99;"></div>
+          <div style="flex:1;height:38px;border-radius:5px;background:#D8BDB8;"></div>
+          <div style="flex:1;height:38px;border-radius:5px;background:#E5D2CE;"></div>
+          <div style="flex:1;height:38px;border-radius:5px;background:#EFE4DC;"></div>
+          <div style="flex:1;height:38px;border-radius:5px;background:#EFE4DC;"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">06</div>
+      <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;margin:0;">Navegación</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#8A807C;max-width:620px;">Cada aplicación usa el patrón propio de su dispositivo: barra de pestañas en la app de cliente, cabecera con flecha de retorno en la app de staff, y barra lateral en el panel web. El color activo es siempre palo de rosa.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;">
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">App de cliente · barra de pestañas · 64 px + área segura</div>
+        <div style="border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;background:#FFFFFF;">
+          <div style="height:76px;background:#FAF7F2;border-bottom:1px solid #EFE7DE;"></div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);background:#FFFFFF;border-top:1px solid #D8C9BB;padding:10px 0 18px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.02em;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;letter-spacing:0.02em;">Horarios</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;letter-spacing:0.02em;">Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;letter-spacing:0.02em;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">App de staff · cabecera con retorno · 56 px</div>
+        <div style="border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;background:#FFFFFF;">
+          <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #D8C9BB;background:#FFFFFF;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            <div style="display:flex;flex-direction:column;gap:1px;flex:1;min-width:0;">
+              <div style="font-family:Lora,Georgia,serif;font-size:17px;font-weight:500;">Reformer intermedio</div>
+              <div style="font-size:12px;color:#8A807C;">07:30 · 12 alumnas</div>
+            </div>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20.5" y2="20.5"></line></svg>
+          </div>
+          <div style="padding:16px 18px;display:flex;flex-direction:column;gap:10px;background:#FAF7F2;">
+            <div style="display:flex;gap:8px;">
+              <span style="padding:7px 14px;border-radius:999px;background:#B78380;color:#FFFFFF;font-size:12px;font-weight:500;">Entrenadora</span>
+              <span style="padding:7px 14px;border-radius:999px;background:#FFFFFF;border:1px solid #D8C9BB;color:#6E6663;font-size:12px;font-weight:500;">Asistente</span>
+              <span style="padding:7px 14px;border-radius:999px;background:#FFFFFF;border:1px solid #D8C9BB;color:#6E6663;font-size:12px;font-weight:500;">Administración</span>
+            </div>
+            <div style="font-size:13px;color:#8A807C;line-height:1.5;">La app de staff se enruta por rol; sin barra de pestañas, solo cabecera y navegación en profundidad.</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;grid-column:1/-1;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Panel web · barra lateral · 248 px</div>
+        <div style="border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;background:#FFFFFF;display:grid;grid-template-columns:200px minmax(0,1fr);min-height:212px;">
+          <div style="background:#FAF7F2;border-right:1px solid #D8C9BB;padding:16px 12px;display:flex;flex-direction:column;gap:4px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;padding:0 10px 12px;">Emma Studio</div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;background:#FFFFFF;border:1px solid #E7DCD8;color:#B78380;font-size:13px;font-weight:500;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>Resumen
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#6E6663;font-size:13px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>Horarios
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#6E6663;font-size:13px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>Clientas
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:8px;color:#6E6663;font-size:13px;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,16 9,10.5 13,14 20,6.5"></polyline></svg>Reportes
+            </div>
+          </div>
+          <div style="padding:14px 16px;display:flex;flex-direction:column;gap:9px;min-width:0;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,0.9fr);gap:12px;font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;padding-bottom:9px;border-bottom:1px solid #D8C9BB;">
+              <span>Clienta</span><span>Plan</span><span>Estado</span>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,0.9fr);gap:12px;font-size:13px;align-items:center;padding-bottom:8px;border-bottom:1px solid #EFE7DE;">
+              <span style="font-family:Lora,Georgia,serif;font-size:14px;">Lucía Mendoza</span><span style="color:#6E6663;">Paquete 8</span><span style="display:inline-flex;align-items:center;gap:6px;color:#5F7457;font-size:12px;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#7C9473;"></span>Activo</span>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,0.9fr);gap:12px;font-size:13px;align-items:center;padding-bottom:8px;border-bottom:1px solid #EFE7DE;">
+              <span style="font-family:Lora,Georgia,serif;font-size:14px;">Andrea Suárez</span><span style="color:#6E6663;">Mensual</span><span style="display:inline-flex;align-items:center;gap:6px;color:#9A7434;font-size:12px;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>Pendiente</span>
+            </div>
+            <div style="display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,0.9fr);gap:12px;font-size:13px;align-items:center;">
+              <span style="font-family:Lora,Georgia,serif;font-size:14px;">Camila Rojas</span><span style="color:#6E6663;">Paquete 4</span><span style="display:inline-flex;align-items:center;gap:6px;color:#94493A;font-size:12px;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#B25D4B;"></span>Vencido</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="font-size:14px;line-height:1.6;color:#8A807C;max-width:720px;">Densidad: en móvil, tarjetas espaciosas con 24 px de margen; en escritorio, filas de tabla de 44 px con la misma escala tipográfica y los mismos colores de estado. El panel web colapsa la barra lateral a un cajón por debajo de 900 px.</div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">07</div>
+      <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;margin:0;">Fundamentos</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;">
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Radios</div>
+        <div style="display:flex;align-items:flex-end;gap:14px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:58px;height:58px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;"></div><span style="font-size:12px;color:#8A807C;">8 · botón</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:58px;height:58px;border:1px solid #D8C9BB;border-radius:12px;background:#FAF7F2;"></div><span style="font-size:12px;color:#8A807C;">12 · lista</span></div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:58px;height:58px;border:1px solid #D8C9BB;border-radius:16px;background:#FAF7F2;"></div><span style="font-size:12px;color:#8A807C;">16 · tarjeta</span></div>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Espaciado · base 4</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;align-items:center;gap:12px;"><div style="width:8px;height:12px;background:#D8BDB8;border-radius:2px;"></div><span style="font-size:13px;color:#6E6663;">8 · dentro del componente</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><div style="width:16px;height:12px;background:#D8BDB8;border-radius:2px;"></div><span style="font-size:13px;color:#6E6663;">16 · entre elementos</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><div style="width:24px;height:12px;background:#D8BDB8;border-radius:2px;"></div><span style="font-size:13px;color:#6E6663;">24 · margen de pantalla</span></div>
+          <div style="display:flex;align-items:center;gap:12px;"><div style="width:40px;height:12px;background:#D8BDB8;border-radius:2px;"></div><span style="font-size:13px;color:#6E6663;">40 · entre secciones</span></div>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Íconos · trazo 1,3 px</div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap;color:#4A4A4A;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20.5" y2="20.5"></line></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        </div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+        <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Elevación</div>
+        <div style="display:flex;gap:16px;">
+          <div style="flex:1;height:70px;border-radius:12px;background:#FFFFFF;border:1px solid #D8C9BB;"></div>
+          <div style="flex:1;height:70px;border-radius:12px;background:#FFFFFF;border:1px solid #D8C9BB;box-shadow:0 2px 8px rgba(74,74,74,0.05),0 8px 24px rgba(74,74,74,0.04);"></div>
+          <div style="flex:1;height:70px;border-radius:12px;background:#FFFFFF;border:1px solid #D8C9BB;box-shadow:0 6px 16px rgba(74,74,74,0.08),0 18px 40px rgba(74,74,74,0.06);"></div>
+        </div>
+        <div style="font-size:13px;color:#8A807C;line-height:1.5;">Plana · tarjeta · superpuesta (hoja, modal). Nunca más de un nivel por pantalla.</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:20px;padding-top:12px;border-top:1px solid #D8C9BB;">
+    <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;margin:0;">Reglas de escritura</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;font-size:14px;line-height:1.6;color:#6E6663;">
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Trato de tú</span>«Reserva tu clase», no «Reserve su clase».</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Español neutro</span>Sin modismos regionales; frases cortas y cálidas.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Botones en infinitivo o imperativo</span>«Reservar clase», «Confirmar pago».</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Moneda y fecha</span>Bs 350 · 19 de agosto · 07:30.</div>
+    </div>
+  </section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showSpecs&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Amplio&quot;,&quot;Compacto&quot;],&quot;default&quot;:&quot;Amplio&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;elevation&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Sombra suave&quot;,&quot;Sin sombra&quot;],&quot;default&quot;:&quot;Sombra suave&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tarjetas&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const density = this.props.density ?? "Amplio";
+    const elevation = this.props.elevation ?? "Sombra suave";
+    return {
+      showSpecs: this.props.showSpecs ?? true,
+      yes: true,
+      sectionGap: density === "Compacto" ? "44px" : "76px",
+      cardShadow: elevation === "Sin sombra"
+        ? "none"
+        : "0 2px 8px rgba(74,74,74,0.05), 0 8px 24px rgba(74,74,74,0.04)"
+    };
+  }
+}
+</script>
+</body>
+</html>

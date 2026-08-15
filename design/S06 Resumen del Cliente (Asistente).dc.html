@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S06 · Rol: asistente</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Resumen del cliente</h1>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">Todo lo que la asistente necesita para actuar en nombre de una clienta: estado del plan, reserva y cobro en efectivo. En tablet ocupa el panel derecho de la búsqueda (S04).</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Teléfono · Suscripción activa</div>
+          <div style="font-size:12px;color:#8A807C;">"Ver historial" despliega las clases pasadas · interactivo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 18px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">V</div>
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Valeria Áñez</span>
+                <span style="font-size:13px;color:#8A807C;">+591 700 12345</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
+
+            <div style="display:flex;flex-direction:column;gap:18px;padding:22px;border:1px solid #D8C9BB;border-radius:18px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:5px;">
+                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Plan actual</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">Mensual 12 clases</span>
+                </div>
+                <span style="flex:none;display:inline-flex;align-items:center;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Activa</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                  <span style="font-size:14px;color:#6E6663;">Clases disponibles</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">7 de 12</span>
+                </div>
+                <div style="height:6px;width:100%;border-radius:999px;background:rgba(216,201,187,0.5);overflow:hidden;">
+                  <div style="height:100%;width:58%;border-radius:999px;background:#B78380;"></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;padding-top:16px;border-top:1px solid #EFE7DE;font-size:14px;color:#6E6663;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                Pagado hasta el 31 de agosto de 2026
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <button style="height:54px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                Reservar clase
+              </button>
+              <button style="height:54px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #B78380;border-radius:10px;background:transparent;color:#B78380;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="6.5" width="18" height="11" rx="2.5"></rect><circle cx="12" cy="12" r="2.6"></circle></svg>
+                Registrar pago en efectivo
+              </button>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;">
+              <button onClick="{{ toggleHistory }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+                Ver historial
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="{{ chevron }}"></polyline></svg>
+              </button>
+              <sc-if value="{{ historyOpen }}">
+                <div style="display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;">
+                  <sc-for list="{{ history }}" as="h" hint-placeholder-count="4">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid #EFE7DE;">
+                      <span style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                        <span style="font-size:15px;">{{ h.type }}</span>
+                        <span style="font-size:13px;color:#8A807C;">{{ h.when }}</span>
+                      </span>
+                      <span style="flex:none;display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:{{ h.tagBg }};color:{{ h.tagColor }};">{{ h.tag }}</span>
+                    </div>
+                  </sc-for>
+                  <div style="padding:14px 18px;font-size:13px;color:#8A807C;text-align:center;">Últimas 4 clases · <a href="#" style="color:#B78380;font-weight:500;">ver todo</a></div>
+                </div>
+              </sc-if>
+            </div>
+
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Teléfono · Sin plan activo</div>
+          <div style="font-size:12px;color:#8A807C;">"Reservar clase" deshabilitado; el cobro pasa a primaria</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:46px 20px 18px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="11,6 5,12 11,18"></polyline></svg>
+            </button>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
+              <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
+                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
+            <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+              <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
+              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <button style="height:54px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="6.5" width="18" height="11" rx="2.5"></rect><circle cx="12" cy="12" r="2.6"></circle></svg>
+                Registrar pago en efectivo
+              </button>
+              <button disabled="{{ true }}" style="height:54px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #E4DAD0;border-radius:10px;background:transparent;color:#B9AFA9;font-size:16px;font-weight:500;cursor:not-allowed;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                Reservar clase
+              </button>
+              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+            </div>
+
+            <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              Ver historial
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
+            </button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Tablet · Panel derecho con clienta seleccionada</div>
+        <div style="font-size:12px;color:#8A807C;">Suscripción vencida · la lista de búsqueda permanece a la izquierda</div>
+      </div>
+    </sc-if>
+    <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
+      <div style="height:768px;border-radius:18px;overflow:hidden;background:#FAF7F2;display:grid;grid-template-columns:392px 1fr;">
+
+        <div style="border-right:1px solid #D8C9BB;display:flex;flex-direction:column;gap:18px;padding:36px 24px;overflow:hidden;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistente</span>
+            <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Buscar cliente</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.4" stroke-linecap="round" style="flex:none;"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line></svg>
+            <span style="flex:1;font-size:15px;color:#4A4A4A;">Suárez</span>
+          </div>
+          <button style="min-height:48px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid #B78380;border-radius:10px;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"></line><line x1="5.5" y1="12" x2="18.5" y2="12"></line></svg>
+            Nuevo cliente
+          </button>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">2 clientes</span>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #B78380;border-radius:14px;background:rgba(216,189,184,0.16);"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.55);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">P</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Paola Suárez</span><span style="font-size:13px;color:#8A807C;">+591 712 88990</span></span></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">R</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Renata Áñez Suárez</span><span style="font-size:13px;color:#8A807C;">+591 707 44821</span></span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;padding:40px 40px 32px;gap:26px;overflow:hidden;">
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div style="flex:none;width:58px;height:58px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:22px;">P</div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Paola Suárez</span>
+              <span style="font-size:14px;color:#8A807C;">+591 712 88990 · paola.suarez@correo.com</span>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;">
+            <div style="display:flex;flex-direction:column;gap:18px;padding:24px;border:1px solid #D8C9BB;border-radius:18px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:5px;">
+                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Plan actual</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">Mensual 8 clases</span>
+                </div>
+                <span style="flex:none;display:inline-flex;align-items:center;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(178,93,75,0.12);color:#8A4433;">Vencida</span>
+              </div>
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:14px;color:#6E6663;">Clases disponibles</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">0 de 8</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:9px;padding-top:16px;border-top:1px solid #EFE7DE;font-size:14px;color:#8A4433;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B25D4B" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                Venció el 31 de julio de 2026
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <button style="height:54px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3" y="6.5" width="18" height="11" rx="2.5"></rect><circle cx="12" cy="12" r="2.6"></circle></svg>
+                Registrar pago en efectivo
+              </button>
+              <button disabled="{{ true }}" style="height:54px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #E4DAD0;border-radius:10px;background:transparent;color:#B9AFA9;font-size:16px;font-weight:500;cursor:not-allowed;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                Reservar clase
+              </button>
+              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Historial</span>
+              <a href="#" style="font-size:14px;font-weight:500;">Ver historial completo</a>
+            </div>
+            <div style="display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid #EFE7DE;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Reformer Intermedio</span><span style="font-size:13px;color:#8A807C;">28 de julio · 07:00 · Equipetrol</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Asistió</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid #EFE7DE;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Mat Pilates</span><span style="font-size:13px;color:#8A807C;">25 de julio · 09:30 · Equipetrol</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(178,93,75,0.12);color:#8A4433;">No asistió</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Barre</span><span style="font-size:13px;color:#8A807C;">22 de julio · 19:15 · Urubó</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Asistió</span></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Regla de reserva</span>Sin plan activo no se puede reservar, igual que en la app de cliente: el botón queda deshabilitado con nota explicativa.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Jerarquía de acciones</span>Con plan activo manda "Reservar clase"; sin plan, la primaria pasa a ser el cobro en efectivo.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Historial</span>En teléfono se despliega en línea (últimas 4 clases); en tablet siempre visible con enlace a la vista completa.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Tablet</span>El detalle reemplaza el estado vacío del panel derecho; la búsqueda no se pierde.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+const HISTORY = [
+  { type: "Reformer Intermedio", when: "12 de agosto · 07:00 · Equipetrol", ok: true },
+  { type: "Mat Pilates", when: "9 de agosto · 09:30 · Equipetrol", ok: true },
+  { type: "Barre", when: "6 de agosto · 19:15 · Urubó", ok: false },
+  { type: "Reformer Intermedio", when: "4 de agosto · 07:00 · Equipetrol", ok: true }
+];
+
+class Component extends DCLogic {
+  state = { history: true };
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      historyOpen: this.state.history,
+      chevron: this.state.history ? "6,14.5 12,8.5 18,14.5" : "6,9.5 12,15.5 18,9.5",
+      toggleHistory: () => this.setState(s => ({ history: !s.history })),
+      history: HISTORY.map(h => ({
+        type: h.type, when: h.when,
+        tag: h.ok ? "Asistió" : "No asistió",
+        tagBg: h.ok ? "rgba(124,148,115,0.16)" : "rgba(178,93,75,0.12)",
+        tagColor: h.ok ? "#5E7256" : "#8A4433"
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

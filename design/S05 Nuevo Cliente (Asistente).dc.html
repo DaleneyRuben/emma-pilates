@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  input::placeholder { color: #A79E9A; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S05 · Rol: asistente</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Nuevo cliente</h1>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">La asistente crea la cuenta en nombre de la clienta. La contraseña temporal la genera el sistema y se le comunica en el momento. Al crear la cuenta se abre el resumen del cliente (S06).</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Teléfono · Formulario</div>
+          <div style="font-size:12px;color:#8A807C;">Una columna · botón "Copiar" interactivo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 16px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Nuevo cliente</div>
+          </div>
+
+          <div style="padding:28px 20px 24px;display:flex;flex-direction:column;gap:20px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+              <input type="text" placeholder="Nombre y apellido" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" placeholder="correo@ejemplo.com o +591 700 00000" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña temporal</span>
+              <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 8px 0 16px;border:1px solid #D8C9BB;border-radius:8px;background:rgba(216,201,187,0.20);">
+                <span style="flex:1;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:16px;letter-spacing:0.08em;color:#4A4A4A;">emma-7K42</span>
+                <button onClick="{{ onCopy }}" style="flex:none;min-height:38px;padding:0 14px;border:1px solid {{ copyBorder }};border-radius:8px;background:#FFFFFF;color:{{ copyColor }};font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M15 6.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h.5"></path></svg>
+                  {{ copyLabel }}
+                </button>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#8A807C;">Compártela con la clienta; podrá cambiarla desde su perfil al entrar.</span>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FAF7F2;border-top:1px solid #D8C9BB;padding:16px 20px 34px;">
+            <button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Crear cuenta</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Datos completados</div>
+          <div style="font-size:12px;color:#8A807C;">Contraseña ya copiada</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:46px 20px 16px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="11,6 5,12 11,18"></polyline></svg>
+            </button>
+            <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Nuevo cliente</div>
+          </div>
+
+          <div style="padding:28px 20px 24px;display:flex;flex-direction:column;gap:20px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+              <input type="text" value="Renata Áñez Suárez" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" value="+591 707 44821" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña temporal</span>
+              <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 8px 0 16px;border:1px solid #D8C9BB;border-radius:8px;background:rgba(216,201,187,0.20);">
+                <span style="flex:1;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:16px;letter-spacing:0.08em;color:#4A4A4A;">emma-3M89</span>
+                <span style="flex:none;min-height:38px;display:inline-flex;align-items:center;gap:7px;padding:0 14px;border:1px solid #7C9473;border-radius:8px;background:#FFFFFF;color:#5E7256;font-size:13px;font-weight:500;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5,12.5 10,17.5 19,7"></polyline></svg>
+                  Copiada
+                </span>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#8A807C;">Compártela con la clienta; podrá cambiarla desde su perfil al entrar.</span>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FAF7F2;border-top:1px solid #D8C9BB;padding:16px 20px 24px;">
+            <button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">Crear cuenta</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Tablet · Formulario centrado</div>
+        <div style="font-size:12px;color:#8A807C;">Tarjeta de ancho limitado, no estirada</div>
+      </div>
+    </sc-if>
+    <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
+      <div style="height:768px;border-radius:18px;overflow:hidden;background:#FAF7F2;display:flex;flex-direction:column;">
+        <div style="padding:28px 32px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid #EFE7DE;">
+          <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+          </button>
+          <div style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;">Nuevo cliente</div>
+        </div>
+
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:48px 32px;">
+          <div style="width:560px;max-width:100%;display:flex;flex-direction:column;gap:24px;padding:40px;border:1px solid #D8C9BB;border-radius:20px;background:#FFFFFF;box-shadow:0 2px 12px rgba(74,74,74,0.05);">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:400;">Crear una ficha</span>
+              <span style="font-size:14px;line-height:1.6;color:#8A807C;">Con estos datos la clienta ya puede entrar a la app y reservar.</span>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+              <input type="text" placeholder="Nombre y apellido" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" placeholder="correo@ejemplo.com o +591 700 00000" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña temporal</span>
+              <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 8px 0 16px;border:1px solid #D8C9BB;border-radius:8px;background:rgba(216,201,187,0.20);">
+                <span style="flex:1;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:16px;letter-spacing:0.08em;color:#4A4A4A;">emma-7K42</span>
+                <button onClick="{{ onCopy }}" style="flex:none;min-height:38px;padding:0 14px;border:1px solid {{ copyBorder }};border-radius:8px;background:#FFFFFF;color:{{ copyColor }};font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M15 6.5V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h.5"></path></svg>
+                  {{ copyLabel }}
+                </button>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#8A807C;">Compártela con la clienta; podrá cambiarla desde su perfil al entrar.</span>
+            </div>
+            <button style="height:54px;width:100%;margin-top:4px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Crear cuenta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Contraseña temporal</span>La genera el sistema, es de solo lectura y no se puede editar desde esta pantalla.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Copiar</span>El botón confirma con "Copiada" en verde durante unos segundos y vuelve a su estado normal.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Después de crear</span>La app abre el resumen de la clienta recién creada (S06); no hay pantalla de confirmación.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Validación</span>Si el correo o teléfono ya existe, se muestra un error a nivel de campo con enlace a la ficha existente.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  state = { copied: false };
+  componentWillUnmount() { clearTimeout(this._t); }
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      copyLabel: this.state.copied ? "Copiada" : "Copiar",
+      copyBorder: this.state.copied ? "#7C9473" : "#D8C9BB",
+      copyColor: this.state.copied ? "#5E7256" : "#6E6663",
+      onCopy: () => {
+        this.setState({ copied: true });
+        clearTimeout(this._t);
+        this._t = setTimeout(() => this.setState({ copied: false }), 2200);
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

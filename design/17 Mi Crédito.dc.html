@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 17</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Mi crédito</h1>
+    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Pantalla de un solo dato. Con saldo se explica cómo se usa; sin saldo se invita a ganarlo.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Con saldo</div>
+          <div style="font-size:12px;color:#8A807C;">Solo un enlace de texto</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:10px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mi crédito</span>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:40px 28px 100px;text-align:center;">
+
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Saldo a favor</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:64px;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;">Bs {{ credit }}</span>
+              <span style="font-size:15px;color:#6E6663;">disponibles</span>
+            </div>
+
+            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;max-width:290px;text-wrap:pretty;">Este crédito se aplica automáticamente al monto que pagues por tu próximo plan.</p>
+
+            <div style="width:100%;max-width:310px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;text-align:left;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">De dónde viene</span>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;">
+                <span style="color:#6E6663;">Valeria C. · 2 de agosto</span>
+                <span style="font-weight:500;color:#5F7457;font-variant-numeric:tabular-nums;">+Bs 60</span>
+              </div>
+              <div style="height:1px;background:#EFE7DE;"></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px;">
+                <span style="color:#6E6663;">Rocío G. · 19 de julio</span>
+                <span style="font-weight:500;color:#5F7457;font-variant-numeric:tabular-nums;">+Bs 60</span>
+              </div>
+            </div>
+
+            <a href="#" style="font-size:15px;font-weight:500;color:#B78380;padding:10px;">Ver mis referidos</a>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Sin saldo</div>
+          <div style="font-size:12px;color:#8A807C;">Invitación con botón sólido</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:10px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mi crédito</span>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:40px 28px 100px;text-align:center;">
+
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Saldo a favor</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:64px;font-weight:500;line-height:1;color:#8A807C;font-variant-numeric:tabular-nums;">Bs 0</span>
+            </div>
+
+            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;max-width:280px;text-wrap:pretty;">Aún no tienes crédito. Invita a tus amigos para ganar.</p>
+
+            <button style="height:54px;width:100%;max-width:290px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Ver mi código</button>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Jerarquía</div>
+        <div>El monto es el elemento más grande de toda la app (64 px en serif). Todo lo demás es soporte.</div>
+        <div>Con saldo, la única salida es un enlace de texto: no hay nada que comprar desde aquí. Sin saldo, el botón sólido lleva al código, que es la acción real.</div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Detalle de origen</div>
+        <div>La tarjeta lista los créditos acreditados con el verde de éxito en los montos positivos. Es opcional; si el estudio prefiere no exponer quién generó cada crédito, puede omitirse sin cambiar el resto.</div>
+        <div>El monto es ajustable desde Tweaks para revisar cifras de cuatro dígitos.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;creditAmount&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:120,&quot;min&quot;:0,&quot;max&quot;:2000,&quot;step&quot;:10,&quot;unit&quot;:&quot;Bs&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Crédito&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      credit: this.props.creditAmount ?? 120
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 15</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Mis evaluaciones</h1>
+    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Lista breve por naturaleza: como máximo hay una evaluación al mes. Una acción de texto por tarjeta y nada más.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Con evaluación próxima</div>
+          <div style="font-size:12px;color:#8A807C;">Acción de cancelar en texto</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:10px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mis evaluaciones</span>
+          </div>
+
+          <div style="padding:26px 20px;display:flex;flex-direction:column;gap:16px;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Próxima</span>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;gap:16px;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:56px;flex:none;padding:10px 0;border-radius:12px;background:rgba(216,189,184,0.24);">
+                  <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;color:#8A5F5C;">24</span>
+                  <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8A5F5C;">Ago</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px;min-width:0;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">09:30</span>
+                  <span style="font-size:13px;color:#6E6663;">Lunes 24 de agosto · 45 min</span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#6E6663;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Carla Peña
+                  </span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:190px;">Puedes cancelar hasta 3 horas antes.</span>
+                <button style="min-height:44px;padding:0 14px;border:none;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;" style-hover="color:#B25D4B;">Cancelar</button>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;padding-top:14px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Anteriores</span>
+              <div style="display:flex;align-items:center;gap:16px;padding:14px 0;border-bottom:1px solid #EFE7DE;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:1px;width:38px;flex:none;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#8A807C;">06</span>
+                  <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#A79E9A;">Jul</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:15px;color:#6E6663;">09:30 · Carla Peña</span>
+                  <span style="font-size:12px;color:#A79E9A;">Realizada</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;padding:14px 0;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:1px;width:38px;flex:none;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#8A807C;">02</span>
+                  <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#A79E9A;">Jun</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:15px;color:#6E6663;">16:00 · Carla Peña</span>
+                  <span style="font-size:12px;color:#A79E9A;">Realizada</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Sin evaluaciones próximas</div>
+          <div style="font-size:12px;color:#8A807C;">Acceso directo a la disponibilidad</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:10px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mis evaluaciones</span>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:60px 32px 120px;text-align:center;">
+            <div style="width:170px;height:140px;border-radius:16px;background:repeating-linear-gradient(135deg,#EFE4DC 0 10px,#E7DAD3 10px 20px);display:flex;align-items:center;justify-content:center;">
+              <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8A807C;">ilustración</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">No tienes evaluaciones próximas.</div>
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#8A807C;max-width:270px;text-wrap:pretty;">Tu evaluación de este mes sigue disponible y es gratuita.</p>
+            </div>
+            <button style="height:54px;width:100%;max-width:290px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Reservar evaluación</button>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Estructura</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Próxima:</strong> tarjeta con superficie blanca; como mucho hay una a la vez.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Anteriores:</strong> filas planas, sin acciones, en el mismo tono silencioso que el historial de clases.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Cancelar:</strong> acción de texto, no botón sólido; el rojo semántico aparece solo al interactuar.</div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Estado vacío</div>
+        <div>Aquí sí hay llamada a la acción, porque agendar es posible: lleva directo a la disponibilidad (pantalla 13). Si el cupo del mes ya se usó, esa pantalla explica cuándo vuelve.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showCaptions: this.props.showCaptions ?? true };
+  }
+}
+</script>
+</body>
+</html>

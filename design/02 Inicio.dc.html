@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 02</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Inicio</h1>
+    <p style="margin:0;max-width:660px;font-size:15px;line-height:1.6;color:#8A807C;">Primera pantalla tras iniciar sesión. Saludo, promociones, estado del plan y accesos rápidos, con la barra de pestañas de cuatro destinos.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Con plan activo</div>
+          <div style="font-size:12px;color:#8A807C;">Todos los accesos rápidos habilitados</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:66px 20px 28px;display:flex;flex-direction:column;gap:28px;">
+
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Miércoles 19 de agosto</div>
+                <div style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Hola, Lucía</div>
+              </div>
+              <div style="width:46px;height:46px;border-radius:999px;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;flex:none;">LM</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Novedades del estudio</div>
+              </div>
+              <div style="display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin:0 -20px;padding-left:20px;padding-right:20px;">
+                <div style="flex:none;width:268px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                  <div style="height:132px;background:repeating-linear-gradient(135deg,#EFE4DC 0 10px,#E7DAD3 10px 20px);display:flex;align-items:center;justify-content:center;">
+                    <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8A807C;letter-spacing:0.04em;">foto · promoción</span>
+                  </div>
+                  <div style="padding:16px;display:flex;flex-direction:column;gap:6px;">
+                    <div style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Agosto en Reformer</div>
+                    <div style="font-size:13px;line-height:1.5;color:#6E6663;">2 clases de regalo al renovar tu paquete antes del 25.</div>
+                  </div>
+                </div>
+                <div style="flex:none;width:268px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                  <div style="height:132px;background:repeating-linear-gradient(135deg,#EFE4DC 0 10px,#E7DAD3 10px 20px);display:flex;align-items:center;justify-content:center;">
+                    <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8A807C;letter-spacing:0.04em;">foto · promoción</span>
+                  </div>
+                  <div style="padding:16px;display:flex;flex-direction:column;gap:6px;">
+                    <div style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Taller de respiración</div>
+                    <div style="font-size:13px;line-height:1.5;color:#6E6663;">Sábado 29, 10:00. Cupos limitados.</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;justify-content:center;">
+                <span style="width:16px;height:5px;border-radius:999px;background:#B78380;"></span>
+                <span style="width:5px;height:5px;border-radius:999px;background:#D8C9BB;"></span>
+                <span style="width:5px;height:5px;border-radius:999px;background:#D8C9BB;"></span>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:3px;">
+                  <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Tu plan</div>
+                  <div style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">Paquete de 8 clases</div>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;white-space:nowrap;font-size:12px;font-weight:500;background:{{ badgeBg }};color:{{ badgeText }};"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:{{ badgeDot }};"></span>{{ badgeLabel }}</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                  <span style="font-size:14px;color:#4A4A4A;">Te quedan <strong style="font-family:Lora,Georgia,serif;font-size:17px;font-weight:500;">5</strong> de 8 clases</span>
+                  <span style="font-size:13px;color:#8A807C;font-variant-numeric:tabular-nums;">63 %</span>
+                </div>
+                <div style="height:7px;border-radius:999px;background:#EFE4DC;overflow:hidden;">
+                  <div style="width:63%;height:100%;border-radius:999px;background:#B78380;"></div>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:13px;color:#8A807C;">Pagado hasta el 30 de agosto</span>
+                <a href="#" style="font-size:13px;font-weight:500;color:#B78380;">Ver detalle</a>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Accesos rápidos</div>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:18px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;">
+                <span style="width:44px;height:44px;border-radius:12px;background:rgba(216,189,184,0.28);display:flex;align-items:center;justify-content:center;flex:none;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:17px;font-weight:500;color:#4A4A4A;">Reservar una clase</span>
+                  <span style="font-size:13px;color:#8A807C;">Horarios de esta semana</span>
+                </span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <button style="display:flex;flex-direction:column;gap:10px;text-align:left;padding:18px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,16 9,10.5 13,14 20,6.5"></polyline></svg>
+                  <span style="font-family:Lora,Georgia,serif;font-size:16px;font-weight:500;color:#4A4A4A;line-height:1.3;">Evaluación nutricional</span>
+                  <span style="font-size:12px;color:#8A807C;">Próxima: 2 de septiembre</span>
+                </button>
+                <button style="display:flex;flex-direction:column;gap:10px;text-align:left;padding:18px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                  <span style="font-family:Lora,Georgia,serif;font-size:16px;font-weight:500;color:#4A4A4A;line-height:1.3;">Mis referidos</span>
+                  <span style="font-size:12px;color:#8A807C;">2 amigas invitadas</span>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Sin plan activo</div>
+          <div style="font-size:12px;color:#8A807C;">Compra destacada · reserva deshabilitada</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:66px 20px 28px;display:flex;flex-direction:column;gap:28px;">
+
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Miércoles 19 de agosto</div>
+                <div style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Hola, Lucía</div>
+              </div>
+              <div style="width:46px;height:46px;border-radius:999px;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;flex:none;">LM</div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Novedades del estudio</div>
+              <div style="display:flex;gap:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:4px;margin:0 -20px;padding-left:20px;padding-right:20px;">
+                <div style="flex:none;width:268px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                  <div style="height:132px;background:repeating-linear-gradient(135deg,#EFE4DC 0 10px,#E7DAD3 10px 20px);display:flex;align-items:center;justify-content:center;">
+                    <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8A807C;letter-spacing:0.04em;">foto · promoción</span>
+                  </div>
+                  <div style="padding:16px;display:flex;flex-direction:column;gap:6px;">
+                    <div style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Primera clase de prueba</div>
+                    <div style="font-size:13px;line-height:1.5;color:#6E6663;">Conoce el estudio con una sesión introductoria a Bs 60.</div>
+                  </div>
+                </div>
+                <div style="flex:none;width:268px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                  <div style="height:132px;background:repeating-linear-gradient(135deg,#EFE4DC 0 10px,#E7DAD3 10px 20px);display:flex;align-items:center;justify-content:center;">
+                    <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8A807C;letter-spacing:0.04em;">foto · promoción</span>
+                  </div>
+                  <div style="padding:16px;display:flex;flex-direction:column;gap:6px;">
+                    <div style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Taller de respiración</div>
+                    <div style="font-size:13px;line-height:1.5;color:#6E6663;">Sábado 29, 10:00. Cupos limitados.</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;justify-content:center;">
+                <span style="width:16px;height:5px;border-radius:999px;background:#B78380;"></span>
+                <span style="width:5px;height:5px;border-radius:999px;background:#D8C9BB;"></span>
+                <span style="width:5px;height:5px;border-radius:999px;background:#D8C9BB;"></span>
+              </div>
+            </div>
+
+            <div style="background:#B78380;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:0 6px 16px rgba(183,131,128,0.24);">
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.78);">No tienes un plan activo</div>
+                <div style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:500;color:#FFFFFF;line-height:1.2;">Elige tu plan y vuelve al mat</div>
+                <div style="font-size:14px;line-height:1.55;color:rgba(255,255,255,0.86);">Paquetes desde Bs 200. Puedes pagar en el estudio o desde la app.</div>
+              </div>
+              <button style="height:52px;width:100%;border:none;border-radius:8px;background:#FFFFFF;color:#9C6764;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:#FAF2F0;">Comprar un plan</button>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Accesos rápidos</div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <div style="display:flex;align-items:center;gap:14px;width:100%;padding:18px;border:1px solid #E7DCD8;border-radius:14px;background:#F5F1EC;cursor:not-allowed;">
+                  <span style="width:44px;height:44px;border-radius:12px;background:rgba(74,74,74,0.05);display:flex;align-items:center;justify-content:center;flex:none;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B3A9A5" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                  </span>
+                  <span style="display:flex;flex-direction:column;gap:2px;flex:1;min-width:0;">
+                    <span style="font-family:Lora,Georgia,serif;font-size:17px;font-weight:500;color:#B3A9A5;">Reservar una clase</span>
+                    <span style="font-size:12px;color:#A79E9A;line-height:1.4;">Necesitas un plan activo para reservar</span>
+                  </span>
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"></rect><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"></path></svg>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                  <button style="display:flex;flex-direction:column;gap:10px;text-align:left;padding:18px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="4,16 9,10.5 13,14 20,6.5"></polyline></svg>
+                    <span style="font-family:Lora,Georgia,serif;font-size:16px;font-weight:500;color:#4A4A4A;line-height:1.3;">Evaluación nutricional</span>
+                    <span style="font-size:12px;color:#8A807C;">Agenda tu primera cita</span>
+                  </button>
+                  <button style="display:flex;flex-direction:column;gap:10px;text-align:left;padding:18px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    <span style="font-family:Lora,Georgia,serif;font-size:16px;font-weight:500;color:#4A4A4A;line-height:1.3;">Mis referidos</span>
+                    <span style="font-size:12px;color:#8A807C;">Invita y gana clases</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#C4BAB6;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:18px;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Estados de la tarjeta de plan</div>
+        <div style="display:flex;flex-direction:column;gap:14px;font-size:14px;line-height:1.55;color:#6E6663;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#7C9473;"></span>Activa</span>
+            <span>Plan vigente con clases disponibles.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>Por vencer</span>
+            <span>Ventana de recordatorio de renovación.</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:12px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#B25D4B;"></span>Vencida</span>
+            <span>La tarjeta se reemplaza por «Comprar un plan».</span>
+          </div>
+        </div>
+        <div style="height:1px;background:#EFE7DE;"></div>
+        <div style="font-size:13px;line-height:1.6;color:#8A807C;">Cambia el estado del primer marco con el control <strong style="color:#4A4A4A;font-weight:500;">Estado del plan</strong> en Tweaks.</div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Notas de comportamiento</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Carrusel:</strong> desplazamiento horizontal con ajuste por tarjeta; contenido administrado desde el panel web.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Sin plan:</strong> «Reservar» queda deshabilitado en los accesos rápidos y atenuado en la barra de pestañas; la compra es la única acción destacada.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Barra de pestañas:</strong> fija, cuatro destinos, activo en palo de rosa.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;planState&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Activa&quot;,&quot;Por vencer&quot;],&quot;default&quot;:&quot;Activa&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Estado del plan&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const state = this.props.planState ?? "Activa";
+    const map = {
+      "Activa": { bg: "rgba(124,148,115,0.14)", text: "#5F7457", dot: "#7C9473", label: "Activa" },
+      "Por vencer": { bg: "rgba(201,154,78,0.16)", text: "#9A7434", dot: "#C99A4E", label: "Por vencer" }
+    };
+    const s = map[state] ?? map["Activa"];
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      badgeBg: s.bg,
+      badgeText: s.text,
+      badgeDot: s.dot,
+      badgeLabel: s.label
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  input::placeholder { color: #A79E9A; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S01</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Iniciar sesión</h1>
+    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Entrada única para entrenadoras, asistentes, administración y nutrición. Las cuentas las crea administración: no hay registro. Al autenticarse, la app abre directamente en el inicio del rol.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;justify-content:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Iniciar sesión</div>
+          <div style="font-size:12px;color:#8A807C;">Acceso rápido con Face ID</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 52px;display:flex;flex-direction:column;justify-content:center;gap:56px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+            <sc-if value="{{ showStaffLabel }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top:6px;padding:5px 14px;border:1px solid #D8C9BB;border-radius:999px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;background:rgba(216,189,184,0.16);">Acceso del equipo</div>
+            </sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" placeholder="tu@emmapilates.bo" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" placeholder="••••••••" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Iniciar sesión</button>
+            <sc-if value="{{ showBiometric }}" hint-placeholder-val="{{ true }}">
+              <button style="height:52px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#4A4A4A;font-size:15px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><path d="M4 9V6.5A2.5 2.5 0 0 1 6.5 4H9"></path><path d="M15 4h2.5A2.5 2.5 0 0 1 20 6.5V9"></path><path d="M20 15v2.5a2.5 2.5 0 0 1-2.5 2.5H15"></path><path d="M9 20H6.5A2.5 2.5 0 0 1 4 17.5V15"></path><line x1="9.2" y1="10" x2="9.2" y2="11.6"></line><line x1="14.8" y1="10" x2="14.8" y2="11.6"></line><path d="M12 10v3.2"></path><path d="M9.6 15.6c1.5 1.1 3.3 1.1 4.8 0"></path></svg>
+                Iniciar sesión con Face ID
+              </button>
+            </sc-if>
+            <a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Iniciar sesión</div>
+          <div style="font-size:12px;color:#8A807C;">Acceso rápido con huella digital</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;padding:72px 28px 52px;display:flex;flex-direction:column;justify-content:center;gap:56px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+            <sc-if value="{{ showStaffLabel }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top:6px;padding:5px 14px;border:1px solid #D8C9BB;border-radius:999px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;background:rgba(216,189,184,0.16);">Acceso del equipo</div>
+            </sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" placeholder="tu@emmapilates.bo" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" placeholder="••••••••" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Iniciar sesión</button>
+            <sc-if value="{{ showBiometric }}" hint-placeholder-val="{{ true }}">
+              <button style="height:52px;width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#4A4A4A;font-size:15px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;color:#B78380;">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><path d="M4 8.6a9 9 0 0 1 16 0"></path><path d="M5.5 12.5a6.5 6.5 0 0 1 13 0v3.5"></path><path d="M8.6 12.5a3.4 3.4 0 0 1 6.8 0v5"></path><path d="M12 12.5v6.6"></path></svg>
+                Iniciar sesión con huella digital
+              </button>
+            </sc-if>
+            <a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Credenciales incorrectas</div>
+          <div style="font-size:12px;color:#8A807C;">Error a nivel de formulario, sin revelar qué campo falló</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 52px;display:flex;flex-direction:column;justify-content:center;gap:48px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+            <sc-if value="{{ showStaffLabel }}" hint-placeholder-val="{{ true }}">
+              <div style="margin-top:6px;padding:5px 14px;border:1px solid #D8C9BB;border-radius:999px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;background:rgba(216,189,184,0.16);">Acceso del equipo</div>
+            </sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border:1px solid #B25D4B;border-radius:10px;background:rgba(178,93,75,0.08);">
+              <div style="width:6px;height:6px;border-radius:50%;background:#B25D4B;margin-top:7px;flex:none;"></div>
+              <span style="font-size:13px;line-height:1.5;color:#8A4433;">No pudimos verificar tus datos. Revisa tu correo y contraseña e inténtalo de nuevo.</span>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" value="camila@emmapilates.bo" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" value="123456789" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Iniciar sesión</button>
+            <a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <section style="display:flex;flex-direction:column;gap:16px;">
+    <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Destino después de autenticar · un rol por cuenta</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+      <div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:14px;padding:20px;">
+        <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#B78380;font-weight:500;">Entrenadora</div>
+        <div style="font-family:Lora,Georgia,serif;font-size:20px;">Agenda</div>
+        <div style="font-size:13px;color:#8A807C;">Pantalla S02</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:14px;padding:20px;">
+        <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#B78380;font-weight:500;">Asistente</div>
+        <div style="font-family:Lora,Georgia,serif;font-size:20px;">Buscar cliente</div>
+        <div style="font-size:13px;color:#8A807C;">Pantalla S04</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:14px;padding:20px;">
+        <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#B78380;font-weight:500;">Administración</div>
+        <div style="font-family:Lora,Georgia,serif;font-size:20px;">Pagos pendientes</div>
+        <div style="font-size:13px;color:#8A807C;">Pantalla S11</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:14px;padding:20px;">
+        <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#B78380;font-weight:500;">Nutrición</div>
+        <div style="font-family:Lora,Georgia,serif;font-size:20px;">Mi agenda</div>
+        <div style="font-size:13px;color:#8A807C;">Pantalla S15</div>
+      </div>
+    </div>
+  </section>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin registro</span>Las cuentas del equipo las crea administración. No hay enlace de "Crear cuenta" en ningún estado.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin selector de rol</span>Cada cuenta tiene un solo rol; la app decide el destino y nunca pregunta.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Biometría</span>Solo aparece si el dispositivo la tiene registrada y ya hubo un acceso previo con contraseña.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Contraseña olvidada</span>Envía un enlace de restablecimiento al correo registrado por administración.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;showBiometric&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Iniciar sesión&quot;},&quot;showStaffLabel&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Iniciar sesión&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      showBiometric: this.props.showBiometric ?? true,
+      showStaffLabel: this.props.showStaffLabel ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  input::placeholder { color: #A79E9A; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S04 · Rol: asistente</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Buscar cliente</h1>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">Raíz del rol asistente: toda tarea empieza por encontrar (o crear) a la clienta. En teléfono, el resultado navega a Resumen del cliente (S06); en tablet, se abre en el panel derecho sin salir de la búsqueda.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Teléfono · Resultados</div>
+          <div style="font-size:12px;color:#8A807C;">Escribe en el campo para filtrar · interactivo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 20px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistente</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Buscar cliente</span>
+              </div>
+              <div style="flex:none;width:46px;height:46px;border-radius:50%;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:18px;">J</div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;" style-focus-within="border-color:#B78380;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.4" stroke-linecap="round" style="flex:none;"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line></svg>
+              <input type="text" value="{{ query }}" onChange="{{ onQuery }}" placeholder="Buscar por nombre, teléfono o correo" style="flex:1;min-width:0;height:100%;border:none;outline:none;background:transparent;color:#4A4A4A;font-size:15px;" />
+              <sc-if value="{{ hasQuery }}">
+                <button onClick="{{ clearQuery }}" style="flex:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border:none;border-radius:50%;background:rgba(216,201,187,0.5);color:#6E6663;font-size:13px;cursor:pointer;">×</button>
+              </sc-if>
+            </div>
+
+            <button style="min-height:48px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid #B78380;border-radius:10px;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"></line><line x1="5.5" y1="12" x2="18.5" y2="12"></line></svg>
+              Nuevo cliente
+            </button>
+          </div>
+
+          <div style="padding:0 20px 40px;display:flex;flex-direction:column;gap:12px;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">{{ resultsTitle }}</span>
+              <span style="font-size:12px;color:#A79E9A;">{{ resultsCount }}</span>
+            </div>
+
+            <sc-for list="{{ results }}" as="c" hint-placeholder-count="5">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px 18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;">
+                <span style="flex:none;width:42px;height:42px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">{{ c.initial }}</span>
+                <span style="display:flex;flex-direction:column;gap:3px;min-width:0;flex:1;">
+                  <span style="font-size:16px;color:#4A4A4A;">{{ c.name }}</span>
+                  <span style="font-size:13px;color:#8A807C;">{{ c.contact }}</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+            </sc-for>
+
+            <sc-if value="{{ isEmpty }}">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line></svg>
+                <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">No se encontró ningún cliente.</span>
+                <span style="font-size:13px;line-height:1.5;color:#8A807C;">Revisa cómo lo escribiste o crea una ficha nueva.</span>
+                <button style="min-height:48px;width:100%;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:9px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"></line><line x1="5.5" y1="12" x2="18.5" y2="12"></line></svg>
+                  Nuevo cliente
+                </button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Teléfono · Sin resultados</div>
+          <div style="font-size:12px;color:#8A807C;">"+ Nuevo cliente" pasa a acción principal</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:46px 20px 20px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistente</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Buscar cliente</span>
+              </div>
+              <div style="flex:none;width:46px;height:46px;border-radius:50%;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:18px;">J</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border:1px solid #B78380;border-radius:12px;background:#FFFFFF;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.4" stroke-linecap="round" style="flex:none;"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line></svg>
+              <span style="flex:1;font-size:15px;color:#4A4A4A;">Rojas Vega</span>
+              <span style="flex:none;width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(216,201,187,0.5);color:#6E6663;font-size:13px;">×</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:40px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line></svg>
+              <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">No se encontró ningún cliente.</span>
+              <span style="font-size:13px;line-height:1.5;color:#8A807C;">Revisa cómo lo escribiste o crea una ficha nueva.</span>
+              <button style="min-height:48px;width:100%;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:9px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"></line><line x1="5.5" y1="12" x2="18.5" y2="12"></line></svg>
+                Nuevo cliente
+              </button>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Tablet · Dos paneles</div>
+        <div style="font-size:12px;color:#8A807C;">Búsqueda a la izquierda; el detalle se abre a la derecha sin salir de la lista</div>
+      </div>
+    </sc-if>
+    <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
+      <div style="height:768px;border-radius:18px;overflow:hidden;background:#FAF7F2;display:grid;grid-template-columns:392px 1fr;">
+
+        <div style="border-right:1px solid #D8C9BB;display:flex;flex-direction:column;gap:18px;padding:36px 24px;overflow:hidden;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistente</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Buscar cliente</span>
+            </div>
+            <div style="flex:none;width:44px;height:44px;border-radius:50%;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;">J</div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.4" stroke-linecap="round" style="flex:none;"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line></svg>
+            <span style="flex:1;font-size:15px;color:#A79E9A;">Buscar por nombre, teléfono o correo</span>
+          </div>
+
+          <button style="min-height:48px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid #B78380;border-radius:10px;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"></line><line x1="5.5" y1="12" x2="18.5" y2="12"></line></svg>
+            Nuevo cliente
+          </button>
+
+          <div style="display:flex;flex-direction:column;gap:12px;overflow:hidden;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Clientes recientes</span>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">V</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Valeria Áñez</span><span style="font-size:13px;color:#8A807C;">+591 700 12345</span></span></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">L</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Lucía Justiniano</span><span style="font-size:13px;color:#8A807C;">lucia.j@correo.com</span></span></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">P</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Paola Suárez</span><span style="font-size:13px;color:#8A807C;">+591 712 88990</span></span></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">A</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Andrea Roca</span><span style="font-size:13px;color:#8A807C;">andrea.roca@correo.com</span></span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:60px;text-align:center;background:#FAF7F2;">
+          <div style="width:64px;height:64px;border-radius:50%;border:1px solid #D8C9BB;display:flex;align-items:center;justify-content:center;background:rgba(216,201,187,0.18);">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+          </div>
+          <div style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:400;">Selecciona un cliente para ver sus detalles</div>
+          <div style="font-size:14px;line-height:1.6;color:#8A807C;max-width:340px;">Busca por nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin perder la lista.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Búsqueda en vivo</span>Los resultados se filtran mientras se escribe; sin botón de buscar. Coincide con nombre, teléfono y correo.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Jerarquía del botón</span>"Nuevo cliente" es delineado por defecto y pasa a relleno palo de rosa solo cuando no hay coincidencias.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Estado inicial</span>Sin texto de búsqueda, la lista muestra las clientas atendidas recientemente.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Tablet</span>Panel izquierdo fijo de 392 px; el derecho aloja el contenido de S06 al elegir una clienta.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+const CLIENTS = [
+  { name: "Valeria Áñez", phone: "+591 700 12345", email: "valeria.anez@correo.com" },
+  { name: "María Fernanda Áñez", phone: "+591 709 45521", email: "mf.anez@correo.com" },
+  { name: "Lucía Justiniano", phone: "+591 776 33210", email: "lucia.j@correo.com" },
+  { name: "Paola Suárez", phone: "+591 712 88990", email: "paola.suarez@correo.com" },
+  { name: "Andrea Roca", phone: "+591 767 20145", email: "andrea.roca@correo.com" },
+  { name: "Carla Mendoza", phone: "+591 733 55018", email: "carla.mendoza@correo.com" },
+  { name: "Daniela Vaca", phone: "+591 705 91240", email: "dani.vaca@correo.com" },
+  { name: "Sofía Peña", phone: "+591 728 41077", email: "sofia.pena@correo.com" }
+];
+
+const norm = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+class Component extends DCLogic {
+  state = { q: "Áñez" };
+  renderVals() {
+    const q = this.state.q.trim();
+    const list = q === "" ? CLIENTS.slice(0, 4) : CLIENTS.filter(c => norm(c.name + " " + c.phone + " " + c.email).includes(norm(q)));
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      query: this.state.q,
+      hasQuery: this.state.q.length > 0,
+      onQuery: e => this.setState({ q: e.target.value }),
+      clearQuery: () => this.setState({ q: "" }),
+      resultsTitle: q === "" ? "Clientes recientes" : "Resultados",
+      resultsCount: list.length === 0 ? "" : (list.length === 1 ? "1 cliente" : list.length + " clientes"),
+      isEmpty: list.length === 0,
+      results: list.map(c => ({ name: c.name, initial: c.name.charAt(0), contact: c.phone + " · " + c.email }))
+    };
+  }
+}
+</script>
+</body>
+</html>

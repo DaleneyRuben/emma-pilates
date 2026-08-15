@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1620px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 04</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Detalle de la sesión</h1>
+    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Mismo cuerpo de pantalla en los tres casos; solo cambia el área de acción fija sobre la barra de pestañas.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Cupos disponibles</div>
+          <div style="font-size:12px;color:#8A807C;">Acción primaria «Reservar»</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:12px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-size:14px;font-weight:500;color:#8A807C;">Reservar una clase</span>
+          </div>
+
+          <div style="padding:24px 20px 28px;display:flex;flex-direction:column;gap:26px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Miércoles 19 de agosto</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Reformer Pilates</div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:52px;height:52px;border-radius:999px;flex:none;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#8A807C;">foto</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Emma Vargas</div>
+                <div style="font-size:13px;color:#8A807C;">Entrenadora certificada</div>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Sucursal</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                  Centro
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Fecha</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                  19 de agosto
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Horario</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-variant-numeric:tabular-nums;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                  07:00 – 07:50
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Duración</span>
+                <span style="font-size:15px;">50 minutos</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:15px;color:#4A4A4A;"><strong style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">5</strong> de 12 cupos disponibles</span>
+                <span style="font-size:12px;color:#A79E9A;">7 reservados</span>
+              </div>
+              <sc-if value="{{ showBar }}" hint-placeholder-val="{{ true }}">
+                <div style="height:7px;border-radius:999px;background:#EFE4DC;overflow:hidden;">
+                  <div style="width:58%;height:100%;border-radius:999px;background:#B78380;"></div>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Sobre la clase</span>
+              <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Clase de Pilates con Reformer, ideal para tonificar todo el cuerpo. Trabajamos fuerza, control y movilidad con acompañamiento cercano en grupos pequeños.</p>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);">
+              <button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Reservar</button>
+              <div style="font-size:12px;color:#8A807C;text-align:center;padding-top:10px;">Se descontará 1 clase de tu paquete.</div>
+            </div>
+            <div style="border-top:1px solid #EFE7DE;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+                <span style="font-size:11px;">Inicio</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                <span style="font-size:11px;font-weight:500;">Reservar</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                <span style="font-size:11px;">Mis Reservas</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                <span style="font-size:11px;">Perfil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Clase llena</div>
+          <div style="font-size:12px;color:#8A807C;">Acción secundaria · lista de espera</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:12px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-size:14px;font-weight:500;color:#8A807C;">Reservar una clase</span>
+          </div>
+
+          <div style="padding:24px 20px 28px;display:flex;flex-direction:column;gap:26px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Jueves 20 de agosto</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Reformer Pilates</div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:52px;height:52px;border-radius:999px;flex:none;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#8A807C;">foto</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Emma Vargas</div>
+                <div style="font-size:13px;color:#8A807C;">Entrenadora certificada</div>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Sucursal</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                  Centro
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Fecha</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                  20 de agosto
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Horario</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-variant-numeric:tabular-nums;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                  07:00 – 07:50
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Duración</span>
+                <span style="font-size:15px;">50 minutos</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:15px;color:#4A4A4A;"><strong style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">0</strong> de 12 cupos disponibles</span>
+                <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(74,74,74,0.07);color:#6E6663;font-size:12px;font-weight:500;">Lleno</span>
+              </div>
+              <sc-if value="{{ showBar }}" hint-placeholder-val="{{ true }}">
+                <div style="height:7px;border-radius:999px;background:#EFE4DC;overflow:hidden;">
+                  <div style="width:100%;height:100%;border-radius:999px;background:#C4BAB6;"></div>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Sobre la clase</span>
+              <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Clase de Pilates con Reformer, ideal para tonificar todo el cuerpo. Trabajamos fuerza, control y movilidad con acompañamiento cercano en grupos pequeños.</p>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);">
+              <button style="height:54px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:#F6EDEB;">Unirme a la lista de espera</button>
+              <div style="font-size:12px;line-height:1.5;color:#8A807C;text-align:center;padding-top:10px;">Clase llena. Te avisaremos si se libera un cupo.</div>
+            </div>
+            <div style="border-top:1px solid #EFE7DE;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+                <span style="font-size:11px;">Inicio</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                <span style="font-size:11px;font-weight:500;">Reservar</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                <span style="font-size:11px;">Mis Reservas</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                <span style="font-size:11px;">Perfil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Sin clases en tu plan</div>
+          <div style="font-size:12px;color:#8A807C;">Acción deshabilitada · enlace a compra</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:12px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-size:14px;font-weight:500;color:#8A807C;">Reservar una clase</span>
+          </div>
+
+          <div style="padding:24px 20px 28px;display:flex;flex-direction:column;gap:26px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Viernes 21 de agosto</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Mat Pilates</div>
+            </div>
+
+            <div style="display:flex;align-items:center;gap:14px;">
+              <div style="width:52px;height:52px;border-radius:999px;flex:none;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#8A807C;">foto</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:2px;">
+                <div style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Daniela Ortiz</div>
+                <div style="font-size:13px;color:#8A807C;">Entrenadora certificada</div>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Sucursal</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                  Equipetrol
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Fecha</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                  21 de agosto
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Horario</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;font-size:15px;font-variant-numeric:tabular-nums;">
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                  09:00 – 09:50
+                </span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Duración</span>
+                <span style="font-size:15px;">50 minutos</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:15px;color:#4A4A4A;"><strong style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">9</strong> de 14 cupos disponibles</span>
+                <span style="font-size:12px;color:#A79E9A;">5 reservados</span>
+              </div>
+              <sc-if value="{{ showBar }}" hint-placeholder-val="{{ true }}">
+                <div style="height:7px;border-radius:999px;background:#EFE4DC;overflow:hidden;">
+                  <div style="width:36%;height:100%;border-radius:999px;background:#B78380;"></div>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Sobre la clase</span>
+              <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Pilates en colchoneta con énfasis en centro y respiración. Ideal para complementar tus clases de Reformer.</p>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);display:flex;flex-direction:column;gap:10px;">
+              <button disabled="{{ yes }}" style="height:54px;width:100%;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Reservar</button>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;">
+                <span style="font-size:12px;color:#8A807C;">No te quedan clases en tu plan.</span>
+                <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding:4px 8px;">Comprar un plan</a>
+              </div>
+            </div>
+            <div style="border-top:1px solid #EFE7DE;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+                <span style="font-size:11px;">Inicio</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                <span style="font-size:11px;font-weight:500;">Reservar</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                <span style="font-size:11px;">Mis Reservas</span>
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+                <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                <span style="font-size:11px;">Perfil</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Área de acción</span>Fija sobre la barra de pestañas, con separador y sombra hacia arriba; siempre visible sin desplazar.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cabecera</span>Flecha de retorno de 44 px y el nombre de la pantalla anterior; el título de la clase vive en el cuerpo.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Capacidad</span>Barra en palo de rosa; al llenarse pasa a gris neutro con la etiqueta «Lleno».</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Después de reservar</span>Confirmación y salto a «Mis Reservas» con la reserva en estado Confirmada.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;capacityDisplay&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Barra&quot;,&quot;Solo texto&quot;],&quot;default&quot;:&quot;Barra&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Capacidad&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      yes: true,
+      showBar: (this.props.capacityDisplay ?? "Barra") === "Barra"
+    };
+  }
+}
+</script>
+</body>
+</html>

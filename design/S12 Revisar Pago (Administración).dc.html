@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button, textarea { font: inherit; }
+  textarea::placeholder { color: #A79E9A; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S12 · Rol: administración</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Revisar pago</h1>
+    <p style="margin:0;max-width:720px;font-size:15px;line-height:1.6;color:#8A807C;">Se abre al tocar una tarjeta de Pagos pendientes (S11). La administradora compara el comprobante con la app del banco y decide: confirmar o rechazar. Al rechazar se pide siempre un motivo. Cualquiera de las dos acciones vuelve a la lista con un aviso breve.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Revisión</div>
+          <div style="font-size:12px;color:#8A807C;">Toca «Rechazar» para pedir el motivo · interactivo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;gap:12px;padding:58px 20px 14px;border-bottom:1px solid #EFE7DE;background:#FFFFFF;">
+            <button style="flex:none;width:40px;height:40px;margin-left:-8px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:#4A4A4A;cursor:pointer;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Revisar pago</span>
+          </div>
+
+          <div style="padding:22px 20px 40px;display:flex;flex-direction:column;gap:22px;">
+
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:center;gap:13px;">
+                <span style="flex:none;width:46px;height:46px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:18px;">V</span>
+                <span style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">Valeria Áñez</span>
+                  <span style="font-size:13px;color:#8A807C;">Paquete de 8 sesiones</span>
+                </span>
+              </div>
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid #EFE7DE;">
+                <span style="display:flex;flex-direction:column;gap:5px;">
+                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Monto a verificar</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;">Bs 350</span>
+                </span>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#C99A4E;"></span>Pendiente</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;color:#8A807C;line-height:1.5;">
+                <span>Transferencia · Banco Ganadero</span>
+                <span>Enviado hace 20 min · 14 de agosto, 09:12</span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Comprobante</span>
+              <button style="position:relative;display:block;width:100%;padding:0;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;cursor:zoom-in;" style-hover="border-color:#B78380;">
+                <span style="display:block;height:300px;background-image:repeating-linear-gradient(135deg,#F3EDE6 0 10px,#EAE0D6 10px 20px);"></span>
+                <span style="position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;background:rgba(250,247,242,0.94);border-top:1px solid #EFE7DE;">
+                  <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8A807C;text-align:left;">captura del comprobante · JPG</span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#B78380;white-space:nowrap;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line><line x1="11" y1="8.5" x2="11" y2="13.5"></line><line x1="8.5" y1="11" x2="13.5" y2="11"></line></svg>
+                    Ampliar
+                  </span>
+                </span>
+              </button>
+            </div>
+
+            <sc-if value="{{ showActions }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;gap:12px;">
+                <button onClick="{{ onConfirm }}" style="flex:1;min-height:52px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">Confirmar pago</button>
+                <button onClick="{{ onReject }}" style="flex:1;min-height:52px;border:1px solid rgba(178,93,75,0.55);border-radius:10px;background:transparent;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.08);">Rechazar</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ rejecting }}">
+              <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border:1px solid rgba(178,93,75,0.35);border-radius:16px;background:rgba(178,93,75,0.05);">
+                <span style="display:flex;flex-direction:column;gap:5px;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;color:#4A4A4A;">Motivo del rechazo</span>
+                  <span style="font-size:13px;line-height:1.5;color:#8A807C;">La clienta verá este mensaje para corregir y volver a enviar.</span>
+                </span>
+                <textarea value="{{ reason }}" onChange="{{ onReason }}" rows="3" placeholder="Ej. el monto no coincide con la transferencia recibida." style="width:100%;padding:14px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;color:#4A4A4A;font-size:15px;line-height:1.5;resize:none;outline:none;" style-focus="border-color:#B25D4B;"></textarea>
+                <button style="min-height:52px;width:100%;border:none;border-radius:10px;background:{{ rejectBg }};color:{{ rejectColor }};font-size:16px;font-weight:500;cursor:{{ rejectCursor }};">Confirmar rechazo</button>
+                <button onClick="{{ onCancelReject }}" style="min-height:44px;width:100%;border:none;border-radius:10px;background:transparent;color:#8A807C;font-size:15px;cursor:pointer;" style-hover="color:#4A4A4A;">Volver</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ confirmed }}">
+              <div style="display:flex;align-items:center;gap:12px;padding:16px 18px;border-radius:12px;background:#4A4A4A;color:#FAF7F2;box-shadow:0 6px 16px rgba(74,74,74,0.18);">
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#A9C29F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="5,12.5 10,17.5 19,7"></polyline></svg>
+                <span style="flex:1;font-size:15px;">Pago confirmado</span>
+                <button onClick="{{ onReset }}" style="border:none;background:transparent;color:#D8BDB8;font-size:14px;font-weight:500;cursor:pointer;">Volver</button>
+              </div>
+            </sc-if>
+
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Rechazar desplegado</div>
+          <div style="font-size:12px;color:#8A807C;">El motivo es obligatorio: sin texto, «Confirmar rechazo» está deshabilitado</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;gap:12px;padding:58px 20px 14px;border-bottom:1px solid #EFE7DE;background:#FFFFFF;">
+            <span style="flex:none;width:40px;height:40px;margin-left:-8px;display:flex;align-items:center;justify-content:center;color:#4A4A4A;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </span>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Revisar pago</span>
+          </div>
+          <div style="padding:22px 20px 40px;display:flex;flex-direction:column;gap:22px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 20px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;">
+              <div style="display:flex;align-items:center;gap:13px;min-width:0;">
+                <span style="flex:none;width:42px;height:42px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;">V</span>
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Valeria Áñez</span>
+                  <span style="font-size:13px;color:#8A807C;">Paquete de 8 sesiones</span>
+                </div>
+              </div>
+              <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;">Bs 350</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Comprobante</span>
+              <div style="position:relative;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+                <div style="height:150px;background-image:repeating-linear-gradient(135deg,#F3EDE6 0 10px,#EAE0D6 10px 20px);"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-top:1px solid #EFE7DE;background:#FAF7F2;">
+                  <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8A807C;">captura del comprobante · JPG</span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#B78380;white-space:nowrap;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line><line x1="11" y1="8.5" x2="11" y2="13.5"></line><line x1="8.5" y1="11" x2="13.5" y2="11"></line></svg>
+                    Ampliar
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border:1px solid rgba(178,93,75,0.35);border-radius:16px;background:rgba(178,93,75,0.05);">
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Motivo del rechazo</span>
+                <span style="font-size:13px;line-height:1.5;color:#8A807C;">La clienta verá este mensaje para corregir y volver a enviar.</span>
+              </div>
+              <div style="min-height:88px;padding:14px;border:1px solid #B25D4B;border-radius:12px;background:#FFFFFF;font-size:15px;line-height:1.5;color:#4A4A4A;">El monto no coincide con la transferencia recibida.<span style="display:inline-block;width:1px;height:17px;margin-left:1px;vertical-align:-3px;background:#B25D4B;"></span></div>
+              <button style="min-height:52px;width:100%;border:none;border-radius:10px;background:#B25D4B;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(178,93,75,0.22);">Confirmar rechazo</button>
+              <button style="min-height:44px;width:100%;border:none;border-radius:10px;background:transparent;color:#8A807C;font-size:15px;cursor:pointer;">Volver</button>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Revisión y aviso de vuelta</div>
+          <div style="font-size:12px;color:#8A807C;">Al confirmar, vuelve a S11 con un aviso de 2 s</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;position:relative;">
+          <div style="display:flex;align-items:center;gap:12px;padding:44px 20px 14px;border-bottom:1px solid #EFE7DE;background:#FFFFFF;">
+            <span style="flex:none;width:40px;height:40px;margin-left:-8px;display:flex;align-items:center;justify-content:center;color:#4A4A4A;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </span>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Revisar pago</span>
+          </div>
+          <div style="padding:22px 20px 24px;display:flex;flex-direction:column;gap:22px;">
+            <div style="display:flex;flex-direction:column;gap:16px;padding:20px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:center;gap:13px;">
+                <span style="flex:none;width:46px;height:46px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:18px;">P</span>
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">Paola Suárez</span>
+                  <span style="font-size:13px;color:#8A807C;">Mensual ilimitado</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid #EFE7DE;">
+                <div style="display:flex;flex-direction:column;gap:5px;">
+                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Monto a verificar</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;">Bs 600</span>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#C99A4E;"></span>Pendiente</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;color:#8A807C;line-height:1.5;">
+                <span>Transferencia · Banco Nacional</span>
+                <span>Enviado hace 1 h · 14 de agosto, 08:30</span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Comprobante</span>
+              <div style="position:relative;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+                <div style="height:300px;background-image:repeating-linear-gradient(135deg,#F3EDE6 0 10px,#EAE0D6 10px 20px);"></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-top:1px solid #EFE7DE;background:#FAF7F2;">
+                  <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11px;color:#8A807C;">captura del comprobante · JPG</span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#B78380;white-space:nowrap;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line><line x1="11" y1="8.5" x2="11" y2="13.5"></line><line x1="8.5" y1="11" x2="13.5" y2="11"></line></svg>
+                    Ampliar
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:12px;">
+              <button style="flex:1;min-height:52px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">Confirmar pago</button>
+              <button style="flex:1;min-height:52px;border:1px solid rgba(178,93,75,0.55);border-radius:10px;background:transparent;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;">Rechazar</button>
+            </div>
+          </div>
+          <div style="margin:0 20px 32px;display:flex;align-items:center;gap:12px;padding:16px 18px;border-radius:12px;background:#4A4A4A;color:#FAF7F2;box-shadow:0 6px 16px rgba(74,74,74,0.18);">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#A9C29F" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="5,12.5 10,17.5 19,7"></polyline></svg>
+            <span style="flex:1;font-size:15px;">Pago confirmado</span>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Una sola comparación</span>Nombre, plan y monto arriba; el comprobante ocupa el resto. Todo lo necesario para cotejar con la app del banco, sin desplazar dos veces.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Comprobante</span>Toque para ampliar a pantalla completa con zoom; se cierra con un gesto hacia abajo.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Rechazo con motivo</span>«Rechazar» no rechaza: despliega el campo. Sin texto, «Confirmar rechazo» queda deshabilitado y el motivo llega a la clienta.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Vuelta a la lista</span>Confirmar o rechazar regresa a S11 con un aviso de 2 s («Pago confirmado» / «Pago rechazado»). Sin pantalla de resultado.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  state = { mode: "idle", reason: "" };
+  renderVals() {
+    const hasReason = this.state.reason.trim().length > 0;
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      showActions: this.state.mode === "idle",
+      rejecting: this.state.mode === "reject",
+      confirmed: this.state.mode === "confirmed",
+      reason: this.state.reason,
+      onReason: e => this.setState({ reason: e.target.value }),
+      onReject: () => this.setState({ mode: "reject" }),
+      onCancelReject: () => this.setState({ mode: "idle" }),
+      onConfirm: () => this.setState({ mode: "confirmed" }),
+      onReset: () => this.setState({ mode: "idle", reason: "" }),
+      rejectBg: hasReason ? "#B25D4B" : "#E7DCD8",
+      rejectColor: hasReason ? "#FFFFFF" : "#B3A9A5",
+      rejectCursor: hasReason ? "pointer" : "not-allowed"
+    };
+  }
+}
+</script>
+</body>
+</html>

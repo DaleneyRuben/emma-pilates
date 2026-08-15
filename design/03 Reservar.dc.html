@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1500px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 03</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Reservar una clase</h1>
+    <p style="margin:0;max-width:660px;font-size:15px;line-height:1.6;color:#8A807C;">Sucursal, día y tipo de clase filtran la lista de sesiones. Tocar una tarjeta abre el detalle de la sesión.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Listado de sesiones</div>
+          <div style="font-size:12px;color:#8A807C;">Día y filtro interactivos</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;position:relative;">
+          <div style="padding:66px 0 28px;display:flex;flex-direction:column;gap:22px;">
+
+            <div style="padding:0 20px;display:flex;flex-direction:column;gap:14px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Reservar una clase</div>
+              <button onClick="{{ openSheet }}" style="display:inline-flex;align-items:center;gap:10px;align-self:flex-start;min-height:44px;padding:0 16px;border:1px solid #D8C9BB;border-radius:999px;background:#FFFFFF;color:#4A4A4A;font-size:14px;cursor:pointer;" style-hover="border-color:#B78380;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                Sucursal: <strong style="font-weight:500;">{{ branchName }}</strong>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
+              </button>
+            </div>
+
+            <div style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:2px 20px 6px;">
+              <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+                <button onClick="{{ d.onClick }}" style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid {{ d.border }};background:{{ d.bg }};color:{{ d.color }};display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;">
+                  <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">{{ d.dow }}</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">{{ d.num }}</span>
+                </button>
+              </sc-for>
+            </div>
+
+            <div style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:0 20px 4px;">
+              <sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
+                <button onClick="{{ c.onClick }}" style="flex:none;min-height:38px;padding:0 16px;border-radius:999px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.color }};font-size:13px;font-weight:500;white-space:nowrap;cursor:pointer;">{{ c.label }}</button>
+              </sc-for>
+            </div>
+
+            <div style="padding:0 20px;display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">{{ dayTitle }}</span>
+                <span style="font-size:12px;color:#A79E9A;">{{ countLabel }}</span>
+              </div>
+
+              <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="4">
+                <button style="display:flex;flex-direction:column;gap:12px;width:100%;text-align:left;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.05);" style-hover="border-color:#B78380;">
+                  <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;width:100%;">
+                    <span style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                      <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">{{ s.time }}</span>
+                      <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#4A4A4A;">{{ s.type }}</span>
+                    </span>
+                    <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;white-space:nowrap;font-size:12px;font-weight:500;background:{{ s.tagBg }};color:{{ s.tagColor }};flex:none;">{{ s.tagLabel }}</span>
+                  </span>
+                  <span style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding-top:12px;border-top:1px solid #EFE7DE;">
+                    <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                      {{ s.trainer }}
+                    </span>
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+                  </span>
+                </button>
+              </sc-for>
+
+              <sc-if value="{{ isEmpty }}">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:40px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                  <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">No hay clases con este filtro</span>
+                  <span style="font-size:13px;line-height:1.5;color:#8A807C;">Prueba con otro día o quita el filtro de tipo de clase.</span>
+                </div>
+              </sc-if>
+            </div>
+
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;font-weight:500;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;">Perfil</span>
+            </div>
+          </div>
+
+          <sc-if value="{{ sheetOpen }}">
+            <div style="position:sticky;bottom:0;height:0;z-index:80;">
+            <div style="position:absolute;bottom:0;left:0;right:0;height:874px;display:flex;flex-direction:column;justify-content:flex-end;">
+              <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(74,74,74,0.32);"></div>
+              <div style="position:relative;background:#FFFFFF;border-top-left-radius:20px;border-top-right-radius:20px;padding:14px 20px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 -8px 32px rgba(74,74,74,0.16);">
+                <div style="width:42px;height:4px;border-radius:999px;background:#D8C9BB;align-self:center;margin-bottom:12px;"></div>
+                <div style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;margin-bottom:6px;">Elige una sucursal</div>
+                <sc-for list="{{ branches }}" as="b" hint-placeholder-count="3">
+                  <button onClick="{{ b.onClick }}" style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:56px;padding:0 4px;border:none;background:transparent;border-bottom:1px solid #EFE7DE;cursor:pointer;text-align:left;">
+                    <span style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="font-family:Lora,Georgia,serif;font-size:17px;font-weight:500;color:{{ b.color }};">{{ b.name }}</span>
+                      <span style="font-size:12px;color:#8A807C;">{{ b.address }}</span>
+                    </span>
+                    <span style="color:{{ b.checkColor }};display:flex;">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
+                    </span>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+            </div>
+          </sc-if>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Clase llena</div>
+          <div style="font-size:12px;color:#8A807C;">Etiqueta «Lleno» neutra · lista de espera disponible</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:66px 20px 28px;display:flex;flex-direction:column;gap:22px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Reservar una clase</div>
+            <div style="display:inline-flex;align-items:center;gap:10px;align-self:flex-start;min-height:44px;padding:0 16px;border:1px solid #D8C9BB;border-radius:999px;background:#FFFFFF;font-size:14px;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+              Sucursal: <strong style="font-weight:500;">Equipetrol</strong>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
+            </div>
+            <div style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;">
+              <div style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">Mié</span><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#4A4A4A;">19</span></div>
+              <div style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">Jue</span><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">20</span></div>
+              <div style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">Vie</span><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#4A4A4A;">21</span></div>
+              <div style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">Sáb</span><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#4A4A4A;">22</span></div>
+              <div style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;display:flex;flex-direction:column;align-items:center;gap:5px;"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">Dom</span><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#4A4A4A;">23</span></div>
+            </div>
+            <div style="display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;">
+              <div style="flex:none;min-height:38px;display:flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:13px;font-weight:500;">Todas</div>
+              <div style="flex:none;min-height:38px;display:flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:13px;font-weight:500;">Reformer Pilates</div>
+              <div style="flex:none;min-height:38px;display:flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:13px;font-weight:500;">Mat Pilates</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Jueves 20 de agosto</span>
+                <span style="font-size:12px;color:#A79E9A;">3 clases</span>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:rgba(74,74,74,0.07);color:#6E6663;font-size:12px;font-weight:500;white-space:nowrap;">Lleno</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                  <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Emma Vargas
+                  </span>
+                  <span style="font-size:13px;font-weight:500;color:#B78380;">Lista de espera</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:rgba(216,189,184,0.28);color:#8A5F5C;font-size:12px;font-weight:500;white-space:nowrap;">2 cupos</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                  <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Daniela Ortiz
+                  </span>
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:rgba(216,189,184,0.28);color:#8A5F5C;font-size:12px;font-weight:500;white-space:nowrap;">6 cupos</span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                  <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Emma Vargas
+                  </span>
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;font-weight:500;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Reglas de la lista</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Orden:</strong> por hora de inicio; las clases ya pasadas del día no se muestran.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Cupos:</strong> «X cupos» en tono de marca; «Lleno» en gris neutro, nunca en rojo — no es un error, solo capacidad completa.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Clase llena:</strong> la tarjeta sigue siendo tocable y ofrece lista de espera en el detalle.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Sucursal:</strong> chip con hoja inferior; la selección persiste entre sesiones.</div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Interacción del prototipo</div>
+        <div>En el primer marco puedes tocar los días, los filtros de tipo de clase y el chip de sucursal: la lista responde en vivo, incluido el estado vacío.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+const DAYS = [
+  { dow: "Mié", num: "19", title: "Miércoles 19 de agosto" },
+  { dow: "Jue", num: "20", title: "Jueves 20 de agosto" },
+  { dow: "Vie", num: "21", title: "Viernes 21 de agosto" },
+  { dow: "Sáb", num: "22", title: "Sábado 22 de agosto" },
+  { dow: "Dom", num: "23", title: "Domingo 23 de agosto" },
+  { dow: "Lun", num: "24", title: "Lunes 24 de agosto" },
+  { dow: "Mar", num: "25", title: "Martes 25 de agosto" }
+];
+
+const BASE = [
+  { time: "07:00 – 07:50", type: "Reformer Pilates", trainer: "Emma Vargas", spots: 3 },
+  { time: "09:00 – 09:50", type: "Mat Pilates", trainer: "Daniela Ortiz", spots: 6 },
+  { time: "12:15 – 13:05", type: "Reformer Pilates", trainer: "Emma Vargas", spots: 0 },
+  { time: "17:00 – 17:50", type: "Pilates Prenatal", trainer: "Andrea Suárez", spots: 4 },
+  { time: "18:30 – 19:20", type: "Reformer Pilates", trainer: "Daniela Ortiz", spots: 1 },
+  { time: "19:30 – 20:20", type: "Mat Pilates", trainer: "Emma Vargas", spots: 8 }
+];
+
+const SCHEDULE = DAYS.map((d, i) => {
+  if (i === 4) return BASE.slice(1, 3).map(s => ({ ...s, spots: 5 }));
+  const rotated = BASE.slice(i % 3).concat(BASE.slice(0, i % 3));
+  return rotated
+    .slice(0, 5)
+    .map((s, j) => ({ ...s, spots: (i + j) % 4 === 0 ? 0 : (i + j * 2) % 8 + 1 }))
+    .sort((a, b) => a.time.localeCompare(b.time));
+});
+
+class Component extends DCLogic {
+  state = { day: 0, filter: "Todas", sheet: false, branch: "Centro" };
+
+  renderVals() {
+    const { day, filter } = this.state;
+    const list = SCHEDULE[day].filter(s => filter === "Todas" || s.type === filter);
+
+    const days = DAYS.map((d, i) => {
+      const on = i === day;
+      return {
+        dow: d.dow,
+        num: d.num,
+        bg: on ? "#B78380" : "#FFFFFF",
+        color: on ? "#FFFFFF" : "#4A4A4A",
+        border: on ? "#B78380" : "#D8C9BB",
+        onClick: () => this.setState({ day: i })
+      };
+    });
+
+    const chips = ["Todas", "Reformer Pilates", "Mat Pilates", "Pilates Prenatal"].map(label => {
+      const on = label === filter;
+      return {
+        label,
+        bg: on ? "#B78380" : "#FFFFFF",
+        color: on ? "#FFFFFF" : "#6E6663",
+        border: on ? "#B78380" : "#D8C9BB",
+        onClick: () => this.setState({ filter: label })
+      };
+    });
+
+    const sessions = list.map(s => ({
+      time: s.time,
+      type: s.type,
+      trainer: s.trainer,
+      tagLabel: s.spots === 0 ? "Lleno" : s.spots + (s.spots === 1 ? " cupo" : " cupos"),
+      tagBg: s.spots === 0 ? "rgba(74,74,74,0.07)" : "rgba(216,189,184,0.28)",
+      tagColor: s.spots === 0 ? "#6E6663" : "#8A5F5C"
+    }));
+
+    const branches = [
+      { name: "Centro", address: "Calle Ayacucho 245" },
+      { name: "Equipetrol", address: "Av. San Martín 1120" },
+      { name: "Urubó", address: "Condominio Los Tajibos" }
+    ].map(b => ({
+      name: b.name,
+      address: b.address,
+      color: b.name === this.state.branch ? "#B78380" : "#4A4A4A",
+      checkColor: b.name === this.state.branch ? "#B78380" : "transparent",
+      onClick: () => this.setState({ branch: b.name, sheet: false })
+    }));
+
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      branchName: this.state.branch,
+      days,
+      chips,
+      sessions,
+      branches,
+      isEmpty: sessions.length === 0,
+      dayTitle: DAYS[day].title,
+      countLabel: sessions.length === 1 ? "1 clase" : sessions.length + " clases",
+      sheetOpen: this.state.sheet,
+      openSheet: () => this.setState({ sheet: true }),
+      closeSheet: () => this.setState({ sheet: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

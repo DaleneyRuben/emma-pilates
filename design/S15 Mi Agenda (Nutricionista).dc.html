@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S15 · Rol: nutricionista</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Mi agenda</h1>
+    <p style="margin:0;max-width:720px;font-size:15px;line-height:1.6;color:#8A807C;">Pantalla raíz de la nutricionista tras iniciar sesión (S01). Sin barra de pestañas: solo sus evaluaciones próximas, agrupadas por día. El ícono de la cabecera abre «Mi disponibilidad» (S16).</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Evaluaciones próximas</div>
+          <div style="font-size:12px;color:#8A807C;">Toca una tarjeta para abrirla · interactivo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="height:100%;min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:66px 20px 40px;display:flex;flex-direction:column;gap:26px;">
+
+            <div style="flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Nutricionista</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Hola, Daniela</span>
+              </div>
+              <button title="Mi disponibilidad" style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="border-color:#B78380;background:#F6EDEB;">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><polyline points="8.5,14 10.5,16 15.5,12"></polyline></svg>
+              </button>
+            </div>
+
+            <sc-if value="{{ hasItems }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:26px;">
+                <sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+                  <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                      <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">{{ g.label }}</span>
+                      <span style="font-size:12px;color:#A79E9A;">{{ g.count }}</span>
+                    </div>
+                    <sc-for list="{{ g.items }}" as="e" hint-placeholder-count="3">
+                      <button onClick="{{ e.onClick }}" style="display:flex;align-items:center;gap:16px;width:100%;text-align:left;padding:18px;border:1px solid {{ e.border }};border-radius:16px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.05);" style-hover="border-color:#B78380;">
+                        <span style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:62px;">
+                          <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">{{ e.time }}</span>
+                          <span style="font-size:12px;color:#A79E9A;">{{ e.duration }}</span>
+                        </span>
+                        <span style="flex:none;width:1px;height:38px;background:#EFE7DE;"></span>
+                        <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                          <span style="font-size:16px;color:#4A4A4A;">{{ e.client }}</span>
+                          <span style="font-size:13px;color:#8A807C;">{{ e.kind }}</span>
+                        </span>
+                        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+                      </button>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isEmpty }}">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:56px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">No tienes evaluaciones agendadas.</span>
+                <span style="font-size:13px;line-height:1.5;color:#8A807C;">Revisa tu disponibilidad para que las clientas puedan reservar.</span>
+              </div>
+            </sc-if>
+
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Evaluaciones próximas</div>
+          <div style="font-size:12px;color:#8A807C;">Misma estructura, densidad Material</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="height:100%;min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:52px 20px 40px;display:flex;flex-direction:column;gap:26px;">
+            <div style="flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Nutricionista</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Hola, Daniela</span>
+              </div>
+              <div style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><polyline points="8.5,14 10.5,16 15.5,12"></polyline></svg>
+              </div>
+            </div>
+
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Hoy · jueves 14 de agosto</span>
+                <span style="font-size:12px;color:#A79E9A;">3 evaluaciones</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="flex:none;display:flex;flex-direction:column;gap:2px;min-width:62px;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">09:00</span>
+                  <span style="font-size:12px;color:#A79E9A;">45 min</span>
+                </div>
+                <span style="flex:none;width:1px;height:38px;background:#EFE7DE;"></span>
+                <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;">Valeria Áñez</span>
+                  <span style="font-size:13px;color:#8A807C;">Primera evaluación</span>
+                </div>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="flex:none;display:flex;flex-direction:column;gap:2px;min-width:62px;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">10:30</span>
+                  <span style="font-size:12px;color:#A79E9A;">45 min</span>
+                </div>
+                <span style="flex:none;width:1px;height:38px;background:#EFE7DE;"></span>
+                <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;">Lucía Justiniano</span>
+                  <span style="font-size:13px;color:#8A807C;">Seguimiento</span>
+                </div>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="flex:none;display:flex;flex-direction:column;gap:2px;min-width:62px;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">16:00</span>
+                  <span style="font-size:12px;color:#A79E9A;">45 min</span>
+                </div>
+                <span style="flex:none;width:1px;height:38px;background:#EFE7DE;"></span>
+                <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;">Andrea Roca</span>
+                  <span style="font-size:13px;color:#8A807C;">Seguimiento</span>
+                </div>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </div>
+            </div>
+
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Mañana · viernes 15 de agosto</span>
+                <span style="font-size:12px;color:#A79E9A;">2 evaluaciones</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="flex:none;display:flex;flex-direction:column;gap:2px;min-width:62px;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">08:30</span>
+                  <span style="font-size:12px;color:#A79E9A;">45 min</span>
+                </div>
+                <span style="flex:none;width:1px;height:38px;background:#EFE7DE;"></span>
+                <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;">Paola Suárez</span>
+                  <span style="font-size:13px;color:#8A807C;">Primera evaluación</span>
+                </div>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="flex:none;display:flex;flex-direction:column;gap:2px;min-width:62px;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">11:15</span>
+                  <span style="font-size:12px;color:#A79E9A;">45 min</span>
+                </div>
+                <span style="flex:none;width:1px;height:38px;background:#EFE7DE;"></span>
+                <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;">Carla Mendoza</span>
+                  <span style="font-size:13px;color:#8A807C;">Seguimiento</span>
+                </div>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Sin evaluaciones</div>
+          <div style="font-size:12px;color:#8A807C;">Invita a revisar la disponibilidad, sin alarmar</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="height:100%;min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:66px 20px 40px;display:flex;flex-direction:column;gap:26px;">
+            <div style="flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Nutricionista</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Hola, Daniela</span>
+              </div>
+              <div style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><polyline points="8.5,14 10.5,16 15.5,12"></polyline></svg>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:10px;padding:56px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+              <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">No tienes evaluaciones agendadas.</span>
+              <span style="font-size:13px;line-height:1.5;color:#8A807C;">Revisa tu disponibilidad para que las clientas puedan reservar.</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Raíz del rol</span>Sin barra de pestañas: la agenda es el inicio. «Mi disponibilidad» (S16) es el único camino de la cabecera.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Agrupación por día</span>Encabezado de día en etiqueta versalita; «Hoy» y «Mañana» se nombran así antes de la fecha. Solo días con evaluaciones.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Hora primero</span>La hora ancla la tarjeta en cifras tabulares; el nombre de la clienta va en cuerpo, no en serif, para no competir con la hora.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Estado vacío</span>Tono neutro: puede ser una semana tranquila. Sugiere revisar la disponibilidad, sin tratarlo como error.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;estado&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Con evaluaciones&quot;,&quot;Vacío&quot;],&quot;default&quot;:&quot;Con evaluaciones&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Estado del prototipo&quot;}}">
+const GROUPS = [
+  {
+    label: "Hoy · jueves 14 de agosto",
+    items: [
+      { time: "09:00", client: "Valeria Áñez", kind: "Primera evaluación" },
+      { time: "10:30", client: "Lucía Justiniano", kind: "Seguimiento" },
+      { time: "16:00", client: "Andrea Roca", kind: "Seguimiento" }
+    ]
+  },
+  {
+    label: "Mañana · viernes 15 de agosto",
+    items: [
+      { time: "08:30", client: "Paola Suárez", kind: "Primera evaluación" },
+      { time: "11:15", client: "Carla Mendoza", kind: "Seguimiento" }
+    ]
+  },
+  {
+    label: "Lunes 18 de agosto",
+    items: [
+      { time: "09:00", client: "Sofía Peña", kind: "Primera evaluación" }
+    ]
+  }
+];
+
+class Component extends DCLogic {
+  state = { selected: "" };
+  renderVals() {
+    const empty = (this.props.estado ?? "Con evaluaciones") === "Vacío";
+    const groups = empty ? [] : GROUPS;
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      hasItems: groups.length > 0,
+      isEmpty: groups.length === 0,
+      groups: groups.map((g, gi) => ({
+        label: g.label,
+        count: g.items.length === 1 ? "1 evaluación" : g.items.length + " evaluaciones",
+        items: g.items.map((e, i) => {
+          const id = gi + "-" + i;
+          return {
+            time: e.time,
+            duration: "45 min",
+            client: e.client,
+            kind: e.kind,
+            border: this.state.selected === id ? "#B78380" : "#D8C9BB",
+            onClick: () => this.setState({ selected: id })
+          };
+        })
+      }))
+    };
+  }
+}
+</script>
+</body>
+</html>

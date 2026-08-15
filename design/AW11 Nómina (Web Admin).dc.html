@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button, select { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:2200px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW11</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Nómina</h1>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Registro de pagos de sueldo. A diferencia del resto de Back Office, esta pantalla no depende de la sucursal elegida en la barra superior: una persona puede dar clases en dos sucursales y su sueldo se paga una sola vez. "+ Registrar pago" y las filas abren AW12.</p>
+  </header>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
+        <div style="font-size:12px;color:#8A807C;">Tabla de pagos · una acción principal · sin filtro de sucursal</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/back-office/nomina
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:720px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Nómina</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Descuentos</a>
+        </nav>
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Nómina</h2>
+              <div style="font-size:12.5px;color:#8A807C;">Todas las sucursales · agosto 2026 · 9 pagos registrados</div>
+            </div>
+            <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              Registrar pago
+            </button>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="flex:1;max-width:300px;height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
+              <span style="font-size:12.5px;color:#A79E9A;">Buscar por empleado</span>
+            </div>
+            <button style="height:34px;padding:0 13px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#6E6663;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">
+              Agosto 2026
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+
+          <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+              <div>Empleado</div>
+              <div style="text-align:right;">Monto</div>
+              <div style="text-align:right;">Fecha</div>
+            </div>
+
+            <a href="#" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">CV</div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;">Camila Vargas</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Instructora · Equipetrol, Urubó</span>
+                </div>
+              </div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 6.200</div>
+              <div style="font-size:13.5px;color:#6E6663;text-align:right;font-variant-numeric:tabular-nums;">05/08/2026</div>
+            </a>
+
+            <a href="#" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">RQ</div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;">Rodrigo Quiroga</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Instructor · Equipetrol</span>
+                </div>
+              </div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.800</div>
+              <div style="font-size:13.5px;color:#6E6663;text-align:right;font-variant-numeric:tabular-nums;">05/08/2026</div>
+            </a>
+
+            <a href="#" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">LM</div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;">Lucía Montaño</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Recepción · Urubó</span>
+                </div>
+              </div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 4.500</div>
+              <div style="font-size:13.5px;color:#6E6663;text-align:right;font-variant-numeric:tabular-nums;">05/08/2026</div>
+            </a>
+
+            <a href="#" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">AS</div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;">Andrea Salvatierra</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Nutricionista · Equipetrol</span>
+                </div>
+              </div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.900</div>
+              <div style="font-size:13.5px;color:#6E6663;text-align:right;font-variant-numeric:tabular-nums;">05/08/2026</div>
+            </a>
+
+            <a href="#" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">JT</div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;">Javier Terceros</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Mantenimiento · Equipetrol, Urubó</span>
+                </div>
+              </div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.200</div>
+              <div style="font-size:13.5px;color:#6E6663;text-align:right;font-variant-numeric:tabular-nums;">05/08/2026</div>
+            </a>
+
+            <a href="#" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">PN</div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;">Paola Nogales</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Instructora · Urubó</span>
+                </div>
+              </div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.400</div>
+              <div style="font-size:13.5px;color:#6E6663;text-align:right;font-variant-numeric:tabular-nums;">20/07/2026</div>
+            </a>
+
+            <a href="#" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">CV</div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;">Camila Vargas</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Instructora · Equipetrol, Urubó</span>
+                </div>
+              </div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 6.200</div>
+              <div style="font-size:13.5px;color:#6E6663;text-align:right;font-variant-numeric:tabular-nums;">05/07/2026</div>
+            </a>
+
+            <a href="#" style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">RQ</div>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;">Rodrigo Quiroga</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Instructor · Equipetrol</span>
+                </div>
+              </div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.800</div>
+              <div style="font-size:13.5px;color:#6E6663;text-align:right;font-variant-numeric:tabular-nums;">05/07/2026</div>
+            </a>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#A79E9A;">
+            <span>Mostrando 8 de 24 pagos</span>
+            <span>La nómina no se filtra por sucursal: incluye a todo el personal.</span>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
+          <div style="font-size:12px;color:#8A807C;">Tarjetas apiladas · monto a la derecha</div>
+        </div>
+      </sc-if>
+      <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+        <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            admin.emmapilates.bo/back-office/nomina
+          </div>
+        </div>
+        <div style="height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:20px;line-height:1;">Emma</span>
+          </div>
+          <div style="width:28px;height:28px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+        </div>
+        <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:3px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:24px;">Nómina</h2>
+            <span style="font-size:12px;color:#8A807C;">Agosto 2026 · 9 pagos</span>
+          </div>
+          <button style="height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;cursor:pointer;" style-hover="background:#A87370;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+            Registrar pago
+          </button>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <span style="font-size:14.5px;font-weight:500;">Camila Vargas</span>
+                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+              </div>
+              <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 6.200</span>
+            </a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <span style="font-size:14.5px;font-weight:500;">Rodrigo Quiroga</span>
+                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+              </div>
+              <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 5.800</span>
+            </a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <span style="font-size:14.5px;font-weight:500;">Lucía Montaño</span>
+                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+              </div>
+              <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 4.500</span>
+            </a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <span style="font-size:14.5px;font-weight:500;">Andrea Salvatierra</span>
+                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+              </div>
+              <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 3.900</span>
+            </a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
+              <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                <span style="font-size:14.5px;font-weight:500;">Javier Terceros</span>
+                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+              </div>
+              <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 3.200</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Fuera del alcance de sucursal</span>El selector de la barra superior sigue visible por coherencia, pero no filtra esta tabla; el subtítulo y el pie lo dicen.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Empleado con contexto</span>Inicial, nombre y una línea con cargo y sucursales donde trabaja: identifica sin abrir la ficha.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Montos alineados</span>Monto y fecha a la derecha con cifras tabulares, para comparar filas de un vistazo.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Una sola acción</span>"+ Registrar pago" abre AW12 en blanco; tocar una fila abre el mismo formulario en modo edición.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showCaptions: this.props.showCaptions ?? true };
+  }
+}
+</script>
+</body>
+</html>

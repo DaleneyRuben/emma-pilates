@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S03 · Rol: entrenadora</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Lista de asistentes</h1>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">Se abre al tocar una sesión en Mi agenda (S02). La asistencia solo puede registrarse cuando la clase ya terminó, así que la pantalla tiene dos estados distintos.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Antes de que termine la clase</div>
+          <div style="font-size:12px;color:#8A807C;">Lista de solo lectura, sin controles</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 16px;display:flex;flex-direction:column;gap:16px;background:#FAF7F2;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.15;">Reformer Intermedio</div>
+              <div style="font-size:13px;line-height:1.5;color:#8A807C;">Sucursal Equipetrol · Jueves 13 de agosto · 07:00 – 08:00</div>
+            </div>
+          </div>
+
+          <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Reservas</span>
+              <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">8 de 8</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;">
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #EFE7DE;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">V</span><span style="font-size:16px;">Valeria Áñez</span></div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #EFE7DE;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">M</span><span style="font-size:16px;">María Fernanda Áñez</span></div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #EFE7DE;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">L</span><span style="font-size:16px;">Lucía Justiniano</span></div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #EFE7DE;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">P</span><span style="font-size:16px;">Paola Suárez</span></div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #EFE7DE;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">A</span><span style="font-size:16px;">Andrea Roca</span></div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #EFE7DE;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">C</span><span style="font-size:16px;">Carla Mendoza</span></div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #EFE7DE;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">D</span><span style="font-size:16px;">Daniela Vaca</span></div>
+              <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">S</span><span style="font-size:16px;">Sofía Peña</span></div>
+            </div>
+
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:16px;border:1px dashed #D8C9BB;border-radius:14px;background:rgba(216,201,187,0.14);">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
+              <span style="font-size:13px;line-height:1.55;color:#6E6663;">Podrás marcar asistencia cuando termine la clase.</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Después de la clase</div>
+          <div style="font-size:12px;color:#8A807C;">Segmentado por clienta, sin selección previa · interactivo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 20px 16px;display:flex;flex-direction:column;gap:16px;background:#FAF7F2;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;" style-hover="opacity:0.7;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.15;">Reformer Intermedio</div>
+              <div style="font-size:13px;line-height:1.5;color:#8A807C;">Sucursal Equipetrol · Jueves 13 de agosto · 07:00 – 08:00</div>
+            </div>
+          </div>
+
+          <div style="padding:24px 20px 24px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistencia</span>
+              <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">{{ progressLabel }}</span>
+            </div>
+
+            <sc-for list="{{ roster }}" as="c" hint-placeholder-count="8">
+              <div style="display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;">
+                <div style="display:flex;align-items:center;gap:14px;">
+                  <span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">{{ c.initial }}</span>
+                  <span style="font-size:16px;">{{ c.name }}</span>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <button onClick="{{ c.onYes }}" style="min-height:44px;border-radius:10px;border:1px solid {{ c.yesBorder }};background:{{ c.yesBg }};color:{{ c.yesColor }};font-size:14px;font-weight:500;cursor:pointer;">Asistió</button>
+                  <button onClick="{{ c.onNo }}" style="min-height:44px;border-radius:10px;border:1px solid {{ c.noBorder }};background:{{ c.noBg }};color:{{ c.noColor }};font-size:14px;font-weight:500;cursor:pointer;">No asistió</button>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FAF7F2;border-top:1px solid #D8C9BB;padding:16px 20px 34px;display:flex;flex-direction:column;gap:10px;">
+            <sc-if value="{{ pending }}">
+              <span style="font-size:12px;color:#8A807C;text-align:center;">{{ pendingLabel }}</span>
+            </sc-if>
+            <button style="height:54px;width:100%;border:none;border-radius:8px;background:{{ saveBg }};color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar asistencia</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Después de la clase</div>
+          <div style="font-size:12px;color:#8A807C;">Registro parcial en curso</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:46px 20px 16px;display:flex;flex-direction:column;gap:16px;border-bottom:1px solid #EFE7DE;">
+            <button style="width:44px;height:44px;margin-left:-10px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;cursor:pointer;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="11,6 5,12 11,18"></polyline></svg>
+            </button>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.15;">Mat Pilates</div>
+              <div style="font-size:13px;line-height:1.5;color:#8A807C;">Sucursal Urubó · Jueves 13 de agosto · 09:30 – 10:30</div>
+            </div>
+          </div>
+
+          <div style="padding:24px 20px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistencia</span>
+              <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">3 de 5 marcadas</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;">
+              <div style="display:flex;align-items:center;gap:14px;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">R</span><span style="font-size:16px;">Rocío Melgar</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #7C9473;background:rgba(124,148,115,0.16);color:#5E7256;font-size:14px;font-weight:500;">Asistió</div>
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;font-size:14px;font-weight:500;">No asistió</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;">
+              <div style="display:flex;align-items:center;gap:14px;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">N</span><span style="font-size:16px;">Natalia Ribera</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;font-size:14px;font-weight:500;">Asistió</div>
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #B25D4B;background:rgba(178,93,75,0.10);color:#8A4433;font-size:14px;font-weight:500;">No asistió</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;">
+              <div style="display:flex;align-items:center;gap:14px;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">G</span><span style="font-size:16px;">Gabriela Ortiz</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #7C9473;background:rgba(124,148,115,0.16);color:#5E7256;font-size:14px;font-weight:500;">Asistió</div>
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;font-size:14px;font-weight:500;">No asistió</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;">
+              <div style="display:flex;align-items:center;gap:14px;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">I</span><span style="font-size:16px;">Isabel Camacho</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #7C9473;background:rgba(124,148,115,0.16);color:#5E7256;font-size:14px;font-weight:500;">Asistió</div>
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;font-size:14px;font-weight:500;">No asistió</div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;padding:16px 18px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;">
+              <div style="display:flex;align-items:center;gap:14px;"><span style="flex:none;width:36px;height:36px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;">F</span><span style="font-size:16px;">Fernanda Landívar</span></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;font-size:14px;font-weight:500;">Asistió</div>
+                <div style="min-height:44px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:1px solid #D8C9BB;background:#FFFFFF;color:#8A807C;font-size:14px;font-weight:500;">No asistió</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FAF7F2;border-top:1px solid #D8C9BB;padding:16px 20px 24px;display:flex;flex-direction:column;gap:10px;">
+            <span style="font-size:12px;color:#8A807C;text-align:center;">Falta marcar 2 clientas.</span>
+            <button style="height:54px;width:100%;border:none;border-radius:8px;background:#D8BDB8;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;">Guardar asistencia</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cuándo aparece el control</span>El segmentado solo se habilita una vez pasada la hora de fin de la sesión.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin valor por defecto</span>Ninguna opción viene marcada: la entrenadora decide clienta por clienta.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Guardar</span>El botón se mantiene fijo abajo; queda en rosa empolvado hasta que todas las clientas estén marcadas.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Color de estado</span>Verde para "Asistió", terracota para "No asistió"; nunca decorativos.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+const ROSTER = ["Valeria Áñez", "María Fernanda Áñez", "Lucía Justiniano", "Paola Suárez", "Andrea Roca", "Carla Mendoza", "Daniela Vaca", "Sofía Peña"];
+
+class Component extends DCLogic {
+  state = { marks: {} };
+  renderVals() {
+    const marks = this.state.marks;
+    const done = ROSTER.filter((_, i) => marks[i]).length;
+    const missing = ROSTER.length - done;
+    const set = (i, v) => () => this.setState(s => ({ marks: Object.assign({}, s.marks, { [i]: s.marks[i] === v ? null : v }) }));
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      progressLabel: done + " de " + ROSTER.length + " marcadas",
+      pending: missing > 0,
+      pendingLabel: missing === 1 ? "Falta marcar 1 clienta." : "Falta marcar " + missing + " clientas.",
+      saveBg: missing > 0 ? "#D8BDB8" : "#B78380",
+      roster: ROSTER.map((name, i) => {
+        const v = marks[i];
+        return {
+          name, initial: name.charAt(0),
+          onYes: set(i, "yes"), onNo: set(i, "no"),
+          yesBg: v === "yes" ? "rgba(124,148,115,0.16)" : "#FFFFFF",
+          yesBorder: v === "yes" ? "#7C9473" : "#D8C9BB",
+          yesColor: v === "yes" ? "#5E7256" : "#8A807C",
+          noBg: v === "no" ? "rgba(178,93,75,0.10)" : "#FFFFFF",
+          noBorder: v === "no" ? "#B25D4B" : "#D8C9BB",
+          noColor: v === "no" ? "#8A4433" : "#8A807C"
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>
