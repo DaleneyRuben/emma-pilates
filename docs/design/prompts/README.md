@@ -56,6 +56,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S19](./staff/19-change-password.md) | Crea tu contraseña | `S19` | ✅ |
 | [S20](./staff/20-notifications.md) | Notificaciones | `S20` | ✅ |
 | [S21](./staff/21-assistant-manage-bookings.md) | Reservas de la clienta (Asistente) | `S21` | ✅ |
+| [S22](./staff/22-assistant-client-history.md) | Historial de la clienta (Asistente) | `S22` | 🕓 not yet generated |
 
 ## Admin web (`admin-web/`)
 
@@ -96,7 +97,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 
 ## Follow-ups (`followups/`)
 
-Each of these was sent as the next message in the existing Claude Design conversation for the surface it targets. All seven have been applied and verified against the built files in `../../../design/`.
+Each of these was sent as the next message in the existing Claude Design conversation for the surface it targets. Follow-ups 01–07 have been applied and verified against the built files in `../../../design/`; 08–10 are pending.
 
 | Follow-up | Fixes | Status |
 |---|---|---|
@@ -107,7 +108,10 @@ Each of these was sent as the next message in the existing Claude Design convers
 | [05](./followups/05-waitlist-visibility-for-staff.md) | Surfaces the Waitlist on `S03`/`AW03`, fixes cancel-session copy on `AW03`/`S14` | ✅ applied |
 | [06](./followups/06-client-overview-add-bookings-entry.md) | Adds the entry point for `S21` to `S06` | ✅ applied |
 | [07](./followups/07-insumos-add-withdrawal-history-link.md) | Adds the entry point for `AW31` to `AW08` | ✅ applied |
+| [08](./followups/08-remove-referral-reward-label.md) | Removes the referral-reward helper text from `01` | 🕓 pending |
+| [09](./followups/09-trainer-remove-waitlist-visibility.md) | Removes the Waitlist section from `S03` (Trainer) | 🕓 pending |
+| [10](./followups/10-client-overview-wire-history-link.md) | Wires `S06`'s "ver todo"/"Ver historial completo" links to new screen `S22` | 🕓 pending |
 
 ## Status
 
-All prompts in this index have a generated screen in `../../../design/`, and all seven follow-ups have landed. `design/README.md`'s screen inventory and shell notes have been updated to match (including `AW30`/`AW31`, which the shell doc had missed on the previous pass).
+All prompts in this index have a generated screen in `../../../design/` except `S22` (prompt written, not yet generated), and follow-ups 01–07 have landed; 08–10 are pending. `design/README.md`'s screen inventory and shell notes have been updated to match (including `AW30`/`AW31`, which the shell doc had missed on the previous pass).
