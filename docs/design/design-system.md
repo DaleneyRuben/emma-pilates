@@ -12,41 +12,89 @@ This project is for Bolivia. Scope is **user-visible text only** — every scree
 
 Assumed default: informal **"tú"** address (not "usted") — standard for consumer wellness apps in the region. Flag if the studio prefers the formal register.
 
+Currency is the boliviano, written `Bs 1.200,00` (dot thousands, comma decimals). Dates are `dd/mm/aaaa`, times are 24-hour.
+
 ## Color Palette
 
-Fixed across all three apps: the client mobile app, the staff mobile app (Trainer/Assistant/Administrator, routed by Role), and the admin desktop web app.
+Fixed across all three apps: the client mobile app, the staff mobile app (Trainer/Assistant/Administrator/Nutritionist, routed by Role), and the admin desktop web app. **Closed palette — do not introduce colors outside this list.** Tints are the semantic color at low alpha.
 
-| Name | Hex | Role |
+| Token | Hex | Role |
 |---|---|---|
-| Plomo cálido | `#4A4A4A` | Primary text / dark neutral |
-| Palo de rosa | `#B78380` | Primary accent |
-| Rosa empolvado | `#D8BDB8` | Secondary accent |
-| Arena cálida | `#D8C9BB` | Tertiary / warm neutral |
-| Marfil | `#FAF7F2` | Background / light neutral |
+| Arena (page background) | `#F2ECE5` | App/page background |
+| Superficie | `#FAF7F2` | Content area behind cards, inset panels |
+| Blanco | `#FFFFFF` | Cards, tables, panels, inputs |
+| Superficie sutil | `#FDFAF6` | Table headers, field suffixes, inline add rows |
+| Hover de fila | `#FDF7F2` | Table row / card hover |
+| Palo de rosa (primario) | `#B78380` | Primary buttons, active nav, links, focus ring |
+| Palo de rosa hover | `#A87370` | Primary hover |
+| Palo de rosa presionado | `#9C6764` | Primary active |
+| Palo de rosa tinte | `#EFE0DC` | Active nav background, avatars, badges |
+| Palo de rosa profundo | `#8A5D59` | Text/icon on the tint |
+| Rosa empolvado | `#D8BDB8` | Secondary accent, avatar fill |
+| Tinte suave | `#F6EDEB` / `#F7EEE9` | Secondary-button hover |
+| Plomo cálido | `#4A4A4A` | Primary text, neutral summary figures |
+| Texto secundario | `#6E6663` | Body text, table secondary cells |
+| Texto tenue | `#8A807C` | Subtitles, labels, helper text |
+| Texto muy tenue | `#A79E9A` | Placeholders, meta, footnotes |
+| Borde fuerte | `#D8C9BB` | Frame borders, input borders |
+| Borde | `#E4D8CC` | Card and table borders |
+| Divisor | `#F2EBE2` | Row separators inside cards |
+| Éxito | `#7C9473` (texto `#5F7457`) | Confirmed, active, attended, income |
+| Advertencia | `#C99A4E` (texto `#9A7434`) | Pending, low stock |
+| Error | `#B25D4B` (texto `#94493A`) | Cancelled, overdue, no-show, destructive, expenses |
+| Deshabilitado | fondo `#E7DCD8`, texto `#B3A9A5` | Disabled buttons and icons |
+
+Status pills: semantic color at **12–16% alpha** as background, the darker text tone as foreground, a **6px dot** of the full color so state does not depend on color alone, fully rounded, 11.5–12px.
 
 Every screen-generation prompt should reference this palette by name and hex so results stay consistent across surfaces.
 
-## Semantic Colors
+## Typography
 
-Status indicators (Booking confirmed/cancelled, Payment pending/confirmed, Subscription active/expired) use dedicated semantic hues, kept separate from the brand accent above so status reads at a glance without borrowing Palo de rosa's meaning.
+Fonts: **Lora** (400/500/600 — headings, proper names, prices) and **Work Sans** (300/400/500/600 — body, labels, controls). Google Fonts.
 
-| Name | Hex | Role |
-|---|---|---|
-| Success | `#7C9473` | Confirmed / active / attended |
-| Warning | `#C99A4E` | Pending |
-| Error | `#B25D4B` | Cancelled / expired / no-show |
+| Style | Spec |
+|---|---|
+| Display | Lora 400 · 44/1.1 · `-0.01em` |
+| Título 1 | Lora 500 · 30/1.2 |
+| Título 2 | Lora 500 · 22/1.3 |
+| Precio | Lora 500 · 26 · tabular numerals |
+| Cuerpo grande | Work Sans 400 · 17/1.65 |
+| Cuerpo | Work Sans 400 · 15/1.6 |
+| Etiqueta | Work Sans 500 · 12 · `0.16em` · uppercase |
+| Nota | Work Sans 400 · 13/1.5 |
+
+Admin web runs one step tighter: page title Lora 400 · 27, panel title Lora 400 · 22, table cell 14, table header 10.5 uppercase `0.14em`, field label 10.5 uppercase `0.14em`, helper text 11.5.
+
+All numeric columns, money, dates, and counts use `font-variant-numeric: tabular-nums`. Long prose uses `text-wrap: pretty`.
+
+## Spacing, Radius, Shadow
+
+- Spacing scale: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 26, 32, 40 px.
+- Radius: 8px controls, 10–12px cards and panels, 14–16px outer frames, 999px pills.
+- Shadows: primary button `0 2px 6px rgba(183,131,128,0.22)`; card hover `0 6px 16px rgba(74,58,48,0.10)`; side panel `-14px 0 34px rgba(74,58,48,0.14)`; dragged card `0 16px 32px rgba(74,58,48,0.20)`; popover `0 12px 28px rgba(74,58,48,0.14)`.
+- Focus ring on inputs: `border-color:#B78380; box-shadow:0 0 0 3px rgba(183,131,128,0.15)`.
+- Scrim behind side panels/modals: `rgba(74,58,48,0.22)`.
+
+## Buttons
+
+- Primary: `#B78380` fill, white text, radius 8, min-height 52 mobile / 38–46 desktop, weight 500, shadow above; hover `#A87370`, active `#9C6764`, disabled `#E7DCD8`/`#B3A9A5`.
+- Secondary: 1px `#B78380` border, transparent fill, `#B78380` text; hover tint `#F6EDEB`.
+- Tertiary/link: text only in `#B78380`; hover `#9C6764`.
+- Compact neutral (admin web): 1px `#D8C9BB`, `#FAF7F2` fill, `#4A4A4A` text, height 30–38; hover border `#B78380`.
+- Destructive: Error `#B25D4B` text/border, hover text `#94493A`, hover tint `rgba(178,93,75,0.10)`.
+- **One solid button per view.**
+- Mobile hit targets never below 44px.
 
 ## Style Conventions
 
 Applies to every surface unless a surface-specific prompt overrides it.
 
 - **Corners**: soft-rounded — ~12–16px on cards, ~8px on buttons and inputs. Restrained, not maximal.
-- **Icons**: thin, single-weight line icons only. No filled glyphs.
-- **Density**: spacious — generous whitespace between elements, not a dense enterprise layout.
-- **Typography**: a warm serif for headings, class names, and prices; a clean plain sans for body text and UI labels.
+- **Icons**: thin, single-weight line icons only, inline SVG, 24×24 viewBox, `stroke="currentColor"`-style strokes at 1.4–2.1 weight, rendered at 11–22px. No filled glyphs.
+- **Density**: spacious on mobile — generous whitespace between elements. Admin web runs tighter (see Typography above) — dense, scanned/operated desktop work, not a mobile-style card layout.
 - **Buttons/CTAs**: solid fill in Palo de rosa, rounded rectangle, generous mobile-first tap targets.
-- **Cards**: Marfil/white surface, thin Arena cálida border, soft shadow.
-- **Navigation** (mobile surfaces): bottom tab bar for primary sections.
+- **Cards**: white/Superficie surface, thin Borde, soft shadow.
+- **Navigation** (mobile surfaces): bottom tab bar for primary sections (client app only — see Staff App below).
 
 ### Client App Tab Bar
 
@@ -68,7 +116,7 @@ Plans & Payment, Subscription detail, Evaluations, and Referrals are not top-lev
 | Role | Home screen | Scope |
 |---|---|---|
 | Trainer | My Schedule | View own Sessions, mark Attendance. Narrow, single-purpose. |
-| Assistant | Client Search | Find/create a client, book or record a cash Payment on their behalf. Responsive to both phone and tablet — assistants commonly use tablets at the front desk, but the same app must also work well on a phone (mobile-first layout, adapting at tablet width — e.g. a list-only phone layout becoming a side-by-side list-and-detail layout). |
+| Assistant | Client Search | Find/create a client, book or manage Bookings and record a cash Payment on their behalf. Responsive to both phone and tablet — assistants commonly use tablets at the front desk, but the same app must also work well on a phone (mobile-first layout, adapting at tablet width — e.g. a list-only phone layout becoming a side-by-side list-and-detail layout). |
 | Administrator | Pending Payments | Per [ADR-0004](../adr/0004-split-administrator-across-mobile-and-desktop.md), only two time-critical tasks: confirm/reject a pending transfer Payment, and cancel a Session as a last resort. Pending Payments is what a push notification opens directly into, with a header action leading into the Cancel Session flow as a secondary path. |
 | Nutritionist | Mi Agenda | See who's booked into upcoming Evaluations, and publish/manage Availability Blocks (the open time ranges Evaluation slots are auto-generated from) as a secondary path. |
 
@@ -76,20 +124,24 @@ No tab bar for any Role — each is a header + back-arrow drill-down from its ho
 
 ### Admin Desktop Web Responsiveness
 
-This is a website, opened in any browser — including a phone's browser — not the staff mobile app above. It must never break or become unusable at a narrow width: dense tabular views (the income/expense report, Back Office lists) reflow into a stacked/card layout on narrow screens. This does not change ADR-0004's boundary — the work itself (schedule building, Back Office entry, reports) is still designed desktop-first for deliberate, detailed use; a phone browser is a fallback that stays usable, not the intended primary workflow.
+This is a website, opened in any browser — including a phone's browser — not the staff mobile app above. It must never break or become unusable at a narrow width: dense tabular views (the income/expense report, Back Office lists) reflow into a stacked/card layout on narrow screens, side panels become full-screen sheets, and the sidebar collapses to a hamburger drawer. This does not change ADR-0004's boundary — the work itself (schedule building, Back Office entry, reports) is still designed desktop-first for deliberate, detailed use; a phone browser is a fallback that stays usable, not the intended primary workflow.
 
 ### Admin Desktop Web Navigation
 
-A persistent left sidebar (not a mobile tab bar), grouped into five sections:
+Reference width **1440px**; every screen also has a 420px narrow-browser variant.
+
+A persistent left sidebar (236px, not a mobile tab bar), grouped into five sections. **This is the canonical, complete item list — every admin-web prompt and every regenerated screen must render all of it, not a subset:**
 
 | Group | Contains |
 |---|---|
 | Horario | Schedule grid, Session form |
-| Catálogo | Planes, Tipos de Clase, Sucursales |
-| Back Office | Insumos, Nómina, Gastos, Categorías de Gasto, Pagos, Personal, Clientes, Evaluaciones nutricionales |
+| Catálogo | Tipos de clase, Planes, Sucursales |
+| Back Office | Clientes, Pagos (badge), Insumos (badge, warning tint), Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto |
 | Reporte | Income/expense report |
-| Promociones | Promotions carousel management, Referidos, Créditos |
+| Promociones | Promociones, Referidos, Créditos |
 
-A Branch selector sits in the top bar, persistent across every screen except Reporte (which offers its own "todas las sucursales" option since it aggregates), since most Back Office and schedule data is scoped to a single Branch. On narrow/mobile widths (see Admin Desktop Web Responsiveness above), the sidebar collapses into a hamburger-triggered drawer.
+There is no "Descuentos" item — see [ADR-0007](../adr/0007-drop-descuentos-from-admin-web.md); no domain concept backs it, and it must not be reintroduced.
 
-List pages (Planes, Tipos de Clase, Insumos, Nómina, Gastos, Categorías de Gasto, Promociones) use a dense data table with sortable columns, not mobile-style cards — this is scanned/operated desktop work. Each row opens its Form as a side panel; a "+ Nuevo" button in the page header creates one. On narrow widths, tables reflow into a stacked card-per-row layout per the Admin Desktop Web Responsiveness note.
+A Branch selector sits in the top bar, persistent across every screen. It scopes most pages, but is shown-and-ignored (studio-wide data, not per-Branch) on Nómina, Clientes, Referidos, Créditos, and Pagos; Reporte replaces it with its own selector that adds "Todas las sucursales". Sucursales is the list that feeds the top-bar selector itself. On narrow/mobile widths (see Admin Desktop Web Responsiveness above), the sidebar collapses into a hamburger-triggered drawer.
+
+List pages (Planes, Tipos de Clase, Sucursales, Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de Gasto, Promociones, Referidos, Créditos) use a dense data table with sortable columns, not mobile-style cards — this is scanned/operated desktop work. Most rows open a Form as a side panel; a "+ Nuevo" button in the page header creates one. Several lists are **read-only** (no primary action, no side panel edit) because nothing in the domain creates or edits those records directly from the admin: Clientes, Evaluaciones nutricionales, Referidos, Créditos, and Pagos (which is confirmed/rejected via a review panel, not edited). On narrow widths, tables reflow into a stacked card-per-row layout per the Admin Desktop Web Responsiveness note.
