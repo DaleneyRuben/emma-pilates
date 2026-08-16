@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  input::placeholder { color: #A79E9A; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:2200px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW33</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Menú de usuario y cambiar contraseña</h1>
+    <p style="margin:0;max-width:900px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">No es una pantalla aparte: son los estados superpuestos de la celda de usuario que el armazón de AW02 ya dibuja en la barra superior y que hasta ahora ninguna pantalla abría. Aquí viven las dos acciones que faltaban en la web de administración: cambiar tu propia contraseña y cerrar sesión. El menú pertenece al armazón, así que está disponible igual en todas las pantallas autenticadas; lo dibujamos sobre Horario (AW02) solo para verlo en su lugar. Nada detrás de la superposición cambia.</p>
+  </header>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">1 · Escritorio · Menú abierto</div>
+        <div style="font-size:12px;color:#8A807C;">Popover anclado al borde derecho de la celda de usuario · el chevron gira mientras está abierto · clic fuera o Esc lo cierra</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;position:relative;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/horario
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.6"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg>
+            </button>
+            <div style="width:1px;height:20px;background:#E4D8CC;"></div>
+            <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:#FAF3EC;cursor:pointer;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:0.02em;">MF</div>
+              <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="transform:rotate(180deg);"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:720px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px 24px;display:flex;flex-direction:column;gap:4px;">
+          <sc-for list="{{ nav }}" as="item" hint-placeholder-count="12">
+            <sc-if value="{{ item.isGroup }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">{{ item.label }}</div>
+            </sc-if>
+            <sc-if value="{{ item.isActive }}" hint-placeholder-val="{{ false }}">
+              <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+                {{ item.label }}
+              </a>
+            </sc-if>
+            <sc-if value="{{ item.isLink }}" hint-placeholder-val="{{ true }}">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">
+                {{ item.label }}
+                <sc-if value="{{ item.badgePink }}" hint-placeholder-val="{{ false }}">
+                  <span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">{{ item.badge }}</span>
+                </sc-if>
+                <sc-if value="{{ item.badgeGold }}" hint-placeholder-val="{{ false }}">
+                  <span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">{{ item.badge }}</span>
+                </sc-if>
+              </a>
+            </sc-if>
+          </sc-for>
+        </nav>
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Horario</h2>
+              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · sala única · 24 sesiones esta semana</div>
+            </div>
+            <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              Nueva sesión
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:10px;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <button style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="2"><path d="M15 6l-6 6 6 6"></path></svg></button>
+              <div style="font-size:13.5px;font-weight:500;">10 – 16 de agosto de 2026</div>
+              <button style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="2"><path d="M9 6l6 6-6 6"></path></svg></button>
+              <button style="height:28px;padding:0 12px;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;">Hoy</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:16px;font-size:12px;color:#8A807C;">
+              <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#D8BDB8;"></span>Programada</span>
+              <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#CBB9A4;"></span>Llena</span>
+              <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#E0D3C6;"></span>Cancelada</span>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:62px repeat(7,1fr);border-bottom:1px solid #E4D8CC;background:#FDFAF6;">
+              <div style="border-right:1px solid #EFE6DC;"></div>
+              <sc-for list="{{ days }}" as="day" hint-placeholder-count="7">
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;">
+                  <span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">{{ day.name }}</span>
+                  <span style="font-size:14px;font-weight:500;">{{ day.num }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:62px repeat(7,1fr);">
+              <div style="border-right:1px solid #EFE6DC;background:#FDFAF6;position:relative;height:528px;">
+                <sc-for list="{{ hours }}" as="h" hint-placeholder-count="7">
+                  <div style="height:88px;padding:1px 8px 0;text-align:right;font-size:10.5px;color:#A79E9A;">{{ h }}</div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ days }}" as="day" hint-placeholder-count="7">
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 43px,#F4EDE4 43px,#F4EDE4 44px);padding:0 5px;">
+                  <sc-for list="{{ day.items }}" as="s" hint-placeholder-count="2">
+                    <div style="{{ s.pos }}">
+                      <div style="height:40px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:5px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;">
+                        <span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ s.title }}</span>
+                        <span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ s.meta }}</span>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <div style="position:absolute;top:82px;right:18px;width:240px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:10px;box-shadow:0 12px 28px rgba(74,58,48,0.14);overflow:hidden;">
+        <div style="padding:14px 14px 12px;display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:14px;font-weight:500;">María Fernanda Loza</div>
+          <div style="font-size:11.5px;color:#A79E9A;">mfloza@emmapilates.bo</div>
+          <div style="margin-top:5px;font-size:11.5px;color:#8A807C;">Administradora</div>
+        </div>
+        <div style="height:1px;background:#EFE6DC;"></div>
+        <div style="padding:6px;display:flex;flex-direction:column;">
+          <button style="height:36px;display:flex;align-items:center;gap:9px;padding:0 8px;border:none;border-radius:7px;background:transparent;font-size:13.5px;color:#4A4A4A;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.6"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            Cambiar contraseña
+          </button>
+          <button style="height:36px;display:flex;align-items:center;gap:9px;padding:0 8px;border:none;border-radius:7px;background:transparent;font-size:13.5px;color:#B0655B;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B0655B" stroke-width="1.6" stroke-linecap="round"><path d="M15 17l5-5-5-5"></path><path d="M20 12H9"></path><path d="M12 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6"></path></svg>
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">2 · Escritorio · Cambiar contraseña</div>
+        <div style="font-size:12px;color:#8A807C;">Panel lateral de 408 px sobre la página atenuada · no es el flujo de recuperación (AW30/AW32) y no lo ofrece</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;position:relative;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/horario
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.6"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg>
+            </button>
+            <div style="width:1px;height:20px;background:#E4D8CC;"></div>
+            <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+              <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:720px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px 24px;display:flex;flex-direction:column;gap:4px;">
+          <sc-for list="{{ nav }}" as="item" hint-placeholder-count="12">
+            <sc-if value="{{ item.isGroup }}" hint-placeholder-val="{{ false }}">
+              <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">{{ item.label }}</div>
+            </sc-if>
+            <sc-if value="{{ item.isActive }}" hint-placeholder-val="{{ false }}">
+              <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+                {{ item.label }}
+              </a>
+            </sc-if>
+            <sc-if value="{{ item.isLink }}" hint-placeholder-val="{{ true }}">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;">
+                {{ item.label }}
+                <sc-if value="{{ item.badgePink }}" hint-placeholder-val="{{ false }}">
+                  <span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">{{ item.badge }}</span>
+                </sc-if>
+                <sc-if value="{{ item.badgeGold }}" hint-placeholder-val="{{ false }}">
+                  <span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">{{ item.badge }}</span>
+                </sc-if>
+              </a>
+            </sc-if>
+          </sc-for>
+        </nav>
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Horario</h2>
+              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · sala única · 24 sesiones esta semana</div>
+            </div>
+            <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+              Nueva sesión
+            </button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:10px;">
+            <div style="font-size:13.5px;font-weight:500;">10 – 16 de agosto de 2026</div>
+            <div style="display:flex;align-items:center;gap:16px;font-size:12px;color:#8A807C;">
+              <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#D8BDB8;"></span>Programada</span>
+              <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#CBB9A4;"></span>Llena</span>
+              <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#E0D3C6;"></span>Cancelada</span>
+            </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:62px repeat(7,1fr);border-bottom:1px solid #E4D8CC;background:#FDFAF6;">
+              <div style="border-right:1px solid #EFE6DC;"></div>
+              <sc-for list="{{ days }}" as="day" hint-placeholder-count="7">
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;">
+                  <span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">{{ day.name }}</span>
+                  <span style="font-size:14px;font-weight:500;">{{ day.num }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:grid;grid-template-columns:62px repeat(7,1fr);">
+              <div style="border-right:1px solid #EFE6DC;background:#FDFAF6;position:relative;height:528px;">
+                <sc-for list="{{ hours }}" as="h" hint-placeholder-count="7">
+                  <div style="height:88px;padding:1px 8px 0;text-align:right;font-size:10.5px;color:#A79E9A;">{{ h }}</div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ days }}" as="day" hint-placeholder-count="7">
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 43px,#F4EDE4 43px,#F4EDE4 44px);padding:0 5px;">
+                  <sc-for list="{{ day.items }}" as="s" hint-placeholder-count="2">
+                    <div style="{{ s.pos }}">
+                      <div style="height:40px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:5px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;">
+                        <span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ s.title }}</span>
+                        <span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ s.meta }}</span>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      <div style="position:absolute;top:44px;left:0;right:0;bottom:0;background:rgba(74,58,48,0.22);"></div>
+      <div style="position:absolute;top:44px;right:0;bottom:0;width:408px;background:#FFFFFF;border-left:1px solid #E4D8CC;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="padding:20px 24px 18px;border-bottom:1px solid #EFE6DC;display:flex;align-items:flex-start;gap:16px;">
+          <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+            <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.2;">Cambiar contraseña</h3>
+            <p style="margin:0;font-size:12.5px;line-height:1.55;color:#8A807C;text-wrap:pretty;">Tu sesión seguirá abierta en este navegador.</p>
+          </div>
+          <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+          </button>
+        </div>
+        <div style="flex:1;padding:22px 24px;display:flex;flex-direction:column;gap:18px;">
+          <label style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña actual</span>
+            <input type="password" defaultValue="{{ current }}" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+            <input type="password" defaultValue="{{ nueva }}" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            <span style="font-size:12px;color:#A79E9A;">Mínimo 8 caracteres.</span>
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+            <input type="password" defaultValue="{{ mismatch }}" style="height:44px;width:100%;padding:0 14px;border:1px solid #C08A7E;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#C08A7E;box-shadow:0 0 0 3px rgba(192,138,126,0.18);" />
+            <span style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:#B0655B;line-height:1.4;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B0655B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>
+              Las contraseñas no coinciden.
+            </span>
+          </label>
+        </div>
+        <div style="padding:16px 24px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:10px;">
+          <button disabled="{{ true }}" style="height:46px;width:100%;border:none;border-radius:8px;background:#E2D3CD;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:not-allowed;">Guardar contraseña</button>
+          <span style="text-align:center;font-size:12px;color:#A79E9A;">Se habilita cuando los tres campos están llenos y las dos nuevas coinciden.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">3 · Escritorio · Confirmar cierre de sesión</div>
+          <div style="font-size:12px;color:#8A807C;">Reemplaza el popover en la misma posición anclada · al confirmar vuelve al login (AW01)</div>
+        </div>
+      </sc-if>
+      <div style="width:880px;position:relative;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+        <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="display:flex;gap:7px;">
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          </div>
+          <div style="flex:1;max-width:340px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">admin.emmapilates.bo/horario</div>
+        </div>
+        <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="width:200px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+            <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:0 18px;">
+            <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:#FAF3EC;cursor:pointer;">
+              <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+              <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="transform:rotate(180deg);"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+        </div>
+        <div style="display:flex;align-items:stretch;height:360px;">
+          <div style="width:200px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+            <div style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;">Horario</div>
+            <div style="height:32px;padding:0 12px 0 22px;line-height:32px;font-size:13px;color:#6E6663;">Tipos de clase</div>
+            <div style="height:32px;padding:0 12px 0 22px;line-height:32px;font-size:13px;color:#6E6663;">Planes</div>
+            <div style="height:32px;padding:0 12px 0 22px;line-height:32px;font-size:13px;color:#6E6663;">Clientes</div>
+            <div style="height:32px;padding:0 12px 0 22px;line-height:32px;font-size:13px;color:#6E6663;">Pagos</div>
+          </div>
+          <div style="flex:1;background:#FAF7F2;padding:24px 26px;display:flex;flex-direction:column;gap:14px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Horario</h2>
+            <div style="flex:1;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;background-image:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 43px,#F4EDE4 43px,#F4EDE4 44px);"></div>
+          </div>
+        </div>
+        <div style="position:absolute;top:82px;right:18px;width:272px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:10px;box-shadow:0 12px 28px rgba(74,58,48,0.14);padding:18px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="font-size:15px;font-weight:500;">¿Cerrar sesión?</div>
+            <p style="margin:0;font-size:12.5px;line-height:1.55;color:#8A807C;text-wrap:pretty;">Si tienes un panel abierto sin guardar, se descarta.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <button style="height:40px;width:100%;border:1px solid #C08A7E;border-radius:8px;background:#FFFFFF;color:#B0655B;font-size:13.5px;font-weight:500;cursor:pointer;" style-hover="background:#FBF1EE;">Cerrar sesión</button>
+            <button style="height:32px;align-self:center;border:none;background:transparent;color:#B78380;font-size:13.5px;cursor:pointer;" style-hover="color:#9C6764;">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">4 · Navegador angosto · 420 px</div>
+          <div style="font-size:12px;color:#8A807C;">Solo el avatar en la barra · el menú baja como hoja al pie; el panel pasa a pantalla completa</div>
+        </div>
+      </sc-if>
+      <div style="display:flex;gap:24px;align-items:flex-start;">
+
+        <div style="width:420px;position:relative;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+          <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+            <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">admin.emmapilates.bo/horario</div>
+          </div>
+          <div style="height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+            <div style="display:flex;align-items:center;gap:12px;">
+              <button style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+              </button>
+              <span style="font-family:Lora,Georgia,serif;font-size:20px;line-height:1;">Emma</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button style="height:28px;display:flex;align-items:center;gap:5px;padding:0 9px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:11.5px;color:#4A4A4A;cursor:pointer;">Equipetrol<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+              <div style="width:28px;height:28px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;box-shadow:0 0 0 2px #EFE0DC;">MF</div>
+            </div>
+          </div>
+          <div style="position:relative;height:620px;background:#FAF7F2;">
+            <div style="padding:16px 14px;display:flex;flex-direction:column;gap:12px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:24px;">Horario</h2>
+              <div style="font-size:12.5px;color:#8A807C;">Miércoles 12 de agosto · sala única</div>
+              <div style="height:420px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;background-image:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 43px,#F4EDE4 43px,#F4EDE4 44px);"></div>
+            </div>
+            <div style="position:absolute;inset:0;background:rgba(74,58,48,0.22);"></div>
+            <div style="position:absolute;left:0;right:0;bottom:0;background:#FFFFFF;border-top:1px solid #E4D8CC;border-radius:14px 14px 0 0;box-shadow:0 -12px 28px rgba(74,58,48,0.14);padding:10px 14px 18px;display:flex;flex-direction:column;gap:10px;">
+              <div style="width:40px;height:4px;border-radius:999px;background:#E4D8CC;align-self:center;"></div>
+              <div style="display:flex;align-items:center;gap:11px;padding:6px 4px 12px;border-bottom:1px solid #EFE6DC;">
+                <div style="width:36px;height:36px;flex:none;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;">MF</div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:14px;font-weight:500;">María Fernanda Loza</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">mfloza@emmapilates.bo</span>
+                  <span style="font-size:11.5px;color:#8A807C;">Administradora</span>
+                </div>
+              </div>
+              <button style="height:48px;display:flex;align-items:center;gap:10px;padding:0 6px;border:none;border-radius:8px;background:transparent;font-size:14.5px;color:#4A4A4A;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.6"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+                Cambiar contraseña
+              </button>
+              <button style="height:48px;display:flex;align-items:center;gap:10px;padding:0 6px;border:none;border-radius:8px;background:transparent;font-size:14.5px;color:#B0655B;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B0655B" stroke-width="1.6" stroke-linecap="round"><path d="M15 17l5-5-5-5"></path><path d="M20 12H9"></path><path d="M12 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6"></path></svg>
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+          <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+            <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">admin.emmapilates.bo/horario</div>
+          </div>
+          <div style="height:672px;display:flex;flex-direction:column;background:#FFFFFF;">
+            <div style="padding:18px 16px 16px;border-bottom:1px solid #EFE6DC;display:flex;align-items:flex-start;gap:14px;">
+              <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+                <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:21px;line-height:1.2;">Cambiar contraseña</h3>
+                <p style="margin:0;font-size:12.5px;line-height:1.55;color:#8A807C;text-wrap:pretty;">Tu sesión seguirá abierta en este navegador.</p>
+              </div>
+              <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+              </button>
+            </div>
+            <div style="flex:1;padding:20px 16px;display:flex;flex-direction:column;gap:18px;">
+              <label style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña actual</span>
+                <input type="password" placeholder="Tu contraseña actual" style="height:46px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+                <input type="password" placeholder="Mínimo 8 caracteres" style="height:46px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+                <input type="password" placeholder="Repite la contraseña nueva" style="height:46px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              </label>
+            </div>
+            <div style="padding:14px 16px 20px;border-top:1px solid #EFE6DC;">
+              <button disabled="{{ true }}" style="height:46px;width:100%;border:none;border-radius:8px;background:#E2D3CD;color:#FFFFFF;font-size:15px;font-weight:500;cursor:not-allowed;">Guardar contraseña</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Pertenece al armazón</span>Igual en todas las pantallas autenticadas de la web de administración, sin cambios: no es parte de Horario.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Rol como dato, no como estado</span>"Administradora" va en texto neutro; nunca una píldora de estado, misma regla que AW23.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Salir con contención</span>"Cerrar sesión" solo lleva el tono de error en el texto y pide confirmación; nadie abre este menú para irse.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">No es recuperación</span>El panel exige la contraseña actual; quien la olvidó usa "¿Olvidaste tu contraseña?" en el login (AW30 → AW32).</div>
+  </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const nav = [
+      { label: "Horario", isActive: true },
+      { label: "Catálogo", isGroup: true },
+      { label: "Tipos de clase", isLink: true },
+      { label: "Planes", isLink: true },
+      { label: "Sucursales", isLink: true },
+      { label: "Back Office", isGroup: true },
+      { label: "Clientes", isLink: true },
+      { label: "Pagos", isLink: true, badge: "6", badgePink: true },
+      { label: "Insumos", isLink: true, badge: "3", badgeGold: true },
+      { label: "Evaluaciones nutricionales", isLink: true },
+      { label: "Personal", isLink: true },
+      { label: "Nómina", isLink: true },
+      { label: "Gastos", isLink: true },
+      { label: "Categorías de gasto", isLink: true },
+      { label: "Reporte", isLink: true },
+      { label: "Promociones", isGroup: true },
+      { label: "Promociones", isLink: true },
+      { label: "Referidos", isLink: true },
+      { label: "Créditos", isLink: true }
+    ];
+    const s = (top, title, meta) => ({ pos: "position:absolute;left:5px;right:5px;top:" + top + "px", title, meta });
+    const days = [
+      { name: "Lun", num: "10", items: [s(0, "Reformer Intermedio", "07:00 · Camila Rojas"), s(132, "Mat Pilates", "10:00 · Daniela Ortiz"), s(396, "Barre", "16:00 · Camila Rojas")] },
+      { name: "Mar", num: "11", items: [s(44, "Mat Pilates", "08:00 · Daniela Ortiz"), s(220, "Prenatal", "12:00 · Valeria Peña"), s(440, "Reformer Intermedio", "17:00 · Camila Rojas")] },
+      { name: "Mié", num: "12 · hoy", items: [s(0, "Reformer Intermedio", "07:00 · Camila Rojas"), s(132, "Mat Pilates", "10:00 · Daniela Ortiz"), s(396, "Reformer Avanzado", "16:00 · Valeria Peña")] },
+      { name: "Jue", num: "13", items: [s(44, "Reformer Intermedio", "08:00 · Camila Rojas"), s(264, "Prenatal", "13:00 · Valeria Peña")] },
+      { name: "Vie", num: "14", items: [s(0, "Reformer Intermedio", "07:00 · Camila Rojas"), s(176, "Mat Pilates", "11:00 · Daniela Ortiz"), s(440, "Barre", "17:00 · Camila Rojas")] },
+      { name: "Sáb", num: "15", items: [s(88, "Mat Pilates", "09:00 · Daniela Ortiz"), s(176, "Reformer Intermedio", "11:00 · Camila Rojas")] },
+      { name: "Dom", num: "16", items: [s(132, "Mat Pilates", "10:00 · Valeria Peña")] }
+    ];
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      nav, days,
+      hours: ["07:00", "09:00", "11:00", "13:00", "15:00", "17:00"],
+      current: "EmmaPilates2025",
+      nueva: "Equipetrol2026",
+      mismatch: "Equipetrol20"
+    };
+  }
+}
+</script>
+</body>
+</html>
