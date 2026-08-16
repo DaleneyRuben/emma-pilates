@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  input::placeholder { color: #A79E9A; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S19</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Crear contraseña</h1>
+    <p style="margin:0;max-width:780px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Paso obligatorio justo después de S01, la primera vez que alguien del equipo entra con la contraseña temporal que le generó administración en AW24. Sin navegación ni flecha de retorno: no se puede saltar mientras la temporal siga activa. Al guardar, la app entra directo al inicio del rol (S02, S04, S11 o S15), sin pantalla de éxito. Mismo patrón que la pantalla 21 de la app de cliente.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Campos vacíos</div>
+          <div style="font-size:12px;color:#8A807C;">Botón inactivo hasta llenar y coincidir</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 52px;display:flex;flex-direction:column;justify-content:center;gap:40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div>
+            <div style="width:28px;height:1px;background:#D8C9BB;"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2>
+            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu administradora te creó una cuenta con una contraseña temporal. Elige una nueva para continuar.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+              <input type="password" placeholder="Mínimo 8 caracteres" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+              <input type="password" placeholder="Repite la contraseña" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button disabled="{{ isTrue }}" style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Guardar y continuar</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · No coinciden</div>
+          <div style="font-size:12px;color:#8A807C;">Validación en línea bajo el segundo campo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 52px;display:flex;flex-direction:column;justify-content:center;gap:40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div>
+            <div style="width:28px;height:1px;background:#D8C9BB;"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2>
+            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu administradora te creó una cuenta con una contraseña temporal. Elige una nueva para continuar.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+              <input type="password" value="emma2026estudio" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+              <input type="password" value="emma2026estudi" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" />
+              <span style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.5;color:#8A4433;">
+                <span style="width:6px;height:6px;border-radius:50%;background:#B25D4B;margin-top:6px;flex:none;"></span>
+                Las contraseñas no coinciden.
+              </span>
+            </label>
+            <button disabled="{{ isTrue }}" style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Guardar y continuar</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Listo para guardar</div>
+          <div style="font-size:12px;color:#8A807C;">Coinciden: el botón toma el palo de rosa</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 52px;display:flex;flex-direction:column;justify-content:center;gap:40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div>
+            <div style="width:28px;height:1px;background:#D8C9BB;"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2>
+            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu administradora te creó una cuenta con una contraseña temporal. Elige una nueva para continuar.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+              <input type="password" value="emma2026estudio" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+              <input type="password" value="emma2026estudio" style="height:52px;width:100%;padding:0 16px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar y continuar</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Listo para guardar</div>
+          <div style="font-size:12px;color:#8A807C;">Sin flecha del sistema: el paso no se puede abandonar</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;padding:72px 28px 52px;display:flex;flex-direction:column;justify-content:center;gap:40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div>
+            <div style="width:28px;height:1px;background:#D8C9BB;"></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2>
+            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu administradora te creó una cuenta con una contraseña temporal. Elige una nueva para continuar.</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+              <input type="password" value="emma2026estudio" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+              <input type="password" value="emma2026estudio" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar y continuar</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Paso obligatorio</span>Sin flecha de retorno ni acceso al inicio del rol hasta guardar la contraseña nueva.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Botón condicionado</span>Inactivo (#E7DCD8 sobre texto #B3A9A5) hasta que los dos campos estén llenos y sean iguales.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Validación en línea</span>El aviso va bajo el segundo campo, con borde #B25D4B; el primero no se marca.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Destino por rol</span>Al guardar entra al inicio que le toca: S02 entrenadora, S04 asistente, S11 administración, S15 nutrición.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      isTrue: true
+    };
+  }
+}
+</script>
+</body>
+</html>

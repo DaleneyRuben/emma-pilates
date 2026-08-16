@@ -25,14 +25,14 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW08</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Insumos</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Existencias de la sucursal elegida en la barra superior: cambiar de sucursal cambia la tabla completa. La insignia "Stock bajo" en color Advertencia aparece cuando la cantidad llega al umbral de alerta del insumo. "+ Nuevo insumo" y las filas abren AW09; "Registrar retiro" abre AW10.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Existencias de la sucursal elegida en la barra superior: cambiar de sucursal cambia la tabla completa. La insignia "Stock bajo" en color Advertencia aparece cuando la cantidad llega al umbral de alerta del insumo. "+ Nuevo insumo" y las filas abren AW09; "Registrar retiro" abre AW10; "Ver historial de retiros" abre AW31.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
-        <div style="font-size:12px;color:#8A807C;">Dos acciones en el encabezado · tabla con estado de stock</div>
+        <div style="font-size:12px;color:#8A807C;">Tres acciones en el encabezado · tabla con estado de stock</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -68,7 +68,7 @@
 
       <div style="display:flex;align-items:stretch;min-height:720px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
-          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
             Horario
           </a>
@@ -82,14 +82,17 @@
           <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
-          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
           </a>
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Descuentos</a>
         </nav>
 
         <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
@@ -99,6 +102,7 @@
               <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · 11 insumos · 3 con stock bajo</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
+              <a href="#" style="min-height:38px;display:flex;align-items:center;padding:0 8px;font-size:13.5px;font-weight:500;color:#B78380;">Ver historial de retiros</a>
               <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 16px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:13.5px;font-weight:500;cursor:pointer;" style-hover="background:#F7EEE9;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v11"></path><path d="M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19h14"></path></svg>
                 Registrar retiro
@@ -257,6 +261,7 @@
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.8" stroke-linecap="round"><path d="M12 4v11"></path><path d="M7.5 10.5L12 15l4.5-4.5"></path><path d="M5 19h14"></path></svg>
               Registrar retiro
             </button>
+            <a href="#" style="min-height:44px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:500;color:#B78380;">Ver historial de retiros</a>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
@@ -301,7 +306,7 @@
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Por sucursal</span>La tabla depende del selector de la barra superior: cada sucursal tiene su propio stock.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Umbral a la vista</span>Cada fila dice su umbral de alerta, así se entiende por qué hay o no insignia.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">"Stock bajo" en Advertencia</span>Aparece cuando la cantidad iguala o baja del umbral; el resto de filas queda en blanco.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Dos acciones</span>"Registrar retiro" es delineado porque descuenta stock; "+ Nuevo insumo" es la acción principal.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Tres acciones</span>"Registrar retiro" es delineado porque descuenta stock; "+ Nuevo insumo" es la acción principal; "Ver historial de retiros" queda como enlace de texto porque solo consulta, no cambia nada.</div>
     </div>
   </div>
 

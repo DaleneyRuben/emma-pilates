@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button, select { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:2200px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW31</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Retiros e insumos consumidos</h1>
+    <p style="margin:0;max-width:880px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Registro mensual de consumo de la sucursal elegida en la barra superior. Se llega desde "Ver historial de retiros" en AW08 y es solo de lectura: los retiros se registran únicamente en AW10, en el momento de sacar el insumo. Sub-vista de Insumos, por eso "Insumos" sigue activo en la barra lateral y no hay ítem propio.</p>
+  </header>
+
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
+        <div style="font-size:12px;color:#8A807C;">Filtros de mes e insumo · tabla de tres columnas · totales por insumo bajo la tabla</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/back-office/insumos/retiros
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #B78380;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:860px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
+        </nav>
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:9px;">
+            <a href="#" style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#B78380;width:fit-content;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg>
+              Insumos
+            </a>
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Retiros e insumos consumidos</h2>
+              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · registro de solo lectura</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div style="height:34px;display:flex;align-items:center;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;overflow:hidden;">
+              <button style="width:32px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-right:1px solid #F2EBE2;background:transparent;cursor:pointer;" style-hover="background:#FDF7F2;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg>
+              </button>
+              <div style="display:flex;align-items:center;gap:8px;padding:0 14px;font-size:12.5px;color:#4A4A4A;font-weight:500;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+                Agosto 2026
+              </div>
+              <button style="width:32px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-left:1px solid #F2EBE2;background:transparent;cursor:pointer;" style-hover="background:#FDF7F2;">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg>
+              </button>
+            </div>
+            <button style="height:34px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+              <span style="color:#A79E9A;">Insumo</span>
+              Todos
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+
+          <div style="font-size:13px;color:#6E6663;">{{ resumen }}</div>
+
+          <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+            <div style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.4fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+              <div>Insumo</div>
+              <div style="text-align:right;">Cantidad retirada</div>
+              <div style="text-align:right;">Fecha</div>
+            </div>
+
+            <sc-for list="{{ retiros }}" as="r" hint-placeholder-count="10">
+              <div style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.4fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
+                <div style="font-size:14px;">{{ r.insumo }}</div>
+                <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">{{ r.cantidad }}</div>
+                <div style="font-size:13.5px;text-align:right;color:#6E6663;font-variant-numeric:tabular-nums;">{{ r.fecha }}</div>
+              </div>
+            </sc-for>
+
+            <div style="display:flex;flex-direction:column;gap:9px;padding:16px 20px;background:#FDFAF6;">
+              <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Total retirado en el mes</div>
+              <div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:#6E6663;">
+                <sc-for list="{{ totales }}" as="t" hint-placeholder-count="5">
+                  <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:4px;height:4px;border-radius:50%;background:#D2C0B2;"></span><span style="color:#4A4A4A;">{{ t.insumo }}:</span>{{ t.total }}</span>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#A79E9A;">
+            <span>Ordenado del retiro más reciente al más antiguo</span>
+            <span>Los retiros se registran en AW10 y aquí solo se consultan.</span>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · sin retiros en el rango</div>
+          <div style="font-size:12px;color:#8A807C;">Los filtros quedan visibles para cambiar de mes sin volver atrás</div>
+        </div>
+      </sc-if>
+      <div style="width:880px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px 28px;display:flex;flex-direction:column;gap:18px;">
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <a href="#" style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#B78380;width:fit-content;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg>
+            Insumos
+          </a>
+          <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Retiros e insumos consumidos</h2>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+          <div style="height:34px;display:flex;align-items:center;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;overflow:hidden;">
+            <button style="width:32px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-right:1px solid #F2EBE2;background:transparent;cursor:pointer;" style-hover="background:#FDF7F2;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg>
+            </button>
+            <div style="display:flex;align-items:center;gap:8px;padding:0 14px;font-size:12.5px;color:#4A4A4A;font-weight:500;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+              Febrero 2026
+            </div>
+            <button style="width:32px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-left:1px solid #F2EBE2;background:transparent;cursor:pointer;" style-hover="background:#FDF7F2;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg>
+            </button>
+          </div>
+          <button style="height:34px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+            <span style="color:#A79E9A;">Insumo</span>
+            Detergente
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:64px 32px;display:flex;flex-direction:column;align-items:center;gap:12px;">
+          <div style="width:52px;height:52px;border-radius:50%;background:#F7F1EA;display:flex;align-items:center;justify-content:center;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C3B6AC" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+          </div>
+          <div style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:400;">Sin retiros en este rango.</div>
+          <p style="margin:0;max-width:380px;text-align:center;font-size:13.5px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Prueba con otro mes o quita el filtro de insumo para ver todo el consumo de la sucursal.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
+          <div style="font-size:12px;color:#8A807C;">Filas apiladas · totales al final, misma jerarquía</div>
+        </div>
+      </sc-if>
+      <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+        <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            admin.emmapilates.bo/…/retiros
+          </div>
+        </div>
+        <div style="height:52px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 14px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:20px;line-height:1;">Emma</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button style="height:28px;display:flex;align-items:center;gap:5px;padding:0 9px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:11.5px;color:#4A4A4A;cursor:pointer;">Equipetrol<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+            <div style="width:28px;height:28px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+          </div>
+        </div>
+        <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <a href="#" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#B78380;width:fit-content;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg>
+              Insumos
+            </a>
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:23px;line-height:1.15;">Retiros e insumos consumidos</h2>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="height:40px;display:flex;align-items:center;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;overflow:hidden;">
+              <button style="width:38px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-right:1px solid #F2EBE2;background:transparent;cursor:pointer;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg>
+              </button>
+              <div style="flex:1;text-align:center;font-size:13px;color:#4A4A4A;font-weight:500;">Agosto 2026</div>
+              <button style="width:38px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-left:1px solid #F2EBE2;background:transparent;cursor:pointer;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg>
+              </button>
+            </div>
+            <button style="height:40px;width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:13px;color:#4A4A4A;cursor:pointer;">
+              <span style="display:flex;align-items:center;gap:8px;"><span style="color:#A79E9A;">Insumo</span>Todos</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+          <div style="font-size:12.5px;color:#6E6663;">{{ resumen }}</div>
+          <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+            <sc-for list="{{ retirosMovil }}" as="r" hint-placeholder-count="6">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid #F2EBE2;">
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                  <span style="font-size:14px;">{{ r.insumo }}</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">{{ r.fecha }}</span>
+                </div>
+                <span style="font-size:14px;font-weight:500;flex:none;font-variant-numeric:tabular-nums;">{{ r.cantidad }}</span>
+              </div>
+            </sc-for>
+            <div style="display:flex;flex-direction:column;gap:8px;padding:14px;background:#FDFAF6;">
+              <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Total retirado en el mes</div>
+              <div style="display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#6E6663;">
+                <sc-for list="{{ totales }}" as="t" hint-placeholder-count="5">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><span style="color:#4A4A4A;">{{ t.insumo }}</span>{{ t.total }}</div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Solo lectura</span>No hay acción principal: un retiro nace en AW10, al momento de sacar el insumo, y no se edita ni se borra desde aquí.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Un mes a la vez</span>El selector arranca en el mes actual; los filtros de mes e insumo son la única interacción.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Los totales son el informe</span>El bloque bajo la tabla resume unidades por insumo: es el dato de consumo que se busca al entrar.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sub-vista de Insumos</span>"Insumos" queda activo en la barra lateral y el enlace de vuelta lleva a AW08.</div>
+    </div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+const RETIROS = [
+  { insumo: "Papel higiénico", cantidad: "6 rollos", fecha: "14 ago 2026 · 18:20" },
+  { insumo: "Alcohol en gel 500 ml", cantidad: "2 unid.", fecha: "13 ago 2026 · 09:05" },
+  { insumo: "Toallas de mano", cantidad: "4 unid.", fecha: "12 ago 2026 · 20:40" },
+  { insumo: "Detergente", cantidad: "2 unid.", fecha: "11 ago 2026 · 07:50" },
+  { insumo: "Papel higiénico", cantidad: "6 rollos", fecha: "8 ago 2026 · 19:15" },
+  { insumo: "Desinfectante de superficies", cantidad: "1 litro", fecha: "7 ago 2026 · 21:00" },
+  { insumo: "Alcohol en gel 500 ml", cantidad: "3 unid.", fecha: "6 ago 2026 · 08:30" },
+  { insumo: "Papel higiénico", cantidad: "6 rollos", fecha: "5 ago 2026 · 18:05" },
+  { insumo: "Toallas de mano", cantidad: "6 unid.", fecha: "4 ago 2026 · 12:10" },
+  { insumo: "Detergente", cantidad: "4 unid.", fecha: "3 ago 2026 · 20:25" },
+  { insumo: "Calcetines antideslizantes", cantidad: "5 pares", fecha: "3 ago 2026 · 10:45" },
+  { insumo: "Alcohol en gel 500 ml", cantidad: "2 unid.", fecha: "2 ago 2026 · 09:20" },
+  { insumo: "Bandas elásticas medianas", cantidad: "2 unid.", fecha: "1 ago 2026 · 17:35" },
+  { insumo: "Papel higiénico", cantidad: "6 rollos", fecha: "1 ago 2026 · 07:40" }
+];
+
+const TOTALES = [
+  { insumo: "Papel higiénico", total: "24 rollos" },
+  { insumo: "Toallas de mano", total: "10 unid." },
+  { insumo: "Alcohol en gel 500 ml", total: "7 unid." },
+  { insumo: "Detergente", total: "6 unid." },
+  { insumo: "Calcetines antideslizantes", total: "5 pares" },
+  { insumo: "Bandas elásticas medianas", total: "2 unid." },
+  { insumo: "Desinfectante de superficies", total: "1 litro" }
+];
+
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      retiros: RETIROS,
+      retirosMovil: RETIROS.slice(0, 6),
+      totales: TOTALES,
+      resumen: RETIROS.length + " retiros en agosto de 2026."
+    };
+  }
+}
+</script>
+</body>
+</html>

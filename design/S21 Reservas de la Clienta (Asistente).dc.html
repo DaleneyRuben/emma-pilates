@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1980px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S21 · Rol: asistente</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Reservas de la clienta</h1>
+    <p style="margin:0;max-width:840px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Se abre desde "Ver reservas" en S06 y la flecha vuelve ahí. Misma estructura y estados que Mis reservas (pantalla 05) de la app de cliente, pero actuando en nombre de la clienta: el banner "Viendo reservas de:" acompaña toda la tarea, también al reprogramar. En tablet ocupa el panel derecho, junto a la búsqueda, igual que S06.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Con reservas</div>
+          <div style="font-size:12px;color:#8A807C;">Los tres estados juntos, sin barra de pestañas</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reservas de la clienta</span>
+          </div>
+
+          <div style="margin:0 16px;display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #D8C9BB;border-radius:12px;background:rgba(216,189,184,0.16);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+            <span style="font-size:13.5px;color:#6E6663;">Viendo reservas de: <span style="color:#4A4A4A;font-weight:500;">Valeria Áñez</span></span>
+          </div>
+
+          <div style="padding:16px 16px 28px;display:flex;flex-direction:column;gap:12px;">
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Hoy · 18:30 – 19:20</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#6E6663;">
+                <span style="display:inline-flex;align-items:center;gap:7px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                  Daniela Ortiz
+                </span>
+                <span style="display:inline-flex;align-items:center;gap:7px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                  Equipetrol
+                </span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:160px;">Faltan menos de 2 h 30 para el inicio.</span>
+                <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#7C9473;"></span>Confirmada</span>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#6E6663;">
+                <span style="display:inline-flex;align-items:center;gap:7px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                  Emma Vargas
+                </span>
+                <span style="display:inline-flex;align-items:center;gap:7px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                  Centro
+                </span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Se puede cancelar sin costo hasta las 04:30.</span>
+                <button onClick="{{ openSheet }}" style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Sábado 22 · 09:00 – 09:50</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Es la 2.ª en la lista.</span>
+                <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Confirmar cancelación</div>
+          <div style="font-size:12px;color:#8A807C;">La pregunta nombra a la clienta · interactivo</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;position:relative;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reservas de la clienta</span>
+          </div>
+
+          <div style="margin:0 16px;display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #D8C9BB;border-radius:12px;background:rgba(216,189,184,0.16);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+            <span style="font-size:13.5px;color:#6E6663;">Viendo reservas de: <span style="color:#4A4A4A;font-weight:500;">Valeria Áñez</span></span>
+          </div>
+
+          <div style="padding:16px 16px 28px;display:flex;flex-direction:column;gap:12px;">
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#7C9473;"></span>Confirmada</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Se puede cancelar sin costo hasta las 04:30.</span>
+                <button onClick="{{ openSheet }}" style="min-height:44px;padding:0 18px;border:1px solid #B25D4B;border-radius:8px;background:rgba(178,93,75,0.08);color:#B25D4B;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;">Cancelar</button>
+              </div>
+            </div>
+          </div>
+
+          <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;">
+            <div onClick="{{ closeSheet }}" style="position:absolute;inset:0;background:rgba(74,74,74,0.32);"></div>
+            <div style="position:relative;background:#FFFFFF;border-top-left-radius:20px;border-top-right-radius:20px;padding:14px 20px 40px;display:flex;flex-direction:column;gap:6px;box-shadow:0 -8px 28px rgba(74,58,48,0.16);">
+              <div style="width:42px;height:4px;border-radius:999px;background:#D8C9BB;align-self:center;margin-bottom:12px;"></div>
+              <div style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;line-height:1.3;">¿Cancelar esta reserva de Valeria Áñez?</div>
+              <p style="margin:6px 0 0;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Reformer Pilates, mañana 07:00. La clase vuelve a su plan y se le avisa por notificación.</p>
+              <div style="display:flex;flex-direction:column;gap:10px;margin-top:18px;">
+                <button style="min-height:52px;width:100%;border:none;border-radius:10px;background:#B25D4B;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(178,93,75,0.22);">Sí, cancelar la reserva</button>
+                <button onClick="{{ closeSheet }}" style="min-height:52px;width:100%;border:1px solid #D8C9BB;border-radius:10px;background:transparent;color:#6E6663;font-size:16px;font-weight:500;cursor:pointer;">No, volver</button>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Sin reservas próximas</div>
+          <div style="font-size:12px;color:#8A807C;">La salida es reservar por ella (S07)</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reservas de la clienta</span>
+          </div>
+
+          <div style="margin:0 16px;display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #D8C9BB;border-radius:12px;background:rgba(216,189,184,0.16);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+            <span style="font-size:13.5px;color:#6E6663;">Viendo reservas de: <span style="color:#4A4A4A;font-weight:500;">Renata Áñez Suárez</span></span>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 32px 80px;text-align:center;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.1" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+            <div style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">Esta clienta no tiene reservas próximas.</div>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#8A807C;max-width:260px;text-wrap:pretty;">Puedes reservarle una clase desde el horario del estudio.</p>
+            <button style="height:52px;min-width:220px;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Reservar una clase</button>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Tablet · 1024 px</div>
+          <div style="font-size:12px;color:#8A807C;">Panel derecho junto a la búsqueda, mismo reparto que S06</div>
+        </div>
+      </sc-if>
+      <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
+        <div style="height:768px;border-radius:18px;overflow:hidden;background:#FAF7F2;display:grid;grid-template-columns:392px 1fr;">
+
+        <div style="border-right:1px solid #D8C9BB;display:flex;flex-direction:column;gap:18px;padding:36px 24px;overflow:hidden;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistente</span>
+            <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Buscar cliente</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.4" stroke-linecap="round" style="flex:none;"><circle cx="11" cy="11" r="6.5"></circle><line x1="16" y1="16" x2="20" y2="20"></line></svg>
+            <span style="flex:1;font-size:15px;color:#4A4A4A;">Áñez</span>
+          </div>
+          <button style="min-height:48px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:1px solid #B78380;border-radius:10px;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"></line><line x1="5.5" y1="12" x2="18.5" y2="12"></line></svg>
+            Nuevo cliente
+          </button>
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">2 clientes</span>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #B78380;border-radius:14px;background:rgba(216,189,184,0.16);"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.55);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">V</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Valeria Áñez</span><span style="font-size:13px;color:#8A807C;">+591 707 12345</span></span></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">R</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Renata Áñez Suárez</span><span style="font-size:13px;color:#8A807C;">+591 707 44821</span></span></div>
+          </div>
+        </div>
+
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;">
+          <div style="padding:26px 30px 16px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button style="width:44px;height:44px;margin-left:-10px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+              </button>
+              <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;">Reservas de la clienta</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid #D8C9BB;border-radius:12px;background:rgba(216,189,184,0.16);">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:13.5px;color:#6E6663;">Viendo reservas de: <span style="color:#4A4A4A;font-weight:500;">Valeria Áñez</span></span>
+            </div>
+          </div>
+
+          <div style="padding:6px 30px 30px;display:grid;grid-template-columns:1fr 1fr;gap:16px;align-content:start;">
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Hoy · 18:30 – 19:20</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:180px;">Faltan menos de 2 h 30 para el inicio.</span>
+                <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#7C9473;"></span>Confirmada</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:180px;">Se puede cancelar sin costo hasta las 04:30.</span>
+                <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Sábado 22 · 09:00 – 09:50</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                </div>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:180px;">Es la 2.ª en la lista.</span>
+                <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Banner siempre visible</span>"Viendo reservas de:" queda bajo el encabezado durante toda la tarea, también en la pantalla de reprogramar, para no actuar sobre la clienta equivocada.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Mismos estados que la 05</span>Confirmada con "Cancelar", no cancelable con "Reprogramar", en lista de espera con "Salir de la lista": nada que la clienta no pueda hacer sola.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cancelar pregunta primero</span>La hoja nombra a la clienta y la clase; al confirmar, la clase vuelve a su plan y se le notifica.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Reprogramar</span>Abre las alternativas del mismo día, igual que la pantalla 06 del cliente, con el banner arriba.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  state = { sheet: true };
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      sheetOpen: this.state.sheet,
+      openSheet: () => this.setState({ sheet: true }),
+      closeSheet: () => this.setState({ sheet: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

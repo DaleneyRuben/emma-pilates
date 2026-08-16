@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S20</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Notificaciones</h1>
+    <p style="margin:0;max-width:800px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">No hay enlace en el menú: se llega desde una notificación push, igual que S11. La flecha vuelve al inicio del rol. Aquí se muestran los cuatro tipos juntos como documentación; una cuenta real solo ve los de su rol. Mismo lenguaje visual que la pantalla 19 de la app de cliente: sin leer con fondo rosa empolvado y punto; leídas planas.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Con notificaciones</div>
+          <div style="font-size:12px;color:#8A807C;">Un aviso por rol · dos sin leer arriba</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:10px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;flex:1;">Notificaciones</span>
+            <button style="min-height:40px;padding:0 12px;border:none;border-radius:8px;background:transparent;color:#B78380;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex:none;" style-hover="color:#9C6764;">Marcar leídas</button>
+          </div>
+
+          <div style="padding:18px 16px 28px;display:flex;flex-direction:column;gap:16px;">
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="padding:0 4px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Sin leer</span>
+
+              <div style="display:flex;align-items:flex-start;gap:13px;padding:16px;border:1px solid rgba(216,189,184,0.6);border-radius:14px;background:rgba(216,189,184,0.14);">
+                <span style="width:38px;height:38px;border-radius:999px;flex:none;background:rgba(201,154,78,0.14);display:flex;align-items:center;justify-content:center;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C99A4E" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;">
+                  <span style="font-size:14px;line-height:1.55;color:#4A4A4A;">Se te asignó una sesión de última hora: Reformer Intermedio, hoy 16:00.</span>
+                  <span style="font-size:12px;color:#8A807C;">Hace 25 minutos · Entrenadora</span>
+                </span>
+                <span style="width:8px;height:8px;border-radius:999px;background:#B78380;flex:none;margin-top:6px;"></span>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:13px;padding:16px;border:1px solid rgba(216,189,184,0.6);border-radius:14px;background:rgba(216,189,184,0.14);">
+                <span style="width:38px;height:38px;border-radius:999px;flex:none;background:rgba(201,154,78,0.14);display:flex;align-items:center;justify-content:center;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C99A4E" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="3.5" width="14" height="17" rx="2.5"></rect><line x1="8.5" y1="9" x2="15.5" y2="9"></line><line x1="8.5" y1="13" x2="13" y2="13"></line></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;">
+                  <span style="font-size:14px;line-height:1.55;color:#4A4A4A;">Tienes un comprobante de pago pendiente de revisión.</span>
+                  <span style="font-size:12px;color:#8A807C;">Hace 1 hora · Administración</span>
+                </span>
+                <span style="width:8px;height:8px;border-radius:999px;background:#B78380;flex:none;margin-top:6px;"></span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <span style="padding:0 4px 8px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Anteriores</span>
+
+              <div style="display:flex;align-items:flex-start;gap:13px;padding:16px 4px;border-bottom:1px solid #EFE7DE;">
+                <span style="width:38px;height:38px;border-radius:999px;flex:none;background:rgba(216,201,187,0.34);display:flex;align-items:center;justify-content:center;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;">
+                  <span style="font-size:14px;line-height:1.55;color:#6E6663;">Nueva evaluación agendada: mañana 09:00 con Paola Suárez.</span>
+                  <span style="font-size:12px;color:#A79E9A;">Ayer, 17:40 · Nutrición</span>
+                </span>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:13px;padding:16px 4px;">
+                <span style="width:38px;height:38px;border-radius:999px;flex:none;background:rgba(124,148,115,0.14);display:flex;align-items:center;justify-content:center;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;">
+                  <span style="font-size:14px;line-height:1.55;color:#6E6663;">Nuevo pago en efectivo confirmado para Valeria Áñez.</span>
+                  <span style="font-size:12px;color:#A79E9A;">Ayer, 11:20 · Asistente</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Sin notificaciones</div>
+          <div style="font-size:12px;color:#8A807C;">Sin acción · "Marcar leídas" desaparece</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:10px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Notificaciones</span>
+          </div>
+
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 32px 80px;text-align:center;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.1" stroke-linecap="round"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z"></path><path d="M10.5 18.5a2 2 0 0 0 3 0"></path></svg>
+            <div style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">No tienes notificaciones.</div>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#8A807C;max-width:250px;text-wrap:pretty;">Te avisaremos aquí cuando haya algo que necesite tu atención.</p>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Con notificaciones</div>
+          <div style="font-size:12px;color:#8A807C;">Misma lista, flecha del sistema en el encabezado</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:44px 16px 12px;display:flex;align-items:center;gap:10px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="11,6 5,12 11,18"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;flex:1;">Notificaciones</span>
+            <button style="min-height:40px;padding:0 12px;border:none;border-radius:8px;background:transparent;color:#B78380;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;flex:none;">Marcar leídas</button>
+          </div>
+
+          <div style="padding:18px 16px 28px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <span style="padding:0 4px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Sin leer</span>
+
+              <div style="display:flex;align-items:flex-start;gap:13px;padding:16px;border:1px solid rgba(216,189,184,0.6);border-radius:14px;background:rgba(216,189,184,0.14);">
+                <span style="width:38px;height:38px;border-radius:999px;flex:none;background:rgba(201,154,78,0.14);display:flex;align-items:center;justify-content:center;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C99A4E" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;">
+                  <span style="font-size:14px;line-height:1.55;color:#4A4A4A;">Se te asignó una sesión de última hora: Reformer Intermedio, hoy 16:00.</span>
+                  <span style="font-size:12px;color:#8A807C;">Hace 25 minutos · Entrenadora</span>
+                </span>
+                <span style="width:8px;height:8px;border-radius:999px;background:#B78380;flex:none;margin-top:6px;"></span>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:13px;padding:16px;border:1px solid rgba(216,189,184,0.6);border-radius:14px;background:rgba(216,189,184,0.14);">
+                <span style="width:38px;height:38px;border-radius:999px;flex:none;background:rgba(201,154,78,0.14);display:flex;align-items:center;justify-content:center;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C99A4E" stroke-width="1.3" stroke-linecap="round"><rect x="5" y="3.5" width="14" height="17" rx="2.5"></rect><line x1="8.5" y1="9" x2="15.5" y2="9"></line><line x1="8.5" y1="13" x2="13" y2="13"></line></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;">
+                  <span style="font-size:14px;line-height:1.55;color:#4A4A4A;">Tienes un comprobante de pago pendiente de revisión.</span>
+                  <span style="font-size:12px;color:#8A807C;">Hace 1 hora · Administración</span>
+                </span>
+                <span style="width:8px;height:8px;border-radius:999px;background:#B78380;flex:none;margin-top:6px;"></span>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:2px;">
+              <span style="padding:0 4px 8px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Anteriores</span>
+
+              <div style="display:flex;align-items:flex-start;gap:13px;padding:16px 4px;border-bottom:1px solid #EFE7DE;">
+                <span style="width:38px;height:38px;border-radius:999px;flex:none;background:rgba(216,201,187,0.34);display:flex;align-items:center;justify-content:center;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;">
+                  <span style="font-size:14px;line-height:1.55;color:#6E6663;">Nueva evaluación agendada: mañana 09:00 con Paola Suárez.</span>
+                  <span style="font-size:12px;color:#A79E9A;">Ayer, 17:40 · Nutrición</span>
+                </span>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:13px;padding:16px 4px;">
+                <span style="width:38px;height:38px;border-radius:999px;flex:none;background:rgba(124,148,115,0.14);display:flex;align-items:center;justify-content:center;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
+                </span>
+                <span style="display:flex;flex-direction:column;gap:5px;flex:1;min-width:0;">
+                  <span style="font-size:14px;line-height:1.55;color:#6E6663;">Nuevo pago en efectivo confirmado para Valeria Áñez.</span>
+                  <span style="font-size:12px;color:#A79E9A;">Ayer, 11:20 · Asistente</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cada cuenta ve lo suyo</span>Los cuatro tipos aparecen juntos solo aquí, como documentación; en la app se filtran por rol. La etiqueta de rol bajo cada aviso es de este documento, no de la pantalla.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Color del ícono</span><span><strong style="color:#9A7434;font-weight:500;">Ámbar:</strong> pide acción (sesión asignada, comprobante por revisar). <strong style="color:#5F7457;font-weight:500;">Verde:</strong> confirmaciones. <strong style="color:#8A5F5C;font-weight:500;">Arena:</strong> agenda, sin estado.</span></div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Al tocar</span>Se abre la pantalla relacionada y queda leída: el comprobante lleva a S11; la sesión asignada, a S02.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin barra de pestañas</span>La app de staff no la tiene: la flecha vuelve al inicio del rol de la cuenta.</div>
+  </div>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { showCaptions: this.props.showCaptions ?? true };
+  }
+}
+</script>
+</body>
+</html>
