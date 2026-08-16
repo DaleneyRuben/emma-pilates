@@ -8,7 +8,7 @@ Three surfaces for a Pilates studio in Santa Cruz de la Sierra, Bolivia:
 |---|---|---|---|
 | **Client app** | `01`–`19` | Mobile (iOS/Android, 390×844 reference) | Clients: booking, plans, payments, nutrition, referrals |
 | **Staff app** | `S01`–`S17` | Mobile | Trainers, front desk, administration, nutritionist |
-| **Admin web** | `AW01`–`AW29` | Desktop web (1440px reference, 420px narrow) | Studio management: schedule, catalog, back office, reports, promotions |
+| **Admin web** | `AW01`–`AW31` | Desktop web (1440px reference, 420px narrow) | Studio management: schedule, catalog, back office, reports, promotions |
 | **Design system** | `Sistema de Diseño.dc.html` | — | Source of truth for tokens and components |
 
 All product copy is **neutral Spanish (Bolivia), informal "tú" address**. Currency is the boliviano, written `Bs 1.200,00` (dot thousands, comma decimals). Dates are `dd/mm/aaaa`, times are 24-hour.
@@ -104,7 +104,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 
 ---
 
-## Admin web — shell (shared by AW02–AW29)
+## Admin web — shell (shared by AW02–AW29, AW31)
 
 Reference width **1440px**; a 420px narrow-browser variant is drawn for every screen.
 
@@ -112,7 +112,7 @@ Reference width **1440px**; a 420px narrow-browser variant is drawn for every sc
   - The branch selector scopes most pages. Exceptions: **AW11 Nómina**, **AW21/AW22 Clientes**, **AW26 Referidos**, **AW27 Créditos** and **AW28/AW29 Pagos** are not branch-scoped (the selector stays visible for shell consistency but is ignored — those records belong to the studio, not a branch); **AW16 Reporte** replaces the top-bar selector with its own selector that adds "Todas las sucursales".
   - **AW19 Sucursales** is the list that feeds the top-bar selector.
 - **Sidebar**, 236px, white, right border `#E4D8CC`, padding 18px/12px, 4px gaps. Top-level items are 36px rows with a 15px icon; group labels are 10px uppercase `0.18em` `#A79E9A`; group children are 32px rows indented to 22px left padding. Sections auto-expand; the active group label turns `#B78380`.
-  - Order: **Horario** · *Catálogo* (Tipos de clase, Planes, Sucursales) · *Back Office* (Clientes, Pagos ⟨badge 6⟩, Insumos ⟨badge 3, warning tint⟩, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto) · **Reporte** · *Promociones* (Promociones, Referidos, Créditos, Descuentos).
+  - Order: **Horario** · *Catálogo* (Tipos de clase, Planes, Sucursales) · *Back Office* (Clientes, Pagos ⟨badge 6⟩, Insumos ⟨badge 3, warning tint⟩, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto) · **Reporte** · *Promociones* (Promociones, Referidos, Créditos). Descuentos was dropped for good — see [ADR-0007](../docs/adr/0007-drop-descuentos-from-admin-web.md); do not reintroduce it here without a new ADR superseding that one.
   - Active item: `#EFE0DC` background, `#8A5D59` text, weight 500. Hover: `#FAF3EC` background, `#B78380` text.
   - Counter badges: 18px tall pill, `#EFE0DC`/`#8A5D59`, or warning `rgba(201,154,78,0.18)`/`#9A7434`.
 - **Main area**: `#FAF7F2`, padding 24px 26px 32px, 18px column gap. Header row = page title (Lora 27) + one-line subtitle (12.5 `#8A807C`) on the left, primary action(s) on the right.
@@ -221,6 +221,8 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW27` | Créditos | Read-only, 3 columns, right-aligned tabular amounts, total row |
 | `AW28` | Pagos | Studio-wide transfers; search + status filter (default Pendiente); pending row → `AW29` |
 | `AW29` | Revisar pago | Review panel: summary, large receipt, Confirmar pago / Rechazar (+ mandatory reason) |
+| `AW30` | Recuperar contraseña | Chains from `AW01`; centered card, no shell; form + sent states |
+| `AW31` | Retiros e insumos consumidos | Read-only sub-view of `AW08`; no sidebar item of its own |
 
 ---
 
@@ -228,10 +230,12 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 **Navigation**
 - Admin: sidebar item → page. `+ Nuevo …` and any table row → the matching side panel (`AW04→AW05`, `AW06→AW07`, `AW08→AW09`, `AW11→AW12`, `AW13→AW14`, `AW17→AW18`, `AW19→AW20`, `AW21→AW22`, `AW23→AW24`, `AW28→AW29`). Close icon or scrim dismisses the panel.
-- Read-only pages with no primary action: `AW21`, `AW22`, `AW25`, `AW26`, `AW27`, `AW28`, plus `AW16`.
-- `AW08` has two actions: **Registrar retiro** (secondary, outlined — it subtracts stock) and **+ Nuevo insumo** (primary).
+- `AW01→AW30`: "¿Olvidaste tu contraseña?" on Login opens Recuperar contraseña; "Volver a iniciar sesión" returns.
+- `AW08→AW31`: "Ver historial de retiros" opens the read-only withdrawal history; the back link returns to `AW08`.
+- Read-only pages with no primary action: `AW21`, `AW22`, `AW25`, `AW26`, `AW27`, `AW28`, `AW31`, plus `AW16`.
+- `AW08` has three actions: **Ver historial de retiros** (link, opens `AW31`), **Registrar retiro** (secondary, outlined — it subtracts stock) and **+ Nuevo insumo** (primary).
 
-**Back office (AW19–AW29)**
+**Back office (AW19–AW29, AW31)**
 - `AW19`: `+ Nueva sucursal` and any row open `AW20`. There is no delete — a branch with session history can only be edited. Footer strip states this.
 - `AW20`: two fields (Nombre, Dirección). Create-mode helper: "Aparecerá en el selector de sucursal al guardarla". Edit mode shows a fixed note that the branch is already referenced in the top-bar selector and in every back-office record (sessions, payments, supplies, expenses, payroll) — renaming moves nothing.
 - `AW21`: accounts are created in the staff app (`S05`) or by self-registration, so this screen creates nothing — no primary action, search-only filter, pagination ("Mostrando 9 de 148 clientes" + Anterior / Página 1 de 17 / Siguiente). Any row opens `AW22`.
@@ -243,6 +247,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `AW27`: read-only, no manual adjustment. Columns Cliente / Saldo de crédito / Última actividad, amounts right-aligned and tabular, last-activity sub-line says "Crédito ganado" or "Usado en un pago". A summary row carries **Total en saldo activo**.
 - `AW28`: coexists with the mobile flow (`S11`/`S12`) — both surfaces can confirm or reject. Filters: search by client + status dropdown (Todos · Pendiente · Confirmado · Rechazado), defaulting to **Pendiente**. No primary action — clients raise payments from the app. A **Pendiente** row opens `AW29`; **Confirmado** and **Rechazado** rows are final and not clickable.
 - `AW29`: 408px panel over the dimmed list. Header = client name · plan. Summary grid: Monto a verificar / Fecha / Método (always **Transferencia** — cash is confirmed on the spot by front desk in `S10`, so it never reaches this queue; the field is shown but not editable). Then a large clickable receipt image with "Ver en grande". Footer: **Confirmar pago** (primary) and **Rechazar** (Error, outlined). Pressing **Rechazar** does not reject: it swaps both buttons for a `Motivo del rechazo` textarea (helper: "La clienta verá este mensaje para corregir y volver a enviar.") plus **Confirmar rechazo** and a **Cancelar** link. The reason is mandatory — with the field empty, Confirmar rechazo is disabled. Either action closes the panel and returns to `AW28` with the row resolved.
+- `AW31`: read-only, month-scoped list of withdrawals against the branch selected in the top bar. Reached only from `AW08`'s "Ver historial de retiros"; withdrawals themselves are still recorded exclusively in `AW10`. "Insumos" stays the active sidebar item — there is no nav entry of its own.
 
 **Forms**
 - One primary "Guardar" per panel, pinned in the footer.
