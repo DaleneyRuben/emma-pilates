@@ -30,6 +30,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [20](./client/20-recover-password.md) | Recuperar contraseña | `20` | ✅ |
 | [21](./client/21-change-password.md) | Crea tu contraseña | `21` | ✅ |
 | [22](./client/22-edit-profile.md) | Editar perfil | `22` | ✅ |
+| [23](./client/23-change-password-signed-in.md) | Cambiar contraseña (sesión iniciada) | `23` | 🕓 not yet generated |
 
 ## Staff app (`staff/`)
 
@@ -57,6 +58,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S20](./staff/20-notifications.md) | Notificaciones | `S20` | ✅ |
 | [S21](./staff/21-assistant-manage-bookings.md) | Reservas de la clienta (Asistente) | `S21` | ✅ |
 | [S22](./staff/22-assistant-client-history.md) | Historial de la clienta (Asistente) | `S22` | 🕓 not yet generated |
+| [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | 🕓 not yet generated |
 
 ## Admin web (`admin-web/`)
 
@@ -94,10 +96,12 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | AW29 | Revisar pago | `AW29` | ✅ |
 | [AW30](./admin-web/30-recover-password.md) | Recuperar contraseña | `AW30` | ✅ |
 | [AW31](./admin-web/31-retiros-consumo.md) | Retiros e insumos consumidos | `AW31` | ✅ |
+| [AW32](./admin-web/32-create-password.md) | Crear contraseña | `AW32` | 🕓 not yet generated |
+| [AW33](./admin-web/33-user-menu.md) | Menú de usuario y cambiar contraseña | `AW33` | 🕓 not yet generated |
 
 ## Follow-ups (`followups/`)
 
-Each of these was sent as the next message in the existing Claude Design conversation for the surface it targets. Follow-ups 01–07 have been applied and verified against the built files in `../../../design/`; 08–10 are pending.
+Each of these was sent as the next message in the existing Claude Design conversation for the surface it targets. Follow-ups 01–07 have been applied and verified against the built files in `../../../design/`; 08–17 are pending.
 
 | Follow-up | Fixes | Status |
 |---|---|---|
@@ -111,7 +115,21 @@ Each of these was sent as the next message in the existing Claude Design convers
 | [08](./followups/08-remove-referral-reward-label.md) | Removes the referral-reward helper text from `01` | 🕓 pending |
 | [09](./followups/09-trainer-remove-waitlist-visibility.md) | Removes the Waitlist section from `S03` (Trainer) | 🕓 pending |
 | [10](./followups/10-client-overview-wire-history-link.md) | Wires `S06`'s "ver todo"/"Ver historial completo" links to new screen `S22` | 🕓 pending |
+| [11](./followups/11-remove-remaining-unlimited-plans.md) | Removes the unlimited plans follow-up 02 missed, on `AW05`, `AW22`, `S11`, `S12` (also "sesiones" → "clases") | 🕓 pending |
+| [12](./followups/12-cancellation-window-copy.md) | Fixes the 6 h cancellation window on `Sistema de Diseño` and `S14` — it is 2 h 30 | 🕓 pending |
+| [13](./followups/13-plan-detail-validity-and-payment-methods.md) | Fixes when the plan's date range starts, and the payment-method note, on `09` | 🕓 pending |
+| [14](./followups/14-design-system-navigation-drift.md) | Resyncs `Sistema de Diseño`'s navigation section with the built apps | 🕓 pending |
+| [15](./followups/15-trainer-session-cancelled-notification.md) | Adds the session-cancelled notification for the Trainer to `S20` | 🕓 pending |
+| [16](./followups/16-profile-add-change-password.md) | Adds the "Cambiar contraseña" row to `18`, the entry point for new screen `23` | 🕓 pending |
+| [17](./followups/17-handoff-readme-inventory.md) | Resyncs the exported `design/README.md` — Descuentos back out, `AW30`/`AW31`, `20`–`22`, `S18`–`S22`, mobile navigation | 🕓 pending |
 
 ## Status
 
-All prompts in this index have a generated screen in `../../../design/` except `S22` (prompt written, not yet generated), and follow-ups 01–07 have landed; 08–10 are pending. `design/README.md`'s screen inventory and shell notes have been updated to match (including `AW30`/`AW31`, which the shell doc had missed on the previous pass).
+Every prompt in this index has a generated screen in `../../../design/` except the five newest — `23`, `S23`, `AW32`, `AW33` and `S22` — which close gaps found by auditing the built screens against `booking/CONTEXT.md` and `back-office/CONTEXT.md`:
+
+- `23` / `S23` / `AW33` — no surface had a signed-in way to change a password, and neither the staff app nor the admin web had a designed way to log out at all, even though `S02` and the admin shell both draw the control that should open it.
+- `AW32` — `AW30` requests a reset link but the screen that link opens was never designed, so the admin web's recovery flow dead-ended. The client (`21`) and staff (`S19`) apps both have their equivalent.
+
+Follow-ups 01–07 have landed. 08–17 are pending: 08–10 were written earlier; 11–15 fix contradictions between built screens and the glossaries; 16 wires up the entry point for `23`; 17 resyncs the exported handoff README.
+
+Everything under `../../../design/` — the screens, `Sistema de Diseño`, and `README.md` — is **generated output from Claude Design and is never edited by hand**. Anything wrong in there is fixed by writing a follow-up here and re-sending it in that surface's design conversation, so the next export keeps the fix instead of overwriting it.
