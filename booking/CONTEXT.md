@@ -41,7 +41,7 @@ The fallback operation available only once a Booking can no longer be freely can
 _Avoid_: Change booking, swap
 
 **Evaluation**:
-A one-on-one appointment between a client and the Nutritionist, booked against the Nutritionist's published availability. Distinct from a Session: no Class Type, no capacity, single client. Free to any client with an active Subscription — it costs no money and consumes no class allowance — but limited to one per calendar month, unused months not carrying over, and not bookable at all without an active Subscription. The client is reminded twice: 1 day before, and again 1 hour before.
+A one-on-one appointment between a client and the Nutritionist, booked against the Nutritionist's published availability. Distinct from a Session: no Class Type, no capacity, single client. Free to any client with an active Subscription — it costs no money and consumes no class allowance — but limited to one per calendar month, unused months not carrying over, and not bookable at all without an active Subscription. Can be freely cancelled up to 3 hours before its start; inside that window it can no longer be cancelled (there is no Reschedule fallback for an Evaluation the way there is for a Session — the slot is simply kept or given up). A cancelled Evaluation's slot becomes bookable again; unlike a Session, it has no Waitlist. The client is reminded twice: 1 day before, and again 1 hour before.
 _Avoid_: Appointment, session (when referring to a nutritionist evaluation)
 
 **Availability Block**:
