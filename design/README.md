@@ -13,6 +13,12 @@ Three surfaces for a Pilates studio in Santa Cruz de la Sierra, Bolivia:
 
 All product copy is **neutral Spanish (Bolivia), informal "tú" address**. Currency is the boliviano, written `Bs 1.200,00` (dot thousands, comma decimals). Dates are `dd/mm/aaaa`, times are 24-hour.
 
+Plans always sell a **fixed number of classes** — no plan is unlimited, anywhere. The full catalog, shown in the admin screens (`AW04`, `AW05`) and used in every piece of sample data: **Paquete de 8 clases (Bs 560) · Paquete de 12 clases (Bs 780) · Mensual 16 clases (Bs 1.050) · Trimestral 36 clases (Bs 2.100) · Semestral 90 clases (Bs 5.400) · Anual 180 clases (Bs 9.600)**. The client-facing screens (`08`, `S09`) offer the first four. Durations are 1, 3, 6 or 12 months — there is no 15-day pass. A plan's validity starts **when the payment is confirmed**, never at the first class. What a client consumes is a **clase**; a **sesión** is the class as scheduled in the studio's timetable.
+
+Free cancellation runs up to **2 h 30** before the class starts; after that the client can only reschedule to another class the same day — nothing is deducted. If the studio cancels a session, the class is refunded to **every** booking, including those already past the cancellation window.
+
+In the client app the **only** payment method is a transfer to the studio's QR with the receipt attached. Cash is registered by the team in the staff app (`S10`), never by the client.
+
 ## About the design files
 
 The files in this bundle are **design references created in HTML** — prototypes that show intended look, copy, and behavior. They are **not production code to copy**.
@@ -112,7 +118,7 @@ Reference width **1440px**; a 420px narrow-browser variant is drawn for every sc
   - The branch selector scopes most pages. Exceptions: **AW11 Nómina**, **AW21/AW22 Clientes**, **AW26 Referidos**, **AW27 Créditos** and **AW28/AW29 Pagos** are not branch-scoped (the selector stays visible for shell consistency but is ignored — those records belong to the studio, not a branch); **AW16 Reporte** replaces the top-bar selector with its own selector that adds "Todas las sucursales".
   - **AW19 Sucursales** is the list that feeds the top-bar selector.
 - **Sidebar**, 236px, white, right border `#E4D8CC`, padding 18px/12px, 4px gaps. Top-level items are 36px rows with a 15px icon; group labels are 10px uppercase `0.18em` `#A79E9A`; group children are 32px rows indented to 22px left padding. Sections auto-expand; the active group label turns `#B78380`.
-  - Order: **Horario** · *Catálogo* (Tipos de clase, Planes, Sucursales) · *Back Office* (Clientes, Pagos ⟨badge 6⟩, Insumos ⟨badge 3, warning tint⟩, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto) · **Reporte** · *Promociones* (Promociones, Referidos, Créditos).
+  - Order: **Horario** · *Catálogo* (Tipos de clase, Planes, Sucursales) · *Back Office* (Clientes, Pagos ⟨badge 6⟩, Insumos ⟨badge 3, warning tint⟩, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto) · **Reporte** · *Promociones* (Promociones, Referidos, Créditos). No "Descuentos" at any level — it does not exist in the product (ADR-0007).
   - Descuentos was dropped for good — see ADR-0007; do not reintroduce it here without a new ADR superseding that one.
   - Active item: `#EFE0DC` background, `#8A5D59` text, weight 500. Hover: `#FAF3EC` background, `#B78380` text.
   - Counter badges: 18px tall pill, `#EFE0DC`/`#8A5D59`, or warning `rgba(201,154,78,0.18)`/`#9A7434`.
@@ -156,7 +162,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `07` | Historial de clases | Past classes |
 | `08` | Elegir plan | Plan catalog |
 | `09` | Detalle del plan | Plan detail |
-| `10` | Pago | Payment (QR/transfer + receipt upload) |
+| `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash) |
 | `11` | Estado del pago | Pending/confirmed/rejected states |
 | `12` | Mi plan | Active plan, sessions left, expiry |
 | `13` | Evaluación nutricional | Book a nutrition assessment |
@@ -205,7 +211,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 |---|---|---|
 | `AW01` | Iniciar sesión | Centered card, email + password, error state |
 | `AW02` | Horario | Week grid of sessions; establishes the shell |
-| `AW03` | Formulario de sesión | Side panel; capacity constraints + trainer notification |
+| `AW03` | Formulario de sesión | Side panel; seats booked + waitlist count, capacity constraints, trainer notification; cancelling refunds every booking and notifies the waitlist too |
 | `AW04` | Planes | Catalog table |
 | `AW05` | Formulario de plan | Side panel |
 | `AW06` | Tipos de clase | Catalog table |
@@ -261,12 +267,12 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `S01→S18` via "¿Olvidaste tu contraseña?"; `S01→S19` on first login with a temporary password.
 - `S06→S21` (Reservas de la clienta) and `S06→S22` (Historial de la clienta).
 - `S15` cards are selectable, not navigable: tapping highlights a card (border → `#B78380`) so the nutritionist keeps their place down the day. There is no assessment detail screen anywhere — an Evaluation records the appointment, not its content (same reason `AW25` rows are not links).
-- `S20` has no menu entry — it is reached from a push notification and filtered by role. The header avatar on each role root opens `S23`.
+- `S20` has no menu entry — it is reached from a push notification and filtered by role. Every role root (`S02`, `S04`, `S11`, `S15`) carries a 46px circular initials avatar as the **last control on the right** of its header, labelled "Tu cuenta", and it is the only path to `S23` — and therefore to change password and log out. Where the root also has a screen action (`S11` → `S13`, `S15` → `S16`), that action is a 46px rounded square with a 1px `#D8C9BB` border and sits **before** the avatar (10px gap): outlined square = screen action, filled circle with initials = your account.
 
 **Back office (AW19–AW29)**
 - `AW19`: `+ Nueva sucursal` and any row open `AW20`. There is no delete — a branch with session history can only be edited. Footer strip states this.
 - `AW20`: two fields (Nombre, Dirección). Create-mode helper: "Aparecerá en el selector de sucursal al guardarla". Edit mode shows a fixed note that the branch is already referenced in the top-bar selector and in every back-office record (sessions, payments, supplies, expenses, payroll) — renaming moves nothing.
-- `AW21`: accounts are created in the staff app (`S05`) or by self-registration, so this screen creates nothing — no primary action, search-only filter, pagination ("Mostrando 9 de 148 clientes" + Anterior / Página 1 de 17 / Siguiente). Any row opens `AW22`.
+- `AW21`: accounts are created in the staff app (`S05`) or by self-registration, so this screen creates nothing — no primary action, search-only filter, pagination ("Mostrando 9 de 148 clientas" + Anterior / Página 1 de 17 / Siguiente). Any row opens `AW22`.
 - `AW21` no-results: search is the whole interface, so the miss is drawn. The table card and its header row stay, with the message centred in the body — "No se encontró ninguna clienta." + "Revisa cómo escribiste el nombre o el teléfono." + a quieter "Las cuentas se crean desde la app del personal o cuando la clienta se registra." **No call to action** (unlike `S04`, this screen cannot create a client). Footer reads "Mostrando 0 de 148 clientas" and both pagination controls render in the disabled tone. At 420px the stacked cards are replaced by the same message with the search field pinned above.
 - `AW22`: read-only summary panel on `#FAF7F2` rows — contacto, plan (vigencia, clases disponibles), crédito, referidos (código). With no active plan the Plan block collapses to one muted line ("Último plan vencido el 30/06/2026."). No footer, no editable fields.
 - `AW23`: `+ Nuevo miembro` and any row open `AW24`. Role renders as a neutral label, not a status pill; branch assignment listed as plain text ("Equipetrol, Urubó" / "Todas"). One-at-a-time role filter, default "Todos".

@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S11 · Rol: administración</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Pagos pendientes</h1>
-    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">Pantalla raíz de administración tras iniciar sesión (S01) y destino directo de la notificación push. Lista todas las transferencias en espera de confirmación; cada tarjeta abre la revisión del pago (S12). El ícono de la cabecera lleva al flujo secundario de cancelar una clase (S13).</p>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">Pantalla raíz de administración tras iniciar sesión (S01) y destino directo de la notificación push. Lista todas las transferencias en espera de confirmación; cada tarjeta abre la revisión del pago (S12). La cabecera lleva dos controles, el avatar siempre el último: el ícono de cancelar una clase (S13) y tu cuenta, que abre Perfil (S23) — el único camino a cambiar contraseña y cerrar sesión, porque este rol no tiene barra de pestañas.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
@@ -45,15 +45,18 @@
               <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
                 <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Administración</span>
                 <span style="display:flex;align-items:center;gap:10px;">
-                  <span style="font-family:Lora,Georgia,serif;font-size:27px;font-weight:400;line-height:1.2;white-space:nowrap;">Pagos pendientes</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:400;line-height:1.25;">Pagos pendientes</span>
                   <sc-if value="{{ hasPayments }}" hint-placeholder-val="{{ true }}">
                     <span style="display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:28px;height:28px;padding:0 9px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;">{{ count }}</span>
                   </sc-if>
                 </span>
               </div>
-              <button title="Cancelar una clase" style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="border-color:#B78380;background:#F6EDEB;">
-                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="9.5" y1="14.5" x2="14.5" y2="19"></line><line x1="14.5" y1="14.5" x2="9.5" y2="19"></line></svg>
-              </button>
+              <div style="flex:none;display:flex;align-items:center;gap:10px;">
+                <button title="Cancelar una clase" style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="border-color:#B78380;background:#F6EDEB;">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="9.5" y1="14.5" x2="14.5" y2="19"></line><line x1="14.5" y1="14.5" x2="9.5" y2="19"></line></svg>
+                </button>
+                <button aria-label="Tu cuenta" style="flex:none;width:46px;height:46px;border-radius:50%;border:none;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;cursor:pointer;" style-hover="background:#CEB0AB;" style-active="background:#C4A29D;">MF</button>
+              </div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
@@ -113,19 +116,22 @@
               <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
                 <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Administración</span>
                 <span style="display:flex;align-items:center;gap:10px;">
-                  <span style="font-family:Lora,Georgia,serif;font-size:27px;font-weight:400;line-height:1.2;white-space:nowrap;">Pagos pendientes</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:400;line-height:1.25;">Pagos pendientes</span>
                   <span style="display:inline-flex;align-items:center;justify-content:center;flex:none;min-width:28px;height:28px;padding:0 9px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:14px;font-weight:500;font-variant-numeric:tabular-nums;">4</span>
                 </span>
               </div>
-              <div style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;">
-                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="9.5" y1="14.5" x2="14.5" y2="19"></line><line x1="14.5" y1="14.5" x2="9.5" y2="19"></line></svg>
+              <div style="flex:none;display:flex;align-items:center;gap:10px;">
+                <div style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="9.5" y1="14.5" x2="14.5" y2="19"></line><line x1="14.5" y1="14.5" x2="9.5" y2="19"></line></svg>
+                </div>
+                <div style="flex:none;width:46px;height:46px;border-radius:50%;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;">MF</div>
               </div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
                 <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Por confirmar</span>
-                <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">Bs 1.900 en total</span>
+                <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">Bs 2.950 en total</span>
               </div>
 
               <div style="display:flex;flex-direction:column;gap:14px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
@@ -140,7 +146,7 @@
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:12px;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
-                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 300</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 560</span>
                   <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#8A807C;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C99A4E" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>Ayer, 19:40</span>
                 </div>
               </div>
@@ -151,13 +157,13 @@
                     <span style="flex:none;width:44px;height:44px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;">A</span>
                     <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                       <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Andrea Roca</span>
-                      <span style="font-size:13px;color:#8A807C;">Paquete de 4 clases</span>
+                      <span style="font-size:13px;color:#8A807C;">Paquete de 12 clases</span>
                     </div>
                   </div>
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:12px;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
-                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 200</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 780</span>
                   <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#8A807C;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C99A4E" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>Hace 3 h</span>
                 </div>
               </div>
@@ -191,7 +197,7 @@
                   <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:12px;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
-                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 350</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 560</span>
                   <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#8A807C;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C99A4E" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>Hace 20 min</span>
                 </div>
               </div>
@@ -215,10 +221,13 @@
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
               <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
                 <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Administración</span>
-                <span style="font-family:Lora,Georgia,serif;font-size:27px;font-weight:400;line-height:1.2;white-space:nowrap;">Pagos pendientes</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:400;line-height:1.25;">Pagos pendientes</span>
               </div>
-              <div style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;">
-                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="9.5" y1="14.5" x2="14.5" y2="19"></line><line x1="14.5" y1="14.5" x2="9.5" y2="19"></line></svg>
+              <div style="flex:none;display:flex;align-items:center;gap:10px;">
+                <div style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="9.5" y1="14.5" x2="14.5" y2="19"></line><line x1="14.5" y1="14.5" x2="9.5" y2="19"></line></svg>
+                </div>
+                <div style="flex:none;width:46px;height:46px;border-radius:50%;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;">MF</div>
               </div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:56px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
@@ -237,7 +246,7 @@
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Raíz del rol</span>Administración no tiene barra de pestañas: esta bandeja es su inicio y el destino de la notificación push de un pago nuevo.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Orden y antigüedad</span>Más antiguos primero, para que ninguna transferencia se quede esperando. Menos de 24 h en «Hace…»; después, «Ayer» con la hora.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin acción en la lista</span>No se confirma ni rechaza desde la tarjeta: siempre se abre la revisión del pago (S12), donde está el comprobante.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cabecera</span>Único ícono a la derecha: «Cancelar una clase» (S13). Es un camino secundario, nunca compite con la lista.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cabecera</span>Dos controles a la derecha, el avatar siempre el último: «Cancelar una clase» (S13) y tu cuenta, que abre Perfil (S23) — el único camino a cambiar contraseña y cerrar sesión. Cuadrado con contorno = acción de la pantalla; círculo relleno con iniciales = tu cuenta.</div>
   </div>
 
 </div>
@@ -246,7 +255,7 @@
 <script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;},&quot;estado&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Con pagos&quot;,&quot;Vacío&quot;],&quot;default&quot;:&quot;Con pagos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Estado del prototipo&quot;}}">
 const PAYMENTS = [
   { name: "Carla Mendoza", plan: "Paquete de 8 clases", amount: 300, ago: "Ayer, 19:40" },
-  { name: "Andrea Roca", plan: "Paquete de 4 clases", amount: 200, ago: "Hace 3 h" },
+  { name: "Andrea Roca", plan: "Paquete de 12 clases", amount: 200, ago: "Hace 3 h" },
   { name: "Paola Suárez", plan: "Mensual 16 clases", amount: 1050, ago: "Hace 1 h" },
   { name: "Valeria Áñez", plan: "Paquete de 8 clases", amount: 350, ago: "Hace 20 min" }
 ];

@@ -60,7 +60,7 @@
               <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding-top:16px;border-top:1px solid #EFE7DE;">
                 <span style="display:flex;flex-direction:column;gap:5px;">
                   <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Monto a verificar</span>
-                  <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;">Bs 350</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;">Bs 560</span>
                 </span>
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#C99A4E;"></span>Pendiente</span>
               </div>
@@ -119,6 +119,30 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Comprobante ampliado</div>
+          <div style="font-size:12px;color:#8A807C;">Pantalla completa con zoom · sin acciones dentro · se cierra con un gesto hacia abajo o la X</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:rgba(74,58,48,0.92);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:58px 16px 12px;">
+            <span style="font-size:14px;color:#FAF7F2;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Valeria Áñez</span>
+            <button style="flex:none;width:44px;height:44px;margin-right:-6px;display:flex;align-items:center;justify-content:center;border:none;background:transparent;color:#FAF7F2;cursor:pointer;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:0 0 34px;">
+            <div style="width:100%;aspect-ratio:3 / 4;display:flex;align-items:center;justify-content:center;background-image:repeating-linear-gradient(135deg,#F3EDE6 0 10px,#EAE0D6 10px 20px);">
+              <span style="font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:11.5px;line-height:1.6;text-align:center;color:#8A807C;background:rgba(250,247,242,0.92);border:1px solid #EFE7DE;border-radius:10px;padding:9px 13px;">captura del comprobante<br />al ancho de pantalla · pinch para zoom y arrastre para mover</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Rechazar desplegado</div>
           <div style="font-size:12px;color:#8A807C;">El motivo es obligatorio: sin texto, «Confirmar rechazo» está deshabilitado</div>
         </div>
@@ -140,7 +164,7 @@
                   <span style="font-size:13px;color:#8A807C;">Paquete de 8 clases</span>
                 </div>
               </div>
-              <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;">Bs 350</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap;">Bs 560</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:10px;">
@@ -175,7 +199,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Android · Revisión y aviso de vuelta</div>
-          <div style="font-size:12px;color:#8A807C;">Al confirmar, vuelve a S11 con un aviso de 2 s</div>
+          <div style="font-size:12px;color:#8A807C;">Al confirmar, vuelve a S11 con un aviso de 2 s · ampliación del comprobante con densidad Material</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
@@ -238,6 +262,9 @@
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Una sola comparación</span>Nombre, plan y monto arriba; el comprobante ocupa el resto. Todo lo necesario para cotejar con la app del banco, sin desplazar dos veces.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Comprobante</span>Toque para ampliar a pantalla completa con zoom; se cierra con un gesto hacia abajo.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Comprobante ampliado</span>Fondo rgba(74,58,48,0.92) —casi opaco, porque en el teléfono el comprobante es toda la tarea—, imagen al ancho y centrada, pinch para zoom y arrastre para mover, sin nada encima de la imagen. Sobre el área segura, una sola fila: el nombre de la clienta en 14px a la izquierda y un cierre de 44px a la derecha.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Se decide abajo, no en el visor</span>Dentro del visor no hay «Confirmar pago» ni «Rechazar»: la decisión se toma en la pantalla de abajo, donde el monto está a la vista. Al cerrar (gesto hacia abajo o el cierre) vuelve S12 tal como estaba, incluso con el motivo del rechazo desplegado y ya escrito.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Android · mismo visor</span>Idéntico con densidad Material: cierre de 48dp con ícono de 24dp arriba a la derecha, nombre en 14px a la izquierda, imagen al ancho. Se mantiene el gesto de arrastrar hacia abajo para descartar, además del botón atrás del sistema.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Rechazo con motivo</span>«Rechazar» no rechaza: despliega el campo. Sin texto, «Confirmar rechazo» queda deshabilitado y el motivo llega a la clienta.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Vuelta a la lista</span>Confirmar o rechazar regresa a S11 con un aviso de 2 s («Pago confirmado» / «Pago rechazado»). Sin pantalla de resultado.</div>
   </div>
