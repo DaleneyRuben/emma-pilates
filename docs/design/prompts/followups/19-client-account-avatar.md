@@ -1,21 +1,21 @@
-# Follow-up — El avatar de Inicio abre Perfil
+# Follow-up — The avatar on Inicio opens Perfil
 
 Targets: **02 (Inicio)**. Send as a follow-up.
 
 ---
 
-El avatar "LM" junto al saludo es un `div` decorativo: no es botón, no tiene estado de pulsación y no lleva a ninguna parte. En la app de staff el mismo elemento abre Perfil, y en la web de administración la celda de usuario abre su menú (AW33). Aquí no hace nada, y una clienta que lo toca esperando su cuenta no obtiene respuesta.
+The "LM" avatar beside the greeting is a decorative `div`: not a button, no pressed state, leads nowhere. In the staff app the same element opens Perfil, and in the admin web the user cell opens its menu (AW33). Here it does nothing, and a client who taps it expecting her account gets no response.
 
-Conviértelo en un control real:
+Turn it into a real control:
 
-- Mismo círculo de 46 px, relleno `#D8BDB8`, iniciales en Lora blanco, dos letras ("LM"). No cambia de tamaño, color ni posición: sigue alineado con el saludo, arriba a la derecha.
-- Botón con área táctil mínima de 44 px, estado de pulsación y etiqueta accesible "Tu cuenta".
-- Al tocarlo abre **Perfil (pantalla 18)**, la raíz de la pestaña Perfil, con la pestaña "Perfil" marcada como activa en la barra inferior. Es un atajo a un destino que ya existe: no abre una hoja ni un menú, y no crea una pantalla nueva.
+- Same 46px circle, `#D8BDB8` fill, initials in white Lora, two letters ("LM"). It does not change size, colour or position: still aligned with the greeting, top right.
+- A button with a minimum 44px touch target, a pressed state, and the accessible label "Tu cuenta".
+- Tapping it opens **Perfil (screen 18)**, the root of the Perfil tab, with "Perfil" marked active in the bottom bar. It is a shortcut to a destination that already exists: it does not open a sheet or a menu, and it does not create a new screen.
 
-Añade la nota correspondiente al pie de la pantalla: el avatar es un atajo a Perfil; la barra de pestañas sigue siendo el camino principal.
+Add the matching note to the screen's footer: the avatar is a shortcut to Perfil; the tab bar is still the primary route.
 
-El avatar se queda **solo en Inicio**. Las otras raíces de pestaña (Reservar, Mis reservas) no lo llevan: en la app de cliente la barra de pestañas acompaña a todas las pantallas y ya ofrece Perfil en todo momento, así que repetir el avatar sería un segundo camino al mismo sitio en la misma pantalla. En la app de staff, que no tiene barra de pestañas, el avatar sí va en las cuatro raíces (ver el follow-up de S02/S04/S11/S15).
+The avatar stays **only on Inicio**. The other tab roots (Reservar, Mis reservas) don't get it: in the client app the tab bar accompanies every screen and already offers Perfil at all times, so repeating the avatar would be a second route to the same place on the same screen. In the staff app, which has no tab bar, the avatar does belong on all four roots (see the S02/S04/S11/S15 follow-up).
 
 ---
 
-Nada más cambia en esta pantalla: el saludo y la fecha, el carrusel de novedades, la tarjeta de plan con su progreso y su enlace "Ver detalle", los accesos rápidos y la barra de pestañas de cuatro destinos se quedan exactamente como están, en todos los frames.
+Nothing else changes on this screen: the greeting and date, the news carousel, the plan card with its progress and its "Ver detalle" link, the quick actions and the four-destination tab bar all stay exactly as they are, in every frame.

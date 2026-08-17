@@ -1,49 +1,49 @@
-# Follow-up — El avatar de cuenta en las cuatro raíces de la app de staff
+# Follow-up — The account avatar on all four staff app roots
 
 Targets: **S02 (Mi agenda · Entrenadora)**, **S04 (Buscar cliente · Asistente)**, **S11 (Pagos pendientes · Administración)**, **S15 (Mi agenda · Nutricionista)**. Send as a follow-up.
 
 ---
 
-Prompt S23 (Perfil) dice que se llega "desde el avatar en la raíz de cada rol", y las notas de S02 ya prometían que "el avatar abre perfil y cierre de sesión". Ninguna de las cuatro raíces lo cumple:
+Prompt S23 (Perfil) says it is reached "from the avatar on each role's root", and S02's notes already promised that "el avatar abre perfil y cierre de sesión". None of the four roots delivers it:
 
-- En **S02** y **S04** el avatar es decorativo: un `div` que no es botón, no tiene estado de pulsación y no lleva a ninguna parte. Además muestra **una sola letra** ("C", "J"), mientras que la app de cliente usa dos ("LM") y la web de administración también ("MF", AW33).
-- En **S11** y **S15** **no hay avatar**: la esquina superior derecha la ocupa un botón de ícono de 46 px que lleva a un flujo secundario ("Cancelar una clase" → S13; "Mi disponibilidad" → S16).
+- On **S02** and **S04** the avatar is decorative: a `div` that isn't a button, has no pressed state and leads nowhere. It also shows a **single letter** ("C", "J"), while the client app uses two ("LM") and the admin web does too ("MF", AW33).
+- On **S11** and **S15** there is **no avatar at all**: the top-right corner holds a 46px icon button leading to a secondary flow ("Cancelar una clase" → S13; "Mi disponibilidad" → S16).
 
-La app de staff no tiene barra de pestañas en ningún rol, así que el avatar es el **único** camino hacia Perfil (S23), y por lo tanto el único camino hacia cambiar contraseña y cerrar sesión. Hoy administración y nutrición no tienen ninguno: quedan encerradas en su pantalla raíz sin poder salir de la sesión.
+No staff role has a tab bar, so the avatar is the **only** route to Perfil (S23), and therefore the only route to changing a password or logging out. Today Administración and Nutrición have neither: they are locked inside their root screen with no way out of the session.
 
-## 1. El avatar es un control, no un adorno
+## 1. The avatar is a control, not an ornament
 
-En las cuatro raíces, el avatar es un botón real:
+On all four roots, the avatar is a real button:
 
-- Círculo de 46 px, relleno `#D8BDB8`, iniciales en Lora blanco, **siempre dos letras** (las del nombre y el apellido).
-- Área táctil mínima de 44 px y estado de pulsación (el mismo oscurecimiento suave que usan los demás controles de la app).
-- Etiqueta accesible "Tu cuenta".
-- Al tocarlo abre **Perfil (S23)**, del que se vuelve con la flecha de retorno a esta misma raíz. No abre una hoja ni un menú intermedio: el destino es la pantalla que ya existe.
+- 46px circle, `#D8BDB8` fill, initials in white Lora, **always two letters** (first name and surname).
+- Minimum 44px touch target and a pressed state (the same soft darkening the app's other controls use).
+- Accessible label "Tu cuenta".
+- Tapping it opens **Perfil (S23)**, which returns to this same root via the back arrow. It does not open a sheet or an intermediate menu: the destination is the screen that already exists.
 
-Corrige las iniciales de una letra:
+Fix the single-letter initials:
 
-- **S02** — "C" → **"CR"**, Camila Rojas, el mismo nombre y correo que ya usa S23 para la entrenadora.
-- **S04** — "J" → dos letras del nombre completo de la asistente. Fíjale un nombre y úsalo igual en todas las pantallas del rol (sugerencia: **Jimena Zabala**, "JZ"; cualquier nombre sirve mientras no choque con los de las clientas de ejemplo).
+- **S02** — "C" → **"CR"**, Camila Rojas, the same name and email S23 already uses for the trainer.
+- **S04** — "J" → two letters from the assistant's full name. Fix a name and use it consistently across every screen of that role (suggestion: **Jimena Zabala**, "JZ"; any name works as long as it doesn't clash with the sample clients').
 
-## 2. Dónde va el avatar cuando ya hay un ícono de acción
+## 2. Where the avatar goes when there is already an action icon
 
-El lado derecho de la cabecera puede llevar dos controles, y **el avatar es siempre el último a la derecha**, en las cuatro raíces y en todos los frames. Así su posición no cambia de rol en rol.
+The right side of the header may carry two controls, and **the avatar is always the rightmost one**, on all four roots and in every frame. That way its position doesn't shift from role to role.
 
-- **S11** — a la derecha del título quedan, en este orden: el botón "Cancelar una clase" que ya está (cuadrado redondeado de 46 px, borde `#D8C9BB`, fondo blanco, ícono palo de rosa) y luego el avatar. Separación de 10 px.
-- **S15** — igual, con el botón "Mi disponibilidad" seguido del avatar.
+- **S11** — to the right of the title, in this order: the existing "Cancelar una clase" button (46px rounded square, `#D8C9BB` border, white fill, palo de rosa icon) and then the avatar. 10px apart.
+- **S15** — the same, with the "Mi disponibilidad" button followed by the avatar.
 
-La diferencia de forma hace el trabajo de distinguirlos: **cuadrado redondeado con contorno = acción de la pantalla; círculo relleno con iniciales = tu cuenta.** No pongas el avatar dentro de un cuadrado ni le pongas borde.
+The difference in shape does the work of telling them apart: **outlined rounded square = screen action; filled circle with initials = your account.** Don't put the avatar inside a square and don't give it a border.
 
-Si el título ya no entra al lado de los dos controles —"Pagos pendientes" con su contador en el frame de Android es el caso ajustado— baja el título a 24 px o deja que ocupe dos líneas, pero **no** encojas los controles ni quites el contador de pagos por confirmar.
+If the title no longer fits beside both controls — "Pagos pendientes" with its counter in the Android frame is the tight case — drop the title to 24px or let it wrap to two lines, but do **not** shrink the controls or remove the pending-payments counter.
 
-Aplica los dos controles en **todos los frames de cada pantalla**, incluidos los estados vacíos ("No hay pagos pendientes", "No tienes evaluaciones agendadas", "No tienes clases este día") y las versiones Android: es cuando no hay nada en la lista que más se nota si no hay salida.
+Apply both controls in **every frame of each screen**, including the empty states ("No hay pagos pendientes", "No tienes evaluaciones agendadas", "No tienes clases este día") and the Android versions: an empty list is exactly when a missing way out is most noticeable.
 
-En **S04**, el avatar es el único control de la derecha; "Nuevo cliente" sigue donde está, dentro del cuerpo, sin subir a la cabecera. En el frame de tablet, el avatar va arriba a la derecha del panel izquierdo, no sobre el panel de detalle.
+On **S04**, the avatar is the only control on the right; "Nuevo cliente" stays where it is, inside the body, and does not move up into the header. In the tablet frame, the avatar goes at the top right of the left panel, not over the detail panel.
 
-## 3. Actualiza las notas de cada pantalla
+## 3. Update each screen's notes
 
-Las notas al pie de S11 y S15 dicen hoy que el ícono de la cabecera es el único camino secundario del rol. Ahora son dos: el ícono de acción y el avatar, que abre Perfil (S23). La nota de S02 —"Sin navegación · el avatar abre perfil y cierre de sesión"— ya es correcta; déjala y añade la equivalente en S04, S11 y S15.
+The footer notes on S11 and S15 currently say the header icon is the role's only secondary route. There are now two: the action icon and the avatar, which opens Perfil (S23). S02's note — "Sin navegación · el avatar abre perfil y cierre de sesión" — is already correct; leave it and add the equivalent to S04, S11 and S15.
 
 ---
 
-Nada más cambia. Las listas, tarjetas, selectores de fecha, contadores, estados vacíos y el destino de cada tarjeta se quedan igual; "Cancelar una clase" sigue llevando a S13 y "Mi disponibilidad" a S16; ninguna raíz gana barra de pestañas; Notificaciones (S20) sigue colgando de Perfil y no se sube a la cabecera; y Perfil (S23) no cambia en absoluto: esta corrección es solo sobre cómo se llega a él.
+Nothing else changes. The lists, cards, date pickers, counters, empty states and each card's destination stay as they are; "Cancelar una clase" still leads to S13 and "Mi disponibilidad" to S16; no root gains a tab bar; Notificaciones (S20) still hangs off Perfil and does not move up into the header; and Perfil (S23) does not change at all — this correction is only about how it is reached.
