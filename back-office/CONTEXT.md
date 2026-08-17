@@ -13,7 +13,7 @@ A logged record of taking units of a Supply out of a Branch's storage, decrement
 _Avoid_: Consumption, Depósito, Stock movement
 
 **Salary Payment**:
-A record, logged manually by the Administrator, that a Staff Member was paid — amount and date only. How the amount is arrived at (per Session, per day, per month, or any other arrangement) happens entirely outside the system; the system only records that the payment happened, for expense reporting.
+A record, logged manually by the Administrator, that a Staff Member was paid — amount and date only. How the amount is arrived at (per Session, per day, per month, or any other arrangement) happens entirely outside the system; the system only records that the payment happened, for expense reporting. Unlike Supply and Expense, a Salary Payment is **not** scoped to a Branch: a Staff Member may be assigned several Branches and a single payment covers all their work. Narrowing payroll to a Branch therefore selects the Staff Members assigned to it, not the payments themselves — the same payment shows under every Branch its Staff Member works at — so a true per-Branch salary cost is not a figure the system can produce.
 _Avoid_: Salario, Payroll, Wage, Salary (as a rate)
 
 **Expense Category**:
