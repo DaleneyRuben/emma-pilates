@@ -112,15 +112,15 @@ Each of these was sent as the next message in the existing Claude Design convers
 | [02](./followups/02-plan-catalog-no-unlimited.md) | Removes unlimited plans / 15-day pass from AW04, 08, S09 | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
 | [03](./followups/03-referral-reward-copy.md) | Fixes the referral-reward copy on `01` | ✅ applied |
 | [04](./followups/04-payment-rejected-notification.md) | Adds the missing payment-rejected notification type to `19` | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
-| [05](./followups/05-waitlist-visibility-for-staff.md) | Surfaces the Waitlist on `S03`/`AW03`, fixes cancel-session copy on `AW03`/`S14` | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
-| [06](./followups/06-client-overview-add-bookings-entry.md) | Adds the entry point for `S21` to `S06` | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
-| [07](./followups/07-insumos-add-withdrawal-history-link.md) | Adds the entry point for `AW31` to `AW08` | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
+| [05](./followups/05-waitlist-visibility-for-staff.md) | Surfaces the Waitlist on `S03`/`AW03`, fixes cancel-session copy on `AW03`/`S14` | ✅ applied |
+| [06](./followups/06-client-overview-add-bookings-entry.md) | Adds the entry point for `S21` to `S06` | ✅ applied |
+| [07](./followups/07-insumos-add-withdrawal-history-link.md) | Adds the entry point for `AW31` to `AW08` | ✅ applied |
 | [08](./followups/08-remove-referral-reward-label.md) | Removes the referral-reward helper text from `01` | ✅ applied |
 | [09](./followups/09-trainer-remove-waitlist-visibility.md) | Removes the Waitlist section from `S03` (Trainer) | ✅ applied |
 | [10](./followups/10-client-overview-wire-history-link.md) | Wires `S06`'s "ver todo"/"Ver historial completo" links to new screen `S22` | ✅ applied |
-| [11](./followups/11-remove-remaining-unlimited-plans.md) | Removes the unlimited plans follow-up 02 missed, on `AW05`, `AW22`, `S11`, `S12` (also "sesiones" → "clases") | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
+| [11](./followups/11-remove-remaining-unlimited-plans.md) | Removes the unlimited plans follow-up 02 missed, on `AW05`, `AW22`, `S11`, `S12` (also "sesiones" → "clases") | ⚠️ plans done; "sesiones" → "clases" still open on `Sistema de Diseño` — see [31](./followups/31-plan-naming-leftovers.md) |
 | [12](./followups/12-cancellation-window-copy.md) | Fixes the 6 h cancellation window on `Sistema de Diseño` and `S14` — it is 2 h 30 | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
-| [13](./followups/13-plan-detail-validity-and-payment-methods.md) | Fixes when the plan's date range starts, and the payment-method note, on `09` | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
+| [13](./followups/13-plan-detail-validity-and-payment-methods.md) | Fixes when the plan's date range starts, and the payment-method note, on `09` | ✅ applied |
 | [14](./followups/14-design-system-navigation-drift.md) | Resyncs `Sistema de Diseño`'s navigation section with the built apps | ✅ applied |
 | [15](./followups/15-trainer-session-cancelled-notification.md) | Adds the session-cancelled notification for the Trainer to `S20` | ✅ applied |
 | [16](./followups/16-profile-add-change-password.md) | Adds the "Cambiar contraseña" row to `18`, the entry point for new screen `23` | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
@@ -138,6 +138,7 @@ Each of these was sent as the next message in the existing Claude Design convers
 | [28](./followups/28-clientes-counter-consistency.md) | Makes `AW21`'s two footer counters agree, and `AW22`'s subtitle with them | ✅ applied |
 | [29](./followups/29-restore-reverted-followups.md) | Restores 01/02/04/05/11/12/16, reverted by the export that applied 19–22 and 27–28, and finishes 27 on `S11` | ✅ applied |
 | [30](./followups/30-invariants-checklist.md) | Standing checklist of settled facts — send it alongside every future follow-up | ♾️ standing, never "applied" |
+| [31](./followups/31-plan-naming-leftovers.md) | `Sistema de Diseño`'s "sesiones usadas" and `AW34`'s invented plan; amends 30 §8 (six notification types, not seven) and §1 (no invented plans) | 🕓 pending |
 
 ## Status
 
@@ -145,7 +146,9 @@ Every prompt in this index has a generated screen in `../../../design/`.
 
 **A follow-up landing is not permanent, and this has now happened twice.** The first export of 2026-08-17 applied 19–22, 28 and most of 27, and in the same pass reverted 01, 02, 04, 05, 11, 12 and 16. 29 restored all seven and finished 27 — and that export, in turn, reverted 05 (on `AW03`), 06, 07, 11 (on `Sistema de Diseño` and the admin web) and 13. Each round fixes what it was asked to fix and silently drops settled decisions elsewhere; 11 came back as "Mensual libre" rather than "ilimitado", so it survived a text search for the old wording.
 
-Restoring items one at a time is not converging. [30](./followups/30-invariants-checklist.md) is the response: a standing checklist of every settled fact, sent alongside every future follow-up, so the conversation is re-grounded each time instead of being told to fix one symptom. Treat every export as needing a full re-verify against it. The five newest generated screens close gaps found by auditing the built screens against `booking/CONTEXT.md` and `back-office/CONTEXT.md`:
+Restoring items one at a time was not converging. [30](./followups/30-invariants-checklist.md) is the response: a standing checklist of every settled fact, sent alongside every future follow-up, so the conversation is re-grounded each time instead of being told to fix one symptom. Treat every export as needing a full re-verify against it.
+
+**It worked.** The third export restored all five items the second one had dropped — the `S06` and `AW08` entry points, `AW03`'s waitlist copy, `09`'s validity and payment-method lines, and every trace of "Mensual libre" — and reverted nothing. Two leftovers remain, both from the same invariant about plans, and [31](./followups/31-plan-naming-leftovers.md) closes them. 31 also amends the checklist itself: §8 claimed `19` has seven notification types when it has six, and §1 needed an explicit "don't invent plan names for sample data". A sent follow-up is never edited in place — corrections to it are carried by the next one. The five newest generated screens close gaps found by auditing the built screens against `booking/CONTEXT.md` and `back-office/CONTEXT.md`:
 
 - `23` / `S23` / `AW33` — no surface had a signed-in way to change a password, and neither the staff app nor the admin web had a designed way to log out at all, even though `S02` and the admin shell both drew the control that should open it.
 - `AW32` — `AW30` requests a reset link but the screen that link opens was never designed, so the admin web's recovery flow dead-ended. The client (`21`) and staff (`S19`) apps both have their equivalent.
