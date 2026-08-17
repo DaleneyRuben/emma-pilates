@@ -102,26 +102,28 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 
 ## Follow-ups (`followups/`)
 
-Each of these was sent as the next message in the existing Claude Design conversation for the surface it targets. Status is verified against the built files in `../../../design/`.
+Each of these was sent as the next message in the existing Claude Design conversation for the surface it targets. Status is verified against the built files in `../../../design/`, and **re-verified after every export** — a ✅ is only true of the current bundle.
+
+[30](./followups/30-invariants-checklist.md) is different from the rest: it is a standing checklist, sent alongside every other follow-up, and never gets marked applied.
 
 | Follow-up | Fixes | Status |
 |---|---|---|
-| [01](./followups/01-sidebar-remove-descuentos.md) | Drops "Descuentos" and makes the sidebar identical on every admin screen ([ADR-0007](../adr/0007-drop-descuentos-from-admin-web.md)) | ⚠️ reverted by the 2026-08-17 export — restored by [29](./followups/29-restore-reverted-followups.md) |
-| [02](./followups/02-plan-catalog-no-unlimited.md) | Removes unlimited plans / 15-day pass from AW04, 08, S09 | ⚠️ reverted by the 2026-08-17 export — restored by [29](./followups/29-restore-reverted-followups.md) |
+| [01](./followups/01-sidebar-remove-descuentos.md) | Drops "Descuentos" and makes the sidebar identical on every admin screen ([ADR-0007](../adr/0007-drop-descuentos-from-admin-web.md)) | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
+| [02](./followups/02-plan-catalog-no-unlimited.md) | Removes unlimited plans / 15-day pass from AW04, 08, S09 | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
 | [03](./followups/03-referral-reward-copy.md) | Fixes the referral-reward copy on `01` | ✅ applied |
-| [04](./followups/04-payment-rejected-notification.md) | Adds the missing payment-rejected notification type to `19` | ⚠️ reverted by the 2026-08-17 export — restored by [29](./followups/29-restore-reverted-followups.md) |
-| [05](./followups/05-waitlist-visibility-for-staff.md) | Surfaces the Waitlist on `S03`/`AW03`, fixes cancel-session copy on `AW03`/`S14` | ⚠️ reverted by the 2026-08-17 export — restored by [29](./followups/29-restore-reverted-followups.md) |
-| [06](./followups/06-client-overview-add-bookings-entry.md) | Adds the entry point for `S21` to `S06` | ✅ applied |
-| [07](./followups/07-insumos-add-withdrawal-history-link.md) | Adds the entry point for `AW31` to `AW08` | ✅ applied |
+| [04](./followups/04-payment-rejected-notification.md) | Adds the missing payment-rejected notification type to `19` | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
+| [05](./followups/05-waitlist-visibility-for-staff.md) | Surfaces the Waitlist on `S03`/`AW03`, fixes cancel-session copy on `AW03`/`S14` | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
+| [06](./followups/06-client-overview-add-bookings-entry.md) | Adds the entry point for `S21` to `S06` | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
+| [07](./followups/07-insumos-add-withdrawal-history-link.md) | Adds the entry point for `AW31` to `AW08` | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
 | [08](./followups/08-remove-referral-reward-label.md) | Removes the referral-reward helper text from `01` | ✅ applied |
 | [09](./followups/09-trainer-remove-waitlist-visibility.md) | Removes the Waitlist section from `S03` (Trainer) | ✅ applied |
 | [10](./followups/10-client-overview-wire-history-link.md) | Wires `S06`'s "ver todo"/"Ver historial completo" links to new screen `S22` | ✅ applied |
-| [11](./followups/11-remove-remaining-unlimited-plans.md) | Removes the unlimited plans follow-up 02 missed, on `AW05`, `AW22`, `S11`, `S12` (also "sesiones" → "clases") | ⚠️ reverted by the 2026-08-17 export — restored by [29](./followups/29-restore-reverted-followups.md) |
-| [12](./followups/12-cancellation-window-copy.md) | Fixes the 6 h cancellation window on `Sistema de Diseño` and `S14` — it is 2 h 30 | ⚠️ reverted by the 2026-08-17 export — restored by [29](./followups/29-restore-reverted-followups.md) |
-| [13](./followups/13-plan-detail-validity-and-payment-methods.md) | Fixes when the plan's date range starts, and the payment-method note, on `09` | ✅ applied |
+| [11](./followups/11-remove-remaining-unlimited-plans.md) | Removes the unlimited plans follow-up 02 missed, on `AW05`, `AW22`, `S11`, `S12` (also "sesiones" → "clases") | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
+| [12](./followups/12-cancellation-window-copy.md) | Fixes the 6 h cancellation window on `Sistema de Diseño` and `S14` — it is 2 h 30 | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
+| [13](./followups/13-plan-detail-validity-and-payment-methods.md) | Fixes when the plan's date range starts, and the payment-method note, on `09` | ⚠️ reverted by the second export — see [30](./followups/30-invariants-checklist.md) |
 | [14](./followups/14-design-system-navigation-drift.md) | Resyncs `Sistema de Diseño`'s navigation section with the built apps | ✅ applied |
 | [15](./followups/15-trainer-session-cancelled-notification.md) | Adds the session-cancelled notification for the Trainer to `S20` | ✅ applied |
-| [16](./followups/16-profile-add-change-password.md) | Adds the "Cambiar contraseña" row to `18`, the entry point for new screen `23` | ⚠️ reverted by the 2026-08-17 export — restored by [29](./followups/29-restore-reverted-followups.md) |
+| [16](./followups/16-profile-add-change-password.md) | Adds the "Cambiar contraseña" row to `18`, the entry point for new screen `23` | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
 | [17](./followups/17-handoff-readme-inventory.md) | Resyncs the exported `design/README.md` — Descuentos back out, `AW30`/`AW31`, `20`–`22`, `S18`–`S22`, mobile navigation | ✅ applied |
 | [18](./followups/18-staff-account-avatar.md) | Makes the account avatar a real control on `S02`/`S04` and adds it to `S11`/`S15`, the two roots that had no way into `S23` | ⚠️ partly applied (`S15` only) — remainder superseded by [27](./followups/27-staff-account-avatar-remaining-roots.md), do not re-send |
 | [19](./followups/19-client-account-avatar.md) | Wires the inert avatar on `02` to the Perfil tab (`18`) | ✅ applied |
@@ -132,15 +134,18 @@ Each of these was sent as the next message in the existing Claude Design convers
 | [24](./followups/24-booking-confirmed-notice.md) | Acknowledges a new booking on `05` and a new evaluation on `15` | ✅ applied |
 | [25](./followups/25-admin-clients-no-results.md) | Adds the no-results state to `AW21`, whose only filter is search | ✅ applied |
 | [26](./followups/26-nutritionist-agenda-caption.md) | Fixes `S15`'s "toca para abrirla" caption — selection highlights, opens nothing | ✅ applied |
-| [27](./followups/27-staff-account-avatar-remaining-roots.md) | Carries `S15`'s account avatar into `S02`/`S04`/`S11` — replaces the unapplied part of 18 | ⚠️ partly applied (`S02`/`S04` done; `S11` only 1 of 3 frames) — completed by [29](./followups/29-restore-reverted-followups.md) |
+| [27](./followups/27-staff-account-avatar-remaining-roots.md) | Carries `S15`'s account avatar into `S02`/`S04`/`S11` — replaces the unapplied part of 18 | ✅ applied |
 | [28](./followups/28-clientes-counter-consistency.md) | Makes `AW21`'s two footer counters agree, and `AW22`'s subtitle with them | ✅ applied |
-| [29](./followups/29-restore-reverted-followups.md) | Restores 01/02/04/05/11/12/16, reverted by the export that applied 19–22 and 27–28, and finishes 27 on `S11` | 🕓 pending |
+| [29](./followups/29-restore-reverted-followups.md) | Restores 01/02/04/05/11/12/16, reverted by the export that applied 19–22 and 27–28, and finishes 27 on `S11` | ✅ applied |
+| [30](./followups/30-invariants-checklist.md) | Standing checklist of settled facts — send it alongside every future follow-up | ♾️ standing, never "applied" |
 
 ## Status
 
 Every prompt in this index has a generated screen in `../../../design/`.
 
-**A follow-up landing is not permanent.** The export of 2026-08-17 applied 19–22, 28 and most of 27, and in the same pass reverted seven follow-ups that had already been verified — 01, 02, 04, 05, 11, 12 and 16 — apparently because some conversations lost their follow-up history. `AW21` re-exported with a clean sidebar while `AW22`, sent in the same follow-up, brought "Descuentos" back. 29 restores all seven and finishes 27 on `S11`. Treat every export as needing a full re-verify, not just a check of the screens the follow-up named. The five newest generated screens close gaps found by auditing the built screens against `booking/CONTEXT.md` and `back-office/CONTEXT.md`:
+**A follow-up landing is not permanent, and this has now happened twice.** The first export of 2026-08-17 applied 19–22, 28 and most of 27, and in the same pass reverted 01, 02, 04, 05, 11, 12 and 16. 29 restored all seven and finished 27 — and that export, in turn, reverted 05 (on `AW03`), 06, 07, 11 (on `Sistema de Diseño` and the admin web) and 13. Each round fixes what it was asked to fix and silently drops settled decisions elsewhere; 11 came back as "Mensual libre" rather than "ilimitado", so it survived a text search for the old wording.
+
+Restoring items one at a time is not converging. [30](./followups/30-invariants-checklist.md) is the response: a standing checklist of every settled fact, sent alongside every future follow-up, so the conversation is re-grounded each time instead of being told to fix one symptom. Treat every export as needing a full re-verify against it. The five newest generated screens close gaps found by auditing the built screens against `booking/CONTEXT.md` and `back-office/CONTEXT.md`:
 
 - `23` / `S23` / `AW33` — no surface had a signed-in way to change a password, and neither the staff app nor the admin web had a designed way to log out at all, even though `S02` and the admin shell both drew the control that should open it.
 - `AW32` — `AW30` requests a reset link but the screen that link opens was never designed, so the admin web's recovery flow dead-ended. The client (`21`) and staff (`S19`) apps both have their equivalent.
