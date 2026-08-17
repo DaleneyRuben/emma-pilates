@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button, select { font: inherit; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW34</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Selector de sucursal</h1>
+    <p style="margin:0;max-width:880px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">No es una página: son los estados abiertos del control que el armazón (AW02) ya dibuja en la barra superior y que ninguna pantalla había abierto. La contraparte exacta del menú de usuario (AW33), en la otra celda de la misma barra. Presente sin cambios en todas las páginas autenticadas.</p>
+    <p style="margin:0;max-width:880px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Las cuatro sucursales vienen de AW19. Elegir una cierra el popover y recarga la página en la que ya estás, acotada a la nueva sucursal: nunca te lleva a otro lugar y nunca pide confirmación, porque el cambio es gratis y reversible al instante.</p>
+  </header>
+
+  <div style="display:flex;align-items:flex-start;gap:40px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">1 · Escritorio 1440 px · selector abierto (página con sucursal)</div>
+          <div style="font-size:12px;color:#8A807C;">Sobre Horario (AW02). Popover anclado al borde izquierdo de la celda; clic afuera o Esc cierra.</div>
+        </div>
+      </sc-if>
+      <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);position:relative;">
+        <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="display:flex;gap:7px;">
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          </div>
+          <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            admin.emmapilates.bo/horario
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+            <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+            <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+              Sucursal Equipetrol
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="2" style="transform:rotate(180deg);"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.6"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg>
+              </button>
+              <div style="width:1px;height:20px;background:#E4D8CC;"></div>
+              <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+                <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:0.02em;">MF</div>
+                <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:stretch;min-height:760px;">
+          <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px 24px;display:flex;flex-direction:column;gap:4px;">
+            <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+              Horario
+            </a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
+            <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+              Reporte
+            </a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
+          </nav>
+
+          <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Horario</h2>
+                <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · sala única · 24 sesiones esta semana</div>
+              </div>
+              <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                Nueva sesión
+              </button>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:10px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="2"><path d="M15 6l-6 6 6 6"></path></svg></button>
+                <div style="font-size:13.5px;font-weight:500;">10 – 16 de agosto de 2026</div>
+                <button style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="2"><path d="M9 6l6 6-6 6"></path></svg></button>
+                <button style="height:28px;padding:0 12px;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;">Hoy</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;font-size:12px;color:#8A807C;">
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#D8BDB8;"></span>Programada</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#CBB9A4;"></span>Llena</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#E0D3C6;"></span>Cancelada</span>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+              <div style="display:grid;grid-template-columns:62px repeat(7,1fr);border-bottom:1px solid #E4D8CC;background:#FDFAF6;">
+                <div style="border-right:1px solid #EFE6DC;"></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Lun</span><span style="font-size:14px;font-weight:500;">10</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Mar</span><span style="font-size:14px;font-weight:500;">11</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;background:#F7EEE9;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#B78380;">Mié</span><span style="font-size:14px;font-weight:600;color:#8A5D59;">12 · hoy</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Jue</span><span style="font-size:14px;font-weight:500;">13</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Vie</span><span style="font-size:14px;font-weight:500;">14</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Sáb</span><span style="font-size:14px;font-weight:500;">15</span></div>
+                <div style="padding:9px 10px;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Dom</span><span style="font-size:14px;font-weight:500;">16</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:62px repeat(7,1fr);">
+                <div style="border-right:1px solid #EFE6DC;background:#FDFAF6;position:relative;height:528px;">
+                  <div style="position:absolute;top:1px;right:8px;font-size:10.5px;color:#A79E9A;">07:00</div>
+                  <div style="position:absolute;top:75px;right:8px;font-size:10.5px;color:#A79E9A;">09:00</div>
+                  <div style="position:absolute;top:150px;right:8px;font-size:10.5px;color:#A79E9A;">11:00</div>
+                  <div style="position:absolute;top:225px;right:8px;font-size:10.5px;color:#A79E9A;">13:00</div>
+                  <div style="position:absolute;top:300px;right:8px;font-size:10.5px;color:#A79E9A;">15:00</div>
+                  <div style="position:absolute;top:375px;right:8px;font-size:10.5px;color:#A79E9A;">17:00</div>
+                  <div style="position:absolute;top:450px;right:8px;font-size:10.5px;color:#A79E9A;">19:00</div>
+                  <div style="position:absolute;bottom:1px;right:8px;font-size:10.5px;color:#A79E9A;">21:00</div>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:0px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">07:00 · Camila Rojas</span></a>
+                  <a href="#" style="position:absolute;top:113px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">10:00 · Daniela Ortiz</span></a>
+                  <a href="#" style="position:absolute;top:338px;left:5px;right:5px;height:36px;border-radius:7px;background:#E9DFD1;border-left:3px solid #CBB9A4;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#6B5B45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Avanzado</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">16:00 · Valeria Peña</span></a>
+                  <a href="#" style="position:absolute;top:413px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Barre</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">18:00 · Camila Rojas</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:38px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">08:00 · Daniela Ortiz</span></a>
+                  <a href="#" style="position:absolute;top:188px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Prenatal</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">12:00 · Valeria Peña</span></a>
+                  <a href="#" style="position:absolute;top:375px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">17:00 · Camila Rojas</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FDF9F4 0,#FDF9F4 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:0px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">07:00 · Camila Rojas</span></a>
+                  <a href="#" style="position:absolute;top:113px;left:5px;right:5px;height:36px;border-radius:7px;background:#E9DFD1;border-left:3px solid #CBB9A4;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#6B5B45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">10:00 · Daniela Ortiz</span></a>
+                  <a href="#" style="position:absolute;top:263px;left:5px;right:5px;height:36px;border-radius:7px;background:#F1EBE3;border-left:3px solid #E0D3C6;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#9A918C;text-decoration:line-through;">Barre</span><span style="font-size:10.5px;color:#A79E9A;">14:00 · cancelada</span></a>
+                  <a href="#" style="position:absolute;top:338px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Avanzado</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">16:00 · Valeria Peña</span></a>
+                  <a href="#" style="position:absolute;top:413px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">18:00 · Daniela Ortiz</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:38px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">08:00 · Camila Rojas</span></a>
+                  <a href="#" style="position:absolute;top:225px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Prenatal</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">13:00 · Valeria Peña</span></a>
+                  <a href="#" style="position:absolute;top:375px;left:5px;right:5px;height:36px;border-radius:7px;background:#E9DFD1;border-left:3px solid #CBB9A4;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#6B5B45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Barre</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">17:00 · Camila Rojas</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:0px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">07:00 · Camila Rojas</span></a>
+                  <a href="#" style="position:absolute;top:150px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">11:00 · Daniela Ortiz</span></a>
+                  <a href="#" style="position:absolute;top:338px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Avanzado</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">16:00 · Valeria Peña</span></a>
+                  <a href="#" style="position:absolute;top:413px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Barre</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">18:00 · Camila Rojas</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:75px;left:5px;right:5px;height:36px;border-radius:7px;background:#E9DFD1;border-left:3px solid #CBB9A4;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#6B5B45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">09:00 · Daniela Ortiz</span></a>
+                  <a href="#" style="position:absolute;top:150px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">11:00 · Camila Rojas</span></a>
+                </div>
+                <div style="position:relative;height:528px;background:repeating-linear-gradient(to bottom,#FDFBF8 0,#FDFBF8 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:113px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">10:00 · Valeria Peña</span></a>
+                </div>
+              </div>
+            </div>
+          </main>
+        </div>
+
+        <div style="position:absolute;top:84px;left:254px;width:280px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:10px;box-shadow:0 12px 28px rgba(74,58,48,0.14);overflow:hidden;">
+          <div style="padding:12px 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Sucursal</div>
+          <div style="padding:0 6px;display:flex;flex-direction:column;">
+            <button style="height:40px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;border:none;border-radius:7px;background:#EFE0DC;text-align:left;cursor:pointer;">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0;">
+                <span style="font-size:13.5px;font-weight:500;color:#8A5D59;">Equipetrol</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:210px;">Av. San Martín 245, entre 3.º y 4.º anillo</span>
+              </span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A5D59" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M20 6L9 17l-5-5"></path></svg>
+            </button>
+            <button style="height:40px;display:flex;align-items:center;gap:10px;padding:0 10px;border:none;border-radius:7px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0;">
+                <span style="font-size:13.5px;color:#4A4A4A;">Urubó</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:240px;">Condominio Río Norte, local 12, camino al Urubó km 4</span>
+              </span>
+            </button>
+            <button style="height:40px;display:flex;align-items:center;gap:10px;padding:0 10px;border:none;border-radius:7px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0;">
+                <span style="font-size:13.5px;color:#4A4A4A;">Norte</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:240px;">Av. Banzer km 6, Torre Vitri, piso 2</span>
+              </span>
+            </button>
+            <button style="height:40px;display:flex;align-items:center;gap:10px;padding:0 10px;border:none;border-radius:7px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0;">
+                <span style="font-size:13.5px;color:#4A4A4A;">Las Palmas</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:240px;">Calle Los Tajibos 78, barrio Las Palmas</span>
+              </span>
+            </button>
+          </div>
+          <div style="margin-top:6px;height:1px;background:#EFE6DC;"></div>
+          <div style="padding:6px;">
+            <a href="#" style="height:36px;display:flex;align-items:center;gap:9px;padding:0 10px;border-radius:7px;font-size:13px;color:#B78380;" style-hover="background:#FAF3EC;color:#9C6764;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7" stroke-linecap="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+              Gestionar sucursales
+            </a>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="width:1440px;font-size:12px;line-height:1.6;color:#8A807C;text-wrap:pretty;">La sucursal activa se marca como el armazón marca un ítem activo del menú lateral — fondo <span style="color:#8A5D59;">#EFE0DC</span>, texto <span style="color:#8A5D59;">#8A5D59</span>, peso 500 y un check a la derecha. Nunca una pastilla de estado: una sucursal no es un estado. Sin opción «Todas las sucursales»: el selector del armazón siempre resuelve a una sola sede.</div>
+      </sc-if>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">3 · Escritorio 1440 px · cambio aplicado</div>
+          <div style="font-size:12px;color:#8A807C;">La misma página tras elegir Urubó. Al lado de 1 para que el cambio de alcance se lea como causa y efecto.</div>
+        </div>
+      </sc-if>
+      <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+        <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="display:flex;gap:7px;">
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          </div>
+          <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            admin.emmapilates.bo/horario
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+            <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+            <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+              Sucursal Urubó
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.6"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg>
+              </button>
+              <div style="width:1px;height:20px;background:#E4D8CC;"></div>
+              <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+                <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:0.02em;">MF</div>
+                <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:stretch;min-height:760px;">
+          <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px 24px;display:flex;flex-direction:column;gap:4px;">
+            <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+              Horario
+            </a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">1</span></a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
+            <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+              Reporte
+            </a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
+          </nav>
+
+          <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
+              <div style="display:flex;flex-direction:column;gap:5px;">
+                <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Horario</h2>
+                <div style="font-size:12.5px;color:#8A807C;">Sucursal Urubó · sala única · 16 sesiones esta semana</div>
+              </div>
+              <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+                Nueva sesión
+              </button>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:10px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <button style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="2"><path d="M15 6l-6 6 6 6"></path></svg></button>
+                <div style="font-size:13.5px;font-weight:500;">10 – 16 de agosto de 2026</div>
+                <button style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="2"><path d="M9 6l6 6-6 6"></path></svg></button>
+                <button style="height:28px;padding:0 12px;border:1px solid #E4D8CC;border-radius:7px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;">Hoy</button>
+              </div>
+              <div style="display:flex;align-items:center;gap:16px;font-size:12px;color:#8A807C;">
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#D8BDB8;"></span>Programada</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#CBB9A4;"></span>Llena</span>
+                <span style="display:flex;align-items:center;gap:6px;"><span style="width:9px;height:9px;border-radius:3px;background:#E0D3C6;"></span>Cancelada</span>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+              <div style="display:grid;grid-template-columns:62px repeat(7,1fr);border-bottom:1px solid #E4D8CC;background:#FDFAF6;">
+                <div style="border-right:1px solid #EFE6DC;"></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Lun</span><span style="font-size:14px;font-weight:500;">10</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Mar</span><span style="font-size:14px;font-weight:500;">11</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;background:#F7EEE9;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#B78380;">Mié</span><span style="font-size:14px;font-weight:600;color:#8A5D59;">12 · hoy</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Jue</span><span style="font-size:14px;font-weight:500;">13</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Vie</span><span style="font-size:14px;font-weight:500;">14</span></div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Sáb</span><span style="font-size:14px;font-weight:500;">15</span></div>
+                <div style="padding:9px 10px;display:flex;flex-direction:column;gap:1px;"><span style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Dom</span><span style="font-size:14px;font-weight:500;">16</span></div>
+              </div>
+              <div style="display:grid;grid-template-columns:62px repeat(7,1fr);">
+                <div style="border-right:1px solid #EFE6DC;background:#FDFAF6;position:relative;height:528px;">
+                  <div style="position:absolute;top:1px;right:8px;font-size:10.5px;color:#A79E9A;">07:00</div>
+                  <div style="position:absolute;top:75px;right:8px;font-size:10.5px;color:#A79E9A;">09:00</div>
+                  <div style="position:absolute;top:150px;right:8px;font-size:10.5px;color:#A79E9A;">11:00</div>
+                  <div style="position:absolute;top:225px;right:8px;font-size:10.5px;color:#A79E9A;">13:00</div>
+                  <div style="position:absolute;top:300px;right:8px;font-size:10.5px;color:#A79E9A;">15:00</div>
+                  <div style="position:absolute;top:375px;right:8px;font-size:10.5px;color:#A79E9A;">17:00</div>
+                  <div style="position:absolute;top:450px;right:8px;font-size:10.5px;color:#A79E9A;">19:00</div>
+                  <div style="position:absolute;bottom:1px;right:8px;font-size:10.5px;color:#A79E9A;">21:00</div>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:38px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">08:00 · Lucía Sandoval</span></a>
+                  <a href="#" style="position:absolute;top:300px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">15:00 · Lucía Sandoval</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:75px;left:5px;right:5px;height:36px;border-radius:7px;background:#E9DFD1;border-left:3px solid #CBB9A4;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#6B5B45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">09:00 · Andrea Vaca</span></a>
+                  <a href="#" style="position:absolute;top:375px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">17:00 · Lucía Sandoval</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FDF9F4 0,#FDF9F4 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:38px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">08:00 · Lucía Sandoval</span></a>
+                  <a href="#" style="position:absolute;top:225px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Prenatal</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">13:00 · Andrea Vaca</span></a>
+                  <a href="#" style="position:absolute;top:413px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">18:00 · Lucía Sandoval</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:113px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">10:00 · Andrea Vaca</span></a>
+                  <a href="#" style="position:absolute;top:375px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Barre</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">17:00 · Lucía Sandoval</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:38px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">08:00 · Lucía Sandoval</span></a>
+                  <a href="#" style="position:absolute;top:263px;left:5px;right:5px;height:36px;border-radius:7px;background:#F1EBE3;border-left:3px solid #E0D3C6;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#9A918C;text-decoration:line-through;">Prenatal</span><span style="font-size:10.5px;color:#A79E9A;">14:00 · cancelada</span></a>
+                </div>
+                <div style="position:relative;height:528px;border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;">
+                  <a href="#" style="position:absolute;top:75px;left:5px;right:5px;height:36px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;padding:4px 8px;display:flex;flex-direction:column;gap:1px;overflow:hidden;"><span style="font-size:11.5px;font-weight:500;color:#7A4F4B;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span><span style="font-size:10.5px;color:#8A807C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">09:00 · Andrea Vaca</span></a>
+                </div>
+                <div style="position:relative;height:528px;background:repeating-linear-gradient(to bottom,#FDFBF8 0,#FDFBF8 36px,#F4EDE4 36px,#F4EDE4 37px);padding:0 5px;"></div>
+              </div>
+            </div>
+          </main>
+        </div>
+      </div>
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="width:1440px;font-size:12px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Sin confirmación y sin franja de aviso: la barra superior es la respuesta permanente a «¿en qué sucursal estoy?», y repetirla en un mensaje pasajero sería ruido. Cambian el rótulo de la celda, el subtítulo de la página y las sesiones de la grilla — nada más. Nótese que el contador de Insumos del menú lateral también se acota: 1 en Urubó, 3 en Equipetrol.</div>
+      </sc-if>
+    </div>
+  </div>
+
+  <div style="display:flex;align-items:flex-start;gap:40px;flex-wrap:wrap;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">2 · Escritorio 1440 px · selector sobre una página sin sucursal</div>
+          <div style="font-size:12px;color:#8A807C;">Sobre Pagos (AW28). Las filas no están desactivadas: la elección es real, solo no se aplica aquí.</div>
+        </div>
+      </sc-if>
+      <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);position:relative;">
+        <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="display:flex;gap:7px;">
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          </div>
+          <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            admin.emmapilates.bo/back-office/pagos
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+            <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+            <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+              Sucursal Equipetrol
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="2" style="transform:rotate(180deg);"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+            <div style="display:flex;align-items:center;gap:14px;">
+              <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.6"><path d="M18 8a6 6 0 1 0-12 0c0 6-2 7-2 7h16s-2-1-2-7"></path><path d="M10.5 20a2 2 0 0 0 3 0"></path></svg>
+              </button>
+              <div style="width:1px;height:20px;background:#E4D8CC;"></div>
+              <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+                <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;letter-spacing:0.02em;">MF</div>
+                <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:stretch;min-height:620px;">
+          <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px 24px;display:flex;flex-direction:column;gap:4px;">
+            <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+              Horario
+            </a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#FFFFFF;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
+            <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;color:#4A4A4A;font-size:13px;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+              Reporte
+            </a>
+            <div style="margin-top:10px;padding:0 12px 6px;flex:none;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
+            <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
+          </nav>
+
+          <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Pagos</h2>
+              <div style="font-size:12.5px;color:#8A807C;">Todo el estudio · 6 transferencias esperando revisión</div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+              <div style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 0.9fr 18px;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+                <div>Clienta</div><div>Plan</div><div>Fecha</div><div>Monto</div><div></div>
+              </div>
+              <a href="#" style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 0.9fr 18px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+                <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">CG</div><span style="font-size:13.5px;">Camila Guzmán</span></div>
+                <div style="font-size:13px;color:#6E6663;">Paquete de 8 clases</div>
+                <div style="font-size:13px;color:#6E6663;">14 ago 2026</div>
+                <div style="font-size:13.5px;font-weight:500;">Bs 560</div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
+              </a>
+              <a href="#" style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 0.9fr 18px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+                <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">RM</div><span style="font-size:13.5px;">Rocío Mendoza</span></div>
+                <div style="font-size:13px;color:#6E6663;">Mensual ilimitado</div>
+                <div style="font-size:13px;color:#6E6663;">14 ago 2026</div>
+                <div style="font-size:13.5px;font-weight:500;">Bs 890</div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
+              </a>
+              <a href="#" style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 0.9fr 18px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+                <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">VA</div><span style="font-size:13.5px;">Valentina Arce</span></div>
+                <div style="font-size:13px;color:#6E6663;">Paquete de 4 clases</div>
+                <div style="font-size:13px;color:#6E6663;">13 ago 2026</div>
+                <div style="font-size:13.5px;font-weight:500;">Bs 320</div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
+              </a>
+              <a href="#" style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 0.9fr 18px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+                <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">LP</div><span style="font-size:13.5px;">Lorena Paz</span></div>
+                <div style="font-size:13px;color:#6E6663;">Paquete de 8 clases</div>
+                <div style="font-size:13px;color:#6E6663;">13 ago 2026</div>
+                <div style="font-size:13.5px;font-weight:500;">Bs 560</div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
+              </a>
+              <a href="#" style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 0.9fr 18px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+                <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MT</div><span style="font-size:13.5px;">Mariana Terceros</span></div>
+                <div style="font-size:13px;color:#6E6663;">Mensual ilimitado</div>
+                <div style="font-size:13px;color:#6E6663;">12 ago 2026</div>
+                <div style="font-size:13.5px;font-weight:500;">Bs 890</div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
+              </a>
+              <a href="#" style="display:grid;grid-template-columns:1.6fr 1.1fr 1fr 0.9fr 18px;align-items:center;gap:16px;padding:14px 20px;color:#4A4A4A;" style-hover="background:#FDF7F2;">
+                <div style="display:flex;align-items:center;gap:10px;"><div style="width:30px;height:30px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">SC</div><span style="font-size:13.5px;">Sofía Chávez</span></div>
+                <div style="font-size:13px;color:#6E6663;">Paquete de 4 clases</div>
+                <div style="font-size:13px;color:#6E6663;">12 ago 2026</div>
+                <div style="font-size:13.5px;font-weight:500;">Bs 320</div>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
+              </a>
+            </div>
+          </main>
+        </div>
+
+        <div style="position:absolute;top:84px;left:254px;width:280px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:10px;box-shadow:0 12px 28px rgba(74,58,48,0.14);overflow:hidden;">
+          <div style="padding:10px;">
+            <div style="padding:9px 11px;background:#FAF7F2;border:1px solid #EFE6DC;border-radius:8px;font-size:11.5px;line-height:1.5;color:#8A807C;text-wrap:pretty;">Esta página no se filtra por sucursal — los pagos son del estudio, no de una sede.</div>
+          </div>
+          <div style="padding:2px 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Sucursal</div>
+          <div style="padding:0 6px;display:flex;flex-direction:column;">
+            <button style="height:40px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 10px;border:none;border-radius:7px;background:#EFE0DC;text-align:left;cursor:pointer;">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0;">
+                <span style="font-size:13.5px;font-weight:500;color:#8A5D59;">Equipetrol</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:210px;">Av. San Martín 245, entre 3.º y 4.º anillo</span>
+              </span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8A5D59" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M20 6L9 17l-5-5"></path></svg>
+            </button>
+            <button style="height:40px;display:flex;align-items:center;gap:10px;padding:0 10px;border:none;border-radius:7px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0;">
+                <span style="font-size:13.5px;color:#4A4A4A;">Urubó</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:240px;">Condominio Río Norte, local 12, camino al Urubó km 4</span>
+              </span>
+            </button>
+            <button style="height:40px;display:flex;align-items:center;gap:10px;padding:0 10px;border:none;border-radius:7px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0;">
+                <span style="font-size:13.5px;color:#4A4A4A;">Norte</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:240px;">Av. Banzer km 6, Torre Vitri, piso 2</span>
+              </span>
+            </button>
+            <button style="height:40px;display:flex;align-items:center;gap:10px;padding:0 10px;border:none;border-radius:7px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:1px;min-width:0;">
+                <span style="font-size:13.5px;color:#4A4A4A;">Las Palmas</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:240px;">Calle Los Tajibos 78, barrio Las Palmas</span>
+              </span>
+            </button>
+          </div>
+          <div style="margin-top:6px;height:1px;background:#EFE6DC;"></div>
+          <div style="padding:6px;">
+            <a href="#" style="height:36px;display:flex;align-items:center;gap:9px;padding:0 10px;border-radius:7px;font-size:13px;color:#B78380;" style-hover="background:#FAF3EC;color:#9C6764;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7" stroke-linecap="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+              Gestionar sucursales
+            </a>
+          </div>
+        </div>
+      </div>
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="width:1440px;font-size:12px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Nómina (AW11), Clientes (AW21/AW22), Referidos (AW26), Créditos (AW27) y Pagos (AW28/AW29) son de todo el estudio, y el selector sigue en la barra superior en todas por consistencia del armazón. Abierto ahí, lo dice en vez de insinuar un filtro que no está corriendo. Cambia la última cláusula por el tipo de registro de la página sobre la que se abre.</div>
+      </sc-if>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">4 · Navegador angosto · 420 px</div>
+          <div style="font-size:12px;color:#8A807C;">Hoja anclada abajo, filas de 48 px, misma marca de activo. En la barra cabe el nombre, sin la dirección.</div>
+        </div>
+      </sc-if>
+      <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);position:relative;">
+        <div style="height:38px;display:flex;align-items:center;gap:10px;padding:0 12px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+          <div style="display:flex;gap:6px;">
+            <div style="width:9px;height:9px;border-radius:50%;background:#D2C0B2;"></div>
+            <div style="width:9px;height:9px;border-radius:50%;background:#D2C0B2;"></div>
+          </div>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 10px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:10px;color:#8A807C;overflow:hidden;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2" style="flex:none;"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+            <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">admin.emmapilates.bo/horario</span>
+          </div>
+        </div>
+
+        <div style="height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+          <div style="display:flex;align-items:center;gap:10px;min-width:0;">
+            <button style="width:32px;height:32px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+            </button>
+            <button style="height:30px;display:flex;align-items:center;gap:7px;padding:0 10px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;min-width:0;">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6" style="flex:none;"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+              <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="2" style="flex:none;transform:rotate(180deg);"><path d="M6 9l6 6 6-6"></path></svg>
+            </button>
+          </div>
+          <div style="width:28px;height:28px;flex:none;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;">MF</div>
+        </div>
+
+        <div style="background:#FAF7F2;padding:18px 14px 300px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:23px;line-height:1.15;">Horario</h2>
+            <div style="font-size:12px;color:#8A807C;">Sucursal Equipetrol · 24 sesiones esta semana</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:7px;background:#FFFFFF;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="2"><path d="M15 6l-6 6 6 6"></path></svg></button>
+            <div style="flex:1;text-align:center;font-size:13px;font-weight:500;">Mié 12 de agosto</div>
+            <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:7px;background:#FFFFFF;cursor:pointer;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="2"><path d="M9 6l6 6-6 6"></path></svg></button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <a href="#" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:11px;color:#4A4A4A;">
+              <div style="flex:none;width:46px;font-size:12.5px;font-weight:500;color:#8A5D59;">07:00</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Reformer Intermedio</span>
+                <span style="font-size:11.5px;color:#8A807C;">Camila Rojas · 6 de 8</span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round" style="flex:none;"><path d="M9 5l7 7-7 7"></path></svg>
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:11px;color:#4A4A4A;">
+              <div style="flex:none;width:46px;font-size:12.5px;font-weight:500;color:#8A5D59;">10:00</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mat Pilates</span>
+                <span style="font-size:11.5px;color:#8A807C;">Daniela Ortiz · llena</span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round" style="flex:none;"><path d="M9 5l7 7-7 7"></path></svg>
+            </a>
+            <a href="#" style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:11px;color:#4A4A4A;">
+              <div style="flex:none;width:46px;font-size:12.5px;font-weight:500;color:#A79E9A;">14:00</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;">
+                <span style="font-size:13.5px;font-weight:500;color:#9A918C;text-decoration:line-through;">Barre</span>
+                <span style="font-size:11.5px;color:#A79E9A;">Cancelada</span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round" style="flex:none;"><path d="M9 5l7 7-7 7"></path></svg>
+            </a>
+          </div>
+        </div>
+
+        <div style="position:absolute;inset:38px 0 0;background:rgba(74,58,48,0.28);"></div>
+
+        <div style="position:absolute;left:0;right:0;bottom:0;background:#FFFFFF;border-top:1px solid #E4D8CC;border-radius:16px 16px 0 0;box-shadow:0 -12px 28px rgba(74,58,48,0.14);overflow:hidden;">
+          <div style="display:flex;justify-content:center;padding:8px 0 2px;">
+            <div style="width:36px;height:4px;border-radius:999px;background:#E0D3C6;"></div>
+          </div>
+          <div style="padding:8px 16px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Sucursal</div>
+          <div style="padding:0 8px;display:flex;flex-direction:column;">
+            <button style="min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 12px;border:none;border-radius:9px;background:#EFE0DC;text-align:left;cursor:pointer;">
+              <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                <span style="font-size:14px;font-weight:500;color:#8A5D59;">Equipetrol</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:280px;">Av. San Martín 245, entre 3.º y 4.º anillo</span>
+              </span>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8A5D59" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M20 6L9 17l-5-5"></path></svg>
+            </button>
+            <button style="min-height:48px;display:flex;align-items:center;gap:10px;padding:6px 12px;border:none;border-radius:9px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                <span style="font-size:14px;color:#4A4A4A;">Urubó</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:340px;">Condominio Río Norte, local 12, camino al Urubó km 4</span>
+              </span>
+            </button>
+            <button style="min-height:48px;display:flex;align-items:center;gap:10px;padding:6px 12px;border:none;border-radius:9px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                <span style="font-size:14px;color:#4A4A4A;">Norte</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:340px;">Av. Banzer km 6, Torre Vitri, piso 2</span>
+              </span>
+            </button>
+            <button style="min-height:48px;display:flex;align-items:center;gap:10px;padding:6px 12px;border:none;border-radius:9px;background:transparent;text-align:left;cursor:pointer;" style-hover="background:#FAF3EC;">
+              <span style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                <span style="font-size:14px;color:#4A4A4A;">Las Palmas</span>
+                <span style="font-size:11.5px;color:#A79E9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;max-width:340px;">Calle Los Tajibos 78, barrio Las Palmas</span>
+              </span>
+            </button>
+          </div>
+          <div style="margin-top:8px;height:1px;background:#EFE6DC;"></div>
+          <div style="padding:8px 8px 16px;">
+            <a href="#" style="min-height:44px;display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:9px;font-size:13.5px;color:#B78380;" style-hover="background:#FAF3EC;color:#9C6764;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7" stroke-linecap="round"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+              Gestionar sucursales
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <sc-if value="{{ showNotes }}" hint-placeholder-val="{{ true }}">
+    <div style="max-width:1440px;display:flex;flex-direction:column;gap:14px;padding:22px 24px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:14px;">
+      <div style="font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#B78380;font-weight:500;">Notas del armazón</div>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 32px;">
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="font-size:13.5px;font-weight:500;">Pertenece al armazón</div>
+          <div style="font-size:12.5px;line-height:1.6;color:#8A807C;text-wrap:pretty;">El selector está presente sin cambios en todas las páginas autenticadas de la web de administración, en la misma celda de la barra superior. No es una pantalla que se visite: es un control que se abre.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="font-size:13.5px;font-weight:500;">La única excepción</div>
+          <div style="font-size:12.5px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Reporte (AW16) es la única pantalla que lo anula con un selector propio, y el único lugar donde existe «Todas las sucursales» — porque es la única que agrega cifras entre sedes.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="font-size:13.5px;font-weight:500;">Qué se acota</div>
+          <div style="font-size:12.5px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Sesiones, bloques de disponibilidad y asignaciones de personal (booking), más insumos, retiros y gastos (back office). Al cambiar de sede, esas páginas se recargan con los datos de la nueva sucursal.</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:5px;">
+          <div style="font-size:13.5px;font-weight:500;">Qué no crea</div>
+          <div style="font-size:12.5px;line-height:1.6;color:#8A807C;text-wrap:pretty;">«Gestionar sucursales» es un enlace, no un botón: este popover no crea nada. Alta, edición y direcciones viven en Sucursales (AW19) y su formulario (AW20).</div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Lámina&quot;},&quot;showNotes&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Lámina&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      showNotes: this.props.showNotes ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>

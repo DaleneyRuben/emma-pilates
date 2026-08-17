@@ -156,6 +156,415 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Confirmar cancelación</div>
+          <div style="font-size:12px;color:#8A807C;">Hoja inferior sobre la lista atenuada · sin pantalla nueva · al confirmar, la tarjeta desaparece</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="position:relative;height:100%;background:#FAF7F2;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="padding:66px 20px 28px;display:flex;flex-direction:column;gap:24px;">
+
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Mis reservas</div>
+              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;">
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Hoy · miércoles 19</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Daniela Ortiz
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Equipetrol
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
+                  <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
+                </div>
+              </div>
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Mañana · jueves 20</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Emma Vargas
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Centro
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
+                  <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
+                </div>
+              </div>
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Sábado 22 de agosto</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Emma Vargas
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Centro
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Eres la 2.ª en la lista.</span>
+                  <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;">Perfil</span>
+            </div>
+          </div>
+          <div style="position:absolute;inset:0;z-index:10;background:rgba(74,58,48,0.22);"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:#FFFFFF;border-top:1px solid #D8C9BB;border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(74,58,48,0.14);padding:24px 20px 34px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;">¿Cancelar esta reserva?</div>
+              <div style="font-size:13px;line-height:1.5;color:#8A807C;">Reformer Pilates · jueves 20 de agosto, 07:00 – 07:50 · Emma Vargas · Centro</div>
+            </div>
+            <div style="font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para volver a reservarlo tendrá que seguir habiendo cupo.</div>
+            <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px;">
+              <button style="min-height:52px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:transparent;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.08);">Sí, cancelar reserva</button>
+              <button style="min-height:44px;width:100%;border:none;border-radius:8px;background:transparent;color:#8A807C;font-size:15px;font-weight:500;cursor:pointer;" style-hover="color:#4A4A4A;">Volver</button>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Recién reservada</div>
+          <div style="font-size:12px;color:#8A807C;">Al volver de 04 · aviso pasajero, sin botón ni cierre · la tarjeta nueva lleva el filo Éxito mientras el aviso está</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:66px 20px 28px;display:flex;flex-direction:column;gap:20px;">
+
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Mis reservas</div>
+              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="display:flex;align-items:flex-start;gap:12px;background:rgba(124,148,115,0.14);border-radius:12px;padding:14px 16px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px;"><circle cx="12" cy="12" r="9"></circle><polyline points="8,12.4 11,15.2 16.2,9.4"></polyline></svg>
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                  <span style="font-size:15px;font-weight:500;color:#4A4A4A;">Reserva confirmada</span>
+                  <span style="font-size:12px;line-height:1.45;color:#6E6663;">Reformer Pilates · jueves 20 de agosto, 07:00</span>
+                </div>
+              </div>
+              <span style="font-size:12px;line-height:1.4;color:#8A807C;padding-left:2px;">Te quedan 7 clases en tu plan.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:14px;">
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Hoy · miércoles 19</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Daniela Ortiz
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Equipetrol
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
+                  <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
+                </div>
+              </div>
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Mañana · jueves 20</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-left:3px solid #7C9473;border-radius:16px;padding:18px 18px 18px 16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                  </div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Emma Vargas
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Centro
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
+                  <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
+                </div>
+              </div>
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Sábado 22 de agosto</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:8px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Emma Vargas
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Centro
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Eres la 2.ª en la lista.</span>
+                  <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Recién reservada</div>
+          <div style="font-size:12px;color:#8A807C;">Mismo aviso con densidad Material · barra de navegación con indicador</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:46px 16px 24px;display:flex;flex-direction:column;gap:18px;">
+
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.15;">Mis reservas</div>
+              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding-bottom:3px;white-space:nowrap;">Ver historial</a>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;align-items:flex-start;gap:12px;background:rgba(124,148,115,0.14);border-radius:8px;padding:12px 14px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="9"></circle><polyline points="8,12.4 11,15.2 16.2,9.4"></polyline></svg>
+                <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
+                  <span style="font-size:14px;font-weight:500;color:#4A4A4A;">Reserva confirmada</span>
+                  <span style="font-size:12px;line-height:1.4;color:#6E6663;">Reformer Pilates · jueves 20 de agosto, 07:00</span>
+                </div>
+              </div>
+              <span style="font-size:12px;line-height:1.4;color:#8A807C;padding-left:2px;">Te quedan 7 clases en tu plan.</span>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Hoy · miércoles 19</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Mat Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Daniela Ortiz
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Equipetrol
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
+                  <button style="min-height:44px;padding:0 16px;border:1px solid #B78380;border-radius:999px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
+                </div>
+              </div>
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:4px;">Mañana · jueves 20</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-left:3px solid #7C9473;border-radius:12px;padding:16px 16px 16px 14px;display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Reformer Pilates</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Emma Vargas
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Centro
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
+                  <button style="min-height:44px;padding:0 16px;border:1px solid #D8C9BB;border-radius:999px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
+                </div>
+              </div>
+
+              <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:4px;">Sábado 22 de agosto</div>
+              </sc-if>
+              <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;">
+                <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+                  <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
+                    <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Reformer Pilates</span>
+                  </div>
+                  <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:#6E6663;">
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Emma Vargas
+                  </span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                    Centro
+                  </span>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
+                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Eres la 2.ª en la lista.</span>
+                  <button style="min-height:44px;padding:0 16px;border:1px solid #D8C9BB;border-radius:999px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:12px 0 26px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A79E9A;">
+              <div style="display:flex;align-items:center;justify-content:center;height:32px;padding:0 20px;border-radius:999px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              </div>
+              <span style="font-size:12px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A79E9A;">
+              <div style="display:flex;align-items:center;justify-content:center;height:32px;padding:0 20px;border-radius:999px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              </div>
+              <span style="font-size:12px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#8A5F5C;">
+              <div style="display:flex;align-items:center;justify-content:center;height:32px;padding:0 20px;border-radius:999px;background:rgba(216,189,184,0.34);">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              </div>
+              <span style="font-size:12px;font-weight:500;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A79E9A;">
+              <div style="display:flex;align-items:center;justify-content:center;height:32px;padding:0 20px;border-radius:999px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              </div>
+              <span style="font-size:12px;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Sin reservas próximas</div>
           <div style="font-size:12px;color:#8A807C;">Estado vacío con acción única</div>
         </div>
@@ -224,6 +633,9 @@
         <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Detalles</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Orden:</strong> por fecha y hora ascendente, agrupadas por día.</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Cancelar:</strong> el borde y el texto pasan a rojo semántico al posar el cursor o el dedo; nunca es un botón sólido.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Confirmación:</strong> «Cancelar» abre una hoja inferior sobre la lista atenuada (rgba(74,58,48,0.22)) con la reserva en una línea y la consecuencia en otra; la acción destructiva va delineada en rojo semántico y «Volver» queda como texto. Confirmar cierra la hoja y la tarjeta ya no está: sin pantalla de resultado.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Sin confirmación:</strong> «Reprogramar» y «Salir de la lista» no la piden — reprogramar mueve un cupo ya consumido y la lista de espera no consume nada.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Recién reservada:</strong> al volver de 04 aparece un aviso en tinte Éxito bajo el título, con la clase, el día y la hora, y debajo el saldo que la reserva acaba de cambiar. Es pasajero: se va tras unos segundos o al primer scroll y no vuelve para esa reserva. Mientras está, la tarjeta nueva lleva un filo Éxito para encontrarla en la lista; después es una tarjeta normal. Sin botón ni control de cierre — no es una tarea.</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Historial:</strong> enlace de texto en la esquina superior derecha, sin competir con el título.</div>
       </div>
     </div>

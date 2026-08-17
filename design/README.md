@@ -8,7 +8,7 @@ Three surfaces for a Pilates studio in Santa Cruz de la Sierra, Bolivia:
 |---|---|---|---|
 | **Client app** | `01`–`23` | Mobile (iOS/Android, 390×844 reference) | Clients: booking, plans, payments, nutrition, referrals |
 | **Staff app** | `S01`–`S23` | Mobile | Trainers, front desk, administration, nutritionist |
-| **Admin web** | `AW01`–`AW33` | Desktop web (1440px reference, 420px narrow) | Studio management: schedule, catalog, back office, reports, promotions |
+| **Admin web** | `AW01`–`AW34` | Desktop web (1440px reference, 420px narrow) | Studio management: schedule, catalog, back office, reports, promotions |
 | **Design system** | `Sistema de Diseño.dc.html` | — | Source of truth for tokens and components |
 
 All product copy is **neutral Spanish (Bolivia), informal "tú" address**. Currency is the boliviano, written `Bs 1.200,00` (dot thousands, comma decimals). Dates are `dd/mm/aaaa`, times are 24-hour.
@@ -236,6 +236,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW31` | Retiros e insumos consumidos | Withdrawal history behind `AW08` |
 | `AW32` | Crear contraseña | Set password from the emailed link / first login |
 | `AW33` | Menú de usuario y cambiar contraseña | Top-bar user menu overlay, change-password side panel, log-out confirm |
+| `AW34` | Selector de sucursal | Not a page: the open states of the top-bar branch control (branches come from `AW19`); picking one closes the popover and reloads the current page in that scope |
 
 ---
 
@@ -253,17 +254,20 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - Four-tab bar: Inicio · Reservar · Mis Reservas · Perfil. Child screens replace the tab bar with a header and a back arrow.
 - `01→20` via "¿Olvidaste tu contraseña?". `01→21` is forced after a first login with a temporary password — the client cannot reach `02` until it completes.
 - `18→22` (Editar perfil) and `18→23` (Cambiar contraseña); both return to `18`.
+- Booking and assessment confirmations are acknowledged on arrival, not on a result screen: `04→05` and `14→15` land with a transient Éxito-tinted notice strip under the header (check glyph + "Reserva confirmada" / "Evaluación confirmada" and the class, day and time in the Nota style). It fades after a few seconds or on first scroll and never returns for that record; while it shows, the new card carries a 3px Éxito left edge so it can be found in the list. No button, no dismiss control. `05` adds one muted balance line ("Te quedan 7 clases en tu plan."); `15` has none — an assessment consumes no class allowance.
 
 **Navigation — staff app**
 - No tab bar for any role. Each role lands on its own root — `S02` Trainer, `S04` Front desk, `S11` Administration, `S15` Nutritionist — and navigates in depth from a header with a back arrow.
 - `S01→S18` via "¿Olvidaste tu contraseña?"; `S01→S19` on first login with a temporary password.
 - `S06→S21` (Reservas de la clienta) and `S06→S22` (Historial de la clienta).
+- `S15` cards are selectable, not navigable: tapping highlights a card (border → `#B78380`) so the nutritionist keeps their place down the day. There is no assessment detail screen anywhere — an Evaluation records the appointment, not its content (same reason `AW25` rows are not links).
 - `S20` has no menu entry — it is reached from a push notification and filtered by role. The header avatar on each role root opens `S23`.
 
 **Back office (AW19–AW29)**
 - `AW19`: `+ Nueva sucursal` and any row open `AW20`. There is no delete — a branch with session history can only be edited. Footer strip states this.
 - `AW20`: two fields (Nombre, Dirección). Create-mode helper: "Aparecerá en el selector de sucursal al guardarla". Edit mode shows a fixed note that the branch is already referenced in the top-bar selector and in every back-office record (sessions, payments, supplies, expenses, payroll) — renaming moves nothing.
 - `AW21`: accounts are created in the staff app (`S05`) or by self-registration, so this screen creates nothing — no primary action, search-only filter, pagination ("Mostrando 9 de 148 clientes" + Anterior / Página 1 de 17 / Siguiente). Any row opens `AW22`.
+- `AW21` no-results: search is the whole interface, so the miss is drawn. The table card and its header row stay, with the message centred in the body — "No se encontró ninguna clienta." + "Revisa cómo escribiste el nombre o el teléfono." + a quieter "Las cuentas se crean desde la app del personal o cuando la clienta se registra." **No call to action** (unlike `S04`, this screen cannot create a client). Footer reads "Mostrando 0 de 148 clientas" and both pagination controls render in the disabled tone. At 420px the stacked cards are replaced by the same message with the search field pinned above.
 - `AW22`: read-only summary panel on `#FAF7F2` rows — contacto, plan (vigencia, clases disponibles), crédito, referidos (código). With no active plan the Plan block collapses to one muted line ("Último plan vencido el 30/06/2026."). No footer, no editable fields.
 - `AW23`: `+ Nuevo miembro` and any row open `AW24`. Role renders as a neutral label, not a status pill; branch assignment listed as plain text ("Equipetrol, Urubó" / "Todas"). One-at-a-time role filter, default "Todos".
 - `AW24`: exactly one role, chosen in a 2×2 grid (selected = Palo de rosa, others neutral). Choosing **Administrador** replaces the branch picker with a read-only row ("Todas las sucursales (implícito por el rol)"). Create mode shows a generated temporary password (`emma-9T57`) with **Copiar** and the note that the person changes it at first login — same pattern as `S05`. Edit mode drops the temporary password and offers **Restablecer contraseña**; removing a branch warns that already-assigned sessions are not reassigned.
