@@ -9,7 +9,7 @@ These standards apply regardless of which AI assistant, editor, or command-line 
 
 ## Inherited baseline
 
-This project specializes the user's global [coding standards](/Users/rubendaleney/.claude/skills/coding-standards/SKILL.md). Read that skill first when it is available. This file restates its operative rules so contributors on other machines and AI tools can follow the project without depending on that absolute path.
+This project specializes the user's global [coding standards](/Users/rubendaleney/.agents/skills/coding-standards/SKILL.md). Read that skill first when it is available. This file restates its operative rules so contributors on other machines and AI tools can follow the project without depending on that absolute path.
 
 If the global and project standards differ, follow the stricter rule unless it conflicts with a direct user instruction. Accepted ADRs remain authoritative for architecture choices.
 
@@ -90,4 +90,4 @@ Before calling a change complete, run the narrowest relevant tests plus configur
 
 Create an atomic commit after each meaningful implementation checkpoint once its relevant tests are green. Do not batch unrelated work into a later commit.
 
-Every commit must use the project [`commit`](../commit/SKILL.md) skill. Invoke `/commit` when supported; otherwise read and execute that skill directly. Do not run `git commit` through an improvised workflow.
+Every commit must use the project [`commit`](../commit/SKILL.md) skill. Invoke `$commit` in Codex, `/commit` in clients that expose slash skills, or read and execute that skill directly when native invocation is unavailable. Do not run `git commit` through an improvised workflow.

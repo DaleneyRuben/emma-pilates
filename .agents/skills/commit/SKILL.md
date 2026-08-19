@@ -5,7 +5,7 @@ description: Review, validate, stage, and commit a single logical Pilates projec
 
 # Commit workflow
 
-This workflow is mandatory for every commit, regardless of AI tool. Invoke it as `/commit` when slash skills are supported; otherwise follow these instructions directly.
+This workflow is mandatory for every commit, regardless of AI tool. Invoke it as `$commit` in Codex, `/commit` in clients that expose slash skills, or follow these instructions directly when native invocation is unavailable.
 
 ## 1. Review the worktree
 
