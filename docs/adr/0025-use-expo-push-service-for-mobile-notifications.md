@@ -1,0 +1,13 @@
+# Use Expo Push Service for mobile notifications
+
+Status: accepted
+
+The role-routed mobile application will use `expo-notifications` and Expo Push Service for remote notifications on iOS and Android. Each authenticated app installation registers its Expo push token as a notification endpoint owned by the system Account defined in [ADR-0009](./0009-separate-system-account-from-domain-identities.md); one Account may have multiple active device endpoints, and a shared device must not remain associated with an Account after sign-out.
+
+The backend sends notifications through a project-owned provider interface, with Expo confined to its infrastructure adapter. The pg-boss workflow established in [ADR-0024](./0024-use-pg-boss-for-durable-background-jobs.md) records delivery work durably, retries temporary network, rate-limit, and provider failures with backoff, stores Expo ticket identifiers, and checks push receipts. An endpoint reported as `DeviceNotRegistered` is deactivated until that installation registers again. Permanent payload and credential failures are surfaced for operations rather than retried indefinitely.
+
+A push message is an optional prompt, not a source of truth or proof of delivery. Its data contains a stable notification type and only the identifiers needed to deep-link into the app, which then fetches and authorizes current state through the API. Lock-screen text excludes sensitive financial, credential, receipt-image, and Evaluation information. Handlers tolerate delayed or duplicate delivery, and every notification-relevant state remains discoverable in the application when push permission is denied or delivery never occurs.
+
+Expo Push Service was selected because it is free, presents one delivery API for both mobile platforms, fits the Expo application chosen in [ADR-0022](./0022-use-expo-with-react-native-for-the-mobile-app.md), and is sufficient for the project's transactional notifications. OneSignal was rejected because its campaign, segmentation, analytics, in-app messaging, additional SDK, and third-party user model add more product surface and data processing than the documented workflows require. Direct APNs and FCM integration was rejected because it duplicates platform-specific credentials, token behavior, delivery code, and operational handling without a current need for their advanced features.
+
+The provider interface and Account-owned endpoint model preserve a later migration to OneSignal or direct APNs and FCM. This decision does not select the notification-permission prompt experience, per-category user preferences, badge policy, sounds, worker process topology, or any Expo Application Services product beyond the configuration required to use Expo Push Service.
