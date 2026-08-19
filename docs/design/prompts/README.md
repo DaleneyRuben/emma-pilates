@@ -1,8 +1,8 @@
 # Design prompts index
 
-Prompts fed to the design tool (Claude Design) to generate the screens in `../../../design/`. Start with [`00-design-system.md`](./00-design-system.md) — every other prompt references it by name.
+Prompts fed to the design-generation tool to produce the screens in `../../../design/`. Start with [`00-design-system.md`](./00-design-system.md) — every other prompt references it by name.
 
-For fixes to **already-generated** screens, use [`followups/`](./followups/) instead of editing the original screen prompt — each follow-up is a short delta meant to be sent as the next message in the existing Claude Design conversation, so only the affected screen(s) regenerate. Only write/edit a full prompt file directly for a screen that hasn't been generated yet.
+For fixes to **already-generated** screens, use [`followups/`](./followups/) instead of editing the original screen prompt — each follow-up is a short delta meant to be sent as the next message in the existing design session, so only the affected screen(s) regenerate. Only write/edit a full prompt file directly for a screen that hasn't been generated yet.
 
 ## Client app (`client/`)
 
@@ -102,7 +102,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 
 ## Follow-ups (`followups/`)
 
-Each of these was sent as the next message in the existing Claude Design conversation for the surface it targets. Status is verified against the built files in `../../../design/`, and **re-verified after every export** — a ✅ is only true of the current bundle.
+Each of these was sent as the next message in the existing design session for the surface it targets. Status is verified against the built files in `../../../design/`, and **re-verified after every export** — a ✅ is only true of the current bundle.
 
 [30](./followups/30-invariants-checklist.md) is different from the rest: it is a standing checklist, sent alongside every other follow-up, and never gets marked applied.
 
@@ -167,4 +167,4 @@ Follow-ups 18–20 close the entry point for `S23` and `18`. `S23` says it is re
 
 Follow-ups 21–26 and `AW34` come from a second audit, this one looking for controls the screens draw but never resolve. Three are promises the design files make in their own copy or notes and don't keep: `AW29`'s "Ver en grande" and `S12`'s "Ampliar" open no enlarged receipt, even though checking a transfer screenshot against the bank is the entire purpose of both screens; `05`'s notes specify "«Cancelar», con confirmación previa" and no confirmation exists, on `05` or on `15`. `AW34` is the same class of gap as `AW33` — the other cell of the same top bar, drawn on every page, opened by none, while `AW19` calls itself the list that feeds it. The last three are smaller: `05` and `15` complete a booking in silence while every comparable moment in the product acknowledges itself (`11`, `S10`, `S12`, `S14`); `AW21` is search-only and has no no-results state, though `S04` and `AW25`/`AW31` all have theirs; and `S15` is captioned "toca una tarjeta para abrirla" when tapping only moves a border — the caption is wrong, not the behaviour, since an Evaluation records the appointment and not its contents.
 
-Everything under `../../../design/` — the screens, `Sistema de Diseño`, and `README.md` — is **generated output from Claude Design and is never edited by hand**. Anything wrong in there is fixed by writing a follow-up here and re-sending it in that surface's design conversation, so the next export keeps the fix instead of overwriting it.
+Everything under `../../../design/` — the screens, `Sistema de Diseño`, and `README.md` — is **generated output and is never edited by hand**. Anything wrong in there is fixed by writing a follow-up here and re-sending it in that surface's design session, so the next export keeps the fix instead of overwriting it.
