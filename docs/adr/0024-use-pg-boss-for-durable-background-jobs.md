@@ -1,0 +1,15 @@
+# Use pg-boss for durable background jobs
+
+Status: accepted
+
+The backend will use pg-boss, a PostgreSQL-backed durable job queue, for scheduled checks, reminders, push-notification delivery, and other work that should survive an API restart or complete outside an HTTP request. Queue data lives in a dedicated technical schema rather than either bounded context's schema, reusing the database selected in [ADR-0011](./0011-use-postgresql-with-schema-per-bounded-context.md) without introducing Redis or a cloud-specific messaging service.
+
+Jobs are recorded transactionally with the state change that requires them whenever possible, using pg-boss's Prisma transaction adapter behind an application-owned job-scheduling interface. Workers provide delayed execution, exclusive claiming, bounded retries, dead-letter handling, and failed-job visibility. Delivery is treated as at-least-once: every handler must be idempotent, reload authoritative state by stable identifiers, and confirm that the requested work is still applicable before acting. A scheduled Session check, for example, must tolerate the Session being changed or cancelled before its execution time.
+
+This queue will run the one-time empty-Session check, Subscription and Evaluation reminders, and asynchronous notification delivery. It will not move consistency-sensitive domain work out of the transaction that owns it: when a Booking cancellation frees capacity, Waitlist promotion and allowance consumption remain synchronous under the protections established by [ADR-0015](./0015-use-prisma-for-postgresql-access.md); only the resulting notification is queued.
+
+pg-boss's automatic schema migration on application startup will be disabled. Queue-schema installation and upgrades require an explicit, reviewed deployment migration step, following the same no-runtime-synchronization policy as the application schemas. pg-boss remains an infrastructure detail and does not appear in domain models or public application interfaces.
+
+A cron-first design backed by durable processing markers was rejected as the primary mechanism because the application would need to build its own claiming, retry, deduplication, and failure-inspection machinery. Cron remains available for reconciliation or maintenance sweeps. Graphile Worker was considered, but pg-boss's direct Prisma transaction adapter and built-in dead-letter support fit this backend more closely than Graphile Worker's SQL-function integration. Redis with BullMQ was rejected because its scaling benefits do not justify another stateful service or the PostgreSQL-to-Redis consistency boundary at the expected workload. A custom queue was rejected because it would recreate correctness and operational machinery already supplied by pg-boss.
+
+This decision does not select the push-notification provider, worker process topology, retry timings, retention policy, or monitoring tools.
