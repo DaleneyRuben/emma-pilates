@@ -1,6 +1,6 @@
 # Delegate authentication to a managed identity provider
 
-Status: accepted
+Status: superseded by [ADR-0029](./0029-manage-authentication-in-the-nestjs-backend.md)
 
 A managed identity provider will verify credentials, issue and refresh session tokens, and run password-recovery flows. The modular monolith will validate the provider's tokens and map the provider subject to the system Account established in [ADR-0009](./0009-separate-system-account-from-domain-identities.md).
 
