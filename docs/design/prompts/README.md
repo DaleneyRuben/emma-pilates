@@ -140,6 +140,7 @@ Each of these was sent as the next message in the existing design session for th
 | [30](./followups/30-invariants-checklist.md) | Standing checklist of settled facts — send it alongside every future follow-up | ♾️ standing, never "applied" |
 | [31](./followups/31-plan-naming-leftovers.md) | `Sistema de Diseño`'s "sesiones usadas" and `AW34`'s invented plan; amends 30 §8 (six notification types, not seven) and §1 (no invented plans) | ✅ applied |
 | [32](./followups/32-design-system-navigation-drift-again.md) | `Sistema de Diseño`'s navigation section, drifted again — tab bar labels, the missing Nutricionista role, an invented admin sidebar, abbreviated plan names; amends 30 §5 (Reporte) and §1 (full plan names) | ✅ applied |
+| [33](./followups/33-email-only-authentication.md) | Makes email the only login and recovery identifier on client, staff, and admin account forms; keeps phone as optional contact data (ADR-0029) | 🕓 pending |
 
 ## Status
 

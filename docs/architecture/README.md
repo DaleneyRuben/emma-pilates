@@ -27,6 +27,7 @@ Resolved within this branch:
 
 - [x] Separate the system Account from Client and Staff Member identities.
 - [x] Manage credentials and recovery in the NestJS system-identity module.
+- [x] Require one unique email login identifier for every Account; phone numbers remain contact data rather than login identifiers.
 - [x] Use opaque server-side Authentication Sessions.
 - [x] Store mobile credentials in operating-system secure storage and admin-web credentials in secure `HttpOnly` cookies.
 - [x] Expire mobile sessions after 30 idle days or 90 total days.
@@ -39,7 +40,7 @@ Resolved within this branch:
 
 Next decisions in this branch, in order:
 
-- [ ] Choose login identifiers and any identifier-verification rules.
+- [ ] Choose when and how an Account's required email address is verified.
 - [ ] Choose the password-recovery delivery channel or staff-assisted process.
 - [ ] Define Client self-registration, Assistant-created Client accounts, Staff Member provisioning, and temporary-password behavior.
 - [ ] Define authentication abuse controls: request throttling, guessing resistance, backoff or lockout, and account-enumeration behavior.
