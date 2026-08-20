@@ -32,13 +32,13 @@ Resolved within this branch:
 - [x] Expire mobile sessions after 30 idle days or 90 total days.
 - [x] Expire admin-web sessions after 30 idle minutes or 12 total hours.
 - [x] Allow multiple concurrent sessions without a product-level device cap in the first release.
+- [x] Provide a **Log out all other devices** action that keeps the current session active and revokes every other session across mobile and admin web.
 - [x] Revoke all old sessions after password recovery and create one replacement session on the device completing the reset.
 - [x] Keep the current session and revoke all other sessions after a normal password change.
 - [x] Revoke all sessions immediately when an Account is disabled; re-enabling requires a new login.
 
 Next decisions in this branch, in order:
 
-- [ ] Choose first-release self-service session controls.
 - [ ] Choose login identifiers and any identifier-verification rules.
 - [ ] Choose the password-recovery delivery channel or staff-assisted process.
 - [ ] Define Client self-registration, Assistant-created Client accounts, Staff Member provisioning, and temporary-password behavior.
