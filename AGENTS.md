@@ -5,6 +5,7 @@ This is the tool-neutral entrypoint for any AI-assisted work in this repository.
 ## Read first
 
 - [Context Map](./CONTEXT-MAP.md) lists the bounded contexts and links to each context's glossary (`CONTEXT.md`) and ADRs. Read the affected context before touching business logic or domain terms.
+- [Architecture roadmap](./docs/architecture/README.md) shows the current architecture focus, accepted coverage, and ordered queue of unresolved decisions.
 - [Architecture decisions](./docs/adr/) record accepted technical and product constraints. Read the relevant ADRs before changing architecture or implementation boundaries.
 - [Design](./docs/design/) contains the design-system reference and per-screen prompts; [`docs/design/prompts/README.md`](./docs/design/prompts/README.md) is the screen index and [`design/README.md`](./design/README.md) is the generated handoff specification.
 

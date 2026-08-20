@@ -1,0 +1,93 @@
+# Architecture roadmap
+
+This document tracks which architectural areas are settled, which area is currently being discussed, and what remains before each application surface is ready to implement. It is an index and work queue, not a replacement for the project's accepted decisions, domain language, designs, or operational runbooks.
+
+## Sources of truth
+
+- [`CONTEXT-MAP.md`](../../CONTEXT-MAP.md) defines the bounded contexts and points to their domain glossaries and context-specific ADRs.
+- [`docs/adr/`](../adr/) contains system-wide decisions and trade-offs.
+- [`booking/CONTEXT.md`](../../booking/CONTEXT.md) and [`back-office/CONTEXT.md`](../../back-office/CONTEXT.md) define the canonical domain language and business rules.
+- [`docs/design/`](../design/) contains the design-system reference and screen prompts that describe the intended user journeys.
+- [`AGENTS.md`](../../AGENTS.md) and the project skills under [`.agents/skills/`](../../.agents/skills/) define the engineering and delivery workflow.
+
+Record a decision in an ADR only when it is hard to reverse, surprising without context, and the result of a meaningful trade-off. Put domain terms and business rules in the owning `CONTEXT.md`; put repeatable operational procedures in runbooks; put implementation rules in the project coding standards.
+
+## Status meanings
+
+- **Covered**: the important architectural decisions are accepted. Revisit only when a requirement or measured constraint changes.
+- **In progress**: this is the single branch currently being resolved one decision at a time.
+- **Queued**: important decisions remain, but they are not the current focus.
+- **Deferred**: deliberately excluded from the initial release or postponed until a stated trigger occurs.
+
+## Current focus
+
+**System identity, authentication, and authorization** is the active architecture branch. [ADR-0029](../adr/0029-manage-authentication-in-the-nestjs-backend.md) assigns authentication to the NestJS backend, and [ADR-0030](../adr/0030-use-opaque-server-side-authentication-sessions.md) records the Authentication Session model and its accepted policies.
+
+Resolved within this branch:
+
+- [x] Separate the system Account from Client and Staff Member identities.
+- [x] Manage credentials and recovery in the NestJS system-identity module.
+- [x] Use opaque server-side Authentication Sessions.
+- [x] Store mobile credentials in operating-system secure storage and admin-web credentials in secure `HttpOnly` cookies.
+- [x] Expire mobile sessions after 30 idle days or 90 total days.
+- [x] Expire admin-web sessions after 30 idle minutes or 12 total hours.
+- [x] Allow multiple concurrent sessions without a product-level device cap in the first release.
+- [x] Revoke all old sessions after password recovery and create one replacement session on the device completing the reset.
+- [x] Keep the current session and revoke all other sessions after a normal password change.
+- [x] Revoke all sessions immediately when an Account is disabled; re-enabling requires a new login.
+
+Next decisions in this branch, in order:
+
+- [ ] Choose first-release self-service session controls.
+- [ ] Choose login identifiers and any identifier-verification rules.
+- [ ] Choose the password-recovery delivery channel or staff-assisted process.
+- [ ] Define Client self-registration, Assistant-created Client accounts, Staff Member provisioning, and temporary-password behavior.
+- [ ] Define authentication abuse controls: request throttling, guessing resistance, backoff or lockout, and account-enumeration behavior.
+- [ ] Decide whether Administrators require multi-factor authentication.
+- [ ] Record the Role and Branch authorization matrix and where each rule is enforced.
+- [ ] Define security audit events and who may inspect them.
+- [ ] Design future Administrator-to-Staff-Member impersonation, including actor preservation, duration, restrictions, and auditing. This remains deferred until the initial identity policies are complete.
+
+## Coverage map
+
+| Area | Status | Accepted foundation | Remaining architecture work |
+| --- | --- | --- | --- |
+| Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership and Back Office glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
+| Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
+| Backend structure | Covered | TypeScript pnpm monorepo; NestJS modular monolith; context-owned module interfaces | Specify architecture tests when the backend is scaffolded. |
+| Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
+| API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors | Define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
+| Identity and access | In progress | Account boundary; backend-managed authentication; opaque Authentication Sessions | Complete the active checklist above. |
+| Mobile architecture | Queued | Expo with React Native; generated REST client; Expo Push Service | Navigation, server and local state, offline policy, local persistence, deep links, EAS builds, over-the-air updates, and test tools. |
+| Admin-web architecture | Queued | Vite, React, and TanStack Router; static SPA | Component-system implementation, forms and runtime validation, server-state caching, local state, test tools, cookie/CSRF integration, and Vercel hosting documentation. |
+| Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
+| Notifications | Queued | Expo Push Service; Account-owned device endpoints; durable delivery jobs | Permission prompt, notification catalog, user preferences, badges, sounds, and operational visibility. |
+| Uploaded images | Queued | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces | Signed-URL lifetime, dimensions and byte limits, transformations, content and malware checks, retention, deletion, and public delivery. |
+| Hosting and delivery | Partly covered | Northflank API and worker; Aiven PostgreSQL; R2 backups; GitHub Actions; disposable CI PostgreSQL; no permanent staging | Document admin-web hosting, mobile build and store release, production deployment and rollback, migration sequencing, and provider configuration. |
+| Operations and security | Queued | Daily logical database backup and portable provider boundaries | Secrets, health and readiness checks, logs, metrics, tracing, error reporting, alerts, restore drills, recovery objectives, and incident runbooks. |
+| Testing architecture | Queued | CI quality gates and required unit, integration, contract, architecture, and end-to-end layers | Select concrete tools, fixture strategy, database isolation, client test boundaries, and critical end-to-end journeys. |
+| Data governance | Queued | Sensitive notification and object-access constraints | Retention and deletion policies, Account closure, receipt and Evaluation data handling, audit retention, and any export requirements. |
+
+## Ordered work queue
+
+Work down this list unless the current decision exposes a dependency that must be resolved first:
+
+1. Finish identity, Authentication Session, authorization, and audit policies.
+2. Specify transactional and concurrency rules for Booking creation and Subscription allowance consumption, Session capacity, Waitlist promotion, Payment confirmation, Credit application, and Referral rewards.
+3. Set time, timezone, scheduling, idempotency, pagination, and caching conventions shared by the API and jobs.
+4. Complete the mobile architecture immediately before scaffolding the mobile app.
+5. Complete the admin-web architecture immediately before scaffolding the admin web app.
+6. Complete background-job, notification, and uploaded-image operating policies.
+7. Complete deployment, observability, backup restoration, rollback, and incident-response documentation before production use.
+8. Complete the test architecture and personal-data lifecycle rules before handling real user data.
+
+## Update rule
+
+After an architecture decision is accepted:
+
+1. Update the owning ADR or `CONTEXT.md` immediately.
+2. Update this roadmap's current-focus checklist or coverage status in the same logical change.
+3. Validate links and formatting.
+4. Commit the decision atomically using the project `commit` skill.
+
+Only one branch should be marked **In progress**. This keeps the interview focused and makes the next unresolved decision visible without reconstructing the conversation.
