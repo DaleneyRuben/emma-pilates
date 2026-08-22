@@ -24,6 +24,6 @@ Apply these focused corrections:
 - Repurpose `21` **Crea tu contraseña** as the page opened by an Assistant-created Client's activation link. Remove every reference to first Login, a temporary password, or a forced post-Login step. Explain that choosing a password activates the Account and verifies its email.
 - On `23` **Cambiar contraseña**, keep the signed-in password-change flow but describe it as distinct from activation through `21`, not from a forced first-Login step.
 
-Do not invent the post-success route yet. Architecture still needs to decide whether successful activation creates an authenticated session or returns the person to Login. Likewise, do not invent link-expiration or resend-limit values.
+After the recipient successfully creates the first password, show a brief confirmation and return to the appropriate Login screen: `01` for a Client, `S01` for a Staff Member using the mobile app, or `AW01` for an Administrator using the admin web. Activation must not create an authenticated session. Do not invent link-expiration or resend-limit values.
 
 Preserve names, Roles, Branch assignment, email-only authentication, optional contact phone fields, responsive layout, password fields, validation, and visual styling. This follow-up supersedes follow-up 33 only where 33 says the temporary-password behavior remains unchanged; every email-only correction in 33 still applies.
