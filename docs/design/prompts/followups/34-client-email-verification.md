@@ -13,7 +13,7 @@ Add one post-registration frame to `01` **Iniciar sesión · Registrarse**:
 - Explain that a verification link was sent to the submitted email address and that the Client must open it before signing in.
 - State that the verification link expires after **24 hours**.
 - Show the submitted email address so a typo is visible.
-- Provide a secondary **"Reenviar correo"** action and a text link **"Volver a iniciar sesión"**.
+- Provide a secondary **"Reenviar correo"** action and a text link **"Volver a iniciar sesión"**. A successful resend invalidates every older unused verification link and sends one new link with a fresh 24-hour lifetime; only the newest link works.
 - Do not show the authenticated tab bar or route to Inicio from this state.
 - The verification link itself does not open an authenticated session. After verification, the Client returns to `01` and signs in normally.
 
