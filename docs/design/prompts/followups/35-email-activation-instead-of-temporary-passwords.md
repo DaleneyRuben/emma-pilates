@@ -13,12 +13,14 @@ Apply these focused corrections:
 ## Staff mobile
 
 - On `S05` **Nuevo cliente**, remove the generated **"Contraseña temporal"** field and **"Copiar"** action. Explain briefly that an activation link will be sent to the required email address. The create action sends that invitation.
+- After `S05` successfully creates the still-pending Client Account, show the submitted email address and a **"Cambiar correo"** action for an authorized Assistant. Correcting it preserves the Client and Account, invalidates every activation link sent to the old address, and sends one new activation link to the corrected address with a fresh 7-day lifetime. Do not present this action after activation.
 - Repurpose `S19` **Crea tu contraseña** as the page opened by an Administrator-created Staff Member's activation link. Remove every reference to first Login, a temporary password, or a forced post-Login step. Explain that creating the password activates the Account and verifies its email.
 - On `S23` **Perfil**, keep the signed-in password-change flow but describe it as distinct from activation through `S19`, not from a forced first-Login step.
 
 ## Admin web
 
 - On the create states of `AW24` **Formulario de personal**, remove the generated **"Contraseña temporal"** field and **"Copiar"** action. Explain briefly that an activation link will be sent to the required email address. Editing an existing Staff Member does not send a new activation link merely because the record is saved.
+- Give the pending, not-yet-activated edit state of `AW24` a **"Cambiar correo"** action for an Administrator. Correcting it preserves the Staff Member and Account, invalidates every activation link sent to the old address, and sends one new activation link to the corrected address with a fresh 7-day lifetime. Do not show this as an ordinary email edit after activation.
 - On `AW32` **Crear contraseña**, replace the temporary-password **Primer ingreso** variant with a **Desde una invitación** variant. It is opened from the activation email and explains that choosing a password activates the Account. Preserve the password-recovery-link and expired-link variants.
 
 ## Client mobile
