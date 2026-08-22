@@ -21,13 +21,14 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**System identity, authentication, and authorization** is the active architecture branch. [ADR-0029](../adr/0029-manage-authentication-in-the-nestjs-backend.md) assigns authentication to the NestJS backend, and [ADR-0030](../adr/0030-use-opaque-server-side-authentication-sessions.md) records the Authentication Session model and its accepted policies.
+**System identity, authentication, and authorization** is the active architecture branch. [ADR-0029](../adr/0029-manage-authentication-in-the-nestjs-backend.md) assigns authentication to the NestJS backend, [ADR-0030](../adr/0030-use-opaque-server-side-authentication-sessions.md) records the Authentication Session model and its accepted policies, and [ADR-0031](../adr/0031-use-sendpulse-for-transactional-email.md) selects the managed transactional-email boundary used by this branch.
 
 Resolved within this branch:
 
 - [x] Separate the system Account from Client and Staff Member identities.
 - [x] Manage credentials and recovery in the NestJS system-identity module.
 - [x] Require one unique email login identifier for every Account; phone numbers remain contact data rather than login identifiers.
+- [x] Send transactional email through SendPulse behind a project-owned provider interface.
 - [x] Use opaque server-side Authentication Sessions.
 - [x] Store mobile credentials in operating-system secure storage and admin-web credentials in secure `HttpOnly` cookies.
 - [x] Expire mobile sessions after 30 idle days or 90 total days.
@@ -58,7 +59,7 @@ Next decisions in this branch, in order:
 | Backend structure | Covered | TypeScript pnpm monorepo; NestJS modular monolith; context-owned module interfaces | Specify architecture tests when the backend is scaffolded. |
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors | Define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
-| Identity and access | In progress | Account boundary; backend-managed authentication; opaque Authentication Sessions | Complete the active checklist above. |
+| Identity and access | In progress | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface | Complete the active checklist above. |
 | Mobile architecture | Queued | Expo with React Native; generated REST client; Expo Push Service | Navigation, server and local state, offline policy, local persistence, deep links, EAS builds, over-the-air updates, and test tools. |
 | Admin-web architecture | Queued | Vite, React, and TanStack Router; static SPA | Component-system implementation, forms and runtime validation, server-state caching, local state, test tools, cookie/CSRF integration, and Vercel hosting documentation. |
 | Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
