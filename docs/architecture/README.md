@@ -35,6 +35,7 @@ Resolved within this branch:
 - [x] Expire self-registration verification links after 24 hours, staff-created Account activation links after 7 days, and password-recovery links after 30 minutes.
 - [x] Invalidate every older unused link of the same purpose when issuing a replacement; only the newest link remains valid with a fresh full lifetime.
 - [x] Allow an unverified email address to be corrected while an Account is pending; preserve the Account, invalidate links sent to the old address, and send a fresh link to the corrected address. This does not apply after activation.
+- [x] Reuse the existing pending Account and domain identity when the same email repeats the same account-creation request; rotate the link instead of creating a duplicate, keep public responses neutral, and identify the pending record to authorized staff.
 - [x] Send transactional email through SendPulse behind a project-owned provider interface.
 - [x] Use opaque server-side Authentication Sessions.
 - [x] Store mobile credentials in operating-system secure storage and admin-web credentials in secure `HttpOnly` cookies.
@@ -48,7 +49,7 @@ Resolved within this branch:
 
 Next decisions in this branch, in order:
 
-- [ ] Complete the pending registration and activation lifecycle: cancellation, duplicate account-creation requests, and cleanup.
+- [ ] Complete the pending registration and activation lifecycle: cancellation, conflicting cross-flow account-creation requests, and cleanup.
 - [ ] Define authentication abuse controls: request throttling, guessing resistance, backoff or lockout, and account-enumeration behavior.
 - [ ] Decide whether Administrators require multi-factor authentication.
 - [ ] Record the Role and Branch authorization matrix and where each rule is enforced.

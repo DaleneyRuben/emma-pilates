@@ -9,6 +9,7 @@ Targets: **Client `01`**. Send [30](./30-invariants-checklist.md) and the still-
 Add one post-registration frame to `01` **Iniciar sesión · Registrarse**:
 
 - Replace the registration form with a calm confirmation state after **Crear cuenta** succeeds.
+- If **Crear cuenta** repeats a self-registration for the same email while that self-registered Client Account is still pending, reuse the existing Account and Client rather than creating duplicates. Send one fresh verification link and show the same confirmation state without revealing whether the Account was created or reused.
 - Use the heading **"Revisa tu correo"**.
 - Explain that a verification link was sent to the submitted email address and that the Client must open it before signing in.
 - State that the verification link expires after **24 hours**.
@@ -18,6 +19,6 @@ Add one post-registration frame to `01` **Iniciar sesión · Registrarse**:
 - Do not show the authenticated tab bar or route to Inicio from this state.
 - The verification link itself does not open an authenticated session. After verification, the Client returns to `01` and signs in normally.
 
-The resend-limit policy and the behavior when the Client no longer has the pending-registration flow open are not settled yet, so do not invent either in this design. **Cambiar correo** is only for this still-pending self-registration; do not present it as a way to change an activated Account's verified login email.
+The resend-limit policy, conflicting creation flows, and the behavior when the Client no longer has the pending-registration flow open are not settled yet, so do not invent them in this design. **Cambiar correo** is only for this still-pending self-registration; do not present it as a way to change an activated Account's verified login email.
 
 Preserve the existing login, biometric, registration, and referral-code frames and their visual styling. Apply follow-up 33's email-only correction at the same time; do not reintroduce phone as a signup or login identifier.
