@@ -61,7 +61,7 @@ A physical studio location with a single studio room, so two Sessions at the sam
 _Avoid_: Location, studio (when referring to a single site), site
 
 **Client**:
-A studio customer who holds Subscriptions and creates Bookings/Evaluations. Has no home or default Branch — can book at any Branch. Account may be self-registered or created by an Assistant with a temporary password.
+A studio customer who holds Subscriptions and creates Bookings/Evaluations. Has no home or default Branch — can book at any Branch. Account may be self-registered or created by an Assistant; an Assistant-created Account is activated by the Client through an emailed link rather than a staff-provided password.
 _Avoid_: Customer, member, user
 
 **Staff Member**:
