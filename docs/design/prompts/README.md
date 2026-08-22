@@ -143,6 +143,7 @@ Each of these was sent as the next message in the existing design session for th
 | [33](./followups/33-email-only-authentication.md) | Makes email the only login and recovery identifier on client, staff, and admin account forms; keeps phone as optional contact data (ADR-0029) | 🕓 pending |
 | [34](./followups/34-client-email-verification.md) | Adds `01`'s post-registration **Revisa tu correo** state and blocks normal access until the email link is opened (ADR-0029) | 🕓 pending |
 | [35](./followups/35-email-activation-instead-of-temporary-passwords.md) | Replaces temporary passwords with emailed activation links for staff-created Client and Staff Member Accounts (ADR-0029) | 🕓 pending |
+| [36](./followups/36-email-password-recovery-destinations.md) | Completes email password recovery across all surfaces and distinguishes its replacement session from activation (ADR-0029, ADR-0030) | 🕓 pending |
 
 ## Status
 
