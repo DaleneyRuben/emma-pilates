@@ -28,6 +28,7 @@ Resolved within this branch:
 - [x] Separate the system Account from Client and Staff Member identities.
 - [x] Manage credentials and recovery in the NestJS system-identity module.
 - [x] Require one unique email login identifier for every Account; phone numbers remain contact data rather than login identifiers.
+- [x] Require self-registered Clients to open a single-use email-verification link before normal access; verification does not sign them in automatically.
 - [x] Send transactional email through SendPulse behind a project-owned provider interface.
 - [x] Use opaque server-side Authentication Sessions.
 - [x] Store mobile credentials in operating-system secure storage and admin-web credentials in secure `HttpOnly` cookies.
@@ -41,7 +42,7 @@ Resolved within this branch:
 
 Next decisions in this branch, in order:
 
-- [ ] Choose when and how an Account's required email address is verified.
+- [ ] Choose email-verification behavior for Assistant-created Client Accounts and Administrator-created Staff Member Accounts.
 - [ ] Choose the password-recovery delivery channel or staff-assisted process.
 - [ ] Define Client self-registration, Assistant-created Client accounts, Staff Member provisioning, and temporary-password behavior.
 - [ ] Define authentication abuse controls: request throttling, guessing resistance, backoff or lockout, and account-enumeration behavior.
