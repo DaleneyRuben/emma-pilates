@@ -6,6 +6,8 @@ Targets: **Client `21`, `23`; Staff `S05`, `S19`, `S23`; Admin web `AW24`, `AW32
 
 [ADR-0029](../../../adr/0029-manage-authentication-in-the-nestjs-backend.md) replaces every temporary-password flow with an emailed activation link. An Assistant-created Client Account and an Administrator-created Staff Member Account begin inactive. The recipient opens a single-use link that verifies the required email address and lets that person create the Account's first password. Staff never see, copy, or relay a password.
 
+The activation link expires after **7 days**. State that duration wherever the invitation or its expired state explains validity; do not use the 24-hour self-registration verification lifetime or the 30-minute password-recovery lifetime.
+
 Apply these focused corrections:
 
 ## Staff mobile
@@ -24,6 +26,6 @@ Apply these focused corrections:
 - Repurpose `21` **Crea tu contraseña** as the page opened by an Assistant-created Client's activation link. Remove every reference to first Login, a temporary password, or a forced post-Login step. Explain that choosing a password activates the Account and verifies its email.
 - On `23` **Cambiar contraseña**, keep the signed-in password-change flow but describe it as distinct from activation through `21`, not from a forced first-Login step.
 
-After the recipient successfully creates the first password, show a brief confirmation and return to the appropriate Login screen: `01` for a Client, `S01` for a Staff Member using the mobile app, or `AW01` for an Administrator using the admin web. Activation must not create an authenticated session. Do not invent link-expiration or resend-limit values.
+After the recipient successfully creates the first password, show a brief confirmation and return to the appropriate Login screen: `01` for a Client, `S01` for a Staff Member using the mobile app, or `AW01` for an Administrator using the admin web. Activation must not create an authenticated session. Do not invent resend-limit values.
 
 Preserve names, Roles, Branch assignment, email-only authentication, optional contact phone fields, responsive layout, password fields, validation, and visual styling. This follow-up supersedes follow-up 33 only where 33 says the temporary-password behavior remains unchanged; every email-only correction in 33 still applies.

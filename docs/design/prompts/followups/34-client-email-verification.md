@@ -11,11 +11,12 @@ Add one post-registration frame to `01` **Iniciar sesión · Registrarse**:
 - Replace the registration form with a calm confirmation state after **Crear cuenta** succeeds.
 - Use the heading **"Revisa tu correo"**.
 - Explain that a verification link was sent to the submitted email address and that the Client must open it before signing in.
+- State that the verification link expires after **24 hours**.
 - Show the submitted email address so a typo is visible.
 - Provide a secondary **"Reenviar correo"** action and a text link **"Volver a iniciar sesión"**.
 - Do not show the authenticated tab bar or route to Inicio from this state.
 - The verification link itself does not open an authenticated session. After verification, the Client returns to `01` and signs in normally.
 
-The exact link-expiration and resend-limit copy is not settled yet, so do not invent a duration or retry count in this design.
+The resend-limit policy is not settled yet, so do not invent a retry count in this design.
 
 Preserve the existing login, biometric, registration, and referral-code frames and their visual styling. Apply follow-up 33's email-only correction at the same time; do not reintroduce phone as a signup or login identifier.

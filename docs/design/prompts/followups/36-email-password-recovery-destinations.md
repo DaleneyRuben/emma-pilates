@@ -11,7 +11,7 @@ Apply these focused corrections:
 - Keep `20`, `S18`, and `AW30` as the email reset-link request screens. Apply follow-up 33 so the mobile forms accept email only and every sent state says **"Revisa tu correo"**.
 - Give `21`, `S19`, and `AW32` two explicit link-entry variants: **Activar cuenta** for the activation link from follow-up 35, and **Restablecer contraseña** for a password-recovery link.
 - The recovery variant uses **"Crea una contraseña nueva"**, the existing new-password and confirmation fields, and the same mismatch validation. It must not mention activation, email verification, an invitation, first Login, or a temporary password.
-- Preserve an expired-link state without inventing a duration. Its action returns to the matching recovery-request screen: `20`, `S18`, or `AW30`.
+- Password-recovery links expire after **30 minutes**. Use that exact duration on the sent and expired-link states; do not reuse the 24-hour self-registration verification lifetime or the 7-day Account-activation lifetime. The expired-link action returns to the matching recovery-request screen: `20`, `S18`, or `AW30`.
 
 The success destinations intentionally differ:
 

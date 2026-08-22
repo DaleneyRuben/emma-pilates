@@ -32,6 +32,7 @@ Resolved within this branch:
 - [x] Activate Assistant-created Client and Administrator-created Staff Member Accounts through a single-use email link that verifies the address and lets the recipient create the first password; staff never handle passwords.
 - [x] Return recipients to Login after successful activation instead of creating an Authentication Session automatically.
 - [x] Recover passwords through a single-use email reset link for every Account; SMS, WhatsApp, and staff assistance are not normal recovery channels.
+- [x] Expire self-registration verification links after 24 hours, staff-created Account activation links after 7 days, and password-recovery links after 30 minutes.
 - [x] Send transactional email through SendPulse behind a project-owned provider interface.
 - [x] Use opaque server-side Authentication Sessions.
 - [x] Store mobile credentials in operating-system secure storage and admin-web credentials in secure `HttpOnly` cookies.
@@ -45,7 +46,7 @@ Resolved within this branch:
 
 Next decisions in this branch, in order:
 
-- [ ] Define pending registration and activation lifecycle: link expiry, resend, address correction, cancellation, duplicate requests, and cleanup.
+- [ ] Define pending registration and activation lifecycle: resend, address correction, cancellation, duplicate requests, and cleanup.
 - [ ] Define authentication abuse controls: request throttling, guessing resistance, backoff or lockout, and account-enumeration behavior.
 - [ ] Decide whether Administrators require multi-factor authentication.
 - [ ] Record the Role and Branch authorization matrix and where each rule is enforced.
