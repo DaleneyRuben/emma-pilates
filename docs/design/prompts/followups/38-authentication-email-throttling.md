@@ -6,6 +6,8 @@ Targets: **Client `01`, `20`; Staff `S05`, `S18`; Admin web `AW24`, `AW30`**. Se
 
 [ADR-0029](../../../adr/0029-manage-authentication-in-the-nestjs-backend.md) applies layered limits before sending verification, activation, or password-recovery email. The backend limits each recipient and purpose, each first-party installation or browser across different recipients, and each trusted network address. A suppressed request sends no email and leaves the currently valid link unchanged.
 
+For each recipient and purpose, verification and activation permit one email every 60 seconds, five in a rolling hour, and ten in a rolling 24-hour period. Password recovery permits one email every five minutes, three in a rolling hour, and five in a rolling 24-hour period.
+
 Apply these states consistently:
 
 ## Public Client and recovery requests
@@ -19,6 +21,6 @@ Apply these states consistently:
 - On the pending invitation states of `S05` and `AW24`, show an explicit temporary limit when an authorized resend is suppressed. Keep the existing pending Account visible, preserve the current link, and show the server-provided retry time.
 - Do not add an override, CAPTCHA, phone fallback, WhatsApp fallback, or a way to copy an activation secret.
 
-The exact cooldowns and hourly or daily budgets are not settled yet. Do not invent numeric limits in the design.
+The broader client-wide and network-wide rolling budgets are not settled yet. Do not invent numeric values for those limits in the design. Treat every retry time as server-provided rather than calculating it independently in the client.
 
 Preserve the existing form values, destinations, link lifetimes, neutral public wording, responsive layout, and visual styling.

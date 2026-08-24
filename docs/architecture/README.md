@@ -55,10 +55,11 @@ Resolved within this branch:
 - [x] Combine an opaque random first-party mobile-installation or browser identifier with trusted network information for broader Login throttling; do not use hardware fingerprinting or permit a missing identifier to bypass the network limit.
 - [x] Limit actual failed password checks to 20 per client identifier and 100 per network address in a rolling 15-minute window; pre-verification rejections do not count or extend the window.
 - [x] Layer authentication-email limits by recipient and purpose, first-party client identifier, and trusted network; suppressed requests send nothing and preserve the currently valid link, while public recipient-specific suppression remains neutral.
+- [x] Limit verification and activation email per recipient and purpose to one per 60 seconds, five per rolling hour, and ten per rolling 24 hours; limit password-recovery email to one per five minutes, three per rolling hour, and five per rolling 24 hours.
 
 Next decisions in this branch, in order:
 
-- [ ] Complete authentication abuse controls: exact authentication-email cooldowns and rolling budgets, plus remaining account-enumeration behavior.
+- [ ] Complete authentication abuse controls: authentication-email client-wide and network-wide rolling budgets, plus remaining account-enumeration behavior.
 - [ ] Decide whether Administrators require multi-factor authentication.
 - [ ] Record the Role and Branch authorization matrix and where each rule is enforced.
 - [ ] Define security audit events and who may inspect them.
