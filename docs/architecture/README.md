@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Mobile application architecture and stack** is the active architecture branch. [ADR-0022](../adr/0022-use-expo-with-react-native-for-the-mobile-app.md) selects the Expo and React Native foundation, [ADR-0032](../adr/0032-use-react-navigation-for-mobile-navigation.md) selects explicit React Navigation static configuration, [ADR-0033](../adr/0033-use-tanstack-query-for-mobile-server-state.md) assigns backend-owned mobile data to TanStack Query, and [ADR-0034](../adr/0034-use-react-hook-form-and-zod-for-mobile-forms.md) selects React Hook Form with Zod for mobile input workflows.
+**Mobile application architecture and stack** is the active architecture branch. [ADR-0022](../adr/0022-use-expo-with-react-native-for-the-mobile-app.md) selects the Expo and React Native foundation, [ADR-0032](../adr/0032-use-react-navigation-for-mobile-navigation.md) selects explicit React Navigation static configuration, [ADR-0033](../adr/0033-use-tanstack-query-for-mobile-server-state.md) assigns backend-owned mobile data to TanStack Query, [ADR-0034](../adr/0034-use-react-hook-form-and-zod-for-mobile-forms.md) selects React Hook Form with Zod, and [ADR-0035](../adr/0035-use-an-online-first-read-only-mobile-cache.md) defines the online-first offline experience.
 
 Resolved within this branch:
 
@@ -32,10 +32,11 @@ Resolved within this branch:
 - [x] Use TanStack Query over the generated OpenAPI client for mobile server state.
 - [x] Use React Hook Form with Zod runtime schemas for mobile forms.
 - [x] Keep local UI state near its owner and use React Context only for low-frequency application-wide concerns; add no global-state library initially.
+- [x] Remain online-first, with an Account-scoped read-only cache for approved schedule, upcoming Booking, and minimal Subscription projections; never queue writes initially.
 
 Next decisions in this branch, in order:
 
-- [ ] Define offline behavior and local persistence, including what sensitive data may be stored.
+- [ ] Select the persistence mechanism, at-rest protection, cache lifetime, and storage limits for the approved offline projections.
 - [ ] Define deep-link ownership and authentication gating for notifications and application links.
 - [ ] Select mobile test tools and boundaries.
 - [ ] Decide the EAS build, store release, and over-the-air update policy.
@@ -50,7 +51,7 @@ Next decisions in this branch, in order:
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors | Define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
 | Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
-| Mobile architecture | In progress | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context without a global store | Offline policy, local persistence, deep links, EAS builds, over-the-air updates, and test tools. |
+| Mobile architecture | In progress | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only offline cache | Persistence mechanism and limits, deep links, EAS builds, over-the-air updates, and test tools. |
 | Admin-web architecture | Queued | Vite, React, and TanStack Router; static SPA | Component-system implementation, forms and runtime validation, server-state caching, local state, test tools, cookie/CSRF integration, and Vercel hosting documentation. |
 | Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
 | Notifications | Queued | Expo Push Service; Account-owned device endpoints; durable delivery jobs | Permission prompt, notification catalog, user preferences, badges, sounds, and operational visibility. |
