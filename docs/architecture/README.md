@@ -49,10 +49,11 @@ Resolved within this branch:
 - [x] Revoke all old sessions after password recovery and create one replacement session on the device completing the reset.
 - [x] Keep the current session and revoke all other sessions after a normal password change.
 - [x] Revoke all sessions immediately when an Account is disabled; re-enabling requires a new login.
+- [x] Protect login with PostgreSQL-backed progressive temporary backoff based on claimed-email and request-origin activity; never hard-lock the whole Account or require CAPTCHA in the first release.
 
 Next decisions in this branch, in order:
 
-- [ ] Define authentication abuse controls: request throttling, guessing resistance, backoff or lockout, and account-enumeration behavior.
+- [ ] Complete authentication abuse controls: login thresholds, delay progression and reset windows; registration, verification, activation, and recovery request limits; and remaining account-enumeration behavior.
 - [ ] Decide whether Administrators require multi-factor authentication.
 - [ ] Record the Role and Branch authorization matrix and where each rule is enforced.
 - [ ] Define security audit events and who may inspect them.
