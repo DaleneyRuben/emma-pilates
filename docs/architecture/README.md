@@ -53,10 +53,11 @@ Resolved within this branch:
 - [x] Allow five Login failures without an enforced delay, then wait 30 seconds, 1 minute, 5 minutes, and finally 15 minutes for the ninth and later failures; requests during a wait neither verify nor extend it.
 - [x] Reset an email-and-origin Login failure lane after a successful Login or one hour without another failed password verification; throttled requests do not restart that clock.
 - [x] Combine an opaque random first-party mobile-installation or browser identifier with trusted network information for broader Login throttling; do not use hardware fingerprinting or permit a missing identifier to bypass the network limit.
+- [x] Limit actual failed password checks to 20 per client identifier and 100 per network address in a rolling 15-minute window; pre-verification rejections do not count or extend the window.
 
 Next decisions in this branch, in order:
 
-- [ ] Complete authentication abuse controls: client-wide and network-wide Login thresholds and reset windows; registration, verification, activation, and recovery request limits; and remaining account-enumeration behavior.
+- [ ] Complete authentication abuse controls: registration, verification, activation, and recovery request limits; and remaining account-enumeration behavior.
 - [ ] Decide whether Administrators require multi-factor authentication.
 - [ ] Record the Role and Branch authorization matrix and where each rule is enforced.
 - [ ] Define security audit events and who may inspect them.

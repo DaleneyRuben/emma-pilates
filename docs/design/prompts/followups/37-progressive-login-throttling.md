@@ -8,7 +8,7 @@ Targets: **Client `01`; Staff `S01`; Admin web `AW01`**. Send [30](./30-invarian
 
 The first five failures have no enforced delay. The sixth failure waits 30 seconds, the seventh 1 minute, the eighth 5 minutes, and the ninth and later failures 15 minutes. A submission during an active wait returns the same remaining delay without checking the password or extending the wait.
 
-The backend also applies broader limits using a random first-party installation or browser identifier together with trusted network information. These are backend abuse-control signals, not hardware fingerprinting and not a new authentication step.
+The backend also applies broader limits using a random first-party installation or browser identifier together with trusted network information. A client identifier may produce 20 failed password checks across all emails in a rolling 15-minute window; a network address may produce 100. Reaching either budget pauses password checks until enough failures leave that window. Requests rejected before checking a password do not count. These are backend abuse-control signals, not hardware fingerprinting and not a new authentication step.
 
 Add a throttled Login state to `01`, `S01`, and `AW01`:
 
