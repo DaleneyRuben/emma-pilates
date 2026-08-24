@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Mobile application architecture and stack** is the active architecture branch. [ADR-0022](../adr/0022-use-expo-with-react-native-for-the-mobile-app.md) selects the Expo and React Native foundation, [ADR-0032](../adr/0032-use-react-navigation-for-mobile-navigation.md) selects explicit React Navigation static configuration, and [ADR-0033](../adr/0033-use-tanstack-query-for-mobile-server-state.md) assigns backend-owned mobile data to TanStack Query over the generated REST client.
+**Mobile application architecture and stack** is the active architecture branch. [ADR-0022](../adr/0022-use-expo-with-react-native-for-the-mobile-app.md) selects the Expo and React Native foundation, [ADR-0032](../adr/0032-use-react-navigation-for-mobile-navigation.md) selects explicit React Navigation static configuration, [ADR-0033](../adr/0033-use-tanstack-query-for-mobile-server-state.md) assigns backend-owned mobile data to TanStack Query, and [ADR-0034](../adr/0034-use-react-hook-form-and-zod-for-mobile-forms.md) selects React Hook Form with Zod for mobile input workflows.
 
 Resolved within this branch:
 
@@ -30,10 +30,10 @@ Resolved within this branch:
 - [x] Use Expo Push Service through a backend-owned notification boundary.
 - [x] Use React Navigation static configuration with explicit role-specific route trees.
 - [x] Use TanStack Query over the generated OpenAPI client for mobile server state.
+- [x] Use React Hook Form with Zod runtime schemas for mobile forms.
 
 Next decisions in this branch, in order:
 
-- [ ] Select form state and runtime validation.
 - [ ] Decide what local client state exists outside server state and navigation.
 - [ ] Define offline behavior and local persistence, including what sensitive data may be stored.
 - [ ] Define deep-link ownership and authentication gating for notifications and application links.
@@ -50,7 +50,7 @@ Next decisions in this branch, in order:
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors | Define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
 | Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
-| Mobile architecture | In progress | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query for server state | Local state, forms and runtime validation, offline policy, local persistence, deep links, EAS builds, over-the-air updates, and test tools. |
+| Mobile architecture | In progress | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod | Local state, offline policy, local persistence, deep links, EAS builds, over-the-air updates, and test tools. |
 | Admin-web architecture | Queued | Vite, React, and TanStack Router; static SPA | Component-system implementation, forms and runtime validation, server-state caching, local state, test tools, cookie/CSRF integration, and Vercel hosting documentation. |
 | Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
 | Notifications | Queued | Expo Push Service; Account-owned device endpoints; durable delivery jobs | Permission prompt, notification catalog, user preferences, badges, sounds, and operational visibility. |
