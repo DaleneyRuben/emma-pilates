@@ -50,10 +50,11 @@ Resolved within this branch:
 - [x] Keep the current session and revoke all other sessions after a normal password change.
 - [x] Revoke all sessions immediately when an Account is disabled; re-enabling requires a new login.
 - [x] Protect login with PostgreSQL-backed progressive temporary backoff based on claimed-email and request-origin activity; never hard-lock the whole Account or require CAPTCHA in the first release.
+- [x] Allow five Login failures without an enforced delay, then wait 30 seconds, 1 minute, 5 minutes, and finally 15 minutes for the ninth and later failures; requests during a wait neither verify nor extend it.
 
 Next decisions in this branch, in order:
 
-- [ ] Complete authentication abuse controls: login thresholds, delay progression and reset windows; registration, verification, activation, and recovery request limits; and remaining account-enumeration behavior.
+- [ ] Complete authentication abuse controls: Login reset windows and broader origin limits; registration, verification, activation, and recovery request limits; and remaining account-enumeration behavior.
 - [ ] Decide whether Administrators require multi-factor authentication.
 - [ ] Record the Role and Branch authorization matrix and where each rule is enforced.
 - [ ] Define security audit events and who may inspect them.
