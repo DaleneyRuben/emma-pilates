@@ -21,17 +21,17 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Admin-web architecture and stack** is the active architecture branch. [ADR-0023](../adr/0023-use-vite-react-and-tanstack-router-for-admin-web.md) selects Vite, React, TanStack Router, and a static single-page application, while [ADR-0040](../adr/0040-build-admin-components-with-shadcn-tailwind-and-radix.md) selects the project-owned component and design-system implementation. The mobile architecture branch is covered by [ADR-0022](../adr/0022-use-expo-with-react-native-for-the-mobile-app.md) and its linked decisions, including manual EAS store releases in [ADR-0038](../adr/0038-use-eas-build-and-submit-for-manual-mobile-releases.md) and controlled over-the-air fixes in [ADR-0039](../adr/0039-use-controlled-eas-updates-for-small-mobile-fixes.md).
+**Admin-web architecture and stack** is the active architecture branch. [ADR-0023](../adr/0023-use-vite-react-and-tanstack-router-for-admin-web.md) selects Vite, React, TanStack Router, and a static single-page application, [ADR-0040](../adr/0040-build-admin-components-with-shadcn-tailwind-and-radix.md) selects the project-owned component and design-system implementation, and [ADR-0041](../adr/0041-use-react-hook-form-and-zod-for-admin-forms.md) selects form state and runtime validation. The mobile architecture branch is covered by [ADR-0022](../adr/0022-use-expo-with-react-native-for-the-mobile-app.md) and its linked decisions, including manual EAS store releases in [ADR-0038](../adr/0038-use-eas-build-and-submit-for-manual-mobile-releases.md) and controlled over-the-air fixes in [ADR-0039](../adr/0039-use-controlled-eas-updates-for-small-mobile-fixes.md).
 
 Resolved within this branch:
 
 - [x] Use Vite and React for a static TypeScript single-page application.
 - [x] Use TanStack Router for typed routes and validated URL search state.
 - [x] Build project-owned components from shadcn/ui's Radix-based components and Tailwind design tokens; use TanStack Table for data-table behavior.
+- [x] Use React Hook Form with Zod runtime schemas for admin-web forms.
 
 Next decisions in this branch, in order:
 
-- [ ] Select forms and runtime validation.
 - [ ] Select server-state caching and local client-state boundaries.
 - [ ] Select admin-web test tools.
 - [ ] Define cookie, CSRF, and browser-session integration.
@@ -48,7 +48,7 @@ Next decisions in this branch, in order:
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors | Define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
 | Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
-| Admin-web architecture | In progress | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table | Forms and runtime validation, server-state caching, local state, test tools, cookie/CSRF integration, and Vercel hosting documentation. |
+| Admin-web architecture | In progress | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod | Server-state caching, local state, test tools, cookie/CSRF integration, and Vercel hosting documentation. |
 | Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
 | Notifications | Queued | Expo Push Service; Account-owned device endpoints; durable delivery jobs | Permission prompt, notification catalog, user preferences, badges, sounds, and operational visibility. |
 | Uploaded images | Queued | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces | Signed-URL lifetime, dimensions and byte limits, transformations, content and malware checks, retention, deletion, and public delivery. |
