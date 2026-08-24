@@ -1,0 +1,13 @@
+# Maintain a shared development API and database
+
+Status: accepted
+
+The project will maintain four isolated data environments: each developer's local PostgreSQL database, a persistent shared development PostgreSQL database, disposable PostgreSQL instances created for CI, and the production PostgreSQL database. A persistent shared development API will be the only application boundary in front of the development database. Vercel admin-web previews will call that development API and will never connect directly to PostgreSQL or use the production API.
+
+The shared development environment exists for collaborative preview testing with realistic backend behavior and persistent non-production data. It uses credentials and provider resources isolated from production, contains only synthetic or explicitly approved test data, and must never receive a copy of production personal data. Preview builds display an unmistakable development-environment indicator and contain only the public development API origin; database credentials remain exclusively with the development API.
+
+Committed migrations build and evolve the development schema through an explicit deployment step. Runtime schema synchronization and Prisma schema pushing are prohibited there for the same reasons they are prohibited in production. Development data is resettable and has no backup or availability promise unless a later operational requirement establishes one. Reset and seed tooling must be safe to target only the development environment and must refuse production credentials.
+
+The shared environment means concurrent previews can observe or change the same test records, and a preview may expect an API contract not yet deployed to the shared development API. That limitation is accepted instead of paying for an isolated API and database per pull request. Development API deployment cadence, test-data reset ownership, preview access control, and compatibility behavior for full-stack pull requests remain separate decisions.
+
+This decision changes the original environment model in [ADR-0028](./0028-use-github-actions-ci-with-disposable-postgresql.md), which excluded a persistent non-production environment to minimize cost. UI-only previews backed by MSW were rejected because they would not exercise the real development API. Connecting previews to the production API was rejected because preview defects and test activity must not affect production behavior or data. The providers and cost limits for the shared development API and database are not selected by this decision.
