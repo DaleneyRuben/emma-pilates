@@ -21,26 +21,21 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Mobile application architecture and stack** is the active architecture branch. [ADR-0022](../adr/0022-use-expo-with-react-native-for-the-mobile-app.md) selects the Expo and React Native foundation, [ADR-0032](../adr/0032-use-react-navigation-for-mobile-navigation.md) selects explicit React Navigation static configuration, [ADR-0033](../adr/0033-use-tanstack-query-for-mobile-server-state.md) assigns backend-owned mobile data to TanStack Query, [ADR-0034](../adr/0034-use-react-hook-form-and-zod-for-mobile-forms.md) selects React Hook Form with Zod, [ADR-0035](../adr/0035-use-an-online-first-read-only-mobile-cache.md) defines the online-first offline experience, [ADR-0036](../adr/0036-use-verified-https-links-through-a-central-mobile-ingress.md) defines verified external-link ingress, [ADR-0037](../adr/0037-use-jest-react-native-testing-library-and-maestro-for-mobile-tests.md) selects the mobile test stack, and [ADR-0038](../adr/0038-use-eas-build-and-submit-for-manual-mobile-releases.md) assigns manually triggered native builds and store uploads to EAS.
+**Admin-web architecture and stack** is the active architecture branch. [ADR-0023](../adr/0023-use-vite-react-and-tanstack-router-for-admin-web.md) selects Vite, React, TanStack Router, and a static single-page application. The mobile architecture branch is covered by [ADR-0022](../adr/0022-use-expo-with-react-native-for-the-mobile-app.md) and its linked decisions, including manual EAS store releases in [ADR-0038](../adr/0038-use-eas-build-and-submit-for-manual-mobile-releases.md) and controlled over-the-air fixes in [ADR-0039](../adr/0039-use-controlled-eas-updates-for-small-mobile-fixes.md).
 
 Resolved within this branch:
 
-- [x] Use one Expo and React Native application for Client and Staff Member experiences on iOS and Android.
-- [x] Consume the generated TypeScript REST client from the `api-contracts` workspace package.
-- [x] Use Expo Push Service through a backend-owned notification boundary.
-- [x] Use React Navigation static configuration with explicit role-specific route trees.
-- [x] Use TanStack Query over the generated OpenAPI client for mobile server state.
-- [x] Use React Hook Form with Zod runtime schemas for mobile forms.
-- [x] Keep local UI state near its owner and use React Context only for low-frequency application-wide concerns; add no global-state library initially.
-- [x] Remain online-first, with an Account-scoped read-only cache for approved schedule, upcoming Booking, and minimal Subscription projections; never queue writes initially.
-- [x] Persist only that restricted TanStack Query cache through AsyncStorage; keep Authentication Session credentials in Expo SecureStore.
-- [x] Use verified HTTPS Universal/App Links and one allowlisted ingress that authenticates and authorizes every protected destination.
-- [x] Use Jest with `jest-expo`, React Native Testing Library, and the open-source Maestro CLI for mobile tests.
-- [x] Use EAS Build's free allocation and EAS Submit for manually triggered store releases only after GitHub Actions passes.
+- [x] Use Vite and React for a static TypeScript single-page application.
+- [x] Use TanStack Router for typed routes and validated URL search state.
 
 Next decisions in this branch, in order:
 
-- [ ] Decide whether and how to deliver over-the-air JavaScript and asset updates.
+- [ ] Select the admin-web component system and design-system implementation.
+- [ ] Select forms and runtime validation.
+- [ ] Select server-state caching and local client-state boundaries.
+- [ ] Select admin-web test tools.
+- [ ] Define cookie, CSRF, and browser-session integration.
+- [ ] Document Vercel hosting and release behavior.
 
 ## Coverage map
 
@@ -52,12 +47,12 @@ Next decisions in this branch, in order:
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors | Define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
 | Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
-| Mobile architecture | In progress | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; EAS Build and EAS Submit for manual store releases after CI | Over-the-air update policy; set cache lifetime and storage limits during implementation. |
-| Admin-web architecture | Queued | Vite, React, and TanStack Router; static SPA | Component-system implementation, forms and runtime validation, server-state caching, local state, test tools, cookie/CSRF integration, and Vercel hosting documentation. |
+| Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
+| Admin-web architecture | In progress | Vite, React, and TanStack Router; static SPA | Component-system implementation, forms and runtime validation, server-state caching, local state, test tools, cookie/CSRF integration, and Vercel hosting documentation. |
 | Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
 | Notifications | Queued | Expo Push Service; Account-owned device endpoints; durable delivery jobs | Permission prompt, notification catalog, user preferences, badges, sounds, and operational visibility. |
 | Uploaded images | Queued | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces | Signed-URL lifetime, dimensions and byte limits, transformations, content and malware checks, retention, deletion, and public delivery. |
-| Hosting and delivery | Partly covered | Northflank API and worker; Aiven PostgreSQL; R2 backups; GitHub Actions; disposable CI PostgreSQL; no permanent staging; EAS Build and EAS Submit for manual mobile store releases | Document admin-web hosting, mobile over-the-air delivery, production deployment and rollback, migration sequencing, and provider configuration. |
+| Hosting and delivery | Partly covered | Northflank API and worker; Aiven PostgreSQL; R2 backups; GitHub Actions; disposable CI PostgreSQL; no permanent staging; EAS Build and EAS Submit for manual mobile store releases; controlled EAS Updates | Document admin-web hosting, production deployment and rollback, migration sequencing, and provider configuration. |
 | Operations and security | Queued | Daily logical database backup and portable provider boundaries | Secrets, health and readiness checks, logs, metrics, tracing, error reporting, alerts, restore drills, recovery objectives, and incident runbooks. |
 | Testing architecture | Queued | CI quality gates and required unit, integration, contract, architecture, and end-to-end layers; Jest, React Native Testing Library, and Maestro for mobile | Select backend and admin-web tools, fixture strategy, database isolation, wider client test boundaries, and final critical end-to-end journeys. |
 | Data governance | Queued | Sensitive notification and object-access constraints | Retention and deletion policies, Account closure, receipt and Evaluation data handling, audit retention, and any export requirements. |

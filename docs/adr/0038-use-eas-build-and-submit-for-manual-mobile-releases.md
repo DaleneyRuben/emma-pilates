@@ -10,4 +10,4 @@ GitHub Actions remains the repository's quality gate as established in [ADR-0028
 
 Automatically building or submitting on every merge was rejected because store releases are comparatively infrequent and should be deliberate. Building production apps entirely in GitHub Actions was rejected because iOS runners, native toolchains, signing credentials, and store submission would create more maintenance without improving the product. Maintaining only local release machines was rejected because it would make releases depend on one workstation, although local builds remain a useful fallback.
 
-This decision covers native builds and store submission only. Over-the-air delivery of JavaScript and assets is a separate release path whose compatibility, safety, rollout, and rollback policy must be selected before it is enabled in production.
+This decision covers native builds and store submission. [ADR-0039](./0039-use-controlled-eas-updates-for-small-mobile-fixes.md) separately limits over-the-air delivery to controlled, compatible fixes and defines its validation, rollout, and rollback boundary.
