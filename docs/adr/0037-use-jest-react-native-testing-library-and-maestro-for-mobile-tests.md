@@ -10,4 +10,4 @@ Maestro verifies only release-critical cross-boundary journeys that unit and scr
 
 Vitest was considered for consistency with modern TypeScript tooling but rejected for the mobile application because Expo's maintained native preset and module mocks are centered on Jest. Detox was considered for its gray-box synchronization and deeper React Native integration, but its native setup and version coupling are not justified by the initial journeys. Component tests alone were rejected because they cannot verify the installed application's native navigation, linking, storage, notification, and upload boundaries.
 
-This decision does not select the admin-web or backend test runners, fixture ownership, E2E environment provisioning, CI frequency, or device matrix. Those remain part of the wider testing and delivery architecture.
+[ADR-0043](./0043-use-jest-testing-library-msw-and-playwright-for-admin-tests.md) separately selects the admin-web test tools. This decision does not select the backend test runner, fixture ownership, E2E environment provisioning, CI frequency, or device matrix. Those remain part of the wider testing and delivery architecture.
