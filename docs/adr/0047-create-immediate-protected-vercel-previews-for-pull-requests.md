@@ -1,0 +1,13 @@
+# Create immediate protected Vercel previews for pull requests
+
+Status: accepted
+
+Vercel's Git integration will create a separate admin-web Preview Deployment immediately for every push to a pull request, without waiting for GitHub Actions to finish. Each preview uses Vercel's Preview environment configuration, points only to the shared Render development API and Neon development database selected in [ADR-0046](./0046-host-shared-development-on-render-and-neon.md), and displays the development-environment indicator required by [ADR-0045](./0045-maintain-a-shared-development-api-and-database.md).
+
+Preview deployment and production release remain intentionally different paths. Vercel may build previews directly from pull-request commits for fast feedback, but it must not promote a Git push to the production domain. Production continues to use the validated prebuilt artifact deployed by GitHub Actions under [ADR-0044](./0044-deploy-the-admin-web-to-vercel-through-github-actions.md). A successful preview does not replace formatting, type checking, tests, the production build, or any other CI gate.
+
+All Preview Deployments will use Vercel Authentication protection available to the Hobby project, in addition to the application's own Administrator authentication when that workflow is implemented. Preview configuration contains no production API origin, production credential, database credential, email-delivery credential, or object-storage credential. Pull requests from forks require explicit deployment authorization and must not receive protected environment values automatically.
+
+Every preview shares the development API version and development records, so simultaneous previews are not isolated test environments. Reviewers must expect changes made in one preview to appear in another. Preview URLs also create multiple browser origins; the deferred CORS, cookie, and CSRF implementation must authorize only legitimate project preview origins and must never trust an arbitrary `vercel.app` wildcard.
+
+Waiting for GitHub Actions before deploying was rejected because previews are non-production feedback and an early broken preview is acceptable. One stable shared frontend was rejected because Vercel already supplies pull-request-specific previews and parallel visual review is useful despite the shared backend. Quota exhaustion or Vercel preview unavailability may remove preview feedback, but it does not bypass CI or change the production release path.
