@@ -1,0 +1,13 @@
+# Build admin components with shadcn, Tailwind, and Radix
+
+Status: accepted
+
+The admin web application will build its component system from shadcn/ui's Radix-based React components and Tailwind CSS. shadcn/ui is a source-code distribution mechanism rather than a runtime component package: selected component source is copied into the admin application, adapted to the project, and maintained as first-party code. Radix primitives supply accessible behavior for complex controls such as dialogs, sheets, menus, popovers, selects, and focus management, while Tailwind expresses the visual system through project-owned theme variables and styles.
+
+The approved [Emma design system](../design/design-system.md) remains the visual source of truth. Its closed color palette, Lora and Work Sans typography, spacing, radii, shadows, responsive breakpoints, dense desktop tables, narrow-browser cards, and side-panel-to-sheet behavior will become explicit design tokens and component variants. shadcn defaults are starting points and must not introduce a competing visual language. Components copied into the repository are reviewed, tested, and upgraded deliberately; they are never assumed to inherit safe upstream changes automatically.
+
+Data-heavy list screens will use TanStack Table for headless sorting, filtering, pagination, visibility, and row-model behavior beneath project-owned table and narrow-card presentation. URL-worthy table state remains owned by TanStack Router as established in [ADR-0023](./0023-use-vite-react-and-tanstack-router-for-admin-web.md). Native semantic HTML is preferred where it already provides the required behavior, and using Radix or shadcn does not remove the obligation to supply correct labels, keyboard behavior, focus order, contrast, responsive behavior, and accessibility tests.
+
+Mantine was rejected because its broad integrated component and styling APIs would accelerate initial assembly but require more adaptation to preserve the already-approved design system. MUI Community was rejected because its Material visual language is a weaker starting point for Emma and some advanced MUI X data-grid capabilities require commercial licenses. Using Radix primitives with hand-written CSS alone was rejected because it would preserve control but duplicate component assembly that shadcn already provides. The selected stack is free and open source, gives the project direct control over its component source, and avoids a paid component tier.
+
+This decision does not select form-state or runtime-validation libraries, server-state caching, general client-state management, chart implementation, or admin-web test tools.
