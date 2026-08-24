@@ -37,6 +37,7 @@ Resolved within this branch:
 - [x] Allow an unverified email address to be corrected while an Account is pending; preserve the Account, invalidate links sent to the old address, and send a fresh link to the corrected address. This does not apply after activation.
 - [x] Reuse the existing pending Account and domain identity when the same email repeats the same account-creation request; rotate the link instead of creating a duplicate, keep public responses neutral, and identify the pending record to authorized staff.
 - [x] Keep the existing pending identity and provisioning path when the same email crosses creation flows; reuse compatible pending Clients without overwriting them, and leave incompatible Client/Staff Member conflicts untouched for authorized staff to resolve.
+- [x] Allow authorized cancellation before verification or activation; revoke every outstanding link, release the email, remove the pending identity from active use, and retain only who cancelled it and when.
 - [x] Send transactional email through SendPulse behind a project-owned provider interface.
 - [x] Use opaque server-side Authentication Sessions.
 - [x] Store mobile credentials in operating-system secure storage and admin-web credentials in secure `HttpOnly` cookies.
@@ -50,7 +51,7 @@ Resolved within this branch:
 
 Next decisions in this branch, in order:
 
-- [ ] Complete the pending registration and activation lifecycle: cancellation and cleanup.
+- [ ] Complete the pending registration and activation lifecycle: automatic expiry and cleanup.
 - [ ] Define authentication abuse controls: request throttling, guessing resistance, backoff or lockout, and account-enumeration behavior.
 - [ ] Decide whether Administrators require multi-factor authentication.
 - [ ] Record the Role and Branch authorization matrix and where each rule is enforced.
