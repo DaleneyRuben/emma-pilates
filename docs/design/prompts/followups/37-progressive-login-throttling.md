@@ -17,4 +17,4 @@ Add a throttled Login state to `01`, `S01`, and `AW01`:
 - Do not add CAPTCHA, security questions, phone verification, or a staff-assisted bypass.
 - Preserve the submitted email, password visibility control, recovery link, biometric entry where already present, responsive layout, and existing visual styling.
 
-The reset window is not settled yet. Do not invent one in the design.
+The matching email-and-origin failure lane resets after a successful Login or one hour without another failed password verification. This is backend behavior, not a deadline to display on Login; the UI continues to follow only the current `Retry-After` value.
