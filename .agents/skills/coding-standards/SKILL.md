@@ -62,6 +62,8 @@ Use the narrowest meaningful test level:
 - Mobile and admin web consume `api-contracts`; backend code must not consume the generated client because the backend transport code is its source.
 - Treat `tooling` as a development-only dependency and `test-support` as a test-only dependency. Do not create a general-purpose `shared` package without a concrete, neutral responsibility.
 - Import workspace packages by their declared package name and public `exports`. Do not deep-import package source or use TypeScript path aliases to bypass a public entrypoint.
+- Enforce workspace, bounded-context, and infrastructure import restrictions with scoped core ESLint `no-restricted-imports` rules. A forbidden import is a lint error locally and in CI.
+- Use focused Jest architecture tests for public package entrypoints, NestJS module exports, prohibited direct Prisma access, and structural boundaries that import-pattern lint rules cannot express reliably.
 - Booking & Membership, Back Office, and system identity are top-level NestJS modules with small public application interfaces.
 - Cross-context writes call the owning module's public application service. Never reach into another context's repositories, internal providers, or database tables to perform a write.
 - Keep domain rules and state transitions in framework-light TypeScript. NestJS owns transport, guards, dependency wiring, and application composition.

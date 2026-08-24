@@ -21,25 +21,22 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Backend implementation stack and shared-package conventions** is the active architecture branch. [ADR-0012](../adr/0012-standardize-application-code-on-typescript.md) selects TypeScript, [ADR-0013](../adr/0013-use-a-pnpm-monorepo.md) establishes the workspace and narrow shared-package model, [ADR-0014](../adr/0014-use-nestjs-as-the-backend-application-shell.md) selects the NestJS modular-monolith shell, [ADR-0015](../adr/0015-use-prisma-for-postgresql-access.md) places Prisma behind context-owned repositories, [ADR-0018](../adr/0018-use-rest-with-an-openapi-contract.md) with [ADR-0019](../adr/0019-generate-openapi-from-nestjs-transport-code.md) establishes the REST contract, [ADR-0049](../adr/0049-use-jest-supertest-and-testcontainers-for-backend-tests.md) selects the backend testing foundation, [ADR-0050](../adr/0050-generate-api-contracts-with-orval.md) selects Orval and the committed generated-package workflow, [ADR-0051](../adr/0051-validate-backend-configuration-with-nest-config-and-zod.md) establishes fail-fast typed configuration, and [ADR-0052](../adr/0052-run-backend-processes-from-one-deployable-package.md) defines the single-package, multi-command process topology. The mobile and admin-web architecture branches are now covered; [ADR-0048](../adr/0048-rollback-admin-web-releases-through-git-reverts.md) completes the admin-web delivery decisions with Git-controlled rollback.
+**Identity and access** is the active architecture branch. [ADR-0009](../adr/0009-separate-system-account-from-domain-identities.md) separates the system Account from Client and Staff Member identities, [ADR-0029](../adr/0029-manage-authentication-in-the-nestjs-backend.md) establishes backend-managed email authentication and its activation and recovery journeys, [ADR-0030](../adr/0030-use-opaque-server-side-authentication-sessions.md) defines opaque server-side Authentication Sessions, and [ADR-0031](../adr/0031-use-sendpulse-for-transactional-email.md) isolates SendPulse behind a project-owned delivery interface. The backend implementation stack and shared-package branch is now covered, including the import and architecture-test enforcement conventions added to [ADR-0013](../adr/0013-use-a-pnpm-monorepo.md).
 
 Resolved within this branch:
 
-- [x] Use TypeScript in a pnpm monorepo with independently buildable applications and narrow shared packages.
-- [x] Use NestJS as the modular-monolith shell with framework-light domain rules and context-owned public interfaces.
-- [x] Use PostgreSQL with context-owned schemas and Prisma behind repository adapters.
-- [x] Use code-first NestJS OpenAPI with a generated `api-contracts` package and URI major versioning.
-- [x] Run pg-boss jobs in a separate worker process while keeping consistency-sensitive work synchronous.
-- [x] Use Jest for backend tests, Nest testing utilities and Supertest for application and HTTP behavior, and Testcontainers for disposable PostgreSQL integration tests.
-- [x] Generate the committed `api-contracts` package with Orval using native Fetch and TanStack Query integration; regenerate and verify it in CI.
-- [x] Validate API, worker, and migration configuration at startup with Nest Config and entrypoint-specific Zod schemas.
-- [x] Build one versioned `apps/backend` image with separate API, worker, and explicit one-off migration commands.
-- [x] Coordinate package-owned build, test, lint, and type-check scripts with plain pnpm workspace commands initially.
-- [x] Enforce one-way application-to-package dependencies through explicit package exports, with no application-to-application or package-to-application imports.
+- [x] Keep Account credentials and Authentication Sessions separate from Client and Staff Member domain identities.
+- [x] Manage email-only authentication, verification, activation, and password recovery in the NestJS backend.
+- [x] Use independently revocable opaque Authentication Sessions with surface-specific idle and absolute lifetimes.
+- [x] Send transactional authentication email through a project-owned interface backed initially by SendPulse.
 
 Next decisions in this branch, in order:
 
-- [ ] Select automated enforcement for workspace and backend bounded-context boundaries.
+- [ ] Define authentication-email delivery timeouts, retries, and client-visible failure behavior.
+- [ ] Complete account-enumeration behavior across authentication endpoints.
+- [ ] Define Administrator multi-factor authentication.
+- [ ] Define the authorization matrix and security audit events.
+- [ ] Design the deferred Administrator-to-Staff-Member mobile impersonation feature.
 
 Deferred pre-release requirement from the covered admin-web branch:
 
@@ -51,10 +48,10 @@ Deferred pre-release requirement from the covered admin-web branch:
 | --- | --- | --- | --- |
 | Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership and Back Office glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
-| Backend structure | In progress | TypeScript pnpm monorepo with plain pnpm task orchestration and one-way public-package dependencies; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Select automated enforcement for workspace and bounded-context boundaries. |
+| Backend structure | Covered | TypeScript pnpm monorepo with plain pnpm task orchestration, one-way public-package dependencies, ESLint import restrictions, and Jest architecture tests; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Revisit only if measured build performance or boundary complexity outgrows the initial conventions. |
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client | Automate breaking-change comparison; define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
-| Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
+| Identity and access | In progress | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email delivery behavior, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
 | Admin-web architecture | Covered | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Jest, React Testing Library, MSW, and Playwright; GitHub Actions production deployments to Vercel; immediate protected Vercel previews using Render and Neon development services; Git-revert rollback | Define and test cookie, CSRF, and browser-session integration during implementation before release; revisit the stack only when a measured requirement challenges it. |
 | Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
