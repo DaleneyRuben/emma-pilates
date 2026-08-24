@@ -34,8 +34,11 @@ Resolved within this branch:
 
 Next decisions in this branch, in order:
 
-- [ ] Define cookie, CSRF, and browser-session integration.
 - [ ] Document Vercel hosting and release behavior.
+
+Deferred until implementation:
+
+- [ ] Define and test cookie, CSRF, CORS or same-origin proxying, and browser-session integration using the actual admin-web and API origins. Do not ship the admin web before this security boundary is resolved.
 
 ## Coverage map
 
@@ -48,7 +51,7 @@ Next decisions in this branch, in order:
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors | Define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
 | Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
-| Admin-web architecture | In progress | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Jest, React Testing Library, MSW, and Playwright | Cookie/CSRF integration and Vercel hosting documentation. |
+| Admin-web architecture | In progress | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Jest, React Testing Library, MSW, and Playwright | Document Vercel hosting; define and test cookie, CSRF, and browser-session integration during implementation before release. |
 | Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
 | Notifications | Queued | Expo Push Service; Account-owned device endpoints; durable delivery jobs | Permission prompt, notification catalog, user preferences, badges, sounds, and operational visibility. |
 | Uploaded images | Queued | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces | Signed-URL lifetime, dimensions and byte limits, transformations, content and malware checks, retention, deletion, and public delivery. |
