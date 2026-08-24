@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Backend implementation stack and shared-package conventions** is the active architecture branch. [ADR-0012](../adr/0012-standardize-application-code-on-typescript.md) selects TypeScript, [ADR-0013](../adr/0013-use-a-pnpm-monorepo.md) establishes the workspace and narrow shared-package model, [ADR-0014](../adr/0014-use-nestjs-as-the-backend-application-shell.md) selects the NestJS modular-monolith shell, [ADR-0015](../adr/0015-use-prisma-for-postgresql-access.md) places Prisma behind context-owned repositories, and [ADR-0018](../adr/0018-use-rest-with-an-openapi-contract.md) with [ADR-0019](../adr/0019-generate-openapi-from-nestjs-transport-code.md) establishes the generated REST contract. The mobile and admin-web architecture branches are now covered; [ADR-0048](../adr/0048-rollback-admin-web-releases-through-git-reverts.md) completes the admin-web delivery decisions with Git-controlled rollback.
+**Backend implementation stack and shared-package conventions** is the active architecture branch. [ADR-0012](../adr/0012-standardize-application-code-on-typescript.md) selects TypeScript, [ADR-0013](../adr/0013-use-a-pnpm-monorepo.md) establishes the workspace and narrow shared-package model, [ADR-0014](../adr/0014-use-nestjs-as-the-backend-application-shell.md) selects the NestJS modular-monolith shell, [ADR-0015](../adr/0015-use-prisma-for-postgresql-access.md) places Prisma behind context-owned repositories, [ADR-0018](../adr/0018-use-rest-with-an-openapi-contract.md) with [ADR-0019](../adr/0019-generate-openapi-from-nestjs-transport-code.md) establishes the generated REST contract, and [ADR-0049](../adr/0049-use-jest-supertest-and-testcontainers-for-backend-tests.md) selects the backend testing foundation. The mobile and admin-web architecture branches are now covered; [ADR-0048](../adr/0048-rollback-admin-web-releases-through-git-reverts.md) completes the admin-web delivery decisions with Git-controlled rollback.
 
 Resolved within this branch:
 
@@ -30,10 +30,10 @@ Resolved within this branch:
 - [x] Use PostgreSQL with context-owned schemas and Prisma behind repository adapters.
 - [x] Use code-first NestJS OpenAPI with a generated `api-contracts` package and URI major versioning.
 - [x] Run pg-boss jobs in a separate worker process while keeping consistency-sensitive work synchronous.
+- [x] Use Jest for backend tests, Nest testing utilities and Supertest for application and HTTP behavior, and Testcontainers for disposable PostgreSQL integration tests.
 
 Next decisions in this branch, in order:
 
-- [ ] Select backend unit, integration, contract, and architecture test tools.
 - [ ] Select the OpenAPI TypeScript client generator and generated-package workflow.
 - [ ] Define environment configuration validation and API, worker, and migration entrypoints.
 - [ ] Finalize shared-package dependency rules, build conventions, and automated boundary enforcement.
@@ -48,7 +48,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 | --- | --- | --- | --- |
 | Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership and Back Office glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
-| Backend structure | In progress | TypeScript pnpm monorepo; NestJS modular monolith; context-owned module interfaces; separate API and pg-boss worker processes | Select backend test and generation tools; finalize configuration, entrypoint, build, shared-package, and automated-boundary conventions. |
+| Backend structure | In progress | TypeScript pnpm monorepo; NestJS modular monolith; context-owned module interfaces; separate API and pg-boss worker processes; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers | Select OpenAPI generation tools; finalize configuration, entrypoint, build, shared-package, and automated-boundary conventions. |
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors | Define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
 | Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
@@ -59,7 +59,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 | Uploaded images | Queued | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces | Signed-URL lifetime, dimensions and byte limits, transformations, content and malware checks, retention, deletion, and public delivery. |
 | Hosting and delivery | Partly covered | Northflank production API and worker; Aiven production PostgreSQL; R2 backups; GitHub Actions; local and disposable CI PostgreSQL; Render development API with Neon development PostgreSQL; immediate protected Vercel previews; Vercel admin web production deployed as validated prebuilt output from GitHub Actions with Git-revert rollback; EAS Build and EAS Submit for manual mobile store releases; controlled EAS Updates | Define production migration sequencing and provider configuration. |
 | Operations and security | Queued | Daily logical database backup and portable provider boundaries | Secrets, health and readiness checks, logs, metrics, tracing, error reporting, alerts, restore drills, recovery objectives, and incident runbooks. |
-| Testing architecture | Queued | CI quality gates and required unit, integration, contract, architecture, and end-to-end layers; Jest, React Native Testing Library, and Maestro for mobile; Jest, React Testing Library, MSW, and Playwright for admin web | Select backend tools, fixture strategy, database isolation, wider client test boundaries, and final critical end-to-end journeys. |
+| Testing architecture | Queued | CI quality gates and required unit, integration, contract, architecture, and end-to-end layers; Jest, Nest testing utilities, Supertest, and Testcontainers for backend; Jest, React Native Testing Library, and Maestro for mobile; Jest, React Testing Library, MSW, and Playwright for admin web | Select fixture and database-isolation strategy, automate OpenAPI compatibility and architecture boundaries, and define wider client test boundaries and final critical end-to-end journeys. |
 | Data governance | Queued | Sensitive notification and object-access constraints | Retention and deletion policies, Account closure, receipt and Evaluation data handling, audit retention, and any export requirements. |
 
 ## Ordered work queue
