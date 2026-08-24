@@ -21,4 +21,6 @@ Shared packages are limited to public API contracts, build and lint configuratio
 
 A monorepo makes coordinated API and client changes atomic, keeps one dependency and tooling workflow, and suits a small team working across all three applications. pnpm provides workspace dependency management with strict package boundaries and efficient dependency storage.
 
+Root workspace scripts will coordinate the standard `build`, `test`, `lint`, and `typecheck` tasks by delegating to package-owned scripts through pnpm's recursive and filtering commands. Dependency-aware ordering remains explicit through workspace dependencies, and local development and GitHub Actions invoke the same root commands. Turborepo and Nx will not be added initially; a dedicated task runner may be reconsidered if measured build time, repeated CI work, or task-graph complexity makes pnpm orchestration insufficient.
+
 Independent repositories were rejected for now because they add versioning and coordination overhead without independent teams or release ownership. The deployables remain independently buildable even though their source is colocated.

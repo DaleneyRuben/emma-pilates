@@ -34,10 +34,12 @@ Resolved within this branch:
 - [x] Generate the committed `api-contracts` package with Orval using native Fetch and TanStack Query integration; regenerate and verify it in CI.
 - [x] Validate API, worker, and migration configuration at startup with Nest Config and entrypoint-specific Zod schemas.
 - [x] Build one versioned `apps/backend` image with separate API, worker, and explicit one-off migration commands.
+- [x] Coordinate package-owned build, test, lint, and type-check scripts with plain pnpm workspace commands initially.
 
 Next decisions in this branch, in order:
 
-- [ ] Finalize shared-package dependency rules, build conventions, and automated boundary enforcement.
+- [ ] Define allowed workspace dependency directions and package public-entrypoint rules.
+- [ ] Select automated enforcement for workspace and backend bounded-context boundaries.
 
 Deferred pre-release requirement from the covered admin-web branch:
 
@@ -49,7 +51,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 | --- | --- | --- | --- |
 | Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership and Back Office glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
-| Backend structure | In progress | TypeScript pnpm monorepo; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Finalize build, shared-package, and automated-boundary conventions. |
+| Backend structure | In progress | TypeScript pnpm monorepo with plain pnpm task orchestration; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Finalize shared-package dependency and automated-boundary conventions. |
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client | Automate breaking-change comparison; define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
 | Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
