@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Backend implementation stack and shared-package conventions** is the active architecture branch. [ADR-0012](../adr/0012-standardize-application-code-on-typescript.md) selects TypeScript, [ADR-0013](../adr/0013-use-a-pnpm-monorepo.md) establishes the workspace and narrow shared-package model, [ADR-0014](../adr/0014-use-nestjs-as-the-backend-application-shell.md) selects the NestJS modular-monolith shell, [ADR-0015](../adr/0015-use-prisma-for-postgresql-access.md) places Prisma behind context-owned repositories, [ADR-0018](../adr/0018-use-rest-with-an-openapi-contract.md) with [ADR-0019](../adr/0019-generate-openapi-from-nestjs-transport-code.md) establishes the REST contract, [ADR-0049](../adr/0049-use-jest-supertest-and-testcontainers-for-backend-tests.md) selects the backend testing foundation, and [ADR-0050](../adr/0050-generate-api-contracts-with-orval.md) selects Orval and the committed generated-package workflow. The mobile and admin-web architecture branches are now covered; [ADR-0048](../adr/0048-rollback-admin-web-releases-through-git-reverts.md) completes the admin-web delivery decisions with Git-controlled rollback.
+**Backend implementation stack and shared-package conventions** is the active architecture branch. [ADR-0012](../adr/0012-standardize-application-code-on-typescript.md) selects TypeScript, [ADR-0013](../adr/0013-use-a-pnpm-monorepo.md) establishes the workspace and narrow shared-package model, [ADR-0014](../adr/0014-use-nestjs-as-the-backend-application-shell.md) selects the NestJS modular-monolith shell, [ADR-0015](../adr/0015-use-prisma-for-postgresql-access.md) places Prisma behind context-owned repositories, [ADR-0018](../adr/0018-use-rest-with-an-openapi-contract.md) with [ADR-0019](../adr/0019-generate-openapi-from-nestjs-transport-code.md) establishes the REST contract, [ADR-0049](../adr/0049-use-jest-supertest-and-testcontainers-for-backend-tests.md) selects the backend testing foundation, [ADR-0050](../adr/0050-generate-api-contracts-with-orval.md) selects Orval and the committed generated-package workflow, and [ADR-0051](../adr/0051-validate-backend-configuration-with-nest-config-and-zod.md) establishes fail-fast typed configuration. The mobile and admin-web architecture branches are now covered; [ADR-0048](../adr/0048-rollback-admin-web-releases-through-git-reverts.md) completes the admin-web delivery decisions with Git-controlled rollback.
 
 Resolved within this branch:
 
@@ -32,10 +32,11 @@ Resolved within this branch:
 - [x] Run pg-boss jobs in a separate worker process while keeping consistency-sensitive work synchronous.
 - [x] Use Jest for backend tests, Nest testing utilities and Supertest for application and HTTP behavior, and Testcontainers for disposable PostgreSQL integration tests.
 - [x] Generate the committed `api-contracts` package with Orval using native Fetch and TanStack Query integration; regenerate and verify it in CI.
+- [x] Validate API, worker, and migration configuration at startup with Nest Config and entrypoint-specific Zod schemas.
 
 Next decisions in this branch, in order:
 
-- [ ] Define environment configuration validation and API, worker, and migration entrypoints.
+- [ ] Define API, worker, and migration entrypoints.
 - [ ] Finalize shared-package dependency rules, build conventions, and automated boundary enforcement.
 
 Deferred pre-release requirement from the covered admin-web branch:
@@ -48,7 +49,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 | --- | --- | --- | --- |
 | Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership and Back Office glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
-| Backend structure | In progress | TypeScript pnpm monorepo; NestJS modular monolith; context-owned module interfaces; separate API and pg-boss worker processes; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts | Finalize configuration, entrypoint, build, shared-package, and automated-boundary conventions. |
+| Backend structure | In progress | TypeScript pnpm monorepo; NestJS modular monolith; context-owned module interfaces; separate API and pg-boss worker processes; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Finalize entrypoint, build, shared-package, and automated-boundary conventions. |
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client | Automate breaking-change comparison; define pagination, filtering, idempotency, authorization, and caching conventions as the first endpoints are designed. |
 | Identity and access | Queued | Account boundary; backend-managed authentication; opaque Authentication Sessions; SendPulse behind a project-owned email-delivery interface; accepted session and initial abuse-control policies | Complete authentication-email client/network budgets, account-enumeration behavior, Administrator MFA, authorization matrix, audit events, and deferred impersonation design after stack definition. |
