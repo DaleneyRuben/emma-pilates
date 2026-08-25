@@ -35,10 +35,11 @@ Resolved within this branch:
 - [x] Return one neutral Login failure for unknown, incorrect, pending, unverified, inactive, and disabled Accounts with equivalent password work and throttling behavior.
 - [x] Require every Administrator to enroll TOTP with one-time recovery codes through a 15-minute restricted challenge at first successful password login before receiving a full Authentication Session.
 - [x] Issue ten single-use Administrator recovery codes, warn when three remain, and replace every remaining code when a new set is generated.
+- [x] Require the current password and existing TOTP or recovery code to replace an Administrator factor, then rotate recovery codes and revoke every other Authentication Session.
 
 Next decisions in this branch, in order:
 
-- [ ] Define the Administrator MFA factor-replacement and lockout-recovery lifecycle.
+- [ ] Define the Administrator MFA emergency lockout-recovery lifecycle.
 - [ ] Define the authorization matrix and security audit events.
 - [ ] Design the deferred Administrator-to-Staff-Member mobile impersonation feature.
 
