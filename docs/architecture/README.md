@@ -21,9 +21,9 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Transactional integrity and concurrency** is the active architecture branch. [ADR-0011](../adr/0011-use-postgresql-with-schema-per-bounded-context.md) selects one transactional PostgreSQL database, and [ADR-0015](../adr/0015-use-prisma-for-postgresql-access.md) requires short interactive transactions, database constraints, and bounded retries for critical workflows. The next decision will establish the shared isolation and conflict-handling strategy before applying it to Booking, capacity, Waitlist, Payment, Credit, and Referral workflows.
+**Time and scheduling conventions** is the active architecture branch. The domain already relies on Session start times, a Cancellation Window, recurring operational schedules, expiring authentication links, and delayed jobs. The next decision will establish how instants, Branch-local civil time, and time zones are represented consistently across PostgreSQL, the API, mobile, admin web, and workers.
 
-Identity and access decisions completed before this branch:
+Architecture decisions completed before this branch:
 
 - [x] Keep Account credentials and Authentication Sessions separate from Client and Staff Member domain identities.
 - [x] Manage email-only authentication, verification, activation, and password recovery in the NestJS backend.
@@ -39,11 +39,12 @@ Identity and access decisions completed before this branch:
 - [x] Recover an Administrator who has lost every factor through the current password and a single-use link sent to the verified email address.
 - [x] Enforce fixed Roles plus resource ownership, operational relationship, and Branch scope in backend use cases with default-deny tests.
 - [x] Store focused, append-only audit records for sensitive security, financial, and administrative events in the same PostgreSQL transaction as successful changes.
+- [x] Use selective Serializable transactions with bounded retries and database constraints for allocation and money-related workflows.
 
 Next decisions in this branch, in order:
 
-- [ ] Define the shared transaction-isolation, conflict-detection, and bounded-retry strategy.
-- [ ] Apply the strategy to Booking allowance and capacity, Waitlist promotion, Payment confirmation, Credit application, and Referral rewards.
+- [ ] Define instant, local date/time, and Branch time-zone representation.
+- [ ] Define scheduling-clock, recurrence, and delayed-job conventions.
 
 Deferred identity work:
 
@@ -60,8 +61,9 @@ Deferred pre-release requirement from the covered admin-web branch:
 | Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership and Back Office glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
 | Backend structure | Covered | TypeScript pnpm monorepo with plain pnpm task orchestration, one-way public-package dependencies, ESLint import restrictions, and Jest architecture tests; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Revisit only if measured build performance or boundary complexity outgrows the initial conventions. |
-| Persistence | In progress | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
+| Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations; selective Serializable transactions with bounded retries and database constraints for critical workflows | Confirm each workflow's exact constraints and transaction boundary during schema design before its migration is approved. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client | Automate breaking-change comparison; define pagination, filtering, idempotency, and caching conventions as the first endpoints are designed. |
+| Time and scheduling | In progress | Domain-defined Session times, Cancellation Window, expirations, and delayed work | Define UTC instants, Branch-local civil time, time zones, recurrence, and worker-clock behavior. |
 | Identity and access | Covered | Account boundary; backend-managed authentication with neutral enumeration-resistant public flows; opaque Authentication Sessions; transactionally queued encrypted authentication email through SendPulse with bounded retries, neutral public status, and authorized pending-invitation visibility; accepted session and initial abuse-control policies; mandatory first-login Administrator TOTP, recovery codes, secure factor replacement, and password-plus-email emergency recovery; fixed Roles with use-case-owned contextual authorization; focused append-only audit records | Administrator-to-Staff-Member mobile impersonation remains explicitly deferred. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
 | Admin-web architecture | Covered | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Jest, React Testing Library, MSW, and Playwright; GitHub Actions production deployments to Vercel; immediate protected Vercel previews using Render and Neon development services; Git-revert rollback | Define and test cookie, CSRF, and browser-session integration during implementation before release; revisit the stack only when a measured requirement challenges it. |
@@ -77,10 +79,9 @@ Deferred pre-release requirement from the covered admin-web branch:
 
 Work down this list unless the current decision exposes a dependency that must be resolved first:
 
-1. Specify transactional and concurrency rules for Booking creation and Subscription allowance consumption, Session capacity, Waitlist promotion, Payment confirmation, Credit application, and Referral rewards.
-2. Set time, timezone, scheduling, idempotency, pagination, and caching conventions shared by the API and jobs.
-3. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
-4. Complete the test architecture and personal-data lifecycle rules before handling real user data.
+1. Set time, timezone, scheduling, idempotency, pagination, and caching conventions shared by the API and jobs.
+2. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
+3. Complete the test architecture and personal-data lifecycle rules before handling real user data.
 
 ## Update rule
 

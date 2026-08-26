@@ -1,0 +1,11 @@
+# Use Serializable transactions selectively
+
+Status: accepted
+
+Ordinary database work will use PostgreSQL's default `Read Committed` isolation. Workflows that allocate a limited resource or apply a money-related state transition will instead use short Prisma interactive transactions at `Serializable` isolation. This includes creating a Booking while consuming Subscription allowance and capacity, cancelling a Booking while promoting the Waitlist, confirming a Payment while applying its Subscription and Credit effects, and issuing a Referral reward. Each workflow must commit all of its state changes, queued follow-up work, and required audit record together or commit none of them.
+
+Serializable transactions may be retried only for recognized PostgreSQL serialization failures or deadlocks, with short jittered backoff and a small fixed maximum. A deterministic business conflict such as exhausted allowance, full capacity, or an already-final Payment is not retried. If transient retries are exhausted, the API returns stable RFC 9457 conflict or temporary-failure details rather than pretending the action succeeded. Transactions must not perform network calls, send messages, upload files, or wait for user input.
+
+Database uniqueness, foreign-key, and check constraints remain the final protection for invariants that PostgreSQL can express. Each critical workflow defines and tests its exact constraints and transaction boundary when its schema is designed, including concurrent integration tests against real PostgreSQL. Explicit row locks or parameterized SQL remain available inside the owning repository when an ordered workflow such as Waitlist promotion needs them, but manual locking is not the default concurrency strategy.
+
+Using explicit locks for every critical workflow was rejected because missing one row or taking locks in inconsistent order is easy to get wrong and would require more PostgreSQL-specific repository code. Using `Serializable` for every write was rejected because unrelated low-risk changes do not need its conflict rate or retry overhead. Selective use fits the system's modest traffic while prioritizing correctness where two successful requests could otherwise allocate the same resource or apply the same financial effect twice.
