@@ -20,6 +20,10 @@ _Avoid_: Class (when referring to the catalog entry)
 A specific scheduled, bookable occurrence of a Class Type, at a given time, with an assigned Trainer and a capacity. Capacity defaults from the Class Type but can be overridden per Session (e.g. reduced due to equipment being out of service). Clients book Sessions, not Class Types. A Session is cancelled automatically by the system via a one-time check at 2 hours before its start time: if it has zero Bookings at that point, it's cancelled — the Trainer does not cancel it manually, and a Session that drops to zero Bookings earlier stays normally bookable until that check runs. An Administrator can also cancel a Session that has Bookings, as a last resort when no substitute Trainer can cover it: every Booking on it is cancelled, each client's allowance unit is refunded even inside the Cancellation Window, and the clients are notified.
 _Avoid_: Class (when referring to a specific occurrence)
 
+**Session Schedule**:
+An Administrator-defined weekly pattern for a Class Type, Branch, Trainer, time, and normal capacity that generates concrete Sessions inside the future booking window. Each generated Session remains an independent occurrence so it can carry Bookings and exceptions without rewriting the pattern or history.
+_Avoid_: Recurring Session, schedule template
+
 **Booking**:
 A client's reserved spot in a Session, with its own status (booked / cancelled / rescheduled). Created by the client or by an Assistant on the client's behalf. Consumes one unit of the Subscription's allowance when created; Cancelling refunds that unit back to the allowance, while Rescheduling does not — it's the same already-consumed unit moved to a different Session.
 _Avoid_: Reservation, registration
@@ -45,7 +49,7 @@ A one-on-one appointment between a client and the Nutritionist, booked against t
 _Avoid_: Appointment, session (when referring to a nutritionist evaluation)
 
 **Availability Block**:
-An open time range the Nutritionist publishes (e.g. "Tuesdays 9am–1pm") from which the system auto-generates fixed-length, individually bookable Evaluation slots.
+A recurring weekly open time range the Nutritionist publishes (e.g. "Tuesdays 9am–1pm") from which the system generates concrete, fixed-length, individually bookable Evaluation slots inside the future booking window.
 _Avoid_: Schedule, working hours
 
 **Credit**:

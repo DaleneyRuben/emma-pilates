@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Time and scheduling conventions** is the active architecture branch. [ADR-0057](../adr/0057-use-bolivia-time-for-all-business-scheduling.md) establishes `America/La_Paz` as the single business time zone while retaining unambiguous timezone-aware instants in PostgreSQL and UTC API representations. [ADR-0058](../adr/0058-reconcile-due-work-into-pg-boss.md) uses recurring database-clock reconcilers to rediscover due work and dispatch idempotent pg-boss jobs. The next decision will establish how repeating schedules create concrete bookable occurrences.
+**API reliability and collection conventions** is the active architecture branch. The REST, URI-versioning, OpenAPI, RFC 9457, and generated-client foundations are covered. The next decisions will establish which commands require idempotency protection and how list endpoints express pagination, filtering, sorting, and caching without endpoint-specific invention.
 
 Architecture decisions completed before this branch:
 
@@ -42,10 +42,12 @@ Architecture decisions completed before this branch:
 - [x] Use selective Serializable transactions with bounded retries and database constraints for allocation and money-related workflows.
 - [x] Use Bolivia civil time for every Branch and application surface, with timezone-aware instants for storage and transport.
 - [x] Reconcile due database state periodically into idempotent pg-boss jobs that recheck authoritative state before acting.
+- [x] Materialize weekly Session Schedules and Availability Blocks into concrete occurrences inside the future booking window.
 
 Next decisions in this branch, in order:
 
-- [ ] Define recurrence and concrete schedule-materialization conventions.
+- [ ] Define idempotency-key conventions for retry-sensitive commands.
+- [ ] Define pagination, filtering, sorting, and HTTP caching conventions.
 
 Deferred identity work:
 
@@ -63,8 +65,8 @@ Deferred pre-release requirement from the covered admin-web branch:
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
 | Backend structure | Covered | TypeScript pnpm monorepo with plain pnpm task orchestration, one-way public-package dependencies, ESLint import restrictions, and Jest architecture tests; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Revisit only if measured build performance or boundary complexity outgrows the initial conventions. |
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations; selective Serializable transactions with bounded retries and database constraints for critical workflows | Confirm each workflow's exact constraints and transaction boundary during schema design before its migration is approved. |
-| API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client | Automate breaking-change comparison; define pagination, filtering, idempotency, and caching conventions as the first endpoints are designed. |
-| Time and scheduling | In progress | Domain-defined Session times, Cancellation Window, expirations, and delayed work; one `America/La_Paz` business zone with timezone-aware stored instants and UTC API transport; database-clock reconcilers dispatching idempotent pg-boss jobs | Define recurrence and concrete schedule materialization. |
+| API contract | In progress | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client | Automate breaking-change comparison; define idempotency, pagination, filtering, sorting, and caching conventions. |
+| Time and scheduling | Covered | Domain-defined Session times, Cancellation Window, expirations, and delayed work; one `America/La_Paz` business zone with timezone-aware stored instants and UTC API transport; database-clock reconcilers dispatching idempotent pg-boss jobs; recurring definitions materialized into concrete occurrences | Set the future booking window and recurring-edit behavior with the scheduling product rules. |
 | Identity and access | Covered | Account boundary; backend-managed authentication with neutral enumeration-resistant public flows; opaque Authentication Sessions; transactionally queued encrypted authentication email through SendPulse with bounded retries, neutral public status, and authorized pending-invitation visibility; accepted session and initial abuse-control policies; mandatory first-login Administrator TOTP, recovery codes, secure factor replacement, and password-plus-email emergency recovery; fixed Roles with use-case-owned contextual authorization; focused append-only audit records | Administrator-to-Staff-Member mobile impersonation remains explicitly deferred. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
 | Admin-web architecture | Covered | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Jest, React Testing Library, MSW, and Playwright; GitHub Actions production deployments to Vercel; immediate protected Vercel previews using Render and Neon development services; Git-revert rollback | Define and test cookie, CSRF, and browser-session integration during implementation before release; revisit the stack only when a measured requirement challenges it. |
@@ -80,7 +82,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 
 Work down this list unless the current decision exposes a dependency that must be resolved first:
 
-1. Set time, timezone, scheduling, idempotency, pagination, and caching conventions shared by the API and jobs.
+1. Set idempotency, pagination, filtering, sorting, and caching conventions shared by the API and jobs.
 2. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
 3. Complete the test architecture and personal-data lifecycle rules before handling real user data.
 
