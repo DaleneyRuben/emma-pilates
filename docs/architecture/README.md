@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**API reliability and collection conventions** is the active architecture branch. [ADR-0060](../adr/0060-require-idempotency-keys-for-retry-sensitive-commands.md) protects retry-sensitive commands with Account-scoped idempotency keys and replayed outcomes. [ADR-0061](../adr/0061-use-contextual-pagination-styles.md) assigns cursor pagination to changing mobile collections and page-and-offset pagination to bounded admin tables, with one style per endpoint. [ADR-0062](../adr/0062-allowlist-collection-filters-and-sorts.md) gives each endpoint an explicit, typed allowlist of filters and sort choices. The next decision will establish HTTP caching conventions.
+**Background-processing reliability** is the active architecture branch. The API reliability and collection-conventions branch is now covered by [ADR-0060](../adr/0060-require-idempotency-keys-for-retry-sensitive-commands.md), [ADR-0061](../adr/0061-use-contextual-pagination-styles.md), [ADR-0062](../adr/0062-allowlist-collection-filters-and-sorts.md), and [ADR-0063](../adr/0063-use-private-conditional-http-caching.md). Background work already uses the durable, at-least-once pg-boss foundation in [ADR-0024](../adr/0024-use-pg-boss-for-durable-background-jobs.md) and the recoverable reconciler pattern in [ADR-0058](../adr/0058-reconcile-due-work-into-pg-boss.md). The next decision will set how job families choose retries and execution timeouts.
 
 Architecture decisions completed before this branch:
 
@@ -46,10 +46,13 @@ Architecture decisions completed before this branch:
 - [x] Require Account-scoped idempotency keys for client commands whose retry could duplicate a business effect.
 - [x] Use cursor pagination for changing mobile collections and page-and-offset pagination for bounded admin tables, with one style per endpoint.
 - [x] Expose only endpoint-specific, typed, allowlisted filters and sort choices.
+- [x] Use TanStack Query for presentation caching, private conditional HTTP caching for suitable reads, and `no-store` for sensitive responses.
 
 Next decisions in this branch, in order:
 
-- [ ] Define HTTP caching conventions.
+- [ ] Define job-family retry and execution-timeout policies.
+- [ ] Define failed-job retention, inspection, and recovery.
+- [ ] Define background-worker monitoring and alerts.
 
 Deferred identity work:
 
@@ -67,12 +70,12 @@ Deferred pre-release requirement from the covered admin-web branch:
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
 | Backend structure | Covered | TypeScript pnpm monorepo with plain pnpm task orchestration, one-way public-package dependencies, ESLint import restrictions, and Jest architecture tests; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Revisit only if measured build performance or boundary complexity outgrows the initial conventions. |
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations; selective Serializable transactions with bounded retries and database constraints for critical workflows | Confirm each workflow's exact constraints and transaction boundary during schema design before its migration is approved. |
-| API contract | In progress | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client; Account-scoped idempotency keys with replayed outcomes for retry-sensitive commands; contextual pagination; endpoint-specific allowlisted filters and sorts | Automate breaking-change comparison; define caching conventions. |
+| API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client; Account-scoped idempotency keys with replayed outcomes for retry-sensitive commands; contextual pagination; endpoint-specific allowlisted filters and sorts; private conditional caching with sensitive-response opt-out | Automate breaking-change comparison as part of implementation. |
 | Time and scheduling | Covered | Domain-defined Session times, Cancellation Window, expirations, and delayed work; one `America/La_Paz` business zone with timezone-aware stored instants and UTC API transport; database-clock reconcilers dispatching idempotent pg-boss jobs; recurring definitions materialized into concrete occurrences | Set the future booking window and recurring-edit behavior with the scheduling product rules. |
 | Identity and access | Covered | Account boundary; backend-managed authentication with neutral enumeration-resistant public flows; opaque Authentication Sessions; transactionally queued encrypted authentication email through SendPulse with bounded retries, neutral public status, and authorized pending-invitation visibility; accepted session and initial abuse-control policies; mandatory first-login Administrator TOTP, recovery codes, secure factor replacement, and password-plus-email emergency recovery; fixed Roles with use-case-owned contextual authorization; focused append-only audit records | Administrator-to-Staff-Member mobile impersonation remains explicitly deferred. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
 | Admin-web architecture | Covered | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Jest, React Testing Library, MSW, and Playwright; GitHub Actions production deployments to Vercel; immediate protected Vercel previews using Render and Neon development services; Git-revert rollback | Define and test cookie, CSRF, and browser-session integration during implementation before release; revisit the stack only when a measured requirement challenges it. |
-| Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs; recurring database-state reconcilers for recoverable due work | Retry timings, retention, dead-letter operations, per-family reconciliation intervals, and monitoring. |
+| Background processing | In progress | pg-boss; separate worker service; at-least-once idempotent jobs; recurring database-state reconcilers for recoverable due work | Retry and timeout policies, retention, dead-letter operations, per-family reconciliation intervals, and monitoring. |
 | Notifications | Queued | Expo Push Service; Account-owned device endpoints; durable delivery jobs | Permission prompt, notification catalog, user preferences, badges, sounds, and operational visibility. |
 | Uploaded images | Queued | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces | Signed-URL lifetime, dimensions and byte limits, transformations, content and malware checks, retention, deletion, and public delivery. |
 | Hosting and delivery | Partly covered | One immutable backend image run with separate API, worker, and migration commands; Northflank production API and worker; Aiven production PostgreSQL; R2 backups; GitHub Actions; local and disposable CI PostgreSQL; Render development API with Neon development PostgreSQL; immediate protected Vercel previews; Vercel admin web production deployed as validated prebuilt output from GitHub Actions with Git-revert rollback; EAS Build and EAS Submit for manual mobile store releases; controlled EAS Updates | Define production migration sequencing and provider configuration. |
@@ -84,9 +87,8 @@ Deferred pre-release requirement from the covered admin-web branch:
 
 Work down this list unless the current decision exposes a dependency that must be resolved first:
 
-1. Set HTTP caching conventions for the API clients.
-2. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
-3. Complete the test architecture and personal-data lifecycle rules before handling real user data.
+1. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
+2. Complete the test architecture and personal-data lifecycle rules before handling real user data.
 
 ## Update rule
 
