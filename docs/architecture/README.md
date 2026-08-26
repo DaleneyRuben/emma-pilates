@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**API reliability and collection conventions** is the active architecture branch. [ADR-0060](../adr/0060-require-idempotency-keys-for-retry-sensitive-commands.md) protects retry-sensitive commands with Account-scoped idempotency keys and replayed outcomes. The next decision will establish how list endpoints express pagination, filtering, sorting, and caching without endpoint-specific invention.
+**API reliability and collection conventions** is the active architecture branch. [ADR-0060](../adr/0060-require-idempotency-keys-for-retry-sensitive-commands.md) protects retry-sensitive commands with Account-scoped idempotency keys and replayed outcomes. [ADR-0061](../adr/0061-use-contextual-pagination-styles.md) assigns cursor pagination to changing mobile collections and page-and-offset pagination to bounded admin tables, with one style per endpoint. The next decisions will establish filtering, sorting, and HTTP caching conventions without endpoint-specific invention.
 
 Architecture decisions completed before this branch:
 
@@ -44,10 +44,12 @@ Architecture decisions completed before this branch:
 - [x] Reconcile due database state periodically into idempotent pg-boss jobs that recheck authoritative state before acting.
 - [x] Materialize weekly Session Schedules and Availability Blocks into concrete occurrences inside the future booking window.
 - [x] Require Account-scoped idempotency keys for client commands whose retry could duplicate a business effect.
+- [x] Use cursor pagination for changing mobile collections and page-and-offset pagination for bounded admin tables, with one style per endpoint.
 
 Next decisions in this branch, in order:
 
-- [ ] Define pagination, filtering, sorting, and HTTP caching conventions.
+- [ ] Define allowlisted filtering and sorting conventions.
+- [ ] Define HTTP caching conventions.
 
 Deferred identity work:
 
@@ -65,7 +67,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
 | Backend structure | Covered | TypeScript pnpm monorepo with plain pnpm task orchestration, one-way public-package dependencies, ESLint import restrictions, and Jest architecture tests; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Revisit only if measured build performance or boundary complexity outgrows the initial conventions. |
 | Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations; selective Serializable transactions with bounded retries and database constraints for critical workflows | Confirm each workflow's exact constraints and transaction boundary during schema design before its migration is approved. |
-| API contract | In progress | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client; Account-scoped idempotency keys with replayed outcomes for retry-sensitive commands | Automate breaking-change comparison; define pagination, filtering, sorting, and caching conventions. |
+| API contract | In progress | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client; Account-scoped idempotency keys with replayed outcomes for retry-sensitive commands; cursor pagination for changing mobile collections and page-and-offset pagination for bounded admin tables | Automate breaking-change comparison; define filtering, sorting, and caching conventions. |
 | Time and scheduling | Covered | Domain-defined Session times, Cancellation Window, expirations, and delayed work; one `America/La_Paz` business zone with timezone-aware stored instants and UTC API transport; database-clock reconcilers dispatching idempotent pg-boss jobs; recurring definitions materialized into concrete occurrences | Set the future booking window and recurring-edit behavior with the scheduling product rules. |
 | Identity and access | Covered | Account boundary; backend-managed authentication with neutral enumeration-resistant public flows; opaque Authentication Sessions; transactionally queued encrypted authentication email through SendPulse with bounded retries, neutral public status, and authorized pending-invitation visibility; accepted session and initial abuse-control policies; mandatory first-login Administrator TOTP, recovery codes, secure factor replacement, and password-plus-email emergency recovery; fixed Roles with use-case-owned contextual authorization; focused append-only audit records | Administrator-to-Staff-Member mobile impersonation remains explicitly deferred. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
@@ -82,7 +84,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 
 Work down this list unless the current decision exposes a dependency that must be resolved first:
 
-1. Set pagination, filtering, sorting, and caching conventions shared by the API and jobs.
+1. Set filtering, sorting, and caching conventions shared by the API and jobs.
 2. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
 3. Complete the test architecture and personal-data lifecycle rules before handling real user data.
 
