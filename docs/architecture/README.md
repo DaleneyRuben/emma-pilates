@@ -21,9 +21,9 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Identity and access** is the active architecture branch. [ADR-0009](../adr/0009-separate-system-account-from-domain-identities.md) separates the system Account from Client and Staff Member identities, [ADR-0029](../adr/0029-manage-authentication-in-the-nestjs-backend.md) establishes backend-managed email authentication and its activation and recovery journeys, [ADR-0030](../adr/0030-use-opaque-server-side-authentication-sessions.md) defines opaque server-side Authentication Sessions, [ADR-0031](../adr/0031-use-sendpulse-for-transactional-email.md) isolates SendPulse behind a project-owned delivery interface, [ADR-0053](../adr/0053-require-totp-mfa-for-administrators.md) requires TOTP MFA with recovery codes for Administrators, and [ADR-0054](../adr/0054-enforce-contextual-authorization-in-use-cases.md) establishes fixed Roles with use-case-owned ownership and Branch checks. The backend implementation stack and shared-package branch is now covered, including the import and architecture-test enforcement conventions added to [ADR-0013](../adr/0013-use-a-pnpm-monorepo.md).
+**Transactional integrity and concurrency** is the active architecture branch. [ADR-0011](../adr/0011-use-postgresql-with-schema-per-bounded-context.md) selects one transactional PostgreSQL database, and [ADR-0015](../adr/0015-use-prisma-for-postgresql-access.md) requires short interactive transactions, database constraints, and bounded retries for critical workflows. The next decision will establish the shared isolation and conflict-handling strategy before applying it to Booking, capacity, Waitlist, Payment, Credit, and Referral workflows.
 
-Resolved within this branch:
+Identity and access decisions completed before this branch:
 
 - [x] Keep Account credentials and Authentication Sessions separate from Client and Staff Member domain identities.
 - [x] Manage email-only authentication, verification, activation, and password recovery in the NestJS backend.
@@ -38,11 +38,16 @@ Resolved within this branch:
 - [x] Require the current password and existing TOTP or recovery code to replace an Administrator factor, then rotate recovery codes and revoke every other Authentication Session.
 - [x] Recover an Administrator who has lost every factor through the current password and a single-use link sent to the verified email address.
 - [x] Enforce fixed Roles plus resource ownership, operational relationship, and Branch scope in backend use cases with default-deny tests.
+- [x] Store focused, append-only audit records for sensitive security, financial, and administrative events in the same PostgreSQL transaction as successful changes.
 
 Next decisions in this branch, in order:
 
-- [ ] Define security audit events.
-- [ ] Design the deferred Administrator-to-Staff-Member mobile impersonation feature.
+- [ ] Define the shared transaction-isolation, conflict-detection, and bounded-retry strategy.
+- [ ] Apply the strategy to Booking allowance and capacity, Waitlist promotion, Payment confirmation, Credit application, and Referral rewards.
+
+Deferred identity work:
+
+- [ ] Design Administrator-to-Staff-Member mobile impersonation when that future feature is prioritized.
 
 Deferred pre-release requirement from the covered admin-web branch:
 
@@ -55,16 +60,16 @@ Deferred pre-release requirement from the covered admin-web branch:
 | Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership and Back Office glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
 | Backend structure | Covered | TypeScript pnpm monorepo with plain pnpm task orchestration, one-way public-package dependencies, ESLint import restrictions, and Jest architecture tests; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Revisit only if measured build performance or boundary complexity outgrows the initial conventions. |
-| Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
+| Persistence | In progress | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations | Select transaction isolation, database constraints, and bounded-retry behavior for concurrency-sensitive workflows. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client | Automate breaking-change comparison; define pagination, filtering, idempotency, and caching conventions as the first endpoints are designed. |
-| Identity and access | In progress | Account boundary; backend-managed authentication with neutral enumeration-resistant public flows; opaque Authentication Sessions; transactionally queued encrypted authentication email through SendPulse with bounded retries, neutral public status, and authorized pending-invitation visibility; accepted session and initial abuse-control policies; mandatory first-login Administrator TOTP, recovery codes, secure factor replacement, and password-plus-email emergency recovery; fixed Roles with use-case-owned contextual authorization | Complete audit events and the deferred impersonation design. |
+| Identity and access | Covered | Account boundary; backend-managed authentication with neutral enumeration-resistant public flows; opaque Authentication Sessions; transactionally queued encrypted authentication email through SendPulse with bounded retries, neutral public status, and authorized pending-invitation visibility; accepted session and initial abuse-control policies; mandatory first-login Administrator TOTP, recovery codes, secure factor replacement, and password-plus-email emergency recovery; fixed Roles with use-case-owned contextual authorization; focused append-only audit records | Administrator-to-Staff-Member mobile impersonation remains explicitly deferred. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
 | Admin-web architecture | Covered | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Jest, React Testing Library, MSW, and Playwright; GitHub Actions production deployments to Vercel; immediate protected Vercel previews using Render and Neon development services; Git-revert rollback | Define and test cookie, CSRF, and browser-session integration during implementation before release; revisit the stack only when a measured requirement challenges it. |
 | Background processing | Queued | pg-boss; separate worker service; at-least-once idempotent jobs | Retry timings, retention, dead-letter operations, reconciliation schedules, and monitoring. |
 | Notifications | Queued | Expo Push Service; Account-owned device endpoints; durable delivery jobs | Permission prompt, notification catalog, user preferences, badges, sounds, and operational visibility. |
 | Uploaded images | Queued | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces | Signed-URL lifetime, dimensions and byte limits, transformations, content and malware checks, retention, deletion, and public delivery. |
 | Hosting and delivery | Partly covered | One immutable backend image run with separate API, worker, and migration commands; Northflank production API and worker; Aiven production PostgreSQL; R2 backups; GitHub Actions; local and disposable CI PostgreSQL; Render development API with Neon development PostgreSQL; immediate protected Vercel previews; Vercel admin web production deployed as validated prebuilt output from GitHub Actions with Git-revert rollback; EAS Build and EAS Submit for manual mobile store releases; controlled EAS Updates | Define production migration sequencing and provider configuration. |
-| Operations and security | Queued | Daily logical database backup and portable provider boundaries | Secrets, health and readiness checks, logs, metrics, tracing, error reporting, alerts, restore drills, recovery objectives, and incident runbooks. |
+| Operations and security | Queued | Daily logical database backup; portable provider boundaries; focused append-only PostgreSQL audit records for sensitive events | Secrets, health and readiness checks, logs, metrics, tracing, error reporting, alerts, audit retention, restore drills, recovery objectives, and incident runbooks. |
 | Testing architecture | Queued | CI quality gates and required unit, integration, contract, architecture, and end-to-end layers; Jest, Nest testing utilities, Supertest, and Testcontainers for backend; Jest, React Native Testing Library, and Maestro for mobile; Jest, React Testing Library, MSW, and Playwright for admin web | Select fixture and database-isolation strategy, automate OpenAPI compatibility and architecture boundaries, and define wider client test boundaries and final critical end-to-end journeys. |
 | Data governance | Queued | Sensitive notification and object-access constraints | Retention and deletion policies, Account closure, receipt and Evaluation data handling, audit retention, and any export requirements. |
 
@@ -72,12 +77,10 @@ Deferred pre-release requirement from the covered admin-web branch:
 
 Work down this list unless the current decision exposes a dependency that must be resolved first:
 
-1. Complete the backend implementation stack and shared-package conventions before scaffolding the backend.
-2. Return to the remaining identity, Authentication Session, authorization, and audit policies.
-3. Specify transactional and concurrency rules for Booking creation and Subscription allowance consumption, Session capacity, Waitlist promotion, Payment confirmation, Credit application, and Referral rewards.
-4. Set time, timezone, scheduling, idempotency, pagination, and caching conventions shared by the API and jobs.
-5. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
-6. Complete the test architecture and personal-data lifecycle rules before handling real user data.
+1. Specify transactional and concurrency rules for Booking creation and Subscription allowance consumption, Session capacity, Waitlist promotion, Payment confirmation, Credit application, and Referral rewards.
+2. Set time, timezone, scheduling, idempotency, pagination, and caching conventions shared by the API and jobs.
+3. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
+4. Complete the test architecture and personal-data lifecycle rules before handling real user data.
 
 ## Update rule
 
