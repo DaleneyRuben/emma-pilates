@@ -57,7 +57,7 @@ A link between a referring Client and a referred Client, established when the re
 _Avoid_: Invite
 
 **Branch**:
-A physical studio location with a single studio room, so two Sessions at the same Branch never overlap in time — a Branch's schedule is one class after another. Sessions, Evaluations/Availability Blocks, and staff assignments are scoped to a Branch. Plans and Subscriptions are studio-wide and not tied to a single Branch — a client's Subscription grants access at any Branch. (See [ADR-0001](./docs/adr/0001-model-branch-as-first-class-entity.md).)
+A physical studio location with a single studio room, so two Sessions at the same Branch never overlap in time — a Branch's schedule is one class after another. Every Branch uses Bolivia civil time rather than carrying its own time zone. Sessions, Evaluations/Availability Blocks, and staff assignments are scoped to a Branch. Plans and Subscriptions are studio-wide and not tied to a single Branch — a client's Subscription grants access at any Branch. (See [ADR-0001](./docs/adr/0001-model-branch-as-first-class-entity.md).)
 _Avoid_: Location, studio (when referring to a single site), site
 
 **Client**:
