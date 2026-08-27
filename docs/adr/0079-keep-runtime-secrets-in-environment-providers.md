@@ -1,0 +1,9 @@
+# Keep runtime secrets in environment providers
+
+Status: accepted
+
+Runtime secrets are stored in the protected configuration of the provider that runs the process and are separated across local, development, preview, and production environments. Northflank injects only the production values required by each API, worker, or migration command. Render holds development runtime values. Vercel receives only the admin web's environment-specific public configuration, and EAS manages mobile signing and build credentials; values embedded in a web or mobile bundle are never treated as secrets.
+
+GitHub Actions stores only credentials required to perform its deployment responsibilities, such as narrowly scoped Northflank or Vercel deployment access. It does not become the source of every database, R2, email, session, or other runtime credential. Secrets must not appear in source control, build arguments, generated artifacts, logs, preview configuration, or client bundles. Local development uses ignored environment files, while committed example files document names and safe placeholders only.
+
+Provider-managed runtime secrets were selected because the applications already depend on those providers at runtime and can receive values without copying them through CI. Centralizing every secret in GitHub was rejected because it would unnecessarily expose all runtime credentials to deployment workflows. Operating Vault, SOPS, or another dedicated secret platform was rejected initially because the small project does not justify another security-critical service; rotation and access procedures will still be documented before production credentials are issued.
