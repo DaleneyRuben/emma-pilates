@@ -1,0 +1,11 @@
+# Rebuild images during finalization
+
+Status: accepted
+
+Finalization moves an uploaded image into a processing state and dispatches an idempotent pg-boss job; the API does not decode or transform a potentially 20 MB image inside the HTTP request. The worker verifies the pending intent, object size, checksum, declared and detected format, and decoded dimensions under bounded memory, pixel, and execution limits. It fully decodes the image, applies its orientation, strips metadata and unrecognized trailing data, and re-encodes purpose-specific immutable serving variants. A file that cannot complete that process is rejected and never becomes attachable or publicly accessible.
+
+Receipts produce a readable high-resolution private image and a private thumbnail. Client profile photos produce display-sized private variants using the crop or framing supplied by the client experience. Promotion images produce optimized responsive variants but remain private until the owning Promotion is published. Exact output dimensions and quality are implementation constants derived from the approved screen layouts; clients receive stable asset representations rather than provider keys or transformation parameters.
+
+After every required variant is stored and its database state is finalized, the temporary original is deleted. Failed and abandoned originals remain isolated for the pending-object cleanup policy and are never served. The initial system does not run a separate antivirus service: it accepts only the non-animated raster formats in [ADR-0072](./0072-limit-images-by-upload-purpose.md), strictly decodes and rebuilds them, serves fixed image content types with sniffing disabled, and never executes uploaded content. Antivirus scanning can be added if new upload types or risk evidence justify it.
+
+Keeping validated originals unchanged was rejected because it would retain metadata, unpredictable encoding, and oversized delivery assets. Adding ClamAV immediately was rejected because operating another memory-heavy service provides limited additional protection for the narrow raster-only, decode-and-rebuild pipeline. Synchronous transformation in the API was rejected because large images would lengthen requests and compete with normal API traffic.
