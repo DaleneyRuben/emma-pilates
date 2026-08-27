@@ -1,0 +1,11 @@
+packages:
+  - apps/*
+  - packages/*
+
+allowBuilds:
+  unrs-resolver: true
+
+onlyBuiltDependencies:
+  - '@nestjs/core'
+  - esbuild
+  - unrs-resolver
