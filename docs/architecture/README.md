@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Operational readiness and recovery** is the active architecture branch. Hosting and delivery are covered: the backend uses one immutable image with separate API, worker, and migration commands under [ADR-0052](../adr/0052-run-backend-processes-from-one-deployable-package.md); [ADR-0078](../adr/0078-stage-production-database-migrations.md) serializes releases and stops safely on migration failure; and [ADR-0079](../adr/0079-keep-runtime-secrets-in-environment-providers.md) keeps environment-separated runtime secrets in the providers that consume them while limiting CI to deployment credentials. The next decision will define liveness, readiness, and post-deployment verification.
+**Operational readiness and recovery** is the active architecture branch. Hosting and delivery are covered, while [ADR-0079](../adr/0079-keep-runtime-secrets-in-environment-providers.md) keeps environment-separated runtime secrets in the providers that consume them. [ADR-0080](../adr/0080-separate-health-and-deployment-checks.md) separates API liveness from dependency-aware readiness, retains progress-based worker monitoring, and requires non-mutating post-deployment smoke checks. The next decision will define application logging, error reporting, and alert delivery.
 
 Architecture decisions completed before this branch:
 
@@ -63,10 +63,11 @@ Architecture decisions completed before this branch:
 - [x] Deliver active Promotion images through public, versioned, cacheable R2 URLs while every other image purpose remains private.
 - [x] Run serialized, backward-compatible production migrations before API and worker rollout, stopping the release on failure.
 - [x] Keep runtime secrets in environment-specific provider stores and give CI only narrowly scoped deployment credentials.
+- [x] Separate liveness, readiness, worker progress, and non-mutating post-deployment smoke checks.
 
 Next decisions in this branch, in order:
 
-- [ ] Define liveness, readiness, and post-deployment verification.
+- [ ] Define application logging, error reporting, and alert delivery.
 
 Deferred identity work:
 
@@ -93,7 +94,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 | Notifications | Covered | Expo Push Service; Account-owned device endpoints; durable delivery jobs; receipt handling; privacy-safe payloads; contextual optional permission prompt; four always-enabled role-relevant categories after permission; durable Account-level inbox and synchronized unread badge; standard sound for actionable events only | Add catalog entries and tune interruption behavior only when a concrete journey requires it. |
 | Uploaded images | Covered | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces; 15-minute upload URLs; five-minute private-view URLs; JPEG, PNG, and WebP with purpose-specific limits; asynchronous decode-and-rebuild processing with metadata stripping and safe variants; 24-hour cleanup for unattached uploads; 45-day finalized receipt retention; immediate deletion of detached profile-photo and Promotion-image variants; versioned public delivery for active Promotions only | Set exact serving dimensions and encoding quality during implementation from approved designs. |
 | Hosting and delivery | Covered | One immutable backend image run with separate API, worker, and migration commands; serialized expand-and-contract migrations before rollout with failure stopping the release; Northflank production API and worker; Aiven production PostgreSQL; environment-separated provider-managed runtime secrets; R2 backups; GitHub Actions with deployment-only credentials; local and disposable CI PostgreSQL; Render development API with Neon development PostgreSQL; immediate protected Vercel previews; Vercel admin web production deployed as validated prebuilt output from GitHub Actions with Git-revert rollback; EAS Build and EAS Submit for manual mobile store releases; controlled EAS Updates | Revisit provider choices when cost, quota, availability, or operating evidence crosses an accepted trigger. |
-| Operations and security | In progress | Environment-separated provider-managed secrets; daily logical database backup; portable provider boundaries; focused append-only PostgreSQL audit records for sensitive events | Health and readiness checks, deployment verification, logs, metrics, tracing, error reporting, alerts, audit retention, restore drills, recovery objectives, and incident runbooks. |
+| Operations and security | In progress | Environment-separated provider-managed secrets; separate API liveness and readiness; worker progress heartbeat; non-mutating release smoke checks; daily logical database backup; portable provider boundaries; focused append-only PostgreSQL audit records for sensitive events | Logs, metrics, tracing, error reporting, alert delivery, audit retention, restore drills, recovery objectives, rollback, and incident runbooks. |
 | Testing architecture | Queued | CI quality gates and required unit, integration, contract, architecture, and end-to-end layers; Jest, Nest testing utilities, Supertest, and Testcontainers for backend; Jest, React Native Testing Library, and Maestro for mobile; Jest, React Testing Library, MSW, and Playwright for admin web | Select fixture and database-isolation strategy, automate OpenAPI compatibility and architecture boundaries, and define wider client test boundaries and final critical end-to-end journeys. |
 | Data governance | Queued | Sensitive notification and object-access constraints; 45-day finalized receipt-image retention | Remaining personal-data retention and deletion policies, Account closure, Evaluation data handling, audit retention, and any export requirements. |
 
