@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-**Operational readiness and recovery** is the active architecture branch. Hosting and delivery are covered, while [ADR-0079](../adr/0079-keep-runtime-secrets-in-environment-providers.md) keeps environment-separated runtime secrets in the providers that consume them. [ADR-0080](../adr/0080-separate-health-and-deployment-checks.md) separates API liveness from dependency-aware readiness, retains progress-based worker monitoring, and requires non-mutating post-deployment smoke checks. The next decision will define application logging, error reporting, and alert delivery.
+**Operational readiness and recovery** is the active architecture branch. [ADR-0080](../adr/0080-separate-health-and-deployment-checks.md) separates API liveness from dependency-aware readiness, retains progress-based worker monitoring, and requires non-mutating post-deployment smoke checks. [ADR-0081](../adr/0081-use-provider-logs-and-better-stack-monitoring.md) keeps structured backend logs and infrastructure metrics in Northflank while Better Stack provides sanitized cross-application errors, external checks, heartbeats, and email alerts without session replay. The next decision will define backup retention and restore verification.
 
 Architecture decisions completed before this branch:
 
@@ -64,10 +64,11 @@ Architecture decisions completed before this branch:
 - [x] Run serialized, backward-compatible production migrations before API and worker rollout, stopping the release on failure.
 - [x] Keep runtime secrets in environment-specific provider stores and give CI only narrowly scoped deployment credentials.
 - [x] Separate liveness, readiness, worker progress, and non-mutating post-deployment smoke checks.
+- [x] Use structured provider logs plus Better Stack for sanitized errors, external checks, heartbeats, and email alerts.
 
 Next decisions in this branch, in order:
 
-- [ ] Define application logging, error reporting, and alert delivery.
+- [ ] Define backup retention and restore verification.
 
 Deferred identity work:
 
@@ -94,7 +95,7 @@ Deferred pre-release requirement from the covered admin-web branch:
 | Notifications | Covered | Expo Push Service; Account-owned device endpoints; durable delivery jobs; receipt handling; privacy-safe payloads; contextual optional permission prompt; four always-enabled role-relevant categories after permission; durable Account-level inbox and synchronized unread badge; standard sound for actionable events only | Add catalog entries and tune interruption behavior only when a concrete journey requires it. |
 | Uploaded images | Covered | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces; 15-minute upload URLs; five-minute private-view URLs; JPEG, PNG, and WebP with purpose-specific limits; asynchronous decode-and-rebuild processing with metadata stripping and safe variants; 24-hour cleanup for unattached uploads; 45-day finalized receipt retention; immediate deletion of detached profile-photo and Promotion-image variants; versioned public delivery for active Promotions only | Set exact serving dimensions and encoding quality during implementation from approved designs. |
 | Hosting and delivery | Covered | One immutable backend image run with separate API, worker, and migration commands; serialized expand-and-contract migrations before rollout with failure stopping the release; Northflank production API and worker; Aiven production PostgreSQL; environment-separated provider-managed runtime secrets; R2 backups; GitHub Actions with deployment-only credentials; local and disposable CI PostgreSQL; Render development API with Neon development PostgreSQL; immediate protected Vercel previews; Vercel admin web production deployed as validated prebuilt output from GitHub Actions with Git-revert rollback; EAS Build and EAS Submit for manual mobile store releases; controlled EAS Updates | Revisit provider choices when cost, quota, availability, or operating evidence crosses an accepted trigger. |
-| Operations and security | In progress | Environment-separated provider-managed secrets; separate API liveness and readiness; worker progress heartbeat; non-mutating release smoke checks; daily logical database backup; portable provider boundaries; focused append-only PostgreSQL audit records for sensitive events | Logs, metrics, tracing, error reporting, alert delivery, audit retention, restore drills, recovery objectives, rollback, and incident runbooks. |
+| Operations and security | In progress | Environment-separated provider-managed secrets; separate API liveness and readiness; worker progress heartbeat; non-mutating release smoke checks; structured Pino logs and Northflank infrastructure metrics; Better Stack errors, external checks, heartbeats, and email alerts; correlation IDs instead of full distributed tracing initially; daily logical database backup; portable provider boundaries; focused append-only PostgreSQL audit records for sensitive events | Backup retention, restore drills, recovery objectives, audit retention, rollback, and incident runbooks. |
 | Testing architecture | Queued | CI quality gates and required unit, integration, contract, architecture, and end-to-end layers; Jest, Nest testing utilities, Supertest, and Testcontainers for backend; Jest, React Native Testing Library, and Maestro for mobile; Jest, React Testing Library, MSW, and Playwright for admin web | Select fixture and database-isolation strategy, automate OpenAPI compatibility and architecture boundaries, and define wider client test boundaries and final critical end-to-end journeys. |
 | Data governance | Queued | Sensitive notification and object-access constraints; 45-day finalized receipt-image retention | Remaining personal-data retention and deletion policies, Account closure, Evaluation data handling, audit retention, and any export requirements. |
 
