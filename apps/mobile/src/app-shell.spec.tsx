@@ -33,4 +33,15 @@ describe('App', () => {
       backgroundColor: '#F2ECE5',
     });
   });
+
+  it('uses the approved Work Sans body styling for the studio tagline', async () => {
+    const screen = await render(<App />);
+
+    expect(
+      screen.getByLabelText('Movimiento, equilibrio, bienestar'),
+    ).toHaveStyle({
+      fontFamily: 'WorkSans_400Regular',
+      fontSize: 15,
+    });
+  });
 });
