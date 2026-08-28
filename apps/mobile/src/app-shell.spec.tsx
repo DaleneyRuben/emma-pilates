@@ -9,6 +9,15 @@ describe('App', () => {
     expect(screen.getByLabelText('Emma Pilates Studio')).toBeOnTheScreen();
   });
 
+  it('uses the approved Lora title styling for the application name', async () => {
+    const screen = await render(<App />);
+
+    expect(screen.getByLabelText('Emma Pilates Studio')).toHaveStyle({
+      fontFamily: 'Lora_500Medium',
+      fontSize: 30,
+    });
+  });
+
   it('provides a mobile-sized primary action', async () => {
     const screen = await render(<App />);
 
