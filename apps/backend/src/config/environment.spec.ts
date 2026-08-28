@@ -1,0 +1,19 @@
+import { validateEnvironment } from './environment';
+
+describe('environment configuration', () => {
+  it('rejects configuration when DATABASE_URL is missing', () => {
+    expect(() => validateEnvironment({ NODE_ENV: 'test' })).toThrow(
+      'DATABASE_URL',
+    );
+  });
+
+  it('converts the configured port to a number', () => {
+    const environment = validateEnvironment({
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+      PORT: '4100',
+    });
+
+    expect(environment.PORT).toBe(4100);
+  });
+});
