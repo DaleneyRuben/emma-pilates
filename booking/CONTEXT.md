@@ -9,7 +9,7 @@ A catalog definition of a purchasable offering — e.g. "8-Class Pack" — with 
 _Avoid_: Membership, package (when referring to the catalog entry)
 
 **Subscription**:
-A client's access to a Plan over a fixed date range (start date to a paid-through end date), with a status (active/expired) and a remaining class allowance carried over from the Plan. A client can only book a Session that falls within that date range and only while allowance remains — each Booking consumes one unit. A Subscription is active while it is inside its date range and either has allowance left or still has booked Sessions ahead of it; it expires when the date range ends, or when allowance is at zero and no booked Session remains — classes still unspent at the end date are lost. Cancelling one of those last Bookings returns its unit to the same Subscription, which is still the client's current one, so a returned class is never stranded. Nothing renews on its own, and a client holds one Subscription at a time: a new Plan can only be bought once the current one has expired, and the new date range begins only when a Payment is confirmed. Because booking beyond the end date is never allowed, expiration never orphans a future Booking. The client is sent a renewal reminder 3 days before the paid-through end date.
+A client's access to a Plan over a fixed date range (start date to a paid-through end date), with a status (active/expired) and a remaining class allowance carried over from the Plan. A client can only book a Session that falls within that date range and only while allowance remains — each Booking consumes one unit. A Subscription is active while it is inside its date range and either has allowance left or still has booked Sessions ahead of it; it expires when the date range ends, or when allowance is at zero and no booked Session remains — classes still unspent at the end date are lost. Cancelling one of those last Bookings returns its unit to the same Subscription, which is still the client's current one, so a returned class is never stranded. Nothing renews or extends an active Subscription: a client can buy a new Plan only after the current Subscription has expired, and confirming its Payment starts a new Subscription with the selected Plan's full date range and class allowance. Because booking beyond the end date is never allowed, expiration never orphans a future Booking. The client is sent a renewal reminder 3 days before the paid-through end date.
 _Avoid_: Membership
 
 **Class Type**:
@@ -21,7 +21,7 @@ A specific scheduled, bookable occurrence of a Class Type, at a given time, with
 _Avoid_: Class (when referring to a specific occurrence)
 
 **Session Schedule**:
-An Administrator-defined weekly pattern for a Class Type, Branch, Trainer, time, and normal capacity that generates concrete Sessions inside the future booking window. Each generated Session remains an independent occurrence so it can carry Bookings and exceptions without rewriting the pattern or history.
+An Administrator-defined weekly pattern for a Class Type, Branch, Trainer, time, and normal capacity that generates concrete Sessions up to 30 days ahead. A change takes effect from a selected future date and updates only unbooked future Sessions; Sessions that already have Bookings remain unchanged unless an Administrator explicitly edits or cancels them.
 _Avoid_: Recurring Session, schedule template
 
 **Booking**:
@@ -49,7 +49,7 @@ A one-on-one appointment between a client and the Nutritionist, booked against t
 _Avoid_: Appointment, session (when referring to a nutritionist evaluation)
 
 **Availability Block**:
-A recurring weekly open time range the Nutritionist publishes (e.g. "Tuesdays 9am–1pm") from which the system generates concrete, fixed-length, individually bookable Evaluation slots inside the future booking window.
+A recurring weekly open time range the Nutritionist publishes (e.g. "Tuesdays 9am–1pm") from which the system generates concrete, fixed-length, individually bookable Evaluation slots up to 30 days ahead. A change takes effect from a selected future date and updates only unbooked future slots; an Evaluation that is already booked remains unchanged unless it is explicitly cancelled.
 _Avoid_: Schedule, working hours
 
 **Credit**:
@@ -73,7 +73,7 @@ A person working for the studio, with exactly one Role (Trainer / Nutritionist /
 _Avoid_: User, employee, personal
 
 **Payment**:
-A record of money received for a Plan, with a method (transfer / cash), a status (pending / confirmed / rejected), and the amount the client was asked to pay — the Plan's price less any Credit — so a discounted Payment can be told apart from a short one. A transfer Payment is raised by the client themselves, by marking in the app that they've paid against the studio's QR code; the client attaches a screenshot of their transfer receipt as proof, and it stays pending, granting nothing, until an Administrator checks that screenshot against the money in the bank. Confirming it is what starts or extends the Subscription's date range and resets its class allowance. If the receipt doesn't hold up — amount doesn't match, no matching transfer found — the Administrator rejects it instead, with a short reason; the client sees why and must raise a new transfer Payment with a corrected receipt, the rejected one now settled and final. A push notification tells the Administrator one is waiting so the client isn't kept out of a class they've paid for. A cash Payment is recorded by an Assistant with the money in hand, and is confirmed the moment they record it — cash Payments are never rejected.
+A record of money received for a Plan, with a method (transfer / cash), a status (pending / confirmed / rejected), and the Money Amount the client was asked to pay — the Plan's price less any Credit — so a reduced Payment can be told apart from a short one. A Payment can be raised only after the client's current Subscription has expired. A transfer Payment is raised by the client themselves, by marking in the app that they've paid against the studio's QR code; the client attaches a screenshot of their transfer receipt as proof, and it stays pending, granting nothing, until an Administrator checks that screenshot against the money in the bank. Confirming it starts a new Subscription with the selected Plan's full date range and class allowance; it never extends or resets an active Subscription. If the receipt doesn't hold up — amount doesn't match, no matching transfer found — the Administrator rejects it instead, with a short reason; the client sees why and must raise a new transfer Payment with a corrected receipt, the rejected one now settled and final. A push notification tells the Administrator one is waiting so the client isn't kept out of a class they've paid for. A cash Payment is recorded by an Assistant with the money in hand, and is confirmed the moment they record it — cash Payments are never rejected.
 _Avoid_: Charge, transaction, pendiente / completado (UI labels for pending / confirmed)
 
 **Promotion**:

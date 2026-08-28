@@ -15,15 +15,15 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 ## Status meanings
 
 - **Covered**: the important architectural decisions are accepted. Revisit only when a requirement or measured constraint changes.
-- **In progress**: this is the single branch currently being resolved one decision at a time.
+- **In progress**: architecture work that blocks the implementation currently under way.
 - **Queued**: important decisions remain, but they are not the current focus.
 - **Deferred**: deliberately excluded from the initial release or postponed until a stated trigger occurs.
 
 ## Current focus
 
-**Operational readiness and recovery** is the active architecture branch. [ADR-0080](../adr/0080-separate-health-and-deployment-checks.md) separates API liveness from dependency-aware readiness, retains progress-based worker monitoring, and requires non-mutating post-deployment smoke checks. [ADR-0081](../adr/0081-use-provider-logs-and-better-stack-monitoring.md) keeps structured backend logs and infrastructure metrics in Northflank while Better Stack provides sanitized cross-application errors, external checks, heartbeats, and email alerts without session replay. The next decision will define backup retention and restore verification.
+The architecture is sufficient to begin implementation. The active work is the application foundation: backend configuration, the `/api/v1` transport boundary, Prisma and local PostgreSQL, and generation of the first OpenAPI client package. Remaining architecture questions are handled when their affected feature begins or when their stated release gate approaches; they do not block unrelated scaffolding.
 
-Architecture decisions completed before this branch:
+Accepted architecture decisions:
 
 - [x] Keep Account credentials and Authentication Sessions separate from Client and Staff Member domain identities.
 - [x] Manage email-only authentication, verification, activation, and password recovery in the NestJS backend.
@@ -42,7 +42,7 @@ Architecture decisions completed before this branch:
 - [x] Use selective Serializable transactions with bounded retries and database constraints for allocation and money-related workflows.
 - [x] Use Bolivia civil time for every Branch and application surface, with timezone-aware instants for storage and transport.
 - [x] Reconcile due database state periodically into idempotent pg-boss jobs that recheck authoritative state before acting.
-- [x] Materialize weekly Session Schedules and Availability Blocks into concrete occurrences inside the future booking window.
+- [x] Materialize weekly Session Schedules and Availability Blocks into concrete occurrences up to 30 days ahead.
 - [x] Require Account-scoped idempotency keys for client commands whose retry could duplicate a business effect.
 - [x] Use cursor pagination for changing mobile collections and page-and-offset pagination for bounded admin tables, with one style per endpoint.
 - [x] Expose only endpoint-specific, typed, allowlisted filters and sort choices.
@@ -51,60 +51,63 @@ Architecture decisions completed before this branch:
 - [x] Retain failed jobs for 30 days with sanitized diagnostics and controlled, traceable replay.
 - [x] Monitor worker heartbeat, queue age, failures, and reconciler progress with actionable out-of-band alerts.
 - [x] Request optional notification permission in context and never repeatedly prompt after denial.
-- [x] Enable Booking and schedule updates, reminders, membership and Payment updates, and studio announcements together without per-category opt-outs initially.
+- [x] Enable Booking and schedule updates, reminders, Subscription and Payment updates, and studio announcements together without per-category opt-outs initially.
 - [x] Set the app-icon badge to the Account-level unread notification inbox count across devices.
 - [x] Use the standard operating-system sound only for time-sensitive or actionable notifications.
 - [x] Limit signed upload URLs to 15 minutes and private-view URLs to five minutes.
 - [x] Accept JPEG, PNG, and WebP with purpose-specific dimensions and 10 MB receipt, 5 MB profile-photo, and 20 MB Promotion limits.
 - [x] Asynchronously decode and rebuild safe image variants, remove metadata and temporary originals, and omit a separate antivirus service initially.
 - [x] Delete pending uploads and failed processing artifacts that remain unattached after 24 hours.
-- [x] Delete finalized transfer-receipt images 45 days after successful finalization.
+- [x] Retain a transfer receipt while its Payment is pending, then delete it at the later of 45 days after upload or seven days after the decision.
 - [x] Delete profile-photo and Promotion-image variants immediately after removal, replacement, or owner deletion.
 - [x] Deliver active Promotion images through public, versioned, cacheable R2 URLs while every other image purpose remains private.
 - [x] Run serialized, backward-compatible production migrations before API and worker rollout, stopping the release on failure.
 - [x] Keep runtime secrets in environment-specific provider stores and give CI only narrowly scoped deployment credentials.
 - [x] Separate liveness, readiness, worker progress, and non-mutating post-deployment smoke checks.
 - [x] Use structured provider logs plus Better Stack for sanitized errors, external checks, heartbeats, and email alerts.
+- [x] Represent every Money Amount as integer BOB centavos across PostgreSQL, TypeScript, and the REST API.
+- [x] Bootstrap the first Administrator through an explicit idempotent command and the normal Activation Link flow.
+- [x] Proxy admin-web `/api/v1` requests through the current Vercel origin with host-only cookies and exact trusted-origin checks.
+- [x] Materialize Sessions and Evaluation slots 30 days ahead, applying recurring changes only to unbooked future occurrences from their selected effective date.
 
-Next decisions in this branch, in order:
+Implementation gates:
 
-- [ ] Define backup retention and restore verification.
+- [x] Before Subscription purchasing: a Payment can be raised only after the current Subscription expires; confirmation starts a new Subscription, and all Money Amounts use integer BOB centavos.
+- [x] Before recurring schedules: materialize 30 days ahead and preserve booked future occurrences when their recurring definition changes.
+- [x] Before admin-web authentication: use the Vercel origin proxy, host-only cookies, and exact trusted-origin checks.
+- [x] Before first production access: bootstrap the initial Administrator through an explicit idempotent command and normal activation flow.
+- [ ] Before production credentials or real user data: define backup retention and restore verification, personal-data lifecycle rules, and incident recovery procedures.
 
 Deferred identity work:
 
 - [ ] Design Administrator-to-Staff-Member mobile impersonation when that future feature is prioritized.
 
-Deferred pre-release requirement from the covered admin-web branch:
-
-- [ ] Define and test cookie, CSRF, CORS or same-origin proxying, and browser-session integration using the actual admin-web and API origins. Do not ship the admin web before this security boundary is resolved.
-
 ## Coverage map
 
 | Area | Status | Accepted foundation | Remaining architecture work |
 | --- | --- | --- | --- |
-| Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership and Back Office glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
+| Domain language and boundaries | Covered, ongoing | Context Map; Booking & Membership, Back Office, and System Identity glossaries; Booking ADRs | Keep glossaries and context ADRs current as new rules crystallize. |
 | Application surfaces | Covered | One role-routed Expo mobile app, separate admin web, urgent Administrator work split across surfaces | Revisit only if a new workflow challenges the urgent-mobile versus deliberate-desktop boundary. |
 | Backend structure | Covered | TypeScript pnpm monorepo with plain pnpm task orchestration, one-way public-package dependencies, ESLint import restrictions, and Jest architecture tests; NestJS modular monolith; context-owned module interfaces; one backend image with separate API, pg-boss worker, and migration commands; Jest, Nest testing utilities, Supertest, and disposable PostgreSQL through Testcontainers; Orval-generated API contracts; fail-fast typed configuration with Nest Config and Zod | Revisit only if measured build performance or boundary complexity outgrows the initial conventions. |
-| Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations; selective Serializable transactions with bounded retries and database constraints for critical workflows | Confirm each workflow's exact constraints and transaction boundary during schema design before its migration is approved. |
+| Persistence | Covered | PostgreSQL schemas per context; Prisma behind context-owned repositories; explicit migrations; integer BOB centavos for every Money Amount; selective Serializable transactions with bounded retries and database constraints for critical workflows | Confirm each workflow's exact constraints and transaction boundary during schema design before its migration is approved. |
 | API contract | Covered | First-party REST; NestJS code-first OpenAPI; `/api/v1`; current and previous mobile releases; RFC 9457 errors; committed Orval-generated Fetch and TanStack Query client; Account-scoped idempotency keys with replayed outcomes for retry-sensitive commands; contextual pagination; endpoint-specific allowlisted filters and sorts; private conditional caching with sensitive-response opt-out | Automate breaking-change comparison as part of implementation. |
-| Time and scheduling | Covered | Domain-defined Session times, Cancellation Window, expirations, and delayed work; one `America/La_Paz` business zone with timezone-aware stored instants and UTC API transport; database-clock reconcilers dispatching idempotent pg-boss jobs; recurring definitions materialized into concrete occurrences | Set the future booking window and recurring-edit behavior with the scheduling product rules. |
-| Identity and access | Covered | Account boundary; backend-managed authentication with neutral enumeration-resistant public flows; opaque Authentication Sessions; transactionally queued encrypted authentication email through SendPulse with bounded retries, neutral public status, and authorized pending-invitation visibility; accepted session and initial abuse-control policies; mandatory first-login Administrator TOTP, recovery codes, secure factor replacement, and password-plus-email emergency recovery; fixed Roles with use-case-owned contextual authorization; focused append-only audit records | Administrator-to-Staff-Member mobile impersonation remains explicitly deferred. |
+| Time and scheduling | Covered | Domain-defined Session times, Cancellation Window, expirations, and delayed work; one `America/La_Paz` business zone with timezone-aware stored instants and UTC API transport; database-clock reconcilers dispatching idempotent pg-boss jobs; recurring definitions materialized 30 days ahead; recurring edits preserve booked future occurrences | Revisit only when scheduling experience provides evidence that the 30-day window or preservation rule should change. |
+| Identity and access | Covered | Account boundary and glossary; backend-managed authentication with neutral enumeration-resistant public flows; opaque Authentication Sessions; transactionally queued encrypted authentication email through SendPulse with bounded retries, neutral public status, and authorized pending-invitation visibility; explicit first-Administrator bootstrap command; accepted session and initial abuse-control policies; mandatory first-login Administrator TOTP, recovery codes, secure factor replacement, and password-plus-email emergency recovery; fixed Roles with use-case-owned contextual authorization; focused append-only audit records | Administrator-to-Staff-Member mobile impersonation remains explicitly deferred. |
 | Mobile architecture | Covered | Expo with React Native; generated REST client; Expo Push Service; React Navigation static configuration; TanStack Query; React Hook Form with Zod; local React state and narrow Context; online-first read-only cache in AsyncStorage; credentials in SecureStore; verified HTTPS links through one authenticated ingress; Jest, React Native Testing Library, and Maestro; manual EAS Build and EAS Submit store releases after CI; controlled EAS Updates for small compatible fixes | Set cache lifetime and storage limits during implementation; revisit only when a native or product requirement challenges the accepted boundaries. |
-| Admin-web architecture | Covered | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Jest, React Testing Library, MSW, and Playwright; GitHub Actions production deployments to Vercel; immediate protected Vercel previews using Render and Neon development services; Git-revert rollback | Define and test cookie, CSRF, and browser-session integration during implementation before release; revisit the stack only when a measured requirement challenges it. |
+| Admin-web architecture | Covered | Vite, React, and TanStack Router; static SPA; project-owned shadcn/ui components with Tailwind design tokens and Radix behavior; TanStack Table; React Hook Form with Zod; TanStack Query with local React state and narrow Context; Vercel-origin `/api/v1` proxy with host-only cookies and exact trusted-origin checks; Jest, React Testing Library, MSW, and Playwright; GitHub Actions production deployments to Vercel; immediate protected Vercel previews using Render and Neon development services; Git-revert rollback | Verify proxy forwarding, cookies, and origin checks against actual preview and production deployments before authentication ships. |
 | Background processing | Covered | pg-boss; separate worker service; at-least-once idempotent jobs; recurring database-state reconcilers for recoverable due work; bounded retry and execution-timeout presets by job family; 30-day failed-job retention with controlled replay; structured signals and actionable out-of-band alerts | Set job-family thresholds and reconciliation intervals during implementation and tune them from operating evidence. |
 | Notifications | Covered | Expo Push Service; Account-owned device endpoints; durable delivery jobs; receipt handling; privacy-safe payloads; contextual optional permission prompt; four always-enabled role-relevant categories after permission; durable Account-level inbox and synchronized unread badge; standard sound for actionable events only | Add catalog entries and tune interruption behavior only when a concrete journey requires it. |
-| Uploaded images | Covered | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces; 15-minute upload URLs; five-minute private-view URLs; JPEG, PNG, and WebP with purpose-specific limits; asynchronous decode-and-rebuild processing with metadata stripping and safe variants; 24-hour cleanup for unattached uploads; 45-day finalized receipt retention; immediate deletion of detached profile-photo and Promotion-image variants; versioned public delivery for active Promotions only | Set exact serving dimensions and encoding quality during implementation from approved designs. |
+| Uploaded images | Covered | Cloudflare R2; direct signed uploads; backend finalization; private and public namespaces; 15-minute upload URLs; five-minute private-view URLs; JPEG, PNG, and WebP with purpose-specific limits; asynchronous decode-and-rebuild processing with metadata stripping and safe variants; 24-hour cleanup for unattached uploads; pending-Payment receipt retention followed by deletion at the later of 45 days after upload or seven days after decision; immediate deletion of detached profile-photo and Promotion-image variants; versioned public delivery for active Promotions only | Set exact serving dimensions and encoding quality during implementation from approved designs. |
 | Hosting and delivery | Covered | One immutable backend image run with separate API, worker, and migration commands; serialized expand-and-contract migrations before rollout with failure stopping the release; Northflank production API and worker; Aiven production PostgreSQL; environment-separated provider-managed runtime secrets; R2 backups; GitHub Actions with deployment-only credentials; local and disposable CI PostgreSQL; Render development API with Neon development PostgreSQL; immediate protected Vercel previews; Vercel admin web production deployed as validated prebuilt output from GitHub Actions with Git-revert rollback; EAS Build and EAS Submit for manual mobile store releases; controlled EAS Updates | Revisit provider choices when cost, quota, availability, or operating evidence crosses an accepted trigger. |
-| Operations and security | In progress | Environment-separated provider-managed secrets; separate API liveness and readiness; worker progress heartbeat; non-mutating release smoke checks; structured Pino logs and Northflank infrastructure metrics; Better Stack errors, external checks, heartbeats, and email alerts; correlation IDs instead of full distributed tracing initially; daily logical database backup; portable provider boundaries; focused append-only PostgreSQL audit records for sensitive events | Backup retention, restore drills, recovery objectives, audit retention, rollback, and incident runbooks. |
+| Operations and security | Queued | Environment-separated provider-managed secrets; separate API liveness and readiness; worker progress heartbeat; non-mutating release smoke checks; structured Pino logs and Northflank infrastructure metrics; Better Stack errors, external checks, heartbeats, and email alerts; correlation IDs instead of full distributed tracing initially; daily logical database backup; portable provider boundaries; focused append-only PostgreSQL audit records for sensitive events | Before production: backup retention, restore drills, recovery objectives, audit retention, rollback, and incident runbooks. |
 | Testing architecture | Queued | CI quality gates and required unit, integration, contract, architecture, and end-to-end layers; Jest, Nest testing utilities, Supertest, and Testcontainers for backend; Jest, React Native Testing Library, and Maestro for mobile; Jest, React Testing Library, MSW, and Playwright for admin web | Select fixture and database-isolation strategy, automate OpenAPI compatibility and architecture boundaries, and define wider client test boundaries and final critical end-to-end journeys. |
-| Data governance | Queued | Sensitive notification and object-access constraints; 45-day finalized receipt-image retention | Remaining personal-data retention and deletion policies, Account closure, Evaluation data handling, audit retention, and any export requirements. |
+| Data governance | Queued | Sensitive notification and object-access constraints; transfer receipts retained through Payment review and deleted on the accepted post-decision schedule | Remaining personal-data retention and deletion policies, Account closure, Evaluation data handling, audit retention, and any export requirements. |
 
-## Ordered work queue
+## Delivery order
 
-Work down this list unless the current decision exposes a dependency that must be resolved first:
-
-1. Complete background-job, notification, uploaded-image, deployment, observability, backup, rollback, and incident-response policies.
-2. Complete the test architecture and personal-data lifecycle rules before handling real user data.
+1. Build the application foundation and resolve feature-specific rules immediately before implementing the affected feature.
+2. Complete the test architecture as each executable boundary is introduced.
+3. Complete operational recovery and personal-data lifecycle rules before production credentials or real user data are introduced.
 
 ## Update rule
 
@@ -115,4 +118,4 @@ After an architecture decision is accepted:
 3. Validate links and formatting.
 4. Commit the decision atomically using the project `commit` skill.
 
-Only one branch should be marked **In progress**. This keeps the interview focused and makes the next unresolved decision visible without reconstructing the conversation.
+Mark architecture work **In progress** only when it blocks the implementation currently under way. Keep later feature and release gates queued so architecture work does not prevent unrelated delivery.

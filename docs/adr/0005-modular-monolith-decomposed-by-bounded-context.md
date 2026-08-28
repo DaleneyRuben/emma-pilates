@@ -2,7 +2,7 @@
 
 Status: accepted
 
-The system ships as a single deployable with Booking & Membership and Back Office as enforced top-level modules, mirroring the contexts already documented in [CONTEXT-MAP.md](../../CONTEXT-MAP.md). The module boundary is real and checked, not a naming convention.
+The system ships as a single deployable with Booking & Membership, Back Office, and System Identity as enforced top-level modules, mirroring the contexts documented in [CONTEXT-MAP.md](../../CONTEXT-MAP.md). The module boundary is real and checked, not a naming convention.
 
 The case against splitting into services is transactional rather than about scale. Creating a Booking must atomically consume one unit of a Subscription's allowance, and waitlist promotion must check a candidate's eligibility and create their Booking without a concurrent cancellation promoting the same person twice or handing two clients one spot. In-process those are one database transaction; across a network they become distributed-transaction problems, bought in exchange for independent scaling and deployment that a single studio with a handful of branches will never need.
 
