@@ -43,6 +43,22 @@ pnpm test
 pnpm build
 ```
 
+## API contracts
+
+The backend OpenAPI document and the shared Fetch/TanStack Query client are
+committed artifacts. Regenerate both after changing a controller or transport
+DTO:
+
+```bash
+pnpm generate:api
+```
+
+Check that the committed artifacts are current without accepting a diff:
+
+```bash
+pnpm check:api
+```
+
 Validate the Prisma schema or regenerate its ignored client output:
 
 ```sh

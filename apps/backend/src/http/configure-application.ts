@@ -1,7 +1,7 @@
 import { INestApplication, VersioningType } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 
-export function configureApplication(app: INestApplication): void {
+export function configureApplication(app: INestApplication): OpenAPIObject {
   app.enableVersioning({
     type: VersioningType.URI,
     prefix: 'api/v',
@@ -16,4 +16,6 @@ export function configureApplication(app: INestApplication): void {
   SwaggerModule.setup('docs', app, openApiDocument, {
     jsonDocumentUrl: 'openapi.json',
   });
+
+  return openApiDocument;
 }

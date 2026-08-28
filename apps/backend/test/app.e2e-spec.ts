@@ -73,6 +73,34 @@ describe('operational health (e2e)', () => {
     expect(document.paths).toHaveProperty('/api/v1/probe');
   });
 
+  it('returns the OpenAPI document for offline artifact generation', () => {
+    const document = configureApplication(app);
+
+    expect(document).toMatchObject({
+      info: {
+        title: 'Emma Pilates API',
+        version: '1.0.0',
+      },
+      paths: {
+        '/health/live': {
+          get: {
+            responses: {
+              200: {
+                content: {
+                  'application/json': {
+                    schema: {
+                      $ref: '#/components/schemas/LivenessResponseDto',
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+  });
+
   afterEach(async () => {
     await app.close();
   });
