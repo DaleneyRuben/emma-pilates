@@ -35,6 +35,12 @@ describe("mobile UI primitives", () => {
     });
   });
 
+  it("keeps application screens within the device safe area", async () => {
+    const screen = await render(<Screen />);
+
+    expect(screen.toJSON()?.type).toBe("RNCSafeAreaView");
+  });
+
   it("uses the approved Work Sans body styling", async () => {
     const screen = await render(
       <BodyText accessibilityLabel="Movimiento, equilibrio, bienestar">

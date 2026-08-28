@@ -1,9 +1,13 @@
-import { StyleSheet, View, type ViewProps } from "react-native";
+import { StyleSheet } from "react-native";
+import {
+  SafeAreaView,
+  type SafeAreaViewProps,
+} from "react-native-safe-area-context";
 
 import { colors, spacing } from "./tokens";
 
-export function Screen({ style, ...props }: ViewProps) {
-  return <View {...props} style={[styles.screen, style]} />;
+export function Screen({ style, ...props }: SafeAreaViewProps) {
+  return <SafeAreaView {...props} style={[styles.screen, style]} />;
 }
 
 const styles = StyleSheet.create({

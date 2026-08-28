@@ -1,6 +1,10 @@
 import { render } from "@testing-library/react-native";
 
-import { getRootRouteForRole, MobileNavigation } from "./navigation";
+import {
+  getRootRouteForRole,
+  MobileNavigation,
+  unauthenticatedStackOptions,
+} from "./navigation";
 
 describe("getRootRouteForRole", () => {
   it("routes an unauthenticated app state to the public flow", () => {
@@ -23,5 +27,9 @@ describe("MobileNavigation", () => {
     const screen = await render(<MobileNavigation />);
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
+  });
+
+  it("hides the generated native stack header", () => {
+    expect(unauthenticatedStackOptions).toEqual({ headerShown: false });
   });
 });

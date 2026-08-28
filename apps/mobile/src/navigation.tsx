@@ -60,7 +60,10 @@ function NutritionistAgendaScreen() {
   return <NavigationPlaceholder title="Mi agenda" />;
 }
 
+export const unauthenticatedStackOptions = { headerShown: false };
+
 const UnauthenticatedStack = createNativeStackNavigator({
+  screenOptions: unauthenticatedStackOptions,
   screens: {
     SignIn: SignInScreen,
   },
