@@ -72,4 +72,6 @@ The backend end-to-end smoke test is available separately:
 pnpm --filter @pilates/backend test:e2e
 ```
 
-Architecture decisions and the remaining work queue live in [`docs/architecture/README.md`](./docs/architecture/README.md).
+Architecture decisions live in [`docs/architecture/README.md`](./docs/architecture/README.md).
+The mobile-first delivery order and trackable product backlog live in
+[`docs/implementation/`](./docs/implementation/README.md).

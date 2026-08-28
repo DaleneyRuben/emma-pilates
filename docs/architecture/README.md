@@ -21,7 +21,7 @@ Record a decision in an ADR only when it is hard to reverse, surprising without 
 
 ## Current focus
 
-The architecture is sufficient to begin implementation. The active work is the application foundation: backend configuration, the `/api/v1` transport boundary, Prisma and local PostgreSQL, and generation of the first OpenAPI client package. Remaining architecture questions are handled when their affected feature begins or when their stated release gate approaches; they do not block unrelated scaffolding.
+The architecture is sufficient to implement the product. The initial application foundation is complete: backend configuration, the `/api/v1` transport boundary, Prisma and local PostgreSQL, and the first generated OpenAPI client package. Active delivery is mobile-first and is tracked in the [implementation roadmap](../implementation/README.md) and [product backlog](../implementation/BACKLOG.md). Remaining architecture questions are handled when their affected backlog item begins or when their stated release gate approaches; they do not block unrelated delivery.
 
 Accepted architecture decisions:
 
