@@ -1,6 +1,11 @@
-import { Pressable, StyleSheet, Text, type GestureResponderEvent } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  type GestureResponderEvent,
+} from "react-native";
 
-import { colors, radii, spacing, typography } from './tokens';
+import { colors, radii, spacing, typography } from "./tokens";
 
 type PrimaryButtonProps = {
   label: string;
@@ -22,17 +27,19 @@ export function PrimaryButton({
       onPress={onPress}
       style={[styles.button, disabled && styles.disabledButton]}
     >
-      <Text style={[styles.label, disabled && styles.disabledLabel]}>{label}</Text>
+      <Text style={[styles.label, disabled && styles.disabledLabel]}>
+        {label}
+      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    alignItems: 'center',
+    alignItems: "center",
     backgroundColor: colors.primary,
     borderRadius: radii.control,
-    justifyContent: 'center',
+    justifyContent: "center",
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
@@ -42,7 +49,7 @@ const styles = StyleSheet.create({
   label: {
     color: colors.white,
     fontSize: typography.body,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   disabledLabel: {
     color: colors.disabledText,

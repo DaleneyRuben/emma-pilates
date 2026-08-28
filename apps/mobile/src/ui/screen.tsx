@@ -1,6 +1,6 @@
-import { StyleSheet, View, type ViewProps } from 'react-native';
+import { StyleSheet, View, type ViewProps } from "react-native";
 
-import { colors, spacing } from './tokens';
+import { colors, spacing } from "./tokens";
 
 export function Screen({ style, ...props }: ViewProps) {
   return <View {...props} style={[styles.screen, style]} />;

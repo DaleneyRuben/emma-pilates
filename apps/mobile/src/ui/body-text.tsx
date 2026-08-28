@@ -1,7 +1,7 @@
-import { Text, type TextProps } from 'react-native';
+import { Text, type TextProps } from "react-native";
 
-import { fontFamilies } from './fonts';
-import { colors, typography } from './tokens';
+import { fontFamilies } from "./fonts";
+import { colors, typography } from "./tokens";
 
 export function BodyText({ style, ...props }: TextProps) {
   return (
