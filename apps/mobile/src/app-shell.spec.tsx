@@ -3,45 +3,9 @@ import { render } from "@testing-library/react-native";
 import App from "../App";
 
 describe("App", () => {
-  it("presents the application name as the accessible screen heading", async () => {
+  it("starts with the unauthenticated navigation flow", async () => {
     const screen = await render(<App />);
 
-    expect(screen.getByLabelText("Emma Pilates Studio")).toBeOnTheScreen();
-  });
-
-  it("uses the approved Lora title styling for the application name", async () => {
-    const screen = await render(<App />);
-
-    expect(screen.getByLabelText("Emma Pilates Studio")).toHaveStyle({
-      fontFamily: "Lora_500Medium",
-      fontSize: 30,
-    });
-  });
-
-  it("provides a mobile-sized primary action", async () => {
-    const screen = await render(<App />);
-
-    expect(screen.getByRole("button", { name: "Continuar" })).toHaveStyle({
-      minHeight: 52,
-    });
-  });
-
-  it("uses the design background for the application screen", async () => {
-    const screen = await render(<App />);
-
-    expect(screen.getByTestId("app-screen")).toHaveStyle({
-      backgroundColor: "#F2ECE5",
-    });
-  });
-
-  it("uses the approved Work Sans body styling for the studio tagline", async () => {
-    const screen = await render(<App />);
-
-    expect(
-      screen.getByLabelText("Movimiento, equilibrio, bienestar"),
-    ).toHaveStyle({
-      fontFamily: "WorkSans_400Regular",
-      fontSize: 15,
-    });
+    expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
   });
 });
