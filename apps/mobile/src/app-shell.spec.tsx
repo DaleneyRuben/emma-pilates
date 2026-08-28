@@ -25,4 +25,12 @@ describe('App', () => {
       minHeight: 52,
     });
   });
+
+  it('uses the design background for the application screen', async () => {
+    const screen = await render(<App />);
+
+    expect(screen.getByTestId('app-screen')).toHaveStyle({
+      backgroundColor: '#F2ECE5',
+    });
+  });
 });
