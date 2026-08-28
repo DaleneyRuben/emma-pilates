@@ -8,4 +8,12 @@ describe('App', () => {
 
     expect(screen.getByLabelText('Emma Pilates Studio')).toBeOnTheScreen();
   });
+
+  it('provides a mobile-sized primary action', async () => {
+    const screen = await render(<App />);
+
+    expect(screen.getByRole('button', { name: 'Continuar' })).toHaveStyle({
+      minHeight: 52,
+    });
+  });
 });
