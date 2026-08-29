@@ -40,6 +40,11 @@ PostgreSQL configuration, committed OpenAPI document, and generated
 `api-contracts` package exist. The mobile and admin applications still contain
 their starter screens; no business schema or migration exists yet.
 
+The proposed complete first-release data model and relationship diagram are in
+[`full-release-schema-proposal.md`](./full-release-schema-proposal.md). It is a
+review document only until its generated migration SQL receives explicit
+approval.
+
 Authentication follow-ups 33–38 are pending in the design workflow. Until a new
 export applies and verifies them, generated authentication screens still show
 superseded phone and temporary-password behavior. Backend work follows the
