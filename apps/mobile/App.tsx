@@ -3,6 +3,7 @@ import { useFonts } from "expo-font";
 
 import { fontAssets } from "./src/ui/fonts";
 import { MobileNavigation } from "./src/navigation";
+import { MobileQueryProvider } from "./src/query/provider";
 
 export default function App() {
   const [fontsLoaded] = useFonts(fontAssets);
@@ -13,7 +14,9 @@ export default function App() {
 
   return (
     <>
-      <MobileNavigation />
+      <MobileQueryProvider>
+        <MobileNavigation />
+      </MobileQueryProvider>
       <StatusBar style="auto" />
     </>
   );
