@@ -9,18 +9,16 @@ does not alter the Prisma schema.
 `AuthenticationSession`, and `AuthenticationThrottle`. Booking & Membership
 continues to own `Client` and `StaffMember`.
 
-`system.Account` has exactly one nullable cross-context link: `clientId` or
-`staffMemberId`. A database `CHECK` requires exactly one non-null value; unique
-indexes prevent either domain identity from being linked to more than one
-Account. The approved migration must create the initial `booking.Client` table
-in the same transaction so `clientId` can use a foreign key. Staff linkage is
-prepared as nullable until the Booking & Membership Staff Member migration.
+This first identity slice does not link an Account to a Client or Staff Member.
+Those records do not exist yet, and Booking & Membership remains responsible for
+creating and owning them. A later, separately approved Booking & Membership
+change will add each relationship when the corresponding domain record exists.
 
 ## Proposed `system` tables
 
 | Table                    | Essential columns and constraints                                                                                                                                                                                                                      |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `Account`                | UUID primary key; normalized unique email; nullable unique `clientId`; nullable unique `staffMemberId`; `emailVerifiedAt`; `activatedAt`; `disabledAt`; `pendingExpiresAt`; timestamps; exactly-one-link check once Staff Member exists.               |
+| `Account`                | UUID primary key; normalized unique email; `emailVerifiedAt`; `activatedAt`; `disabledAt`; `pendingExpiresAt`; timestamps.                                                                                                                             |
 | `AccountCredential`      | Account primary-key foreign key; Argon2id password hash; `passwordChangedAt`; timestamps. No plaintext or reversible password.                                                                                                                         |
 | `AuthenticationLink`     | UUID primary key; Account foreign key; purpose (`verification`, `activation`, `password_recovery`); one-way token digest; issued, expires, used, invalidated timestamps. A partial unique index permits only one current link per Account and purpose. |
 | `AuthenticationSession`  | UUID primary key; Account foreign key; one-way credential digest unique; created, last meaningful activity, idle expiry, absolute expiry, revoked timestamps; installation/browser metadata only when privacy-approved.                                |
@@ -35,15 +33,16 @@ prepared as nullable until the Booking & Membership Staff Member migration.
 - A new link invalidates every unused link of the same Account and purpose.
 - Recovery completion revokes all Authentication Sessions before issuing its
   replacement session; activation and verification do not sign a person in.
-- Account authorization resolves Client or Staff Member state from Booking &
-  Membership; no Role, Branch, payment, or Booking data is copied into `system`.
+- This slice does not decide whether an Account belongs to a Client or Staff
+  Member. That connection is added when Booking & Membership introduces the
+  corresponding records; no role, branch, payment, or booking data is copied
+  into `system`.
 
 ## Migration impact for approval
 
-1. Add the listed `system` tables, enum/check/index constraints, and foreign
-   keys to `system.Account`.
-2. Add the initial `booking.Client` table and its Account relation in the same
-   migration; Staff Member linkage is added with its owning table later.
+1. Add the listed `system` tables, enums, indexes, and foreign keys within the
+   `system` schema only.
+2. Add no Client or Staff Member tables, links, or cross-context foreign keys.
 3. Add no seed credentials, no runtime schema push, and no provider credentials.
 4. The later pg-boss schema proposal remains separate and is required before
    transactional authentication email delivery is implemented.
