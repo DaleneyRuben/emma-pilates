@@ -13,10 +13,10 @@ describe("createApiFetcher", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       "https://api.example.com/api/v1/health/live",
-      expect.objectContaining({
-        headers: expect.objectContaining({ Authorization: "Bearer credential" }),
-        method: "GET",
-      }),
+      expect.objectContaining({ method: "GET" }),
     );
+    expect(
+      (fetchMock.mock.calls[0][1]?.headers as Headers).get("Authorization"),
+    ).toBe("Bearer credential");
   });
 });
