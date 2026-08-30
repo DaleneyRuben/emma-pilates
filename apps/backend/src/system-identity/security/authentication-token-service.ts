@@ -21,7 +21,7 @@ export class AuthenticationTokenService {
     );
   }
 
-  private digest(secret: string): Buffer {
+  digest(secret: string): Buffer {
     return createHash('sha256').update(secret, 'utf8').digest();
   }
 }
