@@ -47,12 +47,14 @@ const register = async (
   workerDependencies: ReturnType<typeof dependencies>,
 ): Promise<AuthenticationEmailWorkerHandler> => {
   let handler: AuthenticationEmailWorkerHandler | undefined;
-  const boss: AuthenticationEmailWorkerBoss = {
-    work: jest.fn((_name, _options, registeredHandler) => {
-      handler = registeredHandler;
-      return Promise.resolve('worker-id');
-    }),
-  };
+  const work = jest.fn<
+    Promise<string>,
+    Parameters<AuthenticationEmailWorkerBoss['work']>
+  >((_name, _options, registeredHandler) => {
+    handler = registeredHandler;
+    return Promise.resolve('worker-id');
+  });
+  const boss: AuthenticationEmailWorkerBoss = { work };
 
   await registerAuthenticationEmailWorker(
     boss,
@@ -60,7 +62,7 @@ const register = async (
     () => new Date('2026-08-30T15:00:00.000Z'),
   );
 
-  expect(boss.work).toHaveBeenCalledWith(
+  expect(work).toHaveBeenCalledWith(
     AUTHENTICATION_EMAIL_QUEUE,
     { perJobResults: true },
     expect.any(Function),
