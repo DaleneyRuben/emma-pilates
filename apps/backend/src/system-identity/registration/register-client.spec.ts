@@ -89,4 +89,86 @@ describe('RegisterClient', () => {
       encryptionKeyId: 'local-test-key',
     });
   });
+
+  it('reuses a self-registered Pending Account without granting its continuation', async () => {
+    const now = new Date('2026-08-30T18:00:00.000Z');
+    const transaction = {
+      findAccountByEmail: jest.fn().mockResolvedValue({
+        id: 'existing-account-id',
+        pendingFlow: 'self_registration',
+      }),
+      createSelfRegistration: jest.fn(),
+      replaceSelfRegistrationVerification: jest
+        .fn()
+        .mockResolvedValue(undefined),
+      scheduleAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
+    };
+    const issue = jest
+      .fn()
+      .mockReturnValueOnce({
+        secret: 'new-verification-secret',
+        digest: Buffer.from('new-verification-digest'),
+      })
+      .mockReturnValueOnce({
+        secret: 'unused-continuation-secret',
+        digest: Buffer.from('unused-continuation-digest'),
+      })
+      .mockReturnValueOnce({
+        secret: 'decoy-continuation-secret',
+        digest: Buffer.from('decoy-continuation-digest'),
+      });
+    const registerClient = new RegisterClient({
+      unitOfWork: {
+        execute: jest.fn(
+          async (
+            work: (activeTransaction: typeof transaction) => Promise<boolean>,
+          ) => work(transaction),
+        ),
+      },
+      passwordHasher: {
+        hash: jest.fn().mockResolvedValue('unused-password-hash'),
+      },
+      tokenIssuer: { issue },
+      linkCipher: {
+        encrypt: jest.fn().mockReturnValue({
+          encryptedLinkSecret: 'encrypted-new-verification-secret',
+          encryptionKeyId: 'local-test-key',
+        }),
+      },
+      now: () => now,
+      newId: () => 'new-verification-token-id',
+      newReferralCode: () => 'UNUSED-REFERRAL',
+    });
+
+    await expect(
+      registerClient.execute({
+        name: 'Replacement Name',
+        email: 'ana@example.com',
+        password: 'replacement password',
+      }),
+    ).resolves.toEqual({
+      email: 'ana@example.com',
+      registrationContinuation: 'decoy-continuation-secret',
+    });
+    expect(transaction.createSelfRegistration).not.toHaveBeenCalled();
+    expect(
+      transaction.replaceSelfRegistrationVerification,
+    ).toHaveBeenCalledWith({
+      accountId: 'existing-account-id',
+      pendingExpiresAt: new Date('2026-09-06T18:00:00.000Z'),
+      verificationToken: {
+        id: 'new-verification-token-id',
+        digest: Buffer.from('new-verification-digest'),
+        expiresAt: new Date('2026-08-31T18:00:00.000Z'),
+      },
+    });
+    expect(transaction.scheduleAuthenticationEmail).toHaveBeenCalledWith({
+      version: 1,
+      accountId: 'existing-account-id',
+      authenticationTokenId: 'new-verification-token-id',
+      purpose: 'verification',
+      encryptedLinkSecret: 'encrypted-new-verification-secret',
+      encryptionKeyId: 'local-test-key',
+    });
+  });
 });
