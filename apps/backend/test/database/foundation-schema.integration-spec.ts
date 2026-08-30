@@ -104,6 +104,46 @@ describe('foundation migration', () => {
     );
   });
 
+  it('stores a hashed registration continuation in authentication tokens', async () => {
+    const client = await context.pool.connect();
+    const clientId = randomUUID();
+    const accountId = randomUUID();
+
+    try {
+      await client.query('BEGIN');
+      await client.query(
+        `
+          INSERT INTO booking.clients (id, name, referral_code, updated_at)
+          VALUES ($1, 'Test Client', $2, CURRENT_TIMESTAMP)
+        `,
+        [clientId, `ref-${clientId}`],
+      );
+      await client.query(
+        `
+          INSERT INTO system.accounts (id, email, client_id, updated_at)
+          VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+        `,
+        [accountId, `${accountId}@example.com`, clientId],
+      );
+
+      const result = await client.query<{ purpose: string }>(
+        `
+          INSERT INTO system.authentication_tokens
+            (id, account_id, purpose, token_digest, expires_at)
+          VALUES
+            ($1, $2, 'registration_continuation', $3, CURRENT_TIMESTAMP + INTERVAL '7 days')
+          RETURNING purpose::text
+        `,
+        [randomUUID(), accountId, Buffer.from('continuation-digest')],
+      );
+
+      expect(result.rows).toEqual([{ purpose: 'registration_continuation' }]);
+    } finally {
+      await client.query('ROLLBACK');
+      client.release();
+    }
+  });
+
   it('treats active branch names as unique after trimming and case folding', async () => {
     await expectDatabaseError(
       context,
