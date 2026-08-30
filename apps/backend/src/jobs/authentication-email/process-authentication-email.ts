@@ -14,7 +14,7 @@ export type AuthenticationEmailState = {
 };
 
 export interface AuthenticationEmailStateReader {
-  find(authenticationTokenId: string): Promise<AuthenticationEmailState>;
+  find(authenticationTokenId: string): Promise<AuthenticationEmailState | null>;
 }
 
 export interface AuthenticationLinkDecryptor {
@@ -38,10 +38,22 @@ export type AuthenticationEmailProcessorDependencies = {
 
 export const processAuthenticationEmail = async (
   job: AuthenticationEmailJob,
-  _now: Date,
+  now: Date,
   dependencies: AuthenticationEmailProcessorDependencies,
-): Promise<'delivered'> => {
+): Promise<'delivered' | 'stale'> => {
   const state = await dependencies.stateReader.find(job.authenticationTokenId);
+
+  if (
+    state === null ||
+    state.accountId !== job.accountId ||
+    state.purpose !== job.purpose ||
+    state.usedAt !== null ||
+    state.invalidatedAt !== null ||
+    state.expiresAt <= now
+  ) {
+    return 'stale';
+  }
+
   const linkSecret = await dependencies.decryptor.decrypt(
     job.encryptedLinkSecret,
     job.encryptionKeyId,
