@@ -1,7 +1,7 @@
 # BE-004 — pg-boss authentication-email proposal
 
-Status: approved. The pinned technical-schema review is awaiting separate
-approval. This document creates no database object and applies no migration.
+Status: approved, including the pinned technical schema and native retry timing.
+This document creates no database object and applies no migration.
 
 ## What this adds
 
@@ -111,8 +111,8 @@ authentication journeys work.
 Authentication-email delivery follows the already accepted policy:
 
 - one initial attempt plus three retries;
-- retry delays of approximately 30 seconds, two minutes, and five minutes, with
-  bounded jitter;
+- native pg-boss retry ranges of 30–60 seconds, 60–120 seconds, and 120–240
+  seconds;
 - a hard ten-second timeout for each provider attempt;
 - retries only for network failures, timeouts, provider rate limits, and
   provider server failures;
@@ -178,17 +178,19 @@ database change:
 5. add no Prisma models, seed jobs, provider credentials, or runtime schema
    synchronization.
 
-Before the migration is created or applied, the implementation will present the
-pinned pg-boss version, exact generated SQL or reviewed installation artifact,
-queue settings, rollback effect, and disposable-database verification for a
-second explicit approval.
+The pinned pg-boss version, exact generated SQL, queue settings, and rollback
+effect received explicit approval on 2026-08-30. That approval authorizes
+creating the migration artifact and testing it against disposable PostgreSQL;
+it does not authorize applying the migration to a developer, shared, or
+production database.
 
 That review is now available in
 [`BE-004-pg-boss-schema-review.md`](./BE-004-pg-boss-schema-review.md).
 
 ## Approval decision
 
-Approving this proposal means the next implementation step may install pg-boss,
-write the failing tests, add the worker and local capture boundary, and prepare
-the exact technical-schema migration for review. It does not authorize applying
-that migration to any database.
+The proposal and technical schema were approved on 2026-08-30. Implementation
+may write failing tests, add the worker and local capture boundary, prepare the
+exact technical-schema migration, and verify it only against disposable
+PostgreSQL. It does not authorize applying that migration to a developer,
+shared, or production database.

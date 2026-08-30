@@ -1,7 +1,7 @@
 # BE-004 — pg-boss technical-schema review
 
-Status: awaiting explicit database approval. Nothing in this review has been
-applied to a database.
+Status: approved on 2026-08-30. Nothing in this review has been applied to a
+developer, shared, or production database.
 
 ## Pinned artifact
 
@@ -128,7 +128,7 @@ table is changed either way.
 
 ## Approval decision
 
-Approval authorizes creating the reviewed migration artifact, testing it only
-against disposable PostgreSQL, and implementing BE-004 through TDD. It does not
-authorize applying the migration to the developer, shared-development, or
-production database.
+Approved on 2026-08-30, including the native retry ranges. Approval authorizes
+creating the reviewed migration artifact, testing it only against disposable
+PostgreSQL, and implementing BE-004 through TDD. It does not authorize applying
+the migration to the developer, shared-development, or production database.
