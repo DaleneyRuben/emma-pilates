@@ -1,7 +1,7 @@
 # BE-004 — pg-boss authentication-email proposal
 
-Status: proposed for explicit approval. This document installs no dependency,
-creates no database object, and applies no migration.
+Status: approved. The pinned technical-schema review is awaiting separate
+approval. This document creates no database object and applies no migration.
 
 ## What this adds
 
@@ -182,6 +182,9 @@ Before the migration is created or applied, the implementation will present the
 pinned pg-boss version, exact generated SQL or reviewed installation artifact,
 queue settings, rollback effect, and disposable-database verification for a
 second explicit approval.
+
+That review is now available in
+[`BE-004-pg-boss-schema-review.md`](./BE-004-pg-boss-schema-review.md).
 
 ## Approval decision
 
