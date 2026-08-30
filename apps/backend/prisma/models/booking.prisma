@@ -1,0 +1,65 @@
+enum StaffRole {
+  TRAINER       @map("trainer")
+  NUTRITIONIST  @map("nutritionist")
+  ASSISTANT     @map("assistant")
+  ADMINISTRATOR @map("administrator")
+
+  @@schema("booking")
+}
+
+model Client {
+  id                  String      @id @default(uuid()) @db.Uuid
+  name                String
+  phone               String?
+  profileImageAssetId String?     @unique @map("profile_image_asset_id") @db.Uuid
+  referralCode        String      @unique @map("referral_code")
+  createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  account             Account?
+  profileImageAsset   ImageAsset? @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
+
+  @@map("clients")
+  @@schema("booking")
+}
+
+model StaffMember {
+  id                  String                  @id @default(uuid()) @db.Uuid
+  name                String
+  phone               String?
+  role                StaffRole
+  profileImageAssetId String?                 @unique @map("profile_image_asset_id") @db.Uuid
+  createdAt           DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  account             Account?
+  profileImageAsset   ImageAsset?             @relation("StaffProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
+  branchAssignments   StaffBranchAssignment[]
+
+  @@map("staff_members")
+  @@schema("booking")
+}
+
+model Branch {
+  id               String                  @id @default(uuid()) @db.Uuid
+  name             String
+  address          String
+  createdAt        DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  archivedAt       DateTime?               @map("archived_at") @db.Timestamptz(3)
+  staffAssignments StaffBranchAssignment[]
+  auditRecords     AuditRecord[]
+
+  @@map("branches")
+  @@schema("booking")
+}
+
+model StaffBranchAssignment {
+  staffMemberId String      @map("staff_member_id") @db.Uuid
+  branchId      String      @map("branch_id") @db.Uuid
+  assignedAt    DateTime    @default(now()) @map("assigned_at") @db.Timestamptz(3)
+  staffMember   StaffMember @relation(fields: [staffMemberId], references: [id], onDelete: Cascade)
+  branch        Branch      @relation(fields: [branchId], references: [id], onDelete: Restrict)
+
+  @@id([staffMemberId, branchId])
+  @@map("staff_branch_assignments")
+  @@schema("booking")
+}

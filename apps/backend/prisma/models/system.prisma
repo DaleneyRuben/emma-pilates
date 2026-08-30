@@ -1,0 +1,361 @@
+enum AuthenticationTokenPurpose {
+  VERIFICATION      @map("verification")
+  ACTIVATION        @map("activation")
+  PASSWORD_RECOVERY @map("password_recovery")
+
+  @@schema("system")
+}
+
+enum AuthenticationSessionSurface {
+  MOBILE    @map("mobile")
+  ADMIN_WEB @map("admin_web")
+
+  @@schema("system")
+}
+
+enum AuthenticationSessionRevocationReason {
+  LOGOUT               @map("logout")
+  LOGOUT_OTHER_DEVICES @map("logout_other_devices")
+  PASSWORD_CHANGED     @map("password_changed")
+  PASSWORD_RECOVERED   @map("password_recovered")
+  ACCOUNT_DISABLED     @map("account_disabled")
+  SECURITY_ACTION      @map("security_action")
+
+  @@schema("system")
+}
+
+enum AuthenticationThrottlePurpose {
+  LOGIN             @map("login")
+  VERIFICATION      @map("verification")
+  ACTIVATION        @map("activation")
+  PASSWORD_RECOVERY @map("password_recovery")
+
+  @@schema("system")
+}
+
+enum AuthenticationThrottleEventKind {
+  FAILED_CREDENTIAL_CHECK @map("failed_credential_check")
+  MESSAGE_ISSUED          @map("message_issued")
+
+  @@schema("system")
+}
+
+enum EmailSuppressionReason {
+  HARD_BOUNCE @map("hard_bounce")
+  COMPLAINT   @map("complaint")
+
+  @@schema("system")
+}
+
+enum AuditOutcome {
+  SUCCEEDED @map("succeeded")
+  FAILED    @map("failed")
+
+  @@schema("system")
+}
+
+enum AuditActorKind {
+  ACCOUNT   @map("account")
+  SYSTEM    @map("system")
+  WORKER    @map("worker")
+  BOOTSTRAP @map("bootstrap")
+
+  @@schema("system")
+}
+
+enum NotificationCategory {
+  BOOKING_SCHEDULE     @map("booking_schedule")
+  REMINDER             @map("reminder")
+  SUBSCRIPTION_PAYMENT @map("subscription_payment")
+  ANNOUNCEMENT         @map("announcement")
+
+  @@schema("system")
+}
+
+enum AccountDevicePlatform {
+  IOS     @map("ios")
+  ANDROID @map("android")
+
+  @@schema("system")
+}
+
+enum AccountDeviceDeactivationReason {
+  LOGOUT                @map("logout")
+  ACCOUNT_DISABLED      @map("account_disabled")
+  DEVICE_NOT_REGISTERED @map("device_not_registered")
+  PERMISSION_REVOKED    @map("permission_revoked")
+  ACCOUNT_CHANGED       @map("account_changed")
+  TOKEN_REPLACED        @map("token_replaced")
+
+  @@schema("system")
+}
+
+enum NotificationDeliveryState {
+  QUEUED    @map("queued")
+  SUBMITTED @map("submitted")
+  DELIVERED @map("delivered")
+  FAILED    @map("failed")
+  DISCARDED @map("discarded")
+
+  @@schema("system")
+}
+
+enum ImageAssetPurpose {
+  PROFILE_PHOTO    @map("profile_photo")
+  TRANSFER_RECEIPT @map("transfer_receipt")
+  PROMOTION        @map("promotion")
+
+  @@schema("system")
+}
+
+enum ImageAssetState {
+  PENDING    @map("pending")
+  PROCESSING @map("processing")
+  READY      @map("ready")
+  ATTACHED   @map("attached")
+  FAILED     @map("failed")
+  DELETED    @map("deleted")
+
+  @@schema("system")
+}
+
+model Account {
+  id                        String                  @id @default(uuid()) @db.Uuid
+  email                     String                  @unique
+  passwordHash              String?                 @map("password_hash")
+  passwordChangedAt         DateTime?               @map("password_changed_at") @db.Timestamptz(3)
+  emailVerifiedAt           DateTime?               @map("email_verified_at") @db.Timestamptz(3)
+  activatedAt               DateTime?               @map("activated_at") @db.Timestamptz(3)
+  disabledAt                DateTime?               @map("disabled_at") @db.Timestamptz(3)
+  pendingExpiresAt          DateTime?               @map("pending_expires_at") @db.Timestamptz(3)
+  clientId                  String?                 @unique @map("client_id") @db.Uuid
+  staffMemberId             String?                 @unique @map("staff_member_id") @db.Uuid
+  createdAt                 DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                 DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  client                    Client?                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  staffMember               StaffMember?            @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
+  authenticationTokens      AuthenticationToken[]
+  authenticationSessions    AuthenticationSession[]
+  emailSuppressionsResolved EmailSuppression[]      @relation("EmailSuppressionResolver")
+  auditRecords              AuditRecord[]           @relation("AuditActor")
+  idempotencyRecords        IdempotencyRecord[]
+  notifications             Notification[]
+  devices                   AccountDevice[]
+  ownedImageAssets          ImageAsset[]            @relation("ImageAssetOwner")
+
+  @@map("accounts")
+  @@schema("system")
+}
+
+model AuthenticationToken {
+  id            String                     @id @default(uuid()) @db.Uuid
+  accountId     String                     @map("account_id") @db.Uuid
+  purpose       AuthenticationTokenPurpose
+  tokenDigest   Bytes                      @unique @map("token_digest") @db.ByteA
+  issuedAt      DateTime                   @default(now()) @map("issued_at") @db.Timestamptz(3)
+  expiresAt     DateTime                   @map("expires_at") @db.Timestamptz(3)
+  usedAt        DateTime?                  @map("used_at") @db.Timestamptz(3)
+  invalidatedAt DateTime?                  @map("invalidated_at") @db.Timestamptz(3)
+  account       Account                    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@index([accountId, purpose])
+  @@index([expiresAt])
+  @@map("authentication_tokens")
+  @@schema("system")
+}
+
+model AuthenticationSession {
+  id                       String                                 @id @default(uuid()) @db.Uuid
+  accountId                String                                 @map("account_id") @db.Uuid
+  accountDeviceId          String?                                @map("account_device_id") @db.Uuid
+  surface                  AuthenticationSessionSurface
+  credentialDigest         Bytes                                  @unique @map("credential_digest") @db.ByteA
+  createdAt                DateTime                               @default(now()) @map("created_at") @db.Timestamptz(3)
+  lastMeaningfulActivityAt DateTime                               @map("last_meaningful_activity_at") @db.Timestamptz(3)
+  idleExpiresAt            DateTime                               @map("idle_expires_at") @db.Timestamptz(3)
+  absoluteExpiresAt        DateTime                               @map("absolute_expires_at") @db.Timestamptz(3)
+  revokedAt                DateTime?                              @map("revoked_at") @db.Timestamptz(3)
+  revocationReason         AuthenticationSessionRevocationReason? @map("revocation_reason")
+  account                  Account                                @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  accountDevice            AccountDevice?                         @relation(fields: [accountDeviceId], references: [id], onDelete: SetNull)
+
+  @@index([accountId, revokedAt])
+  @@index([idleExpiresAt])
+  @@index([absoluteExpiresAt])
+  @@map("authentication_sessions")
+  @@schema("system")
+}
+
+model AuthenticationThrottleEvent {
+  id              String                          @id @default(uuid()) @db.Uuid
+  purpose         AuthenticationThrottlePurpose
+  eventKind       AuthenticationThrottleEventKind @map("event_kind")
+  recipientDigest Bytes?                          @map("recipient_digest") @db.ByteA
+  loginLaneDigest Bytes?                          @map("login_lane_digest") @db.ByteA
+  clientDigest    Bytes?                          @map("client_digest") @db.ByteA
+  networkDigest   Bytes?                          @map("network_digest") @db.ByteA
+  occurredAt      DateTime                        @default(now()) @map("occurred_at") @db.Timestamptz(3)
+  expiresAt       DateTime                        @map("expires_at") @db.Timestamptz(3)
+
+  @@index([purpose, recipientDigest, occurredAt])
+  @@index([loginLaneDigest, occurredAt])
+  @@index([clientDigest, occurredAt])
+  @@index([networkDigest, occurredAt])
+  @@index([expiresAt])
+  @@map("authentication_throttle_events")
+  @@schema("system")
+}
+
+model EmailSuppression {
+  id                  String                 @id @default(uuid()) @db.Uuid
+  emailDigest         Bytes                  @map("email_digest") @db.ByteA
+  reason              EmailSuppressionReason
+  provider            String
+  providerEventId     String                 @map("provider_event_id")
+  providerOccurredAt  DateTime               @map("provider_occurred_at") @db.Timestamptz(3)
+  suppressedAt        DateTime               @default(now()) @map("suppressed_at") @db.Timestamptz(3)
+  resolvedAt          DateTime?              @map("resolved_at") @db.Timestamptz(3)
+  resolvedByAccountId String?                @map("resolved_by_account_id") @db.Uuid
+  resolutionReason    String?                @map("resolution_reason")
+  resolutionNote      String?                @map("resolution_note")
+  resolvedByAccount   Account?               @relation("EmailSuppressionResolver", fields: [resolvedByAccountId], references: [id], onDelete: SetNull)
+
+  @@unique([provider, providerEventId])
+  @@index([emailDigest])
+  @@map("email_suppressions")
+  @@schema("system")
+}
+
+model AuditRecord {
+  id             String         @id @default(uuid()) @db.Uuid
+  actionCode     String         @map("action_code")
+  outcome        AuditOutcome
+  actorKind      AuditActorKind @map("actor_kind")
+  actorAccountId String?        @map("actor_account_id") @db.Uuid
+  actorRole      StaffRole?     @map("actor_role")
+  targetType     String         @map("target_type")
+  targetId       String?        @map("target_id") @db.Uuid
+  branchId       String?        @map("branch_id") @db.Uuid
+  correlationId  String         @map("correlation_id") @db.Uuid
+  metadata       Json?
+  occurredAt     DateTime       @default(now()) @map("occurred_at") @db.Timestamptz(3)
+  actorAccount   Account?       @relation("AuditActor", fields: [actorAccountId], references: [id], onDelete: SetNull)
+  branch         Branch?        @relation(fields: [branchId], references: [id], onDelete: Restrict)
+
+  @@index([actorAccountId, occurredAt])
+  @@index([targetType, targetId, occurredAt])
+  @@index([branchId, occurredAt])
+  @@index([correlationId])
+  @@map("audit_records")
+  @@schema("system")
+}
+
+model IdempotencyRecord {
+  id             String   @id @default(uuid()) @db.Uuid
+  accountId      String   @map("account_id") @db.Uuid
+  command        String
+  idempotencyKey String   @map("idempotency_key") @db.Uuid
+  requestHash    Bytes    @map("request_hash") @db.ByteA
+  responseStatus Int      @map("response_status")
+  responseBody   Json?    @map("response_body")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt      DateTime @map("expires_at") @db.Timestamptz(3)
+  account        Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+
+  @@unique([accountId, command, idempotencyKey])
+  @@index([expiresAt])
+  @@map("idempotency_records")
+  @@schema("system")
+}
+
+model Notification {
+  id               String                 @id @default(uuid()) @db.Uuid
+  accountId        String                 @map("account_id") @db.Uuid
+  category         NotificationCategory
+  type             String
+  businessEventKey String                 @map("business_event_key")
+  title            String
+  message          String
+  destinationType  String?                @map("destination_type")
+  destinationId    String?                @map("destination_id") @db.Uuid
+  createdAt        DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
+  readAt           DateTime?              @map("read_at") @db.Timestamptz(3)
+  account          Account                @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  deliveries       NotificationDelivery[]
+
+  @@unique([accountId, businessEventKey])
+  @@index([accountId, readAt, createdAt])
+  @@map("notifications")
+  @@schema("system")
+}
+
+model AccountDevice {
+  id                   String                           @id @default(uuid()) @db.Uuid
+  accountId            String                           @map("account_id") @db.Uuid
+  installationIdDigest Bytes                            @map("installation_id_digest") @db.ByteA
+  expoPushToken        String?                          @map("expo_push_token")
+  platform             AccountDevicePlatform
+  registeredAt         DateTime                         @default(now()) @map("registered_at") @db.Timestamptz(3)
+  tokenUpdatedAt       DateTime                         @default(now()) @map("token_updated_at") @db.Timestamptz(3)
+  lastSeenAt           DateTime                         @default(now()) @map("last_seen_at") @db.Timestamptz(3)
+  deactivatedAt        DateTime?                        @map("deactivated_at") @db.Timestamptz(3)
+  deactivationReason   AccountDeviceDeactivationReason? @map("deactivation_reason")
+  account              Account                          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  sessions             AuthenticationSession[]
+  deliveries           NotificationDelivery[]
+
+  @@index([accountId, deactivatedAt])
+  @@map("account_devices")
+  @@schema("system")
+}
+
+model NotificationDelivery {
+  id               String                    @id @default(uuid()) @db.Uuid
+  notificationId   String                    @map("notification_id") @db.Uuid
+  accountDeviceId  String                    @map("account_device_id") @db.Uuid
+  state            NotificationDeliveryState @default(QUEUED)
+  providerTicketId String?                   @unique @map("provider_ticket_id")
+  attemptCount     Int                       @default(0) @map("attempt_count")
+  lastAttemptAt    DateTime?                 @map("last_attempt_at") @db.Timestamptz(3)
+  receiptCheckedAt DateTime?                 @map("receipt_checked_at") @db.Timestamptz(3)
+  failureCategory  String?                   @map("failure_category")
+  createdAt        DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  completedAt      DateTime?                 @map("completed_at") @db.Timestamptz(3)
+  notification     Notification              @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  accountDevice    AccountDevice             @relation(fields: [accountDeviceId], references: [id], onDelete: Restrict)
+
+  @@unique([notificationId, accountDeviceId])
+  @@index([state, createdAt])
+  @@index([accountDeviceId, state])
+  @@map("notification_deliveries")
+  @@schema("system")
+}
+
+model ImageAsset {
+  id                String            @id @default(uuid()) @db.Uuid
+  ownerAccountId    String            @map("owner_account_id") @db.Uuid
+  purpose           ImageAssetPurpose
+  state             ImageAssetState   @default(PENDING)
+  pendingObjectKey  String            @unique @map("pending_object_key")
+  declaredMediaType String            @map("declared_media_type")
+  declaredByteSize  Int               @map("declared_byte_size")
+  declaredChecksum  Bytes             @map("declared_checksum") @db.ByteA
+  verifiedMediaType String?           @map("verified_media_type")
+  verifiedByteSize  Int?              @map("verified_byte_size")
+  verifiedChecksum  Bytes?            @map("verified_checksum") @db.ByteA
+  verifiedWidth     Int?              @map("verified_width")
+  verifiedHeight    Int?              @map("verified_height")
+  createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt         DateTime          @map("expires_at") @db.Timestamptz(3)
+  finalizedAt       DateTime?         @map("finalized_at") @db.Timestamptz(3)
+  attachedAt        DateTime?         @map("attached_at") @db.Timestamptz(3)
+  deletedAt         DateTime?         @map("deleted_at") @db.Timestamptz(3)
+  ownerAccount      Account           @relation("ImageAssetOwner", fields: [ownerAccountId], references: [id], onDelete: Restrict)
+  clientProfile     Client?           @relation("ClientProfileImage")
+  staffProfile      StaffMember?      @relation("StaffProfileImage")
+
+  @@index([ownerAccountId, state])
+  @@index([state, expiresAt])
+  @@map("image_assets")
+  @@schema("system")
+}

@@ -3,9 +3,12 @@ packages:
   - packages/*
 
 allowBuilds:
-  '@nestjs/core': true
-  '@prisma/engines': true
-  '@scarf/scarf': false
+  "@nestjs/core": true
+  "@prisma/engines": true
+  "@scarf/scarf": false
+  cpu-features: false
   esbuild: true
   prisma: true
+  protobufjs: false
+  ssh2: false
   unrs-resolver: true

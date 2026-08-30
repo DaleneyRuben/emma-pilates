@@ -1,0 +1,177 @@
+import { randomUUID } from 'node:crypto';
+import { DatabaseError, PoolClient } from 'pg';
+import {
+  DatabaseTestContext,
+  startDatabaseTestContext,
+} from './database-test-context';
+
+jest.setTimeout(120_000);
+
+describe('foundation migration', () => {
+  let context: DatabaseTestContext;
+
+  beforeAll(async () => {
+    context = await startDatabaseTestContext();
+  });
+
+  afterAll(async () => {
+    await context?.stop();
+  });
+
+  it('installs the approved foundation tables in their owning schemas', async () => {
+    const result = await context.pool.query<{ table_name: string }>(`
+      SELECT table_schema || '.' || table_name AS table_name
+      FROM information_schema.tables
+      WHERE table_schema IN ('booking', 'system')
+        AND table_type = 'BASE TABLE'
+      ORDER BY table_schema, table_name
+    `);
+
+    expect(result.rows.map(({ table_name: tableName }) => tableName)).toEqual([
+      'booking.branches',
+      'booking.clients',
+      'booking.staff_branch_assignments',
+      'booking.staff_members',
+      'system.account_devices',
+      'system.accounts',
+      'system.audit_records',
+      'system.authentication_sessions',
+      'system.authentication_throttle_events',
+      'system.authentication_tokens',
+      'system.email_suppressions',
+      'system.idempotency_records',
+      'system.image_assets',
+      'system.notification_deliveries',
+      'system.notifications',
+    ]);
+  });
+
+  it('requires every account to belong to exactly one domain identity', async () => {
+    await expectDatabaseError(
+      context,
+      async (client) => {
+        await client.query(
+          `
+            INSERT INTO system.accounts (id, email, updated_at)
+            VALUES ($1, $2, CURRENT_TIMESTAMP)
+          `,
+          [randomUUID(), 'identity@example.com'],
+        );
+      },
+      '23514',
+      'accounts_exactly_one_domain_identity_check',
+    );
+  });
+
+  it('allows only one current authentication token per account and purpose', async () => {
+    const clientId = randomUUID();
+    const accountId = randomUUID();
+
+    await expectDatabaseError(
+      context,
+      async (client) => {
+        await client.query(
+          `
+            INSERT INTO booking.clients (id, name, referral_code, updated_at)
+            VALUES ($1, 'Test Client', $2, CURRENT_TIMESTAMP)
+          `,
+          [clientId, `ref-${clientId}`],
+        );
+        await client.query(
+          `
+            INSERT INTO system.accounts (id, email, client_id, updated_at)
+            VALUES ($1, $2, $3, CURRENT_TIMESTAMP)
+          `,
+          [accountId, `${accountId}@example.com`, clientId],
+        );
+        await client.query(
+          `
+            INSERT INTO system.authentication_tokens
+              (id, account_id, purpose, token_digest, expires_at)
+            VALUES
+              ($1, $2, 'verification', $3, CURRENT_TIMESTAMP + INTERVAL '1 hour'),
+              ($4, $2, 'verification', $5, CURRENT_TIMESTAMP + INTERVAL '1 hour')
+          `,
+          [
+            randomUUID(),
+            accountId,
+            Buffer.from('first'),
+            randomUUID(),
+            Buffer.from('second'),
+          ],
+        );
+      },
+      '23505',
+      'authentication_tokens_one_current_per_account_purpose_key',
+    );
+  });
+
+  it('treats active branch names as unique after trimming and case folding', async () => {
+    await expectDatabaseError(
+      context,
+      async (client) => {
+        await client.query(
+          `
+            INSERT INTO booking.branches (id, name, address, updated_at)
+            VALUES
+              ($1, 'Central', 'First address', CURRENT_TIMESTAMP),
+              ($2, ' central ', 'Second address', CURRENT_TIMESTAMP)
+          `,
+          [randomUUID(), randomUUID()],
+        );
+      },
+      '23505',
+      'branches_active_normalized_name_key',
+    );
+  });
+
+  it('keeps audit records append-only', async () => {
+    const auditRecordId = randomUUID();
+
+    await expectDatabaseError(
+      context,
+      async (client) => {
+        await client.query(
+          `
+            INSERT INTO system.audit_records
+              (id, action_code, outcome, actor_kind, target_type, correlation_id)
+            VALUES ($1, 'test.created', 'succeeded', 'system', 'test', $2)
+          `,
+          [auditRecordId, randomUUID()],
+        );
+        await client.query(
+          'UPDATE system.audit_records SET action_code = $1 WHERE id = $2',
+          ['test.changed', auditRecordId],
+        );
+      },
+      '55000',
+    );
+  });
+});
+
+const expectDatabaseError = async (
+  context: DatabaseTestContext,
+  action: (client: PoolClient) => Promise<void>,
+  code: string,
+  constraint?: string,
+): Promise<void> => {
+  const client = await context.pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    try {
+      await action(client);
+      throw new Error('Expected the database operation to fail');
+    } catch (error) {
+      expect(error).toBeInstanceOf(DatabaseError);
+      expect(error).toMatchObject({
+        code,
+        ...(constraint ? { constraint } : {}),
+      });
+    }
+  } finally {
+    await client.query('ROLLBACK');
+    client.release();
+  }
+};
