@@ -27,11 +27,3 @@ _Avoid_: Verification Link, invitation code
 **Password-Recovery Link**:
 A single-use email link through which an Account holder replaces a forgotten password. It is not an Authentication Session and cannot grant normal application access by itself.
 _Avoid_: Reset code, magic link
-
-**MFA Challenge**:
-A temporary restricted step in which an Administrator proves or enrolls a second authentication factor before a full Authentication Session is created. It grants no ordinary Administrator access.
-_Avoid_: Authentication Session, temporary login
-
-**Recovery Code**:
-One of an Administrator's single-use codes for completing an MFA Challenge when the authenticator app is unavailable. It is not a password-recovery mechanism and is shown only when a set is issued.
-_Avoid_: Backup password, password-reset code

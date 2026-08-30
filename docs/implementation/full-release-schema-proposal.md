@@ -9,7 +9,7 @@ This proposal covers the application tables needed for the documented first
 release. It was checked against:
 
 - the System Identity, Booking & Membership, and Back Office glossaries;
-- the accepted architecture decisions, including authentication, MFA,
+- the accepted architecture decisions, including authentication,
   authorization, auditing, time, idempotency, notifications, uploads, money,
   recurring materialization, and transaction boundaries;
 - all 80 generated product screens: 23 Client, 23 Staff, and 34 admin-web
@@ -45,9 +45,6 @@ flowchart TB
     AuthSession[authentication_sessions]
     ThrottleLane[authentication_throttle_lanes]
     ThrottleEvent[authentication_throttle_events]
-    MfaFactor[administrator_mfa_factors]
-    RecoveryCode[administrator_recovery_codes]
-    MfaChallenge[mfa_challenges]
     EmailSuppression[email_suppressions]
     Audit[audit_records]
     Idempotency[idempotency_records]
@@ -60,9 +57,6 @@ flowchart TB
     Account --> Credential
     Account --> AuthLink
     Account --> AuthSession
-    Account --> MfaFactor
-    Account --> RecoveryCode
-    Account --> MfaChallenge
     Account --> Notification
     Account --> Device
     ThrottleLane --> ThrottleEvent
@@ -142,13 +136,10 @@ flowchart TB
 | -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `accounts`                       | UUID, normalized unique email, nullable unique Client/Staff Member links, verification/activation/disablement/pending-expiry timestamps, created/updated timestamps. A database check requires exactly one domain-identity link.                      |
 | `account_credentials`            | One row per Account with an Argon2id password hash and password-change timestamp. No plaintext or reversible password.                                                                                                                                |
-| `authentication_links`           | Account, purpose (`verification`, `activation`, `password_recovery`, `administrator_mfa_recovery`), one-way token digest, issuance/expiry/use/invalidation timestamps. A partial unique index permits one current link per Account and purpose.       |
+| `authentication_links`           | Account, purpose (`verification`, `activation`, `password_recovery`), one-way token digest, issuance/expiry/use/invalidation timestamps. A partial unique index permits one current link per Account and purpose.                                     |
 | `authentication_sessions`        | Account, unique one-way credential digest, created/meaningful-activity/idle-expiry/absolute-expiry/revocation timestamps. Credentials contain no Role or permission claims.                                                                           |
 | `authentication_throttle_lanes`  | Keyed digest identifying the recipient, claimed-email/client, client-wide, or network-wide lane; purpose; current progressive-login failure state and blocked-until time. No raw session, token, client identifier, or network address.               |
 | `authentication_throttle_events` | Timestamped counted events for rolling hourly, daily, client-wide, and network-wide budgets. Old events are removed after their longest required window.                                                                                              |
-| `administrator_mfa_factors`      | One active encrypted TOTP secret per Administrator Account, enrollment/replacement timestamps, and key version. The encryption key remains outside PostgreSQL.                                                                                        |
-| `administrator_recovery_codes`   | Account, recovery-code set identifier, one-way code hash, issued/used timestamps. Ten rows are issued per set.                                                                                                                                        |
-| `mfa_challenges`                 | Account, one-way challenge credential digest, purpose, 15-minute expiry, completion/invalidation timestamps. This is not an Authentication Session.                                                                                                   |
 | `email_suppressions`             | Normalized email digest/address boundary, hard-bounce or complaint reason, provider event identifier, suppression/resolution timestamps.                                                                                                              |
 | `audit_records`                  | Append-only action code, outcome, actor Account/effective Role, target type/id, optional Branch, correlation id, timestamp, and minimal JSON metadata. This also records pending-account cancellation/expiry, avoiding a separate narrow audit table. |
 | `idempotency_records`            | Account, command name, idempotency key, request hash, stored HTTP outcome, creation/expiry timestamps. Unique by Account, command, and key.                                                                                                           |
@@ -237,7 +228,7 @@ behavior and concurrency tests.
 ## Migration impact and delivery proposal
 
 Because no business data exists yet, the approved implementation can create all
-42 application tables in one initial application migration, ordered so
+39 application tables in one initial application migration, ordered so
 cross-schema foreign keys are valid. The migration will also add required enums,
 partial indexes, checks, exclusion constraints, and PostgreSQL extensions used
 by those constraints. It will not seed real Accounts, credentials, or business
