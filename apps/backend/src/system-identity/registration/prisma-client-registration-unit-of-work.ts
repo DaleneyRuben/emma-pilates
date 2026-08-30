@@ -11,6 +11,10 @@ import type {
   ClientRegistrationTransaction,
   ClientRegistrationUnitOfWork,
 } from './register-client';
+import type {
+  PendingEmailCorrection,
+  PendingEmailCorrectionStatus,
+} from './correct-pending-client-email';
 
 const hourMilliseconds = 60 * 60 * 1_000;
 const dayMilliseconds = 24 * hourMilliseconds;
@@ -38,6 +42,99 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
         ),
       ),
     );
+  }
+
+  correctEmail(
+    correction: PendingEmailCorrection,
+  ): Promise<PendingEmailCorrectionStatus> {
+    return this.dependencies.prisma.$transaction(async (transaction) => {
+      const continuation = await transaction.authenticationToken.findUnique({
+        where: {
+          tokenDigest: toPrismaBytes(correction.continuationDigest),
+        },
+        include: {
+          account: {
+            select: {
+              id: true,
+              email: true,
+              clientId: true,
+              staffMemberId: true,
+              emailVerifiedAt: true,
+              activatedAt: true,
+              pendingExpiresAt: true,
+            },
+          },
+        },
+      });
+
+      if (
+        continuation === null ||
+        continuation.purpose !==
+          AuthenticationTokenPurpose.REGISTRATION_CONTINUATION ||
+        continuation.usedAt !== null ||
+        continuation.invalidatedAt !== null ||
+        continuation.expiresAt <= correction.now ||
+        continuation.account.clientId === null ||
+        continuation.account.staffMemberId !== null ||
+        continuation.account.emailVerifiedAt !== null ||
+        continuation.account.activatedAt !== null ||
+        continuation.account.pendingExpiresAt === null ||
+        continuation.account.pendingExpiresAt <= correction.now
+      ) {
+        return 'expired';
+      }
+
+      const conflictingAccount = await transaction.account.findUnique({
+        where: { email: correction.email },
+        select: { id: true },
+      });
+
+      if (
+        conflictingAccount !== null &&
+        conflictingAccount.id !== continuation.account.id
+      ) {
+        return 'email_unavailable';
+      }
+
+      const activeTransaction = new PrismaClientRegistrationTransaction(
+        transaction,
+        this.dependencies.boss,
+        (email) => this.dependencies.digestEmail(email),
+        this.dependencies.now ?? (() => new Date()),
+      );
+      const canIssueEmail = await activeTransaction.canIssueAuthenticationEmail(
+        {
+          email: correction.email,
+          purpose: 'verification',
+          now: correction.now,
+        },
+      );
+
+      if (!canIssueEmail) {
+        return 'suppressed';
+      }
+
+      await transaction.account.update({
+        where: { id: continuation.account.id },
+        data: { email: correction.email },
+      });
+      await activeTransaction.replaceSelfRegistrationVerification({
+        accountId: continuation.account.id,
+        pendingExpiresAt: correction.pendingExpiresAt,
+        verificationToken: correction.verificationToken,
+      });
+      await activeTransaction.recordIssuedAuthenticationEmail({
+        email: correction.email,
+        purpose: 'verification',
+        occurredAt: correction.now,
+      });
+      await activeTransaction.scheduleAuthenticationEmail({
+        ...correction.emailJob,
+        accountId: continuation.account.id,
+      });
+
+      return 'corrected';
+    });
   }
 }
 
