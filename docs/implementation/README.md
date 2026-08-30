@@ -52,6 +52,10 @@ events that insert rows and representative values after insertion—are recorded
 in
 [`approved-foundation-table-examples.md`](./approved-foundation-table-examples.md).
 
+The next identity dependency is the proposed
+[`BE-004` pg-boss authentication-email foundation](./BE-004-pg-boss-email-job-proposal.md).
+It creates no schema until its technical migration receives explicit approval.
+
 Authentication follow-ups 33–38 are pending in the design workflow. Until a new
 export applies and verifies them, generated authentication screens still show
 superseded phone and temporary-password behavior. Backend work follows the
