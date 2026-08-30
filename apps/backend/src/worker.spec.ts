@@ -1,0 +1,59 @@
+import type { AuthenticationEmailWorkerBoss } from './jobs/authentication-email/authentication-email-worker';
+import { WORKER_HEARTBEAT_INTERVAL_MS } from './jobs/worker-heartbeat';
+import { startWorker, type WorkerBoss } from './worker';
+
+describe('worker entrypoint', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('starts only the worker services and shuts them down gracefully', async () => {
+    jest.useFakeTimers();
+    const isInstalled = jest.fn().mockResolvedValue(true);
+    const schemaVersion = jest.fn().mockResolvedValue(38);
+    const start = jest.fn().mockResolvedValue(undefined);
+    const work = jest
+      .fn<Promise<string>, Parameters<AuthenticationEmailWorkerBoss['work']>>()
+      .mockResolvedValue('worker-id');
+    const getQueueStats = jest
+      .fn()
+      .mockResolvedValue([{ readyCount: 2, activeCount: 1, failedCount: 3 }]);
+    const stop = jest.fn().mockResolvedValue(undefined);
+    const boss: WorkerBoss = {
+      isInstalled,
+      schemaVersion,
+      start,
+      work,
+      getQueueStats,
+      stop,
+    };
+    const emit = jest.fn();
+
+    const stopWorker = await startWorker({
+      boss,
+      authenticationEmail: {
+        stateReader: { find: jest.fn() },
+        decryptor: { decrypt: jest.fn() },
+        renderer: { render: jest.fn() },
+        delivery: { deliver: jest.fn() },
+      },
+      serviceVersion: '1.2.3',
+      emit,
+    });
+
+    expect(isInstalled).toHaveBeenCalledTimes(1);
+    expect(schemaVersion).toHaveBeenCalledTimes(1);
+    expect(start).toHaveBeenCalledTimes(1);
+    expect(work).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(WORKER_HEARTBEAT_INTERVAL_MS);
+    expect(getQueueStats).toHaveBeenCalledWith(
+      'system.authentication-email.v1',
+      { force: true },
+    );
+    expect(emit).toHaveBeenCalledTimes(1);
+
+    await stopWorker();
+    expect(stop).toHaveBeenCalledWith({ graceful: true });
+  });
+});
