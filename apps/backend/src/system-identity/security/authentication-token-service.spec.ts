@@ -11,6 +11,7 @@ describe('AuthenticationTokenService', () => {
     expect(first.digest).toHaveLength(32);
     expect(first.digest.toString('utf8')).not.toContain(first.secret);
     expect(second.secret).not.toBe(first.secret);
+    expect(tokens.digest(first.secret)).toEqual(first.digest);
     expect(tokens.matches(first.secret, first.digest)).toBe(true);
     expect(tokens.matches(second.secret, first.digest)).toBe(false);
   });
