@@ -15,6 +15,10 @@ import type {
   PendingEmailCorrection,
   PendingEmailCorrectionStatus,
 } from './correct-pending-client-email';
+import type {
+  PendingVerificationResend,
+  PendingVerificationResendStatus,
+} from './resend-pending-client-verification';
 
 const hourMilliseconds = 60 * 60 * 1_000;
 const dayMilliseconds = 24 * hourMilliseconds;
@@ -134,6 +138,81 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
       });
 
       return 'corrected';
+    });
+  }
+
+  resend(
+    request: PendingVerificationResend,
+  ): Promise<PendingVerificationResendStatus> {
+    return this.dependencies.prisma.$transaction(async (transaction) => {
+      const continuation = await transaction.authenticationToken.findUnique({
+        where: { tokenDigest: toPrismaBytes(request.continuationDigest) },
+        include: {
+          account: {
+            select: {
+              id: true,
+              email: true,
+              clientId: true,
+              staffMemberId: true,
+              emailVerifiedAt: true,
+              activatedAt: true,
+              pendingExpiresAt: true,
+            },
+          },
+        },
+      });
+
+      if (
+        continuation === null ||
+        continuation.purpose !==
+          AuthenticationTokenPurpose.REGISTRATION_CONTINUATION ||
+        continuation.usedAt !== null ||
+        continuation.invalidatedAt !== null ||
+        continuation.expiresAt <= request.now ||
+        continuation.account.clientId === null ||
+        continuation.account.staffMemberId !== null ||
+        continuation.account.emailVerifiedAt !== null ||
+        continuation.account.activatedAt !== null ||
+        continuation.account.pendingExpiresAt === null ||
+        continuation.account.pendingExpiresAt <= request.now
+      ) {
+        return 'expired';
+      }
+
+      const activeTransaction = new PrismaClientRegistrationTransaction(
+        transaction,
+        this.dependencies.boss,
+        (email) => this.dependencies.digestEmail(email),
+        this.dependencies.now ?? (() => new Date()),
+      );
+      const canIssueEmail = await activeTransaction.canIssueAuthenticationEmail(
+        {
+          email: continuation.account.email,
+          purpose: 'verification',
+          now: request.now,
+        },
+      );
+
+      if (!canIssueEmail) {
+        return 'suppressed';
+      }
+
+      await activeTransaction.replaceSelfRegistrationVerification({
+        accountId: continuation.account.id,
+        pendingExpiresAt: request.pendingExpiresAt,
+        verificationToken: request.verificationToken,
+      });
+      await activeTransaction.recordIssuedAuthenticationEmail({
+        email: continuation.account.email,
+        purpose: 'verification',
+        occurredAt: request.now,
+      });
+      await activeTransaction.scheduleAuthenticationEmail({
+        ...request.emailJob,
+        accountId: continuation.account.id,
+      });
+
+      return 'sent';
     });
   }
 }
