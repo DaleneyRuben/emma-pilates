@@ -52,20 +52,41 @@ and no `client_id`. The database rejects rows with both links or neither link.
 ### `authentication_tokens`
 
 **Purpose:** Represent single-use Verification, Activation, and
-Password-Recovery Links without storing the raw secret received by email.
+Password-Recovery Links, plus the private continuation held by the app during a
+self-registration, without storing any usable raw secret.
 
 **Typical insert triggers:**
 
-| Event                                      | Purpose             | Lifetime   | Resulting row                                                                                                                                                     |
-| ------------------------------------------ | ------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ana self-registers                         | `verification`      | 24 hours   | `account_id=account_ana`, `token_digest=<digest_v1>`, `issued_at=2026-08-29T14:00:00Z`, `expires_at=2026-08-30T14:00:00Z`, `used_at=null`, `invalidated_at=null`  |
-| An Administrator creates Staff Member Luis | `activation`        | 7 days     | `account_id=account_luis`, `token_digest=<digest_a1>`, `issued_at=2026-08-29T15:00:00Z`, `expires_at=2026-09-05T15:00:00Z`, `used_at=null`, `invalidated_at=null` |
-| Ana requests password recovery             | `password_recovery` | 30 minutes | `account_id=account_ana`, `token_digest=<digest_r1>`, `issued_at=2026-10-02T18:00:00Z`, `expires_at=2026-10-02T18:30:00Z`, `used_at=null`, `invalidated_at=null`  |
+| Event                                      | Purpose                     | Lifetime   | Resulting row                                                                                                                                                     |
+| ------------------------------------------ | --------------------------- | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ana self-registers                         | `verification`              | 24 hours   | `account_id=account_ana`, `token_digest=<digest_v1>`, `issued_at=2026-08-29T14:00:00Z`, `expires_at=2026-08-30T14:00:00Z`, `used_at=null`, `invalidated_at=null`  |
+| Ana self-registers                         | `registration_continuation` | 7 days     | `account_id=account_ana`, `token_digest=<digest_c1>`, `issued_at=2026-08-29T14:00:00Z`, `expires_at=2026-09-05T14:00:00Z`, `used_at=null`, `invalidated_at=null`  |
+| An Administrator creates Staff Member Luis | `activation`                | 7 days     | `account_id=account_luis`, `token_digest=<digest_a1>`, `issued_at=2026-08-29T15:00:00Z`, `expires_at=2026-09-05T15:00:00Z`, `used_at=null`, `invalidated_at=null` |
+| Ana requests password recovery             | `password_recovery`         | 30 minutes | `account_id=account_ana`, `token_digest=<digest_r1>`, `issued_at=2026-10-02T18:00:00Z`, `expires_at=2026-10-02T18:30:00Z`, `used_at=null`, `invalidated_at=null`  |
 
 Issuing a replacement link sets `invalidated_at` on the older unused row before
 inserting the replacement. Successful consumption sets `used_at`. Expired rows
 remain unusable even if both fields are still null. The partial unique index
 allows only one current row per Account and purpose.
+
+The app receives the raw registration continuation once when it creates the
+self-registered pending Account; PostgreSQL retains only `<digest_c1>`. A
+repeated public registration receives the same neutral **Revisa tu correo**
+response but never receives the existing continuation, so knowing Ana's email
+does not authorize another person to correct or cancel her registration.
+
+When Ana corrects her email, the backend verifies the continuation digest,
+updates the pending Account, invalidates the old Verification Link, issues and
+queues a new one, and restarts both the continuation's seven-day expiry and the
+Account's seven-day inactivity window. Cancellation requires the same valid
+continuation. It removes the pending Account and Client; the foreign-key cascade
+removes their token rows, while `audit_records` retains the minimal cancellation
+event. An Assistant-created Client has an Activation Link but no
+`registration_continuation`, so a public request cannot change or cancel that
+invitation.
+
+This approved IDN-003 extension adds only the
+`registration_continuation` enum value. It adds no table or column.
 
 ### `authentication_sessions`
 
@@ -378,12 +399,15 @@ Branches.
 
 ### Self-registering Client
 
-One successful registration transaction creates or reuses the `clients` and
-`accounts` rows, invalidates any older current verification token, inserts the
-new `authentication_tokens` row, records the accepted
+One successful new-registration transaction creates the `clients` and
+`accounts` rows, inserts separate Verification Link and registration
+continuation rows in `authentication_tokens`, records the accepted
 `authentication_throttle_events` event, and queues the separately reviewed
-email job. It creates no `authentication_sessions` row. A session exists only
-after verification and a later successful Login.
+email job. Repeating registration for the same self-registered pending Account
+reuses the existing Client and Account, preserves the private continuation,
+and replaces only the Verification Link when the email limits permit it. The
+flow creates no `authentication_sessions` row. A session exists only after
+verification and a later successful Login.
 
 ### Staff invitation
 
