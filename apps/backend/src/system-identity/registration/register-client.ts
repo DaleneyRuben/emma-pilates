@@ -35,6 +35,11 @@ export interface ClientRegistrationTransaction {
   findAccountByEmail(
     email: string,
   ): Promise<ExistingRegistrationAccount | null>;
+  canIssueAuthenticationEmail(input: {
+    email: string;
+    purpose: 'verification' | 'activation';
+    now: Date;
+  }): Promise<boolean>;
   createSelfRegistration(registration: NewSelfRegistration): Promise<void>;
   replaceSelfRegistrationVerification(input: {
     accountId: string;
@@ -111,6 +116,28 @@ export class RegisterClient {
     const created = await this.dependencies.unitOfWork.execute(
       async (transaction) => {
         const existingAccount = await transaction.findAccountByEmail(email);
+        const compatiblePendingAccount =
+          existingAccount === null ||
+          (existingAccount.domainIdentity === 'client' &&
+            existingAccount.pendingFlow !== 'none');
+
+        if (!compatiblePendingAccount) {
+          return false;
+        }
+
+        const emailPurpose =
+          existingAccount?.pendingFlow === 'staff_invitation'
+            ? 'activation'
+            : 'verification';
+        const canIssueEmail = await transaction.canIssueAuthenticationEmail({
+          email,
+          purpose: emailPurpose,
+          now,
+        });
+
+        if (!canIssueEmail) {
+          return false;
+        }
 
         if (existingAccount !== null) {
           if (
