@@ -6,7 +6,7 @@ import {
 } from '@testcontainers/postgresql';
 import { Pool } from 'pg';
 
-const backendRoot = resolve(__dirname, '../..');
+const backendRoot = resolve(process.cwd());
 const disposableDatabasePrefix = 'pilates_test_';
 
 export type DatabaseTestContext = {

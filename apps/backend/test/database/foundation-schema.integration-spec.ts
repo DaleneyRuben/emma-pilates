@@ -5,8 +5,6 @@ import {
   startDatabaseTestContext,
 } from './database-test-context';
 
-jest.setTimeout(120_000);
-
 describe('foundation migration', () => {
   let context: DatabaseTestContext;
 
