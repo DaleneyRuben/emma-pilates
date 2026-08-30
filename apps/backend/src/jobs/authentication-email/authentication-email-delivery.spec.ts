@@ -17,14 +17,16 @@ describe('authentication email delivery deadline', () => {
   });
 
   it('passes a live cancellation signal to delivery', async () => {
-    const delivery = { deliver: jest.fn().mockResolvedValue(undefined) };
+    const deliver = jest
+      .fn<Promise<void>, [typeof message, { signal: AbortSignal }]>()
+      .mockResolvedValue(undefined);
 
-    await deliverAuthenticationEmail(delivery, message);
+    await deliverAuthenticationEmail({ deliver }, message);
 
-    expect(delivery.deliver).toHaveBeenCalledWith(message, {
-      signal: expect.any(AbortSignal),
-    });
-    expect(delivery.deliver.mock.calls[0][1].signal.aborted).toBe(false);
+    expect(deliver).toHaveBeenCalledTimes(1);
+    expect(deliver.mock.calls[0][0]).toEqual(message);
+    expect(deliver.mock.calls[0][1].signal).toBeInstanceOf(AbortSignal);
+    expect(deliver.mock.calls[0][1].signal.aborted).toBe(false);
   });
 
   it('aborts and reports a timeout after ten seconds', async () => {
@@ -38,13 +40,14 @@ describe('authentication email delivery deadline', () => {
     };
 
     const deliveryAttempt = deliverAuthenticationEmail(delivery, message);
+    const timeoutExpectation = expect(deliveryAttempt).rejects.toMatchObject<
+      Partial<AuthenticationEmailDeliveryError>
+    >({ category: 'timeout' });
     await jest.advanceTimersByTimeAsync(
       AUTHENTICATION_EMAIL_DELIVERY_DEADLINE_MS,
     );
 
-    await expect(deliveryAttempt).rejects.toMatchObject<
-      Partial<AuthenticationEmailDeliveryError>
-    >({ category: 'timeout' });
+    await timeoutExpectation;
     expect(deliverySignal?.aborted).toBe(true);
   });
 });

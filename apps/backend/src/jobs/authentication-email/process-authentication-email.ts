@@ -2,7 +2,8 @@ import type { AuthenticationEmailJob } from './authentication-email-job';
 import type {
   AuthenticationEmailDelivery,
   AuthenticationEmailMessage,
-} from './local-email-capture';
+} from './authentication-email-delivery';
+import { deliverAuthenticationEmail } from './authentication-email-delivery';
 
 export type AuthenticationEmailState = {
   accountId: string;
@@ -64,7 +65,7 @@ export const processAuthenticationEmail = async (
     linkSecret,
   });
 
-  await dependencies.delivery.deliver(message);
+  await deliverAuthenticationEmail(dependencies.delivery, message);
 
   return 'delivered';
 };

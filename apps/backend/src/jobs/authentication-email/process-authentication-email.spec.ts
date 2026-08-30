@@ -1,3 +1,4 @@
+import type { AuthenticationEmailMessage } from './authentication-email-delivery';
 import { processAuthenticationEmail } from './process-authentication-email';
 
 const job = {
@@ -32,7 +33,13 @@ describe('processAuthenticationEmail', () => {
         link: 'pilates://verify?token=link-secret',
       }),
     };
-    const delivery = { deliver: jest.fn().mockResolvedValue(undefined) };
+    const deliver = jest
+      .fn<
+        Promise<void>,
+        [AuthenticationEmailMessage, { signal: AbortSignal }]
+      >()
+      .mockResolvedValue(undefined);
+    const delivery = { deliver };
 
     await expect(
       processAuthenticationEmail(job, new Date('2026-08-30T15:00:00.000Z'), {
@@ -53,12 +60,16 @@ describe('processAuthenticationEmail', () => {
       purpose: job.purpose,
       linkSecret: 'link-secret',
     });
-    expect(delivery.deliver).toHaveBeenCalledWith({
+    expect(delivery.deliver).toHaveBeenCalledTimes(1);
+    expect(delivery.deliver.mock.calls[0][0]).toEqual({
       recipient: 'client@example.com',
       purpose: 'verification',
       subject: 'Verify your Pilates account',
       link: 'pilates://verify?token=link-secret',
     });
+    expect(delivery.deliver.mock.calls[0][1].signal).toBeInstanceOf(
+      AbortSignal,
+    );
   });
 
   it.each([
