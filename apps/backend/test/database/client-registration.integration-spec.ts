@@ -10,6 +10,7 @@ import { AUTHENTICATION_EMAIL_QUEUE } from '../../src/jobs/authentication-email/
 import { CorrectPendingClientEmail } from '../../src/system-identity/registration/correct-pending-client-email';
 import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
+import { ResendPendingClientVerification } from '../../src/system-identity/registration/resend-pending-client-verification';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
 import { AuthenticationTokenService } from '../../src/system-identity/security/authentication-token-service';
 import {
@@ -218,6 +219,35 @@ describe('Client registration transaction', () => {
     );
     expect(continuation?.expiresAt).toEqual(
       new Date(correctedAt.getTime() + 7 * 24 * 60 * 60 * 1_000),
+    );
+
+    const resentAt = new Date(correctedAt.getTime() + 61_000);
+    const resend = new ResendPendingClientVerification({
+      gateway,
+      tokens,
+      linkCipher: cipher,
+      now: () => resentAt,
+      newId: randomUUID,
+    });
+
+    await expect(
+      resend.execute({
+        registrationContinuation: registration.registrationContinuation,
+      }),
+    ).resolves.toEqual({ status: 'sent' });
+    const tokensAfterResend = await prisma.authenticationToken.findMany({
+      where: { accountId: originalAccount.id },
+    });
+    const currentAfterResend = tokensAfterResend.filter(
+      ({ purpose, invalidatedAt, usedAt }) =>
+        purpose === AuthenticationTokenPurpose.VERIFICATION &&
+        invalidatedAt === null &&
+        usedAt === null,
+    );
+
+    expect(currentAfterResend).toHaveLength(1);
+    expect(currentAfterResend[0]?.expiresAt).toEqual(
+      new Date(resentAt.getTime() + 24 * 60 * 60 * 1_000),
     );
   });
 });
