@@ -40,6 +40,11 @@ export interface ClientRegistrationTransaction {
     purpose: 'verification' | 'activation';
     now: Date;
   }): Promise<boolean>;
+  recordIssuedAuthenticationEmail(input: {
+    email: string;
+    purpose: 'verification' | 'activation';
+    occurredAt: Date;
+  }): Promise<void>;
   createSelfRegistration(registration: NewSelfRegistration): Promise<void>;
   replaceSelfRegistrationVerification(input: {
     accountId: string;
@@ -112,6 +117,26 @@ export class RegisterClient {
     const pendingInvitationExpiresAt = new Date(
       now.getTime() + pendingInvitationLifetimeMilliseconds,
     );
+    const recordAndScheduleEmail = async (
+      transaction: ClientRegistrationTransaction,
+      targetAccountId: string,
+      authenticationTokenId: string,
+      purpose: 'verification' | 'activation',
+    ): Promise<void> => {
+      await transaction.recordIssuedAuthenticationEmail({
+        email,
+        purpose,
+        occurredAt: now,
+      });
+      await transaction.scheduleAuthenticationEmail({
+        version: 1,
+        accountId: targetAccountId,
+        authenticationTokenId,
+        purpose,
+        encryptedLinkSecret: encryptedLink.encryptedLinkSecret,
+        encryptionKeyId: encryptedLink.encryptionKeyId,
+      });
+    };
 
     const created = await this.dependencies.unitOfWork.execute(
       async (transaction) => {
@@ -153,14 +178,12 @@ export class RegisterClient {
                 expiresAt: verificationExpiresAt,
               },
             });
-            await transaction.scheduleAuthenticationEmail({
-              version: 1,
-              accountId: existingAccount.id,
-              authenticationTokenId: verificationTokenId,
-              purpose: 'verification',
-              encryptedLinkSecret: encryptedLink.encryptedLinkSecret,
-              encryptionKeyId: encryptedLink.encryptionKeyId,
-            });
+            await recordAndScheduleEmail(
+              transaction,
+              existingAccount.id,
+              verificationTokenId,
+              'verification',
+            );
           } else if (
             existingAccount.domainIdentity === 'client' &&
             existingAccount.pendingFlow === 'staff_invitation'
@@ -174,14 +197,12 @@ export class RegisterClient {
                 expiresAt: activationExpiresAt,
               },
             });
-            await transaction.scheduleAuthenticationEmail({
-              version: 1,
-              accountId: existingAccount.id,
-              authenticationTokenId: verificationTokenId,
-              purpose: 'activation',
-              encryptedLinkSecret: encryptedLink.encryptedLinkSecret,
-              encryptionKeyId: encryptedLink.encryptionKeyId,
-            });
+            await recordAndScheduleEmail(
+              transaction,
+              existingAccount.id,
+              verificationTokenId,
+              'activation',
+            );
           }
 
           return false;
@@ -206,14 +227,12 @@ export class RegisterClient {
             expiresAt: pendingExpiresAt,
           },
         });
-        await transaction.scheduleAuthenticationEmail({
-          version: 1,
+        await recordAndScheduleEmail(
+          transaction,
           accountId,
-          authenticationTokenId: verificationTokenId,
-          purpose: 'verification',
-          encryptedLinkSecret: encryptedLink.encryptedLinkSecret,
-          encryptionKeyId: encryptedLink.encryptionKeyId,
-        });
+          verificationTokenId,
+          'verification',
+        );
 
         return true;
       },
