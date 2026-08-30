@@ -37,13 +37,20 @@ locally.
 
 The monorepo, three application shells, backend HTTP boundary, local Prisma and
 PostgreSQL configuration, committed OpenAPI document, and generated
-`api-contracts` package exist. The mobile and admin applications still contain
-their starter screens; no business schema or migration exists yet.
+`api-contracts` package exist. The approved 15-table System Identity,
+Client/Staff/Branch, and image-asset foundation is implemented in the first
+business migration with disposable PostgreSQL integration coverage. The mobile
+and admin applications still contain their starter screens.
 
-The proposed complete first-release data model and relationship diagram are in
-[`full-release-schema-proposal.md`](./full-release-schema-proposal.md). It is a
-review document only until its generated migration SQL receives explicit
-approval.
+The complete first-release data model and relationship diagram are in
+[`full-release-schema-proposal.md`](./full-release-schema-proposal.md). The
+foundation rows are approved and implemented; every remaining proposed slice
+still requires explicit approval of its schema and generated migration SQL.
+
+Concrete examples for the approved foundation tables—including the application
+events that insert rows and representative values after insertion—are recorded
+in
+[`approved-foundation-table-examples.md`](./approved-foundation-table-examples.md).
 
 Authentication follow-ups 33–38 are pending in the design workflow. Until a new
 export applies and verifies them, generated authentication screens still show

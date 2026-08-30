@@ -2,8 +2,9 @@
 
 Status: partially approved. The lean System foundation, image upload intent,
 and the Client/Staff/Branch foundation are approved. Remaining release tables
-stay proposed until reviewed. This document does not create or apply a
-migration.
+stay proposed until reviewed. Concrete insert scenarios and representative rows
+for the implemented foundation are in
+[`approved-foundation-table-examples.md`](./approved-foundation-table-examples.md).
 
 ## Scope and sources
 
@@ -231,14 +232,14 @@ behavior and concurrency tests.
 ## Migration impact and delivery proposal
 
 Implementation is phased rather than waiting for every release table. The first
-proposed persistence slice contains the ten approved lean System tables,
+persistence slice implements the ten approved lean System tables,
 `image_assets`, and the four approved Client/Staff/Branch tables: 15 tables in
 total. `image_variants` and the remaining Booking & Membership and Back Office
 tables stay out of that migration until their reviews are complete.
 
-That first migration will require cross-schema foreign keys, fixed enums,
-partial unique indexes, checks, and append-only protections. It will not seed
-real Accounts or business records and will not install the pg-boss schema.
+That first migration includes cross-schema foreign keys, fixed enums, partial
+unique indexes, checks, and append-only protections. It does not seed real
+Accounts or business records and does not install the pg-boss schema.
 
 Before any Prisma schema or migration is created, its exact model, enum,
 constraint, and index impact must be presented for explicit approval. After
