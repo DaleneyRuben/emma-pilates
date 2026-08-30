@@ -1,7 +1,8 @@
 enum AuthenticationTokenPurpose {
-  VERIFICATION      @map("verification")
-  ACTIVATION        @map("activation")
-  PASSWORD_RECOVERY @map("password_recovery")
+  VERIFICATION              @map("verification")
+  REGISTRATION_CONTINUATION @map("registration_continuation")
+  ACTIVATION                @map("activation")
+  PASSWORD_RECOVERY         @map("password_recovery")
 
   @@schema("system")
 }
