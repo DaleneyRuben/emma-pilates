@@ -15,6 +15,32 @@ Run `git status` and inspect both staged and unstaged diffs. Distinguish changes
 
 A commit contains one logical change. If unrelated changes exist, commit only the current logical group. If ownership or grouping is unclear, stop and ask the user which group to commit.
 
+Atomic means the commit has one purpose and can be reviewed, reverted, or
+cherry-picked without carrying a separate decision with it. Multiple files are
+allowed when every file is required for that one purpose; proximity in time or
+work on the same backlog item is not enough to combine changes.
+
+Before staging, describe the intended commit in one short sentence. If that
+sentence needs “and” to join independently useful outcomes, split the work. In
+particular, keep these checkpoints separate when they can stand alone:
+
+- recording a proposal or approval;
+- adding or upgrading a dependency;
+- committing a generated schema or migration review artifact;
+- adding a failing test;
+- implementing the behavior that makes the test pass;
+- refactoring green code; and
+- marking a backlog item complete with its evidence commit.
+
+For example, approving a pg-boss proposal, pinning pg-boss, and recording its
+generated schema are three commits when each is independently reviewable and
+revertible. Do not bundle them merely because they contribute to the same
+backlog item.
+
+Immediately before `git commit`, inspect `git diff --cached --name-status` and
+`git diff --cached`. If the staged diff contains more than one independently
+revertible outcome, unstage the extra paths and commit each outcome separately.
+
 For TDD work, preserve the project's Red → Green → Refactor history: commit an intentional failing test separately when the workflow calls for a red checkpoint, commit the minimal passing implementation after green, and commit a subsequent refactor separately.
 
 ## 3. Validate before staging
