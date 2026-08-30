@@ -2,7 +2,11 @@ import type { ConstructorOptions, PgBoss } from 'pg-boss';
 
 export const PG_BOSS_SCHEMA_VERSION = 38;
 
-type StartablePgBoss = Pick<PgBoss, 'isInstalled' | 'schemaVersion' | 'start'>;
+export interface StartablePgBoss {
+  isInstalled(): Promise<boolean>;
+  schemaVersion(): Promise<number | null>;
+  start(): Promise<unknown>;
+}
 
 export const pgBossOptions = (
   connectionString: string,

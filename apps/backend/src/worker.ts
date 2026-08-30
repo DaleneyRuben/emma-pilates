@@ -1,0 +1,66 @@
+import type { AuthenticationEmailProcessorDependencies } from './jobs/authentication-email/process-authentication-email';
+import { AUTHENTICATION_EMAIL_QUEUE } from './jobs/authentication-email/authentication-email-job';
+import {
+  registerAuthenticationEmailWorker,
+  type AuthenticationEmailWorkerBoss,
+} from './jobs/authentication-email/authentication-email-worker';
+import {
+  startInstalledPgBoss,
+  type StartablePgBoss,
+} from './jobs/pg-boss-runtime';
+import { startWorkerHeartbeat } from './jobs/worker-heartbeat';
+
+type QueueStatsSnapshot = {
+  readyCount: number;
+  activeCount: number;
+  failedCount: number;
+};
+
+export interface WorkerBoss
+  extends StartablePgBoss, AuthenticationEmailWorkerBoss {
+  getQueueStats(
+    name: string,
+    options: { force: true },
+  ): Promise<QueueStatsSnapshot[]>;
+  stop(options: { graceful: true }): Promise<void>;
+}
+
+type WorkerDependencies = {
+  boss: WorkerBoss;
+  authenticationEmail: AuthenticationEmailProcessorDependencies;
+  serviceVersion: string;
+  emit(record: unknown): void;
+};
+
+export const startWorker = async (
+  dependencies: WorkerDependencies,
+): Promise<() => Promise<void>> => {
+  await startInstalledPgBoss(dependencies.boss);
+  await registerAuthenticationEmailWorker(
+    dependencies.boss,
+    dependencies.authenticationEmail,
+  );
+
+  const stopHeartbeat = startWorkerHeartbeat({
+    serviceVersion: dependencies.serviceVersion,
+    getAuthenticationEmailCounts: async () => {
+      const snapshots = await dependencies.boss.getQueueStats(
+        AUTHENTICATION_EMAIL_QUEUE,
+        { force: true },
+      );
+      const latest = snapshots.at(-1);
+
+      return {
+        ready: latest?.readyCount ?? 0,
+        active: latest?.activeCount ?? 0,
+        failed: latest?.failedCount ?? 0,
+      };
+    },
+    emit: (record) => dependencies.emit(record),
+  });
+
+  return async () => {
+    stopHeartbeat();
+    await dependencies.boss.stop({ graceful: true });
+  };
+};
