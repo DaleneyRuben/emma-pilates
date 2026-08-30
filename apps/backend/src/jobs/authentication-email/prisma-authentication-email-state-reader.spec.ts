@@ -47,4 +47,21 @@ describe('PrismaAuthenticationEmailStateReader', () => {
 
     await expect(reader.find('missing-token-id')).resolves.toBeNull();
   });
+
+  it('does not expose a registration continuation to the email worker', async () => {
+    const reader = new PrismaAuthenticationEmailStateReader({
+      authenticationToken: {
+        findUnique: jest.fn().mockResolvedValue({
+          accountId: '0ae2701e-f8ac-4c8a-8cf0-65182ee0fc1d',
+          purpose: AuthenticationTokenPurpose.REGISTRATION_CONTINUATION,
+          expiresAt: new Date('2026-09-06T16:00:00.000Z'),
+          usedAt: null,
+          invalidatedAt: null,
+          account: { email: 'client@example.com' },
+        }),
+      },
+    });
+
+    await expect(reader.find('continuation-token-id')).resolves.toBeNull();
+  });
 });
