@@ -50,10 +50,16 @@ export class PrismaAuthenticationEmailStateReader implements AuthenticationEmail
       return null;
     }
 
+    const purpose = mapPurpose(token.purpose);
+
+    if (purpose === null) {
+      return null;
+    }
+
     return {
       accountId: token.accountId,
       email: token.account.email,
-      purpose: mapPurpose(token.purpose),
+      purpose,
       expiresAt: token.expiresAt,
       usedAt: token.usedAt,
       invalidatedAt: token.invalidatedAt,
@@ -63,7 +69,7 @@ export class PrismaAuthenticationEmailStateReader implements AuthenticationEmail
 
 const mapPurpose = (
   purpose: AuthenticationTokenPurpose,
-): AuthenticationEmailJob['purpose'] => {
+): AuthenticationEmailJob['purpose'] | null => {
   switch (purpose) {
     case AuthenticationTokenPurpose.VERIFICATION:
       return 'verification';
@@ -71,5 +77,7 @@ const mapPurpose = (
       return 'activation';
     case AuthenticationTokenPurpose.PASSWORD_RECOVERY:
       return 'password_recovery';
+    case AuthenticationTokenPurpose.REGISTRATION_CONTINUATION:
+      return null;
   }
 };
