@@ -4,6 +4,8 @@ import type { IssuedAuthenticationToken } from '../security/authentication-token
 
 const verificationLifetimeMilliseconds = 24 * 60 * 60 * 1_000;
 const pendingRegistrationLifetimeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
+const activationLifetimeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
+const pendingInvitationLifetimeMilliseconds = 30 * 24 * 60 * 60 * 1_000;
 
 type StoredAuthenticationToken = {
   id: string;
@@ -25,6 +27,7 @@ type NewSelfRegistration = {
 
 type ExistingRegistrationAccount = {
   id: string;
+  domainIdentity: 'client' | 'staff';
   pendingFlow: 'self_registration' | 'staff_invitation' | 'none';
 };
 
@@ -37,6 +40,11 @@ export interface ClientRegistrationTransaction {
     accountId: string;
     pendingExpiresAt: Date;
     verificationToken: StoredAuthenticationToken;
+  }): Promise<void>;
+  replaceStaffInvitationActivation(input: {
+    accountId: string;
+    pendingExpiresAt: Date;
+    activationToken: StoredAuthenticationToken;
   }): Promise<void>;
   scheduleAuthenticationEmail(job: AuthenticationEmailJob): Promise<void>;
 }
@@ -93,13 +101,22 @@ export class RegisterClient {
     const pendingExpiresAt = new Date(
       now.getTime() + pendingRegistrationLifetimeMilliseconds,
     );
+    const activationExpiresAt = new Date(
+      now.getTime() + activationLifetimeMilliseconds,
+    );
+    const pendingInvitationExpiresAt = new Date(
+      now.getTime() + pendingInvitationLifetimeMilliseconds,
+    );
 
     const created = await this.dependencies.unitOfWork.execute(
       async (transaction) => {
         const existingAccount = await transaction.findAccountByEmail(email);
 
         if (existingAccount !== null) {
-          if (existingAccount.pendingFlow === 'self_registration') {
+          if (
+            existingAccount.domainIdentity === 'client' &&
+            existingAccount.pendingFlow === 'self_registration'
+          ) {
             await transaction.replaceSelfRegistrationVerification({
               accountId: existingAccount.id,
               pendingExpiresAt,
@@ -114,6 +131,27 @@ export class RegisterClient {
               accountId: existingAccount.id,
               authenticationTokenId: verificationTokenId,
               purpose: 'verification',
+              encryptedLinkSecret: encryptedLink.encryptedLinkSecret,
+              encryptionKeyId: encryptedLink.encryptionKeyId,
+            });
+          } else if (
+            existingAccount.domainIdentity === 'client' &&
+            existingAccount.pendingFlow === 'staff_invitation'
+          ) {
+            await transaction.replaceStaffInvitationActivation({
+              accountId: existingAccount.id,
+              pendingExpiresAt: pendingInvitationExpiresAt,
+              activationToken: {
+                id: verificationTokenId,
+                digest: verificationToken.digest,
+                expiresAt: activationExpiresAt,
+              },
+            });
+            await transaction.scheduleAuthenticationEmail({
+              version: 1,
+              accountId: existingAccount.id,
+              authenticationTokenId: verificationTokenId,
+              purpose: 'activation',
               encryptedLinkSecret: encryptedLink.encryptedLinkSecret,
               encryptionKeyId: encryptedLink.encryptionKeyId,
             });

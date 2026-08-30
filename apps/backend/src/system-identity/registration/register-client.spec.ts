@@ -7,6 +7,7 @@ describe('RegisterClient', () => {
       findAccountByEmail: jest.fn().mockResolvedValue(null),
       createSelfRegistration: jest.fn().mockResolvedValue(undefined),
       replaceSelfRegistrationVerification: jest.fn(),
+      replaceStaffInvitationActivation: jest.fn(),
       scheduleAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
     };
     const unitOfWork = {
@@ -103,6 +104,7 @@ describe('RegisterClient', () => {
       replaceSelfRegistrationVerification: jest
         .fn()
         .mockResolvedValue(undefined),
+      replaceStaffInvitationActivation: jest.fn(),
       scheduleAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
     };
     const issue = jest
