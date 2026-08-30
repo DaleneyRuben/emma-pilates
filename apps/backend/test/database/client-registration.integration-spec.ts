@@ -7,6 +7,7 @@ import {
 } from '../../src/generated/prisma/enums';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { AUTHENTICATION_EMAIL_QUEUE } from '../../src/jobs/authentication-email/authentication-email-job';
+import { CorrectPendingClientEmail } from '../../src/system-identity/registration/correct-pending-client-email';
 import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
@@ -84,6 +85,7 @@ describe('Client registration transaction', () => {
       where: {
         purpose: 'VERIFICATION',
         eventKind: AuthenticationThrottleEventKind.MESSAGE_ISSUED,
+        recipientDigest: new Uint8Array(digestTestEmail(result.email)),
         occurredAt: now,
       },
     });
@@ -131,4 +133,94 @@ describe('Client registration transaction', () => {
       }),
     ).resolves.toBe(0);
   });
+
+  it('corrects a pending email without replacing the Account or Client', async () => {
+    const registeredAt = new Date(Date.now() + 60_000);
+    const correctedAt = new Date(registeredAt.getTime() + 60 * 60 * 1_000);
+    const tokens = new AuthenticationTokenService();
+    const cipher = new AuthenticationLinkCipher(
+      'local-test-key',
+      Buffer.alloc(32, 7),
+    );
+    const gateway = new PrismaClientRegistrationUnitOfWork({
+      prisma,
+      boss,
+      digestEmail: digestTestEmail,
+      now: () => correctedAt,
+    });
+    const registerClient = new RegisterClient({
+      unitOfWork: gateway,
+      passwordHasher: {
+        hash: () => Promise.resolve('original-password-hash'),
+      },
+      tokenIssuer: tokens,
+      linkCipher: cipher,
+      now: () => registeredAt,
+      newId: randomUUID,
+      newReferralCode: () => `REF-${randomUUID()}`,
+    });
+    const originalEmail = `original-${randomUUID()}@example.com`;
+    const registration = await registerClient.execute({
+      name: 'Original Name',
+      email: originalEmail,
+      password: 'original password',
+    });
+    const originalAccount = await prisma.account.findUniqueOrThrow({
+      where: { email: originalEmail },
+      include: { authenticationTokens: true },
+    });
+    const correction = new CorrectPendingClientEmail({
+      gateway,
+      tokens,
+      linkCipher: cipher,
+      now: () => correctedAt,
+      newId: randomUUID,
+    });
+    const correctedEmail = `corrected-${randomUUID()}@example.com`;
+
+    await expect(
+      correction.execute({
+        registrationContinuation: registration.registrationContinuation,
+        email: correctedEmail,
+      }),
+    ).resolves.toEqual({ status: 'corrected', email: correctedEmail });
+    await expect(
+      prisma.account.findUnique({ where: { email: originalEmail } }),
+    ).resolves.toBeNull();
+    const correctedAccount = await prisma.account.findUniqueOrThrow({
+      where: { email: correctedEmail },
+      include: { client: true, authenticationTokens: true },
+    });
+    const currentVerificationTokens =
+      correctedAccount.authenticationTokens.filter(
+        ({ purpose, invalidatedAt, usedAt }) =>
+          purpose === AuthenticationTokenPurpose.VERIFICATION &&
+          invalidatedAt === null &&
+          usedAt === null,
+      );
+    const continuation = correctedAccount.authenticationTokens.find(
+      ({ purpose }) =>
+        purpose === AuthenticationTokenPurpose.REGISTRATION_CONTINUATION,
+    );
+
+    expect(correctedAccount).toMatchObject({
+      id: originalAccount.id,
+      clientId: originalAccount.clientId,
+      passwordHash: 'original-password-hash',
+      pendingExpiresAt: new Date(
+        correctedAt.getTime() + 7 * 24 * 60 * 60 * 1_000,
+      ),
+      client: { name: 'Original Name' },
+    });
+    expect(currentVerificationTokens).toHaveLength(1);
+    expect(currentVerificationTokens[0]?.expiresAt).toEqual(
+      new Date(correctedAt.getTime() + 24 * 60 * 60 * 1_000),
+    );
+    expect(continuation?.expiresAt).toEqual(
+      new Date(correctedAt.getTime() + 7 * 24 * 60 * 60 * 1_000),
+    );
+  });
 });
+
+const digestTestEmail = (email: string): Buffer =>
+  createHmac('sha256', 'test-email-digest-key').update(email).digest();
