@@ -5,6 +5,7 @@ describe('RegisterClient', () => {
     const now = new Date('2026-08-30T18:00:00.000Z');
     const transaction = {
       findAccountByEmail: jest.fn().mockResolvedValue(null),
+      canIssueAuthenticationEmail: jest.fn().mockResolvedValue(true),
       createSelfRegistration: jest.fn().mockResolvedValue(undefined),
       replaceSelfRegistrationVerification: jest.fn(),
       replaceStaffInvitationActivation: jest.fn(),
@@ -100,6 +101,7 @@ describe('RegisterClient', () => {
         domainIdentity: 'client',
         pendingFlow: 'self_registration',
       }),
+      canIssueAuthenticationEmail: jest.fn().mockResolvedValue(true),
       createSelfRegistration: jest.fn(),
       replaceSelfRegistrationVerification: jest
         .fn()
@@ -184,6 +186,7 @@ describe('RegisterClient', () => {
         domainIdentity: 'client',
         pendingFlow: 'staff_invitation',
       }),
+      canIssueAuthenticationEmail: jest.fn().mockResolvedValue(true),
       createSelfRegistration: jest.fn(),
       replaceSelfRegistrationVerification: jest.fn(),
       replaceStaffInvitationActivation: jest.fn().mockResolvedValue(undefined),
@@ -257,5 +260,71 @@ describe('RegisterClient', () => {
       encryptedLinkSecret: 'encrypted-new-activation-secret',
       encryptionKeyId: 'local-test-key',
     });
+  });
+
+  it('keeps the public response neutral when the recipient limit suppresses email', async () => {
+    const transaction = {
+      findAccountByEmail: jest.fn().mockResolvedValue(null),
+      canIssueAuthenticationEmail: jest.fn().mockResolvedValue(false),
+      createSelfRegistration: jest.fn(),
+      replaceSelfRegistrationVerification: jest.fn(),
+      replaceStaffInvitationActivation: jest.fn(),
+      scheduleAuthenticationEmail: jest.fn(),
+    };
+    const registerClient = new RegisterClient({
+      unitOfWork: {
+        execute: jest.fn(
+          async (
+            work: (activeTransaction: typeof transaction) => Promise<boolean>,
+          ) => work(transaction),
+        ),
+      },
+      passwordHasher: {
+        hash: jest.fn().mockResolvedValue('unused-password-hash'),
+      },
+      tokenIssuer: {
+        issue: jest
+          .fn()
+          .mockReturnValueOnce({
+            secret: 'unused-verification-secret',
+            digest: Buffer.from('unused-verification-digest'),
+          })
+          .mockReturnValueOnce({
+            secret: 'unused-continuation-secret',
+            digest: Buffer.from('unused-continuation-digest'),
+          })
+          .mockReturnValueOnce({
+            secret: 'decoy-continuation-secret',
+            digest: Buffer.from('decoy-continuation-digest'),
+          }),
+      },
+      linkCipher: {
+        encrypt: jest.fn().mockReturnValue({
+          encryptedLinkSecret: 'unused-ciphertext',
+          encryptionKeyId: 'local-test-key',
+        }),
+      },
+      now: () => new Date('2026-08-30T18:00:00.000Z'),
+      newId: () => 'unused-id',
+      newReferralCode: () => 'UNUSED-REFERRAL',
+    });
+
+    await expect(
+      registerClient.execute({
+        name: 'Ana Pérez',
+        email: 'ANA@example.com',
+        password: 'correct horse battery staple',
+      }),
+    ).resolves.toEqual({
+      email: 'ana@example.com',
+      registrationContinuation: 'decoy-continuation-secret',
+    });
+    expect(transaction.canIssueAuthenticationEmail).toHaveBeenCalledWith({
+      email: 'ana@example.com',
+      purpose: 'verification',
+      now: new Date('2026-08-30T18:00:00.000Z'),
+    });
+    expect(transaction.createSelfRegistration).not.toHaveBeenCalled();
+    expect(transaction.scheduleAuthenticationEmail).not.toHaveBeenCalled();
   });
 });
