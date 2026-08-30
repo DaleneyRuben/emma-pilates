@@ -1,6 +1,8 @@
 # Full release schema proposal
 
-Status: proposed for explicit approval. This document does not create or apply a
+Status: partially approved. The lean System foundation, image upload intent,
+and the Client/Staff/Branch foundation are approved. Remaining release tables
+stay proposed until reviewed. This document does not create or apply a
 migration.
 
 ## Scope and sources
@@ -25,7 +27,7 @@ identifier, and staff-created Accounts use Activation Links.
 
 ## Proposed ownership
 
-- `system` owns Accounts, credentials, authentication security, audit,
+- `system` owns Accounts, authentication security, audit,
   idempotency, notifications, devices, and uploaded-image metadata.
 - `booking` owns Clients, Staff Members, Branches, catalog, schedules,
   Bookings, Evaluations, Payments, Credits, Referrals, and Promotions.
@@ -40,10 +42,8 @@ identifier, and staff-created Accounts use Activation Links.
 flowchart TB
   subgraph SYSTEM[system schema]
     Account[accounts]
-    Credential[account_credentials]
-    AuthLink[authentication_links]
+    AuthToken[authentication_tokens]
     AuthSession[authentication_sessions]
-    ThrottleLane[authentication_throttle_lanes]
     ThrottleEvent[authentication_throttle_events]
     EmailSuppression[email_suppressions]
     Audit[audit_records]
@@ -52,14 +52,12 @@ flowchart TB
     Device[account_devices]
     Delivery[notification_deliveries]
     Image[image_assets]
-    Variant[image_variants]
+    Variant["image_variants (proposed)"]
 
-    Account --> Credential
-    Account --> AuthLink
+    Account --> AuthToken
     Account --> AuthSession
     Account --> Notification
     Account --> Device
-    ThrottleLane --> ThrottleEvent
     Notification --> Delivery
     Device --> Delivery
     Image --> Variant
@@ -126,28 +124,31 @@ flowchart TB
   Branch --> Expense
   Staff --> Salary
   Image -. optional attachment .-> Client
+  Image -. optional attachment .-> Staff
   Image -. receipt .-> Payment
   Image -. artwork .-> Promotion
 ```
 
 ## `system` tables
 
-| Table                            | Essential data and purpose                                                                                                                                                                                                                            |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `accounts`                       | UUID, normalized unique email, nullable unique Client/Staff Member links, verification/activation/disablement/pending-expiry timestamps, created/updated timestamps. A database check requires exactly one domain-identity link.                      |
-| `account_credentials`            | One row per Account with an Argon2id password hash and password-change timestamp. No plaintext or reversible password.                                                                                                                                |
-| `authentication_links`           | Account, purpose (`verification`, `activation`, `password_recovery`), one-way token digest, issuance/expiry/use/invalidation timestamps. A partial unique index permits one current link per Account and purpose.                                     |
-| `authentication_sessions`        | Account, unique one-way credential digest, created/meaningful-activity/idle-expiry/absolute-expiry/revocation timestamps. Credentials contain no Role or permission claims.                                                                           |
-| `authentication_throttle_lanes`  | Keyed digest identifying the recipient, claimed-email/client, client-wide, or network-wide lane; purpose; current progressive-login failure state and blocked-until time. No raw session, token, client identifier, or network address.               |
-| `authentication_throttle_events` | Timestamped counted events for rolling hourly, daily, client-wide, and network-wide budgets. Old events are removed after their longest required window.                                                                                              |
-| `email_suppressions`             | Normalized email digest/address boundary, hard-bounce or complaint reason, provider event identifier, suppression/resolution timestamps.                                                                                                              |
-| `audit_records`                  | Append-only action code, outcome, actor Account/effective Role, target type/id, optional Branch, correlation id, timestamp, and minimal JSON metadata. This also records pending-account cancellation/expiry, avoiding a separate narrow audit table. |
-| `idempotency_records`            | Account, command name, idempotency key, request hash, stored HTTP outcome, creation/expiry timestamps. Unique by Account, command, and key.                                                                                                           |
-| `notifications`                  | Recipient Account, stable notification type/category, deduplication event key, safe message, authorized destination identifiers, read timestamp, and creation timestamp. This is the durable inbox and badge source.                                  |
-| `account_devices`                | Account, installation identifier digest, Expo token, platform, registered/last-seen/deactivated timestamps. Sign-out detaches the endpoint.                                                                                                           |
-| `notification_deliveries`        | Notification/device pair, provider ticket, receipt status, attempt timestamps, and sanitized failure category. Duplicate delivery never creates another inbox entry.                                                                                  |
-| `image_assets`                   | Owner Account, upload purpose, lifecycle state, server-generated storage keys, declared/verified media metadata, checksum, dimensions, pending/finalized/attached/deletion timestamps. This row begins as the upload intent.                          |
-| `image_variants`                 | Image asset, variant kind, immutable storage key, media type, byte size, width, and height. Image bytes remain in object storage.                                                                                                                     |
+The first ten rows are the approved lean System foundation. Image upload
+metadata remains in the same PostgreSQL schema but is delivered as a separate
+feature slice.
+
+| Status   | Table                            | Essential data and purpose                                                                                                                                                                                                                                                                                                                                                   |
+| -------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Approved | `accounts`                       | UUID; normalized unique email; nullable Argon2id password hash and password-change timestamp; email-verification, activation, disablement, and pending-expiry timestamps; nullable unique Client/Staff Member links; created/updated timestamps. A database check requires exactly one domain-identity link. Credentials stay on this row rather than in a one-to-one table. |
+| Approved | `authentication_tokens`          | Account, purpose (`verification`, `activation`, `password_recovery`), one-way token digest, issued/expiry/use/invalidation timestamps. Raw tokens are never stored, and a partial unique index permits one current token per Account and purpose.                                                                                                                            |
+| Approved | `authentication_sessions`        | Account, optional Account Device, surface (`mobile`, `admin_web`), unique one-way credential digest, created/meaningful-activity/idle-expiry/absolute-expiry/revocation timestamps, and revocation reason. Credentials contain no Role or permission claims.                                                                                                                 |
+| Approved | `authentication_throttle_events` | Purpose, counted event kind, optional recipient digest, login-lane digest, client digest, network digest, occurrence time, and expiry time. Keyed digests support progressive login and rolling message limits without storing raw email, client identifiers, or network addresses. A successful login clears only its claimed-email/origin lane.                            |
+| Approved | `email_suppressions`             | Email digest, hard-bounce/complaint reason, provider and unique provider event identifier, provider/suppression timestamps, and optional resolution actor/reason/note/timestamp. Suppression follows the address rather than an Account.                                                                                                                                     |
+| Approved | `audit_records`                  | Append-only action code and outcome; actor kind, optional Account, and Role snapshot; target type/id; optional Branch; correlation id; minimal JSON metadata; occurrence timestamp. Records survive target deletion and contain no secrets or full personal snapshots.                                                                                                       |
+| Approved | `idempotency_records`            | Account, command, UUID idempotency key, request hash, safe completed HTTP status/body, creation timestamp, and expiry timestamp. Unique by Account, command, and key; rolled-back, authorization, throttle, and transient failures are not retained.                                                                                                                         |
+| Approved | `notifications`                  | Recipient Account, category, stable type, per-Account business-event key, safe title/message, optional authorized destination type/id, creation timestamp, and read timestamp. Unique by Account and event key; this is the durable inbox and badge source.                                                                                                                  |
+| Approved | `account_devices`                | Account, keyed installation-id digest, optional Expo push token, platform, registration/token-update/last-seen timestamps, and optional deactivation timestamp/reason. It stores no hardware advertising identifier. Multiple active devices per Account are allowed, while active installation digests and push tokens remain unique.                                       |
+| Approved | `notification_deliveries`        | Notification/device pair, state (`queued`, `submitted`, `delivered`, `failed`, `discarded`), optional provider ticket, attempt count/timestamps, sanitized failure category, creation timestamp, and completion timestamp. Unique by Notification and Account Device. An inbox Notification remains valid even when no push endpoint exists.                                 |
+| Approved | `image_assets`                   | Owner Account, purpose (`profile_photo`, `transfer_receipt`, `promotion`), lifecycle state, server-generated pending-object key, declared/verified media metadata, checksums, dimensions, creation/expiry/finalization/attachment/deletion timestamps. The shared `profile_photo` purpose supports Client and Staff Member profiles. Image bytes remain in object storage.   |
+| Proposed | `image_variants`                 | Image Asset, variant kind, immutable storage key, media type, byte size, width, height, creation timestamp, and deletion timestamp. A unique Asset/kind pair would represent each rebuilt file while image bytes remain in object storage.                                                                                                                                   |
 
 ## `booking` tables
 
@@ -155,47 +156,47 @@ The fixed Roles are a `StaffRole` enum (`trainer`, `nutritionist`, `assistant`,
 `administrator`), not a configurable table. The accepted authorization model
 does not include custom permissions or editable Roles.
 
-| Table                      | Essential data and purpose                                                                                                                                                                                                                         |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `clients`                  | UUID, name, optional phone, optional profile-image asset, unique referral code, created/updated timestamps. Login email remains on Account. Clients have no home Branch.                                                                           |
-| `staff_members`            | UUID, name, optional phone, exactly one fixed Role, created/updated timestamps. Login email remains on Account.                                                                                                                                    |
-| `branches`                 | UUID, unique name, address, created/updated/archived timestamps. There is no Room or Branch timezone table.                                                                                                                                        |
-| `staff_branch_assignments` | Staff Member/Branch composite key and assignment timestamp. Administrators have implicit access to all Branches and require no rows.                                                                                                               |
-| `plans`                    | Name, allowed duration in months (1/3/6/12), positive class allowance, non-negative price in BOB centavos, display order, archived timestamp. No unlimited Plan.                                                                                   |
-| `class_types`              | Name, positive duration minutes, positive default capacity, optional equipment-needs text, archived timestamp. Equipment is text, not inventory.                                                                                                   |
-| `session_schedules`        | Branch, Class Type, Trainer, Bolivia weekday/wall-clock start, capacity, effective date range, and active state. Edits close the old effective range instead of rewriting historical meaning.                                                      |
-| `sessions`                 | Optional source schedule, Branch, Class Type, Trainer, exact start/end instants, capacity, state, cancellation actor/reason/timestamp, and exception marker. Unique source/local-start prevents duplicate materialization.                         |
-| `subscriptions`            | Client, Plan, start/end dates, original and remaining class allowance, state timestamps, and Plan-name/allowance snapshot needed for history. Only one current Subscription per Client.                                                            |
-| `bookings`                 | Client, Session, Subscription, state, booking actor Account, booked/cancelled/rescheduled timestamps, and idempotency linkage. One active Booking per Client/Session.                                                                              |
-| `waitlist_entries`         | Client, Session, joined order/time, state, promotion timestamp, and promoted Booking. One active entry per Client/Session.                                                                                                                         |
-| `attendance_records`       | One row per Booking with attended/no-show result, recording Trainer Account, and recorded timestamp.                                                                                                                                               |
-| `availability_blocks`      | Nutritionist, Branch, Bolivia weekday/start/end wall-clock times, effective date range, and active state.                                                                                                                                          |
-| `evaluation_slots`         | Source Availability Block, Branch, Nutritionist, exact start/end instants, and state. Unique source/local-start prevents duplicate materialization.                                                                                                |
-| `evaluations`              | Client, Evaluation Slot, state, booking/cancellation timestamps, cancellation actor, and an eligibility month used to enforce one active Evaluation per Client/month.                                                                              |
-| `payments`                 | Client, Plan, transfer/cash method, pending/confirmed/rejected state, requested amount and reserved Credit in BOB centavos, receipt image asset, creator Account, submission/decision timestamps, deciding Account, and required rejection reason. |
-| `credit_accounts`          | One row per Client with a non-negative available balance in BOB centavos and updated timestamp, locked during money transitions.                                                                                                                   |
-| `credit_entries`           | Client Credit Account, positive amount, entry kind (`earned`, `reserved`, `spent`, `released`), optional Payment/Referral references, and timestamp. This is the immutable Credit ledger.                                                          |
-| `referrals`                | Referring Client, unique referred Client, registration timestamp, reward state, first confirmed Payment, and reward Credit entry. Self-referral is prohibited.                                                                                     |
-| `promotions`               | Title, description, image asset, display start/end dates, display order, publication/archive timestamps, and created/updated timestamps.                                                                                                           |
+| Status   | Table                      | Essential data and purpose                                                                                                                                                                                                                         |
+| -------- | -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Approved | `clients`                  | UUID, name, optional normalized phone, optional finalized profile-image asset, unique server-generated referral code, created/updated timestamps. Login email remains on Account. Clients have no home Branch.                                     |
+| Approved | `staff_members`            | UUID, name, optional normalized phone, optional finalized profile-image asset, exactly one fixed Role, created/updated timestamps. Login email remains on Account.                                                                                 |
+| Approved | `branches`                 | UUID, unique active name, address, created/updated/archived timestamps. Archival blocks new activity but preserves history. There is no Room or Branch timezone table.                                                                             |
+| Approved | `staff_branch_assignments` | Staff Member/Branch composite primary key and assignment timestamp. Only Trainers, Nutritionists, and Assistants receive rows. Administrators have implicit access to all Branches. Assignment changes are audited.                                |
+| Proposed | `plans`                    | Name, allowed duration in months (1/3/6/12), positive class allowance, non-negative price in BOB centavos, display order, archived timestamp. No unlimited Plan.                                                                                   |
+| Proposed | `class_types`              | Name, positive duration minutes, positive default capacity, optional equipment-needs text, archived timestamp. Equipment is text, not inventory.                                                                                                   |
+| Proposed | `session_schedules`        | Branch, Class Type, Trainer, Bolivia weekday/wall-clock start, capacity, effective date range, and active state. Edits close the old effective range instead of rewriting historical meaning.                                                      |
+| Proposed | `sessions`                 | Optional source schedule, Branch, Class Type, Trainer, exact start/end instants, capacity, state, cancellation actor/reason/timestamp, and exception marker. Unique source/local-start prevents duplicate materialization.                         |
+| Proposed | `subscriptions`            | Client, Plan, start/end dates, original and remaining class allowance, state timestamps, and Plan-name/allowance snapshot needed for history. Only one current Subscription per Client.                                                            |
+| Proposed | `bookings`                 | Client, Session, Subscription, state, booking actor Account, booked/cancelled/rescheduled timestamps, and idempotency linkage. One active Booking per Client/Session.                                                                              |
+| Proposed | `waitlist_entries`         | Client, Session, joined order/time, state, promotion timestamp, and promoted Booking. One active entry per Client/Session.                                                                                                                         |
+| Proposed | `attendance_records`       | One row per Booking with attended/no-show result, recording Trainer Account, and recorded timestamp.                                                                                                                                               |
+| Proposed | `availability_blocks`      | Nutritionist, Branch, Bolivia weekday/start/end wall-clock times, effective date range, and active state.                                                                                                                                          |
+| Proposed | `evaluation_slots`         | Source Availability Block, Branch, Nutritionist, exact start/end instants, and state. Unique source/local-start prevents duplicate materialization.                                                                                                |
+| Proposed | `evaluations`              | Client, Evaluation Slot, state, booking/cancellation timestamps, cancellation actor, and an eligibility month used to enforce one active Evaluation per Client/month.                                                                              |
+| Proposed | `payments`                 | Client, Plan, transfer/cash method, pending/confirmed/rejected state, requested amount and reserved Credit in BOB centavos, receipt image asset, creator Account, submission/decision timestamps, deciding Account, and required rejection reason. |
+| Proposed | `credit_accounts`          | One row per Client with a non-negative available balance in BOB centavos and updated timestamp, locked during money transitions.                                                                                                                   |
+| Proposed | `credit_entries`           | Client Credit Account, positive amount, entry kind (`earned`, `reserved`, `spent`, `released`), optional Payment/Referral references, and timestamp. This is the immutable Credit ledger.                                                          |
+| Proposed | `referrals`                | Referring Client, unique referred Client, registration timestamp, reward state, first confirmed Payment, and reward Credit entry. Self-referral is prohibited.                                                                                     |
+| Proposed | `promotions`               | Title, description, image asset, display start/end dates, display order, publication/archive timestamps, and created/updated timestamps.                                                                                                           |
 
 ## `back_office` tables
 
-| Table                | Essential data and purpose                                                                                                                                             |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `supplies`           | Branch, name, non-negative current quantity, non-negative low-stock threshold, created/updated/archived timestamps. Unique active name per Branch.                     |
-| `withdrawals`        | Supply, positive quantity, recording Administrator Account, and timestamp. Insert and stock decrement occur atomically and cannot make stock negative.                 |
-| `salary_payments`    | Staff Member, non-negative amount in BOB centavos, payment date, recording Administrator Account, and created/updated timestamps. It is studio-wide, not Branch-owned. |
-| `expense_categories` | Unique name and timestamps. Deletion is restricted while referenced.                                                                                                   |
-| `expenses`           | Branch, Expense Category, non-negative amount in BOB centavos, expense date, recording Administrator Account, and created/updated timestamps.                          |
+| Status   | Table                | Essential data and purpose                                                                                                                                             |
+| -------- | -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Proposed | `supplies`           | Branch, name, non-negative current quantity, non-negative low-stock threshold, created/updated/archived timestamps. Unique active name per Branch.                     |
+| Proposed | `withdrawals`        | Supply, positive quantity, recording Administrator Account, and timestamp. Insert and stock decrement occur atomically and cannot make stock negative.                 |
+| Proposed | `salary_payments`    | Staff Member, non-negative amount in BOB centavos, payment date, recording Administrator Account, and created/updated timestamps. It is studio-wide, not Branch-owned. |
+| Proposed | `expense_categories` | Unique name and timestamps. Deletion is restricted while referenced.                                                                                                   |
+| Proposed | `expenses`           | Branch, Expense Category, non-negative amount in BOB centavos, expense date, recording Administrator Account, and created/updated timestamps.                          |
 
 ## Database constraints and transactional rules
 
-The initial migration must include the constraints that do not fit safely in
-application code alone:
+Each owning migration must include the applicable constraints that do not fit
+safely in application code alone:
 
 - an Account links to exactly one Client or Staff Member, and each domain
   identity links to at most one Account;
-- email, session/link digests, referral codes, active identity links, and
+- email, session/token digests, referral codes, active identity links, and
   materialized source/start pairs are unique;
 - positive capacities, durations, quantities, and allowances; non-negative BOB
   centavo amounts and balances; valid date ranges;
@@ -220,23 +221,27 @@ behavior and concurrency tests.
 - No Room, Equipment, currency, discount, or payment-processor tables.
 - No notification-preference table: all initial categories are enabled together.
 - No report-summary tables: income/expense reports query authoritative records.
-- No separate password-reset, verification, or activation tables: one typed
-  Authentication Link table owns all four link purposes.
+- No separate credential table: the nullable password hash and change timestamp
+  live on Account.
+- No separate password-recovery, verification, or activation tables: one typed
+  Authentication Token table owns the three purposes.
 - No blob table: only image metadata is stored in PostgreSQL.
 - No hand-written job tables: pg-boss owns its reviewed technical schema.
 
 ## Migration impact and delivery proposal
 
-Because no business data exists yet, the approved implementation can create all
-39 application tables in one initial application migration, ordered so
-cross-schema foreign keys are valid. The migration will also add required enums,
-partial indexes, checks, exclusion constraints, and PostgreSQL extensions used
-by those constraints. It will not seed real Accounts, credentials, or business
-records and will not install the pg-boss schema.
+Implementation is phased rather than waiting for every release table. The first
+proposed persistence slice contains the ten approved lean System tables,
+`image_assets`, and the four approved Client/Staff/Branch tables: 15 tables in
+total. `image_variants` and the remaining Booking & Membership and Back Office
+tables stay out of that migration until their reviews are complete.
 
-Before that migration is created or applied, the generated SQL and its exact
-constraints must be presented for explicit approval. After approval, the schema
+That first migration will require cross-schema foreign keys, fixed enums,
+partial unique indexes, checks, and append-only protections. It will not seed
+real Accounts or business records and will not install the pg-boss schema.
+
+Before any Prisma schema or migration is created, its exact model, enum,
+constraint, and index impact must be presented for explicit approval. After
+approval, the migration is created and inspected before application, the schema
 is validated with Prisma, the generated client is rebuilt, and disposable
-PostgreSQL integration tests verify the database-only invariants. Repositories
-and business behavior can still be implemented in backlog order even though the
-stable release tables already exist.
+PostgreSQL integration tests verify database-only invariants.
