@@ -6,6 +6,7 @@ describe('RegisterClient', () => {
     const transaction = {
       findAccountByEmail: jest.fn().mockResolvedValue(null),
       canIssueAuthenticationEmail: jest.fn().mockResolvedValue(true),
+      recordIssuedAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
       createSelfRegistration: jest.fn().mockResolvedValue(undefined),
       replaceSelfRegistrationVerification: jest.fn(),
       replaceStaffInvitationActivation: jest.fn(),
@@ -91,6 +92,11 @@ describe('RegisterClient', () => {
       encryptedLinkSecret: 'encrypted-verification-secret',
       encryptionKeyId: 'local-test-key',
     });
+    expect(transaction.recordIssuedAuthenticationEmail).toHaveBeenCalledWith({
+      email: 'ana@example.com',
+      purpose: 'verification',
+      occurredAt: now,
+    });
   });
 
   it('reuses a self-registered Pending Account without granting its continuation', async () => {
@@ -102,6 +108,7 @@ describe('RegisterClient', () => {
         pendingFlow: 'self_registration',
       }),
       canIssueAuthenticationEmail: jest.fn().mockResolvedValue(true),
+      recordIssuedAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
       createSelfRegistration: jest.fn(),
       replaceSelfRegistrationVerification: jest
         .fn()
@@ -187,6 +194,7 @@ describe('RegisterClient', () => {
         pendingFlow: 'staff_invitation',
       }),
       canIssueAuthenticationEmail: jest.fn().mockResolvedValue(true),
+      recordIssuedAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
       createSelfRegistration: jest.fn(),
       replaceSelfRegistrationVerification: jest.fn(),
       replaceStaffInvitationActivation: jest.fn().mockResolvedValue(undefined),
@@ -266,6 +274,7 @@ describe('RegisterClient', () => {
     const transaction = {
       findAccountByEmail: jest.fn().mockResolvedValue(null),
       canIssueAuthenticationEmail: jest.fn().mockResolvedValue(false),
+      recordIssuedAuthenticationEmail: jest.fn(),
       createSelfRegistration: jest.fn(),
       replaceSelfRegistrationVerification: jest.fn(),
       replaceStaffInvitationActivation: jest.fn(),
@@ -325,6 +334,7 @@ describe('RegisterClient', () => {
       now: new Date('2026-08-30T18:00:00.000Z'),
     });
     expect(transaction.createSelfRegistration).not.toHaveBeenCalled();
+    expect(transaction.recordIssuedAuthenticationEmail).not.toHaveBeenCalled();
     expect(transaction.scheduleAuthenticationEmail).not.toHaveBeenCalled();
   });
 });
