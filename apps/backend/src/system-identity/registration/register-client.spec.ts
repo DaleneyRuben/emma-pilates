@@ -96,6 +96,7 @@ describe('RegisterClient', () => {
     const transaction = {
       findAccountByEmail: jest.fn().mockResolvedValue({
         id: 'existing-account-id',
+        domainIdentity: 'client',
         pendingFlow: 'self_registration',
       }),
       createSelfRegistration: jest.fn(),
@@ -169,6 +170,89 @@ describe('RegisterClient', () => {
       authenticationTokenId: 'new-verification-token-id',
       purpose: 'verification',
       encryptedLinkSecret: 'encrypted-new-verification-secret',
+      encryptionKeyId: 'local-test-key',
+    });
+  });
+
+  it('keeps an Assistant-created Client on its Activation Link flow', async () => {
+    const now = new Date('2026-08-30T18:00:00.000Z');
+    const transaction = {
+      findAccountByEmail: jest.fn().mockResolvedValue({
+        id: 'invited-client-account-id',
+        domainIdentity: 'client',
+        pendingFlow: 'staff_invitation',
+      }),
+      createSelfRegistration: jest.fn(),
+      replaceSelfRegistrationVerification: jest.fn(),
+      replaceStaffInvitationActivation: jest.fn().mockResolvedValue(undefined),
+      scheduleAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
+    };
+    const issue = jest
+      .fn()
+      .mockReturnValueOnce({
+        secret: 'new-activation-secret',
+        digest: Buffer.from('new-activation-digest'),
+      })
+      .mockReturnValueOnce({
+        secret: 'unused-continuation-secret',
+        digest: Buffer.from('unused-continuation-digest'),
+      })
+      .mockReturnValueOnce({
+        secret: 'decoy-continuation-secret',
+        digest: Buffer.from('decoy-continuation-digest'),
+      });
+    const registerClient = new RegisterClient({
+      unitOfWork: {
+        execute: jest.fn(
+          async (
+            work: (activeTransaction: typeof transaction) => Promise<boolean>,
+          ) => work(transaction),
+        ),
+      },
+      passwordHasher: {
+        hash: jest.fn().mockResolvedValue('unused-password-hash'),
+      },
+      tokenIssuer: { issue },
+      linkCipher: {
+        encrypt: jest.fn().mockReturnValue({
+          encryptedLinkSecret: 'encrypted-new-activation-secret',
+          encryptionKeyId: 'local-test-key',
+        }),
+      },
+      now: () => now,
+      newId: () => 'new-activation-token-id',
+      newReferralCode: () => 'UNUSED-REFERRAL',
+    });
+
+    await expect(
+      registerClient.execute({
+        name: 'Replacement Name',
+        email: 'invited@example.com',
+        password: 'ignored public password',
+      }),
+    ).resolves.toEqual({
+      email: 'invited@example.com',
+      registrationContinuation: 'decoy-continuation-secret',
+    });
+    expect(transaction.createSelfRegistration).not.toHaveBeenCalled();
+    expect(
+      transaction.replaceSelfRegistrationVerification,
+    ).not.toHaveBeenCalled();
+    expect(transaction.replaceStaffInvitationActivation).toHaveBeenCalledWith({
+      accountId: 'invited-client-account-id',
+      pendingExpiresAt: new Date('2026-09-29T18:00:00.000Z'),
+      activationToken: {
+        id: 'new-activation-token-id',
+        digest: Buffer.from('new-activation-digest'),
+        expiresAt: new Date('2026-09-06T18:00:00.000Z'),
+      },
+    });
+    expect(transaction.scheduleAuthenticationEmail).toHaveBeenCalledWith({
+      version: 1,
+      accountId: 'invited-client-account-id',
+      authenticationTokenId: 'new-activation-token-id',
+      purpose: 'activation',
+      encryptedLinkSecret: 'encrypted-new-activation-secret',
       encryptionKeyId: 'local-test-key',
     });
   });
