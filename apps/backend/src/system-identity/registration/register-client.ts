@@ -23,9 +23,21 @@ type NewSelfRegistration = {
   continuationToken: StoredAuthenticationToken;
 };
 
+type ExistingRegistrationAccount = {
+  id: string;
+  pendingFlow: 'self_registration' | 'staff_invitation' | 'none';
+};
+
 export interface ClientRegistrationTransaction {
-  findAccountByEmail(email: string): Promise<{ id: string } | null>;
+  findAccountByEmail(
+    email: string,
+  ): Promise<ExistingRegistrationAccount | null>;
   createSelfRegistration(registration: NewSelfRegistration): Promise<void>;
+  replaceSelfRegistrationVerification(input: {
+    accountId: string;
+    pendingExpiresAt: Date;
+    verificationToken: StoredAuthenticationToken;
+  }): Promise<void>;
   scheduleAuthenticationEmail(job: AuthenticationEmailJob): Promise<void>;
 }
 
@@ -87,6 +99,26 @@ export class RegisterClient {
         const existingAccount = await transaction.findAccountByEmail(email);
 
         if (existingAccount !== null) {
+          if (existingAccount.pendingFlow === 'self_registration') {
+            await transaction.replaceSelfRegistrationVerification({
+              accountId: existingAccount.id,
+              pendingExpiresAt,
+              verificationToken: {
+                id: verificationTokenId,
+                digest: verificationToken.digest,
+                expiresAt: verificationExpiresAt,
+              },
+            });
+            await transaction.scheduleAuthenticationEmail({
+              version: 1,
+              accountId: existingAccount.id,
+              authenticationTokenId: verificationTokenId,
+              purpose: 'verification',
+              encryptedLinkSecret: encryptedLink.encryptedLinkSecret,
+              encryptionKeyId: encryptedLink.encryptionKeyId,
+            });
+          }
+
           return false;
         }
 

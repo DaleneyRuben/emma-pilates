@@ -6,6 +6,7 @@ describe('RegisterClient', () => {
     const transaction = {
       findAccountByEmail: jest.fn().mockResolvedValue(null),
       createSelfRegistration: jest.fn().mockResolvedValue(undefined),
+      replaceSelfRegistrationVerification: jest.fn(),
       scheduleAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
     };
     const unitOfWork = {
