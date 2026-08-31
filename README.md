@@ -72,6 +72,10 @@ The backend end-to-end smoke test is available separately:
 pnpm --filter @pilates/backend test:e2e
 ```
 
+For beginner-friendly manual and automated testing instructions, including the
+features that are not testable yet, see the
+[`testing guide`](./docs/testing-guide.md).
+
 Architecture decisions live in [`docs/architecture/README.md`](./docs/architecture/README.md).
 The mobile-first delivery order and trackable product backlog live in
 [`docs/implementation/`](./docs/implementation/README.md).
