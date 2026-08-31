@@ -14,7 +14,7 @@ import { PrismaClientRegistrationUnitOfWork } from './registration/prisma-client
 import { RegisterClient } from './registration/register-client';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
 import { VerifyClientEmail } from './registration/verify-client-email';
-import { Argon2PasswordHasher } from './security/argon2-password-hasher';
+import { argon2PasswordHasher } from './security/argon2-password-hasher';
 import { AuthenticationLinkCipher } from './security/authentication-link-cipher';
 import { authenticationTokens } from './security/authentication-token-service';
 
@@ -75,10 +75,6 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         ),
     },
     {
-      provide: Argon2PasswordHasher,
-      useFactory: () => new Argon2PasswordHasher(),
-    },
-    {
       provide: registrationGateway,
       inject: [systemIdentityPrisma, registrationPgBoss, ConfigService],
       useFactory: (
@@ -100,19 +96,14 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: RegisterClient,
-      inject: [
-        registrationGateway,
-        Argon2PasswordHasher,
-        AuthenticationLinkCipher,
-      ],
+      inject: [registrationGateway, AuthenticationLinkCipher],
       useFactory: (
         unitOfWork: PrismaClientRegistrationUnitOfWork,
-        passwordHasher: Argon2PasswordHasher,
         linkCipher: AuthenticationLinkCipher,
       ) =>
         new RegisterClient({
           unitOfWork,
-          passwordHasher,
+          passwordHasher: argon2PasswordHasher,
           tokenIssuer: authenticationTokens,
           linkCipher,
           now: () => new Date(),

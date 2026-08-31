@@ -1,17 +1,17 @@
-import { Argon2PasswordHasher } from './argon2-password-hasher';
+import { argon2PasswordHasher } from './argon2-password-hasher';
 
-describe('Argon2PasswordHasher', () => {
+describe('Argon2 password hashing', () => {
   it('stores a password as an Argon2id hash that can be verified', async () => {
-    const hasher = new Argon2PasswordHasher();
-
-    const hash = await hasher.hash('correct horse battery staple');
+    const hash = await argon2PasswordHasher.hash(
+      'correct horse battery staple',
+    );
 
     expect(hash).toMatch(/^\$argon2id\$/);
     await expect(
-      hasher.verify(hash, 'correct horse battery staple'),
+      argon2PasswordHasher.verify(hash, 'correct horse battery staple'),
     ).resolves.toBe(true);
-    await expect(hasher.verify(hash, 'incorrect password')).resolves.toBe(
-      false,
-    );
+    await expect(
+      argon2PasswordHasher.verify(hash, 'incorrect password'),
+    ).resolves.toBe(false);
   });
 });
