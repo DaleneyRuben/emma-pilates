@@ -52,10 +52,11 @@ events that insert rows and representative values after insertion—are recorded
 in
 [`approved-foundation-table-examples.md`](./approved-foundation-table-examples.md).
 
-The pg-boss authentication-email foundation and the Client registration
-lifecycle are implemented. The next backend identity slice is `IDN-004`:
-Login, progressive throttling, opaque Authentication Sessions, authenticated
-principal resolution, and logout.
+The pg-boss authentication-email foundation, Client registration lifecycle,
+and mobile Login/Authentication Session lifecycle are implemented. The next
+backend identity slice is `IDN-005`: staff-created activation, password
+recovery and change, Account-wide session revocation, and verified-link
+ingress.
 
 Authentication follow-ups 33–38 are pending in the design workflow. Until a new
 export applies and verifies them, generated authentication screens still show
