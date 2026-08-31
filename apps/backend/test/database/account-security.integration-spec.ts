@@ -30,6 +30,7 @@ describe('Account security persistence', () => {
         accountId,
         purpose: 'ACTIVATION',
         tokenDigest,
+        issuedAt: new Date('2026-08-31T17:00:00.000Z'),
         expiresAt: new Date('2026-09-01T18:00:00.000Z'),
       },
     });
@@ -69,6 +70,7 @@ describe('Account security persistence', () => {
         accountId,
         purpose: 'PASSWORD_RECOVERY',
         tokenDigest,
+        issuedAt: new Date('2026-08-31T17:30:00.000Z'),
         expiresAt: new Date('2026-08-31T18:30:00.000Z'),
       },
     });
