@@ -16,9 +16,25 @@ type CreateMobileAuthenticationSessionDependencies = {
   storeSession(session: NewMobileAuthenticationSession): Promise<void>;
 };
 
+const dayMilliseconds = 24 * 60 * 60 * 1_000;
+
 export const createMobileAuthenticationSession = async (
-  _accountId: string,
-  _dependencies: CreateMobileAuthenticationSessionDependencies,
+  accountId: string,
+  dependencies: CreateMobileAuthenticationSessionDependencies,
 ): Promise<{ credential: string }> => {
-  throw new Error('Not implemented');
+  const now = dependencies.now();
+  const credential = dependencies.issueCredential();
+
+  await dependencies.storeSession({
+    id: dependencies.newId(),
+    accountId,
+    surface: 'mobile',
+    credentialDigest: credential.digest,
+    createdAt: now,
+    lastMeaningfulActivityAt: now,
+    idleExpiresAt: new Date(now.getTime() + 30 * dayMilliseconds),
+    absoluteExpiresAt: new Date(now.getTime() + 90 * dayMilliseconds),
+  });
+
+  return { credential: credential.secret };
 };
