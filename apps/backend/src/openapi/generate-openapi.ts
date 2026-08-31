@@ -1,11 +1,11 @@
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { NestFactory } from '@nestjs/core';
-import { ApiModule } from '../api.module';
+import { AppModule } from '../app.module';
 import { configureApplication } from '../http/configure-application';
 
 async function generateOpenApi(): Promise<void> {
-  const app = await NestFactory.create(ApiModule, { logger: false });
+  const app = await NestFactory.create(AppModule, { logger: false });
 
   try {
     const document = configureApplication(app);
