@@ -6,12 +6,16 @@ import {
   AuthenticationTokenPurpose,
 } from '../../src/generated/prisma/enums';
 import { PrismaClient } from '../../src/generated/prisma/client';
-import { AUTHENTICATION_EMAIL_QUEUE } from '../../src/jobs/authentication-email/authentication-email-job';
+import {
+  AUTHENTICATION_EMAIL_QUEUE,
+  parseAuthenticationEmailJob,
+} from '../../src/jobs/authentication-email/authentication-email-job';
 import { CancelPendingClientRegistration } from '../../src/system-identity/registration/cancel-pending-client-registration';
 import { CorrectPendingClientEmail } from '../../src/system-identity/registration/correct-pending-client-email';
 import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
 import { ResendPendingClientVerification } from '../../src/system-identity/registration/resend-pending-client-verification';
+import { VerifyClientEmail } from '../../src/system-identity/registration/verify-client-email';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
 import { AuthenticationTokenService } from '../../src/system-identity/security/authentication-token-service';
 import {
@@ -319,6 +323,90 @@ describe('Client registration transaction', () => {
       metadata: { initiatedBy: 'registration_continuation' },
       occurredAt: cancelledAt,
     });
+  });
+
+  it('verifies and activates a pending Client without creating a session', async () => {
+    const registeredAt = new Date(Date.now() + 180_000);
+    const verifiedAt = new Date(registeredAt.getTime() + 60_000);
+    const tokens = new AuthenticationTokenService();
+    const cipher = new AuthenticationLinkCipher(
+      'local-test-key',
+      Buffer.alloc(32, 7),
+    );
+    const gateway = new PrismaClientRegistrationUnitOfWork({
+      prisma,
+      boss,
+      digestEmail: digestTestEmail,
+    });
+    const registration = await new RegisterClient({
+      unitOfWork: gateway,
+      passwordHasher: {
+        hash: () => Promise.resolve('verified-password-hash'),
+      },
+      tokenIssuer: tokens,
+      linkCipher: cipher,
+      now: () => registeredAt,
+      newId: randomUUID,
+      newReferralCode: () => `REF-${randomUUID()}`,
+    }).execute({
+      name: 'Verified Client',
+      email: `verified-${randomUUID()}@example.com`,
+      password: 'verified password',
+    });
+    const pendingAccount = await prisma.account.findUniqueOrThrow({
+      where: { email: registration.email },
+    });
+    const jobs = await boss.findJobs(AUTHENTICATION_EMAIL_QUEUE, {
+      id: undefined,
+    });
+    const verificationJob = parseAuthenticationEmailJob(
+      jobs.find(
+        ({ data }) =>
+          typeof data === 'object' &&
+          data !== null &&
+          'accountId' in data &&
+          data.accountId === pendingAccount.id,
+      )?.data,
+    );
+    const verificationSecret = await cipher.decrypt(
+      verificationJob.encryptedLinkSecret,
+      verificationJob.encryptionKeyId,
+    );
+    const verify = new VerifyClientEmail({
+      gateway,
+      tokens,
+      now: () => verifiedAt,
+    });
+
+    await expect(
+      verify.execute({ verificationToken: verificationSecret }),
+    ).resolves.toEqual({ status: 'verified' });
+    const verifiedAccount = await prisma.account.findUniqueOrThrow({
+      where: { id: pendingAccount.id },
+      include: { authenticationTokens: true },
+    });
+
+    expect(verifiedAccount).toMatchObject({
+      emailVerifiedAt: verifiedAt,
+      activatedAt: verifiedAt,
+      pendingExpiresAt: null,
+    });
+    expect(
+      verifiedAccount.authenticationTokens.find(
+        ({ id }) => id === verificationJob.authenticationTokenId,
+      )?.usedAt,
+    ).toEqual(verifiedAt);
+    expect(
+      verifiedAccount.authenticationTokens.find(
+        ({ purpose }) =>
+          purpose === AuthenticationTokenPurpose.REGISTRATION_CONTINUATION,
+      )?.invalidatedAt,
+    ).toEqual(verifiedAt);
+    await expect(
+      prisma.authenticationSession.count({
+        where: { accountId: pendingAccount.id },
+      }),
+    ).resolves.toBe(0);
   });
 });
 
