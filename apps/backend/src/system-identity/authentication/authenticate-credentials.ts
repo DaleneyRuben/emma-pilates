@@ -15,8 +15,26 @@ type AuthenticateCredentialsDependencies = {
 };
 
 export const authenticateCredentials = async (
-  _command: { email: string; password: string },
-  _dependencies: AuthenticateCredentialsDependencies,
+  command: { email: string; password: string },
+  dependencies: AuthenticateCredentialsDependencies,
 ): Promise<{ accountId: string }> => {
-  throw new AuthenticationFailedError();
+  const account = await dependencies.findAccountByEmail(
+    command.email.trim().toLowerCase(),
+  );
+  const passwordMatches = await dependencies.verifyPassword(
+    account?.passwordHash ?? dependencies.dummyPasswordHash,
+    command.password,
+  );
+  const accountCanAuthenticate =
+    account !== null &&
+    account.passwordHash !== null &&
+    account.emailVerifiedAt !== null &&
+    account.activatedAt !== null &&
+    account.disabledAt === null;
+
+  if (!passwordMatches || !accountCanAuthenticate) {
+    throw new AuthenticationFailedError();
+  }
+
+  return { accountId: account.id };
 };
