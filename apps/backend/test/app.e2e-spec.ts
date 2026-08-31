@@ -104,16 +104,17 @@ describe('operational health (e2e)', () => {
   it('publishes the client registration lifecycle from the application module', () => {
     const document = configureApplication(app);
 
-    expect(document.paths).toEqual(
-      expect.objectContaining({
-        '/api/v1/client-registrations': expect.any(Object),
-        '/api/v1/client-registrations/email-corrections': expect.any(Object),
-        '/api/v1/client-registrations/verification-resends':
-          expect.any(Object),
-        '/api/v1/client-registrations/cancellations': expect.any(Object),
-        '/api/v1/client-email-verifications': expect.any(Object),
-      }),
+    expect(document.paths).toHaveProperty('/api/v1/client-registrations');
+    expect(document.paths).toHaveProperty(
+      '/api/v1/client-registrations/email-corrections',
     );
+    expect(document.paths).toHaveProperty(
+      '/api/v1/client-registrations/verification-resends',
+    );
+    expect(document.paths).toHaveProperty(
+      '/api/v1/client-registrations/cancellations',
+    );
+    expect(document.paths).toHaveProperty('/api/v1/client-email-verifications');
   });
 
   afterEach(async () => {
