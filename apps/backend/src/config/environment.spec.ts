@@ -17,6 +17,15 @@ describe('environment configuration', () => {
     expect(environment.PORT).toBe(4100);
   });
 
+  it('uses the conflict-free local API port by default', () => {
+    const environment = validateEnvironment({
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+    });
+
+    expect(environment.PORT).toBe(3100);
+  });
+
   it('requires explicit authentication secrets in production', () => {
     expect(() =>
       validateEnvironment({
