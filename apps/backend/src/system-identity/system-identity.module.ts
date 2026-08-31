@@ -16,7 +16,7 @@ import { ResendPendingClientVerification } from './registration/resend-pending-c
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { Argon2PasswordHasher } from './security/argon2-password-hasher';
 import { AuthenticationLinkCipher } from './security/authentication-link-cipher';
-import { AuthenticationTokenService } from './security/authentication-token-service';
+import { authenticationTokens } from './security/authentication-token-service';
 
 const registrationGateway = Symbol('registrationGateway');
 const registrationPgBoss = Symbol('registrationPgBoss');
@@ -63,10 +63,6 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
       },
     },
     {
-      provide: AuthenticationTokenService,
-      useFactory: () => new AuthenticationTokenService(),
-    },
-    {
       provide: AuthenticationLinkCipher,
       inject: [ConfigService],
       useFactory: (config: ConfigService<Environment, true>) =>
@@ -107,19 +103,17 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
       inject: [
         registrationGateway,
         Argon2PasswordHasher,
-        AuthenticationTokenService,
         AuthenticationLinkCipher,
       ],
       useFactory: (
         unitOfWork: PrismaClientRegistrationUnitOfWork,
         passwordHasher: Argon2PasswordHasher,
-        tokenIssuer: AuthenticationTokenService,
         linkCipher: AuthenticationLinkCipher,
       ) =>
         new RegisterClient({
           unitOfWork,
           passwordHasher,
-          tokenIssuer,
+          tokenIssuer: authenticationTokens,
           linkCipher,
           now: () => new Date(),
           newId: randomUUID,
@@ -128,19 +122,14 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: CorrectPendingClientEmail,
-      inject: [
-        registrationGateway,
-        AuthenticationTokenService,
-        AuthenticationLinkCipher,
-      ],
+      inject: [registrationGateway, AuthenticationLinkCipher],
       useFactory: (
         gateway: PrismaClientRegistrationUnitOfWork,
-        tokens: AuthenticationTokenService,
         linkCipher: AuthenticationLinkCipher,
       ) =>
         new CorrectPendingClientEmail({
           gateway,
-          tokens,
+          tokens: authenticationTokens,
           linkCipher,
           now: () => new Date(),
           newId: randomUUID,
@@ -148,19 +137,14 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: ResendPendingClientVerification,
-      inject: [
-        registrationGateway,
-        AuthenticationTokenService,
-        AuthenticationLinkCipher,
-      ],
+      inject: [registrationGateway, AuthenticationLinkCipher],
       useFactory: (
         gateway: PrismaClientRegistrationUnitOfWork,
-        tokens: AuthenticationTokenService,
         linkCipher: AuthenticationLinkCipher,
       ) =>
         new ResendPendingClientVerification({
           gateway,
-          tokens,
+          tokens: authenticationTokens,
           linkCipher,
           now: () => new Date(),
           newId: randomUUID,
@@ -168,28 +152,22 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: CancelPendingClientRegistration,
-      inject: [registrationGateway, AuthenticationTokenService],
-      useFactory: (
-        gateway: PrismaClientRegistrationUnitOfWork,
-        tokens: AuthenticationTokenService,
-      ) =>
+      inject: [registrationGateway],
+      useFactory: (gateway: PrismaClientRegistrationUnitOfWork) =>
         new CancelPendingClientRegistration({
           gateway,
-          tokens,
+          tokens: authenticationTokens,
           now: () => new Date(),
           newId: randomUUID,
         }),
     },
     {
       provide: VerifyClientEmail,
-      inject: [registrationGateway, AuthenticationTokenService],
-      useFactory: (
-        gateway: PrismaClientRegistrationUnitOfWork,
-        tokens: AuthenticationTokenService,
-      ) =>
+      inject: [registrationGateway],
+      useFactory: (gateway: PrismaClientRegistrationUnitOfWork) =>
         new VerifyClientEmail({
           gateway,
-          tokens,
+          tokens: authenticationTokens,
           now: () => new Date(),
         }),
     },

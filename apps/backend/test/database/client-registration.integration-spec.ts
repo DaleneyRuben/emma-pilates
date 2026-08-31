@@ -18,7 +18,7 @@ import { RegisterClient } from '../../src/system-identity/registration/register-
 import { ResendPendingClientVerification } from '../../src/system-identity/registration/resend-pending-client-verification';
 import { VerifyClientEmail } from '../../src/system-identity/registration/verify-client-email';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
-import { AuthenticationTokenService } from '../../src/system-identity/security/authentication-token-service';
+import { authenticationTokens } from '../../src/system-identity/security/authentication-token-service';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -51,7 +51,7 @@ describe('Client registration transaction', () => {
 
   it('commits the pending Account, Client, digests, throttle event, and encrypted email job together', async () => {
     const now = new Date('2026-08-30T18:00:00.000Z');
-    const tokens = new AuthenticationTokenService();
+    const tokens = authenticationTokens;
     const registerClient = new RegisterClient({
       unitOfWork: new PrismaClientRegistrationUnitOfWork({
         prisma,
@@ -144,7 +144,7 @@ describe('Client registration transaction', () => {
   it('corrects a pending email without replacing the Account or Client', async () => {
     const registeredAt = new Date(Date.now() + 60_000);
     const correctedAt = new Date(registeredAt.getTime() + 60 * 60 * 1_000);
-    const tokens = new AuthenticationTokenService();
+    const tokens = authenticationTokens;
     const cipher = new AuthenticationLinkCipher(
       'local-test-key',
       Buffer.alloc(32, 7),
@@ -260,7 +260,7 @@ describe('Client registration transaction', () => {
   it('cancels a pending self-registration and retains only its audit record', async () => {
     const registeredAt = new Date(Date.now() + 120_000);
     const cancelledAt = new Date(registeredAt.getTime() + 60_000);
-    const tokens = new AuthenticationTokenService();
+    const tokens = authenticationTokens;
     const gateway = new PrismaClientRegistrationUnitOfWork({
       prisma,
       boss,
@@ -329,7 +329,7 @@ describe('Client registration transaction', () => {
   it('verifies and activates a pending Client without creating a session', async () => {
     const registeredAt = new Date(Date.now() + 180_000);
     const verifiedAt = new Date(registeredAt.getTime() + 60_000);
-    const tokens = new AuthenticationTokenService();
+    const tokens = authenticationTokens;
     const cipher = new AuthenticationLinkCipher(
       'local-test-key',
       Buffer.alloc(32, 7),
@@ -425,7 +425,7 @@ describe('Client registration transaction', () => {
       passwordHasher: {
         hash: () => Promise.resolve('expired-password-hash'),
       },
-      tokenIssuer: new AuthenticationTokenService(),
+      tokenIssuer: authenticationTokens,
       linkCipher: new AuthenticationLinkCipher(
         'local-test-key',
         Buffer.alloc(32, 7),
