@@ -10,6 +10,7 @@ const backendRoot = resolve(process.cwd());
 const disposableDatabasePrefix = 'pilates_test_';
 
 export type DatabaseTestContext = {
+  databaseUrl: string;
   pool: Pool;
   stop: () => Promise<void>;
 };
@@ -58,6 +59,7 @@ export const startDatabaseTestContext =
     const pool = new Pool({ connectionString: databaseUrl });
 
     return {
+      databaseUrl,
       pool,
       stop: async () => {
         await pool.end();
