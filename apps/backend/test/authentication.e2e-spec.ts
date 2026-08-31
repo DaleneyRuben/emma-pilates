@@ -13,16 +13,29 @@ import {
   currentSessionLogout,
   mobileLogin,
 } from '../src/system-identity/authentication/authentication.controller';
-import { LoginThrottledError } from '../src/system-identity/authentication/login';
+import {
+  type LoginCommand,
+  LoginThrottledError,
+} from '../src/system-identity/authentication/login';
+import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
 
 describe('authentication (e2e)', () => {
   let app: INestApplication<App>;
-  const executeLogin = jest.fn();
-  const resolvePrincipal = jest.fn();
-  const executeLogout = jest.fn();
+  const opaqueCredential = 'a'.repeat(43);
+  const executeLogin =
+    jest.fn<(command: LoginCommand) => Promise<{ credential: string }>>();
+  const resolvePrincipal =
+    jest.fn<
+      (
+        credential: string,
+        meaningfulActivity: boolean,
+      ) => Promise<AuthenticatedPrincipal>
+    >();
+  const executeLogout =
+    jest.fn<(authenticationSessionId: string) => Promise<void>>();
 
   beforeEach(async () => {
-    executeLogin.mockResolvedValue({ credential: 'opaque-credential' });
+    executeLogin.mockResolvedValue({ credential: opaqueCredential });
     resolvePrincipal.mockResolvedValue({
       accountId: 'account-id',
       authenticationSessionId: 'authentication-session-id',
@@ -55,7 +68,7 @@ describe('authentication (e2e)', () => {
       .set('x-client-identifier', 'mobile-installation-id')
       .send({ email: 'ANA@Example.COM', password: 'correct password' })
       .expect(201)
-      .expect({ credential: 'opaque-credential' });
+      .expect({ credential: opaqueCredential });
 
     expect(executeLogin).toHaveBeenCalledWith({
       email: 'ANA@Example.COM',
@@ -104,23 +117,23 @@ describe('authentication (e2e)', () => {
   it('resolves the current Account identity from a bearer credential', async () => {
     await request(app.getHttpServer())
       .get('/api/v1/authentication-sessions/current')
-      .set('Authorization', 'Bearer opaque-credential')
+      .set('Authorization', `Bearer ${opaqueCredential}`)
       .expect(200)
       .expect({
         accountId: 'account-id',
         identity: { kind: 'client', clientId: 'client-id' },
       });
 
-    expect(resolvePrincipal).toHaveBeenCalledWith('opaque-credential', true);
+    expect(resolvePrincipal).toHaveBeenCalledWith(opaqueCredential, true);
   });
 
   it('logs out the current Authentication Session', async () => {
     await request(app.getHttpServer())
       .delete('/api/v1/authentication-sessions/current')
-      .set('Authorization', 'Bearer opaque-credential')
+      .set('Authorization', `Bearer ${opaqueCredential}`)
       .expect(204);
 
-    expect(resolvePrincipal).toHaveBeenCalledWith('opaque-credential', true);
+    expect(resolvePrincipal).toHaveBeenCalledWith(opaqueCredential, true);
     expect(executeLogout).toHaveBeenCalledWith('authentication-session-id');
   });
 });

@@ -37,6 +37,19 @@ export class ProblemDetailsFilter implements ExceptionFilter {
     const status = isHttpException
       ? exception.getStatus()
       : HttpStatus.INTERNAL_SERVER_ERROR;
+    const exceptionResponse = isHttpException ? exception.getResponse() : null;
+    const problem =
+      typeof exceptionResponse === 'object' && exceptionResponse !== null
+        ? exceptionResponse
+        : null;
+    const customDetail =
+      problem && 'detail' in problem && typeof problem.detail === 'string'
+        ? problem.detail
+        : null;
+    const customCode =
+      problem && 'code' in problem && typeof problem.code === 'string'
+        ? problem.code
+        : null;
 
     response
       .status(status)
@@ -46,10 +59,10 @@ export class ProblemDetailsFilter implements ExceptionFilter {
         title: getTitle(status),
         status,
         detail: isHttpException
-          ? exception.message
+          ? (customDetail ?? exception.message)
           : 'An unexpected error occurred',
         instance: request.originalUrl,
-        code: problemCodes[status] ?? 'http_error',
+        code: customCode ?? problemCodes[status] ?? 'http_error',
       });
   }
 }
