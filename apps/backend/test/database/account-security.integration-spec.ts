@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { PgBoss } from 'pg-boss';
 import { PrismaClient } from '../../src/generated/prisma/client';
+import { AUTHENTICATION_EMAIL_QUEUE } from '../../src/jobs/authentication-email/authentication-email-job';
 import { PrismaAccountSecurityGateway } from '../../src/system-identity/account-security/prisma-account-security-gateway';
 import {
   DatabaseTestContext,
@@ -10,10 +12,84 @@ import {
 describe('Account security persistence', () => {
   let context: DatabaseTestContext;
   let prisma: PrismaClient;
+  let boss: PgBoss;
 
   beforeAll(async () => {
     context = await startDatabaseTestContext();
     prisma = new PrismaClient({ adapter: new PrismaPg(context.pool) });
+    boss = new PgBoss({
+      db: {
+        executeSql: async (text, values) => {
+          const result = await context.pool.query(text, values);
+          return { rows: result.rows };
+        },
+      },
+      schema: 'pgboss',
+      migrate: false,
+    });
+  });
+
+  it('issues a recovery token and durable email job only for a known active Account', async () => {
+    const requestedAt = new Date('2026-08-31T18:00:00.000Z');
+    const accountId = await createClientAccount(prisma, true);
+    const account = await prisma.account.findUniqueOrThrow({
+      where: { id: accountId },
+    });
+    const authenticationTokenId = randomUUID();
+    const gateway = new PrismaAccountSecurityGateway(prisma, {
+      boss,
+      digestEmail: (email) => Buffer.from(`digest:${email}`),
+    });
+
+    await expect(
+      gateway.requestRecovery({
+        email: account.email,
+        token: {
+          id: authenticationTokenId,
+          digest: Buffer.from(randomUUID()),
+          expiresAt: new Date('2026-08-31T18:30:00.000Z'),
+        },
+        emailJob: {
+          purpose: 'password_recovery',
+          authenticationTokenId,
+          encryptedLinkSecret: 'encrypted-secret',
+          encryptionKeyId: 'local-key',
+        },
+        requestedAt,
+      }),
+    ).resolves.toBe('issued');
+
+    await expect(
+      prisma.authenticationToken.findUnique({
+        where: { id: authenticationTokenId },
+      }),
+    ).resolves.not.toBeNull();
+    const jobs = await boss.findJobs(AUTHENTICATION_EMAIL_QUEUE);
+    expect(
+      jobs.some(
+        (job) =>
+          (job.data as { authenticationTokenId?: string })
+            .authenticationTokenId === authenticationTokenId,
+      ),
+    ).toBe(true);
+
+    await expect(
+      gateway.requestRecovery({
+        email: `${randomUUID()}@example.com`,
+        token: {
+          id: randomUUID(),
+          digest: Buffer.from(randomUUID()),
+          expiresAt: new Date('2026-08-31T18:30:00.000Z'),
+        },
+        emailJob: {
+          purpose: 'password_recovery',
+          authenticationTokenId: randomUUID(),
+          encryptedLinkSecret: 'encrypted-secret',
+          encryptionKeyId: 'local-key',
+        },
+        requestedAt,
+      }),
+    ).resolves.toBe('unknown');
   });
 
   afterAll(async () => {
