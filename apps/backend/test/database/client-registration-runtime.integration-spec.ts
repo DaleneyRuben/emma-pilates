@@ -17,6 +17,7 @@ describe('client registration runtime', () => {
     process.env.DATABASE_URL = context.databaseUrl;
     process.env.NODE_ENV = 'test';
     application = await NestFactory.createApplicationContext(AppModule, {
+      abortOnError: false,
       logger: false,
     });
   });
@@ -29,15 +30,13 @@ describe('client registration runtime', () => {
   it('opens the API job client before registration queues email', async () => {
     const registerClient = application.get(RegisterClient);
 
-    await expect(
-      registerClient.execute({
-        name: 'Runtime Client',
-        email: `runtime-${randomUUID()}@example.com`,
-        password: 'some password',
-      }),
-    ).resolves.toMatchObject({
-      email: expect.stringMatching(/^runtime-.*@example\.com$/),
-      registrationContinuation: expect.any(String),
+    const result = await registerClient.execute({
+      name: 'Runtime Client',
+      email: `runtime-${randomUUID()}@example.com`,
+      password: 'some password',
     });
+
+    expect(result.email).toMatch(/^runtime-.*@example\.com$/);
+    expect(result.registrationContinuation).not.toHaveLength(0);
   });
 });

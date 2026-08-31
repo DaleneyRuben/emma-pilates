@@ -12,7 +12,7 @@ describe('pg-boss runtime', () => {
     });
   });
 
-  it('refuses a missing pg-boss schema without starting', async () => {
+  it('refuses a missing pg-boss schema after opening the connection', async () => {
     const boss = {
       isInstalled: jest.fn().mockResolvedValue(false),
       schemaVersion: jest.fn(),
@@ -22,10 +22,10 @@ describe('pg-boss runtime', () => {
     await expect(startInstalledPgBoss(boss)).rejects.toThrow(
       'pg-boss schema is not installed',
     );
-    expect(boss.start).not.toHaveBeenCalled();
+    expect(boss.start).toHaveBeenCalledTimes(1);
   });
 
-  it('refuses an outdated pg-boss schema without migrating it', async () => {
+  it('refuses an outdated pg-boss schema after opening the connection', async () => {
     const boss = {
       isInstalled: jest.fn().mockResolvedValue(true),
       schemaVersion: jest.fn().mockResolvedValue(37),
@@ -35,7 +35,7 @@ describe('pg-boss runtime', () => {
     await expect(startInstalledPgBoss(boss)).rejects.toThrow(
       'Expected pg-boss schema version 38 but found 37',
     );
-    expect(boss.start).not.toHaveBeenCalled();
+    expect(boss.start).toHaveBeenCalledTimes(1);
   });
 
   it('starts an installed schema at the pinned version', async () => {

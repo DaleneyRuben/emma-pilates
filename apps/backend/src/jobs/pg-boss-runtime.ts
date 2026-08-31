@@ -31,6 +31,8 @@ export const createPgBoss = async (
 export const startInstalledPgBoss = async (
   boss: StartablePgBoss,
 ): Promise<void> => {
+  await boss.start();
+
   if (!(await boss.isInstalled())) {
     throw new Error('pg-boss schema is not installed');
   }
@@ -42,6 +44,4 @@ export const startInstalledPgBoss = async (
       `Expected pg-boss schema version ${PG_BOSS_SCHEMA_VERSION} but found ${String(version)}`,
     );
   }
-
-  await boss.start();
 };

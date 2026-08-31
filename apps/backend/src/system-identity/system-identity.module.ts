@@ -5,7 +5,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import type { PgBoss } from 'pg-boss';
 import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
-import { createPgBoss } from '../jobs/pg-boss-runtime';
+import { createPgBoss, startInstalledPgBoss } from '../jobs/pg-boss-runtime';
 import { CancelPendingClientRegistration } from './registration/cancel-pending-client-registration';
 import { ClientEmailVerificationController } from './registration/client-email-verification.controller';
 import { ClientRegistrationController } from './registration/client-registration.controller';
@@ -23,10 +23,17 @@ const registrationPgBoss = Symbol('registrationPgBoss');
 const systemIdentityPrisma = Symbol('systemIdentityPrisma');
 
 class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly boss: PgBoss,
+  ) {}
 
   async onApplicationShutdown(): Promise<void> {
-    await this.prisma.$disconnect();
+    try {
+      await this.boss.stop({ graceful: true });
+    } finally {
+      await this.prisma.$disconnect();
+    }
   }
 }
 
@@ -49,8 +56,11 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     {
       provide: registrationPgBoss,
       inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        createPgBoss(config.getOrThrow('DATABASE_URL')),
+      useFactory: async (config: ConfigService<Environment, true>) => {
+        const boss = await createPgBoss(config.getOrThrow('DATABASE_URL'));
+        await startInstalledPgBoss(boss);
+        return boss;
+      },
     },
     {
       provide: AuthenticationTokenService,
@@ -185,9 +195,9 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: SystemIdentityRuntimeCleanup,
-      inject: [systemIdentityPrisma],
-      useFactory: (prisma: PrismaClient) =>
-        new SystemIdentityRuntimeCleanup(prisma),
+      inject: [systemIdentityPrisma, registrationPgBoss],
+      useFactory: (prisma: PrismaClient, boss: PgBoss) =>
+        new SystemIdentityRuntimeCleanup(prisma, boss),
     },
   ],
 })
