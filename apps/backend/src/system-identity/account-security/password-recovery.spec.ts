@@ -23,23 +23,19 @@ describe('password recovery', () => {
       digest: Buffer.from('session-digest'),
     })),
     digestToken: jest.fn(() => Buffer.from('recovery-digest')),
-    encryptLinkSecret: jest.fn(() => 'encrypted-recovery-secret'),
+    encryptLinkSecret: jest.fn(() => ({
+      encryptedLinkSecret: 'encrypted-recovery-secret',
+      encryptionKeyId: 'local-key',
+    })),
     hashPassword: jest.fn(async () => 'new-password-hash'),
     now: () => now,
-    newId: jest
-      .fn()
-      .mockReturnValueOnce('authentication-token-id')
-      .mockReturnValueOnce('authentication-session-id')
-      .mockReturnValueOnce('audit-record-id'),
+    newTokenId: jest.fn(() => 'authentication-token-id'),
+    newSessionId: jest.fn(() => 'authentication-session-id'),
+    newAuditRecordId: jest.fn(() => 'audit-record-id'),
   };
 
   beforeEach(() => {
     jest.clearAllMocks();
-    dependencies.newId
-      .mockReset()
-      .mockReturnValueOnce('authentication-token-id')
-      .mockReturnValueOnce('authentication-session-id')
-      .mockReturnValueOnce('audit-record-id');
   });
 
   it('returns the same accepted response when an email is unknown', async () => {
@@ -57,10 +53,7 @@ describe('password recovery', () => {
   it('issues a single-use recovery link with a thirty-minute lifetime', async () => {
     gateway.requestRecovery.mockResolvedValue('issued');
 
-    await requestPasswordRecovery(
-      { email: 'ana@example.com' },
-      dependencies,
-    );
+    await requestPasswordRecovery({ email: 'ana@example.com' }, dependencies);
 
     expect(gateway.requestRecovery).toHaveBeenCalledWith({
       email: 'ana@example.com',
@@ -73,6 +66,7 @@ describe('password recovery', () => {
         purpose: 'password_recovery',
         authenticationTokenId: 'authentication-token-id',
         encryptedLinkSecret: 'encrypted-recovery-secret',
+        encryptionKeyId: 'local-key',
       },
       requestedAt: now,
     });
