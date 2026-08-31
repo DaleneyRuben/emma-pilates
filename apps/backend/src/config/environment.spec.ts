@@ -16,4 +16,13 @@ describe('environment configuration', () => {
 
     expect(environment.PORT).toBe(4100);
   });
+
+  it('requires explicit authentication secrets in production', () => {
+    expect(() =>
+      validateEnvironment({
+        DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+        NODE_ENV: 'production',
+      }),
+    ).toThrow('AUTHENTICATION_LINK_ENCRYPTION_KEY');
+  });
 });
