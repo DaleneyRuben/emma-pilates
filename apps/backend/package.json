@@ -18,7 +18,7 @@
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "pnpm lint --fix",
-    "openapi:generate": "ts-node --transpile-only src/openapi/generate-openapi.ts",
+    "openapi:generate": "nest build && node dist/src/openapi/generate-openapi.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
