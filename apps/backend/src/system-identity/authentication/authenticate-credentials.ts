@@ -1,6 +1,6 @@
 export class AuthenticationFailedError extends Error {}
 
-type AccountCredentials = {
+export type AccountCredentials = {
   id: string;
   passwordHash: string | null;
   emailVerifiedAt: Date | null;

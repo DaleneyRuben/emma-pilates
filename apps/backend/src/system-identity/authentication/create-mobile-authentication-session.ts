@@ -1,4 +1,4 @@
-type NewMobileAuthenticationSession = {
+export type NewMobileAuthenticationSession = {
   id: string;
   accountId: string;
   surface: 'mobile';
