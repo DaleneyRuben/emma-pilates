@@ -47,7 +47,12 @@ export const startWorker = async (
   );
   await dependencies.pendingAccountCleanup.execute();
   const pendingAccountCleanupTimer = setInterval(() => {
-    void dependencies.pendingAccountCleanup.execute();
+    void dependencies.pendingAccountCleanup.execute().catch(() => {
+      dependencies.emit({
+        event: 'pending_account_cleanup_failed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+    });
   }, pendingAccountCleanupIntervalMs);
 
   const stopHeartbeat = startWorkerHeartbeat({
