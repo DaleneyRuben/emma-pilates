@@ -2,7 +2,12 @@ import { createHmac, randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { login } from '../../src/system-identity/authentication/login';
+import { logout } from '../../src/system-identity/authentication/logout';
 import { PrismaAuthenticationGateway } from '../../src/system-identity/authentication/prisma-authentication-gateway';
+import {
+  AuthenticationRequiredError,
+  resolveAuthenticatedPrincipal,
+} from '../../src/system-identity/authentication/resolve-authenticated-principal';
 import {
   hashPassword,
   verifyPassword,
@@ -51,11 +56,13 @@ describe('mobile Login persistence', () => {
     const gateway = new PrismaAuthenticationGateway(prisma);
     const digestSignal = (value: string): Buffer =>
       createHmac('sha256', 'login-throttle-test-key').update(value).digest();
+    const clientIdentifier = randomUUID();
+    const networkAddress = randomUUID();
     const command = {
       email,
       password: 'incorrect password',
-      clientIdentifier: 'test-installation',
-      networkAddress: '127.0.0.1',
+      clientIdentifier,
+      networkAddress,
     };
     const failedAt = new Date('2026-08-31T12:00:00.000Z');
     const dependencies = (now: Date) => ({
@@ -101,10 +108,10 @@ describe('mobile Login persistence', () => {
     });
     const signals = {
       loginLaneDigest: digestSignal(
-        `login-lane:${email}\0client:test-installation\0network:127.0.0.1`,
+        `login-lane:${email}\0client:${clientIdentifier}\0network:${networkAddress}`,
       ),
-      clientDigest: digestSignal('client:test-installation'),
-      networkDigest: digestSignal('network:127.0.0.1'),
+      clientDigest: digestSignal(`client:${clientIdentifier}`),
+      networkDigest: digestSignal(`network:${networkAddress}`),
       normalizedEmail: email,
       now: new Date(successfulAt.getTime() + 1_000),
     };
@@ -119,6 +126,97 @@ describe('mobile Login persistence', () => {
       surface: 'MOBILE',
       createdAt: successfulAt,
       revokedAt: null,
+    });
+  });
+
+  it('resolves current identity, records meaningful activity, and revokes Logout immediately', async () => {
+    const clientId = randomUUID();
+    const accountId = randomUUID();
+    const authenticationSessionId = randomUUID();
+    const credential = authenticationTokens.issue();
+    const createdAt = new Date('2026-08-31T12:00:00.000Z');
+    const activityAt = new Date('2026-09-01T12:00:00.000Z');
+    await prisma.client.create({
+      data: {
+        id: clientId,
+        name: 'Authenticated Client',
+        referralCode: `ref-${clientId}`,
+      },
+    });
+    await prisma.account.create({
+      data: {
+        id: accountId,
+        clientId,
+        email: `${accountId}@example.com`,
+        passwordHash: await hashPassword('correct password'),
+        emailVerifiedAt: createdAt,
+        activatedAt: createdAt,
+        authenticationSessions: {
+          create: {
+            id: authenticationSessionId,
+            surface: 'MOBILE',
+            credentialDigest: Uint8Array.from(credential.digest),
+            createdAt,
+            lastMeaningfulActivityAt: createdAt,
+            idleExpiresAt: new Date('2026-09-30T12:00:00.000Z'),
+            absoluteExpiresAt: new Date('2026-11-29T12:00:00.000Z'),
+          },
+        },
+      },
+    });
+    const gateway = new PrismaAuthenticationGateway(prisma);
+    const resolverDependencies = (now: Date) => ({
+      digestCredential: authenticationTokens.digest,
+      findSessionByCredentialDigest: (digest: Uint8Array) =>
+        gateway.findSessionByCredentialDigest(digest),
+      recordMeaningfulActivity: (
+        input: Parameters<
+          PrismaAuthenticationGateway['recordMeaningfulActivity']
+        >[0],
+      ) => gateway.recordMeaningfulActivity(input),
+      now: () => now,
+    });
+
+    await expect(
+      resolveAuthenticatedPrincipal(
+        credential.secret,
+        true,
+        resolverDependencies(activityAt),
+      ),
+    ).resolves.toEqual({
+      accountId,
+      authenticationSessionId,
+      identity: { kind: 'client', clientId },
+    });
+    await expect(
+      prisma.authenticationSession.findUniqueOrThrow({
+        where: { id: authenticationSessionId },
+      }),
+    ).resolves.toMatchObject({
+      lastMeaningfulActivityAt: activityAt,
+      idleExpiresAt: new Date('2026-10-01T12:00:00.000Z'),
+    });
+
+    const loggedOutAt = new Date('2026-09-01T12:05:00.000Z');
+    await logout(authenticationSessionId, {
+      now: () => loggedOutAt,
+      revokeSession: (input) => gateway.revokeSession(input),
+    });
+
+    await expect(
+      resolveAuthenticatedPrincipal(
+        credential.secret,
+        false,
+        resolverDependencies(loggedOutAt),
+      ),
+    ).rejects.toBeInstanceOf(AuthenticationRequiredError);
+    await expect(
+      prisma.authenticationSession.findUniqueOrThrow({
+        where: { id: authenticationSessionId },
+      }),
+    ).resolves.toMatchObject({
+      revokedAt: loggedOutAt,
+      revocationReason: 'LOGOUT',
     });
   });
 });

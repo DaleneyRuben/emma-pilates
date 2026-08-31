@@ -6,6 +6,7 @@ import {
 } from '../../generated/prisma/enums';
 import type { AccountCredentials } from './authenticate-credentials';
 import type { NewMobileAuthenticationSession } from './create-mobile-authentication-session';
+import type { AuthenticationSessionPrincipalRecord } from './resolve-authenticated-principal';
 
 type ThrottleDigests = {
   loginLaneDigest: Uint8Array;
@@ -135,6 +136,28 @@ export class PrismaAuthenticationGateway {
         absoluteExpiresAt: input.session.absoluteExpiresAt,
       },
     });
+  }
+
+  findSessionByCredentialDigest(
+    _digest: Uint8Array,
+  ): Promise<AuthenticationSessionPrincipalRecord | null> {
+    throw new Error('Not implemented');
+  }
+
+  recordMeaningfulActivity(_input: {
+    authenticationSessionId: string;
+    activityAt: Date;
+    idleExpiresAt: Date;
+  }): Promise<void> {
+    throw new Error('Not implemented');
+  }
+
+  revokeSession(_input: {
+    authenticationSessionId: string;
+    revokedAt: Date;
+    reason: 'logout';
+  }): Promise<void> {
+    throw new Error('Not implemented');
   }
 }
 
