@@ -8,11 +8,13 @@ import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { ClientRegistrationController } from '../src/system-identity/registration/client-registration.controller';
 import { CorrectPendingClientEmail } from '../src/system-identity/registration/correct-pending-client-email';
 import { RegisterClient } from '../src/system-identity/registration/register-client';
+import { ResendPendingClientVerification } from '../src/system-identity/registration/resend-pending-client-verification';
 
 describe('client registration (e2e)', () => {
   let app: INestApplication<App>;
   const execute = jest.fn();
   const correctEmail = jest.fn();
+  const resendVerification = jest.fn();
 
   beforeEach(async () => {
     execute.mockResolvedValue({
@@ -23,6 +25,7 @@ describe('client registration (e2e)', () => {
       status: 'corrected',
       email: 'corrected@example.com',
     });
+    resendVerification.mockResolvedValue({ status: 'sent' });
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [ClientRegistrationController],
       providers: [
@@ -31,6 +34,10 @@ describe('client registration (e2e)', () => {
           provide: CorrectPendingClientEmail,
           useValue: { execute: correctEmail },
         },
+        {
+          provide: ResendPendingClientVerification,
+          useValue: { execute: resendVerification },
+        },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -38,6 +45,18 @@ describe('client registration (e2e)', () => {
     app = moduleFixture.createNestApplication();
     configureApplication(app);
     await app.init();
+  });
+
+  it('resends pending registration verification', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/client-registrations/verification-resends')
+      .send({ registrationContinuation: 'registration-secret' })
+      .expect(202)
+      .expect({ status: 'verification_required' });
+
+    expect(resendVerification).toHaveBeenCalledWith({
+      registrationContinuation: 'registration-secret',
+    });
   });
 
   it('corrects the pending registration email', async () => {
