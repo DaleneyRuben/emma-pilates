@@ -7,6 +7,11 @@ const startClientRegistrationSchema = z.strictObject({
   password: z.string().min(1),
 });
 
+const correctPendingClientEmailSchema = z.strictObject({
+  registrationContinuation: z.string().min(1),
+  email: z.email(),
+});
+
 export class StartClientRegistrationDto {
   @ApiProperty({ example: 'Ana Clienta' })
   name!: string;
@@ -29,10 +34,34 @@ export class PendingClientRegistrationDto {
   registrationContinuation!: string;
 }
 
+export class CorrectPendingClientEmailDto {
+  @ApiProperty({ writeOnly: true })
+  registrationContinuation!: string;
+
+  @ApiProperty({ example: 'corrected@example.com', format: 'email' })
+  email!: string;
+}
+
+export class PendingEmailCorrectionDto {
+  @ApiProperty({ enum: ['verification_required'] })
+  status!: 'verification_required';
+
+  @ApiProperty({ example: 'corrected@example.com', format: 'email' })
+  email!: string;
+}
+
 export function parseStartClientRegistration(
   input: unknown,
 ): StartClientRegistrationDto | null {
   const result = startClientRegistrationSchema.safeParse(input);
+
+  return result.success ? result.data : null;
+}
+
+export function parseCorrectPendingClientEmail(
+  input: unknown,
+): CorrectPendingClientEmailDto | null {
+  const result = correctPendingClientEmailSchema.safeParse(input);
 
   return result.success ? result.data : null;
 }
