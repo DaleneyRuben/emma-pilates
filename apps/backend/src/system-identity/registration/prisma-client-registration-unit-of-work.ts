@@ -1,5 +1,7 @@
 import type { PgBoss } from 'pg-boss';
 import {
+  AuditActorKind,
+  AuditOutcome,
   AuthenticationThrottleEventKind,
   AuthenticationThrottlePurpose,
   AuthenticationTokenPurpose,
@@ -11,6 +13,10 @@ import type {
   ClientRegistrationTransaction,
   ClientRegistrationUnitOfWork,
 } from './register-client';
+import type {
+  PendingClientRegistrationCancellation,
+  PendingClientRegistrationCancellationStatus,
+} from './cancel-pending-client-registration';
 import type {
   PendingEmailCorrection,
   PendingEmailCorrectionStatus,
@@ -213,6 +219,66 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
       });
 
       return 'sent';
+    });
+  }
+
+  cancel(
+    cancellation: PendingClientRegistrationCancellation,
+  ): Promise<PendingClientRegistrationCancellationStatus> {
+    return this.dependencies.prisma.$transaction(async (transaction) => {
+      const continuation = await transaction.authenticationToken.findUnique({
+        where: {
+          tokenDigest: toPrismaBytes(cancellation.continuationDigest),
+        },
+        include: {
+          account: {
+            select: {
+              id: true,
+              clientId: true,
+              staffMemberId: true,
+              emailVerifiedAt: true,
+              activatedAt: true,
+              pendingExpiresAt: true,
+            },
+          },
+        },
+      });
+
+      if (
+        continuation === null ||
+        continuation.purpose !==
+          AuthenticationTokenPurpose.REGISTRATION_CONTINUATION ||
+        continuation.usedAt !== null ||
+        continuation.invalidatedAt !== null ||
+        continuation.expiresAt <= cancellation.now ||
+        continuation.account.clientId === null ||
+        continuation.account.staffMemberId !== null ||
+        continuation.account.emailVerifiedAt !== null ||
+        continuation.account.activatedAt !== null ||
+        continuation.account.pendingExpiresAt === null ||
+        continuation.account.pendingExpiresAt <= cancellation.now
+      ) {
+        return 'expired';
+      }
+
+      const { id: accountId, clientId } = continuation.account;
+
+      await transaction.account.delete({ where: { id: accountId } });
+      await transaction.client.delete({ where: { id: clientId } });
+      await transaction.auditRecord.create({
+        data: {
+          actionCode: 'pending_client_registration.cancelled',
+          outcome: AuditOutcome.SUCCEEDED,
+          actorKind: AuditActorKind.SYSTEM,
+          targetType: 'account',
+          targetId: accountId,
+          correlationId: cancellation.correlationId,
+          metadata: { initiatedBy: 'registration_continuation' },
+          occurredAt: cancellation.now,
+        },
+      });
+
+      return 'cancelled';
     });
   }
 }
