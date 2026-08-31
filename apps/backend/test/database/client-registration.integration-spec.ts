@@ -311,11 +311,12 @@ describe('Client registration transaction', () => {
     ).resolves.toMatchObject({
       actionCode: 'pending_client_registration.cancelled',
       outcome: 'SUCCEEDED',
-      actorKind: 'ACCOUNT',
+      actorKind: 'SYSTEM',
       actorAccountId: null,
       targetType: 'account',
       targetId: pendingAccount.id,
       correlationId,
+      metadata: { initiatedBy: 'registration_continuation' },
       occurredAt: cancelledAt,
     });
   });
