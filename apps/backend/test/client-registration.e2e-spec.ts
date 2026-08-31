@@ -6,21 +6,31 @@ import { App } from 'supertest/types';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { ClientRegistrationController } from '../src/system-identity/registration/client-registration.controller';
+import { CorrectPendingClientEmail } from '../src/system-identity/registration/correct-pending-client-email';
 import { RegisterClient } from '../src/system-identity/registration/register-client';
 
 describe('client registration (e2e)', () => {
   let app: INestApplication<App>;
   const execute = jest.fn();
+  const correctEmail = jest.fn();
 
   beforeEach(async () => {
     execute.mockResolvedValue({
       email: 'client@example.com',
       registrationContinuation: 'registration-secret',
     });
+    correctEmail.mockResolvedValue({
+      status: 'corrected',
+      email: 'corrected@example.com',
+    });
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [ClientRegistrationController],
       providers: [
         { provide: RegisterClient, useValue: { execute } },
+        {
+          provide: CorrectPendingClientEmail,
+          useValue: { execute: correctEmail },
+        },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -28,6 +38,25 @@ describe('client registration (e2e)', () => {
     app = moduleFixture.createNestApplication();
     configureApplication(app);
     await app.init();
+  });
+
+  it('corrects the pending registration email', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/client-registrations/email-corrections')
+      .send({
+        registrationContinuation: 'registration-secret',
+        email: 'corrected@example.com',
+      })
+      .expect(202)
+      .expect({
+        status: 'verification_required',
+        email: 'corrected@example.com',
+      });
+
+    expect(correctEmail).toHaveBeenCalledWith({
+      registrationContinuation: 'registration-secret',
+      email: 'corrected@example.com',
+    });
   });
 
   it('rejects an invalid registration request', async () => {
