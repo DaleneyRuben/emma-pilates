@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   HttpCode,
@@ -9,6 +10,7 @@ import {
 import { ApiAcceptedResponse, ApiOperation } from '@nestjs/swagger';
 import {
   PendingClientRegistrationDto,
+  parseStartClientRegistration,
   StartClientRegistrationDto,
 } from './client-registration.dto';
 import { RegisterClient } from './register-client';
@@ -25,8 +27,14 @@ export class ClientRegistrationController {
   @ApiOperation({ operationId: 'registerClient' })
   @ApiAcceptedResponse({ type: PendingClientRegistrationDto })
   async register(
-    @Body() command: StartClientRegistrationDto,
+    @Body() body: StartClientRegistrationDto,
   ): Promise<PendingClientRegistrationDto> {
+    const command = parseStartClientRegistration(body);
+
+    if (command === null) {
+      throw new BadRequestException('Invalid client registration request');
+    }
+
     const result = await this.registerClient.execute(command);
 
     return {

@@ -1,4 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { z } from 'zod';
+
+const startClientRegistrationSchema = z.strictObject({
+  name: z.string().trim().min(1),
+  email: z.email(),
+  password: z.string().min(1),
+});
 
 export class StartClientRegistrationDto {
   @ApiProperty({ example: 'Ana Clienta' })
@@ -20,4 +27,12 @@ export class PendingClientRegistrationDto {
 
   @ApiProperty({ writeOnly: true })
   registrationContinuation!: string;
+}
+
+export function parseStartClientRegistration(
+  input: unknown,
+): StartClientRegistrationDto | null {
+  const result = startClientRegistrationSchema.safeParse(input);
+
+  return result.success ? result.data : null;
 }
