@@ -11,6 +11,7 @@ import {
   parseAuthenticationEmailJob,
 } from '../../src/jobs/authentication-email/authentication-email-job';
 import { CancelPendingClientRegistration } from '../../src/system-identity/registration/cancel-pending-client-registration';
+import { CleanupExpiredPendingAccounts } from '../../src/system-identity/registration/cleanup-expired-pending-accounts';
 import { CorrectPendingClientEmail } from '../../src/system-identity/registration/correct-pending-client-email';
 import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
@@ -407,6 +408,73 @@ describe('Client registration transaction', () => {
         where: { accountId: pendingAccount.id },
       }),
     ).resolves.toBe(0);
+  });
+
+  it('cleans up an expired pending Account and its provisional Client', async () => {
+    const cleanupAt = new Date();
+    const registeredAt = new Date(
+      cleanupAt.getTime() - 8 * 24 * 60 * 60 * 1_000,
+    );
+    const gateway = new PrismaClientRegistrationUnitOfWork({
+      prisma,
+      boss,
+      digestEmail: digestTestEmail,
+    });
+    const registration = await new RegisterClient({
+      unitOfWork: gateway,
+      passwordHasher: {
+        hash: () => Promise.resolve('expired-password-hash'),
+      },
+      tokenIssuer: new AuthenticationTokenService(),
+      linkCipher: new AuthenticationLinkCipher(
+        'local-test-key',
+        Buffer.alloc(32, 7),
+      ),
+      now: () => registeredAt,
+      newId: randomUUID,
+      newReferralCode: () => `REF-${randomUUID()}`,
+    }).execute({
+      name: 'Expired Client',
+      email: `expired-${randomUUID()}@example.com`,
+      password: 'expired password',
+    });
+    const pendingAccount = await prisma.account.findUniqueOrThrow({
+      where: { email: registration.email },
+    });
+    const correlationId = randomUUID();
+    const cleanup = new CleanupExpiredPendingAccounts({
+      gateway,
+      now: () => cleanupAt,
+      newId: () => correlationId,
+    });
+
+    await expect(cleanup.execute()).resolves.toEqual({ cleaned: 1 });
+    await expect(
+      prisma.account.findUnique({ where: { id: pendingAccount.id } }),
+    ).resolves.toBeNull();
+    await expect(
+      prisma.client.findUnique({ where: { id: pendingAccount.clientId! } }),
+    ).resolves.toBeNull();
+    await expect(
+      prisma.authenticationToken.count({
+        where: { accountId: pendingAccount.id },
+      }),
+    ).resolves.toBe(0);
+    await expect(
+      prisma.auditRecord.findFirstOrThrow({
+        where: { correlationId, targetId: pendingAccount.id },
+      }),
+    ).resolves.toMatchObject({
+      actionCode: 'pending_account.expired',
+      outcome: 'SUCCEEDED',
+      actorKind: 'SYSTEM',
+      actorAccountId: null,
+      targetType: 'account',
+      targetId: pendingAccount.id,
+      correlationId,
+      metadata: { domainIdentity: 'client' },
+      occurredAt: cleanupAt,
+    });
   });
 });
 
