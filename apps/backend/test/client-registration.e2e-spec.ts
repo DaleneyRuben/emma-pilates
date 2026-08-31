@@ -6,10 +6,12 @@ import { App } from 'supertest/types';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { CancelPendingClientRegistration } from '../src/system-identity/registration/cancel-pending-client-registration';
+import { ClientEmailVerificationController } from '../src/system-identity/registration/client-email-verification.controller';
 import { ClientRegistrationController } from '../src/system-identity/registration/client-registration.controller';
 import { CorrectPendingClientEmail } from '../src/system-identity/registration/correct-pending-client-email';
 import { RegisterClient } from '../src/system-identity/registration/register-client';
 import { ResendPendingClientVerification } from '../src/system-identity/registration/resend-pending-client-verification';
+import { VerifyClientEmail } from '../src/system-identity/registration/verify-client-email';
 
 describe('client registration (e2e)', () => {
   let app: INestApplication<App>;
@@ -17,6 +19,7 @@ describe('client registration (e2e)', () => {
   const correctEmail = jest.fn();
   const resendVerification = jest.fn();
   const cancelRegistration = jest.fn();
+  const verifyEmail = jest.fn();
 
   beforeEach(async () => {
     execute.mockResolvedValue({
@@ -29,8 +32,12 @@ describe('client registration (e2e)', () => {
     });
     resendVerification.mockResolvedValue({ status: 'sent' });
     cancelRegistration.mockResolvedValue({ status: 'cancelled' });
+    verifyEmail.mockResolvedValue({ status: 'verified' });
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      controllers: [ClientRegistrationController],
+      controllers: [
+        ClientEmailVerificationController,
+        ClientRegistrationController,
+      ],
       providers: [
         { provide: RegisterClient, useValue: { execute } },
         {
@@ -45,6 +52,7 @@ describe('client registration (e2e)', () => {
           provide: ResendPendingClientVerification,
           useValue: { execute: resendVerification },
         },
+        { provide: VerifyClientEmail, useValue: { execute: verifyEmail } },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -52,6 +60,18 @@ describe('client registration (e2e)', () => {
     app = moduleFixture.createNestApplication();
     configureApplication(app);
     await app.init();
+  });
+
+  it('verifies a client email without creating a session', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/client-email-verifications')
+      .send({ verificationToken: 'verification-secret' })
+      .expect(200)
+      .expect({ status: 'verified' });
+
+    expect(verifyEmail).toHaveBeenCalledWith({
+      verificationToken: 'verification-secret',
+    });
   });
 
   it('cancels a pending client registration', async () => {
