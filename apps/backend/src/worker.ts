@@ -10,6 +10,8 @@ import {
 } from './jobs/pg-boss-runtime';
 import { startWorkerHeartbeat } from './jobs/worker-heartbeat';
 
+const pendingAccountCleanupIntervalMs = 60 * 60 * 1_000;
+
 type QueueStatsSnapshot = {
   readyCount: number;
   activeCount: number;
@@ -28,6 +30,9 @@ export interface WorkerBoss
 type WorkerDependencies = {
   boss: WorkerBoss;
   authenticationEmail: AuthenticationEmailProcessorDependencies;
+  pendingAccountCleanup: {
+    execute(): Promise<{ cleaned: number }>;
+  };
   serviceVersion: string;
   emit(record: unknown): void;
 };
@@ -40,6 +45,10 @@ export const startWorker = async (
     dependencies.boss,
     dependencies.authenticationEmail,
   );
+  await dependencies.pendingAccountCleanup.execute();
+  const pendingAccountCleanupTimer = setInterval(() => {
+    void dependencies.pendingAccountCleanup.execute();
+  }, pendingAccountCleanupIntervalMs);
 
   const stopHeartbeat = startWorkerHeartbeat({
     serviceVersion: dependencies.serviceVersion,
@@ -60,6 +69,7 @@ export const startWorker = async (
   });
 
   return async () => {
+    clearInterval(pendingAccountCleanupTimer);
     stopHeartbeat();
     await dependencies.boss.stop({ graceful: true });
   };

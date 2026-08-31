@@ -37,6 +37,9 @@ describe('worker entrypoint', () => {
         renderer: { render: jest.fn() },
         delivery: { deliver: jest.fn() },
       },
+      pendingAccountCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
       serviceVersion: '1.2.3',
       emit,
     });
