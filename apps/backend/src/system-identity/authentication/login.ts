@@ -33,7 +33,9 @@ type LoginDependencies = {
   verifyPassword(passwordHash: string, password: string): Promise<boolean>;
   dummyPasswordHash: string;
   digestSignal(value: string): Uint8Array;
-  readThrottleEvents(input: LoginThrottleDigests & { now: Date }): Promise<{
+  readThrottleEvents(
+    input: LoginThrottleDigests & { normalizedEmail: string; now: Date },
+  ): Promise<{
     loginLaneFailures: Date[];
     clientFailures: Date[];
     networkFailures: Date[];
@@ -79,6 +81,7 @@ export const login = async (
   const throttleDigests = createThrottleDigests(command, dependencies);
   const throttleEvents = await dependencies.readThrottleEvents({
     ...throttleDigests,
+    normalizedEmail: command.email.trim().toLowerCase(),
     now,
   });
   const throttle = getLoginThrottle(now, throttleEvents);
