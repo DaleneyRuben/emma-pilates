@@ -52,9 +52,10 @@ events that insert rows and representative values after insertion—are recorded
 in
 [`approved-foundation-table-examples.md`](./approved-foundation-table-examples.md).
 
-The next identity dependency is the proposed
-[`BE-004` pg-boss authentication-email foundation](./BE-004-pg-boss-email-job-proposal.md).
-It creates no schema until its technical migration receives explicit approval.
+The pg-boss authentication-email foundation and the Client registration
+lifecycle are implemented. The next backend identity slice is `IDN-004`:
+Login, progressive throttling, opaque Authentication Sessions, authenticated
+principal resolution, and logout.
 
 Authentication follow-ups 33–38 are pending in the design workflow. Until a new
 export applies and verifies them, generated authentication screens still show
