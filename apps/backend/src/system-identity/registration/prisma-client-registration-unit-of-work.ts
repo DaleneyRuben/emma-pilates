@@ -17,6 +17,7 @@ import type {
   PendingClientRegistrationCancellation,
   PendingClientRegistrationCancellationStatus,
 } from './cancel-pending-client-registration';
+import type { ExpiredPendingAccountCleanup } from './cleanup-expired-pending-accounts';
 import type {
   PendingEmailCorrection,
   PendingEmailCorrectionStatus,
@@ -352,6 +353,52 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
       });
 
       return 'verified';
+    });
+  }
+
+  cleanup(request: ExpiredPendingAccountCleanup): Promise<number> {
+    return this.dependencies.prisma.$transaction(async (transaction) => {
+      const expiredAccounts = await transaction.account.findMany({
+        where: {
+          pendingExpiresAt: { lte: request.now },
+          emailVerifiedAt: null,
+          activatedAt: null,
+        },
+        select: { id: true, clientId: true, staffMemberId: true },
+      });
+
+      await Promise.all(
+        expiredAccounts.map(async (account) => {
+          const domainIdentity = account.clientId === null ? 'staff' : 'client';
+
+          await transaction.account.delete({ where: { id: account.id } });
+
+          if (account.clientId !== null) {
+            await transaction.client.delete({
+              where: { id: account.clientId },
+            });
+          } else if (account.staffMemberId !== null) {
+            await transaction.staffMember.delete({
+              where: { id: account.staffMemberId },
+            });
+          }
+
+          await transaction.auditRecord.create({
+            data: {
+              actionCode: 'pending_account.expired',
+              outcome: AuditOutcome.SUCCEEDED,
+              actorKind: AuditActorKind.SYSTEM,
+              targetType: 'account',
+              targetId: account.id,
+              correlationId: request.correlationId,
+              metadata: { domainIdentity },
+              occurredAt: request.now,
+            },
+          });
+        }),
+      );
+
+      return expiredAccounts.length;
     });
   }
 }
