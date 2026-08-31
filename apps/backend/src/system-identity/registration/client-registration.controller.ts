@@ -7,7 +7,12 @@ import {
   Inject,
   Post,
 } from '@nestjs/common';
-import { ApiAcceptedResponse, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiAcceptedResponse,
+  ApiNoContentResponse,
+  ApiOperation,
+} from '@nestjs/swagger';
+import { CancelPendingClientRegistration } from './cancel-pending-client-registration';
 import {
   CorrectPendingClientEmailDto,
   PendingEmailCorrectionDto,
@@ -32,7 +37,27 @@ export class ClientRegistrationController {
     private readonly correctPendingClientEmail: CorrectPendingClientEmail,
     @Inject(ResendPendingClientVerification)
     private readonly resendPendingClientVerification: ResendPendingClientVerification,
+    @Inject(CancelPendingClientRegistration)
+    private readonly cancelPendingClientRegistration: CancelPendingClientRegistration,
   ) {}
+
+  @Post('cancellations')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ operationId: 'cancelPendingClientRegistration' })
+  @ApiNoContentResponse()
+  async cancel(
+    @Body() body: PendingRegistrationContinuationDto,
+  ): Promise<void> {
+    const command = parsePendingRegistrationContinuation(body);
+
+    if (command === null) {
+      throw new BadRequestException(
+        'Invalid pending registration cancellation request',
+      );
+    }
+
+    await this.cancelPendingClientRegistration.execute(command);
+  }
 
   @Post('verification-resends')
   @HttpCode(HttpStatus.ACCEPTED)
