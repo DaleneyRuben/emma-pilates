@@ -25,6 +25,10 @@ import type {
   PendingVerificationResend,
   PendingVerificationResendStatus,
 } from './resend-pending-client-verification';
+import type {
+  ClientEmailVerification,
+  ClientEmailVerificationStatus,
+} from './verify-client-email';
 
 const hourMilliseconds = 60 * 60 * 1_000;
 const dayMilliseconds = 24 * hourMilliseconds;
@@ -279,6 +283,75 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
       });
 
       return 'cancelled';
+    });
+  }
+
+  verify(
+    verification: ClientEmailVerification,
+  ): Promise<ClientEmailVerificationStatus> {
+    return this.dependencies.prisma.$transaction(async (transaction) => {
+      const token = await transaction.authenticationToken.findUnique({
+        where: {
+          tokenDigest: toPrismaBytes(verification.verificationDigest),
+        },
+        include: {
+          account: {
+            select: {
+              id: true,
+              clientId: true,
+              staffMemberId: true,
+              emailVerifiedAt: true,
+              activatedAt: true,
+              pendingExpiresAt: true,
+            },
+          },
+        },
+      });
+
+      if (
+        token === null ||
+        token.purpose !== AuthenticationTokenPurpose.VERIFICATION
+      ) {
+        return 'invalid';
+      }
+
+      if (
+        token.usedAt !== null ||
+        token.invalidatedAt !== null ||
+        token.expiresAt <= verification.now ||
+        token.account.clientId === null ||
+        token.account.staffMemberId !== null ||
+        token.account.emailVerifiedAt !== null ||
+        token.account.activatedAt !== null ||
+        token.account.pendingExpiresAt === null ||
+        token.account.pendingExpiresAt <= verification.now
+      ) {
+        return 'expired';
+      }
+
+      await transaction.authenticationToken.update({
+        where: { id: token.id },
+        data: { usedAt: verification.now },
+      });
+      await transaction.authenticationToken.updateMany({
+        where: {
+          accountId: token.account.id,
+          id: { not: token.id },
+          usedAt: null,
+          invalidatedAt: null,
+        },
+        data: { invalidatedAt: verification.now },
+      });
+      await transaction.account.update({
+        where: { id: token.account.id },
+        data: {
+          emailVerifiedAt: verification.now,
+          activatedAt: verification.now,
+          pendingExpiresAt: null,
+        },
+      });
+
+      return 'verified';
     });
   }
 }
