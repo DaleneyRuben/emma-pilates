@@ -22,6 +22,83 @@
         ]
       }
     },
+    "/api/v1/authentication-sessions": {
+      "post": {
+        "operationId": "createMobileAuthenticationSession",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAuthenticationSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationSessionCredentialDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
+    "/api/v1/authentication-sessions/current": {
+      "get": {
+        "operationId": "getCurrentAuthenticationSession",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentAuthenticationPrincipalDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Authentication"
+        ]
+      },
+      "delete": {
+        "operationId": "logoutCurrentAuthenticationSession",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Authentication"
+        ]
+      }
+    },
     "/api/v1/client-email-verifications": {
       "post": {
         "operationId": "verifyClientEmail",
@@ -198,6 +275,53 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "CreateAuthenticationSessionDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AuthenticationSessionCredentialDto": {
+        "type": "object",
+        "properties": {
+          "credential": {
+            "type": "string",
+            "description": "Opaque bearer credential returned only once"
+          }
+        },
+        "required": [
+          "credential"
+        ]
+      },
+      "CurrentAuthenticationPrincipalDto": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identity": {
+            "type": "object",
+            "additionalProperties": true
+          }
+        },
+        "required": [
+          "accountId",
+          "identity"
         ]
       },
       "VerifyClientEmailDto": {

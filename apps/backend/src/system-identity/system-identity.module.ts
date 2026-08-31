@@ -6,6 +6,16 @@ import type { PgBoss } from 'pg-boss';
 import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
 import { createPgBoss, startInstalledPgBoss } from '../jobs/pg-boss-runtime';
+import {
+  authenticatedPrincipalResolver,
+  AuthenticationController,
+  currentSessionLogout,
+  mobileLogin,
+} from './authentication/authentication.controller';
+import { login } from './authentication/login';
+import { logout } from './authentication/logout';
+import { PrismaAuthenticationGateway } from './authentication/prisma-authentication-gateway';
+import { resolveAuthenticatedPrincipal } from './authentication/resolve-authenticated-principal';
 import { CancelPendingClientRegistration } from './registration/cancel-pending-client-registration';
 import { ClientEmailVerificationController } from './registration/client-email-verification.controller';
 import { ClientRegistrationController } from './registration/client-registration.controller';
@@ -15,12 +25,14 @@ import { RegisterClient } from './registration/register-client';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { argon2PasswordHasher } from './security/argon2-password-hasher';
+import { dummyPasswordHash } from './security/argon2-password-hasher';
 import { AuthenticationLinkCipher } from './security/authentication-link-cipher';
 import { authenticationTokens } from './security/authentication-token-service';
 
 const registrationGateway = Symbol('registrationGateway');
 const registrationPgBoss = Symbol('registrationPgBoss');
 const systemIdentityPrisma = Symbol('systemIdentityPrisma');
+const authenticationGateway = Symbol('authenticationGateway');
 
 class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
   constructor(
@@ -39,6 +51,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
 
 @Module({
   controllers: [
+    AuthenticationController,
     ClientEmailVerificationController,
     ClientRegistrationController,
   ],
@@ -93,6 +106,70 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
               .update(email)
               .digest(),
         }),
+    },
+    {
+      provide: authenticationGateway,
+      inject: [systemIdentityPrisma],
+      useFactory: (prisma: PrismaClient) =>
+        new PrismaAuthenticationGateway(prisma),
+    },
+    {
+      provide: mobileLogin,
+      inject: [authenticationGateway, ConfigService],
+      useFactory:
+        (
+          gateway: PrismaAuthenticationGateway,
+          config: ConfigService<Environment, true>,
+        ) =>
+        (command: Parameters<typeof login>[0]) =>
+          login(command, {
+            findAccountByEmail: (email) => gateway.findAccountByEmail(email),
+            verifyPassword: argon2PasswordHasher.verify,
+            dummyPasswordHash,
+            digestSignal: (value) =>
+              createHmac(
+                'sha256',
+                config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
+              )
+                .update(value)
+                .digest(),
+            readThrottleEvents: (input) => gateway.readThrottleEvents(input),
+            recordFailedCredentialCheck: (input) =>
+              gateway.recordFailedCredentialCheck(input),
+            completeLogin: (input) => gateway.completeLogin(input),
+            issueCredential: authenticationTokens.issue,
+            now: () => new Date(),
+            newId: randomUUID,
+          }),
+    },
+    {
+      provide: authenticatedPrincipalResolver,
+      inject: [authenticationGateway],
+      useFactory:
+        (gateway: PrismaAuthenticationGateway) =>
+        (
+          credential: string,
+          meaningfulActivity: boolean,
+        ): ReturnType<typeof resolveAuthenticatedPrincipal> =>
+          resolveAuthenticatedPrincipal(credential, meaningfulActivity, {
+            digestCredential: authenticationTokens.digest,
+            findSessionByCredentialDigest: (digest) =>
+              gateway.findSessionByCredentialDigest(digest),
+            recordMeaningfulActivity: (input) =>
+              gateway.recordMeaningfulActivity(input),
+            now: () => new Date(),
+          }),
+    },
+    {
+      provide: currentSessionLogout,
+      inject: [authenticationGateway],
+      useFactory:
+        (gateway: PrismaAuthenticationGateway) =>
+        (authenticationSessionId: string): Promise<void> =>
+          logout(authenticationSessionId, {
+            now: () => new Date(),
+            revokeSession: (input) => gateway.revokeSession(input),
+          }),
     },
     {
       provide: RegisterClient,

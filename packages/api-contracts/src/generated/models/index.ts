@@ -5,9 +5,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from "./authenticationSessionCredentialDto";
 export * from "./clientEmailVerificationResultDto";
 export * from "./clientEmailVerificationResultDtoStatus";
 export * from "./correctPendingClientEmailDto";
+export * from "./createAuthenticationSessionDto";
+export * from "./currentAuthenticationPrincipalDto";
+export * from "./currentAuthenticationPrincipalDtoIdentity";
 export * from "./livenessResponseDto";
 export * from "./livenessResponseDtoStatus";
 export * from "./pendingClientRegistrationDto";

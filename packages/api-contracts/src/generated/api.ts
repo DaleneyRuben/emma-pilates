@@ -21,8 +21,11 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AuthenticationSessionCredentialDto,
   ClientEmailVerificationResultDto,
   CorrectPendingClientEmailDto,
+  CreateAuthenticationSessionDto,
+  CurrentAuthenticationPrincipalDto,
   LivenessResponseDto,
   PendingClientRegistrationDto,
   PendingEmailCorrectionDto,
@@ -233,6 +236,441 @@ export function useHealthControllerGetLiveness<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type createMobileAuthenticationSessionResponse201 = {
+  data: AuthenticationSessionCredentialDto;
+  status: 201;
+};
+
+export type createMobileAuthenticationSessionResponseSuccess =
+  createMobileAuthenticationSessionResponse201 & {
+    headers: Headers;
+  };
+export type createMobileAuthenticationSessionResponse =
+  createMobileAuthenticationSessionResponseSuccess;
+
+export const getCreateMobileAuthenticationSessionUrl = () => {
+  return `/api/v1/authentication-sessions`;
+};
+
+export const createMobileAuthenticationSession = async (
+  createAuthenticationSessionDto: CreateAuthenticationSessionDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createMobileAuthenticationSessionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getCreateMobileAuthenticationSessionUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(createAuthenticationSessionDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createMobileAuthenticationSessionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createMobileAuthenticationSessionResponse;
+};
+
+export const getCreateMobileAuthenticationSessionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createMobileAuthenticationSession>>,
+    TError,
+    CreateMobileAuthenticationSessionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createMobileAuthenticationSession>>,
+  TError,
+  CreateMobileAuthenticationSessionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createMobileAuthenticationSession"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createMobileAuthenticationSession>>,
+    CreateMobileAuthenticationSessionMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createMobileAuthenticationSession(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateMobileAuthenticationSessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createMobileAuthenticationSession>>
+>;
+export type CreateMobileAuthenticationSessionMutationBody =
+  CreateAuthenticationSessionDto;
+export type CreateMobileAuthenticationSessionMutationError = unknown;
+export type CreateMobileAuthenticationSessionMutationVariables = {
+  data: CreateAuthenticationSessionDto;
+};
+
+export const useCreateMobileAuthenticationSession = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createMobileAuthenticationSession>>,
+      TError,
+      CreateMobileAuthenticationSessionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createMobileAuthenticationSession>>,
+  TError,
+  CreateMobileAuthenticationSessionMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreateMobileAuthenticationSessionMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getCurrentAuthenticationSessionResponse200 = {
+  data: CurrentAuthenticationPrincipalDto;
+  status: 200;
+};
+
+export type getCurrentAuthenticationSessionResponseSuccess =
+  getCurrentAuthenticationSessionResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentAuthenticationSessionResponse =
+  getCurrentAuthenticationSessionResponseSuccess;
+
+export const getGetCurrentAuthenticationSessionUrl = () => {
+  return `/api/v1/authentication-sessions/current`;
+};
+
+export const getCurrentAuthenticationSession = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentAuthenticationSessionResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetCurrentAuthenticationSessionUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentAuthenticationSessionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentAuthenticationSessionResponse;
+};
+
+export const getGetCurrentAuthenticationSessionQueryKey = () => {
+  return [`/api/v1/authentication-sessions/current`] as const;
+};
+
+export const getGetCurrentAuthenticationSessionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentAuthenticationSessionQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentAuthenticationSession>>
+  > = ({ signal }) =>
+    getCurrentAuthenticationSession({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentAuthenticationSessionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentAuthenticationSession>>
+>;
+export type GetCurrentAuthenticationSessionQueryError = unknown;
+
+export function useGetCurrentAuthenticationSession<
+  TData = Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentAuthenticationSession>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentAuthenticationSession<
+  TData = Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentAuthenticationSession>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentAuthenticationSession<
+  TData = Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentAuthenticationSession<
+  TData = Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAuthenticationSession>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentAuthenticationSessionQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type logoutCurrentAuthenticationSessionResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type logoutCurrentAuthenticationSessionResponseSuccess =
+  logoutCurrentAuthenticationSessionResponse204 & {
+    headers: Headers;
+  };
+export type logoutCurrentAuthenticationSessionResponse =
+  logoutCurrentAuthenticationSessionResponseSuccess;
+
+export const getLogoutCurrentAuthenticationSessionUrl = () => {
+  return `/api/v1/authentication-sessions/current`;
+};
+
+export const logoutCurrentAuthenticationSession = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<logoutCurrentAuthenticationSessionResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getLogoutCurrentAuthenticationSessionUrl(),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: logoutCurrentAuthenticationSessionResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as logoutCurrentAuthenticationSessionResponse;
+};
+
+export const getLogoutCurrentAuthenticationSessionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof logoutCurrentAuthenticationSession>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof logoutCurrentAuthenticationSession>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["logoutCurrentAuthenticationSession"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof logoutCurrentAuthenticationSession>>,
+    void
+  > = () => {
+    return logoutCurrentAuthenticationSession(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LogoutCurrentAuthenticationSessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof logoutCurrentAuthenticationSession>>
+>;
+
+export type LogoutCurrentAuthenticationSessionMutationError = unknown;
+
+export const useLogoutCurrentAuthenticationSession = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof logoutCurrentAuthenticationSession>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof logoutCurrentAuthenticationSession>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(
+    getLogoutCurrentAuthenticationSessionMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type verifyClientEmailResponse200 = {
   data: ClientEmailVerificationResultDto;
