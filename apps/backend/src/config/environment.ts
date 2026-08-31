@@ -31,7 +31,7 @@ const environmentSchema = z
     NODE_ENV: z
       .enum(['development', 'test', 'production'])
       .default('development'),
-    PORT: z.coerce.number().int().positive().max(65_535).default(3000),
+    PORT: z.coerce.number().int().positive().max(65_535).default(3100),
   })
   .superRefine((environment, context) => {
     if (environment.NODE_ENV !== 'production') {
