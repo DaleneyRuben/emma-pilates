@@ -10,7 +10,7 @@ export function configureApplication(app: INestApplication): OpenAPIObject {
   const openApiConfig = new DocumentBuilder()
     .setTitle('Emma Pilates API')
     .setVersion('1.0.0')
-    .addBearerAuth()
+    .addBearerAuth({ type: 'http', scheme: 'bearer', bearerFormat: 'opaque' })
     .build();
   const openApiDocument = SwaggerModule.createDocument(app, openApiConfig);
 

@@ -275,7 +275,7 @@
     "securitySchemes": {
       "bearer": {
         "scheme": "bearer",
-        "bearerFormat": "JWT",
+        "bearerFormat": "opaque",
         "type": "http"
       }
     },
