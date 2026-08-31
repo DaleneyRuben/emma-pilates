@@ -36,13 +36,15 @@ describe('client registration (e2e)', () => {
       .send({ name: '', email: 'not-an-email', password: '' })
       .expect('Content-Type', /application\/problem\+json/)
       .expect(400)
-      .expect(
-        expect.objectContaining({
-          status: 400,
-          code: 'invalid_request',
-          instance: '/api/v1/client-registrations',
-        }),
-      );
+      .expect(({ body }) => {
+        expect(body).toEqual(
+          expect.objectContaining({
+            status: 400,
+            code: 'invalid_request',
+            instance: '/api/v1/client-registrations',
+          }),
+        );
+      });
 
     expect(execute).not.toHaveBeenCalled();
   });
