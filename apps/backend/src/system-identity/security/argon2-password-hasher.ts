@@ -1,5 +1,7 @@
 import { argon2id, hash, verify } from 'argon2';
 
+export const dummyPasswordHash = 'not-configured';
+
 export const hashPassword = (password: string): Promise<string> =>
   hash(password, { type: argon2id });
 
