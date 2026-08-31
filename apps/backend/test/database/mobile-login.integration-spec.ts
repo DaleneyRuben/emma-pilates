@@ -94,6 +94,19 @@ describe('mobile Login persistence', () => {
 
     await expect(login(command, dependencies(failedAt))).rejects.toThrow();
 
+    const otherClientIdentifier = randomUUID();
+    const otherNetworkAddress = randomUUID();
+    const otherLaneDigest = digestSignal(
+      `login-lane:${email}\0client:${otherClientIdentifier}\0network:${otherNetworkAddress}`,
+    );
+    await gateway.recordFailedCredentialCheck({
+      loginLaneDigest: otherLaneDigest,
+      clientDigest: digestSignal(`client:${otherClientIdentifier}`),
+      networkDigest: digestSignal(`network:${otherNetworkAddress}`),
+      occurredAt: failedAt,
+      expiresAt: new Date(failedAt.getTime() + 60 * 60 * 1_000),
+    });
+
     const successfulAt = new Date(failedAt.getTime() + 1_000);
     const result = await login(
       { ...command, password: 'correct password' },
@@ -118,6 +131,19 @@ describe('mobile Login persistence', () => {
 
     await expect(gateway.readThrottleEvents(signals)).resolves.toEqual({
       loginLaneFailures: [],
+      clientFailures: [failedAt],
+      networkFailures: [failedAt],
+    });
+    await expect(
+      gateway.readThrottleEvents({
+        loginLaneDigest: otherLaneDigest,
+        clientDigest: digestSignal(`client:${otherClientIdentifier}`),
+        networkDigest: digestSignal(`network:${otherNetworkAddress}`),
+        normalizedEmail: email,
+        now: new Date(successfulAt.getTime() + 1_000),
+      }),
+    ).resolves.toEqual({
+      loginLaneFailures: [failedAt],
       clientFailures: [failedAt],
       networkFailures: [failedAt],
     });
