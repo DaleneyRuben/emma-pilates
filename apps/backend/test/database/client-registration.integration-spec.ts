@@ -50,7 +50,7 @@ describe('Client registration transaction', () => {
   });
 
   it('commits the pending Account, Client, digests, throttle event, and encrypted email job together', async () => {
-    const now = new Date('2026-08-30T18:00:00.000Z');
+    const now = new Date(Date.now() + 60_000);
     const tokens = authenticationTokens;
     const registerClient = new RegisterClient({
       unitOfWork: new PrismaClientRegistrationUnitOfWork({
@@ -112,12 +112,12 @@ describe('Client registration transaction', () => {
       passwordHash: 'argon2id-password-hash',
       emailVerifiedAt: null,
       activatedAt: null,
-      pendingExpiresAt: new Date('2026-09-06T18:00:00.000Z'),
+      pendingExpiresAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1_000),
       client: { name: 'Ana Pérez' },
     });
     expect(account.authenticationTokens).toHaveLength(2);
     expect(verificationToken?.expiresAt).toEqual(
-      new Date('2026-08-31T18:00:00.000Z'),
+      new Date(now.getTime() + 24 * 60 * 60 * 1_000),
     );
     expect(continuationToken).toBeDefined();
     expect(
