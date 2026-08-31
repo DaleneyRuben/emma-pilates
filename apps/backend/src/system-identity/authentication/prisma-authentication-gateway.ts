@@ -34,9 +34,7 @@ export class PrismaAuthenticationGateway {
     });
   }
 
-  async readThrottleEvents(
-    input: ThrottleDigests & { normalizedEmail: string; now: Date },
-  ): Promise<{
+  async readThrottleEvents(input: ThrottleDigests & { now: Date }): Promise<{
     loginLaneFailures: Date[];
     clientFailures: Date[];
     networkFailures: Date[];

@@ -76,7 +76,6 @@ describe('mobile Login persistence', () => {
         loginLaneDigest: Uint8Array;
         clientDigest: Uint8Array | null;
         networkDigest: Uint8Array;
-        normalizedEmail: string;
         now: Date;
       }) => gateway.readThrottleEvents(input),
       recordFailedCredentialCheck: (
@@ -125,7 +124,6 @@ describe('mobile Login persistence', () => {
       ),
       clientDigest: digestSignal(`client:${clientIdentifier}`),
       networkDigest: digestSignal(`network:${networkAddress}`),
-      normalizedEmail: email,
       now: new Date(successfulAt.getTime() + 1_000),
     };
 
@@ -139,7 +137,6 @@ describe('mobile Login persistence', () => {
         loginLaneDigest: otherLaneDigest,
         clientDigest: digestSignal(`client:${otherClientIdentifier}`),
         networkDigest: digestSignal(`network:${otherNetworkAddress}`),
-        normalizedEmail: email,
         now: new Date(successfulAt.getTime() + 1_000),
       }),
     ).resolves.toEqual({
