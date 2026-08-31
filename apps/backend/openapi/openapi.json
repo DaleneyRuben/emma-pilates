@@ -21,6 +21,159 @@
           "Health"
         ]
       }
+    },
+    "/api/v1/client-email-verifications": {
+      "post": {
+        "operationId": "verifyClientEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyClientEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientEmailVerificationResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ClientEmailVerification"
+        ]
+      }
+    },
+    "/api/v1/client-registrations/cancellations": {
+      "post": {
+        "operationId": "cancelPendingClientRegistration",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PendingRegistrationContinuationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ClientRegistration"
+        ]
+      }
+    },
+    "/api/v1/client-registrations/verification-resends": {
+      "post": {
+        "operationId": "resendPendingClientVerification",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PendingRegistrationContinuationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingVerificationResendDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ClientRegistration"
+        ]
+      }
+    },
+    "/api/v1/client-registrations/email-corrections": {
+      "post": {
+        "operationId": "correctPendingClientEmail",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectPendingClientEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingEmailCorrectionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ClientRegistration"
+        ]
+      }
+    },
+    "/api/v1/client-registrations": {
+      "post": {
+        "operationId": "registerClient",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartClientRegistrationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingClientRegistrationDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "ClientRegistration"
+        ]
+      }
     }
   },
   "info": {
@@ -45,6 +198,147 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "VerifyClientEmailDto": {
+        "type": "object",
+        "properties": {
+          "verificationToken": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "verificationToken"
+        ]
+      },
+      "ClientEmailVerificationResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "expired",
+              "invalid"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "PendingRegistrationContinuationDto": {
+        "type": "object",
+        "properties": {
+          "registrationContinuation": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "registrationContinuation"
+        ]
+      },
+      "PendingVerificationResendDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "verification_required"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CorrectPendingClientEmailDto": {
+        "type": "object",
+        "properties": {
+          "registrationContinuation": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "email": {
+            "type": "string",
+            "example": "corrected@example.com",
+            "format": "email"
+          }
+        },
+        "required": [
+          "registrationContinuation",
+          "email"
+        ]
+      },
+      "PendingEmailCorrectionDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "verification_required"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "example": "corrected@example.com",
+            "format": "email"
+          }
+        },
+        "required": [
+          "status",
+          "email"
+        ]
+      },
+      "StartClientRegistrationDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Ana Clienta"
+          },
+          "email": {
+            "type": "string",
+            "example": "ana@example.com",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "password"
+        ]
+      },
+      "PendingClientRegistrationDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "verification_required"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "example": "ana@example.com",
+            "format": "email"
+          },
+          "registrationContinuation": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "status",
+          "email",
+          "registrationContinuation"
         ]
       }
     }

@@ -5,5 +5,17 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from "./clientEmailVerificationResultDto";
+export * from "./clientEmailVerificationResultDtoStatus";
+export * from "./correctPendingClientEmailDto";
 export * from "./livenessResponseDto";
 export * from "./livenessResponseDtoStatus";
+export * from "./pendingClientRegistrationDto";
+export * from "./pendingClientRegistrationDtoStatus";
+export * from "./pendingEmailCorrectionDto";
+export * from "./pendingEmailCorrectionDtoStatus";
+export * from "./pendingRegistrationContinuationDto";
+export * from "./pendingVerificationResendDto";
+export * from "./pendingVerificationResendDtoStatus";
+export * from "./startClientRegistrationDto";
+export * from "./verifyClientEmailDto";

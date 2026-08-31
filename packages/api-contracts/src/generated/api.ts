@@ -4,20 +4,33 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
+  MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { LivenessResponseDto } from "./models";
+import type {
+  ClientEmailVerificationResultDto,
+  CorrectPendingClientEmailDto,
+  LivenessResponseDto,
+  PendingClientRegistrationDto,
+  PendingEmailCorrectionDto,
+  PendingRegistrationContinuationDto,
+  PendingVerificationResendDto,
+  StartClientRegistrationDto,
+  VerifyClientEmailDto,
+} from "./models";
 
 const withQueryKey = <T extends object, K>(
   query: T,
@@ -220,3 +233,640 @@ export function useHealthControllerGetLiveness<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type verifyClientEmailResponse200 = {
+  data: ClientEmailVerificationResultDto;
+  status: 200;
+};
+
+export type verifyClientEmailResponseSuccess = verifyClientEmailResponse200 & {
+  headers: Headers;
+};
+export type verifyClientEmailResponse = verifyClientEmailResponseSuccess;
+
+export const getVerifyClientEmailUrl = () => {
+  return `/api/v1/client-email-verifications`;
+};
+
+export const verifyClientEmail = async (
+  verifyClientEmailDto: VerifyClientEmailDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<verifyClientEmailResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getVerifyClientEmailUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(verifyClientEmailDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: verifyClientEmailResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as verifyClientEmailResponse;
+};
+
+export const getVerifyClientEmailMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof verifyClientEmail>>,
+    TError,
+    VerifyClientEmailMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof verifyClientEmail>>,
+  TError,
+  VerifyClientEmailMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["verifyClientEmail"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof verifyClientEmail>>,
+    VerifyClientEmailMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return verifyClientEmail(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type VerifyClientEmailMutationResult = NonNullable<
+  Awaited<ReturnType<typeof verifyClientEmail>>
+>;
+export type VerifyClientEmailMutationBody = VerifyClientEmailDto;
+export type VerifyClientEmailMutationError = unknown;
+export type VerifyClientEmailMutationVariables = { data: VerifyClientEmailDto };
+
+export const useVerifyClientEmail = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof verifyClientEmail>>,
+      TError,
+      VerifyClientEmailMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof verifyClientEmail>>,
+  TError,
+  VerifyClientEmailMutationVariables,
+  TContext
+> => {
+  return useMutation(getVerifyClientEmailMutationOptions(options), queryClient);
+};
+
+export type cancelPendingClientRegistrationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type cancelPendingClientRegistrationResponseSuccess =
+  cancelPendingClientRegistrationResponse204 & {
+    headers: Headers;
+  };
+export type cancelPendingClientRegistrationResponse =
+  cancelPendingClientRegistrationResponseSuccess;
+
+export const getCancelPendingClientRegistrationUrl = () => {
+  return `/api/v1/client-registrations/cancellations`;
+};
+
+export const cancelPendingClientRegistration = async (
+  pendingRegistrationContinuationDto: PendingRegistrationContinuationDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelPendingClientRegistrationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getCancelPendingClientRegistrationUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(pendingRegistrationContinuationDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelPendingClientRegistrationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as cancelPendingClientRegistrationResponse;
+};
+
+export const getCancelPendingClientRegistrationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelPendingClientRegistration>>,
+    TError,
+    CancelPendingClientRegistrationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelPendingClientRegistration>>,
+  TError,
+  CancelPendingClientRegistrationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["cancelPendingClientRegistration"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cancelPendingClientRegistration>>,
+    CancelPendingClientRegistrationMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return cancelPendingClientRegistration(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelPendingClientRegistrationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cancelPendingClientRegistration>>
+>;
+export type CancelPendingClientRegistrationMutationBody =
+  PendingRegistrationContinuationDto;
+export type CancelPendingClientRegistrationMutationError = unknown;
+export type CancelPendingClientRegistrationMutationVariables = {
+  data: PendingRegistrationContinuationDto;
+};
+
+export const useCancelPendingClientRegistration = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelPendingClientRegistration>>,
+      TError,
+      CancelPendingClientRegistrationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelPendingClientRegistration>>,
+  TError,
+  CancelPendingClientRegistrationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCancelPendingClientRegistrationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type resendPendingClientVerificationResponse202 = {
+  data: PendingVerificationResendDto;
+  status: 202;
+};
+
+export type resendPendingClientVerificationResponseSuccess =
+  resendPendingClientVerificationResponse202 & {
+    headers: Headers;
+  };
+export type resendPendingClientVerificationResponse =
+  resendPendingClientVerificationResponseSuccess;
+
+export const getResendPendingClientVerificationUrl = () => {
+  return `/api/v1/client-registrations/verification-resends`;
+};
+
+export const resendPendingClientVerification = async (
+  pendingRegistrationContinuationDto: PendingRegistrationContinuationDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resendPendingClientVerificationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getResendPendingClientVerificationUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(pendingRegistrationContinuationDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resendPendingClientVerificationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as resendPendingClientVerificationResponse;
+};
+
+export const getResendPendingClientVerificationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resendPendingClientVerification>>,
+    TError,
+    ResendPendingClientVerificationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resendPendingClientVerification>>,
+  TError,
+  ResendPendingClientVerificationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["resendPendingClientVerification"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resendPendingClientVerification>>,
+    ResendPendingClientVerificationMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return resendPendingClientVerification(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResendPendingClientVerificationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resendPendingClientVerification>>
+>;
+export type ResendPendingClientVerificationMutationBody =
+  PendingRegistrationContinuationDto;
+export type ResendPendingClientVerificationMutationError = unknown;
+export type ResendPendingClientVerificationMutationVariables = {
+  data: PendingRegistrationContinuationDto;
+};
+
+export const useResendPendingClientVerification = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resendPendingClientVerification>>,
+      TError,
+      ResendPendingClientVerificationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resendPendingClientVerification>>,
+  TError,
+  ResendPendingClientVerificationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getResendPendingClientVerificationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type correctPendingClientEmailResponse202 = {
+  data: PendingEmailCorrectionDto;
+  status: 202;
+};
+
+export type correctPendingClientEmailResponseSuccess =
+  correctPendingClientEmailResponse202 & {
+    headers: Headers;
+  };
+export type correctPendingClientEmailResponse =
+  correctPendingClientEmailResponseSuccess;
+
+export const getCorrectPendingClientEmailUrl = () => {
+  return `/api/v1/client-registrations/email-corrections`;
+};
+
+export const correctPendingClientEmail = async (
+  correctPendingClientEmailDto: CorrectPendingClientEmailDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<correctPendingClientEmailResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCorrectPendingClientEmailUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(correctPendingClientEmailDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: correctPendingClientEmailResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as correctPendingClientEmailResponse;
+};
+
+export const getCorrectPendingClientEmailMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof correctPendingClientEmail>>,
+    TError,
+    CorrectPendingClientEmailMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof correctPendingClientEmail>>,
+  TError,
+  CorrectPendingClientEmailMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["correctPendingClientEmail"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof correctPendingClientEmail>>,
+    CorrectPendingClientEmailMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return correctPendingClientEmail(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CorrectPendingClientEmailMutationResult = NonNullable<
+  Awaited<ReturnType<typeof correctPendingClientEmail>>
+>;
+export type CorrectPendingClientEmailMutationBody =
+  CorrectPendingClientEmailDto;
+export type CorrectPendingClientEmailMutationError = unknown;
+export type CorrectPendingClientEmailMutationVariables = {
+  data: CorrectPendingClientEmailDto;
+};
+
+export const useCorrectPendingClientEmail = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof correctPendingClientEmail>>,
+      TError,
+      CorrectPendingClientEmailMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof correctPendingClientEmail>>,
+  TError,
+  CorrectPendingClientEmailMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCorrectPendingClientEmailMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type registerClientResponse202 = {
+  data: PendingClientRegistrationDto;
+  status: 202;
+};
+
+export type registerClientResponseSuccess = registerClientResponse202 & {
+  headers: Headers;
+};
+export type registerClientResponse = registerClientResponseSuccess;
+
+export const getRegisterClientUrl = () => {
+  return `/api/v1/client-registrations`;
+};
+
+export const registerClient = async (
+  startClientRegistrationDto: StartClientRegistrationDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<registerClientResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRegisterClientUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(startClientRegistrationDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: registerClientResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as registerClientResponse;
+};
+
+export const getRegisterClientMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof registerClient>>,
+    TError,
+    RegisterClientMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof registerClient>>,
+  TError,
+  RegisterClientMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["registerClient"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof registerClient>>,
+    RegisterClientMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return registerClient(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RegisterClientMutationResult = NonNullable<
+  Awaited<ReturnType<typeof registerClient>>
+>;
+export type RegisterClientMutationBody = StartClientRegistrationDto;
+export type RegisterClientMutationError = unknown;
+export type RegisterClientMutationVariables = {
+  data: StartClientRegistrationDto;
+};
+
+export const useRegisterClient = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof registerClient>>,
+      TError,
+      RegisterClientMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof registerClient>>,
+  TError,
+  RegisterClientMutationVariables,
+  TContext
+> => {
+  return useMutation(getRegisterClientMutationOptions(options), queryClient);
+};
