@@ -1,12 +1,16 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import {
+  AuthenticationSessionRevocationReason,
   AuthenticationSessionSurface,
   AuthenticationThrottleEventKind,
   AuthenticationThrottlePurpose,
 } from '../../generated/prisma/enums';
 import type { AccountCredentials } from './authenticate-credentials';
 import type { NewMobileAuthenticationSession } from './create-mobile-authentication-session';
-import type { AuthenticationSessionPrincipalRecord } from './resolve-authenticated-principal';
+import {
+  AuthenticationRequiredError,
+  type AuthenticationSessionPrincipalRecord,
+} from './resolve-authenticated-principal';
 
 type ThrottleDigests = {
   loginLaneDigest: Uint8Array;
@@ -139,25 +143,96 @@ export class PrismaAuthenticationGateway {
   }
 
   findSessionByCredentialDigest(
-    _digest: Uint8Array,
+    digest: Uint8Array,
   ): Promise<AuthenticationSessionPrincipalRecord | null> {
-    throw new Error('Not implemented');
+    return this.prisma.authenticationSession
+      .findUnique({
+        where: { credentialDigest: toPrismaBytes(digest) },
+        select: {
+          id: true,
+          accountId: true,
+          createdAt: true,
+          idleExpiresAt: true,
+          absoluteExpiresAt: true,
+          revokedAt: true,
+          account: {
+            select: {
+              disabledAt: true,
+              clientId: true,
+              staffMember: {
+                select: {
+                  id: true,
+                  role: true,
+                  branchAssignments: { select: { branchId: true } },
+                },
+              },
+            },
+          },
+        },
+      })
+      .then((session) =>
+        session === null
+          ? null
+          : {
+              id: session.id,
+              accountId: session.accountId,
+              createdAt: session.createdAt,
+              idleExpiresAt: session.idleExpiresAt,
+              absoluteExpiresAt: session.absoluteExpiresAt,
+              revokedAt: session.revokedAt,
+              accountDisabledAt: session.account.disabledAt,
+              clientId: session.account.clientId,
+              staffMember:
+                session.account.staffMember === null
+                  ? null
+                  : {
+                      id: session.account.staffMember.id,
+                      role: session.account.staffMember.role,
+                      branchIds:
+                        session.account.staffMember.branchAssignments.map(
+                          ({ branchId }) => branchId,
+                        ),
+                    },
+            },
+      );
   }
 
-  recordMeaningfulActivity(_input: {
+  async recordMeaningfulActivity(input: {
     authenticationSessionId: string;
     activityAt: Date;
     idleExpiresAt: Date;
   }): Promise<void> {
-    throw new Error('Not implemented');
+    const result = await this.prisma.authenticationSession.updateMany({
+      where: {
+        id: input.authenticationSessionId,
+        revokedAt: null,
+        idleExpiresAt: { gt: input.activityAt },
+        absoluteExpiresAt: { gt: input.activityAt },
+        account: { disabledAt: null },
+      },
+      data: {
+        lastMeaningfulActivityAt: input.activityAt,
+        idleExpiresAt: input.idleExpiresAt,
+      },
+    });
+
+    if (result.count !== 1) {
+      throw new AuthenticationRequiredError();
+    }
   }
 
-  revokeSession(_input: {
+  async revokeSession(input: {
     authenticationSessionId: string;
     revokedAt: Date;
     reason: 'logout';
   }): Promise<void> {
-    throw new Error('Not implemented');
+    await this.prisma.authenticationSession.updateMany({
+      where: { id: input.authenticationSessionId, revokedAt: null },
+      data: {
+        revokedAt: input.revokedAt,
+        revocationReason: AuthenticationSessionRevocationReason.LOGOUT,
+      },
+    });
   }
 }
 
