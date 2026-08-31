@@ -56,4 +56,42 @@ describe('worker entrypoint', () => {
     await stopWorker();
     expect(stop).toHaveBeenCalledWith({ graceful: true });
   });
+
+  it('cleans expired pending Accounts immediately and once per hour', async () => {
+    jest.useFakeTimers();
+    const boss: WorkerBoss = {
+      isInstalled: jest.fn().mockResolvedValue(true),
+      schemaVersion: jest.fn().mockResolvedValue(38),
+      start: jest.fn().mockResolvedValue(undefined),
+      work: jest.fn().mockResolvedValue('worker-id'),
+      getQueueStats: jest.fn().mockResolvedValue([]),
+      stop: jest.fn().mockResolvedValue(undefined),
+    };
+    const pendingAccountCleanup = {
+      execute: jest.fn().mockResolvedValue({ cleaned: 2 }),
+    };
+    const dependencies = {
+      boss,
+      authenticationEmail: {
+        stateReader: { find: jest.fn() },
+        decryptor: { decrypt: jest.fn() },
+        renderer: { render: jest.fn() },
+        delivery: { deliver: jest.fn() },
+      },
+      pendingAccountCleanup,
+      serviceVersion: '1.2.3',
+      emit: jest.fn(),
+    };
+
+    const stopWorker = await startWorker(dependencies);
+
+    expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
+
+    await stopWorker();
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
+  });
 });
