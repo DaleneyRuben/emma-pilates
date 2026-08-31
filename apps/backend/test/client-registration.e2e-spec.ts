@@ -1,6 +1,7 @@
 import { INestApplication } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { Test, TestingModule } from '@nestjs/testing';
+import { jest } from '@jest/globals';
 import request from 'supertest';
 import { App } from 'supertest/types';
 import { configureApplication } from '../src/http/configure-application';
