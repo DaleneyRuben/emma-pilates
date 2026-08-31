@@ -12,12 +12,16 @@ import {
   CorrectPendingClientEmailDto,
   PendingEmailCorrectionDto,
   PendingClientRegistrationDto,
+  PendingRegistrationContinuationDto,
+  PendingVerificationResendDto,
   parseCorrectPendingClientEmail,
+  parsePendingRegistrationContinuation,
   parseStartClientRegistration,
   StartClientRegistrationDto,
 } from './client-registration.dto';
 import { CorrectPendingClientEmail } from './correct-pending-client-email';
 import { RegisterClient } from './register-client';
+import { ResendPendingClientVerification } from './resend-pending-client-verification';
 
 @Controller({ path: 'client-registrations', version: '1' })
 export class ClientRegistrationController {
@@ -26,7 +30,27 @@ export class ClientRegistrationController {
     private readonly registerClient: RegisterClient,
     @Inject(CorrectPendingClientEmail)
     private readonly correctPendingClientEmail: CorrectPendingClientEmail,
+    @Inject(ResendPendingClientVerification)
+    private readonly resendPendingClientVerification: ResendPendingClientVerification,
   ) {}
+
+  @Post('verification-resends')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ operationId: 'resendPendingClientVerification' })
+  @ApiAcceptedResponse({ type: PendingVerificationResendDto })
+  async resendVerification(
+    @Body() body: PendingRegistrationContinuationDto,
+  ): Promise<PendingVerificationResendDto> {
+    const command = parsePendingRegistrationContinuation(body);
+
+    if (command === null) {
+      throw new BadRequestException('Invalid verification resend request');
+    }
+
+    await this.resendPendingClientVerification.execute(command);
+
+    return { status: 'verification_required' };
+  }
 
   @Post('email-corrections')
   @HttpCode(HttpStatus.ACCEPTED)
