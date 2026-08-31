@@ -94,7 +94,9 @@ describe('mobile Login persistence', () => {
     );
     const session = await prisma.authenticationSession.findUniqueOrThrow({
       where: {
-        credentialDigest: authenticationTokens.digest(result.credential),
+        credentialDigest: Uint8Array.from(
+          authenticationTokens.digest(result.credential),
+        ),
       },
     });
     const signals = {
