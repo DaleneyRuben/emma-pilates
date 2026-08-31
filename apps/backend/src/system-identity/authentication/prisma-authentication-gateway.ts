@@ -41,22 +41,7 @@ export class PrismaAuthenticationGateway {
     clientFailures: Date[];
     networkFailures: Date[];
   }> {
-    const account = await this.prisma.account.findUnique({
-      where: { email: input.normalizedEmail },
-      select: {
-        authenticationSessions: {
-          orderBy: { createdAt: 'desc' },
-          take: 1,
-          select: { createdAt: true },
-        },
-      },
-    });
-    const oneHourAgo = new Date(input.now.getTime() - 60 * 60 * 1_000);
-    const lastSuccessfulLoginAt = account?.authenticationSessions[0]?.createdAt;
-    const laneStartedAt =
-      lastSuccessfulLoginAt && lastSuccessfulLoginAt > oneHourAgo
-        ? lastSuccessfulLoginAt
-        : oneHourAgo;
+    const laneStartedAt = new Date(input.now.getTime() - 60 * 60 * 1_000);
     const eventWhere = {
       purpose: AuthenticationThrottlePurpose.LOGIN,
       eventKind: AuthenticationThrottleEventKind.FAILED_CREDENTIAL_CHECK,
@@ -128,18 +113,30 @@ export class PrismaAuthenticationGateway {
     loginLaneDigest: Uint8Array;
     session: NewMobileAuthenticationSession;
   }): Promise<void> {
-    await this.prisma.authenticationSession.create({
-      data: {
-        id: input.session.id,
-        accountId: input.session.accountId,
-        surface: AuthenticationSessionSurface.MOBILE,
-        credentialDigest: toPrismaBytes(input.session.credentialDigest),
-        createdAt: input.session.createdAt,
-        lastMeaningfulActivityAt: input.session.lastMeaningfulActivityAt,
-        idleExpiresAt: input.session.idleExpiresAt,
-        absoluteExpiresAt: input.session.absoluteExpiresAt,
-      },
-    });
+    const credentialDigest = toPrismaBytes(input.session.credentialDigest);
+
+    await this.prisma.$transaction([
+      this.prisma.authenticationThrottleEvent.updateMany({
+        where: {
+          purpose: AuthenticationThrottlePurpose.LOGIN,
+          eventKind: AuthenticationThrottleEventKind.FAILED_CREDENTIAL_CHECK,
+          loginLaneDigest: toPrismaBytes(input.loginLaneDigest),
+        },
+        data: { loginLaneDigest: credentialDigest },
+      }),
+      this.prisma.authenticationSession.create({
+        data: {
+          id: input.session.id,
+          accountId: input.session.accountId,
+          surface: AuthenticationSessionSurface.MOBILE,
+          credentialDigest,
+          createdAt: input.session.createdAt,
+          lastMeaningfulActivityAt: input.session.lastMeaningfulActivityAt,
+          idleExpiresAt: input.session.idleExpiresAt,
+          absoluteExpiresAt: input.session.absoluteExpiresAt,
+        },
+      }),
+    ]);
   }
 
   findSessionByCredentialDigest(
