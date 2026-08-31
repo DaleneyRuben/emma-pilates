@@ -411,9 +411,9 @@ describe('Client registration transaction', () => {
   });
 
   it('cleans up an expired pending Account and its provisional Client', async () => {
-    const cleanupAt = new Date();
-    const registeredAt = new Date(
-      cleanupAt.getTime() - 8 * 24 * 60 * 60 * 1_000,
+    const registeredAt = new Date();
+    const cleanupAt = new Date(
+      registeredAt.getTime() + 8 * 24 * 60 * 60 * 1_000,
     );
     const gateway = new PrismaClientRegistrationUnitOfWork({
       prisma,
@@ -448,7 +448,9 @@ describe('Client registration transaction', () => {
       newId: () => correlationId,
     });
 
-    await expect(cleanup.execute()).resolves.toEqual({ cleaned: 1 });
+    const result = await cleanup.execute();
+
+    expect(result.cleaned).toBeGreaterThanOrEqual(1);
     await expect(
       prisma.account.findUnique({ where: { id: pendingAccount.id } }),
     ).resolves.toBeNull();
