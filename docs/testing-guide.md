@@ -26,6 +26,18 @@ You need:
 - Docker Desktop only if you want to run the automated database integration
   tests with their default setup.
 
+The local services use these default ports:
+
+| Service | Default port |
+| --- | ---: |
+| Backend API and Swagger | `3100` |
+| Expo development server | `8081` |
+| Admin web starter | `5173` |
+| PostgreSQL | `5432` |
+
+These defaults avoid the `8080`, `3000`, `3005`, and `3015` ports used by the
+other local project.
+
 Open Terminal and move into the project:
 
 ```sh
@@ -104,6 +116,13 @@ cp -n apps/backend/.env.example apps/backend/.env
 If `createdb` says the database already exists, that is fine. The `-n` option
 keeps an existing `.env` file instead of overwriting your local settings.
 
+If you created `apps/backend/.env` before the default changed, open it and make
+sure it contains:
+
+```dotenv
+PORT=3100
+```
+
 If PostgreSQL is installed through Homebrew but `pg_isready` does not report
 `accepting connections`, run `brew services list`, find the service whose name
 starts with `postgresql`, and start that exact service with
@@ -125,14 +144,14 @@ pnpm dev:backend
 ```
 
 Keep this Terminal window open. The API normally uses
-`http://localhost:3000`.
+`http://localhost:3100`.
 
 ## Test 3: check the API and use Swagger
 
 Open these addresses in a browser:
 
-- Health check: [http://localhost:3000/health/live](http://localhost:3000/health/live)
-- Interactive API documentation: [http://localhost:3000/docs](http://localhost:3000/docs)
+- Health check: [http://localhost:3100/health/live](http://localhost:3100/health/live)
+- Interactive API documentation: [http://localhost:3100/docs](http://localhost:3100/docs)
 
 The health check should show:
 
