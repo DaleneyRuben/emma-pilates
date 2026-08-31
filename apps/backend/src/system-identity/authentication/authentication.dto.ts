@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { z } from 'zod';
 
 export class CreateAuthenticationSessionDto {
@@ -14,12 +14,42 @@ export class AuthenticationSessionCredentialDto {
   credential!: string;
 }
 
+export class ClientAuthenticationIdentityDto {
+  @ApiProperty({ enum: ['client'] })
+  kind!: 'client';
+
+  @ApiProperty({ format: 'uuid' })
+  clientId!: string;
+}
+
+export class StaffAuthenticationIdentityDto {
+  @ApiProperty({ enum: ['staff'] })
+  kind!: 'staff';
+
+  @ApiProperty({ format: 'uuid' })
+  staffMemberId!: string;
+
+  @ApiProperty({
+    enum: ['trainer', 'nutritionist', 'assistant', 'administrator'],
+  })
+  role!: 'trainer' | 'nutritionist' | 'assistant' | 'administrator';
+
+  @ApiProperty({ type: [String], format: 'uuid' })
+  branchIds!: string[];
+}
+
 export class CurrentAuthenticationPrincipalDto {
   @ApiProperty({ format: 'uuid' })
   accountId!: string;
 
-  @ApiProperty({ type: 'object', additionalProperties: true })
-  identity!: Record<string, unknown>;
+  @ApiProperty({
+    oneOf: [
+      { $ref: getSchemaPath(ClientAuthenticationIdentityDto) },
+      { $ref: getSchemaPath(StaffAuthenticationIdentityDto) },
+    ],
+    discriminator: { propertyName: 'kind' },
+  })
+  identity!: ClientAuthenticationIdentityDto | StaffAuthenticationIdentityDto;
 }
 
 const createAuthenticationSessionSchema = z.object({

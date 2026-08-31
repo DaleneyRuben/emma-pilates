@@ -277,6 +277,62 @@
           "status"
         ]
       },
+      "ClientAuthenticationIdentityDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "client"
+            ]
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "kind",
+          "clientId"
+        ]
+      },
+      "StaffAuthenticationIdentityDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "staff"
+            ]
+          },
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "trainer",
+              "nutritionist",
+              "assistant",
+              "administrator"
+            ]
+          },
+          "branchIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "staffMemberId",
+          "role",
+          "branchIds"
+        ]
+      },
       "CreateAuthenticationSessionDto": {
         "type": "object",
         "properties": {
@@ -315,8 +371,17 @@
             "format": "uuid"
           },
           "identity": {
-            "type": "object",
-            "additionalProperties": true
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClientAuthenticationIdentityDto"
+              },
+              {
+                "$ref": "#/components/schemas/StaffAuthenticationIdentityDto"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "kind"
+            }
           }
         },
         "required": [

@@ -17,6 +17,7 @@ import {
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiExtraModels,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -25,9 +26,11 @@ import type { Request, Response } from 'express';
 import { AuthenticationFailedError } from './authenticate-credentials';
 import {
   AuthenticationSessionCredentialDto,
+  ClientAuthenticationIdentityDto,
   CreateAuthenticationSessionDto,
   CurrentAuthenticationPrincipalDto,
   parseCreateAuthenticationSession,
+  StaffAuthenticationIdentityDto,
 } from './authentication.dto';
 import type { LoginCommand } from './login';
 import { LoginThrottledError } from './login';
@@ -73,6 +76,7 @@ const authenticationProblem = (
 ): HttpException => new HttpException({ code, detail }, status);
 
 @Controller({ path: 'authentication-sessions', version: '1' })
+@ApiExtraModels(ClientAuthenticationIdentityDto, StaffAuthenticationIdentityDto)
 export class AuthenticationController {
   constructor(
     @Inject(mobileLogin) private readonly loginHandler: MobileLoginHandler,

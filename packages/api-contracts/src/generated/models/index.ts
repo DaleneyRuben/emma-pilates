@@ -6,12 +6,13 @@
  */
 
 export * from "./authenticationSessionCredentialDto";
+export * from "./clientAuthenticationIdentityDto";
+export * from "./clientAuthenticationIdentityDtoKind";
 export * from "./clientEmailVerificationResultDto";
 export * from "./clientEmailVerificationResultDtoStatus";
 export * from "./correctPendingClientEmailDto";
 export * from "./createAuthenticationSessionDto";
 export * from "./currentAuthenticationPrincipalDto";
-export * from "./currentAuthenticationPrincipalDtoIdentity";
 export * from "./livenessResponseDto";
 export * from "./livenessResponseDtoStatus";
 export * from "./pendingClientRegistrationDto";
@@ -21,5 +22,8 @@ export * from "./pendingEmailCorrectionDtoStatus";
 export * from "./pendingRegistrationContinuationDto";
 export * from "./pendingVerificationResendDto";
 export * from "./pendingVerificationResendDtoStatus";
+export * from "./staffAuthenticationIdentityDto";
+export * from "./staffAuthenticationIdentityDtoKind";
+export * from "./staffAuthenticationIdentityDtoRole";
 export * from "./startClientRegistrationDto";
 export * from "./verifyClientEmailDto";

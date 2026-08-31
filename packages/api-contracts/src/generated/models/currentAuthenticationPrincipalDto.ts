@@ -4,9 +4,10 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
-import type { CurrentAuthenticationPrincipalDtoIdentity } from "./currentAuthenticationPrincipalDtoIdentity";
+import type { ClientAuthenticationIdentityDto } from "./clientAuthenticationIdentityDto";
+import type { StaffAuthenticationIdentityDto } from "./staffAuthenticationIdentityDto";
 
 export interface CurrentAuthenticationPrincipalDto {
   accountId: string;
-  identity: CurrentAuthenticationPrincipalDtoIdentity;
+  identity: ClientAuthenticationIdentityDto | StaffAuthenticationIdentityDto;
 }
