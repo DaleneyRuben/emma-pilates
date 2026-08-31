@@ -18,6 +18,7 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiExtraModels,
+  ApiHeader,
   ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
@@ -87,6 +88,11 @@ export class AuthenticationController {
 
   @Post()
   @ApiOperation({ operationId: 'createMobileAuthenticationSession' })
+  @ApiHeader({
+    name: 'x-client-identifier',
+    required: false,
+    description: 'Random first-party app installation identifier',
+  })
   @ApiCreatedResponse({ type: AuthenticationSessionCredentialDto })
   async login(
     @Body() body: CreateAuthenticationSessionDto,

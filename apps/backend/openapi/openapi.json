@@ -25,7 +25,17 @@
     "/api/v1/authentication-sessions": {
       "post": {
         "operationId": "createMobileAuthenticationSession",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "x-client-identifier",
+            "in": "header",
+            "description": "Random first-party app installation identifier",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -262,6 +272,13 @@
   "tags": [],
   "servers": [],
   "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
     "schemas": {
       "LivenessResponseDto": {
         "type": "object",
