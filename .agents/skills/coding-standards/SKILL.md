@@ -54,6 +54,24 @@ Use the narrowest meaningful test level:
 - Write comments only when the reason, invariant, or tradeoff is non-obvious. Do not narrate what the code already states.
 - Keep secrets, provider SDK types, Prisma types, NestJS types, and transport DTOs out of domain models.
 
+### Functions and classes
+
+- Prefer plain functions for stateless calculations, parsing, validation,
+  formatting, workflow helpers, and React components.
+- Use classes when NestJS decorators or dependency injection, Swagger runtime
+  metadata, lifecycle hooks, or genuinely stateful infrastructure materially
+  benefit from them.
+- Stateful adapters may use classes to keep cohesive dependencies and resource
+  lifecycle together. Keep framework and infrastructure classes outside domain
+  models.
+- An application use case may be a class when constructor injection gives it a
+  clear public interface, but a single `execute` method does not by itself
+  justify a class. Prefer a function or factory when it expresses the same
+  behavior more directly.
+- Do not create a class merely to wrap one unrelated function, imitate a Java
+  pattern, or make a module appear architectural. Every class must have a
+  concrete framework, metadata, lifecycle, state, or interface reason.
+
 ## Monorepo and module boundaries
 
 - Use the pnpm workspace layout accepted in ADR-0013: deployables under `apps/`, narrow shared packages under `packages/`.
