@@ -16,11 +16,13 @@ import { VerifyClientEmail } from '../src/system-identity/registration/verify-cl
 
 describe('client registration (e2e)', () => {
   let app: INestApplication<App>;
-  const execute = jest.fn();
-  const correctEmail = jest.fn();
-  const resendVerification = jest.fn();
-  const cancelRegistration = jest.fn();
-  const verifyEmail = jest.fn();
+  const execute = jest.fn<RegisterClient['execute']>();
+  const correctEmail = jest.fn<CorrectPendingClientEmail['execute']>();
+  const resendVerification =
+    jest.fn<ResendPendingClientVerification['execute']>();
+  const cancelRegistration =
+    jest.fn<CancelPendingClientRegistration['execute']>();
+  const verifyEmail = jest.fn<VerifyClientEmail['execute']>();
 
   beforeEach(async () => {
     execute.mockResolvedValue({
