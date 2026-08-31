@@ -1,6 +1,19 @@
+type LogoutDependencies = {
+  now(): Date;
+  revokeSession(input: {
+    authenticationSessionId: string;
+    revokedAt: Date;
+    reason: 'logout';
+  }): Promise<void>;
+};
+
 export const logout = async (
-  _authenticationSessionId: string,
-  _dependencies: unknown,
+  authenticationSessionId: string,
+  dependencies: LogoutDependencies,
 ): Promise<void> => {
-  throw new Error('Not implemented');
+  await dependencies.revokeSession({
+    authenticationSessionId,
+    revokedAt: dependencies.now(),
+    reason: 'logout',
+  });
 };
