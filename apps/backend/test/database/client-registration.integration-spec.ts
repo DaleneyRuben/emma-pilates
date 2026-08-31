@@ -7,6 +7,7 @@ import {
 } from '../../src/generated/prisma/enums';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { AUTHENTICATION_EMAIL_QUEUE } from '../../src/jobs/authentication-email/authentication-email-job';
+import { CancelPendingClientRegistration } from '../../src/system-identity/registration/cancel-pending-client-registration';
 import { CorrectPendingClientEmail } from '../../src/system-identity/registration/correct-pending-client-email';
 import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
@@ -249,6 +250,74 @@ describe('Client registration transaction', () => {
     expect(currentAfterResend[0]?.expiresAt).toEqual(
       new Date(resentAt.getTime() + 24 * 60 * 60 * 1_000),
     );
+  });
+
+  it('cancels a pending self-registration and retains only its audit record', async () => {
+    const registeredAt = new Date(Date.now() + 120_000);
+    const cancelledAt = new Date(registeredAt.getTime() + 60_000);
+    const tokens = new AuthenticationTokenService();
+    const gateway = new PrismaClientRegistrationUnitOfWork({
+      prisma,
+      boss,
+      digestEmail: digestTestEmail,
+    });
+    const registration = await new RegisterClient({
+      unitOfWork: gateway,
+      passwordHasher: {
+        hash: () => Promise.resolve('cancelled-password-hash'),
+      },
+      tokenIssuer: tokens,
+      linkCipher: new AuthenticationLinkCipher(
+        'local-test-key',
+        Buffer.alloc(32, 7),
+      ),
+      now: () => registeredAt,
+      newId: randomUUID,
+      newReferralCode: () => `REF-${randomUUID()}`,
+    }).execute({
+      name: 'Cancelled Client',
+      email: `cancelled-${randomUUID()}@example.com`,
+      password: 'cancelled password',
+    });
+    const pendingAccount = await prisma.account.findUniqueOrThrow({
+      where: { email: registration.email },
+    });
+    const correlationId = randomUUID();
+    const cancel = new CancelPendingClientRegistration({
+      gateway,
+      tokens,
+      now: () => cancelledAt,
+      newId: () => correlationId,
+    });
+
+    await expect(
+      cancel.execute({
+        registrationContinuation: registration.registrationContinuation,
+      }),
+    ).resolves.toEqual({ status: 'cancelled' });
+    await expect(
+      prisma.account.findUnique({ where: { id: pendingAccount.id } }),
+    ).resolves.toBeNull();
+    await expect(
+      prisma.client.findUnique({ where: { id: pendingAccount.clientId! } }),
+    ).resolves.toBeNull();
+    await expect(
+      prisma.authenticationToken.count({
+        where: { accountId: pendingAccount.id },
+      }),
+    ).resolves.toBe(0);
+    await expect(
+      prisma.auditRecord.findFirstOrThrow({ where: { correlationId } }),
+    ).resolves.toMatchObject({
+      actionCode: 'pending_client_registration.cancelled',
+      outcome: 'SUCCEEDED',
+      actorKind: 'ACCOUNT',
+      actorAccountId: null,
+      targetType: 'account',
+      targetId: pendingAccount.id,
+      correlationId,
+      occurredAt: cancelledAt,
+    });
   });
 });
 
