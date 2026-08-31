@@ -97,4 +97,48 @@ describe('worker entrypoint', () => {
     await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
   });
+
+  it('emits a sanitized signal when a scheduled cleanup fails', async () => {
+    jest.useFakeTimers();
+    const boss: WorkerBoss = {
+      isInstalled: jest.fn().mockResolvedValue(true),
+      schemaVersion: jest.fn().mockResolvedValue(38),
+      start: jest.fn().mockResolvedValue(undefined),
+      work: jest.fn().mockResolvedValue('worker-id'),
+      getQueueStats: jest.fn().mockResolvedValue([]),
+      stop: jest.fn().mockResolvedValue(undefined),
+    };
+    const pendingAccountCleanup = {
+      execute: jest
+        .fn()
+        .mockResolvedValueOnce({ cleaned: 0 })
+        .mockRejectedValueOnce(new Error('sensitive database failure')),
+    };
+    const emit = jest.fn();
+
+    const stopWorker = await startWorker({
+      boss,
+      authenticationEmail: {
+        stateReader: { find: jest.fn() },
+        decryptor: { decrypt: jest.fn() },
+        renderer: { render: jest.fn() },
+        delivery: { deliver: jest.fn() },
+      },
+      pendingAccountCleanup,
+      serviceVersion: '1.2.3',
+      emit,
+    });
+
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+
+    expect(emit).toHaveBeenCalledWith({
+      event: 'pending_account_cleanup_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(JSON.stringify(emit.mock.calls)).not.toContain(
+      'sensitive database failure',
+    );
+
+    await stopWorker();
+  });
 });
