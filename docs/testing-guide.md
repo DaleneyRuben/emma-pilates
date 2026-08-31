@@ -5,16 +5,18 @@ you are starting with no project knowledge.
 
 ## What is ready to test?
 
-| Area | What you can test now | Current limit |
-| --- | --- | --- |
-| Mobile app | Open the Expo app in the iOS Simulator and inspect the initial screen, fonts, colors, safe-area layout, and accessibility label | The visible screen is only a foundation placeholder; registration, Login, Client, and Staff screens are not connected yet |
-| Backend health | Confirm that the API is running | This checks only that the HTTP process is alive, not the database or worker |
-| API documentation | Open Swagger and inspect or send requests to every current endpoint | Swagger does not make unfinished journeys complete |
-| Client registration | Create a pending Client registration in a local PostgreSQL database | The verification email cannot be viewed yet |
-| Pending registration actions | Correct the email, request another verification email, or cancel using the continuation returned by registration | Resend deliberately gives the same neutral response whether it sends or suppresses an email |
-| Email verification | Confirm that an unknown token returns `invalid` | A valid token cannot be obtained manually until local email capture is runnable |
-| Automated checks | Run backend, API-contract, type, lint, and build checks | Mobile Jest currently has a dependency-wiring problem; database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database |
-| Admin web | Open the Vite starter page and verify that the development server works | No Pilates admin features have been built yet, so this is not a product test |
+| Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Mobile app                   | Open the Expo app in the iOS Simulator and inspect the initial screen, fonts, colors, safe-area layout, and accessibility label | The visible screen is only a foundation placeholder; registration, Login, Client, and Staff screens are not connected yet                                     |
+| Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
+| API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
+| Client registration          | Create a pending Client registration in a local PostgreSQL database                                                             | The verification email cannot be viewed yet                                                                                                                   |
+| Pending registration actions | Correct the email, request another verification email, or cancel using the continuation returned by registration                | Resend deliberately gives the same neutral response whether it sends or suppresses an email                                                                   |
+| Email verification           | Confirm that an unknown token returns `invalid`                                                                                 | A valid token cannot be obtained manually until local email capture is runnable                                                                               |
+| Login and logout             | Create an opaque mobile Authentication Session, inspect its current Account identity, and revoke it                             | Until the mobile Login screen is built, use Swagger and the local-only activation step below                                                                  |
+| Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
+| Automated checks             | Run backend, API-contract, type, lint, and build checks                                                                         | Mobile Jest currently has a dependency-wiring problem; database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database |
+| Admin web                    | Open the Vite starter page and verify that the development server works                                                         | No Pilates admin features have been built yet, so this is not a product test                                                                                  |
 
 ## Before you begin
 
@@ -28,12 +30,12 @@ You need:
 
 The local services use these default ports:
 
-| Service | Default port |
-| --- | ---: |
-| Backend API and Swagger | `3100` |
-| Expo development server | `8081` |
-| Admin web starter | `5173` |
-| PostgreSQL | `5432` |
+| Service                 | Default port |
+| ----------------------- | -----------: |
+| Backend API and Swagger |       `3100` |
+| Expo development server |       `8081` |
+| Admin web starter       |       `5173` |
+| PostgreSQL              |       `5432` |
 
 These defaults avoid the `8080`, `3000`, `3005`, and `3015` ports used by the
 other local project.
@@ -156,7 +158,7 @@ Open these addresses in a browser:
 The health check should show:
 
 ```json
-{"status":"ok"}
+{ "status": "ok" }
 ```
 
 Swagger is the easiest way to test the backend without learning command-line
@@ -229,7 +231,7 @@ Open `POST /api/v1/client-registrations/verification-resends` and send:
 Expected response code: `202`, with:
 
 ```json
-{"status":"verification_required"}
+{ "status": "verification_required" }
 ```
 
 The response is intentionally neutral. For privacy and abuse prevention, it
@@ -248,7 +250,7 @@ Open `POST /api/v1/client-email-verifications` and send:
 Expected response code: `200`, with:
 
 ```json
-{"status":"invalid"}
+{ "status": "invalid" }
 ```
 
 ### E. Cancel the pending registration
@@ -284,7 +286,64 @@ the stable code `invalid_request`.
 
 Press `Ctrl+C` in the backend Terminal when you are finished.
 
-## Test 5: run the automated checks
+## Test 5: try Login, current identity, throttling, and logout
+
+The real email-link UI is not connected yet. For this local test only, create a
+second registration and mark it verified directly in your local database. Never
+use this shortcut on a shared or production database.
+
+### A. Prepare one local active Account
+
+Register a new address through Swagger, for example
+`ana.login+1@example.com`, and remember the password you submitted. Then run:
+
+```sh
+psql emma_pilates -c "UPDATE system.accounts SET email_verified_at = CURRENT_TIMESTAMP, activated_at = CURRENT_TIMESTAMP, pending_expires_at = NULL WHERE email = 'ana.login+1@example.com';"
+```
+
+The command should report `UPDATE 1`. If it reports `UPDATE 0`, check that the
+email exactly matches the registration response.
+
+### B. Log in
+
+In Swagger, open `POST /api/v1/authentication-sessions`. You may leave the
+optional `x-client-identifier` header empty for this manual test. Send:
+
+```json
+{
+  "email": "ana.login+1@example.com",
+  "password": "the same password used during registration"
+}
+```
+
+Expected response code: `201`. Copy the returned `credential`. It is a secret,
+so do not commit it or include it in screenshots.
+
+### C. Inspect the signed-in identity
+
+Select **Authorize** at the top of Swagger and paste the raw credential into
+the `bearer` field. Swagger adds the `Bearer` prefix for you.
+
+Open `GET /api/v1/authentication-sessions/current`. Expected response code:
+`200`. The response should identify the Account as a Client and include its
+`clientId`.
+
+### D. Log out
+
+Open `DELETE /api/v1/authentication-sessions/current`. Expected response code:
+`204`. Calling the current-session endpoint again with the old credential
+should now return `401` with `authentication_required`.
+
+### E. See progressive throttling safely
+
+Use a made-up email such as `nobody.login-test@example.com`. Submit the same
+wrong Login six times. Those attempts return the same neutral `401`
+`authentication_failed` response. Submit once more before 30 seconds pass.
+That request should return `429`, stable code `login_throttled`, and a
+`Retry-After` header. The response does not reveal whether the email belongs to
+an Account.
+
+## Test 6: run the automated checks
 
 You do not need to understand the test code to run it. A successful Jest run
 ends with green `PASS` lines and no failed suites.
