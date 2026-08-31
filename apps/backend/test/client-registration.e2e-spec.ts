@@ -5,6 +5,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
+import { CancelPendingClientRegistration } from '../src/system-identity/registration/cancel-pending-client-registration';
 import { ClientRegistrationController } from '../src/system-identity/registration/client-registration.controller';
 import { CorrectPendingClientEmail } from '../src/system-identity/registration/correct-pending-client-email';
 import { RegisterClient } from '../src/system-identity/registration/register-client';
@@ -15,6 +16,7 @@ describe('client registration (e2e)', () => {
   const execute = jest.fn();
   const correctEmail = jest.fn();
   const resendVerification = jest.fn();
+  const cancelRegistration = jest.fn();
 
   beforeEach(async () => {
     execute.mockResolvedValue({
@@ -26,10 +28,15 @@ describe('client registration (e2e)', () => {
       email: 'corrected@example.com',
     });
     resendVerification.mockResolvedValue({ status: 'sent' });
+    cancelRegistration.mockResolvedValue({ status: 'cancelled' });
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [ClientRegistrationController],
       providers: [
         { provide: RegisterClient, useValue: { execute } },
+        {
+          provide: CancelPendingClientRegistration,
+          useValue: { execute: cancelRegistration },
+        },
         {
           provide: CorrectPendingClientEmail,
           useValue: { execute: correctEmail },
@@ -45,6 +52,17 @@ describe('client registration (e2e)', () => {
     app = moduleFixture.createNestApplication();
     configureApplication(app);
     await app.init();
+  });
+
+  it('cancels a pending client registration', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/client-registrations/cancellations')
+      .send({ registrationContinuation: 'registration-secret' })
+      .expect(204);
+
+    expect(cancelRegistration).toHaveBeenCalledWith({
+      registrationContinuation: 'registration-secret',
+    });
   });
 
   it('resends pending registration verification', async () => {
