@@ -442,10 +442,26 @@ backend end-to-end or database integration suites.
 pnpm --filter @pilates/mobile exec jest --runInBand
 ```
 
-These tests verify SecureStore credential persistence, generated-client bearer
-requests, startup Account restoration, every Role route, logout and Account
-cache cleanup, safe authentication-link parsing, and startup/foreground native
-link ingress. They do not create visible Login or recovery screens.
+These tests verify ordinary and biometric SecureStore credential persistence,
+explicit Face ID/fingerprint unlock, biometric-key invalidation, generated-client
+bearer requests, startup Account restoration, every Role route, logout and
+Account cache cleanup, safe authentication-link parsing, and
+startup/foreground native link ingress. They do not create the complete visible
+Login or recovery screens.
+
+### Biometric testing limitation
+
+The iOS Simulator can prove that the app starts, bundles, and displays the Face
+ID entry when a protected credential exists, but it does not enforce SecureStore
+biometric authentication like a physical iPhone. Expo Go also cannot test this
+Face ID configuration because it does not contain this project's native Face ID
+permission message.
+
+A complete manual biometric test therefore requires a physical iPhone and a
+Pilates development or release build. The visible Login flow that lets a tester
+create a protected session is still waiting for `MOB-004`. Until then, run the
+mobile automated tests above; they cover the opt-in, locked, unlock,
+invalidation, and logout behavior without exposing a real credential.
 
 ### Backend HTTP end-to-end tests
 
@@ -501,8 +517,9 @@ The following are not ready for manual product testing:
 - retrieving a valid activation or password-recovery link from a local inbox;
 - completing successful activation or password recovery manually;
 - visible mobile Login, logout, recovery, or password-change screens;
-- manually seeding an Authentication Session into SecureStore to inspect
-  restored Role navigation in the Simulator;
+- opting a real Login into Face ID/fingerprint protection before the visible
+  Login flow exists;
+- enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
 - working Client Home, class browsing, booking, plans, payments, profile, or
