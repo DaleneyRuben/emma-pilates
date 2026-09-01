@@ -69,6 +69,81 @@ describe("AuthenticationFlow", () => {
     ).toBeOnTheScreen();
   });
 
+  it("corrects, resends, and cancels a pending registration", async () => {
+    const register = jest.fn().mockResolvedValue({
+      email: "ana@example.com",
+      registrationContinuation: "continuation",
+      status: "verification_required",
+    });
+    const correctRegistrationEmail = jest.fn().mockResolvedValue({
+      email: "ana.corrected@example.com",
+      status: "verification_required",
+    });
+    const resendRegistrationVerification = jest
+      .fn()
+      .mockResolvedValue({ status: "verification_required" });
+    const cancelRegistration = jest.fn().mockResolvedValue(undefined);
+    const screen = await render(
+      <AuthenticationFlow
+        api={createApiMock({
+          cancelRegistration,
+          correctRegistrationEmail,
+          register,
+          resendRegistrationVerification,
+        })}
+      />,
+    );
+
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Crear cuenta" }),
+    );
+    await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Clienta");
+    await fireEvent.changeText(
+      screen.getByLabelText("Correo electrónico"),
+      "ana@example.com",
+    );
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "password");
+    await fireEvent.changeText(
+      screen.getByLabelText("Confirmar contraseña"),
+      "password",
+    );
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Registrar cuenta" }),
+    );
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Cambiar correo" }),
+    );
+    await fireEvent.changeText(
+      screen.getByLabelText("Correo electrónico"),
+      "ana.corrected@example.com",
+    );
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Guardar correo" }),
+    );
+
+    expect(correctRegistrationEmail).toHaveBeenCalledWith({
+      email: "ana.corrected@example.com",
+      registrationContinuation: "continuation",
+    });
+    expect(screen.getByText("ana.corrected@example.com")).toBeOnTheScreen();
+
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Reenviar correo" }),
+    );
+    expect(resendRegistrationVerification).toHaveBeenCalledWith(
+      "continuation",
+    );
+    expect(
+      screen.getByText(/Si el envío está disponible/),
+    ).toBeOnTheScreen();
+
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Cancelar registro" }),
+    );
+    expect(cancelRegistration).toHaveBeenCalledWith("continuation");
+    expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
+  });
+
   it("requests password recovery without revealing Account existence", async () => {
     const requestPasswordRecovery = jest
       .fn()
