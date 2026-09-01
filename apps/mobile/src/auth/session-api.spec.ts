@@ -62,6 +62,32 @@ describe("createSessionApi", () => {
     ).resolves.toEqual({ status: "rejected" });
   });
 
+  it("uses the server retry time for a throttled Login", async () => {
+    const api = createSessionApi({
+      baseUrl: "https://api.example.com/api/v1",
+      fetch: jest.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({ code: "login_throttled", status: 429 }),
+          {
+            headers: { "Retry-After": "30" },
+            status: 429,
+          },
+        ),
+      ),
+    });
+
+    await expect(
+      api.login({
+        clientIdentifier: "installation-1",
+        email: "ana@example.com",
+        password: "incorrect",
+      }),
+    ).resolves.toEqual({
+      retryAfterSeconds: 30,
+      status: "throttled",
+    });
+  });
+
   it("resolves the current Account through the generated API client", async () => {
     const fetchMock = jest.fn().mockResolvedValue(
       new Response(
