@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mobile app                   | Open the Expo app in the iOS Simulator and inspect the initial screen, fonts, colors, safe-area layout, and accessibility label | The visible screen is only a foundation placeholder; registration, Login, Client, and Staff screens are not connected yet                                     |
+| Mobile app                   | Open the Expo app in the iOS Simulator and inspect the initial screen, fonts, colors, safe-area layout, accessibility label, and signed-out startup restoration | The visible screen is still a foundation placeholder; registration and Login screens are not connected yet                                      |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
 | Client registration          | Create a pending Client registration in a local PostgreSQL database                                                             | The verification email cannot be viewed yet                                                                                                                   |
@@ -16,7 +16,7 @@ you are starting with no project knowledge.
 | Login and logout             | Create an opaque mobile Authentication Session, inspect its current Account identity, and revoke it                             | Until the mobile Login screen is built, use Swagger and the local-only activation step below                                                                  |
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Inspect an invalid link, request password recovery neutrally, and change a signed-in Account password                           | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                              |
-| Automated checks             | Run backend, API-contract, type, lint, and build checks                                                                         | Mobile Jest currently has a dependency-wiring problem; database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database |
+| Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Open the Vite starter page and verify that the development server works                                                         | No Pilates admin features have been built yet, so this is not a product test                                                                                  |
 
 ## Before you begin
@@ -75,8 +75,11 @@ You should see:
 - the content inside the iPhone safe area; and
 - no working form or buttons yet.
 
-This simple screen proves that Expo starts, the approved font loads, the design
-background is applied, and the unauthenticated navigation flow is selected.
+On a clean installation, this simple screen proves that Expo starts, the
+approved font loads, the design background is applied, SecureStore contains no
+active credential, startup restoration finishes safely, and the
+unauthenticated navigation flow is selected. The development app uses
+`http://127.0.0.1:3100/api/v1` by default; non-local API URLs must use HTTPS.
 
 ### Quick accessibility check
 
@@ -433,21 +436,16 @@ This currently covers backend domain behavior, security helpers, registration
 rules, job behavior, and worker building blocks. It does not run the separate
 backend end-to-end or database integration suites.
 
-### Known mobile test-runner problem
-
-Mobile component tests exist for the shell, navigation decisions, UI
-primitives, API adapter, and local persistence boundaries. However, this command
-currently fails before those tests start:
+### Mobile automated tests
 
 ```sh
-pnpm --filter @pilates/mobile test
+pnpm --filter @pilates/mobile exec jest --runInBand
 ```
 
-The current error is `Cannot find module 'jest/package.json'`. The mobile
-package invokes Jest without declaring the Jest executable it needs. Because of
-that same issue, the root `pnpm test` command also stops at the mobile package.
-This is a project setup problem, not a failure caused by your computer or by a
-mobile feature you are testing.
+These tests verify SecureStore credential persistence, generated-client bearer
+requests, startup Account restoration, every Role route, logout and Account
+cache cleanup, safe authentication-link parsing, and startup/foreground native
+link ingress. They do not create visible Login or recovery screens.
 
 ### Backend HTTP end-to-end tests
 
@@ -502,13 +500,15 @@ The following are not ready for manual product testing:
 - automatic cleanup of expired pending accounts through a running worker;
 - retrieving a valid activation or password-recovery link from a local inbox;
 - completing successful activation or password recovery manually;
-- mobile Login, logout, session restoration, recovery, or password-change screens;
+- visible mobile Login, logout, recovery, or password-change screens;
+- manually seeding an Authentication Session into SecureStore to inspect
+  restored Role navigation in the Simulator;
+- opening a production Universal Link or Android App Link before the public
+  mobile-link domain and native association files are configured;
 - working Client Home, class browsing, booking, plans, payments, profile, or
   notifications;
 - working Trainer, Assistant, Administrator, or Nutritionist mobile screens;
-- role-based navigation driven by a signed-in Account;
-- mobile-to-backend requests from the visible app;
-- running the existing mobile Jest tests until their Jest dependency is fixed;
+- mobile-to-backend requests initiated from a visible form or button;
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, or production deployment; and
 - Maestro release-journey tests.
