@@ -123,6 +123,37 @@ describe("createSessionManager", () => {
     expect(save).toHaveBeenCalledWith("new-credential");
   });
 
+  it("protects a newly authenticated session when biometrics are selected", async () => {
+    const save = jest.fn();
+    const saveWithBiometrics = jest.fn();
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: {
+        clear: jest.fn(),
+        load: jest.fn(),
+        save,
+        saveWithBiometrics,
+      },
+      resolveCurrent: jest.fn().mockResolvedValue({
+        accountId: "account-2",
+        identity: {
+          kind: "staff",
+          staffMemberId: "staff-1",
+          role: "trainer",
+          branchIds: ["branch-1"],
+        },
+      }),
+      revokeCurrent: jest.fn(),
+    });
+
+    await manager.start("new-credential", {
+      protectWithBiometrics: true,
+    });
+
+    expect(saveWithBiometrics).toHaveBeenCalledWith("new-credential");
+    expect(save).not.toHaveBeenCalled();
+  });
+
   it("revokes the current session and clears its credential and Account cache", async () => {
     const clearAccountCache = jest.fn();
     const clearCredential = jest.fn();
