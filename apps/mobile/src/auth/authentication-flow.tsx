@@ -344,9 +344,39 @@ function PasswordLinkScreen({
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [inspection, setInspection] = useState<
+    "current" | "invalid" | "loading"
+  >("loading");
   const [submitting, setSubmitting] = useState(false);
   const activation = intent.type === "activate-account";
   const title = activation ? "Activar cuenta" : "Restablecer contraseña";
+
+  useEffect(() => {
+    let active = true;
+    const expectedPurpose = activation ? "activation" : "password_recovery";
+
+    void api
+      .inspectLink(intent.token)
+      .then((result) => {
+        if (active) {
+          setInspection(
+            result.status === "current" &&
+              result.purpose === expectedPurpose
+              ? "current"
+              : "invalid",
+          );
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setInspection("invalid");
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [activation, api, intent.token]);
 
   async function submit() {
     if (password === "" || password !== confirmation) {
@@ -381,6 +411,25 @@ function PasswordLinkScreen({
 
     setError("Este enlace ya no es válido.");
     setSubmitting(false);
+  }
+
+  if (inspection !== "current") {
+    return (
+      <AuthenticationScreen
+        title={
+          inspection === "loading" ? "Comprobando enlace" : "Enlace no válido"
+        }
+      >
+        <BodyText>
+          {inspection === "loading"
+            ? "Estamos comprobando tu enlace seguro."
+            : "Este enlace venció o ya fue utilizado."}
+        </BodyText>
+        {inspection === "invalid" ? (
+          <PrimaryButton label="Ir a iniciar sesión" onPress={onActivated} />
+        ) : null}
+      </AuthenticationScreen>
+    );
   }
 
   return (
