@@ -99,4 +99,26 @@ describe("createCredentialStore", () => {
 
     expect(values).toEqual(new Map());
   });
+
+  it("replaces biometric storage after a password login without biometrics", async () => {
+    const values = new Map<string, string>([
+      ["authentication-session-biometric", "old-protected-credential"],
+      ["authentication-session-biometric-enabled", "true"],
+    ]);
+    const store = createCredentialStore({
+      deleteItemAsync: async (key) => {
+        values.delete(key);
+      },
+      getItemAsync: async (key) => values.get(key) ?? null,
+      setItemAsync: async (key, value) => {
+        values.set(key, value);
+      },
+    });
+
+    await store.save("new-ordinary-credential");
+
+    await expect(store.hasBiometricCredential()).resolves.toBe(false);
+    await expect(store.load()).resolves.toBe("new-ordinary-credential");
+    expect(values.has("authentication-session-biometric")).toBe(false);
+  });
 });
