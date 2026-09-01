@@ -474,6 +474,12 @@ export function AuthenticationFlow({
   );
   const [pending, setPending] = useState<PendingRegistration | null>(null);
 
+  useEffect(() => {
+    if (intent !== null && intent !== undefined) {
+      setRoute(routeForIntent(intent));
+    }
+  }, [intent]);
+
   function showLogin() {
     setRoute("login");
   }
