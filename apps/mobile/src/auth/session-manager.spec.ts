@@ -25,6 +25,36 @@ describe("createSessionManager", () => {
     expect(loadWithBiometrics).not.toHaveBeenCalled();
   });
 
+  it("unlocks a protected credential and resolves its current Account", async () => {
+    const loadWithBiometrics = jest
+      .fn()
+      .mockResolvedValue("protected-credential");
+    const resolveCurrent = jest.fn().mockResolvedValue({
+      accountId: "account-1",
+      identity: { kind: "client", clientId: "client-1" },
+    });
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: {
+        clear: jest.fn(),
+        hasBiometricCredential: jest.fn().mockResolvedValue(true),
+        load: jest.fn(),
+        loadWithBiometrics,
+        save: jest.fn(),
+        saveWithBiometrics: jest.fn(),
+      },
+      resolveCurrent,
+      revokeCurrent: jest.fn(),
+    });
+
+    await expect(manager.unlockWithBiometrics()).resolves.toEqual({
+      accountId: "account-1",
+      role: "client",
+    });
+    expect(loadWithBiometrics).toHaveBeenCalledTimes(1);
+    expect(resolveCurrent).toHaveBeenCalledWith("protected-credential");
+  });
+
   it("restores a stored credential and resolves its current Client Account", async () => {
     const resolveCurrent = jest.fn().mockResolvedValue({
       accountId: "account-1",
