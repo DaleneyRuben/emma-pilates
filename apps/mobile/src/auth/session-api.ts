@@ -12,6 +12,11 @@ type SessionApiOptions = {
   fetch?: typeof globalThis.fetch;
 };
 
+export type SessionLoginResult =
+  | { credential: string; status: "created" }
+  | { status: "rejected" }
+  | { retryAfterSeconds: number; status: "throttled" };
+
 export function createSessionApi(options: SessionApiOptions) {
   const { baseUrl, fetch } = options;
 
@@ -38,11 +43,7 @@ export function createSessionApi(options: SessionApiOptions) {
       clientIdentifier: string;
       email: string;
       password: string;
-    }): Promise<
-      | { credential: string; status: "created" }
-      | { status: "rejected" }
-      | { retryAfterSeconds: number; status: "throttled" }
-    > {
+    }): Promise<SessionLoginResult> {
       const response = await createMobileAuthenticationSession(
         { email, password },
         {

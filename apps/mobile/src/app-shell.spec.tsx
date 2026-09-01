@@ -16,6 +16,7 @@ describe("App", () => {
             addEventListener: () => ({ remove: jest.fn() }),
             getInitialURL: async () => null,
           },
+          login: jest.fn(),
           sessionManager: {
             hasBiometricSession: jest.fn().mockResolvedValue(false),
             logout: jest.fn(),
@@ -89,6 +90,7 @@ describe("App", () => {
             addEventListener: () => ({ remove: jest.fn() }),
             getInitialURL: async () => null,
           },
+          login: jest.fn(),
           sessionManager: {
             hasBiometricSession: jest.fn().mockResolvedValue(false),
             logout: jest.fn(),
