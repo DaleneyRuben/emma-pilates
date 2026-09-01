@@ -23,7 +23,7 @@ type SessionManagerOptions = {
   credentialStore: CredentialStore;
   resolveCurrent: (
     credential: string,
-  ) => Promise<CurrentAuthenticationPrincipalDto>;
+  ) => Promise<CurrentAuthenticationPrincipalDto | null>;
   revokeCurrent: (credential: string) => Promise<void>;
 };
 
@@ -40,7 +40,25 @@ function toMobileSession(
 }
 
 export function createSessionManager(options: SessionManagerOptions) {
-  const { credentialStore, resolveCurrent } = options;
+  const {
+    clearAccountCache,
+    credentialStore,
+    resolveCurrent,
+    revokeCurrent,
+  } = options;
+
+  async function resolveCredential(
+    credential: string,
+  ): Promise<MobileSession | null> {
+    const principal = await resolveCurrent(credential);
+
+    if (principal === null) {
+      await credentialStore.clear();
+      return null;
+    }
+
+    return toMobileSession(principal);
+  }
 
   return {
     async restore(): Promise<MobileSession | null> {
@@ -50,7 +68,22 @@ export function createSessionManager(options: SessionManagerOptions) {
         return null;
       }
 
-      return toMobileSession(await resolveCurrent(credential));
+      return resolveCredential(credential);
+    },
+    async start(credential: string): Promise<MobileSession | null> {
+      await credentialStore.save(credential);
+
+      return resolveCredential(credential);
+    },
+    async logout(session: MobileSession): Promise<void> {
+      const credential = await credentialStore.load();
+
+      if (credential !== null) {
+        await revokeCurrent(credential);
+      }
+
+      await credentialStore.clear();
+      await clearAccountCache(session.accountId);
     },
   };
 }
