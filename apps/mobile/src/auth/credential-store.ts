@@ -35,7 +35,13 @@ export function createCredentialStore(storage: CredentialStorage) {
 
   return {
     canUseBiometrics,
-    clear: () => storage.deleteItemAsync(credentialKey),
+    clear: async () => {
+      await Promise.all([
+        storage.deleteItemAsync(credentialKey),
+        storage.deleteItemAsync(biometricCredentialKey),
+        storage.deleteItemAsync(biometricCredentialMarkerKey),
+      ]);
+    },
     hasBiometricCredential: async () =>
       (await storage.getItemAsync(biometricCredentialMarkerKey)) === "true",
     load: () => storage.getItemAsync(credentialKey),
