@@ -23,4 +23,71 @@ describe("createSessionManager", () => {
     });
     expect(resolveCurrent).toHaveBeenCalledWith("stored-credential");
   });
+
+  it("removes a credential rejected during restoration", async () => {
+    const clear = jest.fn();
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: {
+        clear,
+        load: jest.fn().mockResolvedValue("rejected-credential"),
+        save: jest.fn(),
+      },
+      resolveCurrent: jest.fn().mockResolvedValue(null),
+      revokeCurrent: jest.fn(),
+    });
+
+    await expect(manager.restore()).resolves.toBeNull();
+    expect(clear).toHaveBeenCalledTimes(1);
+  });
+
+  it("persists a new credential before resolving its Staff Role", async () => {
+    const save = jest.fn();
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: {
+        clear: jest.fn(),
+        load: jest.fn(),
+        save,
+      },
+      resolveCurrent: jest.fn().mockResolvedValue({
+        accountId: "account-2",
+        identity: {
+          kind: "staff",
+          staffMemberId: "staff-1",
+          role: "trainer",
+          branchIds: ["branch-1"],
+        },
+      }),
+      revokeCurrent: jest.fn(),
+    });
+
+    await expect(manager.start("new-credential")).resolves.toEqual({
+      accountId: "account-2",
+      role: "trainer",
+    });
+    expect(save).toHaveBeenCalledWith("new-credential");
+  });
+
+  it("revokes the current session and clears its credential and Account cache", async () => {
+    const clearAccountCache = jest.fn();
+    const clearCredential = jest.fn();
+    const revokeCurrent = jest.fn();
+    const manager = createSessionManager({
+      clearAccountCache,
+      credentialStore: {
+        clear: clearCredential,
+        load: jest.fn().mockResolvedValue("stored-credential"),
+        save: jest.fn(),
+      },
+      resolveCurrent: jest.fn(),
+      revokeCurrent,
+    });
+
+    await manager.logout({ accountId: "account-1", role: "client" });
+
+    expect(revokeCurrent).toHaveBeenCalledWith("stored-credential");
+    expect(clearCredential).toHaveBeenCalledTimes(1);
+    expect(clearAccountCache).toHaveBeenCalledWith("account-1");
+  });
 });
