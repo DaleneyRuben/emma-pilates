@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createContext, useContext } from "react";
 
-import { LoginScreen } from "./auth/login-screen";
+import { LoginScreen, type LoginValues } from "./auth/login-screen";
 import type { AppRole } from "./auth/session-manager";
 import { Heading } from "./ui/heading";
 import { Screen } from "./ui/screen";
@@ -19,6 +19,9 @@ type RootRoute =
 const BiometricUnlockContext = createContext<(() => void) | undefined>(
   undefined,
 );
+const LoginContext = createContext<
+  ((values: LoginValues) => Promise<void> | void) | undefined
+>(undefined);
 
 function NavigationPlaceholder({ title }: { title: string }) {
   return (
@@ -30,8 +33,14 @@ function NavigationPlaceholder({ title }: { title: string }) {
 
 function SignInScreen() {
   const onBiometricUnlock = useContext(BiometricUnlockContext);
+  const onLogin = useContext(LoginContext);
 
-  return <LoginScreen onBiometricUnlock={onBiometricUnlock} />;
+  return (
+    <LoginScreen
+      onBiometricUnlock={onBiometricUnlock}
+      onSubmit={onLogin}
+    />
+  );
 }
 
 function ClientHomeScreen() {
@@ -133,9 +142,11 @@ export function getRootRouteForRole(role?: AppRole): RootRoute {
 
 export function MobileNavigation({
   onBiometricUnlock,
+  onLogin,
   role,
 }: {
   onBiometricUnlock?: () => void;
+  onLogin?: (values: LoginValues) => Promise<void> | void;
   role?: AppRole;
 }) {
   switch (role) {
@@ -151,9 +162,11 @@ export function MobileNavigation({
       return <NutritionistNavigation />;
     default:
       return (
-        <BiometricUnlockContext.Provider value={onBiometricUnlock}>
-          <UnauthenticatedNavigation />
-        </BiometricUnlockContext.Provider>
+        <LoginContext.Provider value={onLogin}>
+          <BiometricUnlockContext.Provider value={onBiometricUnlock}>
+            <UnauthenticatedNavigation />
+          </BiometricUnlockContext.Provider>
+        </LoginContext.Provider>
       );
   }
 }

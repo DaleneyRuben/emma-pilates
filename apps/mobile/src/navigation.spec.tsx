@@ -1,7 +1,6 @@
 import {
   fireEvent,
   render,
-  waitFor,
 } from "@testing-library/react-native";
 
 import {
@@ -47,7 +46,7 @@ describe("MobileNavigation", () => {
       />,
     );
 
-    fireEvent.press(
+    await fireEvent.press(
       screen.getByRole("button", {
         name: "Iniciar sesión con Face ID",
       }),
@@ -60,23 +59,21 @@ describe("MobileNavigation", () => {
     const login = jest.fn().mockResolvedValue(undefined);
     const screen = await render(<MobileNavigation onLogin={login} />);
 
-    fireEvent.changeText(
+    await fireEvent.changeText(
       screen.getByLabelText("Correo electrónico"),
       "ana@example.com",
     );
-    fireEvent.changeText(
+    await fireEvent.changeText(
       screen.getByLabelText("Contraseña"),
       "local password",
     );
-    fireEvent.press(
+    await fireEvent.press(
       screen.getByRole("button", { name: "Iniciar sesión" }),
     );
 
-    await waitFor(() => {
-      expect(login).toHaveBeenCalledWith({
-        email: "ana@example.com",
-        password: "local password",
-      });
+    expect(login).toHaveBeenCalledWith({
+      email: "ana@example.com",
+      password: "local password",
     });
   });
 

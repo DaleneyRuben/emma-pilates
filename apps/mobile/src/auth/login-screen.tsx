@@ -42,6 +42,9 @@ export function LoginScreen({
     defaultValues: { email: "", password: "" },
     resolver: zodResolver(loginSchema),
   });
+  const submitLogin = handleSubmit(async (values) => {
+    await onSubmit(values);
+  });
 
   return (
     <Screen style={styles.screen}>
@@ -98,7 +101,7 @@ export function LoginScreen({
             <PrimaryButton
               disabled={isSubmitting}
               label="Iniciar sesión"
-              onPress={handleSubmit(onSubmit)}
+              onPress={submitLogin}
             />
             {onBiometricUnlock === undefined ? null : (
               <BiometricLoginButton onPress={onBiometricUnlock} />
