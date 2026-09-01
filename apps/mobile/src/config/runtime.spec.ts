@@ -1,4 +1,8 @@
-import { getApiBaseUrl, getMobileApiBaseUrl } from "./runtime";
+import {
+  getApiBaseUrl,
+  getMobileApiBaseUrl,
+  getOrCreateInstallationIdentifier,
+} from "./runtime";
 
 describe("getApiBaseUrl", () => {
   it("accepts an absolute HTTPS API URL", () => {
@@ -40,5 +44,26 @@ describe("getMobileApiBaseUrl", () => {
     expect(() => getMobileApiBaseUrl({}, false)).toThrow(
       "EXPO_PUBLIC_API_URL",
     );
+  });
+});
+
+describe("getOrCreateInstallationIdentifier", () => {
+  it("creates one random identifier and reuses it for later Login attempts", async () => {
+    const values = new Map<string, string>();
+    const randomUUID = jest.fn().mockReturnValue("installation-1");
+    const storage = {
+      getItem: async (key: string) => values.get(key) ?? null,
+      setItem: async (key: string, value: string) => {
+        values.set(key, value);
+      },
+    };
+
+    await expect(
+      getOrCreateInstallationIdentifier(storage, randomUUID),
+    ).resolves.toBe("installation-1");
+    await expect(
+      getOrCreateInstallationIdentifier(storage, randomUUID),
+    ).resolves.toBe("installation-1");
+    expect(randomUUID).toHaveBeenCalledTimes(1);
   });
 });
