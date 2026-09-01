@@ -63,6 +63,7 @@ export function createSessionManager(
     resolveCurrent,
     revokeCurrent,
   } = options;
+  let activeCredential: string | null = null;
 
   async function resolveCredential(
     credential: string,
@@ -70,10 +71,12 @@ export function createSessionManager(
     const principal = await resolveCurrent(credential);
 
     if (principal === null) {
+      activeCredential = null;
       await credentialStore.clear();
       return null;
     }
 
+    activeCredential = credential;
     return toMobileSession(principal);
   }
 
@@ -117,12 +120,14 @@ export function createSessionManager(
       return resolveCredential(credential);
     },
     async logout(session: MobileSession): Promise<void> {
-      const credential = await credentialStore.load();
+      const credential =
+        activeCredential ?? (await credentialStore.load());
 
       if (credential !== null) {
         await revokeCurrent(credential);
       }
 
+      activeCredential = null;
       await credentialStore.clear();
       await clearAccountCache(session.accountId);
     },
