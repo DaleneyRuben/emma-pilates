@@ -3,7 +3,7 @@ import {
   parseVerifiedLink,
 } from "./verified-link";
 
-type LinkSource = {
+export type LinkSource = {
   addEventListener: (
     event: "url",
     listener: (event: { url: string }) => void,
