@@ -1,8 +1,10 @@
 import { createStaticNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createContext, useContext } from "react";
 
 import type { AppRole } from "./auth/session-manager";
+import { BiometricLoginButton } from "./ui/biometric-login-button";
 import { Heading } from "./ui/heading";
 import { Screen } from "./ui/screen";
 
@@ -14,6 +16,10 @@ type RootRoute =
   | "Administrator"
   | "Nutritionist";
 
+const BiometricUnlockContext = createContext<(() => void) | undefined>(
+  undefined,
+);
+
 function NavigationPlaceholder({ title }: { title: string }) {
   return (
     <Screen>
@@ -23,7 +29,18 @@ function NavigationPlaceholder({ title }: { title: string }) {
 }
 
 function SignInScreen() {
-  return <NavigationPlaceholder title="Iniciar sesión" />;
+  const onBiometricUnlock = useContext(BiometricUnlockContext);
+
+  return (
+    <Screen>
+      <Heading accessibilityLabel="Iniciar sesión">
+        Iniciar sesión
+      </Heading>
+      {onBiometricUnlock === undefined ? null : (
+        <BiometricLoginButton onPress={onBiometricUnlock} />
+      )}
+    </Screen>
+  );
 }
 
 function ClientHomeScreen() {
@@ -123,7 +140,13 @@ export function getRootRouteForRole(role?: AppRole): RootRoute {
   return roleRoutes[role];
 }
 
-export function MobileNavigation({ role }: { role?: AppRole }) {
+export function MobileNavigation({
+  onBiometricUnlock,
+  role,
+}: {
+  onBiometricUnlock?: () => void;
+  role?: AppRole;
+}) {
   switch (role) {
     case "client":
       return <ClientNavigation />;
@@ -136,6 +159,10 @@ export function MobileNavigation({ role }: { role?: AppRole }) {
     case "nutritionist":
       return <NutritionistNavigation />;
     default:
-      return <UnauthenticatedNavigation />;
+      return (
+        <BiometricUnlockContext.Provider value={onBiometricUnlock}>
+          <UnauthenticatedNavigation />
+        </BiometricUnlockContext.Provider>
+      );
   }
 }

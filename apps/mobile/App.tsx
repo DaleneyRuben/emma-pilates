@@ -59,7 +59,16 @@ function IdentityNavigation() {
     return null;
   }
 
-  return <MobileNavigation role={identity.session?.role} />;
+  return (
+    <MobileNavigation
+      onBiometricUnlock={
+        identity.status === "biometric-locked"
+          ? identity.unlockWithBiometrics
+          : undefined
+      }
+      role={identity.session?.role}
+    />
+  );
 }
 
 export default function App({ runtime }: { runtime?: MobileRuntime }) {
