@@ -3,6 +3,28 @@ type RuntimeEnvironment = {
 };
 
 const localDevelopmentApiUrl = "http://127.0.0.1:3100/api/v1";
+const installationIdentifierKey = "pilates-installation-identifier";
+
+type InstallationIdentifierStorage = {
+  getItem: (key: string) => Promise<string | null>;
+  setItem: (key: string, value: string) => Promise<void>;
+};
+
+export async function getOrCreateInstallationIdentifier(
+  storage: InstallationIdentifierStorage,
+  randomUUID: () => string,
+): Promise<string> {
+  const existing = await storage.getItem(installationIdentifierKey);
+
+  if (existing !== null) {
+    return existing;
+  }
+
+  const created = randomUUID();
+  await storage.setItem(installationIdentifierKey, created);
+
+  return created;
+}
 
 export function getApiBaseUrl(environment: RuntimeEnvironment): string {
   const value = environment.EXPO_PUBLIC_API_URL;
