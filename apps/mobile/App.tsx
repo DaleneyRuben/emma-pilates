@@ -8,6 +8,10 @@ import {
   MobileIdentityProvider,
   useMobileIdentity,
 } from "./src/auth/identity-provider";
+import {
+  createAuthenticationApi,
+  type AuthenticationApi,
+} from "./src/auth/authentication-api";
 import type { LoginValues } from "./src/auth/login-screen";
 import {
   createSessionApi,
@@ -23,7 +27,10 @@ import {
   getOrCreateInstallationIdentifier,
 } from "./src/config/runtime";
 import type { LinkSource } from "./src/ingress/link-ingress";
-import { VerifiedLinkProvider } from "./src/ingress/verified-link-provider";
+import {
+  useVerifiedLinkIntent,
+  VerifiedLinkProvider,
+} from "./src/ingress/verified-link-provider";
 import { fontAssets } from "./src/ui/fonts";
 import { MobileNavigation } from "./src/navigation";
 import { clearPersistedAccountCache } from "./src/query/persistence";
@@ -34,6 +41,7 @@ import {
 
 type MobileRuntime = {
   allowedLinkHosts: readonly string[];
+  authenticationApi: AuthenticationApi;
   linkSource?: LinkSource;
   login: (values: LoginValues) => Promise<SessionLoginResult>;
   sessionManager: SessionManager;
@@ -53,6 +61,7 @@ function createDefaultRuntime(): MobileRuntime {
 
   return {
     allowedLinkHosts: [new URL(apiBaseUrl).hostname],
+    authenticationApi: createAuthenticationApi({ baseUrl: apiBaseUrl }),
     async login({ email, password }) {
       const clientIdentifier = await getOrCreateInstallationIdentifier(
         AsyncStorage,
@@ -71,11 +80,14 @@ function createDefaultRuntime(): MobileRuntime {
 }
 
 function IdentityNavigation({
+  authenticationApi,
   login,
 }: {
+  authenticationApi: AuthenticationApi;
   login: MobileRuntime["login"];
 }) {
   const identity = useMobileIdentity();
+  const { intent } = useVerifiedLinkIntent();
   const handleLogin = useCallback(
     async (values: LoginValues) => {
       const result = await login(values);
@@ -97,12 +109,15 @@ function IdentityNavigation({
 
   return (
     <MobileNavigation
+      authenticationApi={authenticationApi}
+      authenticationIntent={intent}
       onBiometricUnlock={
         identity.status === "biometric-locked"
           ? identity.unlockWithBiometrics
           : undefined
       }
       onLogin={handleLogin}
+      onRecoveryCredential={identity.start}
       role={identity.session?.role}
     />
   );
@@ -127,7 +142,10 @@ export default function App({ runtime }: { runtime?: MobileRuntime }) {
           source={mobileRuntime.linkSource}
         >
           <MobileIdentityProvider manager={mobileRuntime.sessionManager}>
-            <IdentityNavigation login={mobileRuntime.login} />
+            <IdentityNavigation
+              authenticationApi={mobileRuntime.authenticationApi}
+              login={mobileRuntime.login}
+            />
           </MobileIdentityProvider>
         </VerifiedLinkProvider>
       </MobileQueryProvider>

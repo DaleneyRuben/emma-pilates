@@ -3,12 +3,15 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createContext, useContext } from "react";
 
+import { AuthenticationFlow } from "./auth/authentication-flow";
+import type { AuthenticationApi } from "./auth/authentication-api";
 import {
   LoginScreen,
   type LoginSubmissionResult,
   type LoginValues,
 } from "./auth/login-screen";
 import type { AppRole } from "./auth/session-manager";
+import type { AuthenticationLinkIntent } from "./ingress/verified-link";
 import { Heading } from "./ui/heading";
 import { Screen } from "./ui/screen";
 
@@ -148,14 +151,20 @@ export function getRootRouteForRole(role?: AppRole): RootRoute {
 }
 
 export function MobileNavigation({
+  authenticationApi,
+  authenticationIntent,
   onBiometricUnlock,
   onLogin,
+  onRecoveryCredential,
   role,
 }: {
+  authenticationApi?: AuthenticationApi;
+  authenticationIntent?: AuthenticationLinkIntent | null;
   onBiometricUnlock?: () => void;
   onLogin?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
+  onRecoveryCredential?: (credential: string) => Promise<void> | void;
   role?: AppRole;
 }) {
   switch (role) {
@@ -170,6 +179,18 @@ export function MobileNavigation({
     case "nutritionist":
       return <NutritionistNavigation />;
     default:
+      if (authenticationApi !== undefined) {
+        return (
+          <AuthenticationFlow
+            api={authenticationApi}
+            intent={authenticationIntent}
+            onBiometricUnlock={onBiometricUnlock}
+            onLogin={onLogin}
+            onRecoveryCredential={onRecoveryCredential}
+          />
+        );
+      }
+
       return (
         <LoginContext.Provider value={onLogin}>
           <BiometricUnlockContext.Provider value={onBiometricUnlock}>
