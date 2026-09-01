@@ -33,6 +33,10 @@ function IdentityActionsProbe() {
         title="Start"
       />
       <Button onPress={() => identity.logout()} title="Logout" />
+      <Button
+        onPress={() => identity.unlockWithBiometrics()}
+        title="Unlock"
+      />
     </>
   );
 }
@@ -101,5 +105,34 @@ describe("MobileIdentityProvider", () => {
       expect(screen.getByText("signed-out")).toBeOnTheScreen();
     });
     expect(manager.logout).toHaveBeenCalledWith(session);
+  });
+
+  it("waits for an explicit biometric unlock before restoring the session", async () => {
+    const session = { accountId: "account-3", role: "client" as const };
+    const manager = {
+      hasBiometricSession: jest.fn().mockResolvedValue(true),
+      logout: jest.fn(),
+      restore: jest.fn().mockResolvedValue(null),
+      start: jest.fn(),
+      unlockWithBiometrics: jest.fn().mockResolvedValue(session),
+    };
+    const screen = await render(
+      <MobileIdentityProvider manager={manager}>
+        <IdentityActionsProbe />
+      </MobileIdentityProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("biometric-locked")).toBeOnTheScreen();
+    });
+    expect(manager.unlockWithBiometrics).not.toHaveBeenCalled();
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Unlock" }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("signed-in")).toBeOnTheScreen();
+    });
+    expect(manager.unlockWithBiometrics).toHaveBeenCalledTimes(1);
   });
 });
