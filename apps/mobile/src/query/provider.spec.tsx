@@ -1,11 +1,13 @@
 import { render } from "@testing-library/react-native";
-import { useQueryClient } from "@tanstack/react-query";
+import { type QueryClient, useQueryClient } from "@tanstack/react-query";
 import { Text } from "react-native";
 
-import { MobileQueryProvider } from "./provider";
+import { clearMobileQueryCache, MobileQueryProvider } from "./provider";
+
+let providedClient: QueryClient | undefined;
 
 function QueryClientProbe() {
-  useQueryClient();
+  providedClient = useQueryClient();
 
   return <Text>query client available</Text>;
 }
@@ -19,5 +21,18 @@ describe("MobileQueryProvider", () => {
     );
 
     expect(screen.getByText("query client available")).toBeOnTheScreen();
+  });
+
+  it("clears in-memory server state on logout", async () => {
+    await render(
+      <MobileQueryProvider>
+        <QueryClientProbe />
+      </MobileQueryProvider>,
+    );
+    providedClient?.setQueryData(["sessions"], [{ id: "session-1" }]);
+
+    clearMobileQueryCache();
+
+    expect(providedClient?.getQueryData(["sessions"])).toBeUndefined();
   });
 });
