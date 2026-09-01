@@ -17,6 +17,7 @@ import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
+import { TextButton } from "../ui/text-button";
 import { colors, spacing, typography } from "../ui/tokens";
 
 const loginSchema = z.object({
@@ -32,6 +33,8 @@ export type LoginSubmissionResult =
 
 type LoginScreenProps = {
   onBiometricUnlock?: () => void;
+  onForgotPassword?: () => void;
+  onRegister?: () => void;
   onSubmit?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
@@ -39,6 +42,8 @@ type LoginScreenProps = {
 
 export function LoginScreen({
   onBiometricUnlock,
+  onForgotPassword,
+  onRegister,
   onSubmit = () => undefined,
 }: LoginScreenProps) {
   const [rejected, setRejected] = useState(false);
@@ -146,6 +151,15 @@ export function LoginScreen({
             ) : null}
             {onBiometricUnlock === undefined ? null : (
               <BiometricLoginButton onPress={onBiometricUnlock} />
+            )}
+            {onForgotPassword === undefined ? null : (
+              <TextButton
+                label="Olvidé mi contraseña"
+                onPress={onForgotPassword}
+              />
+            )}
+            {onRegister === undefined ? null : (
+              <TextButton label="Crear cuenta" onPress={onRegister} />
             )}
           </View>
         </ScrollView>
