@@ -11,6 +11,10 @@ import { createMobileQueryClient } from "./client";
 
 const queryClient = createMobileQueryClient();
 
+export function clearMobileQueryCache(): void {
+  queryClient.clear();
+}
+
 export function MobileQueryProvider({ children }: PropsWithChildren) {
   useEffect(() => {
     if (AppState === undefined || NetInfo === undefined) {

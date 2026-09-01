@@ -18,7 +18,10 @@ import { VerifiedLinkProvider } from "./src/ingress/verified-link-provider";
 import { fontAssets } from "./src/ui/fonts";
 import { MobileNavigation } from "./src/navigation";
 import { clearPersistedAccountCache } from "./src/query/persistence";
-import { MobileQueryProvider } from "./src/query/provider";
+import {
+  clearMobileQueryCache,
+  MobileQueryProvider,
+} from "./src/query/provider";
 
 type MobileRuntime = {
   allowedLinkHosts: readonly string[];
@@ -33,10 +36,15 @@ function createDefaultRuntime(): MobileRuntime {
   );
   const sessionApi = createSessionApi({ baseUrl: apiBaseUrl });
 
+  async function clearAccountCache(accountId: string): Promise<void> {
+    clearMobileQueryCache();
+    await clearPersistedAccountCache(accountId);
+  }
+
   return {
     allowedLinkHosts: [new URL(apiBaseUrl).hostname],
     sessionManager: createSessionManager({
-      clearAccountCache: clearPersistedAccountCache,
+      clearAccountCache,
       credentialStore,
       resolveCurrent: sessionApi.resolveCurrent,
       revokeCurrent: sessionApi.revokeCurrent,
