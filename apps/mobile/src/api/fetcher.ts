@@ -4,6 +4,18 @@ type ApiFetcherOptions = {
   fetch?: typeof globalThis.fetch;
 };
 
+function joinApiUrl(baseUrl: string, requestPath: string): string {
+  const base = new URL(baseUrl);
+  const basePath = base.pathname.replace(/\/$/, "");
+  const path = `/${requestPath.replace(/^\//, "")}`;
+
+  if (path === basePath || path.startsWith(`${basePath}/`)) {
+    return `${base.origin}${path}`;
+  }
+
+  return `${baseUrl.replace(/\/$/, "")}${path}`;
+}
+
 export function createApiFetcher({
   baseUrl,
   getCredential,
@@ -18,7 +30,7 @@ export function createApiFetcher({
     }
 
     const path = typeof input === "string" ? input : input.toString();
-    const url = `${baseUrl.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
+    const url = joinApiUrl(baseUrl, path);
 
     return fetchImplementation(url, { ...init, headers });
   };
