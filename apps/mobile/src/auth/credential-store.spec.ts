@@ -62,4 +62,20 @@ describe("createCredentialStore", () => {
       },
     );
   });
+
+  it("rejects biometric protection when the device cannot provide it", async () => {
+    const setItemAsync = jest.fn();
+    const store = createCredentialStore({
+      canUseBiometricAuthentication: () => false,
+      deleteItemAsync: jest.fn(),
+      getItemAsync: jest.fn(),
+      setItemAsync,
+    });
+
+    expect(store.canUseBiometrics()).toBe(false);
+    await expect(
+      store.saveWithBiometrics("credential"),
+    ).rejects.toThrow("Biometric authentication is unavailable");
+    expect(setItemAsync).not.toHaveBeenCalled();
+  });
 });
