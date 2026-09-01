@@ -13,6 +13,7 @@ describe("App", () => {
             getInitialURL: async () => null,
           },
           sessionManager: {
+            hasBiometricSession: jest.fn().mockResolvedValue(false),
             logout: jest.fn(),
             restore: jest.fn().mockResolvedValue(null),
             start: jest.fn(),
@@ -36,6 +37,7 @@ describe("App", () => {
             getInitialURL: async () => null,
           },
           sessionManager: {
+            hasBiometricSession: jest.fn().mockResolvedValue(false),
             logout: jest.fn(),
             restore: jest.fn().mockResolvedValue({
               accountId: "account-1",

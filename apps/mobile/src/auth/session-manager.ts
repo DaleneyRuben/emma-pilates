@@ -13,9 +13,13 @@ export type MobileSession = {
 };
 
 type CredentialStore = {
+  canUseBiometrics?: () => boolean;
   clear: () => Promise<void>;
+  hasBiometricCredential?: () => Promise<boolean>;
   load: () => Promise<string | null>;
+  loadWithBiometrics?: () => Promise<string | null>;
   save: (credential: string) => Promise<void>;
+  saveWithBiometrics?: (credential: string) => Promise<void>;
 };
 
 type SessionManagerOptions = {
@@ -28,6 +32,7 @@ type SessionManagerOptions = {
 };
 
 export type SessionManager = {
+  hasBiometricSession: () => Promise<boolean>;
   logout: (session: MobileSession) => Promise<void>;
   restore: () => Promise<MobileSession | null>;
   start: (credential: string) => Promise<MobileSession | null>;
@@ -69,6 +74,9 @@ export function createSessionManager(
   }
 
   return {
+    async hasBiometricSession(): Promise<boolean> {
+      return (await credentialStore.hasBiometricCredential?.()) ?? false;
+    },
     async restore(): Promise<MobileSession | null> {
       const credential = await credentialStore.load();
 
