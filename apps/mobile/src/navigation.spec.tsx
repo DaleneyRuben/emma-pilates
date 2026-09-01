@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react-native";
+import { fireEvent, render } from "@testing-library/react-native";
 
 import {
   getRootRouteForRole,
@@ -27,6 +27,23 @@ describe("MobileNavigation", () => {
     const screen = await render(<MobileNavigation />);
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
+  });
+
+  it("offers Face ID only when a protected session is waiting", async () => {
+    const unlockWithBiometrics = jest.fn();
+    const screen = await render(
+      <MobileNavigation
+        onBiometricUnlock={unlockWithBiometrics}
+      />,
+    );
+
+    fireEvent.press(
+      screen.getByRole("button", {
+        name: "Iniciar sesión con Face ID",
+      }),
+    );
+
+    expect(unlockWithBiometrics).toHaveBeenCalledTimes(1);
   });
 
   it.each([
