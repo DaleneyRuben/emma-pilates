@@ -3,8 +3,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createContext, useContext } from "react";
 
+import { LoginScreen } from "./auth/login-screen";
 import type { AppRole } from "./auth/session-manager";
-import { BiometricLoginButton } from "./ui/biometric-login-button";
 import { Heading } from "./ui/heading";
 import { Screen } from "./ui/screen";
 
@@ -31,16 +31,7 @@ function NavigationPlaceholder({ title }: { title: string }) {
 function SignInScreen() {
   const onBiometricUnlock = useContext(BiometricUnlockContext);
 
-  return (
-    <Screen>
-      <Heading accessibilityLabel="Iniciar sesión">
-        Iniciar sesión
-      </Heading>
-      {onBiometricUnlock === undefined ? null : (
-        <BiometricLoginButton onPress={onBiometricUnlock} />
-      )}
-    </Screen>
-  );
+  return <LoginScreen onBiometricUnlock={onBiometricUnlock} />;
 }
 
 function ClientHomeScreen() {
