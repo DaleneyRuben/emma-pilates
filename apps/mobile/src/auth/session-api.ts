@@ -1,4 +1,5 @@
 import {
+  createMobileAuthenticationSession,
   getCurrentAuthenticationSession,
   logoutCurrentAuthenticationSession,
   type CurrentAuthenticationPrincipalDto,
@@ -22,7 +23,39 @@ export function createSessionApi(options: SessionApiOptions) {
     });
   }
 
+  const unauthenticatedFetcher = createApiFetcher({
+    baseUrl,
+    fetch,
+    getCredential: async () => null,
+  });
+
   return {
+    async login({
+      clientIdentifier,
+      email,
+      password,
+    }: {
+      clientIdentifier: string;
+      email: string;
+      password: string;
+    }): Promise<{ credential: string; status: "created" }> {
+      const response = await createMobileAuthenticationSession(
+        { email, password },
+        {
+          headers: {
+            "x-client-identifier": clientIdentifier,
+          },
+        },
+        unauthenticatedFetcher,
+      );
+      const status: number = response.status;
+
+      if (status !== 201) {
+        throw new Error(`Authentication Session creation failed with ${status}`);
+      }
+
+      return { credential: response.data.credential, status: "created" };
+    },
     async resolveCurrent(
       credential: string,
     ): Promise<CurrentAuthenticationPrincipalDto | null> {
