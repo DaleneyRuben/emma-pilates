@@ -27,6 +27,12 @@ type SessionManagerOptions = {
   revokeCurrent: (credential: string) => Promise<void>;
 };
 
+export type SessionManager = {
+  logout: (session: MobileSession) => Promise<void>;
+  restore: () => Promise<MobileSession | null>;
+  start: (credential: string) => Promise<MobileSession | null>;
+};
+
 function toMobileSession(
   principal: CurrentAuthenticationPrincipalDto,
 ): MobileSession {
@@ -39,7 +45,9 @@ function toMobileSession(
   };
 }
 
-export function createSessionManager(options: SessionManagerOptions) {
+export function createSessionManager(
+  options: SessionManagerOptions,
+): SessionManager {
   const {
     clearAccountCache,
     credentialStore,
