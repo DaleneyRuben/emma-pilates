@@ -2,11 +2,9 @@ import { createStaticNavigation } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import type { AppRole } from "./auth/session-manager";
 import { Heading } from "./ui/heading";
 import { Screen } from "./ui/screen";
-
-type AppRole =
-  "client" | "trainer" | "assistant" | "administrator" | "nutritionist";
 
 type RootRoute =
   | "Unauthenticated"
@@ -102,37 +100,12 @@ const NutritionistStack = createNativeStackNavigator({
   },
 });
 
-const RootStack = createNativeStackNavigator({
-  initialRouteName: "Unauthenticated",
-  screens: {
-    Unauthenticated: {
-      screen: UnauthenticatedStack,
-      options: { headerShown: false },
-    },
-    Client: {
-      screen: ClientTabs,
-      options: { headerShown: false },
-    },
-    Trainer: {
-      screen: TrainerStack,
-      options: { headerShown: false },
-    },
-    Assistant: {
-      screen: AssistantStack,
-      options: { headerShown: false },
-    },
-    Administrator: {
-      screen: AdministratorStack,
-      options: { headerShown: false },
-    },
-    Nutritionist: {
-      screen: NutritionistStack,
-      options: { headerShown: false },
-    },
-  },
-});
-
-const StaticNavigation = createStaticNavigation(RootStack);
+const UnauthenticatedNavigation = createStaticNavigation(UnauthenticatedStack);
+const ClientNavigation = createStaticNavigation(ClientTabs);
+const TrainerNavigation = createStaticNavigation(TrainerStack);
+const AssistantNavigation = createStaticNavigation(AssistantStack);
+const AdministratorNavigation = createStaticNavigation(AdministratorStack);
+const NutritionistNavigation = createStaticNavigation(NutritionistStack);
 
 const roleRoutes: Record<AppRole, RootRoute> = {
   client: "Client",
@@ -150,6 +123,19 @@ export function getRootRouteForRole(role?: AppRole): RootRoute {
   return roleRoutes[role];
 }
 
-export function MobileNavigation() {
-  return <StaticNavigation />;
+export function MobileNavigation({ role }: { role?: AppRole }) {
+  switch (role) {
+    case "client":
+      return <ClientNavigation />;
+    case "trainer":
+      return <TrainerNavigation />;
+    case "assistant":
+      return <AssistantNavigation />;
+    case "administrator":
+      return <AdministratorNavigation />;
+    case "nutritionist":
+      return <NutritionistNavigation />;
+    default:
+      return <UnauthenticatedNavigation />;
+  }
 }
