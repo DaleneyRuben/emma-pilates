@@ -15,6 +15,7 @@ you are starting with no project knowledge.
 | Email verification           | Confirm that an unknown token returns `invalid`                                                                                 | A valid token cannot be obtained manually until local email capture is runnable                                                                               |
 | Login and logout             | Create an opaque mobile Authentication Session, inspect its current Account identity, and revoke it                             | Until the mobile Login screen is built, use Swagger and the local-only activation step below                                                                  |
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
+| Account security             | Inspect an invalid link, request password recovery neutrally, and change a signed-in Account password                           | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                              |
 | Automated checks             | Run backend, API-contract, type, lint, and build checks                                                                         | Mobile Jest currently has a dependency-wiring problem; database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database |
 | Admin web                    | Open the Vite starter page and verify that the development server works                                                         | No Pilates admin features have been built yet, so this is not a product test                                                                                  |
 
@@ -343,7 +344,81 @@ That request should return `429`, stable code `login_throttled`, and a
 `Retry-After` header. The response does not reveal whether the email belongs to
 an Account.
 
-## Test 6: run the automated checks
+## Test 6: try Account security
+
+Keep the backend running and use Swagger. For the signed-in step, complete
+Test 5 through **C. Inspect the signed-in identity** first and leave its bearer
+credential authorized in Swagger.
+
+### A. Inspect an invalid one-time link
+
+Open `POST /api/v1/authentication-links/inspection` and send:
+
+```json
+{ "token": "not-a-real-link-secret" }
+```
+
+Expected response code: `200`, with:
+
+```json
+{ "status": "invalid" }
+```
+
+The response deliberately contains no Account ID, email, Client, or Staff
+Member information.
+
+### B. Request password recovery
+
+Open `POST /api/v1/password-recovery-requests` and send either a real local
+Account email or a made-up address:
+
+```json
+{ "email": "ana.login+1@example.com" }
+```
+
+Expected response code: `202`, with:
+
+```json
+{ "status": "accepted" }
+```
+
+The same response is returned when the address is unknown or temporarily
+rate-limited. This prevents the endpoint from revealing who has an Account.
+
+### C. Change the signed-in Account password
+
+Open `PATCH /api/v1/accounts/current/password`. Swagger uses the bearer
+credential you authorized during Test 5. Send:
+
+```json
+{
+  "currentPassword": "the same password used during registration",
+  "newPassword": "a different local test password"
+}
+```
+
+Expected response code: `204`. The current Authentication Session remains
+active, but every other Authentication Session for that Account is revoked.
+Confirm the current session still works with
+`GET /api/v1/authentication-sessions/current`.
+
+Submitting the old password to `POST /api/v1/authentication-sessions` should
+now return the neutral `401` `authentication_failed` response. The new password
+should create a new Authentication Session.
+
+If `currentPassword` is wrong, the change returns `400` with stable code
+`current_password_incorrect` and changes nothing.
+
+### D. What requires automated tests for now
+
+The backend can activate an Account and complete password recovery with valid
+single-use links. However, the development email capture currently exists only
+inside the worker process and has no beginner-facing inbox or command that
+reveals a captured link. Until that viewer exists, use the automated tests for
+successful activation, link expiry, recovery-wide session revocation, and the
+replacement credential.
+
+## Test 7: run the automated checks
 
 You do not need to understand the test code to run it. A successful Jest run
 ends with green `PASS` lines and no failed suites.
@@ -425,7 +500,9 @@ The following are not ready for manual product testing:
 - receiving or viewing the locally captured verification email;
 - opening a real verification link and completing successful verification;
 - automatic cleanup of expired pending accounts through a running worker;
-- Login, logout, session restoration, password recovery, or password change;
+- retrieving a valid activation or password-recovery link from a local inbox;
+- completing successful activation or password recovery manually;
+- mobile Login, logout, session restoration, recovery, or password-change screens;
 - working Client Home, class browsing, booking, plans, payments, profile, or
   notifications;
 - working Trainer, Assistant, Administrator, or Nutritionist mobile screens;
