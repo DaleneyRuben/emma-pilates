@@ -118,6 +118,28 @@ describe("AuthenticationFlow", () => {
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
   });
 
+  it("opens a verified link received while Login is already visible", async () => {
+    const verifyClientEmail = jest
+      .fn()
+      .mockResolvedValue({ status: "verified" });
+    const api = createApiMock({ verifyClientEmail });
+    const screen = await render(<AuthenticationFlow api={api} />);
+
+    expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
+
+    await screen.rerender(
+      <AuthenticationFlow
+        api={api}
+        intent={{ token: "live-token", type: "verify-email" }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(verifyClientEmail).toHaveBeenCalledWith("live-token");
+      expect(screen.getByText("Correo verificado")).toBeOnTheScreen();
+    });
+  });
+
   it("starts the replacement Session after password recovery", async () => {
     const completePasswordRecovery = jest.fn().mockResolvedValue({
       credential: "replacement-credential",
