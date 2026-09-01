@@ -38,7 +38,10 @@ export function createSessionApi(options: SessionApiOptions) {
       clientIdentifier: string;
       email: string;
       password: string;
-    }): Promise<{ credential: string; status: "created" }> {
+    }): Promise<
+      | { credential: string; status: "created" }
+      | { status: "rejected" }
+    > {
       const response = await createMobileAuthenticationSession(
         { email, password },
         {
@@ -49,6 +52,10 @@ export function createSessionApi(options: SessionApiOptions) {
         unauthenticatedFetcher,
       );
       const status: number = response.status;
+
+      if (status === 401) {
+        return { status: "rejected" };
+      }
 
       if (status !== 201) {
         throw new Error(`Authentication Session creation failed with ${status}`);
