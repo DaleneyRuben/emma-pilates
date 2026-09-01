@@ -78,4 +78,25 @@ describe("createCredentialStore", () => {
     ).rejects.toThrow("Biometric authentication is unavailable");
     expect(setItemAsync).not.toHaveBeenCalled();
   });
+
+  it("clears both ordinary and biometric credentials on logout", async () => {
+    const values = new Map<string, string>([
+      ["authentication-session", "ordinary-credential"],
+      ["authentication-session-biometric", "protected-credential"],
+      ["authentication-session-biometric-enabled", "true"],
+    ]);
+    const store = createCredentialStore({
+      deleteItemAsync: async (key) => {
+        values.delete(key);
+      },
+      getItemAsync: async (key) => values.get(key) ?? null,
+      setItemAsync: async (key, value) => {
+        values.set(key, value);
+      },
+    });
+
+    await store.clear();
+
+    expect(values).toEqual(new Map());
+  });
 });
