@@ -27,6 +27,12 @@ describe("MobileNavigation", () => {
     const screen = await render(<MobileNavigation />);
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Correo electrónico")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Contraseña")).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", { name: "Iniciar sesión" }),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/teléfono/i)).not.toBeOnTheScreen();
   });
 
   it("offers Face ID only when a protected session is waiting", async () => {
