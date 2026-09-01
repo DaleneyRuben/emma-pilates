@@ -1,0 +1,137 @@
+import { createAuthenticationApi } from "./authentication-api";
+
+describe("createAuthenticationApi", () => {
+  it("supports the pending Client registration lifecycle", async () => {
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            email: "ana@example.com",
+            registrationContinuation: "continuation",
+            status: "verification_required",
+          }),
+          { status: 202 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            email: "ana.corrected@example.com",
+            status: "verification_required",
+          }),
+          { status: 202 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ status: "verification_required" }),
+          { status: 202 },
+        ),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+    const api = createAuthenticationApi({
+      baseUrl: "https://api.example.com/api/v1",
+      fetch: fetchMock,
+    });
+
+    await expect(
+      api.register({
+        email: "ana@example.com",
+        name: "Ana Clienta",
+        password: "local password",
+      }),
+    ).resolves.toEqual({
+      email: "ana@example.com",
+      registrationContinuation: "continuation",
+      status: "verification_required",
+    });
+    await expect(
+      api.correctRegistrationEmail({
+        email: "ana.corrected@example.com",
+        registrationContinuation: "continuation",
+      }),
+    ).resolves.toEqual({
+      email: "ana.corrected@example.com",
+      status: "verification_required",
+    });
+    await expect(
+      api.resendRegistrationVerification("continuation"),
+    ).resolves.toEqual({ status: "verification_required" });
+    await expect(
+      api.cancelRegistration("continuation"),
+    ).resolves.toBeUndefined();
+
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "https://api.example.com/api/v1/client-registrations",
+      "https://api.example.com/api/v1/client-registrations/email-corrections",
+      "https://api.example.com/api/v1/client-registrations/verification-resends",
+      "https://api.example.com/api/v1/client-registrations/cancellations",
+    ]);
+  });
+
+  it("supports verification, activation, and password recovery links", async () => {
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ status: "verified" }), {
+          status: 200,
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ purpose: "activation", status: "current" }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ status: "activated" }), {
+          status: 200,
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ status: "accepted" }), {
+          status: 202,
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            credential: "replacement-credential",
+            status: "recovered",
+          }),
+          { status: 201 },
+        ),
+      );
+    const api = createAuthenticationApi({
+      baseUrl: "https://api.example.com/api/v1",
+      fetch: fetchMock,
+    });
+
+    await expect(api.verifyClientEmail("verification-token")).resolves.toEqual(
+      { status: "verified" },
+    );
+    await expect(api.inspectLink("activation-token")).resolves.toEqual({
+      purpose: "activation",
+      status: "current",
+    });
+    await expect(
+      api.activateAccount({
+        password: "new password",
+        token: "activation-token",
+      }),
+    ).resolves.toEqual({ status: "activated" });
+    await expect(
+      api.requestPasswordRecovery("ana@example.com"),
+    ).resolves.toEqual({ status: "accepted" });
+    await expect(
+      api.completePasswordRecovery({
+        password: "replacement password",
+        token: "recovery-token",
+      }),
+    ).resolves.toEqual({
+      credential: "replacement-credential",
+      status: "recovered",
+    });
+  });
+});
