@@ -175,4 +175,31 @@ describe("createSessionManager", () => {
     expect(clearCredential).toHaveBeenCalledTimes(1);
     expect(clearAccountCache).toHaveBeenCalledWith("account-1");
   });
+
+  it("revokes an unlocked biometric session without prompting a second time", async () => {
+    const loadWithBiometrics = jest
+      .fn()
+      .mockResolvedValue("protected-credential");
+    const revokeCurrent = jest.fn();
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: {
+        clear: jest.fn(),
+        load: jest.fn().mockResolvedValue(null),
+        loadWithBiometrics,
+        save: jest.fn(),
+      },
+      resolveCurrent: jest.fn().mockResolvedValue({
+        accountId: "account-1",
+        identity: { kind: "client", clientId: "client-1" },
+      }),
+      revokeCurrent,
+    });
+
+    const session = await manager.unlockWithBiometrics();
+    await manager.logout(session!);
+
+    expect(revokeCurrent).toHaveBeenCalledWith("protected-credential");
+    expect(loadWithBiometrics).toHaveBeenCalledTimes(1);
+  });
 });
