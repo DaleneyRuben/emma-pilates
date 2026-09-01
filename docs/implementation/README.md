@@ -61,10 +61,11 @@ Account at startup, routes every current Role, clears Account cache on logout,
 and centralizes safe authentication-link ingress. `MOB-006` adds optional
 Face ID/fingerprint protection around local credential retrieval, explicit
 unlock state and entry, invalidated-key cleanup, and native Face ID permission
-configuration without changing backend authentication. Authentication screens
-in `MOB-004` still wait for the corrected `DES-001` export. The next product
-checkpoint is review and explicit approval of the `BKM-001` Booking & Membership
-schema before any related migration is created.
+configuration without changing backend authentication. The user approved
+implementing `MOB-004` from the existing generated visual patterns plus the
+accepted behavior in follow-ups 33–38 without waiting for the corrected
+`DES-001` export. Generated files under `design/` remain read-only; `DES-001`
+stays pending so a future design export can be reconciled with the working app.
 
 Authentication follow-ups 33–38 are pending in the design workflow. Until a new
 export applies and verifies them, generated authentication screens still show
