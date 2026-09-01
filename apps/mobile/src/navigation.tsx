@@ -3,7 +3,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createContext, useContext } from "react";
 
-import { LoginScreen, type LoginValues } from "./auth/login-screen";
+import {
+  LoginScreen,
+  type LoginSubmissionResult,
+  type LoginValues,
+} from "./auth/login-screen";
 import type { AppRole } from "./auth/session-manager";
 import { Heading } from "./ui/heading";
 import { Screen } from "./ui/screen";
@@ -20,7 +24,10 @@ const BiometricUnlockContext = createContext<(() => void) | undefined>(
   undefined,
 );
 const LoginContext = createContext<
-  ((values: LoginValues) => Promise<void> | void) | undefined
+  | ((
+      values: LoginValues,
+    ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void)
+  | undefined
 >(undefined);
 
 function NavigationPlaceholder({ title }: { title: string }) {
@@ -146,7 +153,9 @@ export function MobileNavigation({
   role,
 }: {
   onBiometricUnlock?: () => void;
-  onLogin?: (values: LoginValues) => Promise<void> | void;
+  onLogin?: (
+    values: LoginValues,
+  ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
   role?: AppRole;
 }) {
   switch (role) {

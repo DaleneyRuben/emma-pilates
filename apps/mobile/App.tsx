@@ -82,7 +82,11 @@ function IdentityNavigation({
 
       if (result.status === "created") {
         await identity.start(result.credential);
+
+        return undefined;
       }
+
+      return result;
     },
     [identity, login],
   );

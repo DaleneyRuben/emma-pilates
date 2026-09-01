@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useEffect, useState } from "react";
 import { z } from "zod";
 
 import { BiometricLoginButton } from "../ui/biometric-login-button";
@@ -25,15 +26,23 @@ const loginSchema = z.object({
 
 export type LoginValues = z.infer<typeof loginSchema>;
 
+export type LoginSubmissionResult =
+  | { status: "rejected" }
+  | { retryAfterSeconds: number; status: "throttled" };
+
 type LoginScreenProps = {
   onBiometricUnlock?: () => void;
-  onSubmit?: (values: LoginValues) => Promise<void> | void;
+  onSubmit?: (
+    values: LoginValues,
+  ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
 };
 
 export function LoginScreen({
   onBiometricUnlock,
   onSubmit = () => undefined,
 }: LoginScreenProps) {
+  const [rejected, setRejected] = useState(false);
+  const [retryAfterSeconds, setRetryAfterSeconds] = useState(0);
   const {
     control,
     formState: { errors, isSubmitting },
@@ -43,8 +52,29 @@ export function LoginScreen({
     resolver: zodResolver(loginSchema),
   });
   const submitLogin = handleSubmit(async (values) => {
-    await onSubmit(values);
+    setRejected(false);
+    const result = await onSubmit(values);
+
+    if (result?.status === "rejected") {
+      setRejected(true);
+    }
+
+    if (result?.status === "throttled") {
+      setRetryAfterSeconds(result.retryAfterSeconds);
+    }
   });
+
+  useEffect(() => {
+    if (retryAfterSeconds <= 0) {
+      return undefined;
+    }
+
+    const timer = setTimeout(() => {
+      setRetryAfterSeconds((current) => Math.max(0, current - 1));
+    }, 1_000);
+
+    return () => clearTimeout(timer);
+  }, [retryAfterSeconds]);
 
   return (
     <Screen style={styles.screen}>
@@ -99,10 +129,21 @@ export function LoginScreen({
               )}
             />
             <PrimaryButton
-              disabled={isSubmitting}
+              disabled={isSubmitting || retryAfterSeconds > 0}
               label="Iniciar sesión"
               onPress={submitLogin}
             />
+            {rejected ? (
+              <Text accessibilityRole="alert" style={styles.error}>
+                El correo o la contraseña no son correctos.
+              </Text>
+            ) : null}
+            {retryAfterSeconds > 0 ? (
+              <Text accessibilityRole="alert" style={styles.error}>
+                Demasiados intentos. Inténtalo de nuevo en{" "}
+                {retryAfterSeconds} segundos.
+              </Text>
+            ) : null}
             {onBiometricUnlock === undefined ? null : (
               <BiometricLoginButton onPress={onBiometricUnlock} />
             )}
@@ -132,6 +173,13 @@ const styles = StyleSheet.create({
   },
   flex: {
     flex: 1,
+  },
+  error: {
+    color: colors.errorText,
+    fontFamily: fontFamilies.body,
+    fontSize: typography.note,
+    lineHeight: 20,
+    textAlign: "center",
   },
   form: {
     gap: spacing.lgXl,
