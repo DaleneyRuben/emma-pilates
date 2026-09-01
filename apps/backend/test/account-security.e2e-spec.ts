@@ -19,22 +19,32 @@ import { authenticatedPrincipalResolver } from '../src/system-identity/authentic
 
 describe('Account security (e2e)', () => {
   let app: INestApplication<App>;
-  const inspectLink = jest.fn(async () => ({
-    status: 'current' as const,
-    purpose: 'activation' as const,
-  }));
-  const activate = jest.fn(async () => ({ status: 'activated' as const }));
-  const requestRecovery = jest.fn(async () => ({ status: 'accepted' as const }));
-  const completeRecovery = jest.fn(async () => ({
-    status: 'recovered' as const,
-    credential: 'a'.repeat(43),
-  }));
-  const changeCurrentPassword = jest.fn(async () => undefined);
-  const resolvePrincipal = jest.fn(async () => ({
-    accountId: 'account-id',
-    authenticationSessionId: 'authentication-session-id',
-    identity: { kind: 'client' as const, clientId: 'client-id' },
-  }));
+  const inspectLink = jest.fn(() =>
+    Promise.resolve({
+      status: 'current' as const,
+      purpose: 'activation' as const,
+    }),
+  );
+  const activate = jest.fn(() =>
+    Promise.resolve({ status: 'activated' as const }),
+  );
+  const requestRecovery = jest.fn(() =>
+    Promise.resolve({ status: 'accepted' as const }),
+  );
+  const completeRecovery = jest.fn(() =>
+    Promise.resolve({
+      status: 'recovered' as const,
+      credential: 'a'.repeat(43),
+    }),
+  );
+  const changeCurrentPassword = jest.fn(() => Promise.resolve(undefined));
+  const resolvePrincipal = jest.fn(() =>
+    Promise.resolve({
+      accountId: 'account-id',
+      authenticationSessionId: 'authentication-session-id',
+      identity: { kind: 'client' as const, clientId: 'client-id' },
+    }),
+  );
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
