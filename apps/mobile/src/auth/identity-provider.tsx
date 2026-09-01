@@ -1,6 +1,7 @@
 import {
   createContext,
   type PropsWithChildren,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -8,9 +9,14 @@ import {
 
 import type { MobileSession, SessionManager } from "./session-manager";
 
-type MobileIdentity = {
+type MobileIdentityState = {
   session: MobileSession | null;
   status: "restoring" | "signed-in" | "signed-out";
+};
+
+type MobileIdentity = MobileIdentityState & {
+  logout: () => Promise<void>;
+  start: (credential: string) => Promise<void>;
 };
 
 const MobileIdentityContext = createContext<MobileIdentity | undefined>(
@@ -25,7 +31,7 @@ export function MobileIdentityProvider({
   children,
   manager,
 }: MobileIdentityProviderProps) {
-  const [identity, setIdentity] = useState<MobileIdentity>({
+  const [identity, setIdentity] = useState<MobileIdentityState>({
     session: null,
     status: "restoring",
   });
@@ -47,8 +53,29 @@ export function MobileIdentityProvider({
     };
   }, [manager]);
 
+  const start = useCallback(
+    async (credential: string) => {
+      const session = await manager.start(credential);
+
+      setIdentity({
+        session,
+        status: session === null ? "signed-out" : "signed-in",
+      });
+    },
+    [manager],
+  );
+
+  const logout = useCallback(async () => {
+    if (identity.session === null) {
+      return;
+    }
+
+    await manager.logout(identity.session);
+    setIdentity({ session: null, status: "signed-out" });
+  }, [identity.session, manager]);
+
   return (
-    <MobileIdentityContext.Provider value={identity}>
+    <MobileIdentityContext.Provider value={{ ...identity, logout, start }}>
       {children}
     </MobileIdentityContext.Provider>
   );

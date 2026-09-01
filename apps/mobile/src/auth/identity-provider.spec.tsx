@@ -29,10 +29,10 @@ function IdentityActionsProbe() {
     <>
       <Text>{identity.status}</Text>
       <Button
-        onPress={() => void identity.start("new-credential")}
+        onPress={() => identity.start("new-credential")}
         title="Start"
       />
-      <Button onPress={() => void identity.logout()} title="Logout" />
+      <Button onPress={() => identity.logout()} title="Logout" />
     </>
   );
 }
@@ -82,13 +82,17 @@ describe("MobileIdentityProvider", () => {
       expect(screen.getByText("signed-out")).toBeOnTheScreen();
     });
 
-    fireEvent.press(screen.getByRole("button", { name: "Start" }));
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Start" }));
+    });
     await waitFor(() => {
       expect(screen.getByText("signed-in")).toBeOnTheScreen();
     });
     expect(manager.start).toHaveBeenCalledWith("new-credential");
 
-    fireEvent.press(screen.getByRole("button", { name: "Logout" }));
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Logout" }));
+    });
     await waitFor(() => {
       expect(screen.getByText("signed-out")).toBeOnTheScreen();
     });
