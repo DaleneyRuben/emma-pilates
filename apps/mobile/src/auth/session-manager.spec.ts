@@ -1,6 +1,30 @@
 import { createSessionManager } from "./session-manager";
 
 describe("createSessionManager", () => {
+  it("detects a biometric session without unlocking it during startup", async () => {
+    const loadWithBiometrics = jest
+      .fn()
+      .mockResolvedValue("protected-credential");
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: {
+        canUseBiometrics: () => true,
+        clear: jest.fn(),
+        hasBiometricCredential: jest.fn().mockResolvedValue(true),
+        load: jest.fn().mockResolvedValue(null),
+        loadWithBiometrics,
+        save: jest.fn(),
+        saveWithBiometrics: jest.fn(),
+      },
+      resolveCurrent: jest.fn(),
+      revokeCurrent: jest.fn(),
+    });
+
+    await expect(manager.restore()).resolves.toBeNull();
+    await expect(manager.hasBiometricSession()).resolves.toBe(true);
+    expect(loadWithBiometrics).not.toHaveBeenCalled();
+  });
+
   it("restores a stored credential and resolves its current Client Account", async () => {
     const resolveCurrent = jest.fn().mockResolvedValue({
       accountId: "account-1",
