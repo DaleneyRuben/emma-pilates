@@ -141,6 +141,10 @@ describe("AuthenticationFlow", () => {
   });
 
   it("starts the replacement Session after password recovery", async () => {
+    const inspectLink = jest.fn().mockResolvedValue({
+      purpose: "password_recovery",
+      status: "current",
+    });
     const completePasswordRecovery = jest.fn().mockResolvedValue({
       credential: "replacement-credential",
       status: "recovered",
@@ -148,11 +152,16 @@ describe("AuthenticationFlow", () => {
     const startRecoveredSession = jest.fn().mockResolvedValue(undefined);
     const screen = await render(
       <AuthenticationFlow
-        api={createApiMock({ completePasswordRecovery })}
+        api={createApiMock({ completePasswordRecovery, inspectLink })}
         intent={{ token: "recovery-token", type: "recover-password" }}
         onRecoveryCredential={startRecoveredSession}
       />,
     );
+
+    await waitFor(() => {
+      expect(inspectLink).toHaveBeenCalledWith("recovery-token");
+      expect(screen.getByLabelText("Nueva contraseña")).toBeOnTheScreen();
+    });
 
     await fireEvent.changeText(
       screen.getByLabelText("Nueva contraseña"),
@@ -176,17 +185,26 @@ describe("AuthenticationFlow", () => {
   });
 
   it("activates an Account without creating a Session", async () => {
+    const inspectLink = jest.fn().mockResolvedValue({
+      purpose: "activation",
+      status: "current",
+    });
     const activateAccount = jest
       .fn()
       .mockResolvedValue({ status: "activated" });
     const startRecoveredSession = jest.fn();
     const screen = await render(
       <AuthenticationFlow
-        api={createApiMock({ activateAccount })}
+        api={createApiMock({ activateAccount, inspectLink })}
         intent={{ token: "activation-token", type: "activate-account" }}
         onRecoveryCredential={startRecoveredSession}
       />,
     );
+
+    await waitFor(() => {
+      expect(inspectLink).toHaveBeenCalledWith("activation-token");
+      expect(screen.getByLabelText("Nueva contraseña")).toBeOnTheScreen();
+    });
 
     await fireEvent.changeText(
       screen.getByLabelText("Nueva contraseña"),
@@ -206,5 +224,21 @@ describe("AuthenticationFlow", () => {
     });
     expect(startRecoveredSession).not.toHaveBeenCalled();
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
+  });
+
+  it("rejects an expired password link before asking for a password", async () => {
+    const inspectLink = jest.fn().mockResolvedValue({ status: "expired" });
+    const screen = await render(
+      <AuthenticationFlow
+        api={createApiMock({ inspectLink })}
+        intent={{ token: "expired-token", type: "recover-password" }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(inspectLink).toHaveBeenCalledWith("expired-token");
+      expect(screen.getByText("Enlace no válido")).toBeOnTheScreen();
+    });
+    expect(screen.queryByLabelText("Nueva contraseña")).not.toBeOnTheScreen();
   });
 });
