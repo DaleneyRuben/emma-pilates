@@ -1,4 +1,4 @@
-import { getApiBaseUrl } from "./runtime";
+import { getApiBaseUrl, getMobileApiBaseUrl } from "./runtime";
 
 describe("getApiBaseUrl", () => {
   it("accepts an absolute HTTPS API URL", () => {
@@ -28,6 +28,17 @@ describe("getApiBaseUrl", () => {
   it("rejects a relative API URL", () => {
     expect(() => getApiBaseUrl({ EXPO_PUBLIC_API_URL: "/api/v1" })).toThrow(
       "absolute",
+    );
+  });
+});
+
+describe("getMobileApiBaseUrl", () => {
+  it("uses the local backend default only during development", () => {
+    expect(getMobileApiBaseUrl({}, true)).toBe(
+      "http://127.0.0.1:3100/api/v1",
+    );
+    expect(() => getMobileApiBaseUrl({}, false)).toThrow(
+      "EXPO_PUBLIC_API_URL",
     );
   });
 });
