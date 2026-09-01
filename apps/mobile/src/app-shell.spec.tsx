@@ -6,12 +6,28 @@ import {
 
 import App from "../App";
 
+function createAuthenticationApiMock(overrides = {}) {
+  return {
+    activateAccount: jest.fn(),
+    cancelRegistration: jest.fn(),
+    completePasswordRecovery: jest.fn(),
+    correctRegistrationEmail: jest.fn(),
+    inspectLink: jest.fn(),
+    register: jest.fn(),
+    requestPasswordRecovery: jest.fn(),
+    resendRegistrationVerification: jest.fn(),
+    verifyClientEmail: jest.fn(),
+    ...overrides,
+  };
+}
+
 describe("App", () => {
   it("starts with the unauthenticated navigation flow", async () => {
     const screen = await render(
       <App
         runtime={{
           allowedLinkHosts: ["links.emmapilates.test"],
+          authenticationApi: createAuthenticationApiMock(),
           linkSource: {
             addEventListener: () => ({ remove: jest.fn() }),
             getInitialURL: async () => null,
@@ -43,6 +59,7 @@ describe("App", () => {
       <App
         runtime={{
           allowedLinkHosts: ["links.emmapilates.test"],
+          authenticationApi: createAuthenticationApiMock(),
           linkSource: {
             addEventListener: () => ({ remove: jest.fn() }),
             getInitialURL: async () => null,
@@ -81,11 +98,46 @@ describe("App", () => {
     expect(start).toHaveBeenCalledWith("mobile-credential");
   });
 
+  it("routes a verified email link into the authentication flow", async () => {
+    const verifyClientEmail = jest
+      .fn()
+      .mockResolvedValue({ status: "verified" });
+    const screen = await render(
+      <App
+        runtime={{
+          allowedLinkHosts: ["links.emmapilates.test"],
+          authenticationApi: createAuthenticationApiMock({
+            verifyClientEmail,
+          }),
+          linkSource: {
+            addEventListener: () => ({ remove: jest.fn() }),
+            getInitialURL: async () =>
+              "https://links.emmapilates.test/authentication/verify-email?token=verification-token",
+          },
+          login: jest.fn(),
+          sessionManager: {
+            hasBiometricSession: jest.fn().mockResolvedValue(false),
+            logout: jest.fn(),
+            restore: jest.fn().mockResolvedValue(null),
+            start: jest.fn(),
+            unlockWithBiometrics: jest.fn(),
+          },
+        }}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(verifyClientEmail).toHaveBeenCalledWith("verification-token");
+      expect(screen.getByText("Correo verificado")).toBeOnTheScreen();
+    });
+  });
+
   it("restores an authenticated Account into its Role navigation", async () => {
     const screen = await render(
       <App
         runtime={{
           allowedLinkHosts: ["links.emmapilates.test"],
+          authenticationApi: createAuthenticationApiMock(),
           linkSource: {
             addEventListener: () => ({ remove: jest.fn() }),
             getInitialURL: async () => null,
