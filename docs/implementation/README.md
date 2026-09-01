@@ -55,10 +55,12 @@ in
 The pg-boss authentication-email foundation and complete backend Identity slice
 are implemented: Client registration and verification, Account activation,
 Login and logout, password recovery and change, Account-wide Authentication
-Session revocation, and verified-link inspection. The next unblocked item is
-`MOB-005`: secure credential persistence, startup session restoration, logout,
-central verified-link ingress, and current Role routing. Authentication screens
-in `MOB-004` still wait for the corrected `DES-001` export.
+Session revocation, and verified-link inspection. `MOB-005` now connects the
+generated Authentication Session API to SecureStore, restores the current
+Account at startup, routes every current Role, clears Account cache on logout,
+and centralizes safe authentication-link ingress. Authentication screens in
+`MOB-004` still wait for the corrected `DES-001` export. The next unblocked item
+is optional local biometric gating in `MOB-006`.
 
 Authentication follow-ups 33–38 are pending in the design workflow. Until a new
 export applies and verifies them, generated authentication screens still show
