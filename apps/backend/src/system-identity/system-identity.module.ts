@@ -7,6 +7,24 @@ import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
 import { createPgBoss, startInstalledPgBoss } from '../jobs/pg-boss-runtime';
 import {
+  AccountSecurityController,
+  accountActivation,
+  authenticationLinkInspection,
+  currentPasswordChange,
+  passwordRecoveryCompletion,
+  passwordRecoveryRequest,
+} from './account-security/account-security.controller';
+import {
+  activateAccount,
+  inspectAuthenticationLink,
+} from './account-security/authentication-links';
+import { changePassword } from './account-security/change-password';
+import {
+  completePasswordRecovery,
+  requestPasswordRecovery,
+} from './account-security/password-recovery';
+import { PrismaAccountSecurityGateway } from './account-security/prisma-account-security-gateway';
+import {
   authenticatedPrincipalResolver,
   AuthenticationController,
   currentSessionLogout,
@@ -33,6 +51,7 @@ const registrationGateway = Symbol('registrationGateway');
 const registrationPgBoss = Symbol('registrationPgBoss');
 const systemIdentityPrisma = Symbol('systemIdentityPrisma');
 const authenticationGateway = Symbol('authenticationGateway');
+const accountSecurityGateway = Symbol('accountSecurityGateway');
 
 class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
   constructor(
@@ -51,6 +70,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
 
 @Module({
   controllers: [
+    AccountSecurityController,
     AuthenticationController,
     ClientEmailVerificationController,
     ClientRegistrationController,
@@ -112,6 +132,107 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
       inject: [systemIdentityPrisma],
       useFactory: (prisma: PrismaClient) =>
         new PrismaAuthenticationGateway(prisma),
+    },
+    {
+      provide: accountSecurityGateway,
+      inject: [systemIdentityPrisma, registrationPgBoss, ConfigService],
+      useFactory: (
+        prisma: PrismaClient,
+        boss: PgBoss,
+        config: ConfigService<Environment, true>,
+      ) =>
+        new PrismaAccountSecurityGateway(prisma, {
+          boss,
+          digestEmail: (email) =>
+            createHmac(
+              'sha256',
+              config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
+            )
+              .update(email)
+              .digest(),
+        }),
+    },
+    {
+      provide: authenticationLinkInspection,
+      inject: [accountSecurityGateway],
+      useFactory: (gateway: PrismaAccountSecurityGateway) => (token: string) =>
+        inspectAuthenticationLink(token, {
+          gateway,
+          digestToken: authenticationTokens.digest,
+          hashPassword: argon2PasswordHasher.hash,
+          now: () => new Date(),
+        }),
+    },
+    {
+      provide: accountActivation,
+      inject: [accountSecurityGateway],
+      useFactory:
+        (gateway: PrismaAccountSecurityGateway) =>
+        (command: Parameters<typeof activateAccount>[0]) =>
+          activateAccount(command, {
+            gateway,
+            digestToken: authenticationTokens.digest,
+            hashPassword: argon2PasswordHasher.hash,
+            now: () => new Date(),
+          }),
+    },
+    {
+      provide: passwordRecoveryRequest,
+      inject: [accountSecurityGateway, AuthenticationLinkCipher],
+      useFactory:
+        (
+          gateway: PrismaAccountSecurityGateway,
+          linkCipher: AuthenticationLinkCipher,
+        ) =>
+        (command: Parameters<typeof requestPasswordRecovery>[0]) =>
+          requestPasswordRecovery(command, {
+            gateway,
+            issueLinkToken: authenticationTokens.issue,
+            issueSessionCredential: authenticationTokens.issue,
+            digestToken: authenticationTokens.digest,
+            encryptLinkSecret: (secret) => linkCipher.encrypt(secret),
+            hashPassword: argon2PasswordHasher.hash,
+            now: () => new Date(),
+            newTokenId: randomUUID,
+            newSessionId: randomUUID,
+            newAuditRecordId: randomUUID,
+          }),
+    },
+    {
+      provide: passwordRecoveryCompletion,
+      inject: [accountSecurityGateway, AuthenticationLinkCipher],
+      useFactory:
+        (
+          gateway: PrismaAccountSecurityGateway,
+          linkCipher: AuthenticationLinkCipher,
+        ) =>
+        (command: Parameters<typeof completePasswordRecovery>[0]) =>
+          completePasswordRecovery(command, {
+            gateway,
+            issueLinkToken: authenticationTokens.issue,
+            issueSessionCredential: authenticationTokens.issue,
+            digestToken: authenticationTokens.digest,
+            encryptLinkSecret: (secret) => linkCipher.encrypt(secret),
+            hashPassword: argon2PasswordHasher.hash,
+            now: () => new Date(),
+            newTokenId: randomUUID,
+            newSessionId: randomUUID,
+            newAuditRecordId: randomUUID,
+          }),
+    },
+    {
+      provide: currentPasswordChange,
+      inject: [accountSecurityGateway],
+      useFactory:
+        (gateway: PrismaAccountSecurityGateway) =>
+        (command: Parameters<typeof changePassword>[0]) =>
+          changePassword(command, {
+            gateway,
+            verifyPassword: argon2PasswordHasher.verify,
+            hashPassword: argon2PasswordHasher.hash,
+            now: () => new Date(),
+            newAuditRecordId: randomUUID,
+          }),
     },
     {
       provide: mobileLogin,
