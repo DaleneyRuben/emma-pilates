@@ -39,6 +39,29 @@ describe("createSessionApi", () => {
     ).toBe("installation-1");
   });
 
+  it("returns a neutral rejection for incorrect Login credentials", async () => {
+    const api = createSessionApi({
+      baseUrl: "https://api.example.com/api/v1",
+      fetch: jest.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            code: "authentication_failed",
+            status: 401,
+          }),
+          { status: 401 },
+        ),
+      ),
+    });
+
+    await expect(
+      api.login({
+        clientIdentifier: "installation-1",
+        email: "ana@example.com",
+        password: "incorrect",
+      }),
+    ).resolves.toEqual({ status: "rejected" });
+  });
+
   it("resolves the current Account through the generated API client", async () => {
     const fetchMock = jest.fn().mockResolvedValue(
       new Response(
