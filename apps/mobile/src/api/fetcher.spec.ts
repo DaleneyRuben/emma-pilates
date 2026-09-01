@@ -19,4 +19,20 @@ describe("createApiFetcher", () => {
       (fetchMock.mock.calls[0][1]?.headers as Headers).get("Authorization"),
     ).toBe("Bearer credential");
   });
+
+  it("does not duplicate the API version from a generated request path", async () => {
+    const fetchMock = jest.fn().mockResolvedValue(new Response("{}"));
+    const fetcher = createApiFetcher({
+      baseUrl: "https://api.example.com/api/v1",
+      getCredential: async () => null,
+      fetch: fetchMock,
+    });
+
+    await fetcher("/api/v1/authentication-sessions/current");
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.example.com/api/v1/authentication-sessions/current",
+      expect.any(Object),
+    );
+  });
 });
