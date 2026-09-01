@@ -11,12 +11,20 @@ import type { MobileSession, SessionManager } from "./session-manager";
 
 type MobileIdentityState = {
   session: MobileSession | null;
-  status: "restoring" | "signed-in" | "signed-out";
+  status:
+    | "biometric-locked"
+    | "restoring"
+    | "signed-in"
+    | "signed-out";
 };
 
 type MobileIdentity = MobileIdentityState & {
   logout: () => Promise<void>;
-  start: (credential: string) => Promise<void>;
+  start: (
+    credential: string,
+    options?: { protectWithBiometrics?: boolean },
+  ) => Promise<void>;
+  unlockWithBiometrics: () => Promise<void>;
 };
 
 const MobileIdentityContext = createContext<MobileIdentity | undefined>(
@@ -39,11 +47,19 @@ export function MobileIdentityProvider({
   useEffect(() => {
     let active = true;
 
-    void manager.restore().then((session) => {
+    void Promise.all([
+      manager.restore(),
+      manager.hasBiometricSession(),
+    ]).then(([session, hasBiometricSession]) => {
       if (active) {
         setIdentity({
           session,
-          status: session === null ? "signed-out" : "signed-in",
+          status:
+            session === null && hasBiometricSession
+              ? "biometric-locked"
+              : session === null
+                ? "signed-out"
+                : "signed-in",
         });
       }
     });
@@ -54,8 +70,14 @@ export function MobileIdentityProvider({
   }, [manager]);
 
   const start = useCallback(
-    async (credential: string) => {
-      const session = await manager.start(credential);
+    async (
+      credential: string,
+      options?: { protectWithBiometrics?: boolean },
+    ) => {
+      const session =
+        options === undefined
+          ? await manager.start(credential)
+          : await manager.start(credential, options);
 
       setIdentity({
         session,
@@ -64,6 +86,15 @@ export function MobileIdentityProvider({
     },
     [manager],
   );
+
+  const unlockWithBiometrics = useCallback(async () => {
+    const session = await manager.unlockWithBiometrics();
+
+    setIdentity({
+      session,
+      status: session === null ? "signed-out" : "signed-in",
+    });
+  }, [manager]);
 
   const logout = useCallback(async () => {
     if (identity.session === null) {
@@ -75,7 +106,9 @@ export function MobileIdentityProvider({
   }, [identity.session, manager]);
 
   return (
-    <MobileIdentityContext.Provider value={{ ...identity, logout, start }}>
+    <MobileIdentityContext.Provider
+      value={{ ...identity, logout, start, unlockWithBiometrics }}
+    >
       {children}
     </MobileIdentityContext.Provider>
   );
