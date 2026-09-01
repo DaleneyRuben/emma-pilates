@@ -1,11 +1,15 @@
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
+import type { PgBoss } from 'pg-boss';
 import {
   AuditActorKind,
   AuditOutcome,
   AuthenticationSessionRevocationReason,
   AuthenticationSessionSurface,
+  AuthenticationThrottleEventKind,
+  AuthenticationThrottlePurpose,
   AuthenticationTokenPurpose,
 } from '../../generated/prisma/enums';
+import { scheduleAuthenticationEmail } from '../../jobs/authentication-email/schedule-authentication-email';
 import type { AuthenticationLinkGateway } from './authentication-links';
 import type { PasswordChangeGateway } from './change-password';
 import type { PasswordRecoveryGateway } from './password-recovery';
@@ -16,9 +20,105 @@ export class PrismaAccountSecurityGateway
   implements
     AuthenticationLinkGateway,
     PasswordChangeGateway,
-    Pick<PasswordRecoveryGateway, 'inspectRecoveryLink' | 'completeRecovery'>
+    PasswordRecoveryGateway
 {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly recoveryDependencies?: {
+      boss: Pick<PgBoss, 'send'>;
+      digestEmail(email: string): Uint8Array;
+    },
+  ) {}
+
+  requestRecovery(
+    input: Parameters<PasswordRecoveryGateway['requestRecovery']>[0],
+  ): ReturnType<PasswordRecoveryGateway['requestRecovery']> {
+    if (this.recoveryDependencies === undefined) {
+      throw new Error('Password recovery email dependencies are required');
+    }
+
+    return this.prisma.$transaction(async (transaction) => {
+      const account = await transaction.account.findUnique({
+        where: { email: input.email },
+        select: {
+          id: true,
+          passwordHash: true,
+          emailVerifiedAt: true,
+          activatedAt: true,
+          disabledAt: true,
+        },
+      });
+
+      if (
+        account === null ||
+        account.passwordHash === null ||
+        account.emailVerifiedAt === null ||
+        account.activatedAt === null ||
+        account.disabledAt !== null
+      ) {
+        return 'unknown';
+      }
+
+      const recipientDigest = toPrismaBytes(
+        this.recoveryDependencies!.digestEmail(input.email),
+      );
+      const events = await transaction.authenticationThrottleEvent.findMany({
+        where: {
+          purpose: AuthenticationThrottlePurpose.PASSWORD_RECOVERY,
+          eventKind: AuthenticationThrottleEventKind.MESSAGE_ISSUED,
+          recipientDigest,
+          occurredAt: {
+            gte: new Date(input.requestedAt.getTime() - dayMilliseconds),
+          },
+        },
+        select: { occurredAt: true },
+      });
+
+      if (!canIssueRecoveryEmail(events, input.requestedAt)) {
+        return 'suppressed';
+      }
+
+      await transaction.authenticationToken.updateMany({
+        where: {
+          accountId: account.id,
+          purpose: AuthenticationTokenPurpose.PASSWORD_RECOVERY,
+          usedAt: null,
+          invalidatedAt: null,
+        },
+        data: { invalidatedAt: input.requestedAt },
+      });
+      await transaction.authenticationToken.create({
+        data: {
+          id: input.token.id,
+          accountId: account.id,
+          purpose: AuthenticationTokenPurpose.PASSWORD_RECOVERY,
+          tokenDigest: toPrismaBytes(input.token.digest),
+          issuedAt: input.requestedAt,
+          expiresAt: input.token.expiresAt,
+        },
+      });
+      await transaction.authenticationThrottleEvent.create({
+        data: {
+          purpose: AuthenticationThrottlePurpose.PASSWORD_RECOVERY,
+          eventKind: AuthenticationThrottleEventKind.MESSAGE_ISSUED,
+          recipientDigest,
+          occurredAt: input.requestedAt,
+          expiresAt: new Date(input.requestedAt.getTime() + dayMilliseconds),
+        },
+      });
+      await scheduleAuthenticationEmail(
+        this.recoveryDependencies!.boss,
+        transaction,
+        {
+          version: 1,
+          accountId: account.id,
+          ...input.emailJob,
+        },
+      );
+
+      return 'issued';
+    });
+  }
 
   async inspectLink(
     input: Parameters<AuthenticationLinkGateway['inspectLink']>[0],
@@ -238,4 +338,24 @@ const toPrismaBytes = (value: Uint8Array): Uint8Array<ArrayBuffer> => {
   bytes.set(value);
 
   return bytes;
+};
+
+const minuteMilliseconds = 60 * 1_000;
+const hourMilliseconds = 60 * minuteMilliseconds;
+const dayMilliseconds = 24 * hourMilliseconds;
+
+const canIssueRecoveryEmail = (
+  events: { occurredAt: Date }[],
+  now: Date,
+): boolean => {
+  const inLastFiveMinutes = events.some(
+    ({ occurredAt }) =>
+      occurredAt >= new Date(now.getTime() - 5 * minuteMilliseconds),
+  );
+  const inLastHour = events.filter(
+    ({ occurredAt }) =>
+      occurredAt >= new Date(now.getTime() - hourMilliseconds),
+  ).length;
+
+  return !inLastFiveMinutes && inLastHour < 3 && events.length < 5;
 };
