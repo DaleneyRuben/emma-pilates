@@ -21,16 +21,25 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
+  AccountActivationResultDto,
+  AuthenticationLinkInspectionDto,
+  AuthenticationLinkTokenDto,
   AuthenticationSessionCredentialDto,
+  ChangeCurrentPasswordDto,
   ClientEmailVerificationResultDto,
+  CompleteAccountActivationDto,
+  CompletePasswordRecoveryDto,
   CorrectPendingClientEmailDto,
   CreateAuthenticationSessionDto,
   CurrentAuthenticationPrincipalDto,
   LivenessResponseDto,
+  PasswordRecoveryRequestResultDto,
+  PasswordRecoveryResultDto,
   PendingClientRegistrationDto,
   PendingEmailCorrectionDto,
   PendingRegistrationContinuationDto,
   PendingVerificationResendDto,
+  RequestPasswordRecoveryDto,
   StartClientRegistrationDto,
   VerifyClientEmailDto,
 } from "./models";
@@ -236,6 +245,646 @@ export function useHealthControllerGetLiveness<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type inspectAuthenticationLinkResponse200 = {
+  data: AuthenticationLinkInspectionDto;
+  status: 200;
+};
+
+export type inspectAuthenticationLinkResponseSuccess =
+  inspectAuthenticationLinkResponse200 & {
+    headers: Headers;
+  };
+export type inspectAuthenticationLinkResponse =
+  inspectAuthenticationLinkResponseSuccess;
+
+export const getInspectAuthenticationLinkUrl = () => {
+  return `/api/v1/authentication-links/inspection`;
+};
+
+export const inspectAuthenticationLink = async (
+  authenticationLinkTokenDto: AuthenticationLinkTokenDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<inspectAuthenticationLinkResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getInspectAuthenticationLinkUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(authenticationLinkTokenDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: inspectAuthenticationLinkResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as inspectAuthenticationLinkResponse;
+};
+
+export const getInspectAuthenticationLinkMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof inspectAuthenticationLink>>,
+    TError,
+    InspectAuthenticationLinkMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof inspectAuthenticationLink>>,
+  TError,
+  InspectAuthenticationLinkMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["inspectAuthenticationLink"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof inspectAuthenticationLink>>,
+    InspectAuthenticationLinkMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return inspectAuthenticationLink(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type InspectAuthenticationLinkMutationResult = NonNullable<
+  Awaited<ReturnType<typeof inspectAuthenticationLink>>
+>;
+export type InspectAuthenticationLinkMutationBody = AuthenticationLinkTokenDto;
+export type InspectAuthenticationLinkMutationError = unknown;
+export type InspectAuthenticationLinkMutationVariables = {
+  data: AuthenticationLinkTokenDto;
+};
+
+export const useInspectAuthenticationLink = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof inspectAuthenticationLink>>,
+      TError,
+      InspectAuthenticationLinkMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof inspectAuthenticationLink>>,
+  TError,
+  InspectAuthenticationLinkMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getInspectAuthenticationLinkMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type activateAccountResponse200 = {
+  data: AccountActivationResultDto;
+  status: 200;
+};
+
+export type activateAccountResponseSuccess = activateAccountResponse200 & {
+  headers: Headers;
+};
+export type activateAccountResponse = activateAccountResponseSuccess;
+
+export const getActivateAccountUrl = () => {
+  return `/api/v1/account-activations`;
+};
+
+export const activateAccount = async (
+  completeAccountActivationDto: CompleteAccountActivationDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<activateAccountResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getActivateAccountUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(completeAccountActivationDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: activateAccountResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as activateAccountResponse;
+};
+
+export const getActivateAccountMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof activateAccount>>,
+    TError,
+    ActivateAccountMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof activateAccount>>,
+  TError,
+  ActivateAccountMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["activateAccount"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof activateAccount>>,
+    ActivateAccountMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return activateAccount(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ActivateAccountMutationResult = NonNullable<
+  Awaited<ReturnType<typeof activateAccount>>
+>;
+export type ActivateAccountMutationBody = CompleteAccountActivationDto;
+export type ActivateAccountMutationError = unknown;
+export type ActivateAccountMutationVariables = {
+  data: CompleteAccountActivationDto;
+};
+
+export const useActivateAccount = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof activateAccount>>,
+      TError,
+      ActivateAccountMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof activateAccount>>,
+  TError,
+  ActivateAccountMutationVariables,
+  TContext
+> => {
+  return useMutation(getActivateAccountMutationOptions(options), queryClient);
+};
+
+export type requestPasswordRecoveryResponse202 = {
+  data: PasswordRecoveryRequestResultDto;
+  status: 202;
+};
+
+export type requestPasswordRecoveryResponseSuccess =
+  requestPasswordRecoveryResponse202 & {
+    headers: Headers;
+  };
+export type requestPasswordRecoveryResponse =
+  requestPasswordRecoveryResponseSuccess;
+
+export const getRequestPasswordRecoveryUrl = () => {
+  return `/api/v1/password-recovery-requests`;
+};
+
+export const requestPasswordRecovery = async (
+  requestPasswordRecoveryDto: RequestPasswordRecoveryDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<requestPasswordRecoveryResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRequestPasswordRecoveryUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(requestPasswordRecoveryDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: requestPasswordRecoveryResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as requestPasswordRecoveryResponse;
+};
+
+export const getRequestPasswordRecoveryMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestPasswordRecovery>>,
+    TError,
+    RequestPasswordRecoveryMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestPasswordRecovery>>,
+  TError,
+  RequestPasswordRecoveryMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["requestPasswordRecovery"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestPasswordRecovery>>,
+    RequestPasswordRecoveryMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestPasswordRecovery(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestPasswordRecoveryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestPasswordRecovery>>
+>;
+export type RequestPasswordRecoveryMutationBody = RequestPasswordRecoveryDto;
+export type RequestPasswordRecoveryMutationError = unknown;
+export type RequestPasswordRecoveryMutationVariables = {
+  data: RequestPasswordRecoveryDto;
+};
+
+export const useRequestPasswordRecovery = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof requestPasswordRecovery>>,
+      TError,
+      RequestPasswordRecoveryMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof requestPasswordRecovery>>,
+  TError,
+  RequestPasswordRecoveryMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRequestPasswordRecoveryMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type completePasswordRecoveryResponse201 = {
+  data: PasswordRecoveryResultDto;
+  status: 201;
+};
+
+export type completePasswordRecoveryResponseSuccess =
+  completePasswordRecoveryResponse201 & {
+    headers: Headers;
+  };
+export type completePasswordRecoveryResponse =
+  completePasswordRecoveryResponseSuccess;
+
+export const getCompletePasswordRecoveryUrl = () => {
+  return `/api/v1/password-recoveries`;
+};
+
+export const completePasswordRecovery = async (
+  completePasswordRecoveryDto: CompletePasswordRecoveryDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<completePasswordRecoveryResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCompletePasswordRecoveryUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(completePasswordRecoveryDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: completePasswordRecoveryResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as completePasswordRecoveryResponse;
+};
+
+export const getCompletePasswordRecoveryMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof completePasswordRecovery>>,
+    TError,
+    CompletePasswordRecoveryMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof completePasswordRecovery>>,
+  TError,
+  CompletePasswordRecoveryMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["completePasswordRecovery"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof completePasswordRecovery>>,
+    CompletePasswordRecoveryMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return completePasswordRecovery(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CompletePasswordRecoveryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof completePasswordRecovery>>
+>;
+export type CompletePasswordRecoveryMutationBody = CompletePasswordRecoveryDto;
+export type CompletePasswordRecoveryMutationError = unknown;
+export type CompletePasswordRecoveryMutationVariables = {
+  data: CompletePasswordRecoveryDto;
+};
+
+export const useCompletePasswordRecovery = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof completePasswordRecovery>>,
+      TError,
+      CompletePasswordRecoveryMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof completePasswordRecovery>>,
+  TError,
+  CompletePasswordRecoveryMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCompletePasswordRecoveryMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type changeCurrentAccountPasswordResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type changeCurrentAccountPasswordResponseSuccess =
+  changeCurrentAccountPasswordResponse204 & {
+    headers: Headers;
+  };
+export type changeCurrentAccountPasswordResponse =
+  changeCurrentAccountPasswordResponseSuccess;
+
+export const getChangeCurrentAccountPasswordUrl = () => {
+  return `/api/v1/accounts/current/password`;
+};
+
+export const changeCurrentAccountPassword = async (
+  changeCurrentPasswordDto: ChangeCurrentPasswordDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<changeCurrentAccountPasswordResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getChangeCurrentAccountPasswordUrl(), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(changeCurrentPasswordDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: changeCurrentAccountPasswordResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as changeCurrentAccountPasswordResponse;
+};
+
+export const getChangeCurrentAccountPasswordMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof changeCurrentAccountPassword>>,
+    TError,
+    ChangeCurrentAccountPasswordMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof changeCurrentAccountPassword>>,
+  TError,
+  ChangeCurrentAccountPasswordMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["changeCurrentAccountPassword"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof changeCurrentAccountPassword>>,
+    ChangeCurrentAccountPasswordMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return changeCurrentAccountPassword(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ChangeCurrentAccountPasswordMutationResult = NonNullable<
+  Awaited<ReturnType<typeof changeCurrentAccountPassword>>
+>;
+export type ChangeCurrentAccountPasswordMutationBody = ChangeCurrentPasswordDto;
+export type ChangeCurrentAccountPasswordMutationError = unknown;
+export type ChangeCurrentAccountPasswordMutationVariables = {
+  data: ChangeCurrentPasswordDto;
+};
+
+export const useChangeCurrentAccountPassword = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof changeCurrentAccountPassword>>,
+      TError,
+      ChangeCurrentAccountPasswordMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof changeCurrentAccountPassword>>,
+  TError,
+  ChangeCurrentAccountPasswordMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getChangeCurrentAccountPasswordMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type createMobileAuthenticationSessionResponse201 = {
   data: AuthenticationSessionCredentialDto;

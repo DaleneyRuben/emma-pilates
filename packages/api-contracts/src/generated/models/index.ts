@@ -5,16 +5,29 @@
  * OpenAPI spec version: 1.0.0
  */
 
+export * from "./accountActivationResultDto";
+export * from "./accountActivationResultDtoStatus";
+export * from "./authenticationLinkInspectionDto";
+export * from "./authenticationLinkInspectionDtoPurpose";
+export * from "./authenticationLinkInspectionDtoStatus";
+export * from "./authenticationLinkTokenDto";
 export * from "./authenticationSessionCredentialDto";
+export * from "./changeCurrentPasswordDto";
 export * from "./clientAuthenticationIdentityDto";
 export * from "./clientAuthenticationIdentityDtoKind";
 export * from "./clientEmailVerificationResultDto";
 export * from "./clientEmailVerificationResultDtoStatus";
+export * from "./completeAccountActivationDto";
+export * from "./completePasswordRecoveryDto";
 export * from "./correctPendingClientEmailDto";
 export * from "./createAuthenticationSessionDto";
 export * from "./currentAuthenticationPrincipalDto";
 export * from "./livenessResponseDto";
 export * from "./livenessResponseDtoStatus";
+export * from "./passwordRecoveryRequestResultDto";
+export * from "./passwordRecoveryRequestResultDtoStatus";
+export * from "./passwordRecoveryResultDto";
+export * from "./passwordRecoveryResultDtoStatus";
 export * from "./pendingClientRegistrationDto";
 export * from "./pendingClientRegistrationDtoStatus";
 export * from "./pendingEmailCorrectionDto";
@@ -22,6 +35,7 @@ export * from "./pendingEmailCorrectionDtoStatus";
 export * from "./pendingRegistrationContinuationDto";
 export * from "./pendingVerificationResendDto";
 export * from "./pendingVerificationResendDtoStatus";
+export * from "./requestPasswordRecoveryDto";
 export * from "./staffAuthenticationIdentityDto";
 export * from "./staffAuthenticationIdentityDtoKind";
 export * from "./staffAuthenticationIdentityDtoRole";

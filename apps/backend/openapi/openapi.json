@@ -22,6 +22,164 @@
         ]
       }
     },
+    "/api/v1/authentication-links/inspection": {
+      "post": {
+        "operationId": "inspectAuthenticationLink",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticationLinkTokenDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationLinkInspectionDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "AccountSecurity"
+        ]
+      }
+    },
+    "/api/v1/account-activations": {
+      "post": {
+        "operationId": "activateAccount",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteAccountActivationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountActivationResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "AccountSecurity"
+        ]
+      }
+    },
+    "/api/v1/password-recovery-requests": {
+      "post": {
+        "operationId": "requestPasswordRecovery",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestPasswordRecoveryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordRecoveryRequestResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "AccountSecurity"
+        ]
+      }
+    },
+    "/api/v1/password-recoveries": {
+      "post": {
+        "operationId": "completePasswordRecovery",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompletePasswordRecoveryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordRecoveryResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "AccountSecurity"
+        ]
+      }
+    },
+    "/api/v1/accounts/current/password": {
+      "patch": {
+        "operationId": "changeCurrentAccountPassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeCurrentPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AccountSecurity"
+        ]
+      }
+    },
     "/api/v1/authentication-sessions": {
       "post": {
         "operationId": "createMobileAuthenticationSession",
@@ -292,6 +450,162 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "AuthenticationLinkTokenDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "AuthenticationLinkInspectionDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "current",
+              "expired",
+              "invalid"
+            ]
+          },
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "activation",
+              "password_recovery"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CompleteAccountActivationDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 1,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "AccountActivationResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "activated",
+              "expired",
+              "invalid"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "RequestPasswordRecoveryDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "PasswordRecoveryRequestResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "accepted"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CompletePasswordRecoveryDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "writeOnly": true
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 1,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "token",
+          "password"
+        ]
+      },
+      "PasswordRecoveryResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "recovered",
+              "expired",
+              "invalid"
+            ]
+          },
+          "credential": {
+            "type": "string",
+            "description": "Opaque bearer credential returned once"
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "ChangeCurrentPasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "format": "password",
+            "minLength": 1,
+            "writeOnly": true
+          },
+          "newPassword": {
+            "type": "string",
+            "format": "password",
+            "minLength": 1,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
         ]
       },
       "ClientAuthenticationIdentityDto": {
