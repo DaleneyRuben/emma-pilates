@@ -1,4 +1,8 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import {
+  fireEvent,
+  render,
+  waitFor,
+} from "@testing-library/react-native";
 
 import {
   getRootRouteForRole,
@@ -50,6 +54,30 @@ describe("MobileNavigation", () => {
     );
 
     expect(unlockWithBiometrics).toHaveBeenCalledTimes(1);
+  });
+
+  it("submits email and password through the Login boundary", async () => {
+    const login = jest.fn().mockResolvedValue(undefined);
+    const screen = await render(<MobileNavigation onLogin={login} />);
+
+    fireEvent.changeText(
+      screen.getByLabelText("Correo electrónico"),
+      "ana@example.com",
+    );
+    fireEvent.changeText(
+      screen.getByLabelText("Contraseña"),
+      "local password",
+    );
+    fireEvent.press(
+      screen.getByRole("button", { name: "Iniciar sesión" }),
+    );
+
+    await waitFor(() => {
+      expect(login).toHaveBeenCalledWith({
+        email: "ana@example.com",
+        password: "local password",
+      });
+    });
   });
 
   it.each([
