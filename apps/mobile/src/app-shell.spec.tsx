@@ -17,6 +17,7 @@ describe("App", () => {
             logout: jest.fn(),
             restore: jest.fn().mockResolvedValue(null),
             start: jest.fn(),
+            unlockWithBiometrics: jest.fn(),
           },
         }}
       />,
@@ -44,6 +45,7 @@ describe("App", () => {
               role: "administrator",
             }),
             start: jest.fn(),
+            unlockWithBiometrics: jest.fn(),
           },
         }}
       />,

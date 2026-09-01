@@ -36,6 +36,7 @@ export type SessionManager = {
   logout: (session: MobileSession) => Promise<void>;
   restore: () => Promise<MobileSession | null>;
   start: (credential: string) => Promise<MobileSession | null>;
+  unlockWithBiometrics: () => Promise<MobileSession | null>;
 };
 
 function toMobileSession(
@@ -88,6 +89,16 @@ export function createSessionManager(
     },
     async start(credential: string): Promise<MobileSession | null> {
       await credentialStore.save(credential);
+
+      return resolveCredential(credential);
+    },
+    async unlockWithBiometrics(): Promise<MobileSession | null> {
+      const credential =
+        (await credentialStore.loadWithBiometrics?.()) ?? null;
+
+      if (credential === null) {
+        return null;
+      }
 
       return resolveCredential(credential);
     },
