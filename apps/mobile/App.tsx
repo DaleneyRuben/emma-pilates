@@ -12,7 +12,7 @@ import {
   type SessionManager,
 } from "./src/auth/session-manager";
 import { credentialStore } from "./src/auth/credential-store";
-import { getApiBaseUrl } from "./src/config/runtime";
+import { getMobileApiBaseUrl } from "./src/config/runtime";
 import type { LinkSource } from "./src/ingress/link-ingress";
 import { VerifiedLinkProvider } from "./src/ingress/verified-link-provider";
 import { fontAssets } from "./src/ui/fonts";
@@ -27,9 +27,10 @@ type MobileRuntime = {
 };
 
 function createDefaultRuntime(): MobileRuntime {
-  const apiBaseUrl = getApiBaseUrl({
-    EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL,
-  });
+  const apiBaseUrl = getMobileApiBaseUrl(
+    { EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL },
+    __DEV__,
+  );
   const sessionApi = createSessionApi({ baseUrl: apiBaseUrl });
 
   return {
