@@ -29,6 +29,19 @@ describe("MobileNavigation", () => {
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
   });
 
+  it.each([
+    ["client", "Inicio"],
+    ["trainer", "Mi agenda"],
+    ["assistant", "Buscar cliente"],
+    ["administrator", "Pagos pendientes"],
+    ["nutritionist", "Mi agenda"],
+  ] as const)("renders only the %s Role navigation", async (role, label) => {
+    const screen = await render(<MobileNavigation role={role} />);
+
+    expect(screen.getByLabelText(label)).toBeOnTheScreen();
+    expect(screen.queryByLabelText("Iniciar sesión")).not.toBeOnTheScreen();
+  });
+
   it("hides the generated native stack header", () => {
     expect(unauthenticatedStackOptions).toEqual({ headerShown: false });
   });
