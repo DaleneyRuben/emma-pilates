@@ -35,7 +35,10 @@ export type SessionManager = {
   hasBiometricSession: () => Promise<boolean>;
   logout: (session: MobileSession) => Promise<void>;
   restore: () => Promise<MobileSession | null>;
-  start: (credential: string) => Promise<MobileSession | null>;
+  start: (
+    credential: string,
+    options?: { protectWithBiometrics?: boolean },
+  ) => Promise<MobileSession | null>;
   unlockWithBiometrics: () => Promise<MobileSession | null>;
 };
 
@@ -87,8 +90,19 @@ export function createSessionManager(
 
       return resolveCredential(credential);
     },
-    async start(credential: string): Promise<MobileSession | null> {
-      await credentialStore.save(credential);
+    async start(
+      credential: string,
+      options = {},
+    ): Promise<MobileSession | null> {
+      if (options.protectWithBiometrics) {
+        if (credentialStore.saveWithBiometrics === undefined) {
+          throw new Error("Biometric credential storage is unavailable");
+        }
+
+        await credentialStore.saveWithBiometrics(credential);
+      } else {
+        await credentialStore.save(credential);
+      }
 
       return resolveCredential(credential);
     },
