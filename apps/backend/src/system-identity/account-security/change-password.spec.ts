@@ -13,8 +13,8 @@ describe('password change', () => {
   };
   const dependencies = {
     gateway,
-    verifyPassword: jest.fn(async () => true),
-    hashPassword: jest.fn(async () => 'new-password-hash'),
+    verifyPassword: jest.fn(() => Promise.resolve(true)),
+    hashPassword: jest.fn(() => Promise.resolve('new-password-hash')),
     now: () => changedAt,
     newAuditRecordId: () => 'audit-record-id',
   };
@@ -36,13 +36,17 @@ describe('password change', () => {
       dependencies,
     );
 
-    expect(gateway.completePasswordChange).toHaveBeenCalledWith({
-      accountId: 'account-id',
-      authenticationSessionId: 'current-session-id',
-      passwordHash: 'new-password-hash',
-      changedAt,
-      auditRecordId: 'audit-record-id',
-    });
+    expect(gateway.completePasswordChange.mock.calls).toEqual([
+      [
+        {
+          accountId: 'account-id',
+          authenticationSessionId: 'current-session-id',
+          passwordHash: 'new-password-hash',
+          changedAt,
+          auditRecordId: 'audit-record-id',
+        },
+      ],
+    ]);
   });
 
   it('rejects an incorrect current password without changing state', async () => {
@@ -61,6 +65,6 @@ describe('password change', () => {
       ),
     ).rejects.toBeInstanceOf(CurrentPasswordIncorrectError);
 
-    expect(gateway.completePasswordChange).not.toHaveBeenCalled();
+    expect(gateway.completePasswordChange.mock.calls).toHaveLength(0);
   });
 });

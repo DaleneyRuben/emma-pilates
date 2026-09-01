@@ -15,7 +15,7 @@ describe('authentication links', () => {
   const dependencies = {
     gateway,
     digestToken: jest.fn(() => digest),
-    hashPassword: jest.fn(async () => 'argon2id-password-hash'),
+    hashPassword: jest.fn(() => Promise.resolve('argon2id-password-hash')),
     now: () => now,
   };
 
@@ -70,11 +70,15 @@ describe('authentication links', () => {
     expect(dependencies.hashPassword).toHaveBeenCalledWith(
       'new secure password',
     );
-    expect(gateway.activateAccount).toHaveBeenCalledWith({
-      tokenDigest: digest,
-      passwordHash: 'argon2id-password-hash',
-      completedAt: now,
-    });
+    expect(gateway.activateAccount.mock.calls).toEqual([
+      [
+        {
+          tokenDigest: digest,
+          passwordHash: 'argon2id-password-hash',
+          completedAt: now,
+        },
+      ],
+    ]);
   });
 
   it('does not hash a password when the activation link cannot be used', async () => {
@@ -91,6 +95,6 @@ describe('authentication links', () => {
     ).resolves.toEqual({ status: 'expired' });
 
     expect(dependencies.hashPassword).not.toHaveBeenCalled();
-    expect(gateway.activateAccount).not.toHaveBeenCalled();
+    expect(gateway.activateAccount.mock.calls).toHaveLength(0);
   });
 });

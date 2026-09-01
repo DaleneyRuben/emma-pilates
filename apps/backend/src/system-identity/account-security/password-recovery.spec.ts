@@ -27,7 +27,7 @@ describe('password recovery', () => {
       encryptedLinkSecret: 'encrypted-recovery-secret',
       encryptionKeyId: 'local-key',
     })),
-    hashPassword: jest.fn(async () => 'new-password-hash'),
+    hashPassword: jest.fn(() => Promise.resolve('new-password-hash')),
     now: () => now,
     newTokenId: jest.fn(() => 'authentication-token-id'),
     newSessionId: jest.fn(() => 'authentication-session-id'),
@@ -45,9 +45,9 @@ describe('password recovery', () => {
       requestPasswordRecovery({ email: ' Missing@Example.COM ' }, dependencies),
     ).resolves.toEqual({ status: 'accepted' });
 
-    expect(gateway.requestRecovery).toHaveBeenCalledWith(
-      expect.objectContaining({ email: 'missing@example.com' }),
-    );
+    expect(gateway.requestRecovery.mock.calls[0]?.[0]).toMatchObject({
+      email: 'missing@example.com',
+    });
   });
 
   it('issues a single-use recovery link with a thirty-minute lifetime', async () => {
@@ -55,7 +55,7 @@ describe('password recovery', () => {
 
     await requestPasswordRecovery({ email: 'ana@example.com' }, dependencies);
 
-    expect(gateway.requestRecovery).toHaveBeenCalledWith({
+    expect(gateway.requestRecovery.mock.calls[0]?.[0]).toEqual({
       email: 'ana@example.com',
       token: {
         id: 'authentication-token-id',
@@ -86,16 +86,14 @@ describe('password recovery', () => {
       credential: 'session-credential',
     });
 
-    expect(gateway.completeRecovery).toHaveBeenCalledWith(
-      expect.objectContaining({
-        passwordHash: 'new-password-hash',
-        completedAt: now,
-        tokenDigest: Buffer.from('recovery-digest'),
-        authenticationSession: expect.objectContaining({
-          id: 'authentication-session-id',
-          credentialDigest: Buffer.from('session-digest'),
-        }),
-      }),
-    );
+    expect(gateway.completeRecovery.mock.calls[0]?.[0]).toMatchObject({
+      passwordHash: 'new-password-hash',
+      completedAt: now,
+      tokenDigest: Buffer.from('recovery-digest'),
+      authenticationSession: {
+        id: 'authentication-session-id',
+        credentialDigest: Buffer.from('session-digest'),
+      },
+    });
   });
 });
