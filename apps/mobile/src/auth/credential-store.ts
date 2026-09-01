@@ -45,8 +45,21 @@ export function createCredentialStore(storage: CredentialStorage) {
     hasBiometricCredential: async () =>
       (await storage.getItemAsync(biometricCredentialMarkerKey)) === "true",
     load: () => storage.getItemAsync(credentialKey),
-    loadWithBiometrics: () =>
-      storage.getItemAsync(biometricCredentialKey, biometricOptions),
+    async loadWithBiometrics(): Promise<string | null> {
+      const credential = await storage.getItemAsync(
+        biometricCredentialKey,
+        biometricOptions,
+      );
+
+      if (credential === null) {
+        await Promise.all([
+          storage.deleteItemAsync(biometricCredentialKey),
+          storage.deleteItemAsync(biometricCredentialMarkerKey),
+        ]);
+      }
+
+      return credential;
+    },
     async save(credential: string): Promise<void> {
       await storage.setItemAsync(credentialKey, credential);
       await Promise.all([
