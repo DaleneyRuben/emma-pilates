@@ -29,7 +29,12 @@ type CredentialStorage = {
 };
 
 export function createCredentialStore(storage: CredentialStorage) {
+  function canUseBiometrics(): boolean {
+    return storage.canUseBiometricAuthentication?.() ?? false;
+  }
+
   return {
+    canUseBiometrics,
     clear: () => storage.deleteItemAsync(credentialKey),
     hasBiometricCredential: async () =>
       (await storage.getItemAsync(biometricCredentialMarkerKey)) === "true",
@@ -39,6 +44,10 @@ export function createCredentialStore(storage: CredentialStorage) {
     save: (credential: string) =>
       storage.setItemAsync(credentialKey, credential),
     async saveWithBiometrics(credential: string): Promise<void> {
+      if (!canUseBiometrics()) {
+        throw new Error("Biometric authentication is unavailable");
+      }
+
       await storage.setItemAsync(
         biometricCredentialKey,
         credential,
