@@ -41,6 +41,7 @@ export function createSessionApi(options: SessionApiOptions) {
     }): Promise<
       | { credential: string; status: "created" }
       | { status: "rejected" }
+      | { retryAfterSeconds: number; status: "throttled" }
     > {
       const response = await createMobileAuthenticationSession(
         { email, password },
@@ -55,6 +56,19 @@ export function createSessionApi(options: SessionApiOptions) {
 
       if (status === 401) {
         return { status: "rejected" };
+      }
+
+      if (status === 429) {
+        const retryAfterSeconds = Number(
+          response.headers.get("Retry-After") ?? "0",
+        );
+
+        return {
+          retryAfterSeconds: Number.isFinite(retryAfterSeconds)
+            ? Math.max(0, Math.floor(retryAfterSeconds))
+            : 0,
+          status: "throttled",
+        };
       }
 
       if (status !== 201) {
