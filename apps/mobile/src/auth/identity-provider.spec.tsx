@@ -1,5 +1,10 @@
-import { act, render, waitFor } from "@testing-library/react-native";
-import { Text } from "react-native";
+import {
+  act,
+  fireEvent,
+  render,
+  waitFor,
+} from "@testing-library/react-native";
+import { Button, Text } from "react-native";
 
 import {
   MobileIdentityProvider,
@@ -14,6 +19,21 @@ function IdentityProbe() {
       {identity.status}
       {identity.session === null ? "" : `:${identity.session.role}`}
     </Text>
+  );
+}
+
+function IdentityActionsProbe() {
+  const identity = useMobileIdentity();
+
+  return (
+    <>
+      <Text>{identity.status}</Text>
+      <Button
+        onPress={() => void identity.start("new-credential")}
+        title="Start"
+      />
+      <Button onPress={() => void identity.logout()} title="Logout" />
+    </>
   );
 }
 
@@ -44,5 +64,34 @@ describe("MobileIdentityProvider", () => {
     await waitFor(() => {
       expect(screen.getByText("signed-in:trainer")).toBeOnTheScreen();
     });
+  });
+
+  it("starts a newly authenticated session and logs it out", async () => {
+    const session = { accountId: "account-2", role: "assistant" as const };
+    const manager = {
+      logout: jest.fn().mockResolvedValue(undefined),
+      restore: jest.fn().mockResolvedValue(null),
+      start: jest.fn().mockResolvedValue(session),
+    };
+    const screen = await render(
+      <MobileIdentityProvider manager={manager}>
+        <IdentityActionsProbe />
+      </MobileIdentityProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText("signed-out")).toBeOnTheScreen();
+    });
+
+    fireEvent.press(screen.getByRole("button", { name: "Start" }));
+    await waitFor(() => {
+      expect(screen.getByText("signed-in")).toBeOnTheScreen();
+    });
+    expect(manager.start).toHaveBeenCalledWith("new-credential");
+
+    fireEvent.press(screen.getByRole("button", { name: "Logout" }));
+    await waitFor(() => {
+      expect(screen.getByText("signed-out")).toBeOnTheScreen();
+    });
+    expect(manager.logout).toHaveBeenCalledWith(session);
   });
 });
