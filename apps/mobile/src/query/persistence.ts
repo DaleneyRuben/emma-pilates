@@ -11,6 +11,10 @@ export function getPersistedCacheKey(accountId: string): string {
   return `pilates-query:${accountId}`;
 }
 
+export function clearPersistedAccountCache(accountId: string): Promise<void> {
+  return AsyncStorage.removeItem(getPersistedCacheKey(accountId));
+}
+
 export function shouldPersistQuery(queryKey: readonly unknown[]): boolean {
   return (
     typeof queryKey[0] === "string" && persistableQueryNames.has(queryKey[0])
