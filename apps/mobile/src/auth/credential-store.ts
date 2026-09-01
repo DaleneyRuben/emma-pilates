@@ -47,8 +47,13 @@ export function createCredentialStore(storage: CredentialStorage) {
     load: () => storage.getItemAsync(credentialKey),
     loadWithBiometrics: () =>
       storage.getItemAsync(biometricCredentialKey, biometricOptions),
-    save: (credential: string) =>
-      storage.setItemAsync(credentialKey, credential),
+    async save(credential: string): Promise<void> {
+      await storage.setItemAsync(credentialKey, credential);
+      await Promise.all([
+        storage.deleteItemAsync(biometricCredentialKey),
+        storage.deleteItemAsync(biometricCredentialMarkerKey),
+      ]);
+    },
     async saveWithBiometrics(credential: string): Promise<void> {
       if (!canUseBiometrics()) {
         throw new Error("Biometric authentication is unavailable");
