@@ -17,7 +17,11 @@ export function getApiBaseUrl(environment: RuntimeEnvironment): string {
     throw new Error("EXPO_PUBLIC_API_URL must be an absolute URL");
   }
 
-  if (url.protocol !== "https:") {
+  const isLoopbackHttp =
+    url.protocol === "http:" &&
+    ["127.0.0.1", "[::1]", "localhost"].includes(url.hostname);
+
+  if (url.protocol !== "https:" && !isLoopbackHttp) {
     throw new Error("EXPO_PUBLIC_API_URL must use HTTPS");
   }
 
