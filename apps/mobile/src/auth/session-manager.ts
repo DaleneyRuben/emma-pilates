@@ -23,6 +23,7 @@ type CredentialStore = {
 };
 
 type SessionManagerOptions = {
+  acceptedIdentityKind?: "client" | "staff";
   clearAccountCache: (accountId: string) => Promise<void>;
   credentialStore: CredentialStore;
   resolveCurrent: (
@@ -58,6 +59,7 @@ export function createSessionManager(
   options: SessionManagerOptions,
 ): SessionManager {
   const {
+    acceptedIdentityKind,
     clearAccountCache,
     credentialStore,
     resolveCurrent,
@@ -72,6 +74,16 @@ export function createSessionManager(
 
     if (principal === null) {
       activeCredential = null;
+      await credentialStore.clear();
+      return null;
+    }
+
+    if (
+      acceptedIdentityKind !== undefined &&
+      principal.identity.kind !== acceptedIdentityKind
+    ) {
+      activeCredential = null;
+      await revokeCurrent(credential);
       await credentialStore.clear();
       return null;
     }
