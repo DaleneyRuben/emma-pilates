@@ -7,15 +7,15 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mobile app                   | Open the Expo app in the iOS Simulator and inspect the initial screen, fonts, colors, safe-area layout, accessibility label, and signed-out startup restoration | The visible screen is still a foundation placeholder; registration and Login screens are not connected yet                                      |
+| Mobile app                   | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator | Client Home and the Staff destinations are still placeholders                                                                                   |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
-| Client registration          | Create a pending Client registration in a local PostgreSQL database                                                             | The verification email cannot be viewed yet                                                                                                                   |
+| Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The captured verification email does not have a beginner-facing inbox yet                                                                                     |
 | Pending registration actions | Correct the email, request another verification email, or cancel using the continuation returned by registration                | Resend deliberately gives the same neutral response whether it sends or suppresses an email                                                                   |
 | Email verification           | Confirm that an unknown token returns `invalid`                                                                                 | A valid token cannot be obtained manually until local email capture is runnable                                                                               |
-| Login and logout             | Create an opaque mobile Authentication Session, inspect its current Account identity, and revoke it                             | Until the mobile Login screen is built, use Swagger and the local-only activation step below                                                                  |
+| Login and logout             | Log in from the mobile app, restore the protected credential at startup, inspect identity in Swagger, and revoke it             | Visible logout is not available from the placeholder destination screens yet                                                                                  |
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
-| Account security             | Inspect an invalid link, request password recovery neutrally, and change a signed-in Account password                           | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                              |
+| Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Open the Vite starter page and verify that the development server works                                                         | No Pilates admin features have been built yet, so this is not a product test                                                                                  |
 
@@ -71,24 +71,30 @@ build can take a few minutes.
 You should see:
 
 - a light warm-beige background;
-- the heading **Iniciar sesión** in the Lora font;
-- the content inside the iPhone safe area; and
-- no working form or buttons yet.
+- the **Emma** wordmark in Lora;
+- email and password fields;
+- the **Iniciar sesión** button; and
+- **Olvidé mi contraseña** and **Crear cuenta** actions.
 
-On a clean installation, this simple screen proves that Expo starts, the
-approved font loads, the design background is applied, SecureStore contains no
-active credential, startup restoration finishes safely, and the
-unauthenticated navigation flow is selected. The development app uses
+Tap **Crear cuenta**. Confirm that the form asks only for name, email,
+password, and password confirmation. It must not ask for a phone number. Return
+to Login, tap **Olvidé mi contraseña**, and confirm that recovery asks only for
+email. These navigation checks do not need the backend.
+
+On a clean installation, this proves that Expo starts, the approved fonts load,
+the design background and safe area are applied, SecureStore contains no active
+credential, startup restoration finishes safely, and the unauthenticated flow
+is selected. The development app uses
 `http://127.0.0.1:3100/api/v1` by default; non-local API URLs must use HTTPS.
 
 ### Quick accessibility check
 
 On the simulated iPhone, open **Settings > Accessibility > VoiceOver** and turn
-VoiceOver on. Return to the app and tap the heading. VoiceOver should announce
-“Iniciar sesión.” Turn VoiceOver off when finished.
+VoiceOver on. Return to the app and tap the primary button. VoiceOver should
+announce “Iniciar sesión, button.” Turn VoiceOver off when finished.
 
-Do not report the missing form as a bug. It belongs to a later mobile backlog
-item.
+To submit registration, Login, or recovery, keep Expo open and complete
+**Test 2: prepare the local backend** in a second Terminal window.
 
 ### If the Simulator does not open
 
@@ -292,9 +298,10 @@ Press `Ctrl+C` in the backend Terminal when you are finished.
 
 ## Test 5: try Login, current identity, throttling, and logout
 
-The real email-link UI is not connected yet. For this local test only, create a
-second registration and mark it verified directly in your local database. Never
-use this shortcut on a shared or production database.
+The mobile email-link UI is connected, but the local captured-email viewer is
+not available yet. For this local test only, create a second registration and
+mark it verified directly in your local database. Never use this shortcut on a
+shared or production database.
 
 ### A. Prepare one local active Account
 
@@ -308,7 +315,19 @@ psql emma_pilates -c "UPDATE system.accounts SET email_verified_at = CURRENT_TIM
 The command should report `UPDATE 1`. If it reports `UPDATE 0`, check that the
 email exactly matches the registration response.
 
-### B. Log in
+### B. Log in from the mobile app
+
+Keep the backend and Expo running. In the iOS Simulator, enter the active
+Account email and password, then tap **Iniciar sesión**. The app should open the
+Client destination labeled **Inicio**. Close and reopen the app; startup Session
+restoration should return to **Inicio** without asking for the password again.
+
+For an incorrect password, the mobile app must show the same neutral message
+regardless of whether the Account exists. After the backend returns `429`, the
+button is disabled and the app counts down using the server's `Retry-After`
+value.
+
+### C. Log in through Swagger
 
 In Swagger, open `POST /api/v1/authentication-sessions`. You may leave the
 optional `x-client-identifier` header empty for this manual test. Send:
@@ -323,7 +342,7 @@ optional `x-client-identifier` header empty for this manual test. Send:
 Expected response code: `201`. Copy the returned `credential`. It is a secret,
 so do not commit it or include it in screenshots.
 
-### C. Inspect the signed-in identity
+### D. Inspect the signed-in identity
 
 Select **Authorize** at the top of Swagger and paste the raw credential into
 the `bearer` field. Swagger adds the `Bearer` prefix for you.
@@ -332,13 +351,13 @@ Open `GET /api/v1/authentication-sessions/current`. Expected response code:
 `200`. The response should identify the Account as a Client and include its
 `clientId`.
 
-### D. Log out
+### E. Log out
 
 Open `DELETE /api/v1/authentication-sessions/current`. Expected response code:
 `204`. Calling the current-session endpoint again with the old credential
 should now return `401` with `authentication_required`.
 
-### E. See progressive throttling safely
+### F. See progressive throttling safely
 
 Use a made-up email such as `nobody.login-test@example.com`. Submit the same
 wrong Login six times. Those attempts return the same neutral `401`
@@ -350,7 +369,7 @@ an Account.
 ## Test 6: try Account security
 
 Keep the backend running and use Swagger. For the signed-in step, complete
-Test 5 through **C. Inspect the signed-in identity** first and leave its bearer
+Test 5 through **D. Inspect the signed-in identity** first and leave its bearer
 credential authorized in Swagger.
 
 ### A. Inspect an invalid one-time link
@@ -446,8 +465,10 @@ These tests verify ordinary and biometric SecureStore credential persistence,
 explicit Face ID/fingerprint unlock, biometric-key invalidation, generated-client
 bearer requests, startup Account restoration, every Role route, logout and
 Account cache cleanup, safe authentication-link parsing, and
-startup/foreground native link ingress. They do not create the complete visible
-Login or recovery screens.
+startup/foreground native link ingress. They also exercise the visible Login,
+registration, pending-email correction/resend/cancellation, verification,
+activation, recovery-request, password-recovery, neutral rejection, and
+server-timed throttling flows.
 
 ### Biometric testing limitation
 
@@ -458,10 +479,9 @@ Face ID configuration because it does not contain this project's native Face ID
 permission message.
 
 A complete manual biometric test therefore requires a physical iPhone and a
-Pilates development or release build. The visible Login flow that lets a tester
-create a protected session is still waiting for `MOB-004`. Until then, run the
-mobile automated tests above; they cover the opt-in, locked, unlock,
-invalidation, and logout behavior without exposing a real credential.
+Pilates development or release build. Run the mobile automated tests above for
+the protected-session opt-in, locked, unlock, invalidation, and logout behavior
+without exposing a real credential.
 
 ### Backend HTTP end-to-end tests
 
@@ -516,16 +536,13 @@ The following are not ready for manual product testing:
 - automatic cleanup of expired pending accounts through a running worker;
 - retrieving a valid activation or password-recovery link from a local inbox;
 - completing successful activation or password recovery manually;
-- visible mobile Login, logout, recovery, or password-change screens;
-- opting a real Login into Face ID/fingerprint protection before the visible
-  Login flow exists;
+- visible mobile logout or signed-in password-change screens;
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
 - working Client Home, class browsing, booking, plans, payments, profile, or
   notifications;
 - working Trainer, Assistant, Administrator, or Nutritionist mobile screens;
-- mobile-to-backend requests initiated from a visible form or button;
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, or production deployment; and
 - Maestro release-journey tests.

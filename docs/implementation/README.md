@@ -40,7 +40,8 @@ PostgreSQL configuration, committed OpenAPI document, and generated
 `api-contracts` package exist. The approved 15-table System Identity,
 Client/Staff/Branch, and image-asset foundation is implemented in the first
 business migration with disposable PostgreSQL integration coverage. The mobile
-and admin applications still contain their starter screens.
+app now contains the complete first Client authentication journey; signed-in
+destinations and the admin application still contain starter screens.
 
 The complete first-release data model and relationship diagram are in
 [`full-release-schema-proposal.md`](./full-release-schema-proposal.md). The
@@ -64,14 +65,17 @@ unlock state and entry, invalidated-key cleanup, and native Face ID permission
 configuration without changing backend authentication. The user approved
 implementing `MOB-004` from the existing generated visual patterns plus the
 accepted behavior in follow-ups 33–38 without waiting for the corrected
-`DES-001` export. Generated files under `design/` remain read-only; `DES-001`
-stays pending so a future design export can be reconciled with the working app.
+`DES-001` export. `MOB-004` now provides email-only registration and Login,
+pending-email correction/resend/cancellation, neutral Login rejection,
+server-timed throttling, recovery requests, verified-link return, preflight
+link inspection, Account activation, and password recovery with replacement
+Session start. Generated files under `design/` remain read-only; `DES-001` stays
+pending so a future design export can be reconciled with the working app.
 
 Authentication follow-ups 33–38 are pending in the design workflow. Until a new
 export applies and verifies them, generated authentication screens still show
-superseded phone and temporary-password behavior. Backend work follows the
-accepted identity ADRs; authentication UI implementation waits for the corrected
-export.
+superseded phone and temporary-password behavior. The working mobile app follows
+the accepted follow-up behavior and will be reconciled with that future export.
 
 ## Delivery phases
 
