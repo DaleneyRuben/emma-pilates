@@ -1,6 +1,48 @@
 import { createSessionManager } from "./session-manager";
 
 describe("createSessionManager", () => {
+  it.each([
+    ["client", "staff"],
+    ["staff", "client"],
+  ] as const)(
+    "rejects a %s application credential resolved as a %s identity",
+    async (applicationIdentity, resolvedIdentity) => {
+      const clear = jest.fn();
+      const revokeCurrent = jest.fn();
+      const identity =
+        resolvedIdentity === "client"
+          ? { kind: "client" as const, clientId: "client-1" }
+          : {
+              branchIds: ["branch-1"],
+              kind: "staff" as const,
+              role: "trainer" as const,
+              staffMemberId: "staff-1",
+            };
+      const manager = createSessionManager({
+        acceptedIdentityKind: applicationIdentity,
+        clearAccountCache: jest.fn(),
+        credentialStore: {
+          clear,
+          load: jest.fn(),
+          save: jest.fn(),
+        },
+        resolveCurrent: jest.fn().mockResolvedValue({
+          accountId: "account-1",
+          identity,
+        }),
+        revokeCurrent,
+      });
+
+      await expect(
+        manager.start("wrong-application-credential"),
+      ).resolves.toBeNull();
+      expect(revokeCurrent).toHaveBeenCalledWith(
+        "wrong-application-credential",
+      );
+      expect(clear).toHaveBeenCalledTimes(1);
+    },
+  );
+
   it("detects a biometric session without unlocking it during startup", async () => {
     const loadWithBiometrics = jest
       .fn()
