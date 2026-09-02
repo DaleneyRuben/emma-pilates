@@ -2,7 +2,7 @@
 
 Status: accepted
 
-The role-routed mobile application established in [ADR-0008](./0008-one-role-routed-mobile-app-and-admin-web.md) will use React Native through the Expo framework. Client and Staff Member experiences remain one TypeScript application targeting iOS and Android, and the app consumes the generated TypeScript client from the `api-contracts` workspace package.
+The separate Client and Staff mobile applications established in [ADR-0085](./0085-separate-client-and-staff-mobile-applications.md) will use React Native through the Expo framework. Each is an independent TypeScript application targeting iOS and Android, and both consume the generated TypeScript client from the `api-contracts` workspace package.
 
 Expo was selected because the application needs common mobile capabilities such as push notifications, camera and image access for payment receipts, secure local credential storage, deep linking, and repeatable native builds, but has no known requirement for a heavily customized native shell. Expo supplies an integrated framework for those concerns while retaining access to native libraries, configuration plugins, and custom native code when a justified requirement appears.
 

@@ -8,8 +8,9 @@ screen inventory into an execution order. The trackable work items live in
 
 ## Product priority
 
-1. **Mobile app** — highest priority. There is one Expo application with a
-   Client experience and four role-routed Staff experiences.
+1. **Mobile apps** — highest priority. There is one Client Expo application and
+   one separate Staff Expo application. The Staff application routes its four
+   Roles after authentication.
 2. **Backend** — second priority as a product surface, but backend work is pulled
    forward whenever the next mobile journey needs a real API, database rule, or
    background job.
@@ -35,9 +36,11 @@ locally.
 
 ## Current state
 
-The monorepo, three application shells, backend HTTP boundary, local Prisma and
+The monorepo, application shells, backend HTTP boundary, local Prisma and
 PostgreSQL configuration, committed OpenAPI document, and generated
-`api-contracts` package exist. The approved 15-table System Identity,
+`api-contracts` package exist. The original combined mobile shell is being
+split into the separate Client and Staff applications required by ADR-0085.
+The approved 15-table System Identity,
 Client/Staff/Branch, and image-asset foundation is implemented in the first
 business migration with disposable PostgreSQL integration coverage. The mobile
 app now contains the complete first Client authentication journey; signed-in
@@ -82,7 +85,7 @@ the accepted follow-up behavior and will be reconciled with that future export.
 | Phase                               | Outcome                                                                                     | Primary surface               | Exit condition                                                                                      |
 | ----------------------------------- | ------------------------------------------------------------------------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------- |
 | 0. Foundation                       | Local workspace, backend boundary, Prisma, OpenAPI clients                                  | Backend/tooling               | Complete                                                                                            |
-| 1. Mobile foundation                | Design tokens, navigation, testing, API adapter, secure local boundaries                    | Mobile                        | A tested app shell can route unauthenticated, Client, and each Staff Role                           |
+| 1. Mobile foundation                | Design tokens, navigation, testing, API adapter, secure local boundaries                    | Client and Staff mobile       | Separate tested app shells isolate Client access and route each Staff Role                          |
 | 2. Identity                         | Registration, verification, activation, Login, recovery, and opaque Authentication Sessions | Mobile + backend              | Client and Staff can complete their real account journeys locally using a development email adapter |
 | 3. Client discovery                 | Home, Branch and Session browsing, Plans, Subscription summary, and profile                 | Client mobile + backend       | A seeded Client can browse real local API data without hard-coded screen data                       |
 | 4. Booking                          | Booking, Waitlist, cancellation, Reschedule, history, and Attendance rules                  | Client/Staff mobile + backend | The complete class lifecycle works locally with concurrency and authorization tests                 |

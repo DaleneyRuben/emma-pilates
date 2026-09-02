@@ -2,7 +2,7 @@
 
 Status: accepted
 
-The Expo mobile application will use React Navigation with its static configuration API. The navigation tree will be declared explicitly in TypeScript, with role-specific Client and Staff Member flows composed under one application root and with typed routes and deep-link paths generated from that configuration.
+The Client and Staff Expo applications will each use React Navigation with its static configuration API. Each navigation tree will be declared explicitly in TypeScript. The Client application contains only unauthenticated Client and authenticated Client flows; the Staff application contains only unauthenticated Staff and the four Role-routed Staff flows. Typed routes and deep-link paths are generated from each application's configuration.
 
 React Navigation was selected because this is a native iOS and Android application with a separate admin web surface. Explicit control over navigation structure, state resets, authentication boundaries, and role-routed flows is more valuable here than deriving routes from the file system. Its static API also avoids much of the TypeScript and deep-linking boilerplate associated with its older dynamic configuration.
 

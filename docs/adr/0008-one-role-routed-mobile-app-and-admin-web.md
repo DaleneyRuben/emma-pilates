@@ -1,6 +1,6 @@
 # One role-routed mobile app and a separate admin web app
 
-Status: accepted
+Status: superseded by [ADR-0085](./0085-separate-client-and-staff-mobile-applications.md)
 
 The system will have one modular-monolith backend, one mobile application, and one desktop admin web application. The mobile application serves both Clients and Staff Members; after authentication it routes each person to the navigation and capabilities for their Role. The web application is the Administrator's desktop surface.
 

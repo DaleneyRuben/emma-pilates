@@ -2,7 +2,7 @@
 
 Status: accepted
 
-The role-routed mobile application will use `expo-notifications` and Expo Push Service for remote notifications on iOS and Android. Each authenticated app installation registers its Expo push token as a notification endpoint owned by the system Account defined in [ADR-0009](./0009-separate-system-account-from-domain-identities.md); one Account may have multiple active device endpoints, and a shared device must not remain associated with an Account after sign-out.
+The Client and Staff mobile applications will use `expo-notifications` and Expo Push Service for remote notifications on iOS and Android. Each authenticated installation registers its Expo push token and application surface as a notification endpoint owned by the system Account defined in [ADR-0009](./0009-separate-system-account-from-domain-identities.md); one Account may have multiple active device endpoints, and a shared device must not remain associated with an Account after sign-out.
 
 The backend sends notifications through a project-owned provider interface, with Expo confined to its infrastructure adapter. The pg-boss workflow established in [ADR-0024](./0024-use-pg-boss-for-durable-background-jobs.md) records delivery work durably, retries temporary network, rate-limit, and provider failures with backoff, stores Expo ticket identifiers, and checks push receipts. An endpoint reported as `DeviceNotRegistered` is deactivated until that installation registers again. Permanent payload and credential failures are surfaced for operations rather than retried indefinitely.
 
