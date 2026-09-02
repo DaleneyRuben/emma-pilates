@@ -40,6 +40,7 @@ type AuthenticationRoute =
   | "verify-email";
 
 type AuthenticationFlowProps = {
+  allowClientRegistration?: boolean;
   api: AuthenticationApi;
   intent?: AuthenticationLinkIntent | null;
   onBiometricUnlock?: () => void;
@@ -512,6 +513,7 @@ function ErrorMessage({ children }: PropsWithChildren) {
 }
 
 export function AuthenticationFlow({
+  allowClientRegistration = true,
   api,
   intent,
   onBiometricUnlock,
@@ -599,7 +601,9 @@ export function AuthenticationFlow({
     <LoginScreen
       onBiometricUnlock={onBiometricUnlock}
       onForgotPassword={() => setRoute("recovery-request")}
-      onRegister={() => setRoute("register")}
+      onRegister={
+        allowClientRegistration ? () => setRoute("register") : undefined
+      }
       onSubmit={onLogin}
     />
   );
