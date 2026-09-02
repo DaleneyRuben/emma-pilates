@@ -21,6 +21,22 @@ function createApiMock(
 }
 
 describe("AuthenticationFlow", () => {
+  it("keeps Client registration out of the Staff authentication flow", async () => {
+    const screen = await render(
+      <AuthenticationFlow
+        allowClientRegistration={false}
+        api={createApiMock()}
+      />,
+    );
+
+    expect(
+      screen.queryByRole("button", { name: "Crear cuenta" }),
+    ).not.toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", { name: "Olvidé mi contraseña" }),
+    ).toBeOnTheScreen();
+  });
+
   it("registers a Client and shows the pending email actions", async () => {
     const register = jest.fn().mockResolvedValue({
       email: "ana@example.com",
