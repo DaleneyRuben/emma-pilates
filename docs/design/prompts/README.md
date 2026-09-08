@@ -146,6 +146,7 @@ Each of these was sent as the next message in the existing design session for th
 | [36](./followups/36-email-password-recovery-destinations.md) | Completes email password recovery across all surfaces and distinguishes its replacement session from activation (ADR-0029, ADR-0030) | 🕓 pending |
 | [37](./followups/37-progressive-login-throttling.md) | Adds a neutral temporary-throttling state to client, staff, and admin Login without hard-locking the Account or adding CAPTCHA (ADR-0029) | 🕓 pending |
 | [38](./followups/38-authentication-email-throttling.md) | Throttles verification, activation, and recovery email across recipients and origins without revealing Accounts or invalidating an existing link (ADR-0029) | 🕓 pending |
+| [39](./followups/39-align-booking-membership-schema.md) | Adds weekly Session Schedule controls, Class Type descriptions, Promotion publication, and corrects contradictory Booking & Membership sample copy | 🕓 pending |
 
 ## Status
 
