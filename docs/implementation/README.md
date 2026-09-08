@@ -38,13 +38,17 @@ locally.
 
 The monorepo, application shells, backend HTTP boundary, local Prisma and
 PostgreSQL configuration, committed OpenAPI document, and generated
-`api-contracts` package exist. The original combined mobile shell is being
-split into the separate Client and Staff applications required by ADR-0085.
+`api-contracts` package exist. The original combined mobile shell has been
+split into the separate Client and Staff Expo applications required by
+ADR-0085. Each application has isolated authentication eligibility,
+credentials, links, navigation, development ports, and native release identity;
+shared authentication and UI infrastructure lives in `mobile-core`.
 The approved 15-table System Identity,
 Client/Staff/Branch, and image-asset foundation is implemented in the first
-business migration with disposable PostgreSQL integration coverage. The mobile
-app now contains the complete first Client authentication journey; signed-in
-destinations and the admin application still contain starter screens.
+business migration with disposable PostgreSQL integration coverage. The Client
+app contains the complete first Client authentication journey; authenticated
+Client and Staff destinations and the admin application still contain starter
+screens.
 
 The complete first-release data model and relationship diagram are in
 [`full-release-schema-proposal.md`](./full-release-schema-proposal.md). The

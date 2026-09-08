@@ -7,7 +7,8 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Mobile app                   | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator | Client Home and the Staff destinations are still placeholders                                                                                   |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator | Client Home and other signed-in destinations are still placeholders                                                                             |
+| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator and verify that Client registration is unavailable                                                       | Trainer, Assistant, Administrator, and Nutritionist destinations are still placeholders; no ready-made local Staff account exists              |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
 | Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The captured verification email does not have a beginner-facing inbox yet                                                                                     |
@@ -34,7 +35,8 @@ The local services use these default ports:
 | Service                 | Default port |
 | ----------------------- | -----------: |
 | Backend API and Swagger |       `3100` |
-| Expo development server |       `8081` |
+| Client Expo server      |       `8081` |
+| Staff Expo server       |       `8082` |
 | Admin web starter       |       `5173` |
 | PostgreSQL              |       `5432` |
 
@@ -57,12 +59,14 @@ pnpm install
 You only need to install dependencies again when `pnpm-lock.yaml` changes or
 you start from a new copy of the project.
 
-## Test 1: open the mobile app in the iOS Simulator
+## Test 1: open both mobile apps in the iOS Simulator
 
-Start the mobile app:
+### A. Open the Client app
+
+Start the Client app:
 
 ```sh
-pnpm --filter @pilates/mobile ios
+pnpm --filter @pilates/client-mobile ios
 ```
 
 Expo should start an iOS Simulator and install the development app. The first
@@ -81,10 +85,31 @@ password, and password confirmation. It must not ask for a phone number. Return
 to Login, tap **Olvidé mi contraseña**, and confirm that recovery asks only for
 email. These navigation checks do not need the backend.
 
-On a clean installation, this proves that Expo starts, the approved fonts load,
-the design background and safe area are applied, SecureStore contains no active
-credential, startup restoration finishes safely, and the unauthenticated flow
-is selected. The development app uses
+### B. Open the Staff app
+
+Leave the Client Expo server running and open a second Terminal window. From the
+project directory, start the Staff app:
+
+```sh
+pnpm --filter @pilates/staff-mobile ios
+```
+
+Expo Go displays one project at a time, so the Simulator switches from the
+Client project to the Staff project. Both development servers may remain
+running. You should see the same approved Login styling, **Iniciar sesión**, and
+**Olvidé mi contraseña**, but you must not see **Crear cuenta**. Staff Accounts
+are created by authorized Staff workflows, never through Client registration.
+
+The two projects also have different native application identifiers, so Client
+and Staff development or release builds can be installed side by side. Expo Go
+is only a shared preview host and does not demonstrate that side-by-side
+installation.
+
+On a clean installation, these checks prove that each Expo project starts, the
+approved fonts load, the design background and safe area are applied,
+SecureStore contains no active credential for that app, startup restoration
+finishes safely, and the correct unauthenticated flow is selected. Both
+development apps use
 `http://127.0.0.1:3100/api/v1` by default; non-local API URLs must use HTTPS.
 
 ### Quick accessibility check
@@ -101,7 +126,7 @@ To submit registration, Login, or recovery, keep Expo open and complete
 1. Open Xcode once and accept any requested license or component installation.
 2. In Xcode, open **Window > Devices and Simulators** and confirm that an iPhone
    simulator exists.
-3. Run the mobile command again.
+3. Run the applicable Client or Staff command again.
 4. If Expo was already running, press `i` in its Terminal window.
 
 Press `Ctrl+C` in Terminal when you want to stop Expo.
@@ -317,10 +342,17 @@ email exactly matches the registration response.
 
 ### B. Log in from the mobile app
 
-Keep the backend and Expo running. In the iOS Simulator, enter the active
-Account email and password, then tap **Iniciar sesión**. The app should open the
-Client destination labeled **Inicio**. Close and reopen the app; startup Session
-restoration should return to **Inicio** without asking for the password again.
+Keep the backend and Client Expo server running. In the iOS Simulator, open the
+Client app, enter the active Account email and password, then tap **Iniciar
+sesión**. The app should open the Client destination labeled **Inicio**. Close
+and reopen the app; startup Session restoration should return to **Inicio**
+without asking for the password again.
+
+That Client Account must not authenticate in the Staff app. A Staff login needs
+an active Account with a Trainer, Assistant, Administrator, or Nutritionist
+Role. The project does not yet provide a beginner-facing command that creates
+those local Staff fixtures, so authenticated Staff destinations are not ready
+for this manual guide.
 
 For an incorrect password, the mobile app must show the same neutral message
 regardless of whether the Account exists. After the backend returns `429`, the
@@ -458,17 +490,24 @@ backend end-to-end or database integration suites.
 ### Mobile automated tests
 
 ```sh
-pnpm --filter @pilates/mobile exec jest --runInBand
+pnpm --filter @pilates/mobile-core exec jest --runInBand
+pnpm --filter @pilates/client-mobile exec jest --runInBand
+pnpm --filter @pilates/staff-mobile exec jest --runInBand
 ```
 
-These tests verify ordinary and biometric SecureStore credential persistence,
-explicit Face ID/fingerprint unlock, biometric-key invalidation, generated-client
-bearer requests, startup Account restoration, every Role route, logout and
-Account cache cleanup, safe authentication-link parsing, and
+The shared mobile-core tests verify ordinary and biometric SecureStore
+credential persistence, explicit Face ID/fingerprint unlock, biometric-key
+invalidation, generated-client bearer requests, startup Account restoration,
+logout and Account cache cleanup, safe authentication-link parsing, and
 startup/foreground native link ingress. They also exercise the visible Login,
 registration, pending-email correction/resend/cancellation, verification,
 activation, recovery-request, password-recovery, neutral rejection, and
 server-timed throttling flows.
+
+The Client and Staff app tests verify that each application has its own
+credential namespace, links, navigation, and identity eligibility. They also
+prove that Client registration exists only in the Client app, Client Accounts
+cannot enter the Staff app, and Staff Roles cannot enter the Client app.
 
 ### Biometric testing limitation
 
@@ -542,7 +581,8 @@ The following are not ready for manual product testing:
   mobile-link domain and native association files are configured;
 - working Client Home, class browsing, booking, plans, payments, profile, or
   notifications;
-- working Trainer, Assistant, Administrator, or Nutritionist mobile screens;
+- authenticated Trainer, Assistant, Administrator, or Nutritionist journeys and
+  their working destination screens;
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, or production deployment; and
 - Maestro release-journey tests.
