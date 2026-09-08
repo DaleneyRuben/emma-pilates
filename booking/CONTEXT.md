@@ -13,11 +13,11 @@ A client's access to a Plan over a fixed date range (start date to a paid-throug
 _Avoid_: Membership
 
 **Class Type**:
-The catalog definition of a kind of class — e.g. "Reformer Pilates", "Mat Pilates" — with its duration, capacity, and equipment needs.
+The catalog definition of a kind of class — e.g. "Reformer Pilates", "Mat Pilates" — with a short client-facing description, duration, capacity, and equipment needs.
 _Avoid_: Class (when referring to the catalog entry)
 
 **Session**:
-A specific scheduled, bookable occurrence of a Class Type, at a given time, with an assigned Trainer and a capacity. Capacity defaults from the Class Type but can be overridden per Session (e.g. reduced due to equipment being out of service). Clients book Sessions, not Class Types. A Session is cancelled automatically by the system via a one-time check at 2 hours before its start time: if it has zero Bookings at that point, it's cancelled — the Trainer does not cancel it manually, and a Session that drops to zero Bookings earlier stays normally bookable until that check runs. An Administrator can also cancel a Session that has Bookings, as a last resort when no substitute Trainer can cover it: every Booking on it is cancelled, each client's allowance unit is refunded even inside the Cancellation Window, and the clients are notified.
+A specific scheduled, bookable occurrence of a Class Type, at a given time, with an assigned Trainer and a capacity. A Trainer cannot lead overlapping Sessions, even at different Branches. Capacity defaults from the Class Type but can be overridden per Session (e.g. reduced due to equipment being out of service). Clients book Sessions, not Class Types. A Session is cancelled automatically by the system via a one-time check at 2 hours before its start time: if it has zero Bookings at that point, it's cancelled — the Trainer does not cancel it manually, and a Session that drops to zero Bookings earlier stays normally bookable until that check runs. An Administrator can also cancel a Session that has Bookings, as a last resort when no substitute Trainer can cover it: every Booking on it is cancelled, each client's allowance unit is refunded even inside the Cancellation Window, and the clients are notified.
 _Avoid_: Class (when referring to a specific occurrence)
 
 **Session Schedule**:

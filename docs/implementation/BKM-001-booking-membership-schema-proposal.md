@@ -1,7 +1,8 @@
 # BKM-001 — Booking & Membership schema proposal
 
-Status: proposed for explicit approval. This document creates no migration and
-does not alter the Prisma schema.
+Status: revised after the cross-document and design audit; proposed for explicit
+approval. This document creates no migration and does not alter the Prisma
+schema.
 
 ## Purpose and scope
 
@@ -58,12 +59,12 @@ expires. A Plan is never an unlimited membership.
 | Field | Type / constraint | Why it exists |
 | --- | --- | --- |
 | `id` | UUID primary key | Stable Plan identity. |
-| `name` | non-empty text; unique among non-archived Plans | Client and admin label, for example “Paquete de 8 clases”. |
+| `name` | non-empty text; unique among non-hidden Plans | Client and admin label, for example “Paquete de 8 clases”. |
 | `duration_months` | small integer; one of 1, 3, 6, 12 | Defines the fixed Subscription date range. |
 | `class_allowance` | positive integer | Number of class units granted. |
 | `price_centavos` | non-negative integer | Exact BOB price under ADR-0082. |
 | `display_order` | non-negative integer | Stable Client catalog order. |
-| `archived_at` | nullable timestamp | Hides a retired Plan without rewriting history. |
+| `hidden_at` | nullable timestamp | Reversibly removes a Plan from future purchases without rewriting Subscription history. |
 | `created_at`, `updated_at` | timestamps | Operational history. |
 
 ### `class_types`
@@ -75,6 +76,7 @@ bookable occurrence.
 | --- | --- | --- |
 | `id` | UUID primary key | Stable Class Type identity. |
 | `name` | non-empty text; unique among non-archived Class Types | Client-facing label, such as “Reformer Pilates”. |
+| `description` | non-empty text | The short client-facing explanation shown on Session Detail. |
 | `duration_minutes` | positive small integer | Determines concrete Session end time. |
 | `default_capacity` | positive small integer | Normal capacity suggested to Session Schedules. |
 | `equipment_needs` | nullable text | Human-readable equipment note only; it is not inventory. |
@@ -94,11 +96,11 @@ does not rewrite the old row or booked occurrences.
 | `branch_id` | required foreign key to `branches` | The single-room Branch that hosts the Sessions. |
 | `class_type_id` | required foreign key to `class_types` | Class Type and duration source. |
 | `trainer_staff_member_id` | required foreign key to `staff_members` | Assigned Trainer. Application validation requires the Trainer Role and Branch assignment. |
-| `weekday` | small integer from 1 through 7 | Bolivia weekday of the weekly pattern. |
+| `weekday` | ISO small integer from 1 through 7 | Bolivia weekday of the weekly pattern: Monday is 1 and Sunday is 7. |
 | `starts_at_local` | time without time zone | Bolivia wall-clock start time; the business zone is fixed by ADR-0057. |
 | `capacity` | positive small integer | Schedule-level override of the Class Type default. |
 | `effective_from` | date | First local date this pattern can generate. |
-| `effective_until` | nullable date, never before `effective_from` | Last local date it can generate; closing a schedule sets this value. |
+| `effective_until` | nullable date; strictly after `effective_from` | Exclusive upper bound. Closing a schedule sets it to the replacement's `effective_from`, so the two definitions never overlap. |
 | `created_at`, `updated_at` | timestamps | Operational history. |
 
 There is no separate recurrence-rule table: the product has a weekly pattern,
@@ -122,7 +124,10 @@ operate that occurrence even when the source schedule later changes or closes.
 | `capacity` | positive small integer | Per-Session capacity; permits a rare one-off reduction. |
 | `state` | `scheduled` or `cancelled` | Keeps cancelled occurrences in history rather than deleting them. |
 | `is_exception` | boolean, default false | Makes a one-off Session or a changed generated occurrence explicit. |
-| `cancelled_at`, `cancellation_reason`, `cancelled_by_account_id` | nullable, all required together for a cancelled Session | Preserves the minimum cancellation record; the authorized cancellation command arrives in `STAFF-001`. |
+| `cancellation_cause` | nullable `zero_bookings` or `no_substitute_trainer` | Distinguishes the automatic two-hour check from an Administrator's last-resort cancellation. Required exactly when cancelled. |
+| `cancelled_at` | nullable timestamp | Required exactly when cancelled. |
+| `cancelled_by_account_id` | nullable foreign key to `system.accounts` | Required only for `no_substitute_trainer`; must be null for the automatic `zero_bookings` cause. |
+| `cancellation_note` | nullable text | Optional operational context. Neither cancellation flow requires free text. |
 | `created_at`, `updated_at` | timestamps | Operational history. |
 
 Required database protection:
@@ -131,7 +136,14 @@ Required database protection:
   materialization;
 - an exclusion constraint prevents overlapping non-cancelled Sessions at the
   same Branch; and
-- a check requires cancellation fields exactly when `state = cancelled`.
+- a second exclusion constraint prevents a Trainer from leading overlapping
+  non-cancelled Sessions across Branches; and
+- checks enforce the cancellation cause, timestamp, and actor rules for each
+  state and cause.
+
+The overlap constraints use PostgreSQL `btree_gist` for UUID equality combined
+with timestamp ranges. `BKM-002` must create that extension explicitly in the
+reviewed migration rather than assuming it is already installed.
 
 The recurrence reconciler, not the database, decides which dates to materialize
 and keeps the next 30 days available as required by ADR-0059.
@@ -160,6 +172,14 @@ Booking rules will additionally decide whether zero allowance with booked future
 Sessions remains active, as the glossary requires; that behavior belongs to
 `BOOK-001`, not this schema proposal.
 
+Both Subscription dates are inclusive Bolivia civil dates. `starts_on` is the
+local date on which Payment confirmation activates the Subscription. `ends_on`
+is the same calendar day after `duration_months_snapshot`, clamped to the last
+day when the target month has no such date. For example, a one-month Subscription
+starting January 31 is paid through February 28 in a non-leap year. Checks require
+`activated_at`, require `expired_at` exactly when `state = expired`, and prohibit
+an expired timestamp while `state = active`.
+
 ### `promotions`
 
 Administrator-managed informational cards for the Client Home carousel. A
@@ -173,15 +193,33 @@ Promotion does not alter Plan price, Credit, or Payment behavior.
 | `image_asset_id` | nullable foreign key to `system.image_assets` | Artwork once `UPL-001` can finalize it; nullable while a draft is prepared. |
 | `display_starts_on`, `display_ends_on` | dates; end is not before start | Inclusive Client display window in Bolivia civil time. |
 | `display_order` | non-negative integer | Drag-reorder position in the carousel. |
-| `published_at` | nullable timestamp | A draft is not shown to Clients. |
-| `archived_at` | nullable timestamp | Removes a published Promotion without deletion. |
+| `published_at` | nullable timestamp | Current publication time; null means draft or unpublished. Re-publishing sets a new value. |
+| `archived_at` | nullable timestamp | Retires the Promotion without deleting its record. An archived Promotion cannot be published. |
 | `created_at`, `updated_at` | timestamps | Operational history. |
 
-A database check requires an image for a published Promotion. Reads show only
-published, non-archived Promotions whose display range contains the current
-Bolivia date. The reordering command later normalizes `display_order` in one
-transaction; a unique order index would make a simple drag swap unnecessarily
-fragile.
+A database check requires an image for a published Promotion and prohibits an
+archived Promotion from remaining published. Unpublishing clears `published_at`;
+removing or replacing the image of a published Promotion first unpublishes it in
+the same application transaction. Those transitions dispatch the public-variant
+cleanup required by ADR-0077. Reads show only published, non-archived Promotions
+whose display range contains the current Bolivia date. The reordering command
+later normalizes `display_order` in one transaction; a unique order index would
+make a simple drag swap unnecessarily fragile. Reads use `id` as a stable
+tie-breaker when two records temporarily share an order.
+
+## Foreign-key and retention policy
+
+The tables in this proposal preserve business history rather than cascading
+deletion:
+
+- required references to Clients, Staff Members, Branches, Plans, Class Types,
+  Session Schedules, and cancellation Accounts use restrictive deletion;
+- referenced catalog and schedule rows are hidden, archived, or closed instead
+  of deleted; and
+- a Promotion's Image Asset uses restrictive deletion. The owning workflow must
+  unpublish and detach it before the image cleanup process may delete the asset.
+
+No foreign key in this proposal cascades deletion into historical records.
 
 ## Migration impact for approval
 
