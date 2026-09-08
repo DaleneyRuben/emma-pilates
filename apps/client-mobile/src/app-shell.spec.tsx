@@ -21,7 +21,7 @@ function createAuthenticationApiMock(overrides = {}) {
   };
 }
 
-describe("App", () => {
+describe("Client App", () => {
   it("starts with the unauthenticated navigation flow", async () => {
     const screen = await render(
       <App
@@ -132,7 +132,7 @@ describe("App", () => {
     });
   });
 
-  it("restores an authenticated Account into its Role navigation", async () => {
+  it("restores an authenticated Client into the Client navigation", async () => {
     const screen = await render(
       <App
         runtime={{
@@ -148,7 +148,7 @@ describe("App", () => {
             logout: jest.fn(),
             restore: jest.fn().mockResolvedValue({
               accountId: "account-1",
-              role: "administrator",
+              role: "client",
             }),
             start: jest.fn(),
             unlockWithBiometrics: jest.fn(),
@@ -158,7 +158,7 @@ describe("App", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText("Pagos pendientes")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Inicio")).toBeOnTheScreen();
     });
   });
 });

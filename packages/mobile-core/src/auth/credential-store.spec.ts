@@ -1,6 +1,25 @@
 import { createCredentialStore } from "./credential-store";
 
 describe("createCredentialStore", () => {
+  it("isolates credentials with the application namespace", async () => {
+    const setItemAsync = jest.fn().mockResolvedValue(undefined);
+    const store = createCredentialStore(
+      {
+        deleteItemAsync: jest.fn().mockResolvedValue(undefined),
+        getItemAsync: jest.fn().mockResolvedValue(null),
+        setItemAsync,
+      },
+      "staff",
+    );
+
+    await store.save("staff-credential");
+
+    expect(setItemAsync).toHaveBeenCalledWith(
+      "staff.authentication-session",
+      "staff-credential",
+    );
+  });
+
   it("stores, retrieves, and clears an authentication credential", async () => {
     const values = new Map<string, string>();
     const store = createCredentialStore({

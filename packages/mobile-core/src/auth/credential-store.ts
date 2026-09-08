@@ -1,9 +1,5 @@
 import * as SecureStore from "expo-secure-store";
 
-const credentialKey = "authentication-session";
-const biometricCredentialKey = "authentication-session-biometric";
-const biometricCredentialMarkerKey = "authentication-session-biometric-enabled";
-
 const biometricOptions = {
   authenticationPrompt: "Confirma tu identidad para iniciar sesión.",
   requireAuthentication: true,
@@ -28,7 +24,14 @@ type CredentialStorage = {
   ) => Promise<void>;
 };
 
-export function createCredentialStore(storage: CredentialStorage) {
+export function createCredentialStore(
+  storage: CredentialStorage,
+  namespace = "",
+) {
+  const prefix = namespace === "" ? "" : `${namespace}.`;
+  const credentialKey = `${prefix}authentication-session`;
+  const biometricCredentialKey = `${prefix}authentication-session-biometric`;
+  const biometricCredentialMarkerKey = `${prefix}authentication-session-biometric-enabled`;
   function canUseBiometrics(): boolean {
     return storage.canUseBiometricAuthentication?.() ?? false;
   }
@@ -83,4 +86,6 @@ export function createCredentialStore(storage: CredentialStorage) {
   };
 }
 
-export const credentialStore = createCredentialStore(SecureStore);
+export function createNativeCredentialStore(namespace: "client" | "staff") {
+  return createCredentialStore(SecureStore, namespace);
+}

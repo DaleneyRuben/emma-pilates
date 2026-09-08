@@ -1,15 +1,18 @@
 {
   "expo": {
-    "name": "Pilates",
-    "slug": "pilates",
+    "name": "Emma Pilates Staff",
+    "slug": "emma-pilates-staff",
+    "scheme": "emmapilates-staff",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
+      "bundleIdentifier": "com.emmapilates.staff",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.emmapilates.staff",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -25,7 +28,7 @@
       [
         "expo-secure-store",
         {
-          "faceIDPermission": "Permite que Pilates use Face ID para proteger tu sesión."
+          "faceIDPermission": "Permite que Emma Pilates Staff use Face ID para proteger tu sesión."
         }
       ]
     ]

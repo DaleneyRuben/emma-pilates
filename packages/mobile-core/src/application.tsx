@@ -1,45 +1,52 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { randomUUID } from "expo-crypto";
-import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
-import { useCallback, useMemo } from "react";
-
+import { StatusBar } from "expo-status-bar";
 import {
-  MobileIdentityProvider,
-  useMobileIdentity,
-} from "./src/auth/identity-provider";
+  type ComponentType,
+  useCallback,
+  useMemo,
+} from "react";
+
 import {
   createAuthenticationApi,
   type AuthenticationApi,
-} from "./src/auth/authentication-api";
-import type { LoginValues } from "./src/auth/login-screen";
+} from "./auth/authentication-api";
+import {
+  MobileIdentityProvider,
+  useMobileIdentity,
+} from "./auth/identity-provider";
+import type {
+  LoginSubmissionResult,
+  LoginValues,
+} from "./auth/login-screen";
 import {
   createSessionApi,
   type SessionLoginResult,
-} from "./src/auth/session-api";
+} from "./auth/session-api";
 import {
   createSessionManager,
+  type AppRole,
   type SessionManager,
-} from "./src/auth/session-manager";
-import { credentialStore } from "./src/auth/credential-store";
-import {
-  getMobileApiBaseUrl,
-  getOrCreateInstallationIdentifier,
-} from "./src/config/runtime";
-import type { LinkSource } from "./src/ingress/link-ingress";
+} from "./auth/session-manager";
+import type { LinkSource } from "./ingress/link-ingress";
+import type { AuthenticationLinkIntent } from "./ingress/verified-link";
 import {
   useVerifiedLinkIntent,
   VerifiedLinkProvider,
-} from "./src/ingress/verified-link-provider";
-import { fontAssets } from "./src/ui/fonts";
-import { MobileNavigation } from "./src/navigation";
-import { clearPersistedAccountCache } from "./src/query/persistence";
+} from "./ingress/verified-link-provider";
+import {
+  getMobileApiBaseUrl,
+  getOrCreateInstallationIdentifier,
+} from "./config/runtime";
+import { clearPersistedAccountCache } from "./query/persistence";
 import {
   clearMobileQueryCache,
   MobileQueryProvider,
-} from "./src/query/provider";
+} from "./query/provider";
+import { fontAssets } from "./ui/fonts";
 
-type MobileRuntime = {
+export type MobileRuntime = {
   allowedLinkHosts: readonly string[];
   authenticationApi: AuthenticationApi;
   linkSource?: LinkSource;
@@ -47,7 +54,24 @@ type MobileRuntime = {
   sessionManager: SessionManager;
 };
 
-function createDefaultRuntime(): MobileRuntime {
+export type MobileNavigationProps = {
+  authenticationApi: AuthenticationApi;
+  authenticationIntent: AuthenticationLinkIntent | null;
+  onBiometricUnlock?: () => void;
+  onLogin: (
+    values: LoginValues,
+  ) => Promise<LoginSubmissionResult | void>;
+  onRecoveryCredential: (credential: string) => Promise<void>;
+  role?: AppRole;
+};
+
+export function createDefaultMobileRuntime({
+  acceptedIdentityKind,
+  credentialStore,
+}: {
+  acceptedIdentityKind: "client" | "staff";
+  credentialStore: Parameters<typeof createSessionManager>[0]["credentialStore"];
+}): MobileRuntime {
   const apiBaseUrl = getMobileApiBaseUrl(
     { EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL },
     __DEV__,
@@ -71,6 +95,7 @@ function createDefaultRuntime(): MobileRuntime {
       return sessionApi.login({ clientIdentifier, email, password });
     },
     sessionManager: createSessionManager({
+      acceptedIdentityKind,
       clearAccountCache,
       credentialStore,
       resolveCurrent: sessionApi.resolveCurrent,
@@ -80,9 +105,11 @@ function createDefaultRuntime(): MobileRuntime {
 }
 
 function IdentityNavigation({
+  Navigation,
   authenticationApi,
   login,
 }: {
+  Navigation: ComponentType<MobileNavigationProps>;
   authenticationApi: AuthenticationApi;
   login: MobileRuntime["login"];
 }) {
@@ -94,7 +121,6 @@ function IdentityNavigation({
 
       if (result.status === "created") {
         await identity.start(result.credential);
-
         return undefined;
       }
 
@@ -108,7 +134,7 @@ function IdentityNavigation({
   }
 
   return (
-    <MobileNavigation
+    <Navigation
       authenticationApi={authenticationApi}
       authenticationIntent={intent}
       onBiometricUnlock={
@@ -123,12 +149,15 @@ function IdentityNavigation({
   );
 }
 
-export default function App({ runtime }: { runtime?: MobileRuntime }) {
+export function MobileApplication({
+  Navigation,
+  runtime,
+}: {
+  Navigation: ComponentType<MobileNavigationProps>;
+  runtime: MobileRuntime;
+}) {
   const [fontsLoaded] = useFonts(fontAssets);
-  const mobileRuntime = useMemo(
-    () => runtime ?? createDefaultRuntime(),
-    [runtime],
-  );
+  const mobileRuntime = useMemo(() => runtime, [runtime]);
 
   if (!fontsLoaded) {
     return null;
@@ -143,6 +172,7 @@ export default function App({ runtime }: { runtime?: MobileRuntime }) {
         >
           <MobileIdentityProvider manager={mobileRuntime.sessionManager}>
             <IdentityNavigation
+              Navigation={Navigation}
               authenticationApi={mobileRuntime.authenticationApi}
               login={mobileRuntime.login}
             />
