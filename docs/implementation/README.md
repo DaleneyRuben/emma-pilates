@@ -91,10 +91,11 @@ the six-table catalog migration (`2fa845b`) and Booking-owned repository reads
 See the [persistence handoff](./BKM-002-persistence-handoff.md) for checks,
 boundaries, and operational scope. There are now 21 business tables; normal
 development databases still need a separately authorized migration deployment.
-The next Client discovery sequence is `UPL-001` → `DEV-001`/`API-001` →
-`MOB-007`/`MOB-008`. Upload support is pulled forward because a published
-Promotion requires a finalized image; Client Home does not promise a next
-Booking before the Booking tables exist.
+The next core-product sequence is `BOOK-001` → approval → `BOOK-002` →
+`MOB-009`. `DEV-001` and `API-001` are ready to support Client Home, catalog,
+profile, and Session discovery without Promotions. `UPL-001` is intentionally
+later: it is required before published Promotions or receipt uploads, not before
+the core Booking journey.
 
 ## Delivery phases
 
