@@ -16,7 +16,7 @@ describe('foundation migration', () => {
     await context?.stop();
   });
 
-  it('installs the approved foundation tables in their owning schemas', async () => {
+  it('installs only approved business tables in their owning schemas', async () => {
     const result = await context.pool.query<{ table_name: string }>(`
       SELECT table_schema || '.' || table_name AS table_name
       FROM information_schema.tables
@@ -27,9 +27,15 @@ describe('foundation migration', () => {
 
     expect(result.rows.map(({ table_name: tableName }) => tableName)).toEqual([
       'booking.branches',
+      'booking.class_types',
       'booking.clients',
+      'booking.plans',
+      'booking.promotions',
+      'booking.session_schedules',
+      'booking.sessions',
       'booking.staff_branch_assignments',
       'booking.staff_members',
+      'booking.subscriptions',
       'system.account_devices',
       'system.accounts',
       'system.audit_records',
