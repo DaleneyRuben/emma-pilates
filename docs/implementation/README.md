@@ -52,7 +52,8 @@ screens.
 
 The complete first-release data model and relationship diagram are in
 [`full-release-schema-proposal.md`](./full-release-schema-proposal.md). The
-foundation rows are approved and implemented; every remaining proposed slice
+foundation and six-table Booking catalog are approved and implemented;
+every remaining proposed slice
 still requires explicit approval of its schema and generated migration SQL.
 
 Concrete examples for the approved foundation tables—including the application
@@ -84,15 +85,13 @@ export applies and verifies them, generated authentication screens still show
 superseded phone and temporary-password behavior. The working mobile app follows
 the accepted follow-up behavior and will be reconciled with that future export.
 
-`BKM-001` is the active item. Its Booking & Membership schema proposal has been
-revised after auditing the glossaries, ADRs, design prompts, and generated
-screens, and still awaits explicit approval. Its
-[executable review package](./BKM-001-schema-review-package.md) now includes the
-Prisma fragment, generated SQL, PostgreSQL constraints, examples, and 40 passing
-rejection assertions on an isolated PostgreSQL 14 database (`ce330db`). The
-application migration and PostgreSQL 17 repository tests remain BKM-002 work.
-After approval, the Client
-discovery sequence is `BKM-002` → `UPL-001` → `DEV-001`/`API-001` →
+`BKM-001` was approved on September 8, 2026 (`46140dc`). `BKM-002` implements
+the six-table catalog migration (`2fa845b`) and Booking-owned repository reads
+(`45946a1`), with PostgreSQL 17 integration and concurrency coverage (`8bfaf4f`).
+See the [persistence handoff](./BKM-002-persistence-handoff.md) for checks,
+boundaries, and operational scope. There are now 21 business tables; normal
+development databases still need a separately authorized migration deployment.
+The next Client discovery sequence is `UPL-001` → `DEV-001`/`API-001` →
 `MOB-007`/`MOB-008`. Upload support is pulled forward because a published
 Promotion requires a finalized image; Client Home does not promise a next
 Booking before the Booking tables exist.

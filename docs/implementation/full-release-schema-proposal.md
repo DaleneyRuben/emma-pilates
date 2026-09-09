@@ -1,7 +1,9 @@
 # Full release schema proposal
 
 Status: partially approved. The lean System foundation, image upload intent,
-and the Client/Staff/Branch foundation are approved. Remaining release tables
+Client/Staff/Branch foundation, and six-table Booking catalog are approved.
+The catalog implementation is recorded in the
+[BKM-002 handoff](./BKM-002-persistence-handoff.md). Remaining release tables
 stay proposed until reviewed. Concrete insert scenarios and representative rows
 for the implemented foundation are in
 [`approved-foundation-table-examples.md`](./approved-foundation-table-examples.md).
@@ -163,11 +165,11 @@ does not include custom permissions or editable Roles.
 | Approved | `staff_members`            | UUID, name, optional normalized phone, optional finalized profile-image asset, exactly one fixed Role, created/updated timestamps. Login email remains on Account.                                                                                 |
 | Approved | `branches`                 | UUID, unique active name, address, created/updated/archived timestamps. Archival blocks new activity but preserves history. There is no Room or Branch timezone table.                                                                             |
 | Approved | `staff_branch_assignments` | Staff Member/Branch composite primary key and assignment timestamp. Only Trainers, Nutritionists, and Assistants receive rows. Administrators have implicit access to all Branches. Assignment changes are audited.                                |
-| Proposed | `plans`                    | Name, allowed duration in months (1/3/6/12), positive class allowance, non-negative price in BOB centavos, display order, and reversible hidden timestamp. No unlimited Plan.                                                                       |
-| Proposed | `class_types`              | Name, client-facing description, positive duration minutes, positive default capacity, optional equipment-needs text, and archived timestamp. Equipment is text, not inventory.                                                                   |
-| Proposed | `session_schedules`        | Branch, Class Type, Trainer, ISO Bolivia weekday/wall-clock start, capacity, and an inclusive-start/exclusive-end effective date range. Edits close the old range instead of rewriting historical meaning.                                        |
-| Proposed | `sessions`                 | Optional source schedule, Branch, Class Type, Trainer, exact start/end instants, capacity, state, typed cancellation cause, conditional Account actor, optional note, timestamp, and exception marker. Source materialization is unique; Branch and Trainer overlaps are prohibited. |
-| Proposed | `subscriptions`            | Client, Plan, inclusive Bolivia start/paid-through dates using clamped calendar months, original and remaining class allowance, consistent state timestamps, and Plan-name/allowance snapshots. Only one active Subscription per Client.             |
+| Approved | `plans`                    | Name, allowed duration in months (1/3/6/12), positive class allowance, non-negative price in BOB centavos, display order, and reversible hidden timestamp. No unlimited Plan.                                                                       |
+| Approved | `class_types`              | Name, client-facing description, positive duration minutes, positive default capacity, optional equipment-needs text, and archived timestamp. Equipment is text, not inventory.                                                                   |
+| Approved | `session_schedules`        | Branch, Class Type, Trainer, ISO Bolivia weekday/wall-clock start, capacity, and an inclusive-start/exclusive-end effective date range. Edits close the old range instead of rewriting historical meaning.                                        |
+| Approved | `sessions`                 | Optional source schedule, Branch, Class Type, Trainer, exact start/end instants, capacity, state, typed cancellation cause, conditional Account actor, optional note, timestamp, and exception marker. Source materialization is unique; Branch and Trainer overlaps are prohibited. |
+| Approved | `subscriptions`            | Client, Plan, inclusive Bolivia start/paid-through dates using clamped calendar months, original and remaining class allowance, consistent state timestamps, and Plan-name/allowance snapshots. Only one active Subscription per Client.             |
 | Proposed | `bookings`                 | Client, Session, Subscription, state, booking actor Account, booked/cancelled/rescheduled timestamps, and idempotency linkage. One active Booking per Client/Session.                                                                              |
 | Proposed | `waitlist_entries`         | Client, Session, joined order/time, state, promotion timestamp, and promoted Booking. One active entry per Client/Session.                                                                                                                         |
 | Proposed | `attendance_records`       | One row per Booking with attended/no-show result, recording Trainer Account, and recorded timestamp.                                                                                                                                               |
@@ -178,7 +180,7 @@ does not include custom permissions or editable Roles.
 | Proposed | `credit_accounts`          | One row per Client with a non-negative available balance in BOB centavos and updated timestamp, locked during money transitions.                                                                                                                   |
 | Proposed | `credit_entries`           | Client Credit Account, positive amount, entry kind (`earned`, `reserved`, `spent`, `released`), optional Payment/Referral references, and timestamp. This is the immutable Credit ledger.                                                          |
 | Proposed | `referrals`                | Referring Client, unique referred Client, registration timestamp, reward state, first confirmed Payment, and reward Credit entry. Self-referral is prohibited.                                                                                     |
-| Proposed | `promotions`               | Title, description, image asset, display start/end dates, stable display order, publication/archive timestamps, and explicit draft/publish/unpublish/archive transitions. Published records require an attached finalized image.                    |
+| Approved | `promotions`               | Title, description, image asset, display start/end dates, stable display order, publication/archive timestamps, and explicit draft/publish/unpublish/archive transitions. Published records require an attached finalized image.                    |
 
 ## `back_office` tables
 
@@ -236,6 +238,10 @@ persistence slice implements the ten approved lean System tables,
 `image_assets`, and the four approved Client/Staff/Branch tables: 15 tables in
 total. `image_variants` and the remaining Booking & Membership and Back Office
 tables stay out of that migration until their reviews are complete.
+
+BKM-002 adds the six approved catalog tables in a subsequent migration, bringing
+the implemented business-table count to 21. Payment, Booking, and the other
+remaining proposals are not implicitly approved by this catalog approval.
 
 That first migration includes cross-schema foreign keys, fixed enums, partial
 unique indexes, checks, and append-only protections. It does not seed real

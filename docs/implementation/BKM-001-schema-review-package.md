@@ -23,8 +23,10 @@ concrete:
 - [Executable review assertions](./sql/booking-catalog-review-test.sql): valid
   examples and 40 rejected invalid changes, in a transaction that rolls back.
 
-These files are outside the application's migration directory. The deployed
-Prisma schema, generated application client, and development database are unchanged.
+These files remain historical review artifacts outside the migration directory.
+BKM-002 now implements them in the application schema and migration; see the
+[persistence handoff](./BKM-002-persistence-handoff.md). The normal development
+database has not been migrated by this work.
 
 ## Coverage against the product
 
@@ -121,9 +123,9 @@ first database run failed because a two-month Plan was accepted without the
 additional constraints. After those constraints were added, all 40 rejection
 assertions and the valid lifecycle examples passed on isolated PostgreSQL 14.18.
 
-The project's Testcontainers baseline is PostgreSQL 17. BKM-002 must also run
-the resulting migration and repository/concurrency suite on that version before
-completion. This review does not claim PostgreSQL 17, API, or iOS validation.
+The review itself used PostgreSQL 14. BKM-002 subsequently validated the actual
+migration and repository/concurrency suite on PostgreSQL 17.10; its separate
+handoff records that evidence. No iOS validation is claimed for this schema work.
 
 ## Migration impact and approval
 
@@ -133,7 +135,7 @@ There are no drops, backfills, existing-column changes, seeds, or new system
 tables. Installing the extension requires database permission. Foreign-key
 creation takes locks on referenced foundation tables during the migration.
 
-Approval requested: accept these six models and the two SQL files for BKM-002,
-including creating the application migration and testing it on disposable
-databases. Applying it to the user's development database or production remains
-a separate operational action. The review files alone add no mobile feature.
+Approval recorded September 8, 2026 (`46140dc`): these six models and both SQL
+files were accepted for BKM-002 migration creation and disposable-database tests.
+Applying it to the user's development database or production remains a separate
+operational action. The review files alone add no mobile feature.
