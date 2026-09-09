@@ -26,6 +26,8 @@ describe('foundation migration', () => {
     `);
 
     expect(result.rows.map(({ table_name: tableName }) => tableName)).toEqual([
+      'booking.attendance_records',
+      'booking.bookings',
       'booking.branches',
       'booking.class_types',
       'booking.clients',
@@ -36,6 +38,7 @@ describe('foundation migration', () => {
       'booking.staff_branch_assignments',
       'booking.staff_members',
       'booking.subscriptions',
+      'booking.waitlist_entries',
       'system.account_devices',
       'system.accounts',
       'system.audit_records',

@@ -140,6 +140,12 @@ model Account {
   emailSuppressionsResolved EmailSuppression[]      @relation("EmailSuppressionResolver")
   auditRecords              AuditRecord[]           @relation("AuditActor")
   cancelledSessions         Session[]
+  createdBookings           Booking[]               @relation("BookingCreatedBy")
+  cancelledBookings         Booking[]               @relation("BookingCancelledBy")
+  rescheduledBookings       Booking[]               @relation("BookingRescheduledBy")
+  attendanceRecords         AttendanceRecord[]      @relation("AttendanceRecordedBy")
+  joinedWaitlistEntries     WaitlistEntry[]         @relation("WaitlistJoinedBy")
+  closedWaitlistEntries     WaitlistEntry[]         @relation("WaitlistClosedBy")
   idempotencyRecords        IdempotencyRecord[]
   notifications             Notification[]
   devices                   AccountDevice[]

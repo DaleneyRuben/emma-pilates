@@ -8,16 +8,18 @@ enum StaffRole {
 }
 
 model Client {
-  id                  String         @id @default(uuid()) @db.Uuid
+  id                  String          @id @default(uuid()) @db.Uuid
   name                String
   phone               String?
-  profileImageAssetId String?        @unique @map("profile_image_asset_id") @db.Uuid
-  referralCode        String         @unique @map("referral_code")
-  createdAt           DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt           DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+  profileImageAssetId String?         @unique @map("profile_image_asset_id") @db.Uuid
+  referralCode        String          @unique @map("referral_code")
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
   account             Account?
   subscriptions       Subscription[]
-  profileImageAsset   ImageAsset?    @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
+  bookings            Booking[]
+  waitlistEntries     WaitlistEntry[]
+  profileImageAsset   ImageAsset?     @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
 
   @@map("clients")
   @@schema("booking")

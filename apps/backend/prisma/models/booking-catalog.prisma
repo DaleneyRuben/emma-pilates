@@ -78,27 +78,30 @@ model SessionSchedule {
 }
 
 model Session {
-  id                   String                    @id @default(uuid()) @db.Uuid
-  sessionScheduleId    String?                   @map("session_schedule_id") @db.Uuid
-  branchId             String                    @map("branch_id") @db.Uuid
-  classTypeId          String                    @map("class_type_id") @db.Uuid
-  trainerStaffMemberId String                    @map("trainer_staff_member_id") @db.Uuid
-  startsAt             DateTime                  @map("starts_at") @db.Timestamptz(3)
-  endsAt               DateTime                  @map("ends_at") @db.Timestamptz(3)
-  capacity             Int                       @db.SmallInt
-  state                SessionState              @default(SCHEDULED)
-  isException          Boolean                   @default(false) @map("is_exception")
-  cancellationCause    SessionCancellationCause? @map("cancellation_cause")
-  cancelledAt          DateTime?                 @map("cancelled_at") @db.Timestamptz(3)
-  cancelledByAccountId String?                   @map("cancelled_by_account_id") @db.Uuid
-  cancellationNote     String?                   @map("cancellation_note")
-  createdAt            DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt            DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(3)
-  sessionSchedule      SessionSchedule?          @relation(fields: [sessionScheduleId], references: [id], onDelete: Restrict)
-  branch               Branch                    @relation(fields: [branchId], references: [id], onDelete: Restrict)
-  classType            ClassType                 @relation(fields: [classTypeId], references: [id], onDelete: Restrict)
-  trainer              StaffMember               @relation(fields: [trainerStaffMemberId], references: [id], onDelete: Restrict)
-  cancelledByAccount   Account?                  @relation(fields: [cancelledByAccountId], references: [id], onDelete: Restrict)
+  id                           String                    @id @default(uuid()) @db.Uuid
+  sessionScheduleId            String?                   @map("session_schedule_id") @db.Uuid
+  branchId                     String                    @map("branch_id") @db.Uuid
+  classTypeId                  String                    @map("class_type_id") @db.Uuid
+  trainerStaffMemberId         String                    @map("trainer_staff_member_id") @db.Uuid
+  startsAt                     DateTime                  @map("starts_at") @db.Timestamptz(3)
+  endsAt                       DateTime                  @map("ends_at") @db.Timestamptz(3)
+  capacity                     Int                       @db.SmallInt
+  state                        SessionState              @default(SCHEDULED)
+  isException                  Boolean                   @default(false) @map("is_exception")
+  cancellationCause            SessionCancellationCause? @map("cancellation_cause")
+  cancelledAt                  DateTime?                 @map("cancelled_at") @db.Timestamptz(3)
+  cancelledByAccountId         String?                   @map("cancelled_by_account_id") @db.Uuid
+  cancellationNote             String?                   @map("cancellation_note")
+  emptyBookingCheckCompletedAt DateTime?                 @map("empty_booking_check_completed_at") @db.Timestamptz(3)
+  createdAt                    DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                    DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  sessionSchedule              SessionSchedule?          @relation(fields: [sessionScheduleId], references: [id], onDelete: Restrict)
+  branch                       Branch                    @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  classType                    ClassType                 @relation(fields: [classTypeId], references: [id], onDelete: Restrict)
+  trainer                      StaffMember               @relation(fields: [trainerStaffMemberId], references: [id], onDelete: Restrict)
+  cancelledByAccount           Account?                  @relation(fields: [cancelledByAccountId], references: [id], onDelete: Restrict)
+  bookings                     Booking[]
+  waitlistEntries              WaitlistEntry[]
 
   @@unique([sessionScheduleId, startsAt])
   @@index([branchId, startsAt, id])
@@ -126,7 +129,9 @@ model Subscription {
   updatedAt               DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
   client                  Client            @relation(fields: [clientId], references: [id], onDelete: Restrict)
   plan                    Plan              @relation(fields: [planId], references: [id], onDelete: Restrict)
+  bookings                Booking[]
 
+  @@unique([id, clientId])
   @@index([clientId, startsOn])
   @@index([planId])
   @@index([state, endsOn])
