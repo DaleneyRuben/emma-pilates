@@ -23,6 +23,10 @@ describe('createBooking', () => {
             identity: { kind: 'client', clientId: 'client-id' },
           },
           loadSession: jest.fn().mockResolvedValue(session),
+          countLiveBookings: jest.fn().mockResolvedValue(0),
+          findEligibleSubscription: jest.fn().mockResolvedValue({
+            id: 'subscription-id',
+          }),
           create,
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
@@ -32,6 +36,7 @@ describe('createBooking', () => {
     expect(create).toHaveBeenCalledWith({
       sessionId: session.id,
       clientId: 'client-id',
+      subscriptionId: 'subscription-id',
       createdByAccountId: 'account-id',
     });
   });
@@ -53,6 +58,10 @@ describe('createBooking', () => {
           },
         },
         loadSession: jest.fn().mockResolvedValue(session),
+        countLiveBookings: jest.fn().mockResolvedValue(0),
+        findEligibleSubscription: jest.fn().mockResolvedValue({
+          id: 'subscription-id',
+        }),
         create,
         now: () => new Date('2026-09-10T12:00:00Z'),
       },
@@ -61,6 +70,7 @@ describe('createBooking', () => {
     expect(create).toHaveBeenCalledWith({
       sessionId: session.id,
       clientId: 'client-id',
+      subscriptionId: 'subscription-id',
       createdByAccountId: 'assistant-account-id',
     });
   });
@@ -78,6 +88,8 @@ describe('createBooking', () => {
             identity: { kind: 'client', clientId: 'client-id' },
           },
           loadSession: jest.fn().mockResolvedValue(session),
+          countLiveBookings: jest.fn(),
+          findEligibleSubscription: jest.fn(),
           create,
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
@@ -105,11 +117,61 @@ describe('createBooking', () => {
             },
           },
           loadSession: jest.fn().mockResolvedValue(session),
+          countLiveBookings: jest.fn(),
+          findEligibleSubscription: jest.fn(),
           create,
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
       ),
     ).rejects.toThrow('Booking access is denied');
+
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a Booking when the Session is at capacity', async () => {
+    const create = jest.fn();
+
+    await expect(
+      createBooking(
+        { sessionId: session.id },
+        {
+          principal: {
+            accountId: 'account-id',
+            authenticationSessionId: 'authentication-session-id',
+            identity: { kind: 'client', clientId: 'client-id' },
+          },
+          loadSession: jest.fn().mockResolvedValue(session),
+          countLiveBookings: jest.fn().mockResolvedValue(session.capacity),
+          findEligibleSubscription: jest.fn(),
+          create,
+          now: () => new Date('2026-09-10T12:00:00Z'),
+        },
+      ),
+    ).rejects.toThrow('Session is full');
+
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('requires an active Subscription with remaining allowance', async () => {
+    const create = jest.fn();
+
+    await expect(
+      createBooking(
+        { sessionId: session.id },
+        {
+          principal: {
+            accountId: 'account-id',
+            authenticationSessionId: 'authentication-session-id',
+            identity: { kind: 'client', clientId: 'client-id' },
+          },
+          loadSession: jest.fn().mockResolvedValue(session),
+          countLiveBookings: jest.fn().mockResolvedValue(0),
+          findEligibleSubscription: jest.fn().mockResolvedValue(null),
+          create,
+          now: () => new Date('2026-09-10T12:00:00Z'),
+        },
+      ),
+    ).rejects.toThrow('No eligible Subscription');
 
     expect(create).not.toHaveBeenCalled();
   });
