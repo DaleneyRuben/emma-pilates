@@ -339,6 +339,10 @@ stored state, not endpoints available today.
 
 ## Approval impact
 
+The concrete review artifacts are in the
+[BOOK-001 schema review package](./BOOK-001-schema-review-package.md). They
+remain documentation only until a later, explicit migration-creation approval.
+
 If approved, the next design checkpoint will contain the exact Prisma fragment,
 SQL migration, constraints, valid examples, rejected cases, and migration
 impact summary for the three new tables, their enums, and the one Session field.

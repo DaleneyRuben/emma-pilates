@@ -1,0 +1,109 @@
+// Review fragment: merge these additions into a temporary copy of the current
+// Prisma schema as described in BOOK-001-schema-review-package.md.
+
+enum BookingState {
+  BOOKED      @map("booked")
+  CANCELLED   @map("cancelled")
+  RESCHEDULED @map("rescheduled")
+
+  @@schema("booking")
+}
+
+enum BookingCancellationCause {
+  CLIENT_REQUEST    @map("client_request")
+  SESSION_CANCELLED @map("session_cancelled")
+
+  @@schema("booking")
+}
+
+enum WaitlistClosureReason {
+  LEFT              @map("left")
+  PROMOTED          @map("promoted")
+  SESSION_CANCELLED @map("session_cancelled")
+  SESSION_STARTED   @map("session_started")
+
+  @@schema("booking")
+}
+
+enum AttendanceOutcome {
+  ATTENDED @map("attended")
+  NO_SHOW  @map("no_show")
+
+  @@schema("booking")
+}
+
+model Booking {
+  id                      String                   @id @default(uuid()) @db.Uuid
+  sessionId               String                   @map("session_id") @db.Uuid
+  clientId                String                   @map("client_id") @db.Uuid
+  subscriptionId          String                   @map("subscription_id") @db.Uuid
+  state                   BookingState              @default(BOOKED)
+  createdByAccountId      String                   @map("created_by_account_id") @db.Uuid
+  createdAt               DateTime                 @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt               DateTime                 @updatedAt @map("updated_at") @db.Timestamptz(3)
+  cancelledAt             DateTime?                @map("cancelled_at") @db.Timestamptz(3)
+  cancelledByAccountId    String?                  @map("cancelled_by_account_id") @db.Uuid
+  cancellationCause       BookingCancellationCause? @map("cancellation_cause")
+  rescheduledToBookingId  String?                  @unique @map("rescheduled_to_booking_id") @db.Uuid
+  rescheduledAt           DateTime?                @map("rescheduled_at") @db.Timestamptz(3)
+  rescheduledByAccountId  String?                  @map("rescheduled_by_account_id") @db.Uuid
+  session                 Session                  @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  client                  Client                   @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  subscription            Subscription             @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  createdByAccount        Account                  @relation("BookingCreatedBy", fields: [createdByAccountId], references: [id], onDelete: Restrict)
+  cancelledByAccount      Account?                 @relation("BookingCancelledBy", fields: [cancelledByAccountId], references: [id], onDelete: Restrict)
+  rescheduledByAccount    Account?                 @relation("BookingRescheduledBy", fields: [rescheduledByAccountId], references: [id], onDelete: Restrict)
+  rescheduledTo           Booking?                 @relation("BookingRescheduleChain", fields: [rescheduledToBookingId], references: [id], onDelete: Restrict)
+  rescheduledFrom         Booking?                 @relation("BookingRescheduleChain")
+  attendanceRecord        AttendanceRecord?
+  promotedWaitlistEntry   WaitlistEntry?           @relation("WaitlistPromotion")
+
+  @@unique([id, sessionId, clientId])
+  @@unique([id, clientId, subscriptionId])
+  @@index([sessionId])
+  @@index([clientId])
+  @@index([subscriptionId])
+  @@index([createdByAccountId])
+  @@index([cancelledByAccountId])
+  @@index([rescheduledByAccountId])
+  @@map("bookings")
+  @@schema("booking")
+}
+
+model WaitlistEntry {
+  id                    String                 @id @default(uuid()) @db.Uuid
+  sessionId             String                 @map("session_id") @db.Uuid
+  clientId              String                 @map("client_id") @db.Uuid
+  joinedByAccountId     String                 @map("joined_by_account_id") @db.Uuid
+  joinedAt              DateTime               @default(now()) @map("joined_at") @db.Timestamptz(3)
+  closedAt              DateTime?              @map("closed_at") @db.Timestamptz(3)
+  closureReason         WaitlistClosureReason? @map("closure_reason")
+  closedByAccountId     String?                @map("closed_by_account_id") @db.Uuid
+  promotedBookingId     String?                @unique @map("promoted_booking_id") @db.Uuid
+  session               Session                @relation(fields: [sessionId], references: [id], onDelete: Restrict)
+  client                Client                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  joinedByAccount       Account                @relation("WaitlistJoinedBy", fields: [joinedByAccountId], references: [id], onDelete: Restrict)
+  closedByAccount       Account?               @relation("WaitlistClosedBy", fields: [closedByAccountId], references: [id], onDelete: Restrict)
+  promotedBooking       Booking?               @relation("WaitlistPromotion", fields: [promotedBookingId], references: [id], onDelete: Restrict)
+
+  @@index([sessionId, joinedAt, id])
+  @@index([clientId])
+  @@index([joinedByAccountId])
+  @@index([closedByAccountId])
+  @@map("waitlist_entries")
+  @@schema("booking")
+}
+
+model AttendanceRecord {
+  bookingId             String            @id @map("booking_id") @db.Uuid
+  outcome               AttendanceOutcome
+  recordedByAccountId   String            @map("recorded_by_account_id") @db.Uuid
+  recordedAt            DateTime          @map("recorded_at") @db.Timestamptz(3)
+  updatedAt             DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+  booking               Booking           @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  recordedByAccount     Account           @relation("AttendanceRecordedBy", fields: [recordedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([recordedByAccountId])
+  @@map("attendance_records")
+  @@schema("booking")
+}
