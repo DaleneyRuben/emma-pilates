@@ -1,6 +1,8 @@
 # Booking catalog database review
 
-Status: executable proposal, awaiting approval for the application migration.
+Status: approved by the user on September 8, 2026 for BKM-002 implementation
+and migration testing on disposable databases. Normal development and production
+databases are not authorized migration targets.
 Prepared against foundation revision `9530c83`.
 
 ## What this unlocks

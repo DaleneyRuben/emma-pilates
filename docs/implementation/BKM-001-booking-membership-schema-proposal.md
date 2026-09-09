@@ -1,8 +1,8 @@
 # BKM-001 — Booking & Membership schema proposal
 
-Status: revised after the cross-document and design audit; proposed for explicit
-approval. This document creates no migration and does not alter the Prisma
-schema.
+Status: approved by the user on September 8, 2026, including the executable
+review package and BKM-002 migration creation/testing on disposable databases.
+This document itself creates no migration and does not alter the Prisma schema.
 
 ## Purpose and scope
 
