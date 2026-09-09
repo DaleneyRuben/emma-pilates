@@ -1,17 +1,19 @@
 # BOOK-001 — Booking workflow database review
 
-Status: prepared September 9, 2026. These are review artifacts only. They do
-not modify the application Prisma schema, create a migration directory, or
-apply anything to a database.
+Status: approved September 9, 2026. These historical review artifacts informed
+the approved persistence change in `2d48836`. The migration was validated only
+against a disposable `pilates_test_*` database and has not been applied to a
+normal development or production database.
 
 Prepared against proposal revision `6bed0ca` and the implemented Booking catalog
 migration `20260908000000_booking_catalog`.
 
-## Decision still required
+## Approval record
 
-This package makes the approved product rules concrete for review. It does not
-authorize creation, testing, or application of a Prisma migration. A later,
-explicit approval is required before any of those actions.
+The user approved creation and disposable-database validation of the reviewed
+migration. This approval covers only the persistence schema and its database
+invariants; Booking commands remain the separately scoped `BOOK-002` and
+`BOOK-003` work.
 
 ## Reviewed artifacts
 
@@ -26,21 +28,22 @@ explicit approval is required before any of those actions.
 - [Review assertions](./sql/booking-workflow-review-test.sql) — representative
   valid rows and rejected database-only cases in one rolled-back transaction.
 
-These are historical review files outside `apps/backend/prisma/migrations/`.
-They intentionally do not alter `apps/backend/prisma/models/`.
+These remain historical review files outside
+`apps/backend/prisma/migrations/`. The approved implementation is
+[`20260909000000_booking_workflow`](../../apps/backend/prisma/migrations/20260909000000_booking_workflow/migration.sql).
 
 ## Concrete schema impact
 
-| Object | Change | Why it is required |
-| --- | --- | --- |
-| `booking.sessions` | nullable `empty_booking_check_completed_at` | Preserves the documented one-time two-hour empty-Session decision. |
-| `BookingState` | `booked`, `cancelled`, `rescheduled` | One durable Booking state. |
-| `BookingCancellationCause` | `client_request`, `session_cancelled` | Separates the business cause from the Account actor. |
-| `WaitlistClosureReason` | `left`, `promoted`, `session_cancelled`, `session_started` | Accounts for every terminal Waitlist outcome. |
-| `AttendanceOutcome` | `attended`, `no_show` | Supplies the Trainer-recorded reporting result. |
-| `booking.bookings` | Client, Session, Subscription, actor, state, cancellation, and Reschedule chain | Preserves reservation and allowance history without an event table. |
-| `booking.waitlist_entries` | Client, Session, ordered entry, closure, and promotion link | Maintains the ordered queue without mutable position counters. |
-| `booking.attendance_records` | Booking-keyed outcome and Trainer Account actor | Stores one reporting-only Attendance result per Booking. |
+| Object                       | Change                                                                          | Why it is required                                                  |
+| ---------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `booking.sessions`           | nullable `empty_booking_check_completed_at`                                     | Preserves the documented one-time two-hour empty-Session decision.  |
+| `BookingState`               | `booked`, `cancelled`, `rescheduled`                                            | One durable Booking state.                                          |
+| `BookingCancellationCause`   | `client_request`, `session_cancelled`                                           | Separates the business cause from the Account actor.                |
+| `WaitlistClosureReason`      | `left`, `promoted`, `session_cancelled`, `session_started`                      | Accounts for every terminal Waitlist outcome.                       |
+| `AttendanceOutcome`          | `attended`, `no_show`                                                           | Supplies the Trainer-recorded reporting result.                     |
+| `booking.bookings`           | Client, Session, Subscription, actor, state, cancellation, and Reschedule chain | Preserves reservation and allowance history without an event table. |
+| `booking.waitlist_entries`   | Client, Session, ordered entry, closure, and promotion link                     | Maintains the ordered queue without mutable position counters.      |
+| `booking.attendance_records` | Booking-keyed outcome and Trainer Account actor                                 | Stores one reporting-only Attendance result per Booking.            |
 
 There are no drops, backfills, seeds, system tables, notification tables,
 job tables, or modifications under `design/`.
@@ -51,12 +54,12 @@ The fragment is not a standalone schema file. To validate it later, make a
 temporary copy of the current application Prisma schema and merge the fragment
 with these reverse fields:
 
-| Existing model | Fields to add |
-| --- | --- |
-| `Client` | `bookings Booking[]`, `waitlistEntries WaitlistEntry[]` |
-| `Subscription` | `bookings Booking[]` |
-| `Session` | `emptyBookingCheckCompletedAt DateTime? @map("empty_booking_check_completed_at") @db.Timestamptz(3)`, `bookings Booking[]`, `waitlistEntries WaitlistEntry[]` |
-| `Account` | `createdBookings Booking[] @relation("BookingCreatedBy")`, `cancelledBookings Booking[] @relation("BookingCancelledBy")`, `rescheduledBookings Booking[] @relation("BookingRescheduledBy")`, `attendanceRecords AttendanceRecord[] @relation("AttendanceRecordedBy")`, `joinedWaitlistEntries WaitlistEntry[] @relation("WaitlistJoinedBy")`, `closedWaitlistEntries WaitlistEntry[] @relation("WaitlistClosedBy")` |
+| Existing model | Fields to add                                                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Client`       | `bookings Booking[]`, `waitlistEntries WaitlistEntry[]`                                                                                                                                                                                                                                                                                                                                                             |
+| `Subscription` | `bookings Booking[]`                                                                                                                                                                                                                                                                                                                                                                                                |
+| `Session`      | `emptyBookingCheckCompletedAt DateTime? @map("empty_booking_check_completed_at") @db.Timestamptz(3)`, `bookings Booking[]`, `waitlistEntries WaitlistEntry[]`                                                                                                                                                                                                                                                       |
+| `Account`      | `createdBookings Booking[] @relation("BookingCreatedBy")`, `cancelledBookings Booking[] @relation("BookingCancelledBy")`, `rescheduledBookings Booking[] @relation("BookingRescheduledBy")`, `attendanceRecords AttendanceRecord[] @relation("AttendanceRecordedBy")`, `joinedWaitlistEntries WaitlistEntry[] @relation("WaitlistJoinedBy")`, `closedWaitlistEntries WaitlistEntry[] @relation("WaitlistClosedBy")` |
 
 The fragment uses ordinary Prisma foreign-key relations. The review SQL adds
 three deliberately redundant-looking composite keys because PostgreSQL needs
@@ -98,14 +101,16 @@ then the review SQL and constraints inside one transaction. It does not invoke
 Prisma migration commands, create a migration artifact, or touch a normal
 development or production database.
 
-## Migration impact if later approved
+## Approved migration result
 
-A future migration would add the four enums, three `booking` tables, the
-Session marker, ordinary indexes, partial unique indexes, checks, restrictive
-foreign keys, and the three composite keys. It would take normal table/index and
+The approved migration adds the four enums, three `booking` tables, the Session
+marker, ordinary indexes, partial unique indexes, checks, restrictive foreign
+keys, and the three composite keys. It takes normal table/index and
 referenced-table locks while installing constraints. No extension is needed for
 this slice because `btree_gist` was installed by the approved catalog migration.
 
-Before migration creation, the merged temporary Prisma schema must validate,
-the generated SQL must be compared against these review files, and the
-assertions plus real concurrent PostgreSQL integration tests must pass.
+The merged Prisma schema validates; `prisma migrate status` reports the
+disposable database current; and all backend integration tests, including the
+Booking workflow rejection cases, pass there. Capacity, eligibility,
+authorization, overlap, transaction, job, notification, and audit workflows
+remain application work rather than migration behavior.

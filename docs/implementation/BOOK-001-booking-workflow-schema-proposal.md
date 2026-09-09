@@ -67,21 +67,21 @@ A Booking is one Client's reserved spot in one concrete Session. It is never
 deleted: cancellation or Reschedule changes its state so history and allowance
 accounting remain explainable.
 
-| Field | Type / constraint | Purpose |
-| --- | --- | --- |
-| `id` | UUID primary key | Stable Booking identity. |
-| `session_id` | required FK → `booking.sessions` | The concrete reserved Session. |
-| `client_id` | required FK → `booking.clients` | The Client attending. |
-| `subscription_id` | required FK → `booking.subscriptions` | The Subscription unit consumed at Booking creation. |
-| `state` | `booked`, `cancelled`, or `rescheduled` | Current outcome defined by the Booking glossary. |
-| `created_by_account_id` | required FK → `system.accounts` | Client or Assistant actor who created it. |
-| `created_at`, `updated_at` | timezone-aware timestamps | Creation and operational update time. |
-| `cancelled_at` | nullable timezone-aware timestamp | Set only when `state = cancelled`. |
-| `cancelled_by_account_id` | nullable FK → `system.accounts` | Client, Assistant, or Administrator actor. |
-| `cancellation_cause` | nullable `client_request` or `session_cancelled` | Separates voluntary from studio cancellation; the actor distinguishes Client from Assistant. |
-| `rescheduled_to_booking_id` | nullable, unique FK → `booking.bookings` | On the source Booking, points to its replacement. |
-| `rescheduled_at` | nullable timezone-aware timestamp | Set only when `state = rescheduled`. |
-| `rescheduled_by_account_id` | nullable FK → `system.accounts` | Client or Assistant actor who made the same-day move. |
+| Field                       | Type / constraint                                | Purpose                                                                                      |
+| --------------------------- | ------------------------------------------------ | -------------------------------------------------------------------------------------------- |
+| `id`                        | UUID primary key                                 | Stable Booking identity.                                                                     |
+| `session_id`                | required FK → `booking.sessions`                 | The concrete reserved Session.                                                               |
+| `client_id`                 | required FK → `booking.clients`                  | The Client attending.                                                                        |
+| `subscription_id`           | required FK → `booking.subscriptions`            | The Subscription unit consumed at Booking creation.                                          |
+| `state`                     | `booked`, `cancelled`, or `rescheduled`          | Current outcome defined by the Booking glossary.                                             |
+| `created_by_account_id`     | required FK → `system.accounts`                  | Client or Assistant actor who created it.                                                    |
+| `created_at`, `updated_at`  | timezone-aware timestamps                        | Creation and operational update time.                                                        |
+| `cancelled_at`              | nullable timezone-aware timestamp                | Set only when `state = cancelled`.                                                           |
+| `cancelled_by_account_id`   | nullable FK → `system.accounts`                  | Client, Assistant, or Administrator actor.                                                   |
+| `cancellation_cause`        | nullable `client_request` or `session_cancelled` | Separates voluntary from studio cancellation; the actor distinguishes Client from Assistant. |
+| `rescheduled_to_booking_id` | nullable, unique FK → `booking.bookings`         | On the source Booking, points to its replacement.                                            |
+| `rescheduled_at`            | nullable timezone-aware timestamp                | Set only when `state = rescheduled`.                                                         |
+| `rescheduled_by_account_id` | nullable FK → `system.accounts`                  | Client or Assistant actor who made the same-day move.                                        |
 
 A Reschedule creates a normal `booked` replacement using the same Client and
 Subscription, then changes the source to `rescheduled` and links it through
@@ -94,17 +94,17 @@ allowance unit.
 A Waitlist Entry is a Client's place in one full Session's ordered queue. It
 does not reserve a spot and does not consume allowance.
 
-| Field | Type / constraint | Purpose |
-| --- | --- | --- |
-| `id` | UUID primary key | Stable Entry identity. |
-| `session_id` | required FK → `booking.sessions` | The full Session being waited for. |
-| `client_id` | required FK → `booking.clients` | Client holding the queue position. |
-| `joined_by_account_id` | required FK → `system.accounts` | Client or Assistant who joined it. |
-| `joined_at` | timezone-aware timestamp | Queue order; `id` breaks a timestamp tie. |
-| `closed_at` | nullable timezone-aware timestamp | Set when the Entry stops being active. |
-| `closure_reason` | nullable `left`, `promoted`, `session_cancelled`, or `session_started` | Explains every terminal outcome. |
-| `closed_by_account_id` | nullable FK → `system.accounts` | Client or Assistant actor; present only for `left`. |
-| `promoted_booking_id` | nullable, unique FK → `booking.bookings` | Booking created by promotion; present only for `promoted`. |
+| Field                  | Type / constraint                                                      | Purpose                                                    |
+| ---------------------- | ---------------------------------------------------------------------- | ---------------------------------------------------------- |
+| `id`                   | UUID primary key                                                       | Stable Entry identity.                                     |
+| `session_id`           | required FK → `booking.sessions`                                       | The full Session being waited for.                         |
+| `client_id`            | required FK → `booking.clients`                                        | Client holding the queue position.                         |
+| `joined_by_account_id` | required FK → `system.accounts`                                        | Client or Assistant who joined it.                         |
+| `joined_at`            | timezone-aware timestamp                                               | Queue order; `id` breaks a timestamp tie.                  |
+| `closed_at`            | nullable timezone-aware timestamp                                      | Set when the Entry stops being active.                     |
+| `closure_reason`       | nullable `left`, `promoted`, `session_cancelled`, or `session_started` | Explains every terminal outcome.                           |
+| `closed_by_account_id` | nullable FK → `system.accounts`                                        | Client or Assistant actor; present only for `left`.        |
+| `promoted_booking_id`  | nullable, unique FK → `booking.bookings`                               | Booking created by promotion; present only for `promoted`. |
 
 An Entry is active when `closed_at` is null. Its order is always
 `joined_at ASC, id ASC`; there is no mutable position column. Entries that
@@ -115,13 +115,13 @@ remain when a Session starts close with `session_started` and no notification.
 Attendance is one record per Booking, so `booking_id` is both primary key and
 foreign key. A separate generated Attendance identifier adds no business value.
 
-| Field | Type / constraint | Purpose |
-| --- | --- | --- |
-| `booking_id` | primary key and FK → `booking.bookings` | The booked Client whose Attendance is recorded. |
-| `outcome` | `attended` or `no_show` | Assigned Trainer's result after the Session. |
-| `recorded_by_account_id` | required FK → `system.accounts` | Authenticated Trainer Account that saved the roster. |
-| `recorded_at` | timezone-aware timestamp | First complete roster save. |
-| `updated_at` | timezone-aware timestamp | Latest correction time. |
+| Field                    | Type / constraint                       | Purpose                                              |
+| ------------------------ | --------------------------------------- | ---------------------------------------------------- |
+| `booking_id`             | primary key and FK → `booking.bookings` | The booked Client whose Attendance is recorded.      |
+| `outcome`                | `attended` or `no_show`                 | Assigned Trainer's result after the Session.         |
+| `recorded_by_account_id` | required FK → `system.accounts`         | Authenticated Trainer Account that saved the roster. |
+| `recorded_at`            | timezone-aware timestamp                | First complete roster save.                          |
+| `updated_at`             | timezone-aware timestamp                | Latest correction time.                              |
 
 The assigned Trainer must submit an outcome for every `booked` Booking in one
 atomic roster save. The same assigned Trainer may later correct the complete
@@ -135,19 +135,19 @@ Booking state. Client class history reads only `attended` records.
 The future migration must use restrictive foreign keys. Business records are
 kept for history; none of these foreign keys cascade deletion.
 
-| Protection | Reason |
-| --- | --- |
-| Partial unique `(session_id, client_id)` where Booking is `booked` | A Client cannot hold two live spots in one Session. |
-| Partial unique `(session_id, client_id)` where a Waitlist Entry is active | A Client cannot join one Session's Waitlist twice. |
-| Composite FK from Booking `(subscription_id, client_id)` | The consumed Subscription must belong to the booked Client. |
-| Composite FK from promoted Entry `(promoted_booking_id, session_id, client_id)` | A promotion must create a Booking for the same Client and Session. |
-| Composite self-FK from source `(rescheduled_to_booking_id, client_id, subscription_id)` | A Reschedule replacement must retain the Client and Subscription. |
-| Unique `waitlist_entries.promoted_booking_id` | One Entry can create at most one Booking. |
-| Unique `bookings.rescheduled_to_booking_id` | One replacement can have at most one direct predecessor. |
-| Booking state checks | `cancelled` requires exactly its cancellation fields; `rescheduled` requires exactly its Reschedule fields and replacement; `booked` has neither terminal group. |
-| Waitlist state checks | Active has no closure fields; `left` requires its actor; `promoted` requires its Booking; system closure reasons require neither. |
-| Temporal checks | Booking terminal times cannot precede creation, Waitlist closure cannot precede joining, and Attendance update cannot precede its first recording. |
-| Existing positive Session capacity check | Bookings cannot point to an impossible capacity value. |
+| Protection                                                                              | Reason                                                                                                                                                           |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Partial unique `(session_id, client_id)` where Booking is `booked`                      | A Client cannot hold two live spots in one Session.                                                                                                              |
+| Partial unique `(session_id, client_id)` where a Waitlist Entry is active               | A Client cannot join one Session's Waitlist twice.                                                                                                               |
+| Composite FK from Booking `(subscription_id, client_id)`                                | The consumed Subscription must belong to the booked Client.                                                                                                      |
+| Composite FK from promoted Entry `(promoted_booking_id, session_id, client_id)`         | A promotion must create a Booking for the same Client and Session.                                                                                               |
+| Composite self-FK from source `(rescheduled_to_booking_id, client_id, subscription_id)` | A Reschedule replacement must retain the Client and Subscription.                                                                                                |
+| Unique `waitlist_entries.promoted_booking_id`                                           | One Entry can create at most one Booking.                                                                                                                        |
+| Unique `bookings.rescheduled_to_booking_id`                                             | One replacement can have at most one direct predecessor.                                                                                                         |
+| Booking state checks                                                                    | `cancelled` requires exactly its cancellation fields; `rescheduled` requires exactly its Reschedule fields and replacement; `booked` has neither terminal group. |
+| Waitlist state checks                                                                   | Active has no closure fields; `left` requires its actor; `promoted` requires its Booking; system closure reasons require neither.                                |
+| Temporal checks                                                                         | Booking terminal times cannot precede creation, Waitlist closure cannot precede joining, and Attendance update cannot precede its first recording.               |
+| Existing positive Session capacity check                                                | Bookings cannot point to an impossible capacity value.                                                                                                           |
 
 The referenced composite keys require supporting unique keys on
 `subscriptions (id, client_id)`, `bookings (id, session_id, client_id)`, and
@@ -193,18 +193,18 @@ only for allocation and coupled state changes under ADR-0056; deterministic
 business conflicts are not retried. Transactions create durable follow-up work
 but never send a notification or call a provider.
 
-| Command | Isolation | Required state and atomic result |
-| --- | --- | --- |
-| Create Booking | Serializable | Session is scheduled and future. Before direct allocation, process any active queue while promotion is allowed. Capacity remains; Client has one active Subscription covering the Session's Bolivia date with allowance; no live Booking overlaps at any Branch; and no active Entry remains for this Client/Session. Insert `booked`, decrement that Subscription once, and store the idempotent response. Requires `Idempotency-Key`. |
-| Join Waitlist | Serializable | Session is scheduled, future, full, and still more than 2 h 30 away. Client has an active Subscription covering its Bolivia date, but remaining allowance is not required. Client has no live Booking or active Entry for it. Insert only the Entry and idempotent response. Requires `Idempotency-Key`. |
-| Leave Waitlist | Read Committed | Conditional update closes one active Entry as `left`; an already-closed Entry cannot transition again. No allowance changes. |
-| Cancel Booking | Serializable | Booking and Session are live and the start is strictly more than 2 h 30 away. Mark the Booking `cancelled/client_request`, return exactly one unit to its linked Subscription, then promote in queue order while capacity and time permit. |
-| Reschedule Booking | Serializable | Source is `booked` and at or inside 2 h 30 before start, but has not started. Target is a different scheduled future Session on the same Bolivia date. It has capacity after queue fairness, and it overlaps no other live Booking for the Client. Create the same-Client/same-Subscription target and change the source to `rescheduled`; allowance is unchanged. |
-| Promote Waitlist | Serializable, inside the capacity-changing transaction | Before the Cancellation Window, inspect active Entries in order. Promote each first eligible Client while capacity remains. Eligibility requires an active Subscription covering the Session date with allowance and no overlapping live Booking. Skipped Clients stay queued. Each success inserts a Booking, decrements its exact Subscription, closes its Entry, and creates its durable notification. |
-| Cancel Session | Serializable | Administrator targets a scheduled, future Session with at least one live Booking and confirms no substitute Trainer is available. Mark it `cancelled/no_substitute_trainer`; cancel all live Bookings as `session_cancelled`; refund every linked unit; close all active Entries as `session_cancelled`; create one Session audit record and all required Notifications. |
-| Check empty Session | Serializable | At or after `starts_at - 2 hours`, handle a scheduled Session only when `empty_booking_check_completed_at` is null. If zero live Bookings exist, cancel it as `zero_bookings`, close active Entries as `session_cancelled`, and notify the assigned Trainer and queued Clients. Otherwise leave it scheduled. In both cases set the completion timestamp once. |
-| Finalize Session start | Serializable | At or after start, close remaining active Entries as `session_started` without notification and re-evaluate affected zero-allowance Subscriptions. Duplicate work is a no-op. |
-| Record or correct Attendance | Read Committed | Session has ended and is not cancelled. Authenticated Account is its assigned Trainer. Upsert one outcome for every `booked` Booking in a complete atomic roster; a retry with the same values is a no-op. |
+| Command                      | Isolation                                              | Required state and atomic result                                                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Create Booking               | Serializable                                           | Session is scheduled and future. Before direct allocation, process any active queue while promotion is allowed. Capacity remains; Client has one active Subscription covering the Session's Bolivia date with allowance; no live Booking overlaps at any Branch; and no active Entry remains for this Client/Session. Insert `booked`, decrement that Subscription once, and store the idempotent response. Requires `Idempotency-Key`. |
+| Join Waitlist                | Serializable                                           | Session is scheduled, future, full, and still more than 2 h 30 away. Client has an active Subscription covering its Bolivia date, but remaining allowance is not required. Client has no live Booking or active Entry for it. Insert only the Entry and idempotent response. Requires `Idempotency-Key`.                                                                                                                                |
+| Leave Waitlist               | Read Committed                                         | Conditional update closes one active Entry as `left`; an already-closed Entry cannot transition again. No allowance changes.                                                                                                                                                                                                                                                                                                            |
+| Cancel Booking               | Serializable                                           | Booking and Session are live and the start is strictly more than 2 h 30 away. Mark the Booking `cancelled/client_request`, return exactly one unit to its linked Subscription, then promote in queue order while capacity and time permit.                                                                                                                                                                                              |
+| Reschedule Booking           | Serializable                                           | Source is `booked` and at or inside 2 h 30 before start, but has not started. Target is a different scheduled future Session on the same Bolivia date. It has capacity after queue fairness, and it overlaps no other live Booking for the Client. Create the same-Client/same-Subscription target and change the source to `rescheduled`; allowance is unchanged.                                                                      |
+| Promote Waitlist             | Serializable, inside the capacity-changing transaction | Before the Cancellation Window, inspect active Entries in order. Promote each first eligible Client while capacity remains. Eligibility requires an active Subscription covering the Session date with allowance and no overlapping live Booking. Skipped Clients stay queued. Each success inserts a Booking, decrements its exact Subscription, closes its Entry, and creates its durable notification.                               |
+| Cancel Session               | Serializable                                           | Administrator targets a scheduled, future Session with at least one live Booking and confirms no substitute Trainer is available. Mark it `cancelled/no_substitute_trainer`; cancel all live Bookings as `session_cancelled`; refund every linked unit; close all active Entries as `session_cancelled`; create one Session audit record and all required Notifications.                                                                |
+| Check empty Session          | Serializable                                           | At or after `starts_at - 2 hours`, handle a scheduled Session only when `empty_booking_check_completed_at` is null. If zero live Bookings exist, cancel it as `zero_bookings`, close active Entries as `session_cancelled`, and notify the assigned Trainer and queued Clients. Otherwise leave it scheduled. In both cases set the completion timestamp once.                                                                          |
+| Finalize Session start       | Serializable                                           | At or after start, close remaining active Entries as `session_started` without notification and re-evaluate affected zero-allowance Subscriptions. Duplicate work is a no-op.                                                                                                                                                                                                                                                           |
+| Record or correct Attendance | Read Committed                                         | Session has ended and is not cancelled. Authenticated Account is its assigned Trainer. Upsert one outcome for every `booked` Booking in a complete atomic roster; a retry with the same values is a no-op.                                                                                                                                                                                                                              |
 
 At the exact `starts_at - 2 hours 30 minutes` boundary, free cancellation and
 promotion are closed and Reschedule is open. Capacity-changing commands for one
@@ -317,14 +317,14 @@ Role or Trainer, cancelled Sessions, and pre-end attempts.
 These readable identifiers stand in for UUIDs; they are examples of eventual
 stored state, not endpoints available today.
 
-| Event | Resulting rows |
-| --- | --- |
-| Ana books Reformer on September 14 using her 8-class Subscription | `booking(id=bookingAna, session_id=reformerSep14, client_id=ana, subscription_id=anaPack8, state=booked, created_by_account_id=anaAccount)`; `anaPack8.remaining_class_allowance` changes 8 → 7. |
-| Lucía finds that Session full | `waitlist_entries(id=waitLucia, session_id=reformerSep14, client_id=lucia, joined_by_account_id=luciaAccount, joined_at=2026-09-10T14:00:00Z, closed_at=null)`. Her allowance is unchanged. |
-| Ana cancels before the window | `bookingAna.state=cancelled`, `cancellation_cause=client_request`; `anaPack8.remaining_class_allowance` changes 7 → 8. If Lucía remains eligible, her Entry closes as `promoted`, links `bookingLucia`, and that Booking consumes one of Lucía's units. |
-| Ana reschedules during the window | `bookingAna.state=rescheduled`, its Reschedule fields point to new `bookingAnaLater.state=booked`, and both use `anaPack8`; allowance does not change. |
-| Trainer records Ana attended | `attendance_records(booking_id=bookingAnaLater, outcome=attended, recorded_by_account_id=trainerMariaAccount, recorded_at=..., updated_at=...)`. |
-| Full Session starts before Lucía is promoted | `waitLucia.closed_at` is set with `closure_reason=session_started`; no notification is created. |
+| Event                                                             | Resulting rows                                                                                                                                                                                                                                          |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ana books Reformer on September 14 using her 8-class Subscription | `booking(id=bookingAna, session_id=reformerSep14, client_id=ana, subscription_id=anaPack8, state=booked, created_by_account_id=anaAccount)`; `anaPack8.remaining_class_allowance` changes 8 → 7.                                                        |
+| Lucía finds that Session full                                     | `waitlist_entries(id=waitLucia, session_id=reformerSep14, client_id=lucia, joined_by_account_id=luciaAccount, joined_at=2026-09-10T14:00:00Z, closed_at=null)`. Her allowance is unchanged.                                                             |
+| Ana cancels before the window                                     | `bookingAna.state=cancelled`, `cancellation_cause=client_request`; `anaPack8.remaining_class_allowance` changes 7 → 8. If Lucía remains eligible, her Entry closes as `promoted`, links `bookingLucia`, and that Booking consumes one of Lucía's units. |
+| Ana reschedules during the window                                 | `bookingAna.state=rescheduled`, its Reschedule fields point to new `bookingAnaLater.state=booked`, and both use `anaPack8`; allowance does not change.                                                                                                  |
+| Trainer records Ana attended                                      | `attendance_records(booking_id=bookingAnaLater, outcome=attended, recorded_by_account_id=trainerMariaAccount, recorded_at=..., updated_at=...)`.                                                                                                        |
+| Full Session starts before Lucía is promoted                      | `waitLucia.closed_at` is set with `closure_reason=session_started`; no notification is created.                                                                                                                                                         |
 
 ## Explicit non-goals
 
@@ -339,12 +339,11 @@ stored state, not endpoints available today.
 
 ## Approval impact
 
-The concrete review artifacts are in the
-[BOOK-001 schema review package](./BOOK-001-schema-review-package.md). They
-remain documentation only until a later, explicit migration-creation approval.
+The concrete review artifacts and approval record are in the
+[BOOK-001 schema review package](./BOOK-001-schema-review-package.md). The
+approved persistence migration is
+[`20260909000000_booking_workflow`](../../apps/backend/prisma/migrations/20260909000000_booking_workflow/migration.sql).
 
-If approved, the next design checkpoint will contain the exact Prisma fragment,
-SQL migration, constraints, valid examples, rejected cases, and migration
-impact summary for the three new tables, their enums, and the one Session field.
-Only after that separate review will a migration be created or tested on a
-disposable database.
+This completes the BOOK-001 schema-design checkpoint. The separately scoped
+BOOK-002 and BOOK-003 commands must enforce the approved capacity, allowance,
+authorization, scheduling, notification, job, transaction, and audit rules.

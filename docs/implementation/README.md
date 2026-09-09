@@ -89,10 +89,11 @@ the accepted follow-up behavior and will be reconciled with that future export.
 the six-table catalog migration (`2fa845b`) and Booking-owned repository reads
 (`45946a1`), with PostgreSQL 17 integration and concurrency coverage (`8bfaf4f`).
 See the [persistence handoff](./BKM-002-persistence-handoff.md) for checks,
-boundaries, and operational scope. There are now 21 business tables; normal
-development databases still need a separately authorized migration deployment.
-The next core-product sequence is `BOOK-001` → approval → `BOOK-002` →
-`MOB-009`. `DEV-001` and `API-001` are ready to support Client Home, catalog,
+boundaries, and operational scope. `BOOK-001` is now approved and its
+three-table workflow migration is recorded in `2d48836`, bringing the total to
+24 business tables; normal development databases still need a separately
+authorized migration deployment. The next core-product sequence is `BOOK-002`
+→ `MOB-009`. `DEV-001` and `API-001` are ready to support Client Home, catalog,
 profile, and Session discovery without Promotions. `UPL-001` is intentionally
 later: it is required before published Promotions or receipt uploads, not before
 the core Booking journey.
