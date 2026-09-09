@@ -238,6 +238,11 @@ checks, and foreign keys in one reviewed migration:
 
 ## Approval requested
 
-Approval of this proposal authorizes `BKM-002` to prepare the exact Prisma
-models and generated migration SQL for review. It does **not** authorize
-creating or applying that migration yet.
+The exact Prisma models, generated SQL, additional PostgreSQL constraints,
+representative rows, and executable review checks are now available in the
+[schema review package](./BKM-001-schema-review-package.md), evidence `ce330db`.
+
+Approval now requested: accept this proposal and that concrete review package
+for `BKM-002`, including creating the application migration and testing it on
+disposable databases. Applying it to the user's development database or
+production remains a separate operational action.

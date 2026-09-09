@@ -86,7 +86,12 @@ the accepted follow-up behavior and will be reconciled with that future export.
 
 `BKM-001` is the active item. Its Booking & Membership schema proposal has been
 revised after auditing the glossaries, ADRs, design prompts, and generated
-screens, and still awaits explicit approval. After approval, the Client
+screens, and still awaits explicit approval. Its
+[executable review package](./BKM-001-schema-review-package.md) now includes the
+Prisma fragment, generated SQL, PostgreSQL constraints, examples, and 40 passing
+rejection assertions on an isolated PostgreSQL 14 database (`ce330db`). The
+application migration and PostgreSQL 17 repository tests remain BKM-002 work.
+After approval, the Client
 discovery sequence is `BKM-002` → `UPL-001` → `DEV-001`/`API-001` →
 `MOB-007`/`MOB-008`. Upload support is pulled forward because a published
 Promotion requires a finalized image; Client Home does not promise a next
