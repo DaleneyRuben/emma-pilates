@@ -8,15 +8,16 @@ enum StaffRole {
 }
 
 model Client {
-  id                  String      @id @default(uuid()) @db.Uuid
+  id                  String         @id @default(uuid()) @db.Uuid
   name                String
   phone               String?
-  profileImageAssetId String?     @unique @map("profile_image_asset_id") @db.Uuid
-  referralCode        String      @unique @map("referral_code")
-  createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt           DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  profileImageAssetId String?        @unique @map("profile_image_asset_id") @db.Uuid
+  referralCode        String         @unique @map("referral_code")
+  createdAt           DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
   account             Account?
-  profileImageAsset   ImageAsset? @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
+  subscriptions       Subscription[]
+  profileImageAsset   ImageAsset?    @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
 
   @@map("clients")
   @@schema("booking")
@@ -33,6 +34,8 @@ model StaffMember {
   account             Account?
   profileImageAsset   ImageAsset?             @relation("StaffProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
   branchAssignments   StaffBranchAssignment[]
+  schedules           SessionSchedule[]
+  sessions            Session[]
 
   @@map("staff_members")
   @@schema("booking")
@@ -47,6 +50,8 @@ model Branch {
   archivedAt       DateTime?               @map("archived_at") @db.Timestamptz(3)
   staffAssignments StaffBranchAssignment[]
   auditRecords     AuditRecord[]
+  schedules        SessionSchedule[]
+  sessions         Session[]
 
   @@map("branches")
   @@schema("booking")

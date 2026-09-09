@@ -1,0 +1,155 @@
+enum SessionState {
+  SCHEDULED @map("scheduled")
+  CANCELLED @map("cancelled")
+
+  @@schema("booking")
+}
+
+enum SessionCancellationCause {
+  ZERO_BOOKINGS         @map("zero_bookings")
+  NO_SUBSTITUTE_TRAINER @map("no_substitute_trainer")
+
+  @@schema("booking")
+}
+
+enum SubscriptionState {
+  ACTIVE  @map("active")
+  EXPIRED @map("expired")
+
+  @@schema("booking")
+}
+
+model Plan {
+  id             String         @id @default(uuid()) @db.Uuid
+  name           String
+  durationMonths Int            @map("duration_months") @db.SmallInt
+  classAllowance Int            @map("class_allowance")
+  priceCentavos  Int            @map("price_centavos")
+  displayOrder   Int            @map("display_order")
+  hiddenAt       DateTime?      @map("hidden_at") @db.Timestamptz(3)
+  createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
+  subscriptions  Subscription[]
+
+  @@index([hiddenAt, displayOrder, id])
+  @@map("plans")
+  @@schema("booking")
+}
+
+model ClassType {
+  id              String            @id @default(uuid()) @db.Uuid
+  name            String
+  description     String
+  durationMinutes Int               @map("duration_minutes") @db.SmallInt
+  defaultCapacity Int               @map("default_capacity") @db.SmallInt
+  equipmentNeeds  String?           @map("equipment_needs")
+  archivedAt      DateTime?         @map("archived_at") @db.Timestamptz(3)
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+  schedules       SessionSchedule[]
+  sessions        Session[]
+
+  @@map("class_types")
+  @@schema("booking")
+}
+
+model SessionSchedule {
+  id                   String      @id @default(uuid()) @db.Uuid
+  branchId             String      @map("branch_id") @db.Uuid
+  classTypeId          String      @map("class_type_id") @db.Uuid
+  trainerStaffMemberId String      @map("trainer_staff_member_id") @db.Uuid
+  weekday              Int         @db.SmallInt
+  startsAtLocal        DateTime    @map("starts_at_local") @db.Time(0)
+  capacity             Int         @db.SmallInt
+  effectiveFrom        DateTime    @map("effective_from") @db.Date
+  effectiveUntil       DateTime?   @map("effective_until") @db.Date
+  createdAt            DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  branch               Branch      @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  classType            ClassType   @relation(fields: [classTypeId], references: [id], onDelete: Restrict)
+  trainer              StaffMember @relation(fields: [trainerStaffMemberId], references: [id], onDelete: Restrict)
+  sessions             Session[]
+
+  @@index([branchId, effectiveFrom])
+  @@index([classTypeId])
+  @@index([trainerStaffMemberId])
+  @@map("session_schedules")
+  @@schema("booking")
+}
+
+model Session {
+  id                   String                    @id @default(uuid()) @db.Uuid
+  sessionScheduleId    String?                   @map("session_schedule_id") @db.Uuid
+  branchId             String                    @map("branch_id") @db.Uuid
+  classTypeId          String                    @map("class_type_id") @db.Uuid
+  trainerStaffMemberId String                    @map("trainer_staff_member_id") @db.Uuid
+  startsAt             DateTime                  @map("starts_at") @db.Timestamptz(3)
+  endsAt               DateTime                  @map("ends_at") @db.Timestamptz(3)
+  capacity             Int                       @db.SmallInt
+  state                SessionState              @default(SCHEDULED)
+  isException          Boolean                   @default(false) @map("is_exception")
+  cancellationCause    SessionCancellationCause? @map("cancellation_cause")
+  cancelledAt          DateTime?                 @map("cancelled_at") @db.Timestamptz(3)
+  cancelledByAccountId String?                   @map("cancelled_by_account_id") @db.Uuid
+  cancellationNote     String?                   @map("cancellation_note")
+  createdAt            DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt            DateTime                  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  sessionSchedule      SessionSchedule?          @relation(fields: [sessionScheduleId], references: [id], onDelete: Restrict)
+  branch               Branch                    @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  classType            ClassType                 @relation(fields: [classTypeId], references: [id], onDelete: Restrict)
+  trainer              StaffMember               @relation(fields: [trainerStaffMemberId], references: [id], onDelete: Restrict)
+  cancelledByAccount   Account?                  @relation(fields: [cancelledByAccountId], references: [id], onDelete: Restrict)
+
+  @@unique([sessionScheduleId, startsAt])
+  @@index([branchId, startsAt, id])
+  @@index([trainerStaffMemberId, startsAt])
+  @@index([classTypeId])
+  @@index([cancelledByAccountId])
+  @@map("sessions")
+  @@schema("booking")
+}
+
+model Subscription {
+  id                      String            @id @default(uuid()) @db.Uuid
+  clientId                String            @map("client_id") @db.Uuid
+  planId                  String            @map("plan_id") @db.Uuid
+  planNameSnapshot        String            @map("plan_name_snapshot")
+  durationMonthsSnapshot  Int               @map("duration_months_snapshot") @db.SmallInt
+  originalClassAllowance  Int               @map("original_class_allowance")
+  remainingClassAllowance Int               @map("remaining_class_allowance")
+  startsOn                DateTime          @map("starts_on") @db.Date
+  endsOn                  DateTime          @map("ends_on") @db.Date
+  state                   SubscriptionState @default(ACTIVE)
+  activatedAt             DateTime          @map("activated_at") @db.Timestamptz(3)
+  expiredAt               DateTime?         @map("expired_at") @db.Timestamptz(3)
+  createdAt               DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt               DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+  client                  Client            @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  plan                    Plan              @relation(fields: [planId], references: [id], onDelete: Restrict)
+
+  @@index([clientId, startsOn])
+  @@index([planId])
+  @@index([state, endsOn])
+  @@map("subscriptions")
+  @@schema("booking")
+}
+
+model Promotion {
+  id              String      @id @default(uuid()) @db.Uuid
+  headline        String
+  description     String
+  imageAssetId    String?     @map("image_asset_id") @db.Uuid
+  displayStartsOn DateTime    @map("display_starts_on") @db.Date
+  displayEndsOn   DateTime    @map("display_ends_on") @db.Date
+  displayOrder    Int         @map("display_order")
+  publishedAt     DateTime?   @map("published_at") @db.Timestamptz(3)
+  archivedAt      DateTime?   @map("archived_at") @db.Timestamptz(3)
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  imageAsset      ImageAsset? @relation(fields: [imageAssetId], references: [id], onDelete: Restrict)
+
+  @@index([imageAssetId])
+  @@index([displayOrder, id])
+  @@map("promotions")
+  @@schema("booking")
+}

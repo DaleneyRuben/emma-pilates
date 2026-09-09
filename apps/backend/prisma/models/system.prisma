@@ -139,6 +139,7 @@ model Account {
   authenticationSessions    AuthenticationSession[]
   emailSuppressionsResolved EmailSuppression[]      @relation("EmailSuppressionResolver")
   auditRecords              AuditRecord[]           @relation("AuditActor")
+  cancelledSessions         Session[]
   idempotencyRecords        IdempotencyRecord[]
   notifications             Notification[]
   devices                   AccountDevice[]
@@ -354,6 +355,7 @@ model ImageAsset {
   ownerAccount      Account           @relation("ImageAssetOwner", fields: [ownerAccountId], references: [id], onDelete: Restrict)
   clientProfile     Client?           @relation("ClientProfileImage")
   staffProfile      StaffMember?      @relation("StaffProfileImage")
+  promotions        Promotion[]
 
   @@index([ownerAccountId, state])
   @@index([state, expiresAt])
