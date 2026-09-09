@@ -19,6 +19,7 @@ describe('createBooking', () => {
         {
           principal: {
             accountId: 'account-id',
+            authenticationSessionId: 'authentication-session-id',
             identity: { kind: 'client', clientId: 'client-id' },
           },
           loadSession: jest.fn().mockResolvedValue(session),
@@ -43,6 +44,7 @@ describe('createBooking', () => {
       {
         principal: {
           accountId: 'assistant-account-id',
+          authenticationSessionId: 'authentication-session-id',
           identity: {
             kind: 'staff',
             staffMemberId: 'assistant-id',
@@ -72,6 +74,7 @@ describe('createBooking', () => {
         {
           principal: {
             accountId: 'account-id',
+            authenticationSessionId: 'authentication-session-id',
             identity: { kind: 'client', clientId: 'client-id' },
           },
           loadSession: jest.fn().mockResolvedValue(session),
@@ -93,6 +96,7 @@ describe('createBooking', () => {
         {
           principal: {
             accountId: 'assistant-account-id',
+            authenticationSessionId: 'authentication-session-id',
             identity: {
               kind: 'staff',
               staffMemberId: 'assistant-id',
