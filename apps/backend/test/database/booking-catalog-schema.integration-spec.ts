@@ -24,7 +24,9 @@ describe('booking catalog migration', () => {
         resolve('test/database/fixtures/booking-catalog-constraints.sql'),
         'utf8',
       );
-      expect(assertions.match(/SELECT pg_temp.expect_failure/g)).toHaveLength(40);
+      expect(assertions.match(/SELECT pg_temp.expect_failure/g)).toHaveLength(
+        40,
+      );
       await expect(client.query(assertions)).resolves.toBeDefined();
     } finally {
       await client.query('ROLLBACK');
