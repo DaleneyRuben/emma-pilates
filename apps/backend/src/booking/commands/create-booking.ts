@@ -18,9 +18,15 @@ type SessionForBooking = {
 type CreateBookingDependencies = {
   principal: AuthenticatedPrincipal;
   loadSession(sessionId: string): Promise<SessionForBooking | null>;
+  countLiveBookings(sessionId: string): Promise<number>;
+  findEligibleSubscription(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ id: string } | null>;
   create(input: {
     sessionId: string;
     clientId: string;
+    subscriptionId: string;
     createdByAccountId: string;
   }): Promise<{ id: string }>;
   now(): Date;
@@ -74,9 +80,23 @@ export const createBooking = async (
 
   const clientId = resolveClientId(command, session, dependencies.principal);
 
+  if ((await dependencies.countLiveBookings(session.id)) >= session.capacity) {
+    throw new Error('Session is full');
+  }
+
+  const subscription = await dependencies.findEligibleSubscription({
+    clientId,
+    onDate: session.startsAt,
+  });
+
+  if (subscription === null) {
+    throw new Error('No eligible Subscription');
+  }
+
   return dependencies.create({
     sessionId: session.id,
     clientId,
+    subscriptionId: subscription.id,
     createdByAccountId: dependencies.principal.accountId,
   });
 };
