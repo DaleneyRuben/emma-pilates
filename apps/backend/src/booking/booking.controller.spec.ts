@@ -3,6 +3,7 @@ import {
   BookingCancellationController,
   BookingController,
   ClassHistoryController,
+  TrainerAttendanceController,
   BookingRescheduleController,
 } from './booking.controller';
 import { BookingAccessDeniedError } from './commands/create-booking';
@@ -157,5 +158,21 @@ describe('BookingController', () => {
     ).resolves.toEqual([{ bookingId: 'booking-id', sessionId: 'session-id' }]);
 
     expect(listClassHistory).toHaveBeenCalledWith(principal);
+  });
+
+  it('records a Trainer attendance roster', async () => {
+    const recordAttendance = jest.fn().mockResolvedValue(undefined);
+    const controller = new TrainerAttendanceController(
+      recordAttendance,
+      resolvePrincipal,
+    );
+
+    await expect(
+      controller.record(
+        '11111111-1111-4111-8111-111111111111',
+        'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        { outcomes: [{ bookingId: '22222222-2222-4222-8222-222222222222', outcome: 'attended' }] },
+      ),
+    ).resolves.toBeUndefined();
   });
 });
