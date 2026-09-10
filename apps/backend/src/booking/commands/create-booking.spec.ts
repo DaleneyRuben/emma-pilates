@@ -27,6 +27,7 @@ describe('createBooking', () => {
           findEligibleSubscription: jest.fn().mockResolvedValue({
             id: 'subscription-id',
           }),
+          hasOverlappingBooking: jest.fn().mockResolvedValue(false),
           create,
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
@@ -62,6 +63,7 @@ describe('createBooking', () => {
         findEligibleSubscription: jest.fn().mockResolvedValue({
           id: 'subscription-id',
         }),
+        hasOverlappingBooking: jest.fn().mockResolvedValue(false),
         create,
         now: () => new Date('2026-09-10T12:00:00Z'),
       },
@@ -90,6 +92,7 @@ describe('createBooking', () => {
           loadSession: jest.fn().mockResolvedValue(session),
           countLiveBookings: jest.fn(),
           findEligibleSubscription: jest.fn(),
+          hasOverlappingBooking: jest.fn(),
           create,
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
@@ -119,6 +122,7 @@ describe('createBooking', () => {
           loadSession: jest.fn().mockResolvedValue(session),
           countLiveBookings: jest.fn(),
           findEligibleSubscription: jest.fn(),
+          hasOverlappingBooking: jest.fn(),
           create,
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
@@ -143,6 +147,7 @@ describe('createBooking', () => {
           loadSession: jest.fn().mockResolvedValue(session),
           countLiveBookings: jest.fn().mockResolvedValue(session.capacity),
           findEligibleSubscription: jest.fn(),
+          hasOverlappingBooking: jest.fn(),
           create,
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
@@ -167,11 +172,39 @@ describe('createBooking', () => {
           loadSession: jest.fn().mockResolvedValue(session),
           countLiveBookings: jest.fn().mockResolvedValue(0),
           findEligibleSubscription: jest.fn().mockResolvedValue(null),
+          hasOverlappingBooking: jest.fn(),
           create,
           now: () => new Date('2026-09-10T12:00:00Z'),
         },
       ),
     ).rejects.toThrow('No eligible Subscription');
+
+    expect(create).not.toHaveBeenCalled();
+  });
+
+  it('rejects a Booking that overlaps the Client’s existing Session', async () => {
+    const create = jest.fn();
+
+    await expect(
+      createBooking(
+        { sessionId: session.id },
+        {
+          principal: {
+            accountId: 'account-id',
+            authenticationSessionId: 'authentication-session-id',
+            identity: { kind: 'client', clientId: 'client-id' },
+          },
+          loadSession: jest.fn().mockResolvedValue(session),
+          countLiveBookings: jest.fn().mockResolvedValue(0),
+          findEligibleSubscription: jest.fn().mockResolvedValue({
+            id: 'subscription-id',
+          }),
+          hasOverlappingBooking: jest.fn().mockResolvedValue(true),
+          create,
+          now: () => new Date('2026-09-10T12:00:00Z'),
+        },
+      ),
+    ).rejects.toThrow('Client already has an overlapping Booking');
 
     expect(create).not.toHaveBeenCalled();
   });
