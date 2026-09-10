@@ -2,6 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import {
   BookingCancellationController,
   BookingController,
+  ClassHistoryController,
   BookingRescheduleController,
 } from './booking.controller';
 import { BookingAccessDeniedError } from './commands/create-booking';
@@ -138,5 +139,21 @@ describe('BookingController', () => {
       },
       principal,
     );
+  });
+
+  it('returns the authenticated Client’s attended class history', async () => {
+    const listClassHistory = jest
+      .fn()
+      .mockResolvedValue([{ bookingId: 'booking-id', sessionId: 'session-id' }]);
+    const controller = new ClassHistoryController(
+      listClassHistory,
+      resolvePrincipal,
+    );
+
+    await expect(
+      controller.list('Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'),
+    ).resolves.toEqual([{ bookingId: 'booking-id', sessionId: 'session-id' }]);
+
+    expect(listClassHistory).toHaveBeenCalledWith(principal);
   });
 });
