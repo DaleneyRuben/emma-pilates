@@ -5,6 +5,7 @@ type BookingForReschedule = {
   id: string;
   clientId: string;
   subscriptionId: string;
+  state: 'booked' | 'cancelled' | 'rescheduled';
   session: {
     id: string;
     branchId: string;
@@ -78,14 +79,19 @@ export const rescheduleBooking = async (
   dependencies: RescheduleBookingDependencies,
 ): Promise<{ id: string }> => {
   const booking = await dependencies.loadBooking(command.bookingId);
-  const target = await dependencies.loadSession(command.targetSessionId);
 
   if (
     booking === null ||
-    target === null ||
+    booking.state !== 'booked' ||
     booking.session.state !== 'scheduled' ||
-    target.state !== 'scheduled'
+    booking.session.startsAt <= dependencies.now()
   ) {
+    throw new BookingAccessDeniedError();
+  }
+
+  const target = await dependencies.loadSession(command.targetSessionId);
+
+  if (target === null || target.state !== 'scheduled') {
     throw new BookingAccessDeniedError();
   }
 

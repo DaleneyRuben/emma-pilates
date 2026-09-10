@@ -18,6 +18,7 @@ describe('rescheduleBooking', () => {
             id: 'booking-id',
             clientId: 'client-id',
             subscriptionId: 'subscription-id',
+            state: 'booked',
             session: {
               id: 'source-session-id',
               branchId: 'branch-id',
