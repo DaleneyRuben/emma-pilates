@@ -31,7 +31,10 @@ import type {
   CompletePasswordRecoveryDto,
   CorrectPendingClientEmailDto,
   CreateAuthenticationSessionDto,
+  CreateBookingDto,
+  CreatedBookingDto,
   CurrentAuthenticationPrincipalDto,
+  ListSessionAvailabilityParams,
   LivenessResponseDto,
   PasswordRecoveryRequestResultDto,
   PasswordRecoveryResultDto,
@@ -40,6 +43,7 @@ import type {
   PendingRegistrationContinuationDto,
   PendingVerificationResendDto,
   RequestPasswordRecoveryDto,
+  SessionAvailabilityDto,
   StartClientRegistrationDto,
   VerifyClientEmailDto,
 } from "./models";
@@ -1956,4 +1960,462 @@ export const useRegisterClient = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getRegisterClientMutationOptions(options), queryClient);
+};
+
+export type listSessionAvailabilityResponse200 = {
+  data: SessionAvailabilityDto[];
+  status: 200;
+};
+
+export type listSessionAvailabilityResponseSuccess =
+  listSessionAvailabilityResponse200 & {
+    headers: Headers;
+  };
+export type listSessionAvailabilityResponse =
+  listSessionAvailabilityResponseSuccess;
+
+export const getListSessionAvailabilityUrl = (
+  params: ListSessionAvailabilityParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/sessions?${stringifiedParams}`
+    : `/api/v1/sessions`;
+};
+
+export const listSessionAvailability = async (
+  params: ListSessionAvailabilityParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listSessionAvailabilityResponse> => {
+  const res = await (fetchFn ?? fetch)(getListSessionAvailabilityUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listSessionAvailabilityResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listSessionAvailabilityResponse;
+};
+
+export const getListSessionAvailabilityQueryKey = (
+  params?: ListSessionAvailabilityParams,
+) => {
+  return [`/api/v1/sessions`, ...(params ? [params] : [])] as const;
+};
+
+export const getListSessionAvailabilityQueryOptions = <
+  TData = Awaited<ReturnType<typeof listSessionAvailability>>,
+  TError = unknown,
+>(
+  params: ListSessionAvailabilityParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionAvailability>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListSessionAvailabilityQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listSessionAvailability>>
+  > = ({ signal }) =>
+    listSessionAvailability(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listSessionAvailability>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListSessionAvailabilityQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listSessionAvailability>>
+>;
+export type ListSessionAvailabilityQueryError = unknown;
+
+export function useListSessionAvailability<
+  TData = Awaited<ReturnType<typeof listSessionAvailability>>,
+  TError = unknown,
+>(
+  params: ListSessionAvailabilityParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionAvailability>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSessionAvailability>>,
+          TError,
+          Awaited<ReturnType<typeof listSessionAvailability>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListSessionAvailability<
+  TData = Awaited<ReturnType<typeof listSessionAvailability>>,
+  TError = unknown,
+>(
+  params: ListSessionAvailabilityParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionAvailability>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSessionAvailability>>,
+          TError,
+          Awaited<ReturnType<typeof listSessionAvailability>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListSessionAvailability<
+  TData = Awaited<ReturnType<typeof listSessionAvailability>>,
+  TError = unknown,
+>(
+  params: ListSessionAvailabilityParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionAvailability>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListSessionAvailability<
+  TData = Awaited<ReturnType<typeof listSessionAvailability>>,
+  TError = unknown,
+>(
+  params: ListSessionAvailabilityParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionAvailability>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListSessionAvailabilityQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createBookingResponse201 = {
+  data: CreatedBookingDto;
+  status: 201;
+};
+
+export type createBookingResponseSuccess = createBookingResponse201 & {
+  headers: Headers;
+};
+export type createBookingResponse = createBookingResponseSuccess;
+
+export const getCreateBookingUrl = (sessionId: string) => {
+  return `/api/v1/sessions/${sessionId}/bookings`;
+};
+
+export const createBooking = async (
+  sessionId: string,
+  createBookingDto: CreateBookingDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createBookingResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateBookingUrl(sessionId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createBookingDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createBookingResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createBookingResponse;
+};
+
+export const getCreateBookingMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBooking>>,
+    TError,
+    CreateBookingMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createBooking>>,
+  TError,
+  CreateBookingMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createBooking"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createBooking>>,
+    CreateBookingMutationVariables
+  > = (props) => {
+    const { sessionId, data } = props ?? {};
+
+    return createBooking(sessionId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateBookingMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createBooking>>
+>;
+export type CreateBookingMutationBody = CreateBookingDto;
+export type CreateBookingMutationError = unknown;
+export type CreateBookingMutationVariables = {
+  sessionId: string;
+  data: CreateBookingDto;
+};
+
+export const useCreateBooking = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createBooking>>,
+      TError,
+      CreateBookingMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createBooking>>,
+  TError,
+  CreateBookingMutationVariables,
+  TContext
+> => {
+  return useMutation(getCreateBookingMutationOptions(options), queryClient);
+};
+
+export type joinSessionWaitlistResponse201 = {
+  data: CreatedBookingDto;
+  status: 201;
+};
+
+export type joinSessionWaitlistResponseSuccess =
+  joinSessionWaitlistResponse201 & {
+    headers: Headers;
+  };
+export type joinSessionWaitlistResponse = joinSessionWaitlistResponseSuccess;
+
+export const getJoinSessionWaitlistUrl = (sessionId: string) => {
+  return `/api/v1/sessions/${sessionId}/waitlist-entries`;
+};
+
+export const joinSessionWaitlist = async (
+  sessionId: string,
+  createBookingDto: CreateBookingDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<joinSessionWaitlistResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getJoinSessionWaitlistUrl(sessionId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createBookingDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: joinSessionWaitlistResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as joinSessionWaitlistResponse;
+};
+
+export const getJoinSessionWaitlistMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof joinSessionWaitlist>>,
+    TError,
+    JoinSessionWaitlistMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof joinSessionWaitlist>>,
+  TError,
+  JoinSessionWaitlistMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["joinSessionWaitlist"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof joinSessionWaitlist>>,
+    JoinSessionWaitlistMutationVariables
+  > = (props) => {
+    const { sessionId, data } = props ?? {};
+
+    return joinSessionWaitlist(sessionId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type JoinSessionWaitlistMutationResult = NonNullable<
+  Awaited<ReturnType<typeof joinSessionWaitlist>>
+>;
+export type JoinSessionWaitlistMutationBody = CreateBookingDto;
+export type JoinSessionWaitlistMutationError = unknown;
+export type JoinSessionWaitlistMutationVariables = {
+  sessionId: string;
+  data: CreateBookingDto;
+};
+
+export const useJoinSessionWaitlist = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof joinSessionWaitlist>>,
+      TError,
+      JoinSessionWaitlistMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof joinSessionWaitlist>>,
+  TError,
+  JoinSessionWaitlistMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getJoinSessionWaitlistMutationOptions(options),
+    queryClient,
+  );
 };

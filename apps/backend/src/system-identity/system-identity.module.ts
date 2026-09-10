@@ -367,5 +367,6 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         new SystemIdentityRuntimeCleanup(prisma, boss),
     },
   ],
+  exports: [authenticatedPrincipalResolver],
 })
 export class SystemIdentityModule {}

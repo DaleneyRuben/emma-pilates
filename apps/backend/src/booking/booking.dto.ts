@@ -1,0 +1,84 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { z } from 'zod';
+
+export class CreateBookingDto {
+  @ApiPropertyOptional({ format: 'uuid' })
+  clientId?: string;
+}
+
+export class CreatedBookingDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+}
+
+export class SessionAvailabilityDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  branchId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  classTypeId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  trainerStaffMemberId!: string;
+
+  @ApiProperty({ format: 'date-time' })
+  startsAt!: Date;
+
+  @ApiProperty({ format: 'date-time' })
+  endsAt!: Date;
+
+  @ApiProperty({ minimum: 1 })
+  capacity!: number;
+
+  @ApiProperty({ minimum: 0 })
+  bookedCount!: number;
+
+  @ApiProperty({ minimum: 0 })
+  availableSeats!: number;
+
+  @ApiProperty({ minimum: 0 })
+  waitlistCount!: number;
+}
+
+const createBookingSchema = z.object({
+  clientId: z.uuid().optional(),
+});
+const uuidSchema = z.uuid();
+
+const availabilityQuerySchema = z
+  .object({
+    branchId: z.uuid(),
+    from: z.iso.datetime(),
+    until: z.iso.datetime(),
+    limit: z.coerce.number().int().min(1).max(100).default(50),
+  })
+  .refine(({ from, until }) => new Date(from) < new Date(until), {
+    message: 'until must be after from',
+  });
+
+export const parseCreateBooking = (value: unknown): CreateBookingDto | null => {
+  const result = createBookingSchema.safeParse(value);
+  return result.success ? result.data : null;
+};
+
+export const parseAvailabilityQuery = (
+  value: unknown,
+): { branchId: string; from: Date; until: Date; limit: number } | null => {
+  const result = availabilityQuerySchema.safeParse(value);
+  if (!result.success) return null;
+
+  return {
+    branchId: result.data.branchId,
+    from: new Date(result.data.from),
+    until: new Date(result.data.until),
+    limit: result.data.limit,
+  };
+};
+
+export const parseUuid = (value: unknown): string | null => {
+  const result = uuidSchema.safeParse(value);
+  return result.success ? result.data : null;
+};
