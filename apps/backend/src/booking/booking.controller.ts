@@ -32,6 +32,7 @@ import {
   CreateBookingDto,
   parseAvailabilityQuery,
   parseCreateBooking,
+  parseRescheduleBooking,
   parseUuid,
   SessionAvailabilityDto,
 } from './booking.dto';
@@ -41,6 +42,7 @@ import type { SessionAvailabilityHandler } from './session-availability';
 export const createBookingCommand = Symbol('createBookingCommand');
 export const joinWaitlistCommand = Symbol('joinWaitlistCommand');
 export const cancelBookingCommand = Symbol('cancelBookingCommand');
+export const rescheduleBookingCommand = Symbol('rescheduleBookingCommand');
 export const sessionAvailability = Symbol('sessionAvailability');
 
 type CommandHandler = (
@@ -56,6 +58,10 @@ type CancellationCommandHandler = (
   command: { bookingId: string },
   principal: AuthenticatedPrincipal,
 ) => Promise<void>;
+type RescheduleCommandHandler = (
+  command: { bookingId: string; targetSessionId: string },
+  principal: AuthenticatedPrincipal,
+) => Promise<{ id: string }>;
 
 const parseBearerCredential = (authorization: string | undefined): string => {
   const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
@@ -276,6 +282,65 @@ export class BookingCancellationController {
     try {
       await this.cancelBookingHandler(
         { bookingId: parsedBookingId },
+        principal,
+      );
+    } catch (error) {
+      const problem = error instanceof Error ? commandProblem(error) : null;
+      if (problem !== null) throw problem;
+      throw error;
+    }
+  }
+
+  private async authenticate(
+    authorization: string | undefined,
+  ): Promise<AuthenticatedPrincipal> {
+    try {
+      return await this.principalResolver(
+        parseBearerCredential(authorization),
+        true,
+      );
+    } catch (error) {
+      if (
+        error instanceof AuthenticationRequiredError ||
+        error instanceof UnauthorizedException
+      ) {
+        throw new UnauthorizedException('Authentication is required');
+      }
+      throw error;
+    }
+  }
+}
+
+@Controller({ path: 'bookings', version: '1' })
+@ApiBearerAuth()
+export class BookingRescheduleController {
+  constructor(
+    @Inject(rescheduleBookingCommand)
+    private readonly rescheduleBookingHandler: RescheduleCommandHandler,
+    @Inject(authenticatedPrincipalResolver)
+    private readonly principalResolver: PrincipalResolver,
+  ) {}
+
+  @Post(':bookingId/reschedule')
+  @ApiOperation({ operationId: 'rescheduleBooking' })
+  @ApiParam({ name: 'bookingId', format: 'uuid' })
+  @ApiCreatedResponse({ type: CreatedBookingDto })
+  async reschedule(
+    @Param('bookingId') bookingId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: unknown,
+  ): Promise<CreatedBookingDto> {
+    const parsedBookingId = parseUuid(bookingId);
+    const parsed = parseRescheduleBooking(body);
+    if (parsedBookingId === null || parsed === null) {
+      throw invalidRequest('Invalid Reschedule request');
+    }
+
+    const principal = await this.authenticate(authorization);
+
+    try {
+      return await this.rescheduleBookingHandler(
+        { bookingId: parsedBookingId, targetSessionId: parsed.targetSessionId },
         principal,
       );
     } catch (error) {

@@ -11,6 +11,11 @@ export class CreatedBookingDto {
   id!: string;
 }
 
+export class RescheduleBookingDto {
+  @ApiProperty({ format: 'uuid' })
+  targetSessionId!: string;
+}
+
 export class SessionAvailabilityDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -46,6 +51,7 @@ export class SessionAvailabilityDto {
 const createBookingSchema = z.object({
   clientId: z.uuid().optional(),
 });
+const rescheduleBookingSchema = z.object({ targetSessionId: z.uuid() });
 const uuidSchema = z.uuid();
 
 const availabilityQuerySchema = z
@@ -61,6 +67,13 @@ const availabilityQuerySchema = z
 
 export const parseCreateBooking = (value: unknown): CreateBookingDto | null => {
   const result = createBookingSchema.safeParse(value);
+  return result.success ? result.data : null;
+};
+
+export const parseRescheduleBooking = (
+  value: unknown,
+): RescheduleBookingDto | null => {
+  const result = rescheduleBookingSchema.safeParse(value);
   return result.success ? result.data : null;
 };
 
