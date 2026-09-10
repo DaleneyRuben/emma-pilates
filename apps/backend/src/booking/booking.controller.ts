@@ -31,6 +31,7 @@ import {
   CreatedBookingDto,
   CreateBookingDto,
   parseAvailabilityQuery,
+  parseAttendance,
   parseCreateBooking,
   parseRescheduleBooking,
   parseUuid,
@@ -44,6 +45,7 @@ export const joinWaitlistCommand = Symbol('joinWaitlistCommand');
 export const cancelBookingCommand = Symbol('cancelBookingCommand');
 export const rescheduleBookingCommand = Symbol('rescheduleBookingCommand');
 export const classHistory = Symbol('classHistory');
+export const recordAttendanceCommand = Symbol('recordAttendanceCommand');
 export const sessionAvailability = Symbol('sessionAvailability');
 
 type CommandHandler = (
@@ -66,6 +68,13 @@ type RescheduleCommandHandler = (
 type ClassHistoryHandler = (
   principal: AuthenticatedPrincipal,
 ) => Promise<{ bookingId: string; sessionId: string }[]>;
+type AttendanceHandler = (
+  command: {
+    sessionId: string;
+    outcomes: { bookingId: string; outcome: 'attended' | 'no_show' }[];
+  },
+  principal: AuthenticatedPrincipal,
+) => Promise<void>;
 
 const parseBearerCredential = (authorization: string | undefined): string => {
   const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
@@ -409,6 +418,53 @@ export class ClassHistoryController {
       ) {
         throw new UnauthorizedException('Authentication is required');
       }
+      throw error;
+    }
+  }
+}
+
+@Controller({ path: 'sessions', version: '1' })
+@ApiBearerAuth()
+export class TrainerAttendanceController {
+  constructor(
+    @Inject(recordAttendanceCommand)
+    private readonly recordAttendance: AttendanceHandler,
+    @Inject(authenticatedPrincipalResolver)
+    private readonly principalResolver: PrincipalResolver,
+  ) {}
+
+  @Post(':sessionId/attendance')
+  @ApiOperation({ operationId: 'recordSessionAttendance' })
+  async record(
+    @Param('sessionId') sessionId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: unknown,
+  ): Promise<void> {
+    const parsedSessionId = parseUuid(sessionId);
+    const parsed = parseAttendance(body);
+    if (parsedSessionId === null || parsed === null)
+      throw invalidRequest('Invalid Attendance request');
+    const principal = await this.authenticate(authorization);
+    await this.recordAttendance(
+      { sessionId: parsedSessionId, outcomes: parsed.outcomes },
+      principal,
+    );
+  }
+
+  private async authenticate(
+    authorization: string | undefined,
+  ): Promise<AuthenticatedPrincipal> {
+    try {
+      return await this.principalResolver(
+        parseBearerCredential(authorization),
+        true,
+      );
+    } catch (error) {
+      if (
+        error instanceof AuthenticationRequiredError ||
+        error instanceof UnauthorizedException
+      )
+        throw new UnauthorizedException('Authentication is required');
       throw error;
     }
   }

@@ -10,6 +10,8 @@ import {
   cancelBookingCommand,
   BookingRescheduleController,
   ClassHistoryController,
+  TrainerAttendanceController,
+  recordAttendanceCommand,
   classHistory,
   createBookingCommand,
   joinWaitlistCommand,
@@ -37,6 +39,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     BookingCancellationController,
     BookingRescheduleController,
     ClassHistoryController,
+    TrainerAttendanceController,
   ],
   providers: [
     {
@@ -108,6 +111,14 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
                   })),
                 ),
           }),
+    },
+    {
+      provide: recordAttendanceCommand,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) => {
+        const commands = new PrismaBookingCommands(prisma, () => new Date());
+        return commands.recordAttendance.bind(commands);
+      },
     },
     {
       provide: sessionAvailability,

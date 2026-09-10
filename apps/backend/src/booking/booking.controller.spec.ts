@@ -171,7 +171,14 @@ describe('BookingController', () => {
       controller.record(
         '11111111-1111-4111-8111-111111111111',
         'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-        { outcomes: [{ bookingId: '22222222-2222-4222-8222-222222222222', outcome: 'attended' }] },
+        {
+          outcomes: [
+            {
+              bookingId: '22222222-2222-4222-8222-222222222222',
+              outcome: 'attended',
+            },
+          ],
+        },
       ),
     ).resolves.toBeUndefined();
   });

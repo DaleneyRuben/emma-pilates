@@ -16,6 +16,19 @@ export class RescheduleBookingDto {
   targetSessionId!: string;
 }
 
+export class AttendanceOutcomeDto {
+  @ApiProperty({ format: 'uuid' })
+  bookingId!: string;
+
+  @ApiProperty({ enum: ['attended', 'no_show'] })
+  outcome!: 'attended' | 'no_show';
+}
+
+export class RecordAttendanceDto {
+  @ApiProperty({ type: AttendanceOutcomeDto, isArray: true })
+  outcomes!: AttendanceOutcomeDto[];
+}
+
 export class SessionAvailabilityDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -52,6 +65,11 @@ const createBookingSchema = z.object({
   clientId: z.uuid().optional(),
 });
 const rescheduleBookingSchema = z.object({ targetSessionId: z.uuid() });
+const attendanceSchema = z.object({
+  outcomes: z.array(
+    z.object({ bookingId: z.uuid(), outcome: z.enum(['attended', 'no_show']) }),
+  ),
+});
 const uuidSchema = z.uuid();
 
 const availabilityQuerySchema = z
@@ -74,6 +92,11 @@ export const parseRescheduleBooking = (
   value: unknown,
 ): RescheduleBookingDto | null => {
   const result = rescheduleBookingSchema.safeParse(value);
+  return result.success ? result.data : null;
+};
+
+export const parseAttendance = (value: unknown): RecordAttendanceDto | null => {
+  const result = attendanceSchema.safeParse(value);
   return result.success ? result.data : null;
 };
 
