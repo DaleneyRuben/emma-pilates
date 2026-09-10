@@ -233,6 +233,60 @@ describe('Booking commands', () => {
     expect(entry.promotedBookingId).toEqual(expect.any(String));
   });
 
+  it('cancels a Booking, restores its allowance, and promotes the oldest eligible Waitlist Entry atomically', async () => {
+    const fixture = await createFixture(prisma, { capacity: 1 });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const booking = await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+    const waitingClient = await createClientWithSubscription(prisma);
+
+    await commands.joinWaitlist(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: waitingClient.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: waitingClient.clientId },
+      },
+    );
+
+    await commands.cancel(
+      { bookingId: booking.id },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+
+    await expect(
+      prisma.booking.findUniqueOrThrow({
+        where: { id: booking.id },
+        select: { state: true, cancellationCause: true },
+      }),
+    ).resolves.toEqual({
+      state: BookingState.CANCELLED,
+      cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
+    });
+    await expect(
+      prisma.subscription.findUniqueOrThrow({
+        where: { id: fixture.subscriptionId },
+        select: { remainingClassAllowance: true },
+      }),
+    ).resolves.toEqual({ remainingClassAllowance: 2 });
+    await expect(
+      prisma.subscription.findUniqueOrThrow({
+        where: { id: waitingClient.subscriptionId },
+        select: { remainingClassAllowance: true },
+      }),
+    ).resolves.toEqual({ remainingClassAllowance: 1 });
+  });
+
   it('promotes the Waitlist before a direct Booking uses freed capacity', async () => {
     const fixture = await createFixture(prisma, { capacity: 1 });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
