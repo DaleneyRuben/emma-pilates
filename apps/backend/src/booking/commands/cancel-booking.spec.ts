@@ -5,6 +5,8 @@ describe('cancelBooking', () => {
   const booking = {
     id: 'booking-id',
     clientId: 'client-id',
+    subscriptionId: 'subscription-id',
+    state: 'booked' as const,
     session: {
       id: 'session-id',
       branchId: 'branch-id',
@@ -34,6 +36,8 @@ describe('cancelBooking', () => {
 
     expect(cancel).toHaveBeenCalledWith({
       bookingId: booking.id,
+      clientId: booking.clientId,
+      subscriptionId: booking.subscriptionId,
       cancelledByAccountId: 'account-id',
     });
   });

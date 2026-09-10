@@ -1,11 +1,14 @@
 import { createHash } from 'node:crypto';
 import type { Prisma } from '../../generated/prisma/client';
 import {
+  BookingCancellationCause,
+  BookingState,
   PrismaClient,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { createBooking } from './create-booking';
+import { cancelBooking } from './cancel-booking';
 import { joinWaitlist } from './join-waitlist';
 import { promoteWaitlist } from './promote-waitlist';
 import { retrySerializable } from './retry-serializable';
@@ -239,6 +242,93 @@ export class PrismaBookingCommands {
       this.prisma.$transaction(
         async (transaction) =>
           this.executeWaitlistPromotion(transaction, sessionId),
+        { isolationLevel: 'Serializable' },
+      ),
+    );
+  }
+
+  async cancel(
+    command: { bookingId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<void> {
+    await retrySerializable(() =>
+      this.prisma.$transaction(
+        async (transaction) => {
+          await cancelBooking(command, {
+            principal,
+            loadBooking: async (bookingId) => {
+              const booking = await transaction.booking.findUnique({
+                where: { id: bookingId },
+                select: {
+                  id: true,
+                  clientId: true,
+                  subscriptionId: true,
+                  state: true,
+                  session: {
+                    select: {
+                      id: true,
+                      branchId: true,
+                      startsAt: true,
+                      state: true,
+                    },
+                  },
+                },
+              });
+
+              return booking === null
+                ? null
+                : {
+                    ...booking,
+                    state: booking.state.toLowerCase() as
+                      | 'booked'
+                      | 'cancelled'
+                      | 'rescheduled',
+                    session: {
+                      ...booking.session,
+                      state: booking.session.state.toLowerCase() as
+                        | 'scheduled'
+                        | 'cancelled',
+                    },
+                  };
+            },
+            cancel: async (input) => {
+              const cancelled = await transaction.booking.updateMany({
+                where: { id: input.bookingId, state: BookingState.BOOKED },
+                data: {
+                  state: BookingState.CANCELLED,
+                  cancelledAt: this.now(),
+                  cancelledByAccountId: input.cancelledByAccountId,
+                  cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
+                },
+              });
+
+              if (cancelled.count !== 1) {
+                throw new Error('Booking is not cancellable');
+              }
+
+              const restored = await transaction.subscription.updateMany({
+                where: {
+                  id: input.subscriptionId,
+                  clientId: input.clientId,
+                },
+                data: { remainingClassAllowance: { increment: 1 } },
+              });
+
+              if (restored.count !== 1) {
+                throw new Error('Booking Subscription is unavailable');
+              }
+
+              await this.executeWaitlistPromotion(
+                transaction,
+                (await transaction.booking.findUniqueOrThrow({
+                  where: { id: input.bookingId },
+                  select: { sessionId: true },
+                })).sessionId,
+              );
+            },
+            now: this.now,
+          });
+        },
         { isolationLevel: 'Serializable' },
       ),
     );

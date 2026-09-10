@@ -4,6 +4,8 @@ import { BookingAccessDeniedError } from './create-booking';
 type BookingForCancellation = {
   id: string;
   clientId: string;
+  subscriptionId: string;
+  state: 'booked' | 'cancelled' | 'rescheduled';
   session: {
     id: string;
     branchId: string;
@@ -17,6 +19,8 @@ type CancelBookingDependencies = {
   loadBooking(bookingId: string): Promise<BookingForCancellation | null>;
   cancel(input: {
     bookingId: string;
+    clientId: string;
+    subscriptionId: string;
     cancelledByAccountId: string;
   }): Promise<void>;
   now(): Date;
@@ -49,7 +53,11 @@ export const cancelBooking = async (
 ): Promise<void> => {
   const booking = await dependencies.loadBooking(command.bookingId);
 
-  if (booking === null || booking.session.state !== 'scheduled') {
+  if (
+    booking === null ||
+    booking.state !== 'booked' ||
+    booking.session.state !== 'scheduled'
+  ) {
     throw new BookingAccessDeniedError();
   }
 
@@ -64,6 +72,8 @@ export const cancelBooking = async (
 
   await dependencies.cancel({
     bookingId: booking.id,
+    clientId: booking.clientId,
+    subscriptionId: booking.subscriptionId,
     cancelledByAccountId: dependencies.principal.accountId,
   });
 };
