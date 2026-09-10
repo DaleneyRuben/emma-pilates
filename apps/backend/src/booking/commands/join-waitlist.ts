@@ -21,6 +21,10 @@ type JoinWaitlistDependencies = {
     sessionId: string;
     clientId: string;
   }): Promise<boolean>;
+  hasActiveEntry(input: {
+    sessionId: string;
+    clientId: string;
+  }): Promise<boolean>;
   create(input: {
     sessionId: string;
     clientId: string;
@@ -95,6 +99,10 @@ export const joinWaitlist = async (
 
   if (await dependencies.hasLiveBooking({ sessionId: session.id, clientId })) {
     throw new Error('Client already has a Booking');
+  }
+
+  if (await dependencies.hasActiveEntry({ sessionId: session.id, clientId })) {
+    throw new Error('Client already has an active Waitlist Entry');
   }
 
   return dependencies.create({

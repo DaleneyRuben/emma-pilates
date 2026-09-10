@@ -354,6 +354,13 @@ export class PrismaBookingCommands {
             select: { id: true },
           })
           .then((booking) => booking !== null),
+      hasActiveEntry: ({ sessionId, clientId }) =>
+        transaction.waitlistEntry
+          .findFirst({
+            where: { sessionId, clientId, closedAt: null },
+            select: { id: true },
+          })
+          .then((entry) => entry !== null),
       create: (input) =>
         transaction.waitlistEntry.create({
           data: input,

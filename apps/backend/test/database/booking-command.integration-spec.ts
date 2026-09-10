@@ -153,6 +153,32 @@ describe('Booking commands', () => {
     ).resolves.toBe(1);
   });
 
+  it('rejects a second active Waitlist Entry for the same Client', async () => {
+    const fixture = await createFixture(prisma, { capacity: 1 });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+
+    await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+
+    const waitingClient = await createClientWithSubscription(prisma);
+    const principal = {
+      accountId: waitingClient.accountId,
+      authenticationSessionId: randomUUID(),
+      identity: { kind: 'client' as const, clientId: waitingClient.clientId },
+    };
+
+    await commands.joinWaitlist({ sessionId: fixture.sessionId }, principal);
+    await expect(
+      commands.joinWaitlist({ sessionId: fixture.sessionId }, principal),
+    ).rejects.toThrow('Client already has an active Waitlist Entry');
+  });
+
   it('promotes the first eligible Waitlist Entry and consumes allowance', async () => {
     const fixture = await createFixture(prisma, { capacity: 1 });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);

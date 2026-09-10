@@ -84,6 +84,10 @@ const commandProblem = (error: Error): HttpException | null => {
       'active_booking_exists',
       'Client already has a Booking',
     ],
+    'Client already has an active Waitlist Entry': [
+      'active_waitlist_entry_exists',
+      'Client already has an active Waitlist Entry',
+    ],
     'Idempotency Key was reused with a different request': [
       'idempotency_key_reused',
       'Idempotency Key was reused with a different request',
