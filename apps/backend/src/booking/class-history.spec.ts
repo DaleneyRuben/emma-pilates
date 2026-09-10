@@ -2,9 +2,11 @@ import { listClassHistory } from './class-history';
 
 describe('listClassHistory', () => {
   it('returns attended Bookings only for the authenticated Client', async () => {
-    const findAttendedBookings = jest.fn().mockResolvedValue([
-      { bookingId: 'booking-id', sessionId: 'session-id' },
-    ]);
+    const findAttendedBookings = jest
+      .fn()
+      .mockResolvedValue([
+        { bookingId: 'booking-id', sessionId: 'session-id' },
+      ]);
 
     await expect(
       listClassHistory(
