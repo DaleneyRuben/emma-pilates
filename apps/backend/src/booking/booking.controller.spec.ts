@@ -96,7 +96,9 @@ describe('BookingController', () => {
   it('returns a stable problem code when a Booking is inside the Cancellation Window', async () => {
     const cancelBooking = jest
       .fn()
-      .mockRejectedValue(new Error('Booking is inside the Cancellation Window'));
+      .mockRejectedValue(
+        new Error('Booking is inside the Cancellation Window'),
+      );
     const cancellationController = new BookingCancellationController(
       cancelBooking,
       resolvePrincipal,

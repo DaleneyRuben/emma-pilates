@@ -280,14 +280,11 @@ export class PrismaBookingCommands {
                 : {
                     ...booking,
                     state: booking.state.toLowerCase() as
-                      | 'booked'
-                      | 'cancelled'
-                      | 'rescheduled',
+                      'booked' | 'cancelled' | 'rescheduled',
                     session: {
                       ...booking.session,
                       state: booking.session.state.toLowerCase() as
-                        | 'scheduled'
-                        | 'cancelled',
+                        'scheduled' | 'cancelled',
                     },
                   };
             },
@@ -318,12 +315,14 @@ export class PrismaBookingCommands {
                 throw new Error('Booking Subscription is unavailable');
               }
 
-              await this.executeWaitlistPromotion(
-                transaction,
-                (await transaction.booking.findUniqueOrThrow({
+              const cancelledBooking =
+                await transaction.booking.findUniqueOrThrow({
                   where: { id: input.bookingId },
                   select: { sessionId: true },
-                })).sessionId,
+                });
+              await this.executeWaitlistPromotion(
+                transaction,
+                cancelledBooking.sessionId,
               );
             },
             now: this.now,

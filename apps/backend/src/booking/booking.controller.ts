@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   ForbiddenException,
   Headers,
   HttpException,
@@ -19,6 +20,7 @@ import {
   ApiHeader,
   ApiOkResponse,
   ApiOperation,
+  ApiNoContentResponse,
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
@@ -38,6 +40,7 @@ import type { SessionAvailabilityHandler } from './session-availability';
 
 export const createBookingCommand = Symbol('createBookingCommand');
 export const joinWaitlistCommand = Symbol('joinWaitlistCommand');
+export const cancelBookingCommand = Symbol('cancelBookingCommand');
 export const sessionAvailability = Symbol('sessionAvailability');
 
 type CommandHandler = (
@@ -49,6 +52,10 @@ type PrincipalResolver = (
   credential: string,
   meaningfulActivity: boolean,
 ) => Promise<AuthenticatedPrincipal>;
+type CancellationCommandHandler = (
+  command: { bookingId: string },
+  principal: AuthenticatedPrincipal,
+) => Promise<void>;
 
 const parseBearerCredential = (authorization: string | undefined): string => {
   const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
@@ -91,6 +98,14 @@ const commandProblem = (error: Error): HttpException | null => {
     'Idempotency Key was reused with a different request': [
       'idempotency_key_reused',
       'Idempotency Key was reused with a different request',
+    ],
+    'Booking is inside the Cancellation Window': [
+      'booking_cancellation_window',
+      'Booking is inside the Cancellation Window',
+    ],
+    'Booking is not cancellable': [
+      'booking_not_cancellable',
+      'Booking is not cancellable',
     ],
   };
   const problem = problems[error.message];
@@ -205,6 +220,63 @@ export class BookingController {
         { sessionId: parsedSessionId, ...parsed },
         principal,
         parsedIdempotencyKey,
+      );
+    } catch (error) {
+      const problem = error instanceof Error ? commandProblem(error) : null;
+      if (problem !== null) throw problem;
+      throw error;
+    }
+  }
+
+  private async authenticate(
+    authorization: string | undefined,
+  ): Promise<AuthenticatedPrincipal> {
+    try {
+      return await this.principalResolver(
+        parseBearerCredential(authorization),
+        true,
+      );
+    } catch (error) {
+      if (
+        error instanceof AuthenticationRequiredError ||
+        error instanceof UnauthorizedException
+      ) {
+        throw new UnauthorizedException('Authentication is required');
+      }
+      throw error;
+    }
+  }
+}
+
+@Controller({ path: 'bookings', version: '1' })
+@ApiBearerAuth()
+export class BookingCancellationController {
+  constructor(
+    @Inject(cancelBookingCommand)
+    private readonly cancelBookingHandler: CancellationCommandHandler,
+    @Inject(authenticatedPrincipalResolver)
+    private readonly principalResolver: PrincipalResolver,
+  ) {}
+
+  @Delete(':bookingId')
+  @ApiOperation({ operationId: 'cancelBooking' })
+  @ApiParam({ name: 'bookingId', format: 'uuid' })
+  @ApiNoContentResponse()
+  async cancel(
+    @Param('bookingId') bookingId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<void> {
+    const parsedBookingId = parseUuid(bookingId);
+    if (parsedBookingId === null) {
+      throw invalidRequest('Invalid Booking identifier');
+    }
+
+    const principal = await this.authenticate(authorization);
+
+    try {
+      await this.cancelBookingHandler(
+        { bookingId: parsedBookingId },
+        principal,
       );
     } catch (error) {
       const problem = error instanceof Error ? commandProblem(error) : null;

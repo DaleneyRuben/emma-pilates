@@ -6,6 +6,8 @@ import { PrismaClient } from '../generated/prisma/client';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import {
   BookingController,
+  BookingCancellationController,
+  cancelBookingCommand,
   createBookingCommand,
   joinWaitlistCommand,
   sessionAvailability,
@@ -25,7 +27,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
 
 @Module({
   imports: [SystemIdentityModule],
-  controllers: [BookingController],
+  controllers: [BookingController, BookingCancellationController],
   providers: [
     {
       provide: bookingPrisma,
@@ -51,6 +53,14 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.joinWaitlistIdempotent.bind(commands);
+      },
+    },
+    {
+      provide: cancelBookingCommand,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) => {
+        const commands = new PrismaBookingCommands(prisma, () => new Date());
+        return commands.cancel.bind(commands);
       },
     },
     {
