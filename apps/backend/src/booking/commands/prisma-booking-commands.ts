@@ -51,6 +51,20 @@ export class PrismaBookingCommands {
               },
               select: { id: true },
             }),
+          hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
+            transaction.booking
+              .findFirst({
+                where: {
+                  clientId,
+                  state: 'BOOKED',
+                  session: {
+                    startsAt: { lt: endsAt },
+                    endsAt: { gt: startsAt },
+                  },
+                },
+                select: { id: true },
+              })
+              .then((booking) => booking !== null),
           create: async (input) => {
             const consumed = await transaction.subscription.updateMany({
               where: {

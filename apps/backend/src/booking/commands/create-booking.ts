@@ -23,6 +23,11 @@ type CreateBookingDependencies = {
     clientId: string;
     onDate: Date;
   }): Promise<{ id: string } | null>;
+  hasOverlappingBooking(input: {
+    clientId: string;
+    startsAt: Date;
+    endsAt: Date;
+  }): Promise<boolean>;
   create(input: {
     sessionId: string;
     clientId: string;
@@ -91,6 +96,16 @@ export const createBooking = async (
 
   if (subscription === null) {
     throw new Error('No eligible Subscription');
+  }
+
+  if (
+    await dependencies.hasOverlappingBooking({
+      clientId,
+      startsAt: session.startsAt,
+      endsAt: session.endsAt,
+    })
+  ) {
+    throw new Error('Client already has an overlapping Booking');
   }
 
   return dependencies.create({
