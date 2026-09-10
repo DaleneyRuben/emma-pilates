@@ -6,6 +6,7 @@ import {
   TrainerAttendanceController,
   BookingRescheduleController,
   TrainerScheduleController,
+  TrainerSessionRosterController,
 } from './booking.controller';
 import { BookingAccessDeniedError } from './commands/create-booking';
 
@@ -220,6 +221,52 @@ describe('BookingController', () => {
 
     expect(listTrainerSchedule).toHaveBeenCalledWith(
       { on: new Date('2026-09-10T00:00:00.000Z') },
+      principal,
+    );
+  });
+
+  it('returns the authenticated Trainer’s Session roster', async () => {
+    const loadTrainerSessionRoster = jest.fn().mockResolvedValue({
+      sessionId: 'session-id',
+      classTypeName: 'Reformer Pilates',
+      branchName: 'Sucursal Centro',
+      startsAt: new Date('2026-09-10T13:00:00.000Z'),
+      endsAt: new Date('2026-09-10T14:00:00.000Z'),
+      bookings: [
+        {
+          bookingId: 'booking-id',
+          clientName: 'Ana Pérez',
+          attendanceOutcome: 'attended',
+        },
+      ],
+    });
+    const controller = new TrainerSessionRosterController(
+      loadTrainerSessionRoster,
+      resolvePrincipal,
+    );
+
+    await expect(
+      controller.get(
+        '11111111-1111-4111-8111-111111111111',
+        'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      ),
+    ).resolves.toEqual({
+      sessionId: 'session-id',
+      classTypeName: 'Reformer Pilates',
+      branchName: 'Sucursal Centro',
+      startsAt: new Date('2026-09-10T13:00:00.000Z'),
+      endsAt: new Date('2026-09-10T14:00:00.000Z'),
+      bookings: [
+        {
+          bookingId: 'booking-id',
+          clientName: 'Ana Pérez',
+          attendanceOutcome: 'attended',
+        },
+      ],
+    });
+
+    expect(loadTrainerSessionRoster).toHaveBeenCalledWith(
+      { sessionId: '11111111-1111-4111-8111-111111111111' },
       principal,
     );
   });
