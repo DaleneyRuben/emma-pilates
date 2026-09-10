@@ -49,4 +49,36 @@ describe('rescheduleBooking', () => {
       rescheduledByAccountId: 'account-id',
     });
   });
+
+  it('rejects a Booking that is no longer live', async () => {
+    await expect(
+      rescheduleBooking(
+        { bookingId: 'booking-id', targetSessionId: 'target-session-id' },
+        {
+          principal: {
+            accountId: 'account-id',
+            authenticationSessionId: 'authentication-session-id',
+            identity: { kind: 'client', clientId: 'client-id' },
+          },
+          loadBooking: jest.fn().mockResolvedValue({
+            id: 'booking-id',
+            clientId: 'client-id',
+            subscriptionId: 'subscription-id',
+            state: 'rescheduled',
+            session: {
+              id: 'source-session-id',
+              branchId: 'branch-id',
+              startsAt: new Date('2026-09-10T13:30:00Z'),
+              state: 'scheduled',
+            },
+          }),
+          loadSession: jest.fn(),
+          countLiveBookings: jest.fn(),
+          hasOverlappingBooking: jest.fn(),
+          reschedule: jest.fn(),
+          now: () => new Date('2026-09-10T12:00:00Z'),
+        },
+      ),
+    ).rejects.toThrow('Booking access is denied');
+  });
 });
