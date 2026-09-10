@@ -2,6 +2,7 @@ import { UnauthorizedException } from '@nestjs/common';
 import {
   BookingCancellationController,
   BookingController,
+  BookingRescheduleController,
 } from './booking.controller';
 import { BookingAccessDeniedError } from './commands/create-booking';
 
@@ -113,5 +114,29 @@ describe('BookingController', () => {
       response: { code: 'booking_cancellation_window' },
       status: 409,
     });
+  });
+
+  it('reschedules an authenticated Booking without changing its allowance', async () => {
+    const rescheduleBooking = jest.fn().mockResolvedValue({ id: 'booking-id' });
+    const rescheduleController = new BookingRescheduleController(
+      rescheduleBooking,
+      resolvePrincipal,
+    );
+
+    await expect(
+      rescheduleController.reschedule(
+        '11111111-1111-4111-8111-111111111111',
+        'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        { targetSessionId: '22222222-2222-4222-8222-222222222222' },
+      ),
+    ).resolves.toEqual({ id: 'booking-id' });
+
+    expect(rescheduleBooking).toHaveBeenCalledWith(
+      {
+        bookingId: '11111111-1111-4111-8111-111111111111',
+        targetSessionId: '22222222-2222-4222-8222-222222222222',
+      },
+      principal,
+    );
   });
 });
