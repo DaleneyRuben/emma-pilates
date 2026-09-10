@@ -37,11 +37,28 @@ export class PrismaBookingCommands {
     command: { sessionId: string; clientId?: string },
     principal: AuthenticatedPrincipal,
   ): Promise<{ id: string }> {
-    return this.prisma.$transaction(
-      async (transaction) =>
-        this.executeCreate(transaction, command, principal),
+    const result = await this.prisma.$transaction(
+      async (transaction) => {
+        await this.executeWaitlistPromotion(transaction, command.sessionId);
+
+        try {
+          return await this.executeCreate(transaction, command, principal);
+        } catch (error) {
+          if (error instanceof Error && error.message === 'Session is full') {
+            return null;
+          }
+
+          throw error;
+        }
+      },
       { isolationLevel: 'Serializable' },
     );
+
+    if (result === null) {
+      throw new Error('Session is full');
+    }
+
+    return result;
   }
 
   async createIdempotent(
@@ -90,6 +107,7 @@ export class PrismaBookingCommands {
           throw new Error('Stored idempotency response is invalid');
         }
 
+        await this.executeWaitlistPromotion(transaction, command.sessionId);
         const result = await this.executeCreate(
           transaction,
           command,
@@ -198,82 +216,89 @@ export class PrismaBookingCommands {
   ): Promise<{ entryId: string; bookingId: string }[]> {
     return this.prisma.$transaction(
       async (transaction) =>
-        promoteWaitlist(
-          { sessionId },
-          {
-            loadSession: (id) => this.loadSession(transaction, id),
-            countLiveBookings: (id) =>
-              transaction.booking.count({
-                where: { sessionId: id, state: 'BOOKED' },
-              }),
-            loadActiveEntries: (id) =>
-              transaction.waitlistEntry.findMany({
-                where: { sessionId: id, closedAt: null },
-                select: {
-                  id: true,
-                  clientId: true,
-                  joinedByAccountId: true,
-                },
-                orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
-              }),
-            findEligibleSubscription: ({ clientId, onDate }) =>
-              transaction.subscription.findFirst({
-                where: {
-                  clientId,
-                  state: 'ACTIVE',
-                  startsOn: { lte: boliviaDate(onDate) },
-                  endsOn: { gte: boliviaDate(onDate) },
-                  remainingClassAllowance: { gt: 0 },
-                },
-                select: { id: true },
-              }),
-            hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
-              transaction.booking
-                .findFirst({
-                  where: {
-                    clientId,
-                    state: 'BOOKED',
-                    session: {
-                      startsAt: { lt: endsAt },
-                      endsAt: { gt: startsAt },
-                    },
-                  },
-                  select: { id: true },
-                })
-                .then((booking) => booking !== null),
-            createBooking: async (input) => {
-              const consumed = await transaction.subscription.updateMany({
-                where: {
-                  id: input.subscriptionId,
-                  clientId: input.clientId,
-                  remainingClassAllowance: { gt: 0 },
-                },
-                data: { remainingClassAllowance: { decrement: 1 } },
-              });
-
-              if (consumed.count !== 1) {
-                throw new Error('No eligible Subscription');
-              }
-
-              return transaction.booking.create({
-                data: input,
-                select: { id: true },
-              });
-            },
-            closeAsPromoted: async ({ entryId, bookingId }) => {
-              await transaction.waitlistEntry.update({
-                where: { id: entryId },
-                data: {
-                  closedAt: this.now(),
-                  closureReason: WaitlistClosureReason.PROMOTED,
-                  promotedBookingId: bookingId,
-                },
-              });
-            },
-            now: this.now,
-          },
-        ),
+        this.executeWaitlistPromotion(transaction, sessionId),
       { isolationLevel: 'Serializable' },
+    );
+  }
+
+  private executeWaitlistPromotion(
+    transaction: Prisma.TransactionClient,
+    sessionId: string,
+  ): Promise<{ entryId: string; bookingId: string }[]> {
+    return promoteWaitlist(
+      { sessionId },
+      {
+        loadSession: (id) => this.loadSession(transaction, id),
+        countLiveBookings: (id) =>
+          transaction.booking.count({
+            where: { sessionId: id, state: 'BOOKED' },
+          }),
+        loadActiveEntries: (id) =>
+          transaction.waitlistEntry.findMany({
+            where: { sessionId: id, closedAt: null },
+            select: {
+              id: true,
+              clientId: true,
+              joinedByAccountId: true,
+            },
+            orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
+          }),
+        findEligibleSubscription: ({ clientId, onDate }) =>
+          transaction.subscription.findFirst({
+            where: {
+              clientId,
+              state: 'ACTIVE',
+              startsOn: { lte: boliviaDate(onDate) },
+              endsOn: { gte: boliviaDate(onDate) },
+              remainingClassAllowance: { gt: 0 },
+            },
+            select: { id: true },
+          }),
+        hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
+          transaction.booking
+            .findFirst({
+              where: {
+                clientId,
+                state: 'BOOKED',
+                session: {
+                  startsAt: { lt: endsAt },
+                  endsAt: { gt: startsAt },
+                },
+              },
+              select: { id: true },
+            })
+            .then((booking) => booking !== null),
+        createBooking: async (input) => {
+          const consumed = await transaction.subscription.updateMany({
+            where: {
+              id: input.subscriptionId,
+              clientId: input.clientId,
+              remainingClassAllowance: { gt: 0 },
+            },
+            data: { remainingClassAllowance: { decrement: 1 } },
+          });
+
+          if (consumed.count !== 1) {
+            throw new Error('No eligible Subscription');
+          }
+
+          return transaction.booking.create({
+            data: input,
+            select: { id: true },
+          });
+        },
+        closeAsPromoted: async ({ entryId, bookingId }) => {
+          await transaction.waitlistEntry.update({
+            where: { id: entryId },
+            data: {
+              closedAt: this.now(),
+              closureReason: WaitlistClosureReason.PROMOTED,
+              promotedBookingId: bookingId,
+            },
+          });
+        },
+        now: this.now,
+      },
     );
   }
 

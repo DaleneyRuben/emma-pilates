@@ -206,6 +206,57 @@ describe('Booking commands', () => {
     expect(entry.closedAt).toEqual(fixture.now);
     expect(entry.promotedBookingId).toEqual(expect.any(String));
   });
+
+  it('promotes the Waitlist before a direct Booking uses freed capacity', async () => {
+    const fixture = await createFixture(prisma, { capacity: 1 });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const booking = await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+    const waitingClient = await createClientWithSubscription(prisma);
+    const directClient = await createClientWithSubscription(prisma);
+
+    await commands.joinWaitlist(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: waitingClient.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: waitingClient.clientId },
+      },
+    );
+    await prisma.booking.update({
+      where: { id: booking.id },
+      data: {
+        state: BookingState.CANCELLED,
+        cancelledAt: fixture.now,
+        cancelledByAccountId: fixture.accountId,
+        cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
+      },
+    });
+
+    await expect(
+      commands.create(
+        { sessionId: fixture.sessionId },
+        {
+          accountId: directClient.accountId,
+          authenticationSessionId: randomUUID(),
+          identity: { kind: 'client', clientId: directClient.clientId },
+        },
+      ),
+    ).rejects.toThrow('Session is full');
+
+    await expect(
+      prisma.subscription.findUniqueOrThrow({
+        where: { id: waitingClient.subscriptionId },
+        select: { remainingClassAllowance: true },
+      }),
+    ).resolves.toEqual({ remainingClassAllowance: 1 });
+  });
 });
 
 const createFixture = async (
