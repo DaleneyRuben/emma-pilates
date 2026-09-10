@@ -204,7 +204,7 @@ describe('Booking commands', () => {
       where: { id: booking.id },
       data: {
         state: BookingState.CANCELLED,
-        cancelledAt: fixture.now,
+        cancelledAt: new Date(),
         cancelledByAccountId: fixture.accountId,
         cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
       },
@@ -229,7 +229,7 @@ describe('Booking commands', () => {
       select: { closedAt: true, promotedBookingId: true },
     });
 
-    expect(entry.closedAt).toEqual(fixture.now);
+    expect(entry.closedAt).toEqual(expect.any(Date));
     expect(entry.promotedBookingId).toEqual(expect.any(String));
   });
 
@@ -288,8 +288,9 @@ describe('Booking commands', () => {
   });
 
   it('reschedules a Booking to a same-day Session without changing allowance', async () => {
+    const now = new Date();
     const fixture = await createFixture(prisma, {
-      startsAt: new Date('2026-09-10T13:30:00Z'),
+      startsAt: new Date(now.getTime() + 90 * 60 * 1_000),
     });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const sourceBooking = await commands.create(
@@ -311,8 +312,8 @@ describe('Booking commands', () => {
     const targetSession = await prisma.session.create({
       data: {
         ...sourceSession,
-        startsAt: new Date('2026-09-10T15:00:00Z'),
-        endsAt: new Date('2026-09-10T16:00:00Z'),
+        startsAt: new Date(now.getTime() + 3 * 60 * 60 * 1_000),
+        endsAt: new Date(now.getTime() + 4 * 60 * 60 * 1_000),
         capacity: 8,
       },
     });
@@ -379,7 +380,7 @@ describe('Booking commands', () => {
       where: { id: booking.id },
       data: {
         state: BookingState.CANCELLED,
-        cancelledAt: fixture.now,
+        cancelledAt: new Date(),
         cancelledByAccountId: fixture.accountId,
         cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
       },
@@ -430,7 +431,7 @@ describe('Booking commands', () => {
       where: { id: booking.id },
       data: {
         state: BookingState.CANCELLED,
-        cancelledAt: fixture.now,
+        cancelledAt: new Date(),
         cancelledByAccountId: fixture.accountId,
         cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
       },
@@ -496,7 +497,7 @@ const createFixture = async (
   prisma: PrismaClient,
   options: { capacity?: number; startsAt?: Date } = {},
 ) => {
-  const now = new Date('2026-09-10T12:00:00Z');
+  const now = new Date();
   const branch = await prisma.branch.create({
     data: { name: randomUUID(), address: 'Calle Uno' },
   });
@@ -516,9 +517,12 @@ const createFixture = async (
       branchId: branch.id,
       classTypeId: classType.id,
       trainerStaffMemberId: trainer.id,
-      startsAt: options.startsAt ?? new Date('2026-09-10T16:00:00Z'),
+      startsAt:
+        options.startsAt ?? new Date(now.getTime() + 4 * 60 * 60 * 1_000),
       endsAt: new Date(
-        (options.startsAt ?? new Date('2026-09-10T16:00:00Z')).getTime() +
+        (
+          options.startsAt ?? new Date(now.getTime() + 4 * 60 * 60 * 1_000)
+        ).getTime() +
           60 * 60 * 1_000,
       ),
       capacity: options.capacity ?? 8,

@@ -11,6 +11,7 @@ import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
 import { joinWaitlist } from './join-waitlist';
 import { promoteWaitlist } from './promote-waitlist';
+import { rescheduleBooking } from './reschedule-booking';
 import { retrySerializable } from './retry-serializable';
 
 const boliviaDate = (instant: Date): Date => {
@@ -293,7 +294,7 @@ export class PrismaBookingCommands {
                 where: { id: input.bookingId, state: BookingState.BOOKED },
                 data: {
                   state: BookingState.CANCELLED,
-                  cancelledAt: this.now(),
+                  cancelledAt: new Date(),
                   cancelledByAccountId: input.cancelledByAccountId,
                   cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
                 },
@@ -324,6 +325,107 @@ export class PrismaBookingCommands {
                 transaction,
                 cancelledBooking.sessionId,
               );
+            },
+            now: this.now,
+          });
+        },
+        { isolationLevel: 'Serializable' },
+      ),
+    );
+  }
+
+  async reschedule(
+    command: { bookingId: string; targetSessionId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<{ id: string }> {
+    return retrySerializable(() =>
+      this.prisma.$transaction(
+        async (transaction) => {
+          await this.executeWaitlistPromotion(
+            transaction,
+            command.targetSessionId,
+          );
+
+          return rescheduleBooking(command, {
+            principal,
+            loadBooking: async (bookingId) => {
+              const booking = await transaction.booking.findUnique({
+                where: { id: bookingId },
+                select: {
+                  id: true,
+                  clientId: true,
+                  subscriptionId: true,
+                  state: true,
+                  session: {
+                    select: {
+                      id: true,
+                      branchId: true,
+                      startsAt: true,
+                      state: true,
+                    },
+                  },
+                },
+              });
+
+              return booking === null
+                ? null
+                : {
+                    ...booking,
+                    state: booking.state.toLowerCase() as
+                      'booked' | 'cancelled' | 'rescheduled',
+                    session: {
+                      ...booking.session,
+                      state: booking.session.state.toLowerCase() as
+                        'scheduled' | 'cancelled',
+                    },
+                  };
+            },
+            loadSession: (sessionId) =>
+              this.loadSession(transaction, sessionId),
+            countLiveBookings: (sessionId) =>
+              transaction.booking.count({
+                where: { sessionId, state: BookingState.BOOKED },
+              }),
+            hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
+              transaction.booking
+                .findFirst({
+                  where: {
+                    clientId,
+                    state: BookingState.BOOKED,
+                    session: {
+                      startsAt: { lt: endsAt },
+                      endsAt: { gt: startsAt },
+                    },
+                  },
+                  select: { id: true },
+                })
+                .then((booking) => booking !== null),
+            reschedule: async (input) => {
+              const replacement = await transaction.booking.create({
+                data: {
+                  sessionId: input.targetSessionId,
+                  clientId: input.clientId,
+                  subscriptionId: input.subscriptionId,
+                  createdByAccountId: input.rescheduledByAccountId,
+                },
+                select: { id: true },
+              });
+
+              const updated = await transaction.booking.updateMany({
+                where: { id: input.bookingId, state: BookingState.BOOKED },
+                data: {
+                  state: BookingState.RESCHEDULED,
+                  rescheduledAt: new Date(),
+                  rescheduledByAccountId: input.rescheduledByAccountId,
+                  rescheduledToBookingId: replacement.id,
+                },
+              });
+
+              if (updated.count !== 1) {
+                throw new Error('Booking is not reschedulable');
+              }
+
+              return replacement;
             },
             now: this.now,
           });
@@ -403,7 +505,7 @@ export class PrismaBookingCommands {
           await transaction.waitlistEntry.update({
             where: { id: entryId },
             data: {
-              closedAt: this.now(),
+              closedAt: new Date(),
               closureReason: WaitlistClosureReason.PROMOTED,
               promotedBookingId: bookingId,
             },
