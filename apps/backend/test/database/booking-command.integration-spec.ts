@@ -287,6 +287,72 @@ describe('Booking commands', () => {
     ).resolves.toEqual({ remainingClassAllowance: 1 });
   });
 
+  it('reschedules a Booking to a same-day Session without changing allowance', async () => {
+    const fixture = await createFixture(prisma, {
+      startsAt: new Date('2026-09-10T13:30:00Z'),
+    });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const sourceBooking = await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+    const sourceSession = await prisma.session.findUniqueOrThrow({
+      where: { id: fixture.sessionId },
+      select: {
+        branchId: true,
+        classTypeId: true,
+        trainerStaffMemberId: true,
+      },
+    });
+    const targetSession = await prisma.session.create({
+      data: {
+        ...sourceSession,
+        startsAt: new Date('2026-09-10T15:00:00Z'),
+        endsAt: new Date('2026-09-10T16:00:00Z'),
+        capacity: 8,
+      },
+    });
+
+    const replacement = await commands.reschedule(
+      { bookingId: sourceBooking.id, targetSessionId: targetSession.id },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+
+    await expect(
+      prisma.booking.findUniqueOrThrow({
+        where: { id: sourceBooking.id },
+        select: { state: true, rescheduledToBookingId: true },
+      }),
+    ).resolves.toEqual({
+      state: BookingState.RESCHEDULED,
+      rescheduledToBookingId: replacement.id,
+    });
+    await expect(
+      prisma.booking.findUniqueOrThrow({
+        where: { id: replacement.id },
+        select: { sessionId: true, subscriptionId: true, state: true },
+      }),
+    ).resolves.toEqual({
+      sessionId: targetSession.id,
+      subscriptionId: fixture.subscriptionId,
+      state: BookingState.BOOKED,
+    });
+    await expect(
+      prisma.subscription.findUniqueOrThrow({
+        where: { id: fixture.subscriptionId },
+        select: { remainingClassAllowance: true },
+      }),
+    ).resolves.toEqual({ remainingClassAllowance: 1 });
+  });
+
   it('promotes the Waitlist before a direct Booking uses freed capacity', async () => {
     const fixture = await createFixture(prisma, { capacity: 1 });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
@@ -428,7 +494,7 @@ describe('Booking commands', () => {
 
 const createFixture = async (
   prisma: PrismaClient,
-  options: { capacity?: number } = {},
+  options: { capacity?: number; startsAt?: Date } = {},
 ) => {
   const now = new Date('2026-09-10T12:00:00Z');
   const branch = await prisma.branch.create({
@@ -450,8 +516,11 @@ const createFixture = async (
       branchId: branch.id,
       classTypeId: classType.id,
       trainerStaffMemberId: trainer.id,
-      startsAt: new Date('2026-09-10T16:00:00Z'),
-      endsAt: new Date('2026-09-10T17:00:00Z'),
+      startsAt: options.startsAt ?? new Date('2026-09-10T16:00:00Z'),
+      endsAt: new Date(
+        (options.startsAt ?? new Date('2026-09-10T16:00:00Z')).getTime() +
+          60 * 60 * 1_000,
+      ),
       capacity: options.capacity ?? 8,
     },
   });
