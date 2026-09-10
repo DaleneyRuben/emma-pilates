@@ -8,6 +8,7 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { createBooking } from './create-booking';
 import { joinWaitlist } from './join-waitlist';
 import { promoteWaitlist } from './promote-waitlist';
+import { retrySerializable } from './retry-serializable';
 
 const boliviaDate = (instant: Date): Date => {
   const fields = new Intl.DateTimeFormat('en-US', {
@@ -37,21 +38,23 @@ export class PrismaBookingCommands {
     command: { sessionId: string; clientId?: string },
     principal: AuthenticatedPrincipal,
   ): Promise<{ id: string }> {
-    const result = await this.prisma.$transaction(
-      async (transaction) => {
-        await this.executeWaitlistPromotion(transaction, command.sessionId);
+    const result = await retrySerializable(() =>
+      this.prisma.$transaction(
+        async (transaction) => {
+          await this.executeWaitlistPromotion(transaction, command.sessionId);
 
-        try {
-          return await this.executeCreate(transaction, command, principal);
-        } catch (error) {
-          if (error instanceof Error && error.message === 'Session is full') {
-            return null;
+          try {
+            return await this.executeCreate(transaction, command, principal);
+          } catch (error) {
+            if (error instanceof Error && error.message === 'Session is full') {
+              return null;
+            }
+
+            throw error;
           }
-
-          throw error;
-        }
-      },
-      { isolationLevel: 'Serializable' },
+        },
+        { isolationLevel: 'Serializable' },
+      ),
     );
 
     if (result === null) {
@@ -75,65 +78,67 @@ export class PrismaBookingCommands {
       )
       .digest();
 
-    const result = await this.prisma.$transaction(
-      async (transaction) => {
-        const existing = await transaction.idempotencyRecord.findUnique({
-          where: {
-            accountId_command_idempotencyKey: {
+    const result = await retrySerializable(() =>
+      this.prisma.$transaction(
+        async (transaction) => {
+          const existing = await transaction.idempotencyRecord.findUnique({
+            where: {
+              accountId_command_idempotencyKey: {
+                accountId: principal.accountId,
+                command: 'create_booking',
+                idempotencyKey,
+              },
+            },
+            select: { requestHash: true, responseBody: true },
+          });
+
+          if (existing !== null) {
+            if (!Buffer.from(existing.requestHash).equals(requestHash)) {
+              throw new Error(
+                'Idempotency Key was reused with a different request',
+              );
+            }
+
+            if (
+              typeof existing.responseBody === 'object' &&
+              existing.responseBody !== null &&
+              'id' in existing.responseBody &&
+              typeof existing.responseBody.id === 'string'
+            ) {
+              return { id: existing.responseBody.id };
+            }
+
+            throw new Error('Stored idempotency response is invalid');
+          }
+
+          await this.executeWaitlistPromotion(transaction, command.sessionId);
+          let created: { id: string };
+
+          try {
+            created = await this.executeCreate(transaction, command, principal);
+          } catch (error) {
+            if (error instanceof Error && error.message === 'Session is full') {
+              return null;
+            }
+
+            throw error;
+          }
+          await transaction.idempotencyRecord.create({
+            data: {
               accountId: principal.accountId,
               command: 'create_booking',
               idempotencyKey,
+              requestHash,
+              responseStatus: 201,
+              responseBody: created,
+              expiresAt: new Date(this.now().getTime() + 24 * 60 * 60 * 1_000),
             },
-          },
-          select: { requestHash: true, responseBody: true },
-        });
+          });
 
-        if (existing !== null) {
-          if (!Buffer.from(existing.requestHash).equals(requestHash)) {
-            throw new Error(
-              'Idempotency Key was reused with a different request',
-            );
-          }
-
-          if (
-            typeof existing.responseBody === 'object' &&
-            existing.responseBody !== null &&
-            'id' in existing.responseBody &&
-            typeof existing.responseBody.id === 'string'
-          ) {
-            return { id: existing.responseBody.id };
-          }
-
-          throw new Error('Stored idempotency response is invalid');
-        }
-
-        await this.executeWaitlistPromotion(transaction, command.sessionId);
-        let created: { id: string };
-
-        try {
-          created = await this.executeCreate(transaction, command, principal);
-        } catch (error) {
-          if (error instanceof Error && error.message === 'Session is full') {
-            return null;
-          }
-
-          throw error;
-        }
-        await transaction.idempotencyRecord.create({
-          data: {
-            accountId: principal.accountId,
-            command: 'create_booking',
-            idempotencyKey,
-            requestHash,
-            responseStatus: 201,
-            responseBody: created,
-            expiresAt: new Date(this.now().getTime() + 24 * 60 * 60 * 1_000),
-          },
-        });
-
-        return created;
-      },
-      { isolationLevel: 'Serializable' },
+          return created;
+        },
+        { isolationLevel: 'Serializable' },
+      ),
     );
 
     if (result === null) {
@@ -147,10 +152,12 @@ export class PrismaBookingCommands {
     command: { sessionId: string; clientId?: string },
     principal: AuthenticatedPrincipal,
   ): Promise<{ id: string }> {
-    return this.prisma.$transaction(
-      async (transaction) =>
-        this.executeJoinWaitlist(transaction, command, principal),
-      { isolationLevel: 'Serializable' },
+    return retrySerializable(() =>
+      this.prisma.$transaction(
+        async (transaction) =>
+          this.executeJoinWaitlist(transaction, command, principal),
+        { isolationLevel: 'Serializable' },
+      ),
     );
   }
 
@@ -168,68 +175,72 @@ export class PrismaBookingCommands {
       )
       .digest();
 
-    return this.prisma.$transaction(
-      async (transaction) => {
-        const existing = await transaction.idempotencyRecord.findUnique({
-          where: {
-            accountId_command_idempotencyKey: {
+    return retrySerializable(() =>
+      this.prisma.$transaction(
+        async (transaction) => {
+          const existing = await transaction.idempotencyRecord.findUnique({
+            where: {
+              accountId_command_idempotencyKey: {
+                accountId: principal.accountId,
+                command: 'join_waitlist',
+                idempotencyKey,
+              },
+            },
+            select: { requestHash: true, responseBody: true },
+          });
+
+          if (existing !== null) {
+            if (!Buffer.from(existing.requestHash).equals(requestHash)) {
+              throw new Error(
+                'Idempotency Key was reused with a different request',
+              );
+            }
+
+            if (
+              typeof existing.responseBody === 'object' &&
+              existing.responseBody !== null &&
+              'id' in existing.responseBody &&
+              typeof existing.responseBody.id === 'string'
+            ) {
+              return { id: existing.responseBody.id };
+            }
+
+            throw new Error('Stored idempotency response is invalid');
+          }
+
+          const result = await this.executeJoinWaitlist(
+            transaction,
+            command,
+            principal,
+          );
+          await transaction.idempotencyRecord.create({
+            data: {
               accountId: principal.accountId,
               command: 'join_waitlist',
               idempotencyKey,
+              requestHash,
+              responseStatus: 201,
+              responseBody: result,
+              expiresAt: new Date(this.now().getTime() + 24 * 60 * 60 * 1_000),
             },
-          },
-          select: { requestHash: true, responseBody: true },
-        });
+          });
 
-        if (existing !== null) {
-          if (!Buffer.from(existing.requestHash).equals(requestHash)) {
-            throw new Error(
-              'Idempotency Key was reused with a different request',
-            );
-          }
-
-          if (
-            typeof existing.responseBody === 'object' &&
-            existing.responseBody !== null &&
-            'id' in existing.responseBody &&
-            typeof existing.responseBody.id === 'string'
-          ) {
-            return { id: existing.responseBody.id };
-          }
-
-          throw new Error('Stored idempotency response is invalid');
-        }
-
-        const result = await this.executeJoinWaitlist(
-          transaction,
-          command,
-          principal,
-        );
-        await transaction.idempotencyRecord.create({
-          data: {
-            accountId: principal.accountId,
-            command: 'join_waitlist',
-            idempotencyKey,
-            requestHash,
-            responseStatus: 201,
-            responseBody: result,
-            expiresAt: new Date(this.now().getTime() + 24 * 60 * 60 * 1_000),
-          },
-        });
-
-        return result;
-      },
-      { isolationLevel: 'Serializable' },
+          return result;
+        },
+        { isolationLevel: 'Serializable' },
+      ),
     );
   }
 
   async promoteWaitlist(
     sessionId: string,
   ): Promise<{ entryId: string; bookingId: string }[]> {
-    return this.prisma.$transaction(
-      async (transaction) =>
-        this.executeWaitlistPromotion(transaction, sessionId),
-      { isolationLevel: 'Serializable' },
+    return retrySerializable(() =>
+      this.prisma.$transaction(
+        async (transaction) =>
+          this.executeWaitlistPromotion(transaction, sessionId),
+        { isolationLevel: 'Serializable' },
+      ),
     );
   }
 
