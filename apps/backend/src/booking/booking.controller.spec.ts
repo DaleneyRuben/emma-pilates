@@ -1,5 +1,8 @@
 import { UnauthorizedException } from '@nestjs/common';
-import { BookingController } from './booking.controller';
+import {
+  BookingCancellationController,
+  BookingController,
+} from './booking.controller';
 import { BookingAccessDeniedError } from './commands/create-booking';
 
 const principal = {
@@ -67,6 +70,46 @@ describe('BookingController', () => {
     ).rejects.toMatchObject({
       response: { code: 'booking_access_denied' },
       status: 403,
+    });
+  });
+
+  it('cancels an authenticated Booking without an idempotency key', async () => {
+    const cancelBooking = jest.fn().mockResolvedValue(undefined);
+    const cancellationController = new BookingCancellationController(
+      cancelBooking,
+      resolvePrincipal,
+    );
+
+    await expect(
+      cancellationController.cancel(
+        '11111111-1111-4111-8111-111111111111',
+        'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      ),
+    ).resolves.toBeUndefined();
+
+    expect(cancelBooking).toHaveBeenCalledWith(
+      { bookingId: '11111111-1111-4111-8111-111111111111' },
+      principal,
+    );
+  });
+
+  it('returns a stable problem code when a Booking is inside the Cancellation Window', async () => {
+    const cancelBooking = jest
+      .fn()
+      .mockRejectedValue(new Error('Booking is inside the Cancellation Window'));
+    const cancellationController = new BookingCancellationController(
+      cancelBooking,
+      resolvePrincipal,
+    );
+
+    await expect(
+      cancellationController.cancel(
+        '11111111-1111-4111-8111-111111111111',
+        'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      ),
+    ).rejects.toMatchObject({
+      response: { code: 'booking_cancellation_window' },
+      status: 409,
     });
   });
 });
