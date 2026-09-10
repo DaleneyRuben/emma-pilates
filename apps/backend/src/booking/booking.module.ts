@@ -12,6 +12,7 @@ import {
   ClassHistoryController,
   TrainerAttendanceController,
   TrainerScheduleController,
+  TrainerSessionRosterController,
   recordAttendanceCommand,
   classHistory,
   createBookingCommand,
@@ -19,11 +20,13 @@ import {
   sessionAvailability,
   rescheduleBookingCommand,
   trainerSchedule,
+  trainerSessionRoster,
 } from './booking.controller';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
 import { listClassHistory } from './class-history';
 import { listSessionAvailability } from './session-availability';
 import { listTrainerSchedule } from './trainer-schedule';
+import { loadTrainerSessionRoster } from './trainer-session-roster';
 
 const bookingPrisma = Symbol('bookingPrisma');
 
@@ -44,6 +47,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     ClassHistoryController,
     TrainerAttendanceController,
     TrainerScheduleController,
+    TrainerSessionRosterController,
   ],
   providers: [
     {
@@ -170,6 +174,63 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
                   })),
                 );
             },
+          }),
+    },
+    {
+      provide: trainerSessionRoster,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient) =>
+        (
+          input: { sessionId: string },
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          loadTrainerSessionRoster(input, {
+            principal,
+            findRoster: (sessionId) =>
+              prisma.session
+                .findUnique({
+                  where: { id: sessionId },
+                  select: {
+                    id: true,
+                    trainerStaffMemberId: true,
+                    startsAt: true,
+                    endsAt: true,
+                    classType: { select: { name: true } },
+                    branch: { select: { name: true } },
+                    bookings: {
+                      where: { state: 'BOOKED' },
+                      select: {
+                        id: true,
+                        client: { select: { name: true } },
+                        attendanceRecord: { select: { outcome: true } },
+                      },
+                      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+                    },
+                  },
+                })
+                .then((session) =>
+                  session === null
+                    ? null
+                    : {
+                        sessionId: session.id,
+                        trainerStaffMemberId: session.trainerStaffMemberId,
+                        classTypeName: session.classType.name,
+                        branchName: session.branch.name,
+                        startsAt: session.startsAt,
+                        endsAt: session.endsAt,
+                        bookings: session.bookings.map((booking) => ({
+                          bookingId: booking.id,
+                          clientName: booking.client.name,
+                          attendanceOutcome:
+                            booking.attendanceRecord?.outcome === 'ATTENDED'
+                              ? 'attended'
+                              : booking.attendanceRecord?.outcome === 'NO_SHOW'
+                                ? 'no_show'
+                                : null,
+                        })),
+                      },
+                ),
           }),
     },
     {

@@ -38,8 +38,10 @@ import {
   parseUuid,
   SessionAvailabilityDto,
   TrainerScheduleSessionDto,
+  TrainerSessionRosterDto,
 } from './booking.dto';
 import type { TrainerScheduleSession } from './trainer-schedule';
+import type { TrainerSessionRosterResult } from './trainer-session-roster';
 import { BookingAccessDeniedError } from './commands/create-booking';
 import type { SessionAvailabilityHandler } from './session-availability';
 
@@ -50,6 +52,7 @@ export const rescheduleBookingCommand = Symbol('rescheduleBookingCommand');
 export const classHistory = Symbol('classHistory');
 export const recordAttendanceCommand = Symbol('recordAttendanceCommand');
 export const trainerSchedule = Symbol('trainerSchedule');
+export const trainerSessionRoster = Symbol('trainerSessionRoster');
 export const sessionAvailability = Symbol('sessionAvailability');
 
 type CommandHandler = (
@@ -83,6 +86,10 @@ type TrainerScheduleHandler = (
   input: { on: Date },
   principal: AuthenticatedPrincipal,
 ) => Promise<TrainerScheduleSession[]>;
+type TrainerSessionRosterHandler = (
+  input: { sessionId: string },
+  principal: AuthenticatedPrincipal,
+) => Promise<TrainerSessionRosterResult>;
 
 const parseBearerCredential = (authorization: string | undefined): string => {
   const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
@@ -502,6 +509,60 @@ export class TrainerScheduleController {
 
     try {
       return await this.listTrainerSchedule({ on: parsedOn }, principal);
+    } catch (error) {
+      const problem = error instanceof Error ? commandProblem(error) : null;
+      if (problem !== null) throw problem;
+      throw error;
+    }
+  }
+
+  private async authenticate(
+    authorization: string | undefined,
+  ): Promise<AuthenticatedPrincipal> {
+    try {
+      return await this.principalResolver(
+        parseBearerCredential(authorization),
+        true,
+      );
+    } catch (error) {
+      if (
+        error instanceof AuthenticationRequiredError ||
+        error instanceof UnauthorizedException
+      )
+        throw new UnauthorizedException('Authentication is required');
+      throw error;
+    }
+  }
+}
+
+@Controller({ path: 'trainer/sessions', version: '1' })
+@ApiBearerAuth()
+export class TrainerSessionRosterController {
+  constructor(
+    @Inject(trainerSessionRoster)
+    private readonly loadTrainerSessionRoster: TrainerSessionRosterHandler,
+    @Inject(authenticatedPrincipalResolver)
+    private readonly principalResolver: PrincipalResolver,
+  ) {}
+
+  @Get(':sessionId/roster')
+  @ApiOperation({ operationId: 'getTrainerSessionRoster' })
+  @ApiParam({ name: 'sessionId', format: 'uuid' })
+  @ApiOkResponse({ type: TrainerSessionRosterDto })
+  async get(
+    @Param('sessionId') sessionId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<TrainerSessionRosterDto> {
+    const parsedSessionId = parseUuid(sessionId);
+    if (parsedSessionId === null)
+      throw invalidRequest('Invalid Session identifier');
+    const principal = await this.authenticate(authorization);
+
+    try {
+      return await this.loadTrainerSessionRoster(
+        { sessionId: parsedSessionId },
+        principal,
+      );
     } catch (error) {
       const problem = error instanceof Error ? commandProblem(error) : null;
       if (problem !== null) throw problem;

@@ -84,6 +84,37 @@ export class TrainerScheduleSessionDto {
   bookedCount!: number;
 }
 
+export class TrainerRosterBookingDto {
+  @ApiProperty({ format: 'uuid' })
+  bookingId!: string;
+
+  @ApiProperty()
+  clientName!: string;
+
+  @ApiPropertyOptional({ enum: ['attended', 'no_show'], nullable: true })
+  attendanceOutcome!: 'attended' | 'no_show' | null;
+}
+
+export class TrainerSessionRosterDto {
+  @ApiProperty({ format: 'uuid' })
+  sessionId!: string;
+
+  @ApiProperty()
+  classTypeName!: string;
+
+  @ApiProperty()
+  branchName!: string;
+
+  @ApiProperty({ format: 'date-time' })
+  startsAt!: Date;
+
+  @ApiProperty({ format: 'date-time' })
+  endsAt!: Date;
+
+  @ApiProperty({ type: TrainerRosterBookingDto, isArray: true })
+  bookings!: TrainerRosterBookingDto[];
+}
+
 const createBookingSchema = z.object({
   clientId: z.uuid().optional(),
 });
