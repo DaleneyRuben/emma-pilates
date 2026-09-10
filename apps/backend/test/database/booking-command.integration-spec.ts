@@ -354,6 +354,53 @@ describe('Booking commands', () => {
     ).resolves.toEqual({ remainingClassAllowance: 1 });
   });
 
+  it('records a complete Attendance roster after a Session ends', async () => {
+    const fixture = await createFixture(prisma);
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const booking = await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+    const trainerAccount = await prisma.account.create({
+      data: { email: `${randomUUID()}@example.com`, staffMemberId: fixture.trainerId },
+    });
+    await prisma.session.update({
+      where: { id: fixture.sessionId },
+      data: {
+        startsAt: new Date(fixture.now.getTime() - 2 * 60 * 60 * 1_000),
+        endsAt: new Date(fixture.now.getTime() - 60 * 60 * 1_000),
+      },
+    });
+
+    await commands.recordAttendance(
+      {
+        sessionId: fixture.sessionId,
+        outcomes: [{ bookingId: booking.id, outcome: 'attended' }],
+      },
+      {
+        accountId: trainerAccount.id,
+        authenticationSessionId: randomUUID(),
+        identity: {
+          kind: 'staff',
+          staffMemberId: fixture.trainerId,
+          role: 'trainer',
+          branchIds: [fixture.branchId],
+        },
+      },
+    );
+
+    await expect(
+      prisma.attendanceRecord.findUniqueOrThrow({
+        where: { bookingId: booking.id },
+        select: { outcome: true, recordedByAccountId: true },
+      }),
+    ).resolves.toEqual({ outcome: 'ATTENDED', recordedByAccountId: trainerAccount.id });
+  });
+
   it('promotes the Waitlist before a direct Booking uses freed capacity', async () => {
     const fixture = await createFixture(prisma, { capacity: 1 });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
@@ -561,6 +608,8 @@ const createFixture = async (
     now,
     accountId: account.id,
     clientId: client.id,
+    branchId: branch.id,
+    trainerId: trainer.id,
     sessionId: session.id,
     subscriptionId: subscription.id,
   };
