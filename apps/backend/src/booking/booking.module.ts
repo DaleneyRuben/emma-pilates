@@ -11,16 +11,19 @@ import {
   BookingRescheduleController,
   ClassHistoryController,
   TrainerAttendanceController,
+  TrainerScheduleController,
   recordAttendanceCommand,
   classHistory,
   createBookingCommand,
   joinWaitlistCommand,
   sessionAvailability,
   rescheduleBookingCommand,
+  trainerSchedule,
 } from './booking.controller';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
 import { listClassHistory } from './class-history';
 import { listSessionAvailability } from './session-availability';
+import { listTrainerSchedule } from './trainer-schedule';
 
 const bookingPrisma = Symbol('bookingPrisma');
 
@@ -40,6 +43,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     BookingRescheduleController,
     ClassHistoryController,
     TrainerAttendanceController,
+    TrainerScheduleController,
   ],
   providers: [
     {
@@ -119,6 +123,54 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.recordAttendance.bind(commands);
       },
+    },
+    {
+      provide: trainerSchedule,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient) =>
+        (
+          input: { on: Date },
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          listTrainerSchedule(input, {
+            principal,
+            findSessions: ({ trainerStaffMemberId, on }) => {
+              const start = new Date(on.getTime() + 4 * 60 * 60 * 1_000);
+              const end = new Date(start.getTime() + 24 * 60 * 60 * 1_000);
+              return prisma.session
+                .findMany({
+                  where: {
+                    trainerStaffMemberId,
+                    state: 'SCHEDULED',
+                    startsAt: { gte: start, lt: end },
+                  },
+                  select: {
+                    id: true,
+                    startsAt: true,
+                    endsAt: true,
+                    capacity: true,
+                    classType: { select: { name: true } },
+                    branch: { select: { name: true } },
+                    _count: {
+                      select: { bookings: { where: { state: 'BOOKED' } } },
+                    },
+                  },
+                  orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
+                })
+                .then((sessions) =>
+                  sessions.map((session) => ({
+                    sessionId: session.id,
+                    classTypeName: session.classType.name,
+                    branchName: session.branch.name,
+                    startsAt: session.startsAt,
+                    endsAt: session.endsAt,
+                    capacity: session.capacity,
+                    bookedCount: session._count.bookings,
+                  })),
+                );
+            },
+          }),
     },
     {
       provide: sessionAvailability,

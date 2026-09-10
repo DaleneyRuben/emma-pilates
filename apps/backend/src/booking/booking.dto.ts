@@ -61,6 +61,29 @@ export class SessionAvailabilityDto {
   waitlistCount!: number;
 }
 
+export class TrainerScheduleSessionDto {
+  @ApiProperty({ format: 'uuid' })
+  sessionId!: string;
+
+  @ApiProperty()
+  classTypeName!: string;
+
+  @ApiProperty()
+  branchName!: string;
+
+  @ApiProperty({ format: 'date-time' })
+  startsAt!: Date;
+
+  @ApiProperty({ format: 'date-time' })
+  endsAt!: Date;
+
+  @ApiProperty({ minimum: 1 })
+  capacity!: number;
+
+  @ApiProperty({ minimum: 0 })
+  bookedCount!: number;
+}
+
 const createBookingSchema = z.object({
   clientId: z.uuid().optional(),
 });
@@ -71,6 +94,7 @@ const attendanceSchema = z.object({
   ),
 });
 const uuidSchema = z.uuid();
+const calendarDateSchema = z.iso.date();
 
 const availabilityQuerySchema = z
   .object({
@@ -117,4 +141,9 @@ export const parseAvailabilityQuery = (
 export const parseUuid = (value: unknown): string | null => {
   const result = uuidSchema.safeParse(value);
   return result.success ? result.data : null;
+};
+
+export const parseCalendarDate = (value: unknown): Date | null => {
+  const result = calendarDateSchema.safeParse(value);
+  return result.success ? new Date(`${result.data}T00:00:00.000Z`) : null;
 };
