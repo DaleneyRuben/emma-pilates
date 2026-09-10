@@ -43,6 +43,36 @@ describe('Booking commands', () => {
       }),
     ).resolves.toEqual({ remainingClassAllowance: 1 });
   });
+
+  it('replays a Booking command without consuming another allowance', async () => {
+    const fixture = await createFixture(prisma);
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const principal = {
+      accountId: fixture.accountId,
+      authenticationSessionId: randomUUID(),
+      identity: { kind: 'client' as const, clientId: fixture.clientId },
+    };
+    const idempotencyKey = randomUUID();
+
+    const first = await commands.createIdempotent(
+      { sessionId: fixture.sessionId },
+      principal,
+      idempotencyKey,
+    );
+    const replay = await commands.createIdempotent(
+      { sessionId: fixture.sessionId },
+      principal,
+      idempotencyKey,
+    );
+
+    expect(replay).toEqual(first);
+    await expect(
+      prisma.subscription.findUniqueOrThrow({
+        where: { id: fixture.subscriptionId },
+        select: { remainingClassAllowance: true },
+      }),
+    ).resolves.toEqual({ remainingClassAllowance: 1 });
+  });
 });
 
 const createFixture = async (prisma: PrismaClient) => {
