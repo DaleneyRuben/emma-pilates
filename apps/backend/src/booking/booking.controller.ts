@@ -43,6 +43,7 @@ export const createBookingCommand = Symbol('createBookingCommand');
 export const joinWaitlistCommand = Symbol('joinWaitlistCommand');
 export const cancelBookingCommand = Symbol('cancelBookingCommand');
 export const rescheduleBookingCommand = Symbol('rescheduleBookingCommand');
+export const classHistory = Symbol('classHistory');
 export const sessionAvailability = Symbol('sessionAvailability');
 
 type CommandHandler = (
@@ -62,6 +63,9 @@ type RescheduleCommandHandler = (
   command: { bookingId: string; targetSessionId: string },
   principal: AuthenticatedPrincipal,
 ) => Promise<{ id: string }>;
+type ClassHistoryHandler = (
+  principal: AuthenticatedPrincipal,
+) => Promise<{ bookingId: string; sessionId: string }[]>;
 
 const parseBearerCredential = (authorization: string | undefined): string => {
   const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
@@ -348,6 +352,46 @@ export class BookingRescheduleController {
       if (problem !== null) throw problem;
       throw error;
     }
+  }
+
+  private async authenticate(
+    authorization: string | undefined,
+  ): Promise<AuthenticatedPrincipal> {
+    try {
+      return await this.principalResolver(
+        parseBearerCredential(authorization),
+        true,
+      );
+    } catch (error) {
+      if (
+        error instanceof AuthenticationRequiredError ||
+        error instanceof UnauthorizedException
+      ) {
+        throw new UnauthorizedException('Authentication is required');
+      }
+      throw error;
+    }
+  }
+}
+
+@Controller({ path: 'bookings', version: '1' })
+@ApiBearerAuth()
+export class ClassHistoryController {
+  constructor(
+    @Inject(classHistory)
+    private readonly listClassHistory: ClassHistoryHandler,
+    @Inject(authenticatedPrincipalResolver)
+    private readonly principalResolver: PrincipalResolver,
+  ) {}
+
+  @Get('history')
+  @ApiOperation({ operationId: 'listClassHistory' })
+  @ApiOkResponse({ type: CreatedBookingDto, isArray: true })
+  async list(
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<{ bookingId: string; sessionId: string }[]> {
+    const principal = await this.authenticate(authorization);
+    return this.listClassHistory(principal);
   }
 
   private async authenticate(

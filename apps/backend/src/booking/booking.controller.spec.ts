@@ -144,7 +144,9 @@ describe('BookingController', () => {
   it('returns the authenticated Client’s attended class history', async () => {
     const listClassHistory = jest
       .fn()
-      .mockResolvedValue([{ bookingId: 'booking-id', sessionId: 'session-id' }]);
+      .mockResolvedValue([
+        { bookingId: 'booking-id', sessionId: 'session-id' },
+      ]);
     const controller = new ClassHistoryController(
       listClassHistory,
       resolvePrincipal,

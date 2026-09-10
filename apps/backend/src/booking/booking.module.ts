@@ -9,12 +9,15 @@ import {
   BookingCancellationController,
   cancelBookingCommand,
   BookingRescheduleController,
+  ClassHistoryController,
+  classHistory,
   createBookingCommand,
   joinWaitlistCommand,
   sessionAvailability,
   rescheduleBookingCommand,
 } from './booking.controller';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
+import { listClassHistory } from './class-history';
 import { listSessionAvailability } from './session-availability';
 
 const bookingPrisma = Symbol('bookingPrisma');
@@ -33,6 +36,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     BookingController,
     BookingCancellationController,
     BookingRescheduleController,
+    ClassHistoryController,
   ],
   providers: [
     {
@@ -76,6 +80,34 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.reschedule.bind(commands);
       },
+    },
+    {
+      provide: classHistory,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient) =>
+        (
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          listClassHistory(principal, {
+            findAttendedBookings: (clientId) =>
+              prisma.booking
+                .findMany({
+                  where: {
+                    clientId,
+                    state: 'BOOKED',
+                    attendanceRecord: { outcome: 'ATTENDED' },
+                  },
+                  select: { id: true, sessionId: true },
+                  orderBy: { session: { endsAt: 'desc' } },
+                })
+                .then((bookings) =>
+                  bookings.map((booking) => ({
+                    bookingId: booking.id,
+                    sessionId: booking.sessionId,
+                  })),
+                ),
+          }),
     },
     {
       provide: sessionAvailability,
