@@ -309,6 +309,41 @@ describe('Booking commands', () => {
       }),
     ).resolves.toEqual({ remainingClassAllowance: 1 });
   });
+
+  it('allocates only one Booking when Clients race for the last Session spot', async () => {
+    const fixture = await createFixture(prisma, { capacity: 1 });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const firstClient = await createClientWithSubscription(prisma);
+    const secondClient = await createClientWithSubscription(prisma);
+
+    const results = await Promise.allSettled([
+      commands.create(
+        { sessionId: fixture.sessionId },
+        {
+          accountId: firstClient.accountId,
+          authenticationSessionId: randomUUID(),
+          identity: { kind: 'client', clientId: firstClient.clientId },
+        },
+      ),
+      commands.create(
+        { sessionId: fixture.sessionId },
+        {
+          accountId: secondClient.accountId,
+          authenticationSessionId: randomUUID(),
+          identity: { kind: 'client', clientId: secondClient.clientId },
+        },
+      ),
+    ]);
+
+    expect(
+      results.filter((result) => result.status === 'fulfilled'),
+    ).toHaveLength(1);
+    await expect(
+      prisma.booking.count({
+        where: { sessionId: fixture.sessionId, state: BookingState.BOOKED },
+      }),
+    ).resolves.toBe(1);
+  });
 });
 
 const createFixture = async (
