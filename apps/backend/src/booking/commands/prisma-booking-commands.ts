@@ -3,6 +3,7 @@ import type { Prisma } from '../../generated/prisma/client';
 import {
   BookingCancellationCause,
   BookingState,
+  AttendanceOutcome,
   PrismaClient,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
@@ -12,6 +13,7 @@ import { cancelBooking } from './cancel-booking';
 import { joinWaitlist } from './join-waitlist';
 import { promoteWaitlist } from './promote-waitlist';
 import { rescheduleBooking } from './reschedule-booking';
+import { recordAttendance } from './record-attendance';
 import { retrySerializable } from './retry-serializable';
 
 const boliviaDate = (instant: Date): Date => {
@@ -432,6 +434,70 @@ export class PrismaBookingCommands {
         },
         { isolationLevel: 'Serializable' },
       ),
+    );
+  }
+
+  async recordAttendance(
+    command: {
+      sessionId: string;
+      outcomes: { bookingId: string; outcome: 'attended' | 'no_show' }[];
+    },
+    principal: AuthenticatedPrincipal,
+  ): Promise<void> {
+    await this.prisma.$transaction(async (transaction) =>
+      recordAttendance(command, {
+        principal,
+        loadSession: async (sessionId) => {
+          const session = await transaction.session.findUnique({
+            where: { id: sessionId },
+            select: {
+              id: true,
+              trainerStaffMemberId: true,
+              endsAt: true,
+              state: true,
+            },
+          });
+          return session === null
+            ? null
+            : {
+                ...session,
+                state: session.state.toLowerCase() as 'scheduled' | 'cancelled',
+              };
+        },
+        loadBookedIds: async (sessionId) =>
+          (
+            await transaction.booking.findMany({
+              where: { sessionId, state: BookingState.BOOKED },
+              select: { id: true },
+            })
+          ).map(({ id }) => id),
+        save: async ({ outcomes, recordedByAccountId }) => {
+          await Promise.all(
+            outcomes.map(({ bookingId, outcome }) =>
+              transaction.attendanceRecord.upsert({
+                where: { bookingId },
+                create: {
+                  bookingId,
+                  outcome:
+                    outcome === 'attended'
+                      ? AttendanceOutcome.ATTENDED
+                      : AttendanceOutcome.NO_SHOW,
+                  recordedByAccountId,
+                  recordedAt: new Date(),
+                },
+                update: {
+                  outcome:
+                    outcome === 'attended'
+                      ? AttendanceOutcome.ATTENDED
+                      : AttendanceOutcome.NO_SHOW,
+                  recordedByAccountId,
+                },
+              }),
+            ),
+          );
+        },
+        now: this.now,
+      }),
     );
   }
 

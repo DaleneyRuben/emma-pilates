@@ -366,7 +366,10 @@ describe('Booking commands', () => {
       },
     );
     const trainerAccount = await prisma.account.create({
-      data: { email: `${randomUUID()}@example.com`, staffMemberId: fixture.trainerId },
+      data: {
+        email: `${randomUUID()}@example.com`,
+        staffMemberId: fixture.trainerId,
+      },
     });
     await prisma.session.update({
       where: { id: fixture.sessionId },
@@ -398,7 +401,10 @@ describe('Booking commands', () => {
         where: { bookingId: booking.id },
         select: { outcome: true, recordedByAccountId: true },
       }),
-    ).resolves.toEqual({ outcome: 'ATTENDED', recordedByAccountId: trainerAccount.id });
+    ).resolves.toEqual({
+      outcome: 'ATTENDED',
+      recordedByAccountId: trainerAccount.id,
+    });
   });
 
   it('promotes the Waitlist before a direct Booking uses freed capacity', async () => {
