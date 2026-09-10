@@ -17,7 +17,10 @@ type JoinWaitlistDependencies = {
     clientId: string;
     onDate: Date;
   }): Promise<{ id: string } | null>;
-  hasLiveBooking(input: { sessionId: string; clientId: string }): Promise<boolean>;
+  hasLiveBooking(input: {
+    sessionId: string;
+    clientId: string;
+  }): Promise<boolean>;
   create(input: {
     sessionId: string;
     clientId: string;

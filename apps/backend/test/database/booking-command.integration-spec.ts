@@ -73,9 +73,87 @@ describe('Booking commands', () => {
       }),
     ).resolves.toEqual({ remainingClassAllowance: 1 });
   });
+
+  it('joins a full Session Waitlist without consuming allowance', async () => {
+    const fixture = await createFixture(prisma, { capacity: 1 });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+
+    await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+
+    const waitingClient = await createClientWithSubscription(prisma);
+    const entry = await commands.joinWaitlist(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: waitingClient.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: waitingClient.clientId },
+      },
+    );
+
+    expect(entry.id).toEqual(expect.any(String));
+    await expect(
+      prisma.subscription.findUniqueOrThrow({
+        where: { id: waitingClient.subscriptionId },
+        select: { remainingClassAllowance: true },
+      }),
+    ).resolves.toEqual({ remainingClassAllowance: 2 });
+  });
+
+  it('replays a Waitlist command without creating another entry', async () => {
+    const fixture = await createFixture(prisma, { capacity: 1 });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+
+    await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+
+    const waitingClient = await createClientWithSubscription(prisma);
+    const principal = {
+      accountId: waitingClient.accountId,
+      authenticationSessionId: randomUUID(),
+      identity: { kind: 'client' as const, clientId: waitingClient.clientId },
+    };
+    const idempotencyKey = randomUUID();
+
+    const first = await commands.joinWaitlistIdempotent(
+      { sessionId: fixture.sessionId },
+      principal,
+      idempotencyKey,
+    );
+    const replay = await commands.joinWaitlistIdempotent(
+      { sessionId: fixture.sessionId },
+      principal,
+      idempotencyKey,
+    );
+
+    expect(replay).toEqual(first);
+    await expect(
+      prisma.waitlistEntry.count({
+        where: {
+          sessionId: fixture.sessionId,
+          clientId: waitingClient.clientId,
+        },
+      }),
+    ).resolves.toBe(1);
+  });
 });
 
-const createFixture = async (prisma: PrismaClient) => {
+const createFixture = async (
+  prisma: PrismaClient,
+  options: { capacity?: number } = {},
+) => {
   const now = new Date('2026-09-10T12:00:00Z');
   const branch = await prisma.branch.create({
     data: { name: randomUUID(), address: 'Calle Uno' },
@@ -98,7 +176,7 @@ const createFixture = async (prisma: PrismaClient) => {
       trainerStaffMemberId: trainer.id,
       startsAt: new Date('2026-09-10T16:00:00Z'),
       endsAt: new Date('2026-09-10T17:00:00Z'),
-      capacity: 8,
+      capacity: options.capacity ?? 8,
     },
   });
   const client = await prisma.client.create({
@@ -135,6 +213,43 @@ const createFixture = async (prisma: PrismaClient) => {
     accountId: account.id,
     clientId: client.id,
     sessionId: session.id,
+    subscriptionId: subscription.id,
+  };
+};
+
+const createClientWithSubscription = async (prisma: PrismaClient) => {
+  const client = await prisma.client.create({
+    data: { name: 'Bea', referralCode: randomUUID() },
+  });
+  const account = await prisma.account.create({
+    data: { email: `${randomUUID()}@example.com`, clientId: client.id },
+  });
+  const plan = await prisma.plan.create({
+    data: {
+      name: randomUUID(),
+      durationMonths: 1,
+      classAllowance: 2,
+      priceCentavos: 10000,
+      displayOrder: 0,
+    },
+  });
+  const subscription = await prisma.subscription.create({
+    data: {
+      clientId: client.id,
+      planId: plan.id,
+      planNameSnapshot: plan.name,
+      durationMonthsSnapshot: 1,
+      originalClassAllowance: 2,
+      remainingClassAllowance: 2,
+      startsOn: new Date('2026-09-01'),
+      endsOn: new Date('2026-09-30'),
+      activatedAt: new Date('2026-09-10T12:00:00Z'),
+    },
+  });
+
+  return {
+    accountId: account.id,
+    clientId: client.id,
     subscriptionId: subscription.id,
   };
 };
