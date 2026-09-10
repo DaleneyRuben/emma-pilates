@@ -5,6 +5,7 @@ import {
   ClassHistoryController,
   TrainerAttendanceController,
   BookingRescheduleController,
+  TrainerScheduleController,
 } from './booking.controller';
 import { BookingAccessDeniedError } from './commands/create-booking';
 
@@ -181,5 +182,45 @@ describe('BookingController', () => {
         },
       ),
     ).resolves.toBeUndefined();
+  });
+
+  it('returns the authenticated Trainer’s schedule for a selected day', async () => {
+    const listTrainerSchedule = jest.fn().mockResolvedValue([
+      {
+        sessionId: 'session-id',
+        classTypeName: 'Reformer Pilates',
+        branchName: 'Sucursal Centro',
+        startsAt: new Date('2026-09-10T13:00:00.000Z'),
+        endsAt: new Date('2026-09-10T14:00:00.000Z'),
+        capacity: 8,
+        bookedCount: 6,
+      },
+    ]);
+    const controller = new TrainerScheduleController(
+      listTrainerSchedule,
+      resolvePrincipal,
+    );
+
+    await expect(
+      controller.list(
+        '2026-09-10',
+        'Bearer AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      ),
+    ).resolves.toEqual([
+      {
+        sessionId: 'session-id',
+        classTypeName: 'Reformer Pilates',
+        branchName: 'Sucursal Centro',
+        startsAt: new Date('2026-09-10T13:00:00.000Z'),
+        endsAt: new Date('2026-09-10T14:00:00.000Z'),
+        capacity: 8,
+        bookedCount: 6,
+      },
+    ]);
+
+    expect(listTrainerSchedule).toHaveBeenCalledWith(
+      { on: new Date('2026-09-10T00:00:00.000Z') },
+      principal,
+    );
   });
 });
