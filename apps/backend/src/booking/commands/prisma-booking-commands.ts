@@ -75,7 +75,7 @@ export class PrismaBookingCommands {
       )
       .digest();
 
-    return this.prisma.$transaction(
+    const result = await this.prisma.$transaction(
       async (transaction) => {
         const existing = await transaction.idempotencyRecord.findUnique({
           where: {
@@ -108,11 +108,17 @@ export class PrismaBookingCommands {
         }
 
         await this.executeWaitlistPromotion(transaction, command.sessionId);
-        const result = await this.executeCreate(
-          transaction,
-          command,
-          principal,
-        );
+        let created: { id: string };
+
+        try {
+          created = await this.executeCreate(transaction, command, principal);
+        } catch (error) {
+          if (error instanceof Error && error.message === 'Session is full') {
+            return null;
+          }
+
+          throw error;
+        }
         await transaction.idempotencyRecord.create({
           data: {
             accountId: principal.accountId,
@@ -120,15 +126,21 @@ export class PrismaBookingCommands {
             idempotencyKey,
             requestHash,
             responseStatus: 201,
-            responseBody: result,
+            responseBody: created,
             expiresAt: new Date(this.now().getTime() + 24 * 60 * 60 * 1_000),
           },
         });
 
-        return result;
+        return created;
       },
       { isolationLevel: 'Serializable' },
     );
+
+    if (result === null) {
+      throw new Error('Session is full');
+    }
+
+    return result;
   }
 
   async joinWaitlist(
