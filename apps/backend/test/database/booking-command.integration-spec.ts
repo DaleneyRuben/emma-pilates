@@ -1,6 +1,10 @@
 import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from '../../src/generated/prisma/client';
+import {
+  BookingCancellationCause,
+  BookingState,
+  PrismaClient,
+} from '../../src/generated/prisma/client';
 import { PrismaBookingCommands } from '../../src/booking/commands/prisma-booking-commands';
 import {
   DatabaseTestContext,
@@ -147,6 +151,60 @@ describe('Booking commands', () => {
         },
       }),
     ).resolves.toBe(1);
+  });
+
+  it('promotes the first eligible Waitlist Entry and consumes allowance', async () => {
+    const fixture = await createFixture(prisma, { capacity: 1 });
+    const commands = new PrismaBookingCommands(prisma, () => fixture.now);
+    const booking = await commands.create(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+    );
+    const waitingClient = await createClientWithSubscription(prisma);
+
+    await commands.joinWaitlist(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: waitingClient.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: waitingClient.clientId },
+      },
+    );
+    await prisma.booking.update({
+      where: { id: booking.id },
+      data: {
+        state: BookingState.CANCELLED,
+        cancelledAt: fixture.now,
+        cancelledByAccountId: fixture.accountId,
+        cancellationCause: BookingCancellationCause.CLIENT_REQUEST,
+      },
+    });
+
+    const promotions = await commands.promoteWaitlist(fixture.sessionId);
+
+    expect(promotions).toHaveLength(1);
+    expect(promotions[0]?.entryId).toEqual(expect.any(String));
+    expect(promotions[0]?.bookingId).toEqual(expect.any(String));
+    await expect(
+      prisma.subscription.findUniqueOrThrow({
+        where: { id: waitingClient.subscriptionId },
+        select: { remainingClassAllowance: true },
+      }),
+    ).resolves.toEqual({ remainingClassAllowance: 1 });
+    const entry = await prisma.waitlistEntry.findFirstOrThrow({
+      where: {
+        sessionId: fixture.sessionId,
+        clientId: waitingClient.clientId,
+      },
+      select: { closedAt: true, promotedBookingId: true },
+    });
+
+    expect(entry.closedAt).toEqual(fixture.now);
+    expect(entry.promotedBookingId).toEqual(expect.any(String));
   });
 });
 
