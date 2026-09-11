@@ -594,6 +594,208 @@
           "Booking"
         ]
       }
+    },
+    "/api/v1/bookings/{bookingId}": {
+      "delete": {
+        "operationId": "cancelBooking",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "BookingCancellation"
+        ]
+      }
+    },
+    "/api/v1/bookings/{bookingId}/reschedule": {
+      "post": {
+        "operationId": "rescheduleBooking",
+        "parameters": [
+          {
+            "name": "bookingId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedBookingDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "BookingReschedule"
+        ]
+      }
+    },
+    "/api/v1/bookings/history": {
+      "get": {
+        "operationId": "listClassHistory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreatedBookingDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClassHistory"
+        ]
+      }
+    },
+    "/api/v1/sessions/{sessionId}/attendance": {
+      "post": {
+        "operationId": "recordSessionAttendance",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerAttendance"
+        ]
+      }
+    },
+    "/api/v1/trainer/sessions": {
+      "get": {
+        "operationId": "listTrainerSchedule",
+        "parameters": [
+          {
+            "name": "on",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TrainerScheduleSessionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSchedule"
+        ]
+      }
+    },
+    "/api/v1/trainer/sessions/{sessionId}/roster": {
+      "get": {
+        "operationId": "getTrainerSessionRoster",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainerSessionRosterDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSessionRoster"
+        ]
+      }
     }
   },
   "info": {
@@ -1112,6 +1314,107 @@
         },
         "required": [
           "id"
+        ]
+      },
+      "TrainerScheduleSessionDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeName": {
+            "type": "string"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "bookedCount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "sessionId",
+          "classTypeName",
+          "branchName",
+          "startsAt",
+          "endsAt",
+          "capacity",
+          "bookedCount"
+        ]
+      },
+      "TrainerRosterBookingDto": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "attendanceOutcome": {
+            "type": "string",
+            "enum": [
+              "attended",
+              "no_show"
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "bookingId",
+          "clientName"
+        ]
+      },
+      "TrainerSessionRosterDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeName": {
+            "type": "string"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TrainerRosterBookingDto"
+            }
+          }
+        },
+        "required": [
+          "sessionId",
+          "classTypeName",
+          "branchName",
+          "startsAt",
+          "endsAt",
+          "bookings"
         ]
       }
     }
