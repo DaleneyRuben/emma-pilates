@@ -53,12 +53,16 @@ A recurring weekly open time range the Nutritionist publishes (e.g. "Tuesdays 9a
 _Avoid_: Schedule, working hours
 
 **Credit**:
-A spendable money balance on a client's account, earned through Referrals. It comes off the amount the client is asked to pay for their next Plan — that reduced figure is the one printed beside the QR code for them to type into their bank app — and is spent when the Payment is confirmed. If that Payment is never confirmed, the Credit returns to the balance.
+A spendable money balance on a client's account, earned through Referrals. It comes off the amount the client is asked to pay for their next Plan — that reduced figure is the one printed beside the QR code for them to type into their bank app — and is reserved while that purchase is open. It is spent when the Payment is confirmed and returns to the available balance if the purchase expires or its Payment is rejected.
 _Avoid_: Discount, coupon, balance
 
 **Referral**:
-A link between a referring Client and a referred Client, established when the referred Client signs up using the referrer's code. Grants the referrer a Credit once the referred Client's first Payment is confirmed — not at signup, and not while it sits pending.
+A link between a referring Client and a referred Client, established when the referred Client signs up using the referrer's code. Grants the referrer Bs 60 in Credit once the referred Client's first Payment is confirmed — not at signup, and not while it sits pending.
 _Avoid_: Invite
+
+**Purchase Intent**:
+A client's 24-hour commitment to the selected Plan, reserved Credit, and resulting amount to pay before a transfer Payment exists. It grants no access and expires if the client does not submit a transfer receipt in time.
+_Avoid_: Payment, cart, checkout session
 
 **Branch**:
 A physical studio location with a single studio room, so two Sessions at the same Branch never overlap in time — a Branch's schedule is one class after another. Every Branch uses Bolivia civil time rather than carrying its own time zone. Sessions, Evaluations/Availability Blocks, and staff assignments are scoped to a Branch. Plans and Subscriptions are studio-wide and not tied to a single Branch — a client's Subscription grants access at any Branch. (See [ADR-0001](./docs/adr/0001-model-branch-as-first-class-entity.md).)
@@ -73,7 +77,7 @@ A person working for the studio, with exactly one Role (Trainer / Nutritionist /
 _Avoid_: User, employee, personal
 
 **Payment**:
-A record of money received for a Plan, with a method (transfer / cash), a status (pending / confirmed / rejected), and the Money Amount the client was asked to pay — the Plan's price less any Credit — so a reduced Payment can be told apart from a short one. A Payment can be raised only after the client's current Subscription has expired. A transfer Payment is raised by the client themselves, by marking in the app that they've paid against the studio's QR code; the client attaches a screenshot of their transfer receipt as proof, and it stays pending, granting nothing, until an Administrator checks that screenshot against the money in the bank. Confirming it starts a new Subscription with the selected Plan's full date range and class allowance; it never extends or resets an active Subscription. If the receipt doesn't hold up — amount doesn't match, no matching transfer found — the Administrator rejects it instead, with a short reason; the client sees why and must raise a new transfer Payment with a corrected receipt, the rejected one now settled and final. A push notification tells the Administrator one is waiting so the client isn't kept out of a class they've paid for. A cash Payment is recorded by an Assistant with the money in hand, and is confirmed the moment they record it — cash Payments are never rejected.
+A record of how a Plan purchase is settled, with a method (transfer / cash / Credit only), a status (pending / confirmed / rejected), and the Money Amount the client was asked to pay — the Plan's price less any Credit — so a reduced Payment can be told apart from a short one. A Payment can be raised only after the client's current Subscription has expired. A transfer Payment is raised by the client themselves, by marking in the app that they've paid against the studio's QR code; the client attaches a screenshot of their transfer receipt as proof, and it stays pending, granting nothing, until an Administrator checks that screenshot against the money in the bank. Confirming it starts a new Subscription with the selected Plan's full date range and class allowance; it never extends or resets an active Subscription. If the receipt doesn't hold up — amount doesn't match, no matching transfer found — the Administrator rejects it instead, with a short reason; the client sees why and must raise a new transfer Payment with a corrected receipt, the rejected one now settled and final. A push notification tells the Administrator one is waiting so the client isn't kept out of a class they've paid for. A cash Payment is recorded by an Assistant with the money in hand and is confirmed immediately; a Credit-only Payment is also confirmed immediately without a QR or receipt. Neither can be rejected.
 _Avoid_: Charge, transaction, pendiente / completado (UI labels for pending / confirmed)
 
 **Promotion**:
