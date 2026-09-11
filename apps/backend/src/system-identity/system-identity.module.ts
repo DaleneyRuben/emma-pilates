@@ -6,6 +6,7 @@ import type { PgBoss } from 'pg-boss';
 import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
 import { createPgBoss, startInstalledPgBoss } from '../jobs/pg-boss-runtime';
+import { isOpenApiGeneration } from '../openapi/openapi-generation';
 import {
   AccountSecurityController,
   accountActivation,
@@ -53,6 +54,10 @@ const systemIdentityPrisma = Symbol('systemIdentityPrisma');
 const authenticationGateway = Symbol('authenticationGateway');
 const accountSecurityGateway = Symbol('accountSecurityGateway');
 
+const openApiPgBoss: Pick<PgBoss, 'stop'> = {
+  stop: () => Promise.resolve(),
+};
+
 class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
   constructor(
     private readonly prisma: PrismaClient,
@@ -90,6 +95,9 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
       provide: registrationPgBoss,
       inject: [ConfigService],
       useFactory: async (config: ConfigService<Environment, true>) => {
+        if (isOpenApiGeneration(process.env)) {
+          return openApiPgBoss as PgBoss;
+        }
         const boss = await createPgBoss(config.getOrThrow('DATABASE_URL'));
         await startInstalledPgBoss(boss);
         return boss;

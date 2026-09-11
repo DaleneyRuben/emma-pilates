@@ -4,6 +4,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from '../app.module';
 import { configureApplication } from '../http/configure-application';
 
+process.env.OPENAPI_GENERATION = 'true';
+
 async function generateOpenApi(): Promise<void> {
   const app = await NestFactory.create(AppModule, { logger: false });
 
