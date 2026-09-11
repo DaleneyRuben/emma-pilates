@@ -2,11 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { randomUUID } from "expo-crypto";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import {
-  type ComponentType,
-  useCallback,
-  useMemo,
-} from "react";
+import { type ComponentType, useCallback, useMemo } from "react";
 
 import {
   createAuthenticationApi,
@@ -16,14 +12,8 @@ import {
   MobileIdentityProvider,
   useMobileIdentity,
 } from "./auth/identity-provider";
-import type {
-  LoginSubmissionResult,
-  LoginValues,
-} from "./auth/login-screen";
-import {
-  createSessionApi,
-  type SessionLoginResult,
-} from "./auth/session-api";
+import type { LoginSubmissionResult, LoginValues } from "./auth/login-screen";
+import { createSessionApi, type SessionLoginResult } from "./auth/session-api";
 import {
   createSessionManager,
   type AppRole,
@@ -39,15 +29,14 @@ import {
   getMobileApiBaseUrl,
   getOrCreateInstallationIdentifier,
 } from "./config/runtime";
+import { createApiFetcher } from "./api/fetcher";
 import { clearPersistedAccountCache } from "./query/persistence";
-import {
-  clearMobileQueryCache,
-  MobileQueryProvider,
-} from "./query/provider";
+import { clearMobileQueryCache, MobileQueryProvider } from "./query/provider";
 import { fontAssets } from "./ui/fonts";
 
 export type MobileRuntime = {
   allowedLinkHosts: readonly string[];
+  apiFetcher?: typeof globalThis.fetch;
   authenticationApi: AuthenticationApi;
   linkSource?: LinkSource;
   login: (values: LoginValues) => Promise<SessionLoginResult>;
@@ -57,10 +46,9 @@ export type MobileRuntime = {
 export type MobileNavigationProps = {
   authenticationApi: AuthenticationApi;
   authenticationIntent: AuthenticationLinkIntent | null;
+  apiFetcher?: typeof globalThis.fetch;
   onBiometricUnlock?: () => void;
-  onLogin: (
-    values: LoginValues,
-  ) => Promise<LoginSubmissionResult | void>;
+  onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
   onRecoveryCredential: (credential: string) => Promise<void>;
   role?: AppRole;
 };
@@ -70,7 +58,9 @@ export function createDefaultMobileRuntime({
   credentialStore,
 }: {
   acceptedIdentityKind: "client" | "staff";
-  credentialStore: Parameters<typeof createSessionManager>[0]["credentialStore"];
+  credentialStore: Parameters<
+    typeof createSessionManager
+  >[0]["credentialStore"];
 }): MobileRuntime {
   const apiBaseUrl = getMobileApiBaseUrl(
     { EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL },
@@ -85,6 +75,10 @@ export function createDefaultMobileRuntime({
 
   return {
     allowedLinkHosts: [new URL(apiBaseUrl).hostname],
+    apiFetcher: createApiFetcher({
+      baseUrl: apiBaseUrl,
+      getCredential: credentialStore.load,
+    }),
     authenticationApi: createAuthenticationApi({ baseUrl: apiBaseUrl }),
     async login({ email, password }) {
       const clientIdentifier = await getOrCreateInstallationIdentifier(
@@ -107,10 +101,12 @@ export function createDefaultMobileRuntime({
 function IdentityNavigation({
   Navigation,
   authenticationApi,
+  apiFetcher,
   login,
 }: {
   Navigation: ComponentType<MobileNavigationProps>;
   authenticationApi: AuthenticationApi;
+  apiFetcher?: typeof globalThis.fetch;
   login: MobileRuntime["login"];
 }) {
   const identity = useMobileIdentity();
@@ -137,6 +133,7 @@ function IdentityNavigation({
     <Navigation
       authenticationApi={authenticationApi}
       authenticationIntent={intent}
+      apiFetcher={apiFetcher}
       onBiometricUnlock={
         identity.status === "biometric-locked"
           ? identity.unlockWithBiometrics
@@ -174,6 +171,7 @@ export function MobileApplication({
             <IdentityNavigation
               Navigation={Navigation}
               authenticationApi={mobileRuntime.authenticationApi}
+              apiFetcher={mobileRuntime.apiFetcher}
               login={mobileRuntime.login}
             />
           </MobileIdentityProvider>
