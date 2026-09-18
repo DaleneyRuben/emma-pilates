@@ -32,6 +32,7 @@ describe('createPendingUpload', () => {
       declaredMediaType: 'image/jpeg',
       declaredByteSize: 1_000,
       declaredChecksum: new Uint8Array(32),
+      createdAt: new Date('2026-09-18T12:00:00Z'),
       expiresAt: new Date('2026-09-18T12:15:00Z'),
       deletionDueAt: new Date('2026-09-19T12:00:00Z'),
     });

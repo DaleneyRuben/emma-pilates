@@ -24,6 +24,7 @@ type CreatePendingUploadDependencies = {
     declaredMediaType: string;
     declaredByteSize: number;
     declaredChecksum: Uint8Array;
+    createdAt: Date;
     expiresAt: Date;
     deletionDueAt: Date;
   }): Promise<{ id: string }>;
@@ -57,6 +58,7 @@ export const createPendingUpload = async (
     declaredMediaType: command.mediaType,
     declaredByteSize: command.byteSize,
     declaredChecksum: command.checksum,
+    createdAt,
     expiresAt,
     deletionDueAt,
   });
