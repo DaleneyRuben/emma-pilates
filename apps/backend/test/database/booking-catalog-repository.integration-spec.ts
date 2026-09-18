@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, type Prisma } from '../../src/generated/prisma/client';
+import { ImageMediaType } from '../../src/generated/prisma/enums';
 import { createCatalogRepository } from '../../src/booking/catalog/prisma-catalog-repository';
 import {
   DatabaseTestContext,
@@ -260,9 +261,9 @@ describe('Booking catalog repository', () => {
           ownerAccountId: account.id,
           purpose: 'PROMOTION',
           pendingObjectKey: randomUUID(),
-          declaredMediaType: 'image/jpeg',
+          declaredMediaType: ImageMediaType.JPEG,
           declaredByteSize: 100,
-          declaredChecksum: Buffer.from('test'),
+          declaredChecksum: Buffer.alloc(32, 'test'),
           expiresAt: new Date('2026-10-01'),
         },
       });

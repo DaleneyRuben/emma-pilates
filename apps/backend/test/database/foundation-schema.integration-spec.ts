@@ -48,6 +48,7 @@ describe('foundation migration', () => {
       'system.email_suppressions',
       'system.idempotency_records',
       'system.image_assets',
+      'system.image_variants',
       'system.notification_deliveries',
       'system.notifications',
     ]);

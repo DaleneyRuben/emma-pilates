@@ -88,7 +88,7 @@ SELECT pg_temp.expect_failure('UPDATE booking.promotions SET display_ends_on = d
 SELECT pg_temp.expect_failure('UPDATE booking.promotions SET display_order = -1', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.promotions SET headline = '' ''', '23514');
 INSERT INTO system.image_assets (id, owner_account_id, purpose, pending_object_key, declared_media_type, declared_byte_size, declared_checksum, expires_at) VALUES
- ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'promotion', 'test/image', 'image/jpeg', 100, decode('00', 'hex'), now() + interval '1 day');
+ ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'promotion', 'test/image', 'image/jpeg', 100, decode(repeat('00', 32), 'hex'), now() + interval '1 day');
 UPDATE booking.promotions SET image_asset_id = '00000000-0000-0000-0000-000000000001', published_at = now();
 SELECT pg_temp.expect_failure('UPDATE booking.promotions SET archived_at = now()', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.promotions SET image_asset_id = NULL', '23514');
