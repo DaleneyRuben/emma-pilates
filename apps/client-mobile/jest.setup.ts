@@ -9,3 +9,7 @@ jest.mock("@react-native-async-storage/async-storage", () =>
 jest.mock("@react-native-community/netinfo", () => ({
   addEventListener: () => () => undefined,
 }));
+
+jest.mock("expo-crypto", () => ({
+  randomUUID: () => require("node:crypto").randomUUID(),
+}));
