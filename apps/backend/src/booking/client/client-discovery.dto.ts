@@ -1,5 +1,28 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { z } from 'zod';
 import type { ClientSubscriptionStatus } from './client-subscription';
+
+export class UpdateClientProfileDto {
+  @ApiProperty({ minLength: 1 })
+  name!: string;
+
+  @ApiPropertyOptional({ nullable: true })
+  phone!: string | null;
+}
+
+const updateClientProfileSchema = z.strictObject({
+  name: z.string(),
+  phone: z.string().nullable().optional(),
+});
+
+export const parseUpdateClientProfile = (
+  value: unknown,
+): UpdateClientProfileDto | null => {
+  const result = updateClientProfileSchema.safeParse(value);
+  return result.success
+    ? { name: result.data.name, phone: result.data.phone ?? null }
+    : null;
+};
 
 export const clientSubscriptionStatuses: [
   ClientSubscriptionStatus,

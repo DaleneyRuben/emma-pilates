@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  Body,
   Controller,
   ForbiddenException,
   Get,
@@ -7,9 +8,11 @@ import {
   Inject,
   NotFoundException,
   Param,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiBody,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -35,12 +38,15 @@ import {
   ClassTypeDto,
   ClientProfileDto,
   ClientSubscriptionDto,
+  parseUpdateClientProfile,
   PlanDto,
   SessionDetailDto,
+  UpdateClientProfileDto,
 } from './client-discovery.dto';
 
 export const clientProfile = Symbol('clientProfile');
 export const clientSubscription = Symbol('clientSubscription');
+export const clientProfileUpdate = Symbol('clientProfileUpdate');
 export const planCatalog = Symbol('planCatalog');
 export const branchCatalog = Symbol('branchCatalog');
 export const classTypeCatalog = Symbol('classTypeCatalog');
@@ -52,6 +58,10 @@ type ClientProfileHandler = (
 type ClientSubscriptionHandler = (
   principal: AuthenticatedPrincipal,
 ) => Promise<ClientSubscriptionView>;
+type ClientProfileUpdateHandler = (
+  command: { name: string; phone: string | null },
+  principal: AuthenticatedPrincipal,
+) => Promise<ClientProfile>;
 export type PlanCatalogHandler = {
   list(): Promise<PlanSummary[]>;
   find(planId: string): Promise<PlanSummary | null>;
@@ -96,6 +106,8 @@ export class ClientProfileController {
     @Inject(clientProfile) private readonly loadProfile: ClientProfileHandler,
     @Inject(clientSubscription)
     private readonly loadSubscription: ClientSubscriptionHandler,
+    @Inject(clientProfileUpdate)
+    private readonly updateProfile: ClientProfileUpdateHandler,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
   ) {}
@@ -111,6 +123,37 @@ export class ClientProfileController {
       authorization,
     );
     return denyNonClients(() => this.loadProfile(principal));
+  }
+
+  @Patch()
+  @ApiOperation({ operationId: 'updateCurrentClientProfile' })
+  @ApiBody({ type: UpdateClientProfileDto })
+  @ApiOkResponse({ type: ClientProfileDto })
+  async update(
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: unknown,
+  ): Promise<ClientProfileDto> {
+    const parsed = parseUpdateClientProfile(body);
+    if (parsed === null) throw invalidRequest('Invalid profile update');
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+
+    try {
+      return await denyNonClients(() => this.updateProfile(parsed, principal));
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message === 'Client name is required'
+      ) {
+        throw new BadRequestException({
+          code: 'client_name_required',
+          detail: 'Client name is required',
+        });
+      }
+      throw error;
+    }
   }
 
   @Get('subscription')

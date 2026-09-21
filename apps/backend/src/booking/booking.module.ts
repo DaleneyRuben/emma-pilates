@@ -33,6 +33,7 @@ import {
   branchCatalog,
   classTypeCatalog,
   clientProfile,
+  clientProfileUpdate,
   clientSubscription,
   planCatalog,
   sessionDetail,
@@ -40,6 +41,7 @@ import {
 } from './client/client-discovery.controller';
 import { loadClientProfile } from './client/client-profile';
 import { loadClientSubscription } from './client/client-subscription';
+import { updateClientProfile } from './client/update-client-profile';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
 import { listClassHistory } from './class-history';
 import { listSessionAvailability } from './session-availability';
@@ -273,6 +275,24 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
             principal,
             findProfile: (clientId) =>
               createCatalogRepository(prisma).findClientProfile(clientId),
+          }),
+    },
+    {
+      provide: clientProfileUpdate,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient) =>
+        (
+          command: { name: string; phone: string | null },
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          updateClientProfile(command, {
+            principal,
+            saveProfile: (clientId, changes) =>
+              createCatalogRepository(prisma).saveClientProfile(
+                clientId,
+                changes,
+              ),
           }),
     },
     {
