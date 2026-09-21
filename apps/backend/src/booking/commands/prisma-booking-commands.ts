@@ -8,6 +8,7 @@ import {
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { boliviaDate } from '../bolivia-time';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
 import { joinWaitlist } from './join-waitlist';
@@ -15,24 +16,6 @@ import { promoteWaitlist } from './promote-waitlist';
 import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendance } from './record-attendance';
 import { retrySerializable } from './retry-serializable';
-
-const boliviaDate = (instant: Date): Date => {
-  const fields = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/La_Paz',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  })
-    .formatToParts(instant)
-    .reduce<Record<string, string>>((result, part) => {
-      result[part.type] = part.value;
-      return result;
-    }, {});
-
-  return new Date(
-    Date.UTC(Number(fields.year), Number(fields.month) - 1, Number(fields.day)),
-  );
-};
 
 export class PrismaBookingCommands {
   constructor(
