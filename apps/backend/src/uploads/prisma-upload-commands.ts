@@ -9,6 +9,7 @@ import { createPendingUpload } from './create-pending-upload';
 import { finalizeUpload } from './finalize-upload';
 import { validateImageUploadDeclaration, type ImagePurpose } from './image-purpose';
 import type { LocalObjectStorage } from './local-object-storage';
+import { putPendingUploadObject } from './put-pending-upload-object';
 import { verifyImageBytes, type VerifiableMediaType } from './verify-image-bytes';
 
 const purposeToPrisma: Record<ImagePurpose, ImageAssetPurpose> = {
@@ -80,6 +81,29 @@ export function createPrismaUploadCommands(
           });
           return { id: created.id };
         },
+      }),
+
+    putPendingUploadObject: (
+      command: { imageAssetId: string; bytes: Buffer },
+      ownerAccountId: string,
+    ) =>
+      putPendingUploadObject(command, {
+        ownerAccountId,
+        loadPendingObjectKey: async (imageAssetId) => {
+          const asset = await prisma.imageAsset.findUnique({
+            where: { id: imageAssetId },
+            select: { ownerAccountId: true, pendingObjectKey: true, state: true },
+          });
+
+          if (asset === null) return null;
+
+          return {
+            ownerAccountId: asset.ownerAccountId,
+            pendingObjectKey: asset.pendingObjectKey,
+            state: stateFromPrisma[asset.state],
+          };
+        },
+        writeObject: (objectKey, bytes) => storage.put(objectKey, bytes),
       }),
 
     finalizeUpload: (

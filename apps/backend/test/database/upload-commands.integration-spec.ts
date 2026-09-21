@@ -97,6 +97,63 @@ describe('Prisma upload commands', () => {
     });
   });
 
+  it('writes bytes to a pending upload the requesting Account owns', async () => {
+    await withRollback(async (tx) => {
+      const account = await createAccount(tx);
+      const bytes = await receiptBytes();
+      const commands = createPrismaUploadCommands(
+        tx,
+        storage,
+        () => new Date('2026-09-18T12:00:00Z'),
+      );
+
+      const intent = await commands.createPendingUpload({
+        ownerAccountId: account.id,
+        purpose: 'transfer_receipt',
+        mediaType: 'image/jpeg',
+        byteSize: bytes.byteLength,
+        checksum: createHash('sha256').update(bytes).digest(),
+      });
+
+      await commands.putPendingUploadObject(
+        { imageAssetId: intent.id, bytes },
+        account.id,
+      );
+
+      await expect(storage.get(intent.pendingObjectKey)).resolves.toEqual(
+        bytes,
+      );
+    });
+  });
+
+  it('denies writing bytes to a pending upload owned by another Account', async () => {
+    await withRollback(async (tx) => {
+      const owner = await createAccount(tx);
+      const stranger = await createAccount(tx);
+      const bytes = await receiptBytes();
+      const commands = createPrismaUploadCommands(
+        tx,
+        storage,
+        () => new Date('2026-09-18T12:00:00Z'),
+      );
+
+      const intent = await commands.createPendingUpload({
+        ownerAccountId: owner.id,
+        purpose: 'transfer_receipt',
+        mediaType: 'image/jpeg',
+        byteSize: bytes.byteLength,
+        checksum: createHash('sha256').update(bytes).digest(),
+      });
+
+      await expect(
+        commands.putPendingUploadObject(
+          { imageAssetId: intent.id, bytes },
+          stranger.id,
+        ),
+      ).rejects.toThrow('Upload access is denied');
+    });
+  });
+
   it('fails finalization when the stored bytes do not match the declared checksum', async () => {
     await withRollback(async (tx) => {
       const account = await createAccount(tx);
