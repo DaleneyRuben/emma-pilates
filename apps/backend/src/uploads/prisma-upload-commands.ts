@@ -175,6 +175,8 @@ export function createPrismaUploadCommands(
           await prisma.imageAsset.update({
             where: { id: imageAssetId },
             data: {
+              state: ImageAssetState.READY,
+              finalizedAt: now(),
               verifiedMediaType: mediaTypeToPrisma[verified.mediaType],
               verifiedByteSize: verified.byteSize,
               verifiedChecksum: Buffer.from(verified.checksum),
