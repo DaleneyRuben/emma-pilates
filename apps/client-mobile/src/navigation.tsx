@@ -1,14 +1,15 @@
 import {
   AuthenticationFlow,
-  Heading,
   MobileQueryProvider,
-  Screen,
   type MobileNavigationProps,
 } from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStaticNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
+import { BookingsScreen } from "./booking/bookings-screen";
+import { BrowseSessionsScreen } from "./booking/browse-sessions-screen";
+import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientFetcherContext } from "./client-fetcher";
 import { HomeScreen } from "./home/home-screen";
 import { PlanDetailScreen } from "./plans/plan-detail-screen";
@@ -21,23 +22,7 @@ const unavailableFetcher: typeof globalThis.fetch = async () => {
   throw new Error("The authenticated API fetcher is unavailable");
 };
 
-function NavigationPlaceholder({ title }: { title: string }) {
-  return (
-    <Screen>
-      <Heading accessibilityLabel={title}>{title}</Heading>
-    </Screen>
-  );
-}
-
-function ClientBookingScreen() {
-  return <NavigationPlaceholder title="Reservar" />;
-}
-
-function ClientBookingsScreen() {
-  return <NavigationPlaceholder title="Mis reservas" />;
-}
-
-// Plan and Subscription screens are reachable from both Home and Perfil.
+// Plan and Subscription screens are reachable from Home, Reservar, and Perfil.
 const planScreens = {
   Plans: PlansScreen,
   PlanDetail: PlanDetailScreen,
@@ -47,6 +32,15 @@ const planScreens = {
 const HomeStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },
   screens: { Home: HomeScreen, ...planScreens },
+});
+
+const BookingStack = createNativeStackNavigator({
+  screenOptions: { headerShown: false },
+  screens: {
+    Browse: BrowseSessionsScreen,
+    SessionDetail: SessionDetailScreen,
+    ...planScreens,
+  },
 });
 
 const ProfileStack = createNativeStackNavigator({
@@ -62,11 +56,8 @@ const ClientTabs = createBottomTabNavigator({
   screenOptions: { headerShown: false },
   screens: {
     HomeTab: { screen: HomeStack, options: { title: "Inicio" } },
-    Booking: { screen: ClientBookingScreen, options: { title: "Reservar" } },
-    Bookings: {
-      screen: ClientBookingsScreen,
-      options: { title: "Mis Reservas" },
-    },
+    Booking: { screen: BookingStack, options: { title: "Reservar" } },
+    Bookings: { screen: BookingsScreen, options: { title: "Mis Reservas" } },
     ProfileTab: { screen: ProfileStack, options: { title: "Perfil" } },
   },
 });
