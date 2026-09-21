@@ -57,6 +57,9 @@ describe('worker entrypoint', () => {
       'system.authentication-email.v1',
       { force: true },
     );
+    expect(getQueueStats).toHaveBeenCalledWith('uploads.finalize.v1', {
+      force: true,
+    });
     expect(emit).toHaveBeenCalledTimes(1);
 
     await stopWorker();
