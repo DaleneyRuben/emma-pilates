@@ -1,0 +1,107 @@
+import {
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+} from "@testing-library/react-native";
+import { clearMobileQueryCache } from "@pilates/mobile-core";
+
+import App from "../../App";
+import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+
+const profile = {
+  id: "client-1",
+  name: "Mariana Peña",
+  email: "mariana@example.com",
+  phone: null,
+  referralCode: "REF-MARIANA",
+};
+
+const plans = [
+  {
+    id: "plan-8",
+    name: "Paquete de 8 clases",
+    durationMonths: 1,
+    classAllowance: 8,
+    priceCentavos: 56_000,
+  },
+  {
+    id: "plan-36",
+    name: "Trimestral 36 clases",
+    durationMonths: 3,
+    classAllowance: 36,
+    priceCentavos: 210_000,
+  },
+];
+
+describe("Client Plans", () => {
+  afterEach(() => {
+    cleanup();
+    clearMobileQueryCache();
+  });
+
+  it("lists the Plans from Home and opens a Plan detail", async () => {
+    const fetcher = routeFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse({ status: "none", subscription: null }),
+      "/api/v1/plans": () => jsonResponse(plans),
+      "/api/v1/plans/plan-36": () => jsonResponse(plans[1]),
+    });
+    const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Comprar un plan" }),
+      ).toBeOnTheScreen();
+    });
+    fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Elige tu plan")).toBeOnTheScreen();
+      expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("8 clases · válido por 1 mes")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 560")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
+
+    fireEvent.press(
+      screen.getByRole("button", { name: "Trimestral 36 clases" }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Detalle del plan")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("Válido por 3 meses")).toBeOnTheScreen();
+    expect(
+      screen.getByText("36 clases en cualquier sucursal del estudio."),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", { name: "Continuar al pago" }),
+    ).toHaveProp("accessibilityState", { disabled: true });
+  });
+
+  it("shows an empty state when no Plan is visible", async () => {
+    const fetcher = routeFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse({ status: "none", subscription: null }),
+      "/api/v1/plans": () => jsonResponse([]),
+    });
+    const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Comprar un plan" }),
+      ).toBeOnTheScreen();
+    });
+    fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Por ahora no hay planes disponibles."),
+      ).toBeOnTheScreen();
+    });
+  });
+});
