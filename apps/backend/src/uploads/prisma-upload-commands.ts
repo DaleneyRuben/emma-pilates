@@ -1,5 +1,6 @@
-import { randomUUID } from 'node:crypto';
-import type { Prisma } from '../generated/prisma/client';
+import { createHash, randomUUID } from 'node:crypto';
+import { retrySerializable } from '../booking/commands/retry-serializable';
+import type { Prisma, PrismaClient } from '../generated/prisma/client';
 import {
   ImageAssetPurpose,
   ImageAssetState,
@@ -11,6 +12,8 @@ import { validateImageUploadDeclaration, type ImagePurpose } from './image-purpo
 import type { LocalObjectStorage } from './local-object-storage';
 import { putPendingUploadObject } from './put-pending-upload-object';
 import { verifyImageBytes, type VerifiableMediaType } from './verify-image-bytes';
+
+const finalizeUploadIdempotencyRetentionMs = 24 * 60 * 60 * 1_000;
 
 const purposeToPrisma: Record<ImagePurpose, ImageAssetPurpose> = {
   profile_photo: ImageAssetPurpose.PROFILE_PHOTO,
@@ -191,5 +194,95 @@ export function createPrismaUploadCommands(
           });
         },
       }),
+  };
+}
+
+type FinalizeUploadResponse = { id: string; state: string };
+
+const isFinalizeUploadResponse = (
+  value: unknown,
+): value is FinalizeUploadResponse =>
+  typeof value === 'object' &&
+  value !== null &&
+  'id' in value &&
+  'state' in value &&
+  typeof value.id === 'string' &&
+  typeof value.state === 'string';
+
+export function createFinalizeUploadIdempotent(
+  prisma: PrismaClient,
+  storage: LocalObjectStorage,
+  now: () => Date,
+) {
+  return async (
+    command: { imageAssetId: string },
+    ownerAccountId: string,
+    idempotencyKey: string,
+  ): Promise<FinalizeUploadResponse> => {
+    const requestHash = createHash('sha256')
+      .update(JSON.stringify({ imageAssetId: command.imageAssetId }))
+      .digest();
+
+    return retrySerializable(() =>
+      prisma.$transaction(
+        async (transaction) => {
+          const existing = await transaction.idempotencyRecord.findUnique({
+            where: {
+              accountId_command_idempotencyKey: {
+                accountId: ownerAccountId,
+                command: 'finalize_upload',
+                idempotencyKey,
+              },
+            },
+            select: { requestHash: true, responseBody: true },
+          });
+
+          if (existing !== null) {
+            if (!Buffer.from(existing.requestHash).equals(requestHash)) {
+              throw new Error(
+                'Idempotency Key was reused with a different request',
+              );
+            }
+
+            if (!isFinalizeUploadResponse(existing.responseBody)) {
+              throw new Error('Stored idempotency response is invalid');
+            }
+
+            return existing.responseBody;
+          }
+
+          await createPrismaUploadCommands(transaction, storage, now).finalizeUpload(
+            command,
+            ownerAccountId,
+          );
+
+          const asset = await transaction.imageAsset.findUniqueOrThrow({
+            where: { id: command.imageAssetId },
+            select: { id: true, state: true },
+          });
+          const response: FinalizeUploadResponse = {
+            id: asset.id,
+            state: stateFromPrisma[asset.state],
+          };
+
+          await transaction.idempotencyRecord.create({
+            data: {
+              accountId: ownerAccountId,
+              command: 'finalize_upload',
+              idempotencyKey,
+              requestHash,
+              responseStatus: 202,
+              responseBody: response,
+              expiresAt: new Date(
+                now().getTime() + finalizeUploadIdempotencyRetentionMs,
+              ),
+            },
+          });
+
+          return response;
+        },
+        { isolationLevel: 'Serializable' },
+      ),
+    );
   };
 }
