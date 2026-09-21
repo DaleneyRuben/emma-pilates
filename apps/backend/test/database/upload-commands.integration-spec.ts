@@ -86,8 +86,9 @@ describe('Prisma upload commands', () => {
       const asset = await tx.imageAsset.findUniqueOrThrow({
         where: { id: intent.id },
       });
-      expect(asset.state).toBe('PROCESSING');
+      expect(asset.state).toBe('READY');
       expect(asset.processingStartedAt).toEqual(new Date('2026-09-18T12:00:00Z'));
+      expect(asset.finalizedAt).toEqual(new Date('2026-09-18T12:00:00Z'));
       expect(asset.verifiedMediaType).toBe('JPEG');
       expect(asset.verifiedByteSize).toBe(bytes.byteLength);
       expect(Buffer.from(asset.verifiedChecksum ?? [])).toEqual(checksum);

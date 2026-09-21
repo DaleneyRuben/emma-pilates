@@ -92,7 +92,7 @@ describe('Finalize upload idempotency', () => {
     );
 
     expect(replay).toEqual(first);
-    expect(replay.state).toBe('processing');
+    expect(replay.state).toBe('ready');
   });
 
   it('rejects reusing an idempotency key for a different Upload', async () => {
