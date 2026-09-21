@@ -61,6 +61,15 @@ export function formatTimeRange(startsAt: string, endsAt: string): string {
   return `${timeFormatter.format(new Date(startsAt))} – ${timeFormatter.format(new Date(endsAt))}`;
 }
 
+const cancellationWindowMs = 2.5 * 60 * 60 * 1_000;
+
+export function isInsideCancellationWindow(
+  startsAt: string,
+  now: Date,
+): boolean {
+  return new Date(startsAt).getTime() - now.getTime() <= cancellationWindowMs;
+}
+
 export function formatSessionDate(startsAt: string): string {
   return longDateFormatter.format(new Date(startsAt)).replace(",", "");
 }
