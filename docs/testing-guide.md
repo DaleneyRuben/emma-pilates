@@ -8,7 +8,8 @@ you are starting with no project knowledge.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator | Client Home and other signed-in destinations are still placeholders                                                                             |
-| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator and verify that Client registration is unavailable                                                       | Trainer, Assistant, Administrator, and Nutritionist destinations are still placeholders; no ready-made local Staff account exists              |
+| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable                  | Assistant, Administrator, and Nutritionist destinations are still placeholders                                                                |
+| Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, and active Client and Staff Accounts with one command                            | Promotions and receipt images are not included until image delivery is specified                                                              |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
 | Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The captured verification email does not have a beginner-facing inbox yet                                                                                     |
@@ -328,31 +329,48 @@ not available yet. For this local test only, create a second registration and
 mark it verified directly in your local database. Never use this shortcut on a
 shared or production database.
 
-### A. Prepare one local active Account
+### A. Load the local development fixtures
 
-Register a new address through Swagger, for example
-`ana.login+1@example.com`, and remember the password you submitted. Then run:
+With the migrations applied (Test 2), load the deterministic development data:
 
 ```sh
-psql emma_pilates -c "UPDATE system.accounts SET email_verified_at = CURRENT_TIMESTAMP, activated_at = CURRENT_TIMESTAMP, pending_expires_at = NULL WHERE email = 'ana.login+1@example.com';"
+pnpm --filter @pilates/backend db:fixtures
 ```
 
-The command should report `UPDATE 1`. If it reports `UPDATE 0`, check that the
-email exactly matches the registration response.
+The command refuses to run when `NODE_ENV=production`, and running it again is
+safe: it updates the same rows instead of duplicating them. It creates three
+Branches (Centro, Equipetrol, Urubó), three Class Types, the four designed
+Plans, weekly Session Schedules with the next 30 days of Sessions, and these
+active Accounts. Every fixture Account uses the password `emma-local-2026`.
+
+| Email                        | Role          | Representative state                          |
+| ---------------------------- | ------------- | --------------------------------------------- |
+| `lucia@example.com`          | Client        | Active Plan with 5 of 8 classes left          |
+| `valeria@example.com`        | Client        | Active Plan expiring in 3 days, 2 classes left |
+| `isabel@example.com`         | Client        | Active Plan with no classes left              |
+| `sofia@example.com`          | Client        | Expired Plan                                  |
+| `mariana@example.com`        | Client        | Never purchased a Plan                        |
+| `emma.vargas@example.com`    | Trainer       | Leads Sessions in all three Branches          |
+| `daniela.ortiz@example.com`  | Trainer       | Leads Sessions in Centro and Urubó            |
+| `andrea.suarez@example.com`  | Trainer       | Leads Pilates Prenatal in Equipetrol          |
+| `camila.rojas@example.com`   | Assistant     | Assigned to Centro                            |
+| `paola.mendoza@example.com`  | Administrator | Covers every Branch                           |
+| `gabriela.flores@example.com`| Nutritionist  | Assigned to Centro                            |
+
+These fixtures exist only for your local `emma_pilates` database. Never load
+them into a shared-development or production database.
 
 ### B. Log in from the mobile app
 
 Keep the backend and Client Expo server running. In the iOS Simulator, open the
-Client app, enter the active Account email and password, then tap **Iniciar
-sesión**. The app should open the Client destination labeled **Inicio**. Close
-and reopen the app; startup Session restoration should return to **Inicio**
-without asking for the password again.
+Client app, enter `lucia@example.com` and the fixture password, then tap
+**Iniciar sesión**. The app should open the Client destination labeled
+**Inicio**. Close and reopen the app; startup Session restoration should return
+to **Inicio** without asking for the password again.
 
-That Client Account must not authenticate in the Staff app. A Staff login needs
-an active Account with a Trainer, Assistant, Administrator, or Nutritionist
-Role. The project does not yet provide a beginner-facing command that creates
-those local Staff fixtures, so authenticated Staff destinations are not ready
-for this manual guide.
+That Client Account must not authenticate in the Staff app. Use a Staff fixture
+such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
+by the Client app.
 
 For an incorrect password, the mobile app must show the same neutral message
 regardless of whether the Account exists. After the backend returns `429`, the
