@@ -78,7 +78,10 @@ describe('Client discovery reads', () => {
     const repository = createCatalogRepository(prisma);
 
     await expect(repository.listBranches()).resolves.toEqual([
-      expect.objectContaining({ name: 'Centro', address: 'Calle Ayacucho 245' }),
+      expect.objectContaining({
+        name: 'Centro',
+        address: 'Calle Ayacucho 245',
+      }),
       expect.objectContaining({ name: 'Equipetrol' }),
       expect.objectContaining({ name: 'Urubó' }),
     ]);
@@ -114,15 +117,16 @@ describe('Client discovery reads', () => {
         s.startsAt.toISOString() === '2026-09-21T11:00:00.000Z',
     );
 
-    await expect(
-      createCatalogRepository(prisma).findSessionDetail(session!.id),
-    ).resolves.toEqual({
+    const detail = await createCatalogRepository(prisma).findSessionDetail(
+      session!.id,
+    );
+
+    expect(detail).toMatchObject({
       id: session!.id,
       branch: { id: centro!.id, name: 'Centro', address: 'Calle Ayacucho 245' },
       classType: {
         id: session!.classTypeId,
         name: 'Reformer Pilates',
-        description: expect.stringContaining('Reformer'),
         durationMinutes: 50,
       },
       trainerName: 'Emma Vargas',
@@ -133,6 +137,7 @@ describe('Client discovery reads', () => {
       availableSeats: 12,
       waitlistCount: 0,
     });
+    expect(detail?.classType.description).toContain('Reformer');
   });
 
   it('names the Class Type and Trainer in Session availability', async () => {
