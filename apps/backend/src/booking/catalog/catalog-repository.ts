@@ -57,6 +57,8 @@ export type PromotionSummary = {
   displayOrder: number;
 };
 
+import type { UpcomingClientBooking } from '../client/client-bookings';
+
 export type BranchSummary = {
   id: string;
   name: string;
@@ -116,4 +118,8 @@ export type CatalogRepository = {
     changes: { name: string; phone: string | null },
   ): Promise<ClientProfileRecord>;
   findSessionDetail(sessionId: string): Promise<SessionDetail | null>;
+  findUpcomingClientBookings(input: {
+    clientId: string;
+    from: Date;
+  }): Promise<UpcomingClientBooking[]>;
 };

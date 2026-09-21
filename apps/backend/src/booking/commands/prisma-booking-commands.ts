@@ -12,6 +12,7 @@ import { boliviaDate } from '../bolivia-time';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
 import { joinWaitlist } from './join-waitlist';
+import { leaveWaitlist } from './leave-waitlist';
 import { promoteWaitlist } from './promote-waitlist';
 import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendance } from './record-attendance';
@@ -563,6 +564,54 @@ export class PrismaBookingCommands {
         now: this.now,
       },
     );
+  }
+
+  async leaveWaitlist(
+    command: { waitlistEntryId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<void> {
+    await leaveWaitlist(command, {
+      principal,
+      loadEntry: async (waitlistEntryId) => {
+        const entry = await this.prisma.waitlistEntry.findUnique({
+          where: { id: waitlistEntryId },
+          select: {
+            id: true,
+            clientId: true,
+            closedAt: true,
+            session: {
+              select: { id: true, branchId: true, startsAt: true, state: true },
+            },
+          },
+        });
+
+        return entry === null
+          ? null
+          : {
+              ...entry,
+              session: {
+                ...entry.session,
+                state: entry.session.state.toLowerCase() as
+                  'scheduled' | 'cancelled',
+              },
+            };
+      },
+      close: async (input) => {
+        const closed = await this.prisma.waitlistEntry.updateMany({
+          where: { id: input.waitlistEntryId, closedAt: null },
+          data: {
+            closedAt: input.closedAt,
+            closedByAccountId: input.closedByAccountId,
+            closureReason: WaitlistClosureReason.LEFT,
+          },
+        });
+
+        if (closed.count !== 1) {
+          throw new Error('Waitlist Entry is not active');
+        }
+      },
+      now: this.now,
+    });
   }
 
   private executeJoinWaitlist(

@@ -148,6 +148,59 @@ export function createCatalogRepository(
                 waitlistCount: session._count.waitlistEntries,
               },
         ),
+    findUpcomingClientBookings: async ({ clientId, from }) => {
+      const sessionFacts = {
+        id: true,
+        startsAt: true,
+        endsAt: true,
+        classType: { select: { name: true } },
+        trainer: { select: { name: true } },
+        branch: { select: { name: true } },
+      } as const;
+      const [bookings, entries] = await Promise.all([
+        prisma.booking.findMany({
+          where: {
+            clientId,
+            state: 'BOOKED',
+            session: { state: 'SCHEDULED', startsAt: { gt: from } },
+          },
+          select: { id: true, session: { select: sessionFacts } },
+        }),
+        prisma.waitlistEntry.findMany({
+          where: {
+            clientId,
+            closedAt: null,
+            session: { state: 'SCHEDULED', startsAt: { gt: from } },
+          },
+          select: { id: true, session: { select: sessionFacts } },
+        }),
+      ]);
+      const facts = (session: (typeof bookings)[number]['session']) => ({
+        sessionId: session.id,
+        classTypeName: session.classType.name,
+        trainerName: session.trainer.name,
+        branchName: session.branch.name,
+        startsAt: session.startsAt,
+        endsAt: session.endsAt,
+      });
+
+      return [
+        ...bookings.map((booking) => ({
+          kind: 'booking' as const,
+          bookingId: booking.id,
+          ...facts(booking.session),
+        })),
+        ...entries.map((entry) => ({
+          kind: 'waitlist' as const,
+          waitlistEntryId: entry.id,
+          ...facts(entry.session),
+        })),
+      ].sort(
+        (left, right) =>
+          left.startsAt.getTime() - right.startsAt.getTime() ||
+          left.sessionId.localeCompare(right.sessionId),
+      );
+    },
     findClassType: (id) =>
       prisma.classType.findUnique({ where: { id }, select: classTypeSelect }),
     findSessionSchedule: (id) =>
