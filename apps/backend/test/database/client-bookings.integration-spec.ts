@@ -42,6 +42,8 @@ describe('Client upcoming bookings', () => {
       fixtures,
       passwordHash: 'not-a-real-hash',
     });
+    await prisma.waitlistEntry.deleteMany({ where: { clientId: lucia.id } });
+    await prisma.booking.deleteMany({ where: { clientId: lucia.id } });
   });
 
   afterAll(async () => {
@@ -61,6 +63,7 @@ describe('Client upcoming bookings', () => {
         sessionId: first.id,
         clientId: lucia.id,
         joinedByAccountId: await luciaAccountId(),
+        joinedAt: now,
       },
     });
 
@@ -90,6 +93,7 @@ describe('Client upcoming bookings', () => {
         sessionId: third.id,
         clientId: lucia.id,
         joinedByAccountId: await luciaAccountId(),
+        joinedAt: now,
       },
     });
     const commands = new PrismaBookingCommands(prisma, () => now);
