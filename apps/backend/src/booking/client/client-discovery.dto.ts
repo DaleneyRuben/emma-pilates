@@ -1,0 +1,126 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import type { ClientSubscriptionStatus } from './client-subscription';
+
+export const clientSubscriptionStatuses: [
+  ClientSubscriptionStatus,
+  ...ClientSubscriptionStatus[],
+] = ['active', 'expiring_soon', 'expired', 'none'];
+
+export class ClientProfileDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty({ format: 'email' })
+  email!: string;
+
+  @ApiPropertyOptional({ nullable: true })
+  phone!: string | null;
+
+  @ApiProperty()
+  referralCode!: string;
+}
+
+export class ClientSubscriptionSummaryDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  planName!: string;
+
+  @ApiProperty({ minimum: 1 })
+  originalClassAllowance!: number;
+
+  @ApiProperty({ minimum: 0 })
+  remainingClassAllowance!: number;
+
+  @ApiProperty({ format: 'date' })
+  startsOn!: string;
+
+  @ApiProperty({ format: 'date' })
+  endsOn!: string;
+}
+
+export class ClientSubscriptionDto {
+  @ApiProperty({ enum: clientSubscriptionStatuses })
+  status!: ClientSubscriptionStatus;
+
+  @ApiPropertyOptional({ type: ClientSubscriptionSummaryDto, nullable: true })
+  subscription!: ClientSubscriptionSummaryDto | null;
+}
+
+export class PlanDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty({ enum: [1, 3, 6, 12] })
+  durationMonths!: number;
+
+  @ApiProperty({ minimum: 1 })
+  classAllowance!: number;
+
+  @ApiProperty({ minimum: 0, description: 'Money Amount in BOB centavos' })
+  priceCentavos!: number;
+}
+
+export class BranchDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  address!: string;
+}
+
+export class ClassTypeDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty()
+  description!: string;
+
+  @ApiProperty({ minimum: 1 })
+  durationMinutes!: number;
+}
+
+export class SessionDetailDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ type: BranchDto })
+  branch!: BranchDto;
+
+  @ApiProperty({ type: ClassTypeDto })
+  classType!: ClassTypeDto;
+
+  @ApiProperty()
+  trainerName!: string;
+
+  @ApiProperty({ format: 'date-time' })
+  startsAt!: Date;
+
+  @ApiProperty({ format: 'date-time' })
+  endsAt!: Date;
+
+  @ApiProperty({ minimum: 1 })
+  capacity!: number;
+
+  @ApiProperty({ minimum: 0 })
+  bookedCount!: number;
+
+  @ApiProperty({ minimum: 0 })
+  availableSeats!: number;
+
+  @ApiProperty({ minimum: 0 })
+  waitlistCount!: number;
+}
