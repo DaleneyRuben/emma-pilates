@@ -21,11 +21,24 @@ export const pgBossOptions = (
   useListenNotify: false,
 });
 
+type PgBossErrorReport = { event: 'pg_boss_error'; message: string };
+
+const logPgBossError = (report: PgBossErrorReport): void => {
+  console.error(JSON.stringify(report));
+};
+
+// pg-boss emits connection failures as 'error' events; without a listener
+// Node terminates the process.
 export const createPgBoss = async (
   connectionString: string,
+  report: (record: PgBossErrorReport) => void = logPgBossError,
 ): Promise<PgBoss> => {
   const { PgBoss } = await import('pg-boss');
-  return new PgBoss(pgBossOptions(connectionString));
+  const boss = new PgBoss(pgBossOptions(connectionString));
+  boss.on('error', (error: Error) => {
+    report({ event: 'pg_boss_error', message: error.message });
+  });
+  return boss;
 };
 
 export const startInstalledPgBoss = async (
