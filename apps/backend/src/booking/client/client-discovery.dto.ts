@@ -6,7 +6,7 @@ export class UpdateClientProfileDto {
   @ApiProperty({ minLength: 1 })
   name!: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   phone!: string | null;
 }
 
@@ -39,7 +39,7 @@ export class ClientProfileDto {
   @ApiProperty({ format: 'email' })
   email!: string;
 
-  @ApiPropertyOptional({ nullable: true })
+  @ApiPropertyOptional({ type: String, nullable: true })
   phone!: string | null;
 
   @ApiProperty()

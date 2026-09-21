@@ -4,13 +4,12 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
-import type { ClientProfileDtoPhone } from "./clientProfileDtoPhone";
 
 export interface ClientProfileDto {
   id: string;
   name: string;
   email: string;
   /** @nullable */
-  phone?: ClientProfileDtoPhone;
+  phone?: string | null;
   referralCode: string;
 }

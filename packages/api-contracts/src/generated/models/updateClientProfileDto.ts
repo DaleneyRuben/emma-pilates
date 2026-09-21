@@ -4,11 +4,10 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
-import type { UpdateClientProfileDtoPhone } from "./updateClientProfileDtoPhone";
 
 export interface UpdateClientProfileDto {
   /** @minLength 1 */
   name: string;
   /** @nullable */
-  phone?: UpdateClientProfileDtoPhone;
+  phone?: string | null;
 }
