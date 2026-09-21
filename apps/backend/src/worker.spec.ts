@@ -40,6 +40,9 @@ describe('worker entrypoint', () => {
       pendingAccountCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
+      imageUploadCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
       serviceVersion: '1.2.3',
       emit,
     });
@@ -73,6 +76,9 @@ describe('worker entrypoint', () => {
     const pendingAccountCleanup = {
       execute: jest.fn().mockResolvedValue({ cleaned: 2 }),
     };
+    const imageUploadCleanup = {
+      execute: jest.fn().mockResolvedValue({ cleaned: 1 }),
+    };
     const dependencies = {
       boss,
       authenticationEmail: {
@@ -82,6 +88,7 @@ describe('worker entrypoint', () => {
         delivery: { deliver: jest.fn() },
       },
       pendingAccountCleanup,
+      imageUploadCleanup,
       serviceVersion: '1.2.3',
       emit: jest.fn(),
     };
@@ -89,13 +96,16 @@ describe('worker entrypoint', () => {
     const stopWorker = await startWorker(dependencies);
 
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(1);
+    expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(1);
 
     await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
+    expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(2);
 
     await stopWorker();
     await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
+    expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(2);
   });
 
   it('emits a sanitized signal when a scheduled cleanup fails', async () => {
@@ -125,6 +135,9 @@ describe('worker entrypoint', () => {
         delivery: { deliver: jest.fn() },
       },
       pendingAccountCleanup,
+      imageUploadCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
       serviceVersion: '1.2.3',
       emit,
     });
@@ -137,6 +150,53 @@ describe('worker entrypoint', () => {
     });
     expect(JSON.stringify(emit.mock.calls)).not.toContain(
       'sensitive database failure',
+    );
+
+    await stopWorker();
+  });
+
+  it('emits a sanitized signal when a scheduled image upload cleanup fails', async () => {
+    jest.useFakeTimers();
+    const boss: WorkerBoss = {
+      isInstalled: jest.fn().mockResolvedValue(true),
+      schemaVersion: jest.fn().mockResolvedValue(38),
+      start: jest.fn().mockResolvedValue(undefined),
+      work: jest.fn().mockResolvedValue('worker-id'),
+      getQueueStats: jest.fn().mockResolvedValue([]),
+      stop: jest.fn().mockResolvedValue(undefined),
+    };
+    const imageUploadCleanup = {
+      execute: jest
+        .fn()
+        .mockResolvedValueOnce({ cleaned: 0 })
+        .mockRejectedValueOnce(new Error('sensitive storage failure')),
+    };
+    const emit = jest.fn();
+
+    const stopWorker = await startWorker({
+      boss,
+      authenticationEmail: {
+        stateReader: { find: jest.fn() },
+        decryptor: { decrypt: jest.fn() },
+        renderer: { render: jest.fn() },
+        delivery: { deliver: jest.fn() },
+      },
+      pendingAccountCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      imageUploadCleanup,
+      serviceVersion: '1.2.3',
+      emit,
+    });
+
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+
+    expect(emit).toHaveBeenCalledWith({
+      event: 'image_upload_cleanup_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(JSON.stringify(emit.mock.calls)).not.toContain(
+      'sensitive storage failure',
     );
 
     await stopWorker();

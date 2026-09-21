@@ -11,6 +11,7 @@ import {
 import { startWorkerHeartbeat } from './jobs/worker-heartbeat';
 
 const pendingAccountCleanupIntervalMs = 60 * 60 * 1_000;
+const imageUploadCleanupIntervalMs = 60 * 60 * 1_000;
 
 type QueueStatsSnapshot = {
   readyCount: number;
@@ -31,6 +32,9 @@ type WorkerDependencies = {
   boss: WorkerBoss;
   authenticationEmail: AuthenticationEmailProcessorDependencies;
   pendingAccountCleanup: {
+    execute(): Promise<{ cleaned: number }>;
+  };
+  imageUploadCleanup: {
     execute(): Promise<{ cleaned: number }>;
   };
   serviceVersion: string;
@@ -55,6 +59,16 @@ export const startWorker = async (
     });
   }, pendingAccountCleanupIntervalMs);
 
+  await dependencies.imageUploadCleanup.execute();
+  const imageUploadCleanupTimer = setInterval(() => {
+    void dependencies.imageUploadCleanup.execute().catch(() => {
+      dependencies.emit({
+        event: 'image_upload_cleanup_failed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+    });
+  }, imageUploadCleanupIntervalMs);
+
   const stopHeartbeat = startWorkerHeartbeat({
     serviceVersion: dependencies.serviceVersion,
     getAuthenticationEmailCounts: async () => {
@@ -75,6 +89,7 @@ export const startWorker = async (
 
   return async () => {
     clearInterval(pendingAccountCleanupTimer);
+    clearInterval(imageUploadCleanupTimer);
     stopHeartbeat();
     await dependencies.boss.stop({ graceful: true });
   };
