@@ -192,6 +192,9 @@ importers:
 
   apps/client-mobile:
     dependencies:
+      '@pilates/api-contracts':
+        specifier: workspace:*
+        version: link:../../packages/api-contracts
       '@pilates/mobile-core':
         specifier: workspace:*
         version: link:../../packages/mobile-core
