@@ -11,10 +11,7 @@ export type ClientSubscriptionSummary = {
 };
 
 export type ClientSubscriptionStatus =
-  | 'active'
-  | 'expiring_soon'
-  | 'expired'
-  | 'none';
+  'active' | 'expiring_soon' | 'expired' | 'none';
 
 export type ClientSubscriptionView = {
   status: ClientSubscriptionStatus;
