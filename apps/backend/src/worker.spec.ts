@@ -1,4 +1,3 @@
-import type { AuthenticationEmailWorkerBoss } from './jobs/authentication-email/authentication-email-worker';
 import { WORKER_HEARTBEAT_INTERVAL_MS } from './jobs/worker-heartbeat';
 import { startWorker, type WorkerBoss } from './worker';
 
@@ -12,9 +11,7 @@ describe('worker entrypoint', () => {
     const isInstalled = jest.fn().mockResolvedValue(true);
     const schemaVersion = jest.fn().mockResolvedValue(38);
     const start = jest.fn().mockResolvedValue(undefined);
-    const work = jest
-      .fn<Promise<string>, Parameters<AuthenticationEmailWorkerBoss['work']>>()
-      .mockResolvedValue('worker-id');
+    const work = jest.fn<Promise<string>, unknown[]>().mockResolvedValue('worker-id') as WorkerBoss['work'];
     const getQueueStats = jest
       .fn()
       .mockResolvedValue([{ readyCount: 2, activeCount: 1, failedCount: 3 }]);
@@ -37,6 +34,9 @@ describe('worker entrypoint', () => {
         renderer: { render: jest.fn() },
         delivery: { deliver: jest.fn() },
       },
+      finalizeUpload: {
+        process: jest.fn(),
+      },
       pendingAccountCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
@@ -50,7 +50,7 @@ describe('worker entrypoint', () => {
     expect(isInstalled).toHaveBeenCalledTimes(1);
     expect(schemaVersion).toHaveBeenCalledTimes(1);
     expect(start).toHaveBeenCalledTimes(1);
-    expect(work).toHaveBeenCalledTimes(1);
+    expect(work).toHaveBeenCalledTimes(2);
 
     await jest.advanceTimersByTimeAsync(WORKER_HEARTBEAT_INTERVAL_MS);
     expect(getQueueStats).toHaveBeenCalledWith(
@@ -86,6 +86,9 @@ describe('worker entrypoint', () => {
         decryptor: { decrypt: jest.fn() },
         renderer: { render: jest.fn() },
         delivery: { deliver: jest.fn() },
+      },
+      finalizeUpload: {
+        process: jest.fn(),
       },
       pendingAccountCleanup,
       imageUploadCleanup,
@@ -134,6 +137,9 @@ describe('worker entrypoint', () => {
         renderer: { render: jest.fn() },
         delivery: { deliver: jest.fn() },
       },
+      finalizeUpload: {
+        process: jest.fn(),
+      },
       pendingAccountCleanup,
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
@@ -180,6 +186,9 @@ describe('worker entrypoint', () => {
         decryptor: { decrypt: jest.fn() },
         renderer: { render: jest.fn() },
         delivery: { deliver: jest.fn() },
+      },
+      finalizeUpload: {
+        process: jest.fn(),
       },
       pendingAccountCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
