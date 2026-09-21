@@ -490,7 +490,28 @@ reveals a captured link. Until that viewer exists, use the automated tests for
 successful activation, link expiry, recovery-wide session revocation, and the
 replacement credential.
 
-## Test 7: run the automated checks
+## Test 7: read the Client discovery data
+
+Load the fixtures (Test 5A), log in through Swagger as `lucia@example.com`, and
+authorize the returned credential. These read-only endpoints back the Client
+Home, class browsing, Plan, and profile screens:
+
+| Endpoint                                | What you should see                                                       |
+| --------------------------------------- | ------------------------------------------------------------------------- |
+| `GET /api/v1/clients/current`           | Lucía's name, email, phone, and referral code                             |
+| `GET /api/v1/clients/current/subscription` | `status: active` with 5 of 8 classes left and `YYYY-MM-DD` dates      |
+| `GET /api/v1/plans`                     | The four Plans with prices in centavos (`56000` is Bs 560)                |
+| `GET /api/v1/branches`                  | Centro, Equipetrol, and Urubó with addresses                              |
+| `GET /api/v1/class-types`               | Mat, Prenatal, and Reformer Pilates with descriptions                     |
+| `GET /api/v1/sessions?branchId=…`       | Sessions in a Branch with Class Type and Trainer names and free seats     |
+| `GET /api/v1/sessions/{sessionId}`      | One Session with its Branch, Class Type description, Trainer, and seats   |
+
+Log in as `valeria@example.com`, `sofia@example.com`, or `mariana@example.com`
+to see the `expiring_soon`, `expired`, and `none` Subscription statuses. A Staff
+credential receives `403` with `booking_access_denied` from the two
+`clients/current` endpoints.
+
+## Test 8: run the automated checks
 
 You do not need to understand the test code to run it. A successful Jest run
 ends with green `PASS` lines and no failed suites.
