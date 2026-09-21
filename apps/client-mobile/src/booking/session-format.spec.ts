@@ -4,10 +4,19 @@ import {
   dayChipLabel,
   formatSessionDate,
   formatTimeRange,
+  isInsideCancellationWindow,
   upcomingCivilDates,
 } from "./session-format";
 
 describe("Session formatting", () => {
+  it("treats the last 2 h 30 before a Session as the Cancellation Window", () => {
+    const now = new Date("2026-09-21T12:00:00.000Z");
+
+    expect(isInsideCancellationWindow("2026-09-21T14:30:00.000Z", now)).toBe(true);
+    expect(isInsideCancellationWindow("2026-09-21T14:30:00.001Z", now)).toBe(false);
+    expect(isInsideCancellationWindow("2026-09-21T11:00:00.000Z", now)).toBe(true);
+  });
+
   it("derives the Bolivia civil date from an instant", () => {
     expect(boliviaCivilDate(new Date("2026-09-21T03:30:00.000Z"))).toBe(
       "2026-09-20",
