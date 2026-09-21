@@ -57,6 +57,38 @@ export type PromotionSummary = {
   displayOrder: number;
 };
 
+export type BranchSummary = {
+  id: string;
+  name: string;
+  address: string;
+};
+
+export type ClientProfileRecord = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  referralCode: string;
+};
+
+export type SessionDetail = {
+  id: string;
+  branch: BranchSummary;
+  classType: {
+    id: string;
+    name: string;
+    description: string;
+    durationMinutes: number;
+  };
+  trainerName: string;
+  startsAt: Date;
+  endsAt: Date;
+  capacity: number;
+  bookedCount: number;
+  availableSeats: number;
+  waitlistCount: number;
+};
+
 // Date-only arguments represent Bolivia civil dates encoded at UTC midnight.
 // Authorization and image delivery belong to the consuming application workflow.
 export type CatalogRepository = {
@@ -73,5 +105,11 @@ export type CatalogRepository = {
     clientId: string,
     onDate: Date,
   ): Promise<SubscriptionSummary | null>;
+  findLatestSubscription(clientId: string): Promise<SubscriptionSummary | null>;
   listPublishedPromotions(onDate: Date): Promise<PromotionSummary[]>;
+  findVisiblePlan(id: string): Promise<PlanSummary | null>;
+  listBranches(): Promise<BranchSummary[]>;
+  listClassTypes(): Promise<ClassTypeSummary[]>;
+  findClientProfile(clientId: string): Promise<ClientProfileRecord | null>;
+  findSessionDetail(sessionId: string): Promise<SessionDetail | null>;
 };
