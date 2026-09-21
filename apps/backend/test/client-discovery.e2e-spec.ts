@@ -11,6 +11,7 @@ import {
   classTypeCatalog,
   ClientProfileController,
   clientProfile,
+  clientProfileUpdate,
   clientSubscription,
   PlanCatalogController,
   planCatalog,
@@ -64,6 +65,17 @@ describe('client discovery (e2e)', () => {
               name: 'Lucía Fernández',
               email: 'lucia@example.com',
               phone: '+591 70011001',
+              referralCode: 'REF-LUCIA',
+            }),
+        },
+        {
+          provide: clientProfileUpdate,
+          useValue: (command: { name: string; phone: string | null }) =>
+            Promise.resolve({
+              id: 'client-id',
+              name: command.name,
+              email: 'lucia@example.com',
+              phone: command.phone,
               referralCode: 'REF-LUCIA',
             }),
         },
@@ -146,6 +158,29 @@ describe('client discovery (e2e)', () => {
         email: 'lucia@example.com',
         phone: '+591 70011001',
         referralCode: 'REF-LUCIA',
+      });
+  });
+
+  it('updates the current Client profile', async () => {
+    await request(app.getHttpServer())
+      .patch('/api/v1/clients/current')
+      .set('authorization', bearer)
+      .send({ name: 'Lucía F.', phone: null })
+      .expect(200)
+      .expect({
+        id: 'client-id',
+        name: 'Lucía F.',
+        email: 'lucia@example.com',
+        phone: null,
+        referralCode: 'REF-LUCIA',
+      });
+    await request(app.getHttpServer())
+      .patch('/api/v1/clients/current')
+      .set('authorization', bearer)
+      .send({ name: 'Lucía', email: 'new@example.com' })
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body).toMatchObject({ code: 'invalid_request' });
       });
   });
 
