@@ -377,6 +377,14 @@ From Home, **Ver detalle** opens **Mi plan** and **Comprar un plan** opens
 summary, a **Mi plan** row, and **Cerrar sesión**; **Editar** lets you change
 the name and phone (the email stays read-only) and saves through the API.
 
+The **Reservar** tab lists the fixture Sessions for the selected Branch, day,
+and Class Type (past Sessions of today are hidden; full ones show **Lleno**).
+Tapping a Session opens its detail; **Reservar** creates a real Booking and
+lands on **Mis reservas** with a "Reserva confirmada" notice and the updated
+class balance. A full Session offers **Unirme a la lista de espera**, and a
+Client without remaining classes sees the disabled button with a link to the
+Plans.
+
 That Client Account must not authenticate in the Staff app. Use a Staff fixture
 such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
 by the Client app.
