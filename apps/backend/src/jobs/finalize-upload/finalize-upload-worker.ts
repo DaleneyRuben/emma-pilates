@@ -2,10 +2,6 @@ import {
   FINALIZE_UPLOAD_QUEUE,
   parseFinalizeUploadJob,
 } from './finalize-upload-job';
-import {
-  processFinalizeUploadJob,
-  type ProcessFinalizeUploadJobDependencies,
-} from '../../uploads/process-finalize-upload-job';
 
 type FinalizeUploadWorkerJob = {
   id: string;
@@ -34,9 +30,15 @@ export interface FinalizeUploadWorkerBoss {
   ): Promise<string>;
 }
 
+export type FinalizeUploadWorkerDependencies = {
+  process(job: {
+    imageAssetId: string;
+  }): Promise<'verified' | 'failed' | 'stale'>;
+};
+
 const processJob = async (
   job: FinalizeUploadWorkerJob,
-  dependencies: ProcessFinalizeUploadJobDependencies,
+  dependencies: FinalizeUploadWorkerDependencies,
 ): Promise<FinalizeUploadWorkerResult> => {
   let payload;
 
@@ -51,7 +53,7 @@ const processJob = async (
   }
 
   try {
-    const outcome = await processFinalizeUploadJob(payload, dependencies);
+    const outcome = await dependencies.process(payload);
     return { id: job.id, status: 'completed', output: { outcome } };
   } catch {
     return {
@@ -64,7 +66,7 @@ const processJob = async (
 
 export const registerFinalizeUploadWorker = async (
   boss: FinalizeUploadWorkerBoss,
-  dependencies: ProcessFinalizeUploadJobDependencies,
+  dependencies: FinalizeUploadWorkerDependencies,
 ): Promise<void> => {
   await boss.work(
     FINALIZE_UPLOAD_QUEUE,
