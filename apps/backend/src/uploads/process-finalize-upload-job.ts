@@ -26,7 +26,7 @@ type VerifiedImage = {
   height: number;
 };
 
-type ProcessFinalizeUploadJobDependencies = {
+export type ProcessFinalizeUploadJobDependencies = {
   loadImageAsset(
     imageAssetId: string,
   ): Promise<ImageAssetForProcessing | null>;
