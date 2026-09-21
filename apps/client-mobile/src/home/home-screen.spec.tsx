@@ -7,6 +7,11 @@ import {
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
+import {
+  createClientRuntime as createRuntime,
+  jsonResponse,
+  routeFetcher as createFetcher,
+} from "../test-support";
 
 const profile = {
   id: "client-1",
@@ -27,57 +32,6 @@ const activeSubscription = {
     endsOn: "2026-10-11",
   },
 };
-
-function jsonResponse(body: unknown, status = 200) {
-  return new Response(JSON.stringify(body), {
-    headers: { "Content-Type": "application/json" },
-    status,
-  });
-}
-
-function createFetcher(routes: Record<string, () => Response>) {
-  return jest.fn((input: RequestInfo | URL) => {
-    const path = typeof input === "string" ? input : input.toString();
-    const route = routes[path];
-    return Promise.resolve(
-      route === undefined
-        ? jsonResponse({ code: "not_found", status: 404 }, 404)
-        : route(),
-    );
-  }) as unknown as typeof globalThis.fetch;
-}
-
-function createRuntime(fetcher: typeof globalThis.fetch) {
-  return {
-    allowedLinkHosts: ["links.emmapilates.test"],
-    apiFetcher: fetcher,
-    authenticationApi: {
-      activateAccount: jest.fn(),
-      cancelRegistration: jest.fn(),
-      completePasswordRecovery: jest.fn(),
-      correctRegistrationEmail: jest.fn(),
-      inspectLink: jest.fn(),
-      register: jest.fn(),
-      requestPasswordRecovery: jest.fn(),
-      resendRegistrationVerification: jest.fn(),
-      verifyClientEmail: jest.fn(),
-    },
-    linkSource: {
-      addEventListener: () => ({ remove: jest.fn() }),
-      getInitialURL: async () => null,
-    },
-    login: jest.fn(),
-    sessionManager: {
-      hasBiometricSession: jest.fn().mockResolvedValue(false),
-      logout: jest.fn(),
-      restore: jest
-        .fn()
-        .mockResolvedValue({ accountId: "account-1", role: "client" }),
-      start: jest.fn(),
-      unlockWithBiometrics: jest.fn(),
-    },
-  };
-}
 
 describe("Client Home", () => {
   afterEach(() => {
