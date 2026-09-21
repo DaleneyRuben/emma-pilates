@@ -130,9 +130,7 @@ describe('PlanCatalogController', () => {
   it('returns a stable not-found problem for a hidden or unknown Plan', async () => {
     findPlan.mockResolvedValue(null);
 
-    await expect(
-      controller.get(sessionId, bearer),
-    ).rejects.toMatchObject({
+    await expect(controller.get(sessionId, bearer)).rejects.toMatchObject({
       response: { code: 'plan_not_found' },
       status: 404,
     });
