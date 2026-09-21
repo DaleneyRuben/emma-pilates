@@ -10,34 +10,8 @@ const payload = {
   imageAssetId: '0ae2701e-f8ac-4c8a-8cf0-65182ee0fc1d',
 } as const;
 
-const processingAsset = {
-  id: payload.imageAssetId,
-  purpose: 'transfer_receipt' as const,
-  state: 'processing' as const,
-  pendingObjectKey: 'pending/transfer_receipt/asset-id',
-  declaredMediaType: 'image/jpeg',
-  declaredByteSize: 1_000,
-  declaredChecksum: new Uint8Array(32),
-};
-
-const verified = {
-  mediaType: 'image/jpeg',
-  byteSize: 1_000,
-  checksum: new Uint8Array(32),
-  width: 800,
-  height: 600,
-};
-
-const dependencies = () => ({
-  loadImageAsset: jest.fn().mockResolvedValue(processingAsset),
-  readObject: jest.fn().mockResolvedValue(Buffer.from('bytes')),
-  verifyBytes: jest.fn().mockResolvedValue(verified),
-  markVerified: jest.fn().mockResolvedValue(undefined),
-  markFailed: jest.fn().mockResolvedValue(undefined),
-});
-
 const register = async (
-  workerDependencies: ReturnType<typeof dependencies>,
+  process: jest.Mock<Promise<'verified' | 'failed' | 'stale'>, [unknown]>,
 ): Promise<FinalizeUploadWorkerHandler> => {
   let handler: FinalizeUploadWorkerHandler | undefined;
   const work = jest.fn<
@@ -49,7 +23,7 @@ const register = async (
   });
   const boss: FinalizeUploadWorkerBoss = { work };
 
-  await registerFinalizeUploadWorker(boss, workerDependencies);
+  await registerFinalizeUploadWorker(boss, { process });
 
   expect(work).toHaveBeenCalledWith(
     FINALIZE_UPLOAD_QUEUE,
@@ -66,17 +40,18 @@ const register = async (
 
 describe('finalize upload worker', () => {
   it('completes verified jobs', async () => {
-    const handler = await register(dependencies());
+    const process = jest.fn().mockResolvedValue('verified');
+    const handler = await register(process);
 
     await expect(handler([{ id: 'job-1', data: payload }])).resolves.toEqual([
       { id: 'job-1', status: 'completed', output: { outcome: 'verified' } },
     ]);
+    expect(process).toHaveBeenCalledWith(payload);
   });
 
   it('completes stale jobs without retrying them', async () => {
-    const workerDependencies = dependencies();
-    workerDependencies.loadImageAsset.mockResolvedValue(null);
-    const handler = await register(workerDependencies);
+    const process = jest.fn().mockResolvedValue('stale');
+    const handler = await register(process);
 
     await expect(handler([{ id: 'job-2', data: payload }])).resolves.toEqual([
       { id: 'job-2', status: 'completed', output: { outcome: 'stale' } },
@@ -84,11 +59,8 @@ describe('finalize upload worker', () => {
   });
 
   it('completes business verification failures without retrying them', async () => {
-    const workerDependencies = dependencies();
-    workerDependencies.verifyBytes.mockRejectedValue(
-      new Error('image_checksum_mismatch'),
-    );
-    const handler = await register(workerDependencies);
+    const process = jest.fn().mockResolvedValue('failed');
+    const handler = await register(process);
 
     await expect(handler([{ id: 'job-3', data: payload }])).resolves.toEqual([
       { id: 'job-3', status: 'completed', output: { outcome: 'failed' } },
@@ -96,11 +68,8 @@ describe('finalize upload worker', () => {
   });
 
   it('fails jobs that throw unexpectedly for pg-boss to retry', async () => {
-    const workerDependencies = dependencies();
-    workerDependencies.loadImageAsset.mockRejectedValue(
-      new Error('database unreachable'),
-    );
-    const handler = await register(workerDependencies);
+    const process = jest.fn().mockRejectedValue(new Error('database unreachable'));
+    const handler = await register(process);
 
     await expect(handler([{ id: 'job-4', data: payload }])).resolves.toEqual([
       {
@@ -112,7 +81,8 @@ describe('finalize upload worker', () => {
   });
 
   it('dead-letters invalid payloads without exposing their contents', async () => {
-    const handler = await register(dependencies());
+    const process = jest.fn().mockResolvedValue('verified');
+    const handler = await register(process);
 
     await expect(
       handler([
@@ -125,5 +95,6 @@ describe('finalize upload worker', () => {
         output: { failureCategory: 'invalid_payload' },
       },
     ]);
+    expect(process).not.toHaveBeenCalled();
   });
 });
