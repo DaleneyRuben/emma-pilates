@@ -9,6 +9,8 @@ export * from "./auth/session-manager";
 export * from "./ingress/verified-link";
 export * from "./query/provider";
 export * from "./ui/body-text";
+export * from "./ui/form-field";
+export * from "./ui/text-button";
 export * from "./ui/primary-button";
 export * from "./ui/query-failure";
 export * from "./ui/heading";
