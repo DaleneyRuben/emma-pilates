@@ -9,6 +9,9 @@ coverage/
 .turbo/
 apps/backend/src/generated/prisma/
 
+# Local development data
+.data/
+
 # Local configuration
 .env
 .env.*

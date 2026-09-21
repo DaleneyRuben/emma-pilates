@@ -32,6 +32,7 @@ const environmentSchema = z
       .enum(['development', 'test', 'production'])
       .default('development'),
     PORT: z.coerce.number().int().positive().max(65_535).default(3100),
+    UPLOADS_LOCAL_STORAGE_ROOT: z.string().min(1).default('.data/uploads'),
   })
   .superRefine((environment, context) => {
     if (environment.NODE_ENV !== 'production') {

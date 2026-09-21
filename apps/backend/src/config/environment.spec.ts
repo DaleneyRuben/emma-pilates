@@ -34,4 +34,13 @@ describe('environment configuration', () => {
       }),
     ).toThrow('AUTHENTICATION_LINK_ENCRYPTION_KEY');
   });
+
+  it('defaults the local upload storage root when not configured', () => {
+    const environment = validateEnvironment({
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+    });
+
+    expect(environment.UPLOADS_LOCAL_STORAGE_ROOT).toBe('.data/uploads');
+  });
 });
