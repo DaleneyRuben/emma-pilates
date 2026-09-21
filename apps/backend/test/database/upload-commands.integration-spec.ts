@@ -3,10 +3,14 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { PgBoss } from 'pg-boss';
 import sharp from 'sharp';
 import { PrismaClient, type Prisma } from '../../src/generated/prisma/client';
 import { LocalObjectStorage } from '../../src/uploads/local-object-storage';
-import { createPrismaUploadCommands } from '../../src/uploads/prisma-upload-commands';
+import {
+  createFinalizeUploadJobCommands,
+  createPrismaUploadCommands,
+} from '../../src/uploads/prisma-upload-commands';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -17,12 +21,23 @@ describe('Prisma upload commands', () => {
   let prisma: PrismaClient;
   let storageRoot: string;
   let storage: LocalObjectStorage;
+  let boss: PgBoss;
 
   beforeAll(async () => {
     context = await startDatabaseTestContext();
     prisma = new PrismaClient({ adapter: new PrismaPg(context.pool) });
     storageRoot = await mkdtemp(join(tmpdir(), 'pilates-uploads-'));
     storage = new LocalObjectStorage(storageRoot);
+    boss = new PgBoss({
+      db: {
+        executeSql: async (text, values) => {
+          const result = await context.pool.query(text, values);
+          return { rows: result.rows };
+        },
+      },
+      schema: 'pgboss',
+      migrate: false,
+    });
   });
 
   afterAll(async () => {
@@ -61,7 +76,7 @@ describe('Prisma upload commands', () => {
       .jpeg()
       .toBuffer();
 
-  it('records verified metadata once the stored bytes match the declared upload', async () => {
+  it('moves a pending upload to processing and enqueues its verification job', async () => {
     await withRollback(async (tx) => {
       const account = await createAccount(tx);
       const bytes = await receiptBytes();
@@ -70,6 +85,7 @@ describe('Prisma upload commands', () => {
         tx,
         storage,
         () => new Date('2026-09-18T12:00:00Z'),
+        boss,
       );
 
       const intent = await commands.createPendingUpload({
@@ -86,9 +102,52 @@ describe('Prisma upload commands', () => {
       const asset = await tx.imageAsset.findUniqueOrThrow({
         where: { id: intent.id },
       });
-      expect(asset.state).toBe('READY');
+      expect(asset.state).toBe('PROCESSING');
       expect(asset.processingStartedAt).toEqual(new Date('2026-09-18T12:00:00Z'));
-      expect(asset.finalizedAt).toEqual(new Date('2026-09-18T12:00:00Z'));
+
+      const jobs = await tx.$queryRawUnsafe<{ id: string }[]>(
+        `SELECT id FROM pgboss.job WHERE name = $1 AND data->>'imageAssetId' = $2`,
+        'uploads.finalize.v1',
+        intent.id,
+      );
+      expect(jobs).toHaveLength(1);
+    });
+  });
+
+  it('verifies queued bytes and marks the upload ready', async () => {
+    await withRollback(async (tx) => {
+      const account = await createAccount(tx);
+      const bytes = await receiptBytes();
+      const checksum = createHash('sha256').update(bytes).digest();
+      const commands = createPrismaUploadCommands(
+        tx,
+        storage,
+        () => new Date('2026-09-18T12:00:00Z'),
+        boss,
+      );
+      const jobCommands = createFinalizeUploadJobCommands(
+        tx,
+        storage,
+        () => new Date('2026-09-18T12:05:00Z'),
+      );
+
+      const intent = await commands.createPendingUpload({
+        ownerAccountId: account.id,
+        purpose: 'transfer_receipt',
+        mediaType: 'image/jpeg',
+        byteSize: bytes.byteLength,
+        checksum,
+      });
+
+      await storage.put(intent.pendingObjectKey, bytes);
+      await commands.finalizeUpload({ imageAssetId: intent.id }, account.id);
+      await jobCommands.process({ imageAssetId: intent.id });
+
+      const asset = await tx.imageAsset.findUniqueOrThrow({
+        where: { id: intent.id },
+      });
+      expect(asset.state).toBe('READY');
+      expect(asset.finalizedAt).toEqual(new Date('2026-09-18T12:05:00Z'));
       expect(asset.verifiedMediaType).toBe('JPEG');
       expect(asset.verifiedByteSize).toBe(bytes.byteLength);
       expect(Buffer.from(asset.verifiedChecksum ?? [])).toEqual(checksum);
@@ -106,6 +165,7 @@ describe('Prisma upload commands', () => {
         tx,
         storage,
         () => new Date('2026-09-18T12:00:00Z'),
+        boss,
       );
 
       const intent = await commands.createPendingUpload({
@@ -136,6 +196,7 @@ describe('Prisma upload commands', () => {
         tx,
         storage,
         () => new Date('2026-09-18T12:00:00Z'),
+        boss,
       );
 
       const intent = await commands.createPendingUpload({
@@ -155,7 +216,7 @@ describe('Prisma upload commands', () => {
     });
   });
 
-  it('fails finalization when the stored bytes do not match the declared checksum', async () => {
+  it('fails verification when the stored bytes do not match the declared checksum', async () => {
     await withRollback(async (tx) => {
       const account = await createAccount(tx);
       const bytes = await receiptBytes();
@@ -163,6 +224,12 @@ describe('Prisma upload commands', () => {
         tx,
         storage,
         () => new Date('2026-09-18T12:00:00Z'),
+        boss,
+      );
+      const jobCommands = createFinalizeUploadJobCommands(
+        tx,
+        storage,
+        () => new Date('2026-09-18T12:05:00Z'),
       );
 
       const intent = await commands.createPendingUpload({
@@ -175,6 +242,7 @@ describe('Prisma upload commands', () => {
 
       await storage.put(intent.pendingObjectKey, bytes);
       await commands.finalizeUpload({ imageAssetId: intent.id }, account.id);
+      await jobCommands.process({ imageAssetId: intent.id });
 
       const asset = await tx.imageAsset.findUniqueOrThrow({
         where: { id: intent.id },

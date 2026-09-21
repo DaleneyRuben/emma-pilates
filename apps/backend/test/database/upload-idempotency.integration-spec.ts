@@ -3,6 +3,7 @@ import { mkdtemp, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PrismaPg } from '@prisma/adapter-pg';
+import { PgBoss } from 'pg-boss';
 import sharp from 'sharp';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { LocalObjectStorage } from '../../src/uploads/local-object-storage';
@@ -20,12 +21,23 @@ describe('Finalize upload idempotency', () => {
   let prisma: PrismaClient;
   let storageRoot: string;
   let storage: LocalObjectStorage;
+  let boss: PgBoss;
 
   beforeAll(async () => {
     context = await startDatabaseTestContext();
     prisma = new PrismaClient({ adapter: new PrismaPg(context.pool) });
     storageRoot = await mkdtemp(join(tmpdir(), 'pilates-uploads-idempotency-'));
     storage = new LocalObjectStorage(storageRoot);
+    boss = new PgBoss({
+      db: {
+        executeSql: async (text, values) => {
+          const result = await context.pool.query(text, values);
+          return { rows: result.rows };
+        },
+      },
+      schema: 'pgboss',
+      migrate: false,
+    });
   });
 
   afterAll(async () => {
@@ -52,7 +64,12 @@ describe('Finalize upload idempotency', () => {
 
   const createFinalizableUpload = async (ownerAccountId: string) => {
     const bytes = await receiptBytes();
-    const commands = createPrismaUploadCommands(prisma, storage, () => new Date());
+    const commands = createPrismaUploadCommands(
+      prisma,
+      storage,
+      () => new Date(),
+      boss,
+    );
     const intent = await commands.createPendingUpload({
       ownerAccountId,
       purpose: 'transfer_receipt',
@@ -71,6 +88,7 @@ describe('Finalize upload idempotency', () => {
       prisma,
       storage,
       () => new Date(),
+      boss,
     );
     const idempotencyKey = randomUUID();
 
@@ -92,7 +110,7 @@ describe('Finalize upload idempotency', () => {
     );
 
     expect(replay).toEqual(first);
-    expect(replay.state).toBe('ready');
+    expect(replay.state).toBe('processing');
   });
 
   it('rejects reusing an idempotency key for a different Upload', async () => {
@@ -103,6 +121,7 @@ describe('Finalize upload idempotency', () => {
       prisma,
       storage,
       () => new Date(),
+      boss,
     );
     const idempotencyKey = randomUUID();
 
