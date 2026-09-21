@@ -57,6 +57,7 @@ import type {
   StartClientRegistrationDto,
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
+  UpcomingBookingDto,
   UpdateClientProfileDto,
   VerifyClientEmailDto,
 } from "./models";
@@ -4654,6 +4655,295 @@ export function useGetSession<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type listUpcomingBookingsResponse200 = {
+  data: UpcomingBookingDto[];
+  status: 200;
+};
+
+export type listUpcomingBookingsResponseSuccess =
+  listUpcomingBookingsResponse200 & {
+    headers: Headers;
+  };
+export type listUpcomingBookingsResponse = listUpcomingBookingsResponseSuccess;
+
+export const getListUpcomingBookingsUrl = () => {
+  return `/api/v1/bookings`;
+};
+
+export const listUpcomingBookings = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listUpcomingBookingsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListUpcomingBookingsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listUpcomingBookingsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listUpcomingBookingsResponse;
+};
+
+export const getListUpcomingBookingsQueryKey = () => {
+  return [`/api/v1/bookings`] as const;
+};
+
+export const getListUpcomingBookingsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listUpcomingBookings>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listUpcomingBookings>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListUpcomingBookingsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listUpcomingBookings>>
+  > = ({ signal }) =>
+    listUpcomingBookings({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listUpcomingBookings>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListUpcomingBookingsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listUpcomingBookings>>
+>;
+export type ListUpcomingBookingsQueryError = unknown;
+
+export function useListUpcomingBookings<
+  TData = Awaited<ReturnType<typeof listUpcomingBookings>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listUpcomingBookings>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listUpcomingBookings>>,
+          TError,
+          Awaited<ReturnType<typeof listUpcomingBookings>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListUpcomingBookings<
+  TData = Awaited<ReturnType<typeof listUpcomingBookings>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listUpcomingBookings>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listUpcomingBookings>>,
+          TError,
+          Awaited<ReturnType<typeof listUpcomingBookings>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListUpcomingBookings<
+  TData = Awaited<ReturnType<typeof listUpcomingBookings>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listUpcomingBookings>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListUpcomingBookings<
+  TData = Awaited<ReturnType<typeof listUpcomingBookings>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listUpcomingBookings>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListUpcomingBookingsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type leaveWaitlistResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type leaveWaitlistResponseSuccess = leaveWaitlistResponse204 & {
+  headers: Headers;
+};
+export type leaveWaitlistResponse = leaveWaitlistResponseSuccess;
+
+export const getLeaveWaitlistUrl = (waitlistEntryId: string) => {
+  return `/api/v1/waitlist-entries/${waitlistEntryId}`;
+};
+
+export const leaveWaitlist = async (
+  waitlistEntryId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<leaveWaitlistResponse> => {
+  const res = await (fetchFn ?? fetch)(getLeaveWaitlistUrl(waitlistEntryId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: leaveWaitlistResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as leaveWaitlistResponse;
+};
+
+export const getLeaveWaitlistMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof leaveWaitlist>>,
+    TError,
+    LeaveWaitlistMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof leaveWaitlist>>,
+  TError,
+  LeaveWaitlistMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["leaveWaitlist"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof leaveWaitlist>>,
+    LeaveWaitlistMutationVariables
+  > = (props) => {
+    const { waitlistEntryId } = props ?? {};
+
+    return leaveWaitlist(waitlistEntryId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LeaveWaitlistMutationResult = NonNullable<
+  Awaited<ReturnType<typeof leaveWaitlist>>
+>;
+
+export type LeaveWaitlistMutationError = unknown;
+export type LeaveWaitlistMutationVariables = { waitlistEntryId: string };
+
+export const useLeaveWaitlist = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof leaveWaitlist>>,
+      TError,
+      LeaveWaitlistMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof leaveWaitlist>>,
+  TError,
+  LeaveWaitlistMutationVariables,
+  TContext
+> => {
+  return useMutation(getLeaveWaitlistMutationOptions(options), queryClient);
+};
 
 export type createPendingUploadResponse201 = {
   data: PendingUploadDto;

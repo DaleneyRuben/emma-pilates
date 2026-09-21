@@ -64,5 +64,7 @@ export * from "./trainerRosterBookingDto";
 export * from "./trainerRosterBookingDtoAttendanceOutcome";
 export * from "./trainerScheduleSessionDto";
 export * from "./trainerSessionRosterDto";
+export * from "./upcomingBookingDto";
+export * from "./upcomingBookingDtoKind";
 export * from "./updateClientProfileDto";
 export * from "./verifyClientEmailDto";

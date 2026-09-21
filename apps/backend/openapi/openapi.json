@@ -1050,6 +1050,66 @@
         ]
       }
     },
+    "/api/v1/bookings": {
+      "get": {
+        "operationId": "listUpcomingBookings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UpcomingBookingDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientBookings"
+        ]
+      }
+    },
+    "/api/v1/waitlist-entries/{waitlistEntryId}": {
+      "delete": {
+        "operationId": "leaveWaitlist",
+        "parameters": [
+          {
+            "name": "waitlistEntryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "WaitlistEntries"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -2032,6 +2092,56 @@
           "bookedCount",
           "availableSeats",
           "waitlistCount"
+        ]
+      },
+      "UpcomingBookingDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "booking",
+              "waitlist"
+            ]
+          },
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "waitlistEntryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeName": {
+            "type": "string"
+          },
+          "trainerName": {
+            "type": "string"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "sessionId",
+          "classTypeName",
+          "trainerName",
+          "branchName",
+          "startsAt",
+          "endsAt"
         ]
       },
       "CreatePendingUploadDto": {
