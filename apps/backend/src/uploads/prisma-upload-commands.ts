@@ -1,4 +1,6 @@
 import { createHash, randomUUID } from 'node:crypto';
+import type { PgBoss } from 'pg-boss';
+import { scheduleFinalizeUpload } from '../jobs/finalize-upload/schedule-finalize-upload';
 import { retrySerializable } from '../booking/commands/retry-serializable';
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
 import {
@@ -10,6 +12,7 @@ import { createPendingUpload } from './create-pending-upload';
 import { finalizeUpload } from './finalize-upload';
 import { validateImageUploadDeclaration, type ImagePurpose } from './image-purpose';
 import type { LocalObjectStorage } from './local-object-storage';
+import { processFinalizeUploadJob } from './process-finalize-upload-job';
 import { putPendingUploadObject } from './put-pending-upload-object';
 import { verifyImageBytes, type VerifiableMediaType } from './verify-image-bytes';
 
@@ -55,6 +58,7 @@ export function createPrismaUploadCommands(
   prisma: Prisma.TransactionClient,
   storage: LocalObjectStorage,
   now: () => Date,
+  boss: Pick<PgBoss, 'send'>,
 ) {
   return {
     createPendingUpload: (command: {
@@ -118,9 +122,49 @@ export function createPrismaUploadCommands(
         loadImageAsset: async (imageAssetId) => {
           const asset = await prisma.imageAsset.findUnique({
             where: { id: imageAssetId },
+            select: { id: true, ownerAccountId: true, state: true },
+          });
+
+          if (asset === null) return null;
+
+          return {
+            id: asset.id,
+            ownerAccountId: asset.ownerAccountId,
+            state: stateFromPrisma[asset.state],
+          };
+        },
+        beginProcessing: async (imageAssetId) => {
+          await prisma.imageAsset.updateMany({
+            where: { id: imageAssetId, state: ImageAssetState.PENDING },
+            data: {
+              state: ImageAssetState.PROCESSING,
+              processingStartedAt: now(),
+            },
+          });
+        },
+        enqueueFinalization: async (imageAssetId) => {
+          await scheduleFinalizeUpload(boss, prisma, {
+            version: 1,
+            imageAssetId,
+          });
+        },
+      }),
+  };
+}
+
+export function createFinalizeUploadJobCommands(
+  prisma: Prisma.TransactionClient,
+  storage: LocalObjectStorage,
+  now: () => Date,
+) {
+  return {
+    process: (job: { imageAssetId: string }) =>
+      processFinalizeUploadJob(job, {
+        loadImageAsset: async (imageAssetId) => {
+          const asset = await prisma.imageAsset.findUnique({
+            where: { id: imageAssetId },
             select: {
               id: true,
-              ownerAccountId: true,
               purpose: true,
               state: true,
               pendingObjectKey: true,
@@ -134,7 +178,6 @@ export function createPrismaUploadCommands(
 
           return {
             id: asset.id,
-            ownerAccountId: asset.ownerAccountId,
             purpose: purposeFromPrisma[asset.purpose],
             state: stateFromPrisma[asset.state],
             pendingObjectKey: asset.pendingObjectKey,
@@ -142,15 +185,6 @@ export function createPrismaUploadCommands(
             declaredByteSize: asset.declaredByteSize,
             declaredChecksum: new Uint8Array(asset.declaredChecksum),
           };
-        },
-        beginProcessing: async (imageAssetId) => {
-          await prisma.imageAsset.updateMany({
-            where: { id: imageAssetId, state: ImageAssetState.PENDING },
-            data: {
-              state: ImageAssetState.PROCESSING,
-              processingStartedAt: now(),
-            },
-          });
         },
         readObject: (objectKey) => storage.get(objectKey),
         verifyBytes: (bytes, declared, purpose) => {
@@ -215,6 +249,7 @@ export function createFinalizeUploadIdempotent(
   prisma: PrismaClient,
   storage: LocalObjectStorage,
   now: () => Date,
+  boss: Pick<PgBoss, 'send'>,
 ) {
   return async (
     command: { imageAssetId: string },
@@ -253,10 +288,12 @@ export function createFinalizeUploadIdempotent(
             return existing.responseBody;
           }
 
-          await createPrismaUploadCommands(transaction, storage, now).finalizeUpload(
-            command,
-            ownerAccountId,
-          );
+          await createPrismaUploadCommands(
+            transaction,
+            storage,
+            now,
+            boss,
+          ).finalizeUpload(command, ownerAccountId);
 
           const asset = await transaction.imageAsset.findUniqueOrThrow({
             where: { id: command.imageAssetId },

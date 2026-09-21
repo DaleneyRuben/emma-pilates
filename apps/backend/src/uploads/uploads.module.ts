@@ -1,8 +1,11 @@
 import { Module, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PrismaPg } from '@prisma/adapter-pg';
+import type { PgBoss } from 'pg-boss';
 import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
+import { createPgBoss, startInstalledPgBoss } from '../jobs/pg-boss-runtime';
+import { isOpenApiGeneration } from '../openapi/openapi-generation';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import { LocalObjectStorage } from './local-object-storage';
 import {
@@ -19,12 +22,24 @@ import {
 
 const uploadsPrisma = Symbol('uploadsPrisma');
 const uploadsStorage = Symbol('uploadsStorage');
+const uploadsPgBoss = Symbol('uploadsPgBoss');
+
+const openApiPgBoss: Pick<PgBoss, 'stop'> = {
+  stop: () => Promise.resolve(),
+};
 
 class UploadsRuntimeCleanup implements OnApplicationShutdown {
-  constructor(private readonly prisma: PrismaClient) {}
+  constructor(
+    private readonly prisma: PrismaClient,
+    private readonly boss: PgBoss,
+  ) {}
 
-  onApplicationShutdown(): Promise<void> {
-    return this.prisma.$disconnect();
+  async onApplicationShutdown(): Promise<void> {
+    try {
+      await this.boss.stop({ graceful: true });
+    } finally {
+      await this.prisma.$disconnect();
+    }
   }
 }
 
@@ -55,29 +70,53 @@ class UploadsRuntimeCleanup implements OnApplicationShutdown {
         config.getOrThrow<string>('NODE_ENV'),
     },
     {
+      provide: uploadsPgBoss,
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService<Environment, true>) => {
+        if (isOpenApiGeneration(process.env)) {
+          return openApiPgBoss as PgBoss;
+        }
+        const boss = await createPgBoss(config.getOrThrow('DATABASE_URL'));
+        await startInstalledPgBoss(boss);
+        return boss;
+      },
+    },
+    {
       provide: createPendingUploadCommand,
-      inject: [uploadsPrisma, uploadsStorage],
-      useFactory: (prisma: PrismaClient, storage: LocalObjectStorage) =>
-        createPrismaUploadCommands(prisma, storage, () => new Date())
+      inject: [uploadsPrisma, uploadsStorage, uploadsPgBoss],
+      useFactory: (
+        prisma: PrismaClient,
+        storage: LocalObjectStorage,
+        boss: PgBoss,
+      ) =>
+        createPrismaUploadCommands(prisma, storage, () => new Date(), boss)
           .createPendingUpload,
     },
     {
       provide: putPendingUploadObjectCommand,
-      inject: [uploadsPrisma, uploadsStorage],
-      useFactory: (prisma: PrismaClient, storage: LocalObjectStorage) =>
-        createPrismaUploadCommands(prisma, storage, () => new Date())
+      inject: [uploadsPrisma, uploadsStorage, uploadsPgBoss],
+      useFactory: (
+        prisma: PrismaClient,
+        storage: LocalObjectStorage,
+        boss: PgBoss,
+      ) =>
+        createPrismaUploadCommands(prisma, storage, () => new Date(), boss)
           .putPendingUploadObject,
     },
     {
       provide: finalizeUploadCommand,
-      inject: [uploadsPrisma, uploadsStorage],
-      useFactory: (prisma: PrismaClient, storage: LocalObjectStorage) =>
-        createFinalizeUploadIdempotent(prisma, storage, () => new Date()),
+      inject: [uploadsPrisma, uploadsStorage, uploadsPgBoss],
+      useFactory: (
+        prisma: PrismaClient,
+        storage: LocalObjectStorage,
+        boss: PgBoss,
+      ) => createFinalizeUploadIdempotent(prisma, storage, () => new Date(), boss),
     },
     {
       provide: UploadsRuntimeCleanup,
-      inject: [uploadsPrisma],
-      useFactory: (prisma: PrismaClient) => new UploadsRuntimeCleanup(prisma),
+      inject: [uploadsPrisma, uploadsPgBoss],
+      useFactory: (prisma: PrismaClient, boss: PgBoss) =>
+        new UploadsRuntimeCleanup(prisma, boss),
     },
   ],
 })
