@@ -47,7 +47,10 @@ describe('updateClientProfile', () => {
     const saveProfile = jest.fn();
 
     await expect(
-      updateClientProfile({ name: '   ', phone: null }, { principal, saveProfile }),
+      updateClientProfile(
+        { name: '   ', phone: null },
+        { principal, saveProfile },
+      ),
     ).rejects.toThrow('Client name is required');
     expect(saveProfile).not.toHaveBeenCalled();
   });
