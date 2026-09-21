@@ -20,9 +20,11 @@ describe('ClientProfileController', () => {
   const resolvePrincipal = jest.fn();
   const loadProfile = jest.fn();
   const loadSubscription = jest.fn();
+  const updateProfile = jest.fn();
   const controller = new ClientProfileController(
     loadProfile,
     loadSubscription,
+    updateProfile,
     resolvePrincipal,
   );
 
@@ -84,6 +86,41 @@ describe('ClientProfileController', () => {
     await expect(controller.profile(undefined)).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
+  });
+
+  it('updates the profile name and phone', async () => {
+    const updated = {
+      id: 'client-id',
+      name: 'Lucía F.',
+      email: 'lucia@example.com',
+      phone: null,
+      referralCode: 'REF-LUCIA',
+    };
+    updateProfile.mockResolvedValue(updated);
+
+    await expect(
+      controller.update(bearer, { name: 'Lucía F.', phone: null }),
+    ).resolves.toEqual(updated);
+    expect(updateProfile).toHaveBeenCalledWith(
+      { name: 'Lucía F.', phone: null },
+      principal,
+    );
+  });
+
+  it('rejects an invalid profile update body', async () => {
+    await expect(
+      controller.update(bearer, { name: 42, phone: null }),
+    ).rejects.toMatchObject({
+      response: { code: 'invalid_request' },
+      status: 400,
+    });
+    updateProfile.mockRejectedValue(new Error('Client name is required'));
+    await expect(
+      controller.update(bearer, { name: '   ', phone: null }),
+    ).rejects.toMatchObject({
+      response: { code: 'client_name_required' },
+      status: 400,
+    });
   });
 
   it('maps Client-only access to a stable problem code', async () => {

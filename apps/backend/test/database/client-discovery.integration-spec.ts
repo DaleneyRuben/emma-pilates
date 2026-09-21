@@ -54,6 +54,27 @@ describe('Client discovery reads', () => {
     });
   });
 
+  it('saves Client profile changes and returns the updated profile', async () => {
+    const isabel = clientNamed(fixtures, 'isabel@example.com');
+    const repository = createCatalogRepository(prisma);
+
+    await expect(
+      repository.saveClientProfile(isabel.id, {
+        name: 'Isabel Arce Rojas',
+        phone: null,
+      }),
+    ).resolves.toEqual({
+      id: isabel.id,
+      name: 'Isabel Arce Rojas',
+      email: 'isabel@example.com',
+      phone: null,
+      referralCode: 'REF-ISABEL',
+    });
+    await expect(
+      prisma.client.findUniqueOrThrow({ where: { id: isabel.id } }),
+    ).resolves.toMatchObject({ name: 'Isabel Arce Rojas', phone: null });
+  });
+
   it('finds the latest Subscription for an expired Client', async () => {
     const sofia = clientNamed(fixtures, 'sofia@example.com');
     const repository = createCatalogRepository(prisma);
