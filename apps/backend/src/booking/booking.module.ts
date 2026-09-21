@@ -22,6 +22,24 @@ import {
   trainerSchedule,
   trainerSessionRoster,
 } from './booking.controller';
+import { boliviaDate } from './bolivia-time';
+import { createCatalogRepository } from './catalog/prisma-catalog-repository';
+import {
+  BranchCatalogController,
+  ClassTypeCatalogController,
+  ClientProfileController,
+  PlanCatalogController,
+  SessionDetailController,
+  branchCatalog,
+  classTypeCatalog,
+  clientProfile,
+  clientSubscription,
+  planCatalog,
+  sessionDetail,
+  type PlanCatalogHandler,
+} from './client/client-discovery.controller';
+import { loadClientProfile } from './client/client-profile';
+import { loadClientSubscription } from './client/client-subscription';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
 import { listClassHistory } from './class-history';
 import { listSessionAvailability } from './session-availability';
@@ -48,6 +66,11 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     TrainerAttendanceController,
     TrainerScheduleController,
     TrainerSessionRosterController,
+    ClientProfileController,
+    PlanCatalogController,
+    BranchCatalogController,
+    ClassTypeCatalogController,
+    SessionDetailController,
   ],
   providers: [
     {
@@ -237,6 +260,83 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
       provide: sessionAvailability,
       inject: [bookingPrisma],
       useFactory: (prisma: PrismaClient) => listSessionAvailability(prisma),
+    },
+    {
+      provide: clientProfile,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient) =>
+        (
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          loadClientProfile({
+            principal,
+            findProfile: (clientId) =>
+              createCatalogRepository(prisma).findClientProfile(clientId),
+          }),
+    },
+    {
+      provide: clientSubscription,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient) =>
+        (
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) => {
+          const repository = createCatalogRepository(prisma);
+          const toSummary = (
+            subscription: NonNullable<
+              Awaited<ReturnType<typeof repository.findLatestSubscription>>
+            >,
+          ) => ({
+            id: subscription.id,
+            planName: subscription.planNameSnapshot,
+            originalClassAllowance: subscription.originalClassAllowance,
+            remainingClassAllowance: subscription.remainingClassAllowance,
+            startsOn: subscription.startsOn,
+            endsOn: subscription.endsOn,
+          });
+
+          return loadClientSubscription({
+            principal,
+            today: boliviaDate(new Date()),
+            findActiveSubscription: (clientId, onDate) =>
+              repository
+                .findActiveSubscription(clientId, onDate)
+                .then((found) => (found === null ? null : toSummary(found))),
+            findLatestSubscription: (clientId) =>
+              repository
+                .findLatestSubscription(clientId)
+                .then((found) => (found === null ? null : toSummary(found))),
+          });
+        },
+    },
+    {
+      provide: planCatalog,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient): PlanCatalogHandler => ({
+        list: () => createCatalogRepository(prisma).listVisiblePlans(),
+        find: (planId) =>
+          createCatalogRepository(prisma).findVisiblePlan(planId),
+      }),
+    },
+    {
+      provide: branchCatalog,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) => () =>
+        createCatalogRepository(prisma).listBranches(),
+    },
+    {
+      provide: classTypeCatalog,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) => () =>
+        createCatalogRepository(prisma).listClassTypes(),
+    },
+    {
+      provide: sessionDetail,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) => (sessionId: string) =>
+        createCatalogRepository(prisma).findSessionDetail(sessionId),
     },
     {
       provide: BookingRuntimeCleanup,
