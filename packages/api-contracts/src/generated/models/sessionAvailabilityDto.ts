@@ -10,6 +10,8 @@ export interface SessionAvailabilityDto {
   branchId: string;
   classTypeId: string;
   trainerStaffMemberId: string;
+  classTypeName: string;
+  trainerName: string;
   startsAt: string;
   endsAt: string;
   /** @minimum 1 */

@@ -25,15 +25,21 @@ import type {
   AuthenticationLinkInspectionDto,
   AuthenticationLinkTokenDto,
   AuthenticationSessionCredentialDto,
+  BranchDto,
   ChangeCurrentPasswordDto,
+  ClassTypeDto,
   ClientEmailVerificationResultDto,
+  ClientProfileDto,
+  ClientSubscriptionDto,
   CompleteAccountActivationDto,
   CompletePasswordRecoveryDto,
   CorrectPendingClientEmailDto,
   CreateAuthenticationSessionDto,
   CreateBookingDto,
+  CreatePendingUploadDto,
   CreatedBookingDto,
   CurrentAuthenticationPrincipalDto,
+  FinalizedUploadDto,
   ListSessionAvailabilityParams,
   ListTrainerScheduleParams,
   LivenessResponseDto,
@@ -42,9 +48,12 @@ import type {
   PendingClientRegistrationDto,
   PendingEmailCorrectionDto,
   PendingRegistrationContinuationDto,
+  PendingUploadDto,
   PendingVerificationResendDto,
+  PlanDto,
   RequestPasswordRecoveryDto,
   SessionAvailabilityDto,
+  SessionDetailDto,
   StartClientRegistrationDto,
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
@@ -3336,3 +3345,1524 @@ export function useGetTrainerSessionRoster<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type getCurrentClientProfileResponse200 = {
+  data: ClientProfileDto;
+  status: 200;
+};
+
+export type getCurrentClientProfileResponseSuccess =
+  getCurrentClientProfileResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentClientProfileResponse =
+  getCurrentClientProfileResponseSuccess;
+
+export const getGetCurrentClientProfileUrl = () => {
+  return `/api/v1/clients/current`;
+};
+
+export const getCurrentClientProfile = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientProfileResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentClientProfileUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentClientProfileResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientProfileResponse;
+};
+
+export const getGetCurrentClientProfileQueryKey = () => {
+  return [`/api/v1/clients/current`] as const;
+};
+
+export const getGetCurrentClientProfileQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientProfile>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentClientProfile>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentClientProfileQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientProfile>>
+  > = ({ signal }) =>
+    getCurrentClientProfile({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientProfile>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientProfileQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientProfile>>
+>;
+export type GetCurrentClientProfileQueryError = unknown;
+
+export function useGetCurrentClientProfile<
+  TData = Awaited<ReturnType<typeof getCurrentClientProfile>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientProfile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientProfile>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientProfile<
+  TData = Awaited<ReturnType<typeof getCurrentClientProfile>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientProfile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientProfile>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientProfile<
+  TData = Awaited<ReturnType<typeof getCurrentClientProfile>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientProfile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientProfile<
+  TData = Awaited<ReturnType<typeof getCurrentClientProfile>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientProfile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentClientProfileQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getCurrentClientSubscriptionResponse200 = {
+  data: ClientSubscriptionDto;
+  status: 200;
+};
+
+export type getCurrentClientSubscriptionResponseSuccess =
+  getCurrentClientSubscriptionResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentClientSubscriptionResponse =
+  getCurrentClientSubscriptionResponseSuccess;
+
+export const getGetCurrentClientSubscriptionUrl = () => {
+  return `/api/v1/clients/current/subscription`;
+};
+
+export const getCurrentClientSubscription = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientSubscriptionResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentClientSubscriptionUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentClientSubscriptionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientSubscriptionResponse;
+};
+
+export const getGetCurrentClientSubscriptionQueryKey = () => {
+  return [`/api/v1/clients/current/subscription`] as const;
+};
+
+export const getGetCurrentClientSubscriptionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentClientSubscriptionQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientSubscription>>
+  > = ({ signal }) =>
+    getCurrentClientSubscription({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientSubscriptionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientSubscription>>
+>;
+export type GetCurrentClientSubscriptionQueryError = unknown;
+
+export function useGetCurrentClientSubscription<
+  TData = Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientSubscription>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientSubscription<
+  TData = Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientSubscription>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientSubscription<
+  TData = Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientSubscription<
+  TData = Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientSubscription>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentClientSubscriptionQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listPlansResponse200 = {
+  data: PlanDto[];
+  status: 200;
+};
+
+export type listPlansResponseSuccess = listPlansResponse200 & {
+  headers: Headers;
+};
+export type listPlansResponse = listPlansResponseSuccess;
+
+export const getListPlansUrl = () => {
+  return `/api/v1/plans`;
+};
+
+export const listPlans = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listPlansResponse> => {
+  const res = await (fetchFn ?? fetch)(getListPlansUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listPlansResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listPlansResponse;
+};
+
+export const getListPlansQueryKey = () => {
+  return [`/api/v1/plans`] as const;
+};
+
+export const getListPlansQueryOptions = <
+  TData = Awaited<ReturnType<typeof listPlans>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListPlansQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listPlans>>> = ({
+    signal,
+  }) => listPlans({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listPlans>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListPlansQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listPlans>>
+>;
+export type ListPlansQueryError = unknown;
+
+export function useListPlans<
+  TData = Awaited<ReturnType<typeof listPlans>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPlans>>,
+          TError,
+          Awaited<ReturnType<typeof listPlans>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListPlans<
+  TData = Awaited<ReturnType<typeof listPlans>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPlans>>,
+          TError,
+          Awaited<ReturnType<typeof listPlans>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListPlans<
+  TData = Awaited<ReturnType<typeof listPlans>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListPlans<
+  TData = Awaited<ReturnType<typeof listPlans>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listPlans>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListPlansQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getPlanResponse200 = {
+  data: PlanDto;
+  status: 200;
+};
+
+export type getPlanResponseSuccess = getPlanResponse200 & {
+  headers: Headers;
+};
+export type getPlanResponse = getPlanResponseSuccess;
+
+export const getGetPlanUrl = (planId: string) => {
+  return `/api/v1/plans/${planId}`;
+};
+
+export const getPlan = async (
+  planId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getPlanResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetPlanUrl(planId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getPlanResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getPlanResponse;
+};
+
+export const getGetPlanQueryKey = (planId: string) => {
+  return [`/api/v1/plans/${planId}`] as const;
+};
+
+export const getGetPlanQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPlan>>,
+  TError = unknown,
+>(
+  planId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetPlanQueryKey(planId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getPlan>>> = ({
+    signal,
+  }) => getPlan(planId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: planId !== null && planId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+};
+
+export type GetPlanQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPlan>>
+>;
+export type GetPlanQueryError = unknown;
+
+export function useGetPlan<
+  TData = Awaited<ReturnType<typeof getPlan>>,
+  TError = unknown,
+>(
+  planId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlan>>,
+          TError,
+          Awaited<ReturnType<typeof getPlan>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetPlan<
+  TData = Awaited<ReturnType<typeof getPlan>>,
+  TError = unknown,
+>(
+  planId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPlan>>,
+          TError,
+          Awaited<ReturnType<typeof getPlan>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetPlan<
+  TData = Awaited<ReturnType<typeof getPlan>>,
+  TError = unknown,
+>(
+  planId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetPlan<
+  TData = Awaited<ReturnType<typeof getPlan>>,
+  TError = unknown,
+>(
+  planId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getPlan>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetPlanQueryOptions(planId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listBranchesResponse200 = {
+  data: BranchDto[];
+  status: 200;
+};
+
+export type listBranchesResponseSuccess = listBranchesResponse200 & {
+  headers: Headers;
+};
+export type listBranchesResponse = listBranchesResponseSuccess;
+
+export const getListBranchesUrl = () => {
+  return `/api/v1/branches`;
+};
+
+export const listBranches = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listBranchesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListBranchesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listBranchesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listBranchesResponse;
+};
+
+export const getListBranchesQueryKey = () => {
+  return [`/api/v1/branches`] as const;
+};
+
+export const getListBranchesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listBranches>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof listBranches>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListBranchesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listBranches>>> = ({
+    signal,
+  }) => listBranches({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listBranches>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListBranchesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listBranches>>
+>;
+export type ListBranchesQueryError = unknown;
+
+export function useListBranches<
+  TData = Awaited<ReturnType<typeof listBranches>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listBranches>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listBranches>>,
+          TError,
+          Awaited<ReturnType<typeof listBranches>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListBranches<
+  TData = Awaited<ReturnType<typeof listBranches>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listBranches>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listBranches>>,
+          TError,
+          Awaited<ReturnType<typeof listBranches>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListBranches<
+  TData = Awaited<ReturnType<typeof listBranches>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listBranches>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListBranches<
+  TData = Awaited<ReturnType<typeof listBranches>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listBranches>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListBranchesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listClassTypesResponse200 = {
+  data: ClassTypeDto[];
+  status: 200;
+};
+
+export type listClassTypesResponseSuccess = listClassTypesResponse200 & {
+  headers: Headers;
+};
+export type listClassTypesResponse = listClassTypesResponseSuccess;
+
+export const getListClassTypesUrl = () => {
+  return `/api/v1/class-types`;
+};
+
+export const listClassTypes = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listClassTypesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListClassTypesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listClassTypesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listClassTypesResponse;
+};
+
+export const getListClassTypesQueryKey = () => {
+  return [`/api/v1/class-types`] as const;
+};
+
+export const getListClassTypesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listClassTypes>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof listClassTypes>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListClassTypesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listClassTypes>>> = ({
+    signal,
+  }) => listClassTypes({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listClassTypes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListClassTypesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listClassTypes>>
+>;
+export type ListClassTypesQueryError = unknown;
+
+export function useListClassTypes<
+  TData = Awaited<ReturnType<typeof listClassTypes>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listClassTypes>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listClassTypes>>,
+          TError,
+          Awaited<ReturnType<typeof listClassTypes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListClassTypes<
+  TData = Awaited<ReturnType<typeof listClassTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listClassTypes>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listClassTypes>>,
+          TError,
+          Awaited<ReturnType<typeof listClassTypes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListClassTypes<
+  TData = Awaited<ReturnType<typeof listClassTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listClassTypes>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListClassTypes<
+  TData = Awaited<ReturnType<typeof listClassTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listClassTypes>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListClassTypesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getSessionResponse200 = {
+  data: SessionDetailDto;
+  status: 200;
+};
+
+export type getSessionResponseSuccess = getSessionResponse200 & {
+  headers: Headers;
+};
+export type getSessionResponse = getSessionResponseSuccess;
+
+export const getGetSessionUrl = (sessionId: string) => {
+  return `/api/v1/sessions/${sessionId}`;
+};
+
+export const getSession = async (
+  sessionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getSessionResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetSessionUrl(sessionId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getSessionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getSessionResponse;
+};
+
+export const getGetSessionQueryKey = (sessionId: string) => {
+  return [`/api/v1/sessions/${sessionId}`] as const;
+};
+
+export const getGetSessionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getSession>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSession>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetSessionQueryKey(sessionId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getSession>>> = ({
+    signal,
+  }) => getSession(sessionId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: sessionId !== null && sessionId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getSession>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetSessionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getSession>>
+>;
+export type GetSessionQueryError = unknown;
+
+export function useGetSession<
+  TData = Awaited<ReturnType<typeof getSession>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSession>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSession>>,
+          TError,
+          Awaited<ReturnType<typeof getSession>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetSession<
+  TData = Awaited<ReturnType<typeof getSession>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSession>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getSession>>,
+          TError,
+          Awaited<ReturnType<typeof getSession>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetSession<
+  TData = Awaited<ReturnType<typeof getSession>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSession>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetSession<
+  TData = Awaited<ReturnType<typeof getSession>>,
+  TError = unknown,
+>(
+  sessionId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getSession>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetSessionQueryOptions(sessionId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createPendingUploadResponse201 = {
+  data: PendingUploadDto;
+  status: 201;
+};
+
+export type createPendingUploadResponseSuccess =
+  createPendingUploadResponse201 & {
+    headers: Headers;
+  };
+export type createPendingUploadResponse = createPendingUploadResponseSuccess;
+
+export const getCreatePendingUploadUrl = () => {
+  return `/api/v1/uploads`;
+};
+
+export const createPendingUpload = async (
+  createPendingUploadDto: CreatePendingUploadDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createPendingUploadResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreatePendingUploadUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createPendingUploadDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createPendingUploadResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createPendingUploadResponse;
+};
+
+export const getCreatePendingUploadMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createPendingUpload>>,
+    TError,
+    CreatePendingUploadMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createPendingUpload>>,
+  TError,
+  CreatePendingUploadMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createPendingUpload"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createPendingUpload>>,
+    CreatePendingUploadMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createPendingUpload(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreatePendingUploadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createPendingUpload>>
+>;
+export type CreatePendingUploadMutationBody = CreatePendingUploadDto;
+export type CreatePendingUploadMutationError = unknown;
+export type CreatePendingUploadMutationVariables = {
+  data: CreatePendingUploadDto;
+};
+
+export const useCreatePendingUpload = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createPendingUpload>>,
+      TError,
+      CreatePendingUploadMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createPendingUpload>>,
+  TError,
+  CreatePendingUploadMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreatePendingUploadMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type putPendingUploadObjectResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type putPendingUploadObjectResponseSuccess =
+  putPendingUploadObjectResponse204 & {
+    headers: Headers;
+  };
+export type putPendingUploadObjectResponse =
+  putPendingUploadObjectResponseSuccess;
+
+export const getPutPendingUploadObjectUrl = (id: string) => {
+  return `/api/v1/uploads/${id}/object`;
+};
+
+export const putPendingUploadObject = async (
+  id: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<putPendingUploadObjectResponse> => {
+  const res = await (fetchFn ?? fetch)(getPutPendingUploadObjectUrl(id), {
+    ...options,
+    method: "PUT",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: putPendingUploadObjectResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putPendingUploadObjectResponse;
+};
+
+export const getPutPendingUploadObjectMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof putPendingUploadObject>>,
+    TError,
+    PutPendingUploadObjectMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof putPendingUploadObject>>,
+  TError,
+  PutPendingUploadObjectMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["putPendingUploadObject"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof putPendingUploadObject>>,
+    PutPendingUploadObjectMutationVariables
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return putPendingUploadObject(id, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PutPendingUploadObjectMutationResult = NonNullable<
+  Awaited<ReturnType<typeof putPendingUploadObject>>
+>;
+
+export type PutPendingUploadObjectMutationError = unknown;
+export type PutPendingUploadObjectMutationVariables = { id: string };
+
+export const usePutPendingUploadObject = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof putPendingUploadObject>>,
+      TError,
+      PutPendingUploadObjectMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof putPendingUploadObject>>,
+  TError,
+  PutPendingUploadObjectMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getPutPendingUploadObjectMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type finalizeUploadResponse202 = {
+  data: FinalizedUploadDto;
+  status: 202;
+};
+
+export type finalizeUploadResponseSuccess = finalizeUploadResponse202 & {
+  headers: Headers;
+};
+export type finalizeUploadResponse = finalizeUploadResponseSuccess;
+
+export const getFinalizeUploadUrl = (id: string) => {
+  return `/api/v1/uploads/${id}/finalize`;
+};
+
+export const finalizeUpload = async (
+  id: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<finalizeUploadResponse> => {
+  const res = await (fetchFn ?? fetch)(getFinalizeUploadUrl(id), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: finalizeUploadResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as finalizeUploadResponse;
+};
+
+export const getFinalizeUploadMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof finalizeUpload>>,
+    TError,
+    FinalizeUploadMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof finalizeUpload>>,
+  TError,
+  FinalizeUploadMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["finalizeUpload"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof finalizeUpload>>,
+    FinalizeUploadMutationVariables
+  > = (props) => {
+    const { id } = props ?? {};
+
+    return finalizeUpload(id, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type FinalizeUploadMutationResult = NonNullable<
+  Awaited<ReturnType<typeof finalizeUpload>>
+>;
+
+export type FinalizeUploadMutationError = unknown;
+export type FinalizeUploadMutationVariables = { id: string };
+
+export const useFinalizeUpload = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof finalizeUpload>>,
+      TError,
+      FinalizeUploadMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof finalizeUpload>>,
+  TError,
+  FinalizeUploadMutationVariables,
+  TContext
+> => {
+  return useMutation(getFinalizeUploadMutationOptions(options), queryClient);
+};

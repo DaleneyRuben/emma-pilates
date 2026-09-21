@@ -796,6 +796,337 @@
           "TrainerSessionRoster"
         ]
       }
+    },
+    "/api/v1/clients/current": {
+      "get": {
+        "operationId": "getCurrentClientProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientProfile"
+        ]
+      }
+    },
+    "/api/v1/clients/current/subscription": {
+      "get": {
+        "operationId": "getCurrentClientSubscription",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientSubscriptionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientProfile"
+        ]
+      }
+    },
+    "/api/v1/plans": {
+      "get": {
+        "operationId": "listPlans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PlanDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PlanCatalog"
+        ]
+      }
+    },
+    "/api/v1/plans/{planId}": {
+      "get": {
+        "operationId": "getPlan",
+        "parameters": [
+          {
+            "name": "planId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PlanCatalog"
+        ]
+      }
+    },
+    "/api/v1/branches": {
+      "get": {
+        "operationId": "listBranches",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BranchDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "BranchCatalog"
+        ]
+      }
+    },
+    "/api/v1/class-types": {
+      "get": {
+        "operationId": "listClassTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClassTypeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClassTypeCatalog"
+        ]
+      }
+    },
+    "/api/v1/sessions/{sessionId}": {
+      "get": {
+        "operationId": "getSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "SessionDetail"
+        ]
+      }
+    },
+    "/api/v1/uploads": {
+      "post": {
+        "operationId": "createPendingUpload",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePendingUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingUploadDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Uploads"
+        ]
+      }
+    },
+    "/api/v1/uploads/{id}/object": {
+      "put": {
+        "operationId": "putPendingUploadObject",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Uploads"
+        ]
+      }
+    },
+    "/api/v1/uploads/{id}/finalize": {
+      "post": {
+        "operationId": "finalizeUpload",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FinalizedUploadDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Uploads"
+        ]
+      }
     }
   },
   "info": {
@@ -1257,6 +1588,12 @@
             "type": "string",
             "format": "uuid"
           },
+          "classTypeName": {
+            "type": "string"
+          },
+          "trainerName": {
+            "type": "string"
+          },
           "startsAt": {
             "format": "date-time",
             "type": "string"
@@ -1287,6 +1624,8 @@
           "branchId",
           "classTypeId",
           "trainerStaffMemberId",
+          "classTypeName",
+          "trainerName",
           "startsAt",
           "endsAt",
           "capacity",
@@ -1415,6 +1754,314 @@
           "startsAt",
           "endsAt",
           "bookings"
+        ]
+      },
+      "ClientProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "object",
+            "nullable": true
+          },
+          "referralCode": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "referralCode"
+        ]
+      },
+      "ClientSubscriptionSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "originalClassAllowance": {
+            "type": "number",
+            "minimum": 1
+          },
+          "remainingClassAllowance": {
+            "type": "number",
+            "minimum": 0
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "id",
+          "planName",
+          "originalClassAllowance",
+          "remainingClassAllowance",
+          "startsOn",
+          "endsOn"
+        ]
+      },
+      "ClientSubscriptionDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "expiring_soon",
+              "expired",
+              "none"
+            ]
+          },
+          "subscription": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSubscriptionSummaryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "PlanDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "durationMonths": {
+            "type": "number",
+            "enum": [
+              1,
+              3,
+              6,
+              12
+            ]
+          },
+          "classAllowance": {
+            "type": "number",
+            "minimum": 1
+          },
+          "priceCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Money Amount in BOB centavos"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "durationMonths",
+          "classAllowance",
+          "priceCentavos"
+        ]
+      },
+      "BranchDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "address"
+        ]
+      },
+      "ClassTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 1
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "durationMinutes"
+        ]
+      },
+      "SessionDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branch": {
+            "$ref": "#/components/schemas/BranchDto"
+          },
+          "classType": {
+            "$ref": "#/components/schemas/ClassTypeDto"
+          },
+          "trainerName": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "bookedCount": {
+            "type": "number",
+            "minimum": 0
+          },
+          "availableSeats": {
+            "type": "number",
+            "minimum": 0
+          },
+          "waitlistCount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "branch",
+          "classType",
+          "trainerName",
+          "startsAt",
+          "endsAt",
+          "capacity",
+          "bookedCount",
+          "availableSeats",
+          "waitlistCount"
+        ]
+      },
+      "CreatePendingUploadDto": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "profile_photo",
+              "transfer_receipt",
+              "promotion"
+            ]
+          },
+          "mediaType": {
+            "type": "string",
+            "enum": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ]
+          },
+          "byteSize": {
+            "type": "number",
+            "minimum": 1
+          },
+          "checksum": {
+            "type": "string",
+            "description": "Base64-encoded SHA-256 checksum of the declared bytes"
+          }
+        },
+        "required": [
+          "purpose",
+          "mediaType",
+          "byteSize",
+          "checksum"
+        ]
+      },
+      "PendingUploadDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploadUrl": {
+            "type": "string",
+            "description": "Where to PUT the declared bytes before finalizing"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "uploadUrl",
+          "expiresAt"
+        ]
+      },
+      "FinalizedUploadDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "attached",
+              "failed",
+              "deleted"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "state"
         ]
       }
     }
