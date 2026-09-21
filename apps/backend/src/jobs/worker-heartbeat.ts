@@ -10,12 +10,13 @@ type WorkerHeartbeat = {
   event: 'worker_heartbeat';
   serviceVersion: string;
   timestamp: string;
-  queues: { authenticationEmail: QueueCounts };
+  queues: { authenticationEmail: QueueCounts; finalizeUpload: QueueCounts };
 };
 
 type WorkerHeartbeatDependencies = {
   serviceVersion: string;
   getAuthenticationEmailCounts(): Promise<QueueCounts>;
+  getFinalizeUploadCounts(): Promise<QueueCounts>;
   emit(heartbeat: WorkerHeartbeat): void;
   now?: () => Date;
 };
@@ -25,12 +26,15 @@ export const startWorkerHeartbeat = (
 ): (() => void) => {
   const now = dependencies.now ?? (() => new Date());
   const interval = setInterval(() => {
-    void dependencies.getAuthenticationEmailCounts().then((counts) => {
+    void Promise.all([
+      dependencies.getAuthenticationEmailCounts(),
+      dependencies.getFinalizeUploadCounts(),
+    ]).then(([authenticationEmail, finalizeUpload]) => {
       dependencies.emit({
         event: 'worker_heartbeat',
         serviceVersion: dependencies.serviceVersion,
         timestamp: now().toISOString(),
-        queues: { authenticationEmail: counts },
+        queues: { authenticationEmail, finalizeUpload },
       });
     });
   }, WORKER_HEARTBEAT_INTERVAL_MS);

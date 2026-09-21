@@ -4,6 +4,7 @@ import {
   registerAuthenticationEmailWorker,
   type AuthenticationEmailWorkerBoss,
 } from './jobs/authentication-email/authentication-email-worker';
+import { FINALIZE_UPLOAD_QUEUE } from './jobs/finalize-upload/finalize-upload-job';
 import {
   registerFinalizeUploadWorker,
   type FinalizeUploadWorkerBoss,
@@ -79,21 +80,24 @@ export const startWorker = async (
     });
   }, imageUploadCleanupIntervalMs);
 
+  const getQueueCounts = async (queue: string) => {
+    const snapshots = await dependencies.boss.getQueueStats(queue, {
+      force: true,
+    });
+    const latest = snapshots.at(-1);
+
+    return {
+      ready: latest?.readyCount ?? 0,
+      active: latest?.activeCount ?? 0,
+      failed: latest?.failedCount ?? 0,
+    };
+  };
+
   const stopHeartbeat = startWorkerHeartbeat({
     serviceVersion: dependencies.serviceVersion,
-    getAuthenticationEmailCounts: async () => {
-      const snapshots = await dependencies.boss.getQueueStats(
-        AUTHENTICATION_EMAIL_QUEUE,
-        { force: true },
-      );
-      const latest = snapshots.at(-1);
-
-      return {
-        ready: latest?.readyCount ?? 0,
-        active: latest?.activeCount ?? 0,
-        failed: latest?.failedCount ?? 0,
-      };
-    },
+    getAuthenticationEmailCounts: () =>
+      getQueueCounts(AUTHENTICATION_EMAIL_QUEUE),
+    getFinalizeUploadCounts: () => getQueueCounts(FINALIZE_UPLOAD_QUEUE),
     emit: (record) => dependencies.emit(record),
   });
 
