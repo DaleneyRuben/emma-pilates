@@ -120,6 +120,32 @@ enum ImageAssetState {
   @@schema("system")
 }
 
+enum ImageMediaType {
+  JPEG @map("image/jpeg")
+  PNG  @map("image/png")
+  WEBP @map("image/webp")
+
+  @@schema("system")
+}
+
+enum ImageVariantKind {
+  THUMBNAIL      @map("thumbnail")
+  DISPLAY        @map("display")
+  READABLE       @map("readable")
+  PROMOTION_480  @map("promotion_480")
+  PROMOTION_960  @map("promotion_960")
+  PROMOTION_1440 @map("promotion_1440")
+
+  @@schema("system")
+}
+
+enum ImageVariantVisibility {
+  PRIVATE @map("private")
+  PUBLIC  @map("public")
+
+  @@schema("system")
+}
+
 model Account {
   id                        String                  @id @default(uuid()) @db.Uuid
   email                     String                  @unique
@@ -345,10 +371,10 @@ model ImageAsset {
   purpose           ImageAssetPurpose
   state             ImageAssetState   @default(PENDING)
   pendingObjectKey  String            @unique @map("pending_object_key")
-  declaredMediaType String            @map("declared_media_type")
+  declaredMediaType ImageMediaType    @map("declared_media_type")
   declaredByteSize  Int               @map("declared_byte_size")
   declaredChecksum  Bytes             @map("declared_checksum") @db.ByteA
-  verifiedMediaType String?           @map("verified_media_type")
+  verifiedMediaType ImageMediaType?   @map("verified_media_type")
   verifiedByteSize  Int?              @map("verified_byte_size")
   verifiedChecksum  Bytes?            @map("verified_checksum") @db.ByteA
   verifiedWidth     Int?              @map("verified_width")
@@ -356,15 +382,45 @@ model ImageAsset {
   createdAt         DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
   expiresAt         DateTime          @map("expires_at") @db.Timestamptz(3)
   finalizedAt       DateTime?         @map("finalized_at") @db.Timestamptz(3)
+  processingStartedAt DateTime?       @map("processing_started_at") @db.Timestamptz(3)
+  failedAt          DateTime?         @map("failed_at") @db.Timestamptz(3)
+  failureCode       String?           @map("failure_code")
   attachedAt        DateTime?         @map("attached_at") @db.Timestamptz(3)
+  deletionDueAt     DateTime?         @map("deletion_due_at") @db.Timestamptz(3)
+  deleteRequestedAt DateTime?         @map("delete_requested_at") @db.Timestamptz(3)
   deletedAt         DateTime?         @map("deleted_at") @db.Timestamptz(3)
   ownerAccount      Account           @relation("ImageAssetOwner", fields: [ownerAccountId], references: [id], onDelete: Restrict)
   clientProfile     Client?           @relation("ClientProfileImage")
   staffProfile      StaffMember?      @relation("StaffProfileImage")
   promotions        Promotion[]
+  variants          ImageVariant[]
 
   @@index([ownerAccountId, state])
   @@index([state, expiresAt])
+  @@index([state, deletionDueAt])
+  @@index([state, deleteRequestedAt])
   @@map("image_assets")
+  @@schema("system")
+}
+
+model ImageVariant {
+  id                String                 @id @default(uuid()) @db.Uuid
+  imageAssetId      String                 @map("image_asset_id") @db.Uuid
+  kind              ImageVariantKind
+  visibility        ImageVariantVisibility
+  deliveryVersion   String                 @default(uuid()) @map("delivery_version") @db.Uuid
+  storageKey        String                 @unique @map("storage_key")
+  mediaType         ImageMediaType         @map("media_type")
+  byteSize          Int                    @map("byte_size")
+  width             Int
+  height            Int
+  createdAt         DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
+  deleteRequestedAt DateTime?              @map("delete_requested_at") @db.Timestamptz(3)
+  deletedAt         DateTime?              @map("deleted_at") @db.Timestamptz(3)
+  imageAsset        ImageAsset             @relation(fields: [imageAssetId], references: [id], onDelete: Restrict)
+
+  @@unique([imageAssetId, kind, visibility, deliveryVersion])
+  @@index([imageAssetId, visibility, deleteRequestedAt])
+  @@map("image_variants")
   @@schema("system")
 }
