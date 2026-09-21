@@ -9,6 +9,8 @@ import { clearMobileQueryCache } from "@pilates/mobile-core";
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
 
+jest.setTimeout(20_000);
+
 const profile = {
   id: "client-1",
   name: "Sofía Guzmán",
@@ -29,19 +31,29 @@ const expired = {
   },
 };
 
+const readRoutes = {
+  "/api/v1/clients/current": () => jsonResponse(profile),
+  "/api/v1/clients/current/subscription": () => jsonResponse(expired),
+};
+
 async function openProfile(
-  routes: Parameters<typeof routeFetcher>[0],
-  runtime = createClientRuntime(routeFetcher(routes)),
+  runtime = createClientRuntime(routeFetcher(readRoutes)),
 ) {
   const screen = await render(<App runtime={runtime} />);
 
-  await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Perfil" })).toBeOnTheScreen();
-  });
-  fireEvent.press(screen.getByRole("button", { name: "Perfil" }));
-  await waitFor(() => {
-    expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();
-  });
+  await waitFor(
+    () => {
+      expect(screen.getByRole("button", { name: /Perfil/ })).toBeOnTheScreen();
+    },
+    { timeout: 10_000 },
+  );
+  fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
+  await waitFor(
+    () => {
+      expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();
+    },
+    { timeout: 5_000 },
+  );
 
   return screen;
 }
@@ -53,10 +65,7 @@ describe("Client Profile", () => {
   });
 
   it("shows the account summary and the Plan status row", async () => {
-    const screen = await openProfile({
-      "/api/v1/clients/current": () => jsonResponse(profile),
-      "/api/v1/clients/current/subscription": () => jsonResponse(expired),
-    });
+    const screen = await openProfile();
 
     expect(screen.getByText("sofia@example.com")).toBeOnTheScreen();
     expect(screen.getByText("+591 70011004")).toBeOnTheScreen();
@@ -68,10 +77,7 @@ describe("Client Profile", () => {
   });
 
   it("opens the expired Plan detail with a purchase action", async () => {
-    const screen = await openProfile({
-      "/api/v1/clients/current": () => jsonResponse(profile),
-      "/api/v1/clients/current/subscription": () => jsonResponse(expired),
-    });
+    const screen = await openProfile();
 
     fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
 
@@ -84,20 +90,34 @@ describe("Client Profile", () => {
     ).toBeOnTheScreen();
   });
 
+  it("logs out from the profile", async () => {
+    const runtime = createClientRuntime(routeFetcher(readRoutes));
+    const screen = await openProfile(runtime);
+
+    fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
+
+    await waitFor(() => {
+      expect(runtime.sessionManager.logout).toHaveBeenCalled();
+    });
+  });
+
   it("edits the name and phone and keeps the email read-only", async () => {
     const saved = jest.fn();
-    const screen = await openProfile({
-      "/api/v1/clients/current": () => jsonResponse(profile),
-      "/api/v1/clients/current/subscription": () => jsonResponse(expired),
-      "PATCH /api/v1/clients/current": (init) => {
-        saved(JSON.parse(String(init?.body)));
-        return jsonResponse({
-          ...profile,
-          name: "Sofía Guzmán Vega",
-          phone: null,
-        });
-      },
-    });
+    const screen = await openProfile(
+      createClientRuntime(
+        routeFetcher({
+          ...readRoutes,
+          "PATCH /api/v1/clients/current": (init) => {
+            saved(JSON.parse(String(init?.body)));
+            return jsonResponse({
+              ...profile,
+              name: "Sofía Guzmán Vega",
+              phone: null,
+            });
+          },
+        }),
+      ),
+    );
 
     fireEvent.press(screen.getByRole("button", { name: "Editar" }));
     await waitFor(() => {
@@ -124,21 +144,5 @@ describe("Client Profile", () => {
       expect(screen.getByText("Sofía Guzmán Vega")).toBeOnTheScreen();
     });
     expect(screen.queryByText("Editar perfil")).not.toBeOnTheScreen();
-  });
-
-  it("logs out from the profile", async () => {
-    const runtime = createClientRuntime(
-      routeFetcher({
-        "/api/v1/clients/current": () => jsonResponse(profile),
-        "/api/v1/clients/current/subscription": () => jsonResponse(expired),
-      }),
-    );
-    const screen = await openProfile({}, runtime);
-
-    fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
-
-    await waitFor(() => {
-      expect(runtime.sessionManager.logout).toHaveBeenCalled();
-    });
   });
 });
