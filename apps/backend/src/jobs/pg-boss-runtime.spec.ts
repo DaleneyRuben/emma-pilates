@@ -10,7 +10,10 @@ describe('pg-boss runtime', () => {
     const boss = await createPgBoss('postgresql://localhost/unused', report);
 
     expect(boss.listenerCount('error')).toBe(1);
-    boss.emit('error', new Error('Connection terminated due to connection timeout'));
+    boss.emit(
+      'error',
+      new Error('Connection terminated due to connection timeout'),
+    );
     expect(report).toHaveBeenCalledWith({
       event: 'pg_boss_error',
       message: 'Connection terminated due to connection timeout',
