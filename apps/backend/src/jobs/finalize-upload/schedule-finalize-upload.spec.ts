@@ -18,9 +18,9 @@ describe('scheduleFinalizeUpload', () => {
       send: jest.fn().mockResolvedValue('job-id'),
     } as unknown as Pick<PgBoss, 'send'>;
 
-    await expect(
-      scheduleFinalizeUpload(boss, transaction, job),
-    ).resolves.toBe('job-id');
+    await expect(scheduleFinalizeUpload(boss, transaction, job)).resolves.toBe(
+      'job-id',
+    );
 
     expect(boss.send).toHaveBeenCalledWith(
       FINALIZE_UPLOAD_QUEUE,

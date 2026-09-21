@@ -26,7 +26,8 @@ type QueueStatsSnapshot = {
 };
 
 export interface WorkerBoss extends StartablePgBoss {
-  work: AuthenticationEmailWorkerBoss['work'] & FinalizeUploadWorkerBoss['work'];
+  work: AuthenticationEmailWorkerBoss['work'] &
+    FinalizeUploadWorkerBoss['work'];
   getQueueStats(
     name: string,
     options: { force: true },

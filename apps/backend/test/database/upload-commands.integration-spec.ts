@@ -103,7 +103,9 @@ describe('Prisma upload commands', () => {
         where: { id: intent.id },
       });
       expect(asset.state).toBe('PROCESSING');
-      expect(asset.processingStartedAt).toEqual(new Date('2026-09-18T12:00:00Z'));
+      expect(asset.processingStartedAt).toEqual(
+        new Date('2026-09-18T12:00:00Z'),
+      );
 
       const jobs = await tx.$queryRawUnsafe<{ id: string }[]>(
         `SELECT id FROM pgboss.job WHERE name = $1 AND data->>'imageAssetId' = $2`,

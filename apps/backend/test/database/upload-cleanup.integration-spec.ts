@@ -4,7 +4,10 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
-import { ImageAssetState, ImageMediaType } from '../../src/generated/prisma/enums';
+import {
+  ImageAssetState,
+  ImageMediaType,
+} from '../../src/generated/prisma/enums';
 import { cleanupAbandonedUploads } from '../../src/uploads/cleanup-abandoned-uploads';
 import { LocalObjectStorage } from '../../src/uploads/local-object-storage';
 import { createUploadCleanupGateway } from '../../src/uploads/prisma-upload-cleanup-gateway';

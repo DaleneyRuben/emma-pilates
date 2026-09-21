@@ -5,12 +5,7 @@ export class UploadAccessDeniedError extends Error {
 }
 
 type ImageAssetState =
-  | 'pending'
-  | 'processing'
-  | 'ready'
-  | 'attached'
-  | 'failed'
-  | 'deleted';
+  'pending' | 'processing' | 'ready' | 'attached' | 'failed' | 'deleted';
 
 type ImageAssetForFinalization = {
   id: string;

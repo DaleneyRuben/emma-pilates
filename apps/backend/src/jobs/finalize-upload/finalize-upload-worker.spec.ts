@@ -68,7 +68,9 @@ describe('finalize upload worker', () => {
   });
 
   it('fails jobs that throw unexpectedly for pg-boss to retry', async () => {
-    const process = jest.fn().mockRejectedValue(new Error('database unreachable'));
+    const process = jest
+      .fn()
+      .mockRejectedValue(new Error('database unreachable'));
     const handler = await register(process);
 
     await expect(handler([{ id: 'job-4', data: payload }])).resolves.toEqual([

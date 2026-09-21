@@ -2,7 +2,8 @@ import type { Queue } from 'pg-boss';
 import { z } from 'zod';
 
 export const FINALIZE_UPLOAD_QUEUE = 'uploads.finalize.v1' as const;
-export const FINALIZE_UPLOAD_FAILED_QUEUE = 'uploads.finalize.failed.v1' as const;
+export const FINALIZE_UPLOAD_FAILED_QUEUE =
+  'uploads.finalize.failed.v1' as const;
 
 const finalizeUploadJobSchema = z
   .object({

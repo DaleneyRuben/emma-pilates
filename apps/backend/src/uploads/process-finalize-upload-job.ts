@@ -1,12 +1,7 @@
 import type { ImagePurpose } from './image-purpose';
 
 type ImageAssetState =
-  | 'pending'
-  | 'processing'
-  | 'ready'
-  | 'attached'
-  | 'failed'
-  | 'deleted';
+  'pending' | 'processing' | 'ready' | 'attached' | 'failed' | 'deleted';
 
 type ImageAssetForProcessing = {
   id: string;
@@ -27,9 +22,7 @@ type VerifiedImage = {
 };
 
 export type ProcessFinalizeUploadJobDependencies = {
-  loadImageAsset(
-    imageAssetId: string,
-  ): Promise<ImageAssetForProcessing | null>;
+  loadImageAsset(imageAssetId: string): Promise<ImageAssetForProcessing | null>;
   readObject(objectKey: string): Promise<Buffer>;
   verifyBytes(
     bytes: Buffer,
@@ -40,7 +33,10 @@ export type ProcessFinalizeUploadJobDependencies = {
     imageAssetId: string;
     verified: VerifiedImage;
   }): Promise<void>;
-  markFailed(input: { imageAssetId: string; failureCode: string }): Promise<void>;
+  markFailed(input: {
+    imageAssetId: string;
+    failureCode: string;
+  }): Promise<void>;
 };
 
 export const processFinalizeUploadJob = async (

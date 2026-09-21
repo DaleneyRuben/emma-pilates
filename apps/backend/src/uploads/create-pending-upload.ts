@@ -1,4 +1,7 @@
-import { validateImageUploadDeclaration, type ImagePurpose } from './image-purpose';
+import {
+  validateImageUploadDeclaration,
+  type ImagePurpose,
+} from './image-purpose';
 
 type CreatePendingUploadCommand = {
   ownerAccountId: string;

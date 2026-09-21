@@ -11,7 +11,9 @@ describe('worker entrypoint', () => {
     const isInstalled = jest.fn().mockResolvedValue(true);
     const schemaVersion = jest.fn().mockResolvedValue(38);
     const start = jest.fn().mockResolvedValue(undefined);
-    const work = jest.fn<Promise<string>, unknown[]>().mockResolvedValue('worker-id') as WorkerBoss['work'];
+    const work = jest
+      .fn<Promise<string>, unknown[]>()
+      .mockResolvedValue('worker-id') as WorkerBoss['work'];
     const getQueueStats = jest
       .fn()
       .mockResolvedValue([{ readyCount: 2, activeCount: 1, failedCount: 3 }]);

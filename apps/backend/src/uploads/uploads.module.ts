@@ -110,7 +110,8 @@ class UploadsRuntimeCleanup implements OnApplicationShutdown {
         prisma: PrismaClient,
         storage: LocalObjectStorage,
         boss: PgBoss,
-      ) => createFinalizeUploadIdempotent(prisma, storage, () => new Date(), boss),
+      ) =>
+        createFinalizeUploadIdempotent(prisma, storage, () => new Date(), boss),
     },
     {
       provide: UploadsRuntimeCleanup,

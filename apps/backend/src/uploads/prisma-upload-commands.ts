@@ -10,11 +10,17 @@ import {
 } from '../generated/prisma/enums';
 import { createPendingUpload } from './create-pending-upload';
 import { finalizeUpload } from './finalize-upload';
-import { validateImageUploadDeclaration, type ImagePurpose } from './image-purpose';
+import {
+  validateImageUploadDeclaration,
+  type ImagePurpose,
+} from './image-purpose';
 import type { LocalObjectStorage } from './local-object-storage';
 import { processFinalizeUploadJob } from './process-finalize-upload-job';
 import { putPendingUploadObject } from './put-pending-upload-object';
-import { verifyImageBytes, type VerifiableMediaType } from './verify-image-bytes';
+import {
+  verifyImageBytes,
+  type VerifiableMediaType,
+} from './verify-image-bytes';
 
 const finalizeUploadIdempotencyRetentionMs = 24 * 60 * 60 * 1_000;
 
@@ -99,7 +105,11 @@ export function createPrismaUploadCommands(
         loadPendingObjectKey: async (imageAssetId) => {
           const asset = await prisma.imageAsset.findUnique({
             where: { id: imageAssetId },
-            select: { ownerAccountId: true, pendingObjectKey: true, state: true },
+            select: {
+              ownerAccountId: true,
+              pendingObjectKey: true,
+              state: true,
+            },
           });
 
           if (asset === null) return null;

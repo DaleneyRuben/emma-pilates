@@ -39,7 +39,9 @@ describe('processFinalizeUploadJob', () => {
       ),
     ).resolves.toBe('verified');
 
-    expect(readObject).toHaveBeenCalledWith('pending/transfer_receipt/asset-id');
+    expect(readObject).toHaveBeenCalledWith(
+      'pending/transfer_receipt/asset-id',
+    );
     expect(verifyBytes).toHaveBeenCalledWith(
       bytes,
       {

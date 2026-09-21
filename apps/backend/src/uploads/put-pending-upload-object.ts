@@ -1,12 +1,7 @@
 import { UploadAccessDeniedError } from './finalize-upload';
 
 type PendingUploadObjectState =
-  | 'pending'
-  | 'processing'
-  | 'ready'
-  | 'attached'
-  | 'failed'
-  | 'deleted';
+  'pending' | 'processing' | 'ready' | 'attached' | 'failed' | 'deleted';
 
 type PendingUploadTarget = {
   ownerAccountId: string;
@@ -28,7 +23,10 @@ export const putPendingUploadObject = async (
 ): Promise<void> => {
   const target = await dependencies.loadPendingObjectKey(command.imageAssetId);
 
-  if (target === null || target.ownerAccountId !== dependencies.ownerAccountId) {
+  if (
+    target === null ||
+    target.ownerAccountId !== dependencies.ownerAccountId
+  ) {
     throw new UploadAccessDeniedError();
   }
 

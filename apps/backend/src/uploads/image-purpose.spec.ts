@@ -1,6 +1,4 @@
-import {
-  validateImageUploadDeclaration,
-} from './image-purpose';
+import { validateImageUploadDeclaration } from './image-purpose';
 
 describe('validateImageUploadDeclaration', () => {
   it('accepts a WebP transfer receipt at its approved limit', () => {

@@ -1,7 +1,4 @@
-export type ImagePurpose =
-  | 'profile_photo'
-  | 'transfer_receipt'
-  | 'promotion';
+export type ImagePurpose = 'profile_photo' | 'transfer_receipt' | 'promotion';
 
 type ImageUploadDeclaration = {
   purpose: ImagePurpose;
@@ -27,7 +24,10 @@ export const validateImageUploadDeclaration = (
     throw new Error('image_media_type_invalid');
   }
 
-  if (!Number.isSafeInteger(declaration.byteSize) || declaration.byteSize <= 0) {
+  if (
+    !Number.isSafeInteger(declaration.byteSize) ||
+    declaration.byteSize <= 0
+  ) {
     throw new Error('image_size_invalid');
   }
 

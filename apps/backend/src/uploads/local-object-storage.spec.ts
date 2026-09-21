@@ -13,7 +13,9 @@ describe('LocalObjectStorage', () => {
       await expect(storage.get('pending/asset/original')).resolves.toEqual(
         Buffer.from('safe bytes'),
       );
-      await expect(storage.get('../outside')).rejects.toThrow('storage_key_invalid');
+      await expect(storage.get('../outside')).rejects.toThrow(
+        'storage_key_invalid',
+      );
     } finally {
       await rm(root, { recursive: true, force: true });
     }
