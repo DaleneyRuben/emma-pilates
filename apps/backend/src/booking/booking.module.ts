@@ -39,6 +39,13 @@ import {
   sessionDetail,
   type PlanCatalogHandler,
 } from './client/client-discovery.controller';
+import { listClientBookings } from './client/client-bookings';
+import {
+  ClientBookingsController,
+  WaitlistEntriesController,
+  clientBookings,
+  leaveWaitlistCommand,
+} from './client/client-bookings.controller';
 import { loadClientProfile } from './client/client-profile';
 import { loadClientSubscription } from './client/client-subscription';
 import { updateClientProfile } from './client/update-client-profile';
@@ -73,6 +80,8 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     BranchCatalogController,
     ClassTypeCatalogController,
     SessionDetailController,
+    ClientBookingsController,
+    WaitlistEntriesController,
   ],
   providers: [
     {
@@ -276,6 +285,29 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
             findProfile: (clientId) =>
               createCatalogRepository(prisma).findClientProfile(clientId),
           }),
+    },
+    {
+      provide: clientBookings,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient) =>
+        (
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          listClientBookings({
+            principal,
+            findUpcoming: (input) =>
+              createCatalogRepository(prisma).findUpcomingClientBookings(input),
+            now: () => new Date(),
+          }),
+    },
+    {
+      provide: leaveWaitlistCommand,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) => {
+        const commands = new PrismaBookingCommands(prisma, () => new Date());
+        return commands.leaveWaitlist.bind(commands);
+      },
     },
     {
       provide: clientProfileUpdate,
