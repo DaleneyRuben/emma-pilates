@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then see Home with the fixture Subscription states | Class browsing, bookings, Plans, and profile destinations are still placeholders                                                     |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, Plans, Plan detail, Mi plan, Perfil, and Editar perfil with the fixture Accounts | Class browsing and bookings are still placeholders; paying for a Plan from the app is not available yet |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable                  | Assistant, Administrator, and Nutritionist destinations are still placeholders                                                                |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, and active Client and Staff Accounts with one command                            | Promotions and receipt images are not included until image delivery is specified                                                              |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
@@ -371,6 +371,12 @@ paid-through date, and an enabled **Reservar una clase** action. Log in as
 booking action instead. Close and reopen the app; startup Session restoration
 should return to **Inicio** without asking for the password again.
 
+From Home, **Ver detalle** opens **Mi plan** and **Comprar un plan** opens
+**Elige tu plan**; tapping a Plan shows its detail with the price breakdown
+(the payment step is not available yet). The **Perfil** tab shows the Account
+summary, a **Mi plan** row, and **Cerrar sesión**; **Editar** lets you change
+the name and phone (the email stays read-only) and saves through the API.
+
 That Client Account must not authenticate in the Staff app. Use a Staff fixture
 such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
 by the Client app.
@@ -621,8 +627,8 @@ The following are not ready for manual product testing:
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
-- Promotions on Client Home, class browsing, booking, plans, payments,
-  profile, or notifications;
+- Promotions on Client Home, class browsing, booking, payments, or
+  notifications;
 - authenticated Trainer, Assistant, Administrator, or Nutritionist journeys and
   their working destination screens;
 - any Pilates admin-web workflow;
