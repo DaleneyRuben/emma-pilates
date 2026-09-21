@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator | Client Home and other signed-in destinations are still placeholders                                                                             |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then see Home with the fixture Subscription states | Class browsing, bookings, Plans, and profile destinations are still placeholders                                                     |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable                  | Assistant, Administrator, and Nutritionist destinations are still placeholders                                                                |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, and active Client and Staff Accounts with one command                            | Promotions and receipt images are not included until image delivery is specified                                                              |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
@@ -364,9 +364,12 @@ them into a shared-development or production database.
 
 Keep the backend and Client Expo server running. In the iOS Simulator, open the
 Client app, enter `lucia@example.com` and the fixture password, then tap
-**Iniciar sesión**. The app should open the Client destination labeled
-**Inicio**. Close and reopen the app; startup Session restoration should return
-to **Inicio** without asking for the password again.
+**Iniciar sesión**. The app should open **Inicio** with "Hola, Lucía", the
+"Paquete de 8 clases" card marked **Activa** with 5 of 8 classes and its
+paid-through date, and an enabled **Reservar una clase** action. Log in as
+`mariana@example.com` to see the **Comprar un plan** card and the disabled
+booking action instead. Close and reopen the app; startup Session restoration
+should return to **Inicio** without asking for the password again.
 
 That Client Account must not authenticate in the Staff app. Use a Staff fixture
 such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
@@ -618,8 +621,8 @@ The following are not ready for manual product testing:
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
-- working Client Home, class browsing, booking, plans, payments, profile, or
-  notifications;
+- Promotions on Client Home, class browsing, booking, plans, payments,
+  profile, or notifications;
 - authenticated Trainer, Assistant, Administrator, or Nutritionist journeys and
   their working destination screens;
 - any Pilates admin-web workflow;
