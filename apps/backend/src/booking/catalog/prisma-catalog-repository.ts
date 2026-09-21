@@ -30,6 +30,33 @@ const subscriptionSelect = {
   endsOn: true,
 } as const;
 
+const clientProfileSelect = {
+  id: true,
+  name: true,
+  phone: true,
+  referralCode: true,
+  account: { select: { email: true } },
+} as const;
+
+const toClientProfile = (
+  client: {
+    id: string;
+    name: string;
+    phone: string | null;
+    referralCode: string;
+    account: { email: string } | null;
+  } | null,
+) =>
+  client === null || client.account === null
+    ? null
+    : {
+        id: client.id,
+        name: client.name,
+        email: client.account.email,
+        phone: client.phone,
+        referralCode: client.referralCode,
+      };
+
 export function createCatalogRepository(
   prisma: Prisma.TransactionClient,
 ): CatalogRepository {
@@ -59,27 +86,22 @@ export function createCatalogRepository(
       }),
     findClientProfile: (clientId) =>
       prisma.client
-        .findUnique({
+        .findUnique({ where: { id: clientId }, select: clientProfileSelect })
+        .then(toClientProfile),
+    saveClientProfile: (clientId, changes) =>
+      prisma.client
+        .update({
           where: { id: clientId },
-          select: {
-            id: true,
-            name: true,
-            phone: true,
-            referralCode: true,
-            account: { select: { email: true } },
-          },
+          data: { name: changes.name, phone: changes.phone },
+          select: clientProfileSelect,
         })
-        .then((client) =>
-          client === null || client.account === null
-            ? null
-            : {
-                id: client.id,
-                name: client.name,
-                email: client.account.email,
-                phone: client.phone,
-                referralCode: client.referralCode,
-              },
-        ),
+        .then((client) => {
+          const profile = toClientProfile(client);
+          if (profile === null) {
+            throw new Error('Client has no Account');
+          }
+          return profile;
+        }),
     findSessionDetail: (sessionId) =>
       prisma.session
         .findFirst({

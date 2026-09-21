@@ -111,5 +111,9 @@ export type CatalogRepository = {
   listBranches(): Promise<BranchSummary[]>;
   listClassTypes(): Promise<ClassTypeSummary[]>;
   findClientProfile(clientId: string): Promise<ClientProfileRecord | null>;
+  saveClientProfile(
+    clientId: string,
+    changes: { name: string; phone: string | null },
+  ): Promise<ClientProfileRecord>;
   findSessionDetail(sessionId: string): Promise<SessionDetail | null>;
 };
