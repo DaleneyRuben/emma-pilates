@@ -10,6 +10,7 @@ export * from "./ingress/verified-link";
 export * from "./query/provider";
 export * from "./ui/body-text";
 export * from "./ui/primary-button";
+export * from "./ui/query-failure";
 export * from "./ui/heading";
 export * from "./ui/screen";
 export * from "./ui/tokens";

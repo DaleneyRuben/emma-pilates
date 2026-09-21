@@ -5,6 +5,7 @@ import {
   Heading,
   MobileQueryProvider,
   PrimaryButton,
+  QueryFailure,
   radii,
   Screen,
   spacing,
@@ -74,21 +75,6 @@ function NavigationPlaceholder({ title }: { title: string }) {
     <Screen>
       <Heading accessibilityLabel={title}>{title}</Heading>
     </Screen>
-  );
-}
-
-function QueryFailure({
-  label,
-  onRetry,
-}: {
-  label: string;
-  onRetry: () => void;
-}) {
-  return (
-    <View style={styles.centered}>
-      <BodyText accessibilityRole="alert">{label}</BodyText>
-      <PrimaryButton label="Reintentar" onPress={onRetry} />
-    </View>
   );
 }
 
