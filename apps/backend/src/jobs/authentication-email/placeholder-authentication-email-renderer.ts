@@ -10,9 +10,7 @@ const subjectByPurpose: Record<AuthenticationEmailJob['purpose'], string> = {
 
 // Provisional copy and deep-link format: no approved email content or URL scheme
 // exists yet. Replace once real design content lands.
-export class PlaceholderAuthenticationEmailRenderer
-  implements AuthenticationEmailRenderer
-{
+export class PlaceholderAuthenticationEmailRenderer implements AuthenticationEmailRenderer {
   render(input: {
     recipient: string;
     purpose: AuthenticationEmailJob['purpose'];
