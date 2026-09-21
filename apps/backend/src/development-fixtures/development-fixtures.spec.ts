@@ -7,7 +7,9 @@ const today = new Date('2026-09-21T00:00:00.000Z');
 const day = 24 * 60 * 60 * 1_000;
 
 const clientByEmail = (fixtures: DevelopmentFixtures, email: string) => {
-  const client = fixtures.clients.find((candidate) => candidate.email === email);
+  const client = fixtures.clients.find(
+    (candidate) => candidate.email === email,
+  );
   if (!client) throw new Error(`missing client ${email}`);
   return client;
 };
@@ -67,9 +69,15 @@ describe('development fixtures', () => {
     expect(fixtures.sessions.length).toBeGreaterThan(0);
 
     for (const session of fixtures.sessions) {
-      expect(session.startsAt.getTime()).toBeGreaterThanOrEqual(today.getTime());
-      expect(session.startsAt.getTime()).toBeLessThan(today.getTime() + 30 * day);
-      expect(session.endsAt.getTime()).toBeGreaterThan(session.startsAt.getTime());
+      expect(session.startsAt.getTime()).toBeGreaterThanOrEqual(
+        today.getTime(),
+      );
+      expect(session.startsAt.getTime()).toBeLessThan(
+        today.getTime() + 30 * day,
+      );
+      expect(session.endsAt.getTime()).toBeGreaterThan(
+        session.startsAt.getTime(),
+      );
     }
 
     const centro = fixtures.branches.find((branch) => branch.name === 'Centro');
@@ -80,7 +88,9 @@ describe('development fixtures', () => {
     );
 
     expect(mondaySevenAm).toBeDefined();
-    expect(mondaySevenAm?.endsAt.toISOString()).toBe('2026-09-21T11:50:00.000Z');
+    expect(mondaySevenAm?.endsAt.toISOString()).toBe(
+      '2026-09-21T11:50:00.000Z',
+    );
   });
 
   it('links every Session to a schedule with the same Branch, Class Type, and Trainer', () => {
@@ -138,9 +148,9 @@ describe('development fixtures', () => {
     expect(subscriptionsOf(fixtures, 'isabel@example.com')).toMatchObject([
       { state: 'active', remainingClassAllowance: 0 },
     ]);
-    expect(subscriptionsOf(fixtures, 'sofia@example.com')).toMatchObject([
-      { state: 'expired', expiredAt: expect.any(Date) },
-    ]);
+    const [expired] = subscriptionsOf(fixtures, 'sofia@example.com');
+    expect(expired).toMatchObject({ state: 'expired' });
+    expect(expired.expiredAt).toBeInstanceOf(Date);
     expect(subscriptionsOf(fixtures, 'mariana@example.com')).toEqual([]);
   });
 

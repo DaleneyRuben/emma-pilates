@@ -2,7 +2,9 @@ import { deterministicId } from './deterministic-id';
 
 describe('deterministic fixture ids', () => {
   it('derives the same UUID for the same key', () => {
-    expect(deterministicId('client:lucia')).toBe(deterministicId('client:lucia'));
+    expect(deterministicId('client:lucia')).toBe(
+      deterministicId('client:lucia'),
+    );
   });
 
   it('derives different UUIDs for different keys', () => {
