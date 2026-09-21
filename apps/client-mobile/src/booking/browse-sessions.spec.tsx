@@ -122,9 +122,11 @@ describe("Client Browse Sessions", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
+      ).toBeOnTheScreen();
     });
-    expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
+    expect(screen.getAllByText("Emma Vargas")).toHaveLength(2);
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
     expect(screen.getByText("Lleno")).toBeOnTheScreen();
     expect(
@@ -140,7 +142,9 @@ describe("Client Browse Sessions", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
+      ).toBeOnTheScreen();
     });
     fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
 
@@ -149,7 +153,9 @@ describe("Client Browse Sessions", () => {
         screen.getByText("No hay clases con este filtro"),
       ).toBeOnTheScreen();
     });
-    expect(screen.queryByText("Reformer Pilates")).not.toBeOnTheScreen();
+    expect(
+      screen.queryByRole("button", { name: /^Reformer Pilates \d/ }),
+    ).not.toBeOnTheScreen();
   });
 
   it("opens the Session detail from a card", async () => {
@@ -173,9 +179,13 @@ describe("Client Browse Sessions", () => {
     });
 
     await waitFor(() => {
-      expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
+      ).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: /Reformer Pilates/ }));
+    fireEvent.press(
+      screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
+    );
 
     await waitFor(() => {
       expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();

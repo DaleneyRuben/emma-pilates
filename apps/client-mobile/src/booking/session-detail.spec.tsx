@@ -101,11 +101,11 @@ async function openDetail(
   fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: /Reformer Pilates/ })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     },
     { timeout: 5_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Reformer Pilates/ }));
+  fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
   await waitFor(() => {
     expect(screen.getByText("Sobre la clase")).toBeOnTheScreen();
   });
