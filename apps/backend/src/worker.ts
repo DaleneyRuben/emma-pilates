@@ -5,6 +5,11 @@ import {
   type AuthenticationEmailWorkerBoss,
 } from './jobs/authentication-email/authentication-email-worker';
 import {
+  registerFinalizeUploadWorker,
+  type FinalizeUploadWorkerBoss,
+  type FinalizeUploadWorkerDependencies,
+} from './jobs/finalize-upload/finalize-upload-worker';
+import {
   startInstalledPgBoss,
   type StartablePgBoss,
 } from './jobs/pg-boss-runtime';
@@ -19,8 +24,8 @@ type QueueStatsSnapshot = {
   failedCount: number;
 };
 
-export interface WorkerBoss
-  extends StartablePgBoss, AuthenticationEmailWorkerBoss {
+export interface WorkerBoss extends StartablePgBoss {
+  work: AuthenticationEmailWorkerBoss['work'] & FinalizeUploadWorkerBoss['work'];
   getQueueStats(
     name: string,
     options: { force: true },
@@ -31,6 +36,7 @@ export interface WorkerBoss
 type WorkerDependencies = {
   boss: WorkerBoss;
   authenticationEmail: AuthenticationEmailProcessorDependencies;
+  finalizeUpload: FinalizeUploadWorkerDependencies;
   pendingAccountCleanup: {
     execute(): Promise<{ cleaned: number }>;
   };
@@ -48,6 +54,10 @@ export const startWorker = async (
   await registerAuthenticationEmailWorker(
     dependencies.boss,
     dependencies.authenticationEmail,
+  );
+  await registerFinalizeUploadWorker(
+    dependencies.boss,
+    dependencies.finalizeUpload,
   );
   await dependencies.pendingAccountCleanup.execute();
   const pendingAccountCleanupTimer = setInterval(() => {

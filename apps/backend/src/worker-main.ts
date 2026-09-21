@@ -12,6 +12,7 @@ import { AuthenticationLinkCipher } from './system-identity/security/authenticat
 import { cleanupAbandonedUploads } from './uploads/cleanup-abandoned-uploads';
 import { LocalObjectStorage } from './uploads/local-object-storage';
 import { createUploadCleanupGateway } from './uploads/prisma-upload-cleanup-gateway';
+import { createFinalizeUploadJobCommands } from './uploads/prisma-upload-commands';
 import { startWorker } from './worker';
 
 async function bootstrap(): Promise<void> {
@@ -65,6 +66,7 @@ async function bootstrap(): Promise<void> {
       renderer: new PlaceholderAuthenticationEmailRenderer(),
       delivery: new LocalEmailCapture(environment.NODE_ENV),
     },
+    finalizeUpload: createFinalizeUploadJobCommands(prisma, storage, now),
     pendingAccountCleanup: {
       execute: () => pendingAccountCleanupUseCase.execute(),
     },
