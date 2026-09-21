@@ -39,7 +39,10 @@ type DetailNavigation = {
   goBack: () => void;
   navigate: {
     (screen: "Plans"): void;
-    (screen: "Bookings", params: { confirmed: ConfirmedBooking }): void;
+    (
+      screen: "Bookings",
+      params: { screen: "MyBookings"; params: { confirmed: ConfirmedBooking } },
+    ): void;
   };
 };
 
@@ -130,11 +133,14 @@ export function SessionDetailScreen({
           queryKey: getGetCurrentClientSubscriptionQueryKey(),
         });
         navigation.navigate("Bookings", {
-          confirmed: {
-            bookingId: response.data.id,
-            classTypeName: detail.classType.name,
-            startsAt: detail.startsAt,
-            endsAt: detail.endsAt,
+          screen: "MyBookings",
+          params: {
+            confirmed: {
+              bookingId: response.data.id,
+              classTypeName: detail.classType.name,
+              startsAt: detail.startsAt,
+              endsAt: detail.endsAt,
+            },
           },
         });
         return;
