@@ -4,9 +4,10 @@ import { HealthController } from './health/health.controller';
 import { ProblemDetailsFilter } from './http/problem-details.filter';
 import { BookingModule } from './booking/booking.module';
 import { SystemIdentityModule } from './system-identity/system-identity.module';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
-  imports: [SystemIdentityModule, BookingModule],
+  imports: [SystemIdentityModule, BookingModule, UploadsModule],
   controllers: [HealthController],
   providers: [
     {
