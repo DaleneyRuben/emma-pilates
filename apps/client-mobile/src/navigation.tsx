@@ -11,6 +11,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { ClientFetcherContext } from "./client-fetcher";
 import { HomeScreen } from "./home/home-screen";
+import { PlanDetailScreen } from "./plans/plan-detail-screen";
+import { PlansScreen } from "./plans/plans-screen";
 
 const unavailableFetcher: typeof globalThis.fetch = async () => {
   throw new Error("The authenticated API fetcher is unavailable");
@@ -22,10 +24,6 @@ function NavigationPlaceholder({ title }: { title: string }) {
       <Heading accessibilityLabel={title}>{title}</Heading>
     </Screen>
   );
-}
-
-function ClientPlansScreen() {
-  return <NavigationPlaceholder title="Elige tu plan" />;
 }
 
 function ClientSubscriptionScreen() {
@@ -48,7 +46,8 @@ const HomeStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },
   screens: {
     Home: HomeScreen,
-    Plans: ClientPlansScreen,
+    Plans: PlansScreen,
+    PlanDetail: PlanDetailScreen,
     Subscription: ClientSubscriptionScreen,
   },
 });
