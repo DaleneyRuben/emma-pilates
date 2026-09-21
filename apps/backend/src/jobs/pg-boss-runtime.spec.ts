@@ -1,6 +1,22 @@
-import { pgBossOptions, startInstalledPgBoss } from './pg-boss-runtime';
+import {
+  createPgBoss,
+  pgBossOptions,
+  startInstalledPgBoss,
+} from './pg-boss-runtime';
 
 describe('pg-boss runtime', () => {
+  it('reports pg-boss errors instead of crashing the process', async () => {
+    const report = jest.fn();
+    const boss = await createPgBoss('postgresql://localhost/unused', report);
+
+    expect(boss.listenerCount('error')).toBe(1);
+    boss.emit('error', new Error('Connection terminated due to connection timeout'));
+    expect(report).toHaveBeenCalledWith({
+      event: 'pg_boss_error',
+      message: 'Connection terminated due to connection timeout',
+    });
+  });
+
   it('disables runtime schema changes and unused persistence', () => {
     expect(pgBossOptions('postgresql://localhost/pilates')).toMatchObject({
       connectionString: 'postgresql://localhost/pilates',
