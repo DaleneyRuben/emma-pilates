@@ -57,6 +57,7 @@ import type {
   StartClientRegistrationDto,
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
+  UpdateClientProfileDto,
   VerifyClientEmailDto,
 } from "./models";
 
@@ -3529,6 +3530,136 @@ export function useGetCurrentClientProfile<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type updateCurrentClientProfileResponse200 = {
+  data: ClientProfileDto;
+  status: 200;
+};
+
+export type updateCurrentClientProfileResponseSuccess =
+  updateCurrentClientProfileResponse200 & {
+    headers: Headers;
+  };
+export type updateCurrentClientProfileResponse =
+  updateCurrentClientProfileResponseSuccess;
+
+export const getUpdateCurrentClientProfileUrl = () => {
+  return `/api/v1/clients/current`;
+};
+
+export const updateCurrentClientProfile = async (
+  updateClientProfileDto: UpdateClientProfileDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateCurrentClientProfileResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateCurrentClientProfileUrl(), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(updateClientProfileDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateCurrentClientProfileResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateCurrentClientProfileResponse;
+};
+
+export const getUpdateCurrentClientProfileMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateCurrentClientProfile>>,
+    TError,
+    UpdateCurrentClientProfileMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateCurrentClientProfile>>,
+  TError,
+  UpdateCurrentClientProfileMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateCurrentClientProfile"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateCurrentClientProfile>>,
+    UpdateCurrentClientProfileMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return updateCurrentClientProfile(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateCurrentClientProfileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateCurrentClientProfile>>
+>;
+export type UpdateCurrentClientProfileMutationBody = UpdateClientProfileDto;
+export type UpdateCurrentClientProfileMutationError = unknown;
+export type UpdateCurrentClientProfileMutationVariables = {
+  data: UpdateClientProfileDto;
+};
+
+export const useUpdateCurrentClientProfile = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateCurrentClientProfile>>,
+      TError,
+      UpdateCurrentClientProfileMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateCurrentClientProfile>>,
+  TError,
+  UpdateCurrentClientProfileMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getUpdateCurrentClientProfileMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type getCurrentClientSubscriptionResponse200 = {
   data: ClientSubscriptionDto;

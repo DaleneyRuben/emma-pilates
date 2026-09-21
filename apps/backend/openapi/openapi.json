@@ -822,6 +822,41 @@
         "tags": [
           "ClientProfile"
         ]
+      },
+      "patch": {
+        "operationId": "updateCurrentClientProfile",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateClientProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientProfile"
+        ]
       }
     },
     "/api/v1/clients/current/subscription": {
@@ -1783,6 +1818,22 @@
           "name",
           "email",
           "referralCode"
+        ]
+      },
+      "UpdateClientProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "phone": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name"
         ]
       },
       "ClientSubscriptionSummaryDto": {
