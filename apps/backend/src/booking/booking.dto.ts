@@ -42,6 +42,12 @@ export class SessionAvailabilityDto {
   @ApiProperty({ format: 'uuid' })
   trainerStaffMemberId!: string;
 
+  @ApiProperty()
+  classTypeName!: string;
+
+  @ApiProperty()
+  trainerName!: string;
+
   @ApiProperty({ format: 'date-time' })
   startsAt!: Date;
 

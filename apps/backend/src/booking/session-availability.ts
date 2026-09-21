@@ -27,6 +27,8 @@ export const listSessionAvailability =
         startsAt: true,
         endsAt: true,
         capacity: true,
+        classType: { select: { name: true } },
+        trainer: { select: { name: true } },
         _count: {
           select: {
             bookings: { where: { state: 'BOOKED' } },
@@ -41,6 +43,8 @@ export const listSessionAvailability =
       branchId: session.branchId,
       classTypeId: session.classTypeId,
       trainerStaffMemberId: session.trainerStaffMemberId,
+      classTypeName: session.classType.name,
+      trainerName: session.trainer.name,
       startsAt: session.startsAt,
       endsAt: session.endsAt,
       capacity: session.capacity,
