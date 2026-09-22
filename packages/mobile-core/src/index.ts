@@ -1,3 +1,4 @@
+export * from "./account/change-password-screen";
 export * from "./application";
 export * from "./auth/authentication-api";
 export * from "./auth/authentication-flow";
