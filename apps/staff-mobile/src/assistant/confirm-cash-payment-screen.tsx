@@ -30,7 +30,8 @@ import type { ClientContext } from "./client-overview-screen";
 
 type ConfirmNavigation = {
   goBack: () => void;
-  navigate: (screen: "ClientOverview", params: { clientId: string }) => void;
+  // Back to the overview already in the stack, dropping plan and payment.
+  popTo: (screen: "ClientOverview", params: { clientId: string }) => void;
 };
 
 const paymentProblems: Record<string, string> = {
@@ -125,7 +126,7 @@ export function ConfirmCashPaymentScreen({
           </View>
           <PrimaryButton
             label="Volver al cliente"
-            onPress={() => navigation.navigate("ClientOverview", { clientId })}
+            onPress={() => navigation.popTo("ClientOverview", { clientId })}
           />
         </View>
       </Screen>

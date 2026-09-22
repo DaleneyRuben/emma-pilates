@@ -19,7 +19,8 @@ import { AssistantApiError, createAssistantApi } from "./assistant-api";
 
 type NewClientNavigation = {
   goBack: () => void;
-  navigate: (screen: "ClientOverview", params: { clientId: string }) => void;
+  // The form is done once the account exists, so the overview replaces it.
+  replace: (screen: "ClientOverview", params: { clientId: string }) => void;
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,7 +67,7 @@ export function NewClientScreen() {
         setVerificationPending(result.clientId);
         return;
       }
-      navigation.navigate("ClientOverview", { clientId: result.clientId });
+      navigation.replace("ClientOverview", { clientId: result.clientId });
     } catch (error) {
       const code = error instanceof AssistantApiError ? error.code : null;
       setFailure(
@@ -122,7 +123,7 @@ export function NewClientScreen() {
             <TextButton
               label="Ver cliente"
               onPress={() =>
-                navigation.navigate("ClientOverview", {
+                navigation.replace("ClientOverview", {
                   clientId: verificationPending,
                 })
               }
