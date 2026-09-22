@@ -121,10 +121,10 @@ describe('Prisma payment commands', () => {
   });
 
   it('reserves available Credit against the Plan price and records the reservation in the ledger', async () => {
-    const valeria = await principalOf('valeria@example.com');
+    const sofia = await principalOf('sofia@example.com');
     const isabel = await principalOf('isabel@example.com');
     const isabelId = isabel.identity.kind === 'client' ? isabel.identity.clientId : '';
-    const valeriaId = valeria.identity.kind === 'client' ? valeria.identity.clientId : '';
+    const valeriaId = sofia.identity.kind === 'client' ? sofia.identity.clientId : '';
     const admin = await prisma.account.findUniqueOrThrow({
       where: { email: 'paola.mendoza@example.com' },
       select: { id: true },
@@ -151,6 +151,7 @@ describe('Prisma payment commands', () => {
           submittedAt: now,
           decidedByAccountId: admin.id,
           decidedAt: now,
+          createdAt: now,
         },
       });
       await transaction.subscription.create({
@@ -171,6 +172,7 @@ describe('Prisma payment commands', () => {
         data: {
           referrerClientId: isabelId,
           referredClientId: valeriaId,
+          createdAt: now,
           state: 'AWARDED',
           qualifiedPaymentId: payment.id,
           qualifiedAt: now,
