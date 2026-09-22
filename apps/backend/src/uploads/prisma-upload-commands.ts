@@ -335,3 +335,34 @@ export function createFinalizeUploadIdempotent(
     );
   };
 }
+
+export type UploadStatus = {
+  id: string;
+  state: (typeof stateFromPrisma)[ImageAssetState];
+  mediaType: string | null;
+};
+
+// Owners poll this while the worker verifies their upload; other Accounts
+// see nothing, so the read answers null for foreign assets too.
+export function createReadUploadStatus(prisma: PrismaClient) {
+  return async (
+    imageAssetId: string,
+    ownerAccountId: string,
+  ): Promise<UploadStatus | null> => {
+    const asset = await prisma.imageAsset.findFirst({
+      where: { id: imageAssetId, ownerAccountId },
+      select: { id: true, state: true, verifiedMediaType: true },
+    });
+
+    return asset === null
+      ? null
+      : {
+          id: asset.id,
+          state: stateFromPrisma[asset.state],
+          mediaType:
+            asset.verifiedMediaType === null
+              ? null
+              : mediaTypeFromPrisma[asset.verifiedMediaType],
+        };
+  };
+}

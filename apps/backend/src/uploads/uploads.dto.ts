@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 import type { ImagePurpose } from './image-purpose';
 
@@ -35,6 +35,32 @@ export class PendingUploadDto {
 
   @ApiProperty({ format: 'date-time' })
   expiresAt!: Date;
+}
+
+export const uploadStates = [
+  'pending',
+  'processing',
+  'ready',
+  'attached',
+  'failed',
+  'deleted',
+] as const;
+
+export type UploadState = (typeof uploadStates)[number];
+
+export class UploadStatusDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty({ enum: uploadStates })
+  state!: UploadState;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Verified media type once the worker has processed the bytes',
+  })
+  mediaType!: string | null;
 }
 
 export class FinalizedUploadDto {

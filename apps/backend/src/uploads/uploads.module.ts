@@ -17,8 +17,10 @@ import {
   finalizeUploadCommand,
   putPendingUploadObjectCommand,
   UploadsController,
+  readUploadStatusCommand,
   uploadsNodeEnv,
 } from './uploads.controller';
+import { createReadUploadStatus } from './prisma-upload-commands';
 
 const uploadsPrisma = Symbol('uploadsPrisma');
 const uploadsStorage = Symbol('uploadsStorage');
@@ -60,6 +62,11 @@ class UploadsRuntimeCleanup implements OnApplicationShutdown {
       inject: [ConfigService],
       useFactory: (config: ConfigService<Environment, true>) =>
         new LocalObjectStorage(config.getOrThrow('UPLOADS_LOCAL_STORAGE_ROOT')),
+    },
+    {
+      provide: readUploadStatusCommand,
+      inject: [uploadsPrisma],
+      useFactory: (prisma: PrismaClient) => createReadUploadStatus(prisma),
     },
     {
       provide: uploadsNodeEnv,

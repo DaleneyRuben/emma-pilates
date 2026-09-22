@@ -14,6 +14,9 @@ import {
   Put,
   Req,
   UnauthorizedException,
+  Get,
+  Header,
+  NotFoundException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,6 +26,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiResponse,
+  ApiOkResponse,
 } from '@nestjs/swagger';
 import { authenticatedPrincipalResolver } from '../system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
@@ -35,6 +39,7 @@ import {
   parseCreatePendingUpload,
   parseUuid,
   PendingUploadDto,
+  UploadStatusDto,
 } from './uploads.dto';
 
 export const createPendingUploadCommand = Symbol('createPendingUploadCommand');
@@ -43,6 +48,12 @@ export const putPendingUploadObjectCommand = Symbol(
 );
 export const finalizeUploadCommand = Symbol('finalizeUploadCommand');
 export const uploadsNodeEnv = Symbol('uploadsNodeEnv');
+export const readUploadStatusCommand = Symbol('readUploadStatusCommand');
+
+type ReadUploadStatusHandler = (
+  imageAssetId: string,
+  ownerAccountId: string,
+) => Promise<UploadStatusDto | null>;
 
 type CreatePendingUploadHandler = (command: {
   ownerAccountId: string;
@@ -170,6 +181,8 @@ export class UploadsController {
     private readonly putPendingUploadObjectHandler: PutPendingUploadObjectHandler,
     @Inject(finalizeUploadCommand)
     private readonly finalizeUploadHandler: FinalizeUploadHandler,
+    @Inject(readUploadStatusCommand)
+    private readonly readUploadStatus: ReadUploadStatusHandler,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
     @Inject(uploadsNodeEnv) private readonly nodeEnv: string,
@@ -280,6 +293,30 @@ export class UploadsController {
       if (problem !== null) throw problem;
       throw error;
     }
+  }
+
+  @Get(':id')
+  @ApiOperation({ operationId: 'getUploadStatus' })
+  @ApiParam({ name: 'id', format: 'uuid' })
+  @ApiOkResponse({ type: UploadStatusDto })
+  @Header('Cache-Control', 'no-store')
+  async status(
+    @Param('id') id: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<UploadStatusDto> {
+    const parsedId = parseUuid(id);
+    if (parsedId === null) throw invalidRequest('Invalid Upload identifier');
+    const principal = await this.authenticate(authorization);
+    const status = await this.readUploadStatus(parsedId, principal.accountId);
+
+    if (status === null) {
+      throw new NotFoundException({
+        code: 'upload_not_found',
+        detail: 'Upload not found',
+      });
+    }
+
+    return status;
   }
 
   private async authenticate(
