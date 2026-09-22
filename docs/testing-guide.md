@@ -568,8 +568,26 @@ whose Credit covers the price can call `POST /api/v1/credit-purchases` and is
 activated immediately without a QR. Registration accepts an optional
 `referralCode` (another Client's code); an unknown code fails the whole
 registration with `400 referral_code_invalid`. Open Intents expire 24 h later
-through the worker, releasing their Credit. Administrator confirmation and
-rejection endpoints arrive with STAFF-001.
+through the worker, releasing their Credit.
+
+### Reviewing transfers as the Administrator (STAFF-001)
+
+Log in through Swagger as `paola.mendoza@example.com` (Administrator) and
+authorize that credential:
+
+| Endpoint                                              | What you should see                                                                    |
+| ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `GET /api/v1/administrator/payments/pending`          | Pending transfers oldest first with client, Plan, amount, `submittedAt`, receipt flag  |
+| `GET /api/v1/administrator/payments/{paymentId}`      | The review projection plus `receiptUrl`                                                |
+| `GET …/payments/{paymentId}/receipt`                  | The receipt image itself (`Cache-Control: no-store`); Trainers and Clients get `403`   |
+| `POST …/payments/{paymentId}/confirm`                 | `state: confirmed`, a new Subscription starting today, the Client notified             |
+| `POST …/payments/{paymentId}/reject` `{ "reason" }`   | `state: rejected` with the trimmed reason; the Client's Credit is released             |
+| `POST /api/v1/administrator/sessions/{id}/cancel`     | `{ affectedBookings }`: every Booking refunded, waitlist closed, Clients + Trainer told |
+
+Repeating the same decision returns the same result; the opposite decision
+answers `409 payment_confirmation_conflict`. A Session without Bookings answers
+`409 session_has_no_bookings` (the worker's empty check handles those), and a
+started or cancelled one `409 session_not_cancellable`.
 
 ## Test 8: run the automated checks
 
