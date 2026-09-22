@@ -1,6 +1,9 @@
+import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createCatalogRepository } from '../../src/booking/catalog/prisma-catalog-repository';
+import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
+import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
 import {
   buildDevelopmentFixtures,
@@ -47,6 +50,43 @@ describe('development fixtures', () => {
     await expect(prisma.subscription.count()).resolves.toBe(
       fixtures.subscriptions.length,
     );
+    await expect(prisma.payment.count()).resolves.toBe(
+      fixtures.payments.length,
+    );
+    await expect(prisma.referral.count()).resolves.toBe(
+      fixtures.referrals.length,
+    );
+    await expect(prisma.creditLedgerEntry.count()).resolves.toBe(
+      fixtures.creditLedgerEntries.length,
+    );
+  });
+
+  it('lets Sofía read Bs 60 of referral credit and both referrals through the payment reads', async () => {
+    const account = await prisma.account.findUniqueOrThrow({
+      where: { email: 'sofia@example.com' },
+      select: { id: true, clientId: true },
+    });
+    const sofia: AuthenticatedPrincipal = {
+      accountId: account.id,
+      authenticationSessionId: randomUUID(),
+      identity: { kind: 'client', clientId: account.clientId! },
+    };
+    const commands = createPrismaPaymentCommands(prisma, {
+      now: () => today,
+      referralRewardCentavos: 6000,
+    });
+
+    await expect(commands.readCreditSummary(sofia)).resolves.toMatchObject({
+      availableCentavos: 6000,
+      reservedCentavos: 0,
+    });
+    await expect(commands.readReferrals(sofia)).resolves.toMatchObject({
+      referralCode: 'REF-SOFIA',
+      referrals: [
+        { referredName: 'Mariana P.', state: 'pending' },
+        { referredName: 'Valeria Q.', state: 'awarded', awardCentavos: 6000 },
+      ],
+    });
   });
 
   it('creates active Client Accounts that authenticate with the shared password', async () => {

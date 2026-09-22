@@ -117,7 +117,11 @@ describe('Prisma payment commands', () => {
     ).resolves.toBe('subscription_not_expired');
     await expect(
       commands().createPurchaseIntent({ planId: plan.id }, sofia, randomUUID()),
-    ).resolves.toMatchObject({ state: 'open', amountDueCentavos: 56_000 });
+    ).resolves.toMatchObject({
+      state: 'open',
+      creditReservedCentavos: 6000,
+      amountDueCentavos: 50_000,
+    });
   });
 
   it('reserves available Credit against the Plan price and records the reservation in the ledger', async () => {
