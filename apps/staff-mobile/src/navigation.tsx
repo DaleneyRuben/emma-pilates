@@ -25,7 +25,10 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { AccountAvatar } from "./profile/account-avatar";
+import { CancelClassScreen } from "./administrator/cancel-class-screen";
+import { CancelSessionScreen } from "./administrator/cancel-session-screen";
+import { PendingPaymentsScreen } from "./administrator/pending-payments-screen";
+import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
 import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
@@ -35,6 +38,7 @@ import {
   useStaffFetcher,
 } from "./staff-fetcher";
 import { createTrainerApi } from "./trainer-api";
+import { RootHeader } from "./ui/root-header";
 
 type StaffRole = Exclude<AppRole, "client">;
 type AttendanceOutcome = "attended" | "no_show";
@@ -71,18 +75,6 @@ function formatTimeRange(startsAt: string, endsAt: string): string {
     timeZone: "America/La_Paz",
   });
   return `${formatter.format(new Date(startsAt))}–${formatter.format(new Date(endsAt))}`;
-}
-
-// Every role root carries the account avatar: it is the only route to Perfil.
-function RootHeader({ label, title }: { label: string; title: string }) {
-  return (
-    <View style={styles.rootHeader}>
-      <Heading accessibilityLabel={label} style={styles.rootTitle}>
-        {title}
-      </Heading>
-      <AccountAvatar />
-    </View>
-  );
 }
 
 function NavigationPlaceholder({ title }: { title: string }) {
@@ -344,9 +336,6 @@ function TrainerRosterScreen({
 function AssistantClientSearchScreen() {
   return <NavigationPlaceholder title="Buscar cliente" />;
 }
-function AdministratorPaymentsScreen() {
-  return <NavigationPlaceholder title="Pagos pendientes" />;
-}
 function NutritionistAgendaScreen() {
   return <NavigationPlaceholder title="Mi agenda" />;
 }
@@ -371,7 +360,13 @@ const AssistantStack = createNativeStackNavigator({
 });
 const AdministratorStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },
-  screens: { Payments: AdministratorPaymentsScreen, ...accountScreens },
+  screens: {
+    Payments: PendingPaymentsScreen,
+    ReviewPayment: ReviewPaymentScreen,
+    CancelClass: CancelClassScreen,
+    CancelSession: CancelSessionScreen,
+    ...accountScreens,
+  },
 });
 const NutritionistStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },
@@ -462,13 +457,6 @@ const styles = StyleSheet.create({
   dateLabelSelected: { color: colors.white },
   datePicker: { gap: spacing.sm, paddingVertical: spacing.lg },
   list: { gap: spacing.md, paddingBottom: spacing.lg },
-  rootHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.smLg,
-    justifyContent: "space-between",
-  },
-  rootTitle: { flex: 1 },
   rosterRow: {
     backgroundColor: colors.surface,
     borderRadius: radii.card,

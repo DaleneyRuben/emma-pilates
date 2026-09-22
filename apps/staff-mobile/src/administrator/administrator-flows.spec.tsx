@@ -281,7 +281,9 @@ describe("Administrator payments and Session cancellation", () => {
     });
     expect(screen.getByText("Centro")).toBeOnTheScreen();
     await waitFor(() => {
-      expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
+      ).toBeOnTheScreen();
     });
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
     expect(screen.getByText("6 reservas")).toBeOnTheScreen();
@@ -297,7 +299,9 @@ describe("Administrator payments and Session cancellation", () => {
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Todas" }));
     await waitFor(() => {
-      expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
+      ).toBeOnTheScreen();
     });
 
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
