@@ -70,8 +70,51 @@ export type DevelopmentFixtures = {
     state: 'active' | 'expired';
     activatedAt: Date;
     expiredAt: Date | null;
+    paymentId: string | null;
+  }[];
+  payments: {
+    id: string;
+    clientId: string;
+    planId: string;
+    planNameSnapshot: string;
+    durationMonthsSnapshot: number;
+    classAllowanceSnapshot: number;
+    planPriceCentavos: number;
+    creditAppliedCentavos: number;
+    amountDueCentavos: number;
+    method: 'cash';
+    state: 'confirmed';
+    collectedAtBranchId: string;
+    submittedByAccountId: string;
+    submittedAt: Date;
+    decidedByAccountId: string;
+    decidedAt: Date;
+  }[];
+  referrals: {
+    id: string;
+    referrerClientId: string;
+    referredClientId: string;
+    state: 'pending' | 'awarded';
+    qualifiedPaymentId: string | null;
+    qualifiedAt: Date | null;
+    awardCentavos: number | null;
+    awardedAt: Date | null;
+    createdAt: Date;
+  }[];
+  creditLedgerEntries: {
+    id: string;
+    clientId: string;
+    kind: 'referral_award';
+    amountCentavos: number;
+    occurredAt: Date;
+    referralId: string;
+    actorKind: 'account';
+    actorAccountId: string;
+    correlationId: string;
   }[];
 };
+
+const referralRewardCentavos = 6_000;
 
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
 const boliviaOffsetHours = 4;
@@ -369,6 +412,35 @@ const subscriptionDefinitions: readonly SubscriptionDefinition[] = [
   },
 ];
 
+type CashPaymentDefinition = {
+  client: (typeof clientDefinitions)[number]['key'];
+  plan: (typeof planDefinitions)[number]['key'];
+  branch: (typeof branchDefinitions)[number]['key'];
+  collectedBy: (typeof staffDefinitions)[number]['key'];
+};
+
+// Valeria paid her current Plan in cash at the front desk, which is what
+// qualifies Sofía's referral below.
+const cashPaymentDefinitions: readonly CashPaymentDefinition[] = [
+  {
+    client: 'valeria',
+    plan: 'paquete-12',
+    branch: 'centro',
+    collectedBy: 'paola',
+  },
+];
+
+type ReferralDefinition = {
+  referrer: (typeof clientDefinitions)[number]['key'];
+  referred: (typeof clientDefinitions)[number]['key'];
+  registeredDaysAgo: number;
+};
+
+const referralDefinitions: readonly ReferralDefinition[] = [
+  { referrer: 'sofia', referred: 'valeria', registeredDaysAgo: 35 },
+  { referrer: 'sofia', referred: 'mariana', registeredDaysAgo: 5 },
+];
+
 export const buildDevelopmentFixtures = (input: {
   today: Date;
 }): DevelopmentFixtures => {
@@ -433,14 +505,31 @@ export const buildDevelopmentFixtures = (input: {
         }),
   );
 
+  const planOf = (key: string) => {
+    const plan = planDefinitions.find((candidate) => candidate.key === key);
+    if (!plan) throw new Error(`Unknown plan ${key}`);
+    return plan;
+  };
+  const accountIdOf = (staffKey: string) => {
+    const member = staffDefinitions.find(
+      (candidate) => candidate.key === staffKey,
+    );
+    if (!member) throw new Error(`Unknown staff member ${staffKey}`);
+    return deterministicId(`account:${member.email}`);
+  };
+  const paymentIdOf = (client: string, plan: string) =>
+    deterministicId(`payment:${client}:${plan}`);
+
   const subscriptions: DevelopmentFixtures['subscriptions'] =
     subscriptionDefinitions.map((definition) => {
-      const plan = planDefinitions.find(
-        (candidate) => candidate.key === definition.plan,
-      );
-      if (!plan) throw new Error(`Unknown plan ${definition.plan}`);
+      const plan = planOf(definition.plan);
       const startsOn = addDays(input.today, definition.startsInDays);
       const endsOn = addDays(input.today, definition.endsInDays);
+      const paidInCash = cashPaymentDefinitions.some(
+        (payment) =>
+          payment.client === definition.client &&
+          payment.plan === definition.plan,
+      );
 
       return {
         id: deterministicId(
@@ -460,7 +549,102 @@ export const buildDevelopmentFixtures = (input: {
           definition.state === 'expired'
             ? boliviaInstant(addDays(endsOn, 1), 0, 0)
             : null,
+        paymentId: paidInCash
+          ? paymentIdOf(definition.client, definition.plan)
+          : null,
       };
+    });
+
+  const payments: DevelopmentFixtures['payments'] =
+    cashPaymentDefinitions.map((definition) => {
+      const plan = planOf(definition.plan);
+      const subscription = subscriptions.find(
+        (candidate) =>
+          candidate.paymentId === paymentIdOf(definition.client, definition.plan),
+      );
+      if (!subscription) {
+        throw new Error(
+          `Cash payment ${definition.client}:${definition.plan} has no subscription`,
+        );
+      }
+      const collectedBy = accountIdOf(definition.collectedBy);
+
+      return {
+        id: paymentIdOf(definition.client, definition.plan),
+        clientId: clientId(definition.client),
+        planId: planId(plan.key),
+        planNameSnapshot: plan.name,
+        durationMonthsSnapshot: plan.durationMonths,
+        classAllowanceSnapshot: plan.classAllowance,
+        planPriceCentavos: plan.priceCentavos,
+        creditAppliedCentavos: 0,
+        amountDueCentavos: plan.priceCentavos,
+        method: 'cash',
+        state: 'confirmed',
+        collectedAtBranchId: branchId(definition.branch),
+        submittedByAccountId: collectedBy,
+        submittedAt: subscription.activatedAt,
+        decidedByAccountId: collectedBy,
+        decidedAt: subscription.activatedAt,
+      };
+    });
+
+  const referrals: DevelopmentFixtures['referrals'] = referralDefinitions.map(
+    (definition) => {
+      const referredClientId = clientId(definition.referred);
+      const qualifyingPayment = payments.find(
+        (payment) => payment.clientId === referredClientId,
+      );
+      const createdAt = boliviaInstant(
+        addDays(input.today, -definition.registeredDaysAgo),
+        10,
+        0,
+      );
+      const awarded =
+        qualifyingPayment !== undefined &&
+        qualifyingPayment.decidedAt.getTime() > createdAt.getTime();
+
+      return {
+        id: deterministicId(
+          `referral:${definition.referrer}:${definition.referred}`,
+        ),
+        referrerClientId: clientId(definition.referrer),
+        referredClientId,
+        state: awarded ? 'awarded' : 'pending',
+        qualifiedPaymentId: awarded ? qualifyingPayment.id : null,
+        qualifiedAt: awarded ? qualifyingPayment.decidedAt : null,
+        awardCentavos: awarded ? referralRewardCentavos : null,
+        awardedAt: awarded ? qualifyingPayment.decidedAt : null,
+        createdAt,
+      };
+    },
+  );
+
+  const creditLedgerEntries: DevelopmentFixtures['creditLedgerEntries'] =
+    referrals.flatMap((referral) => {
+      if (referral.state !== 'awarded' || referral.awardedAt === null) {
+        return [];
+      }
+      const payment = payments.find(
+        (candidate) => candidate.id === referral.qualifiedPaymentId,
+      );
+      if (!payment) throw new Error(`Referral ${referral.id} lost its payment`);
+
+      return [
+        {
+          id: deterministicId(`credit-ledger:referral-award:${referral.id}`),
+          clientId: referral.referrerClientId,
+          kind: 'referral_award' as const,
+          amountCentavos: referralRewardCentavos,
+          occurredAt: referral.awardedAt,
+          referralId: referral.id,
+          actorKind: 'account' as const,
+          actorAccountId: payment.decidedByAccountId,
+          correlationId: deterministicId(
+            `correlation:referral-award:${referral.id}`,
+          ),
+        },
+      ];
     });
 
   return {
@@ -491,5 +675,8 @@ export const buildDevelopmentFixtures = (input: {
     sessionSchedules,
     sessions,
     subscriptions,
+    payments,
+    referrals,
+    creditLedgerEntries,
   };
 };

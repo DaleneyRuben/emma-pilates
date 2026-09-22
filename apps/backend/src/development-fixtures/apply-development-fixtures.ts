@@ -1,5 +1,13 @@
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
-import { StaffRole, SubscriptionState } from '../generated/prisma/enums';
+import {
+  CreditLedgerActorKind,
+  CreditLedgerEntryKind,
+  PaymentMethod,
+  PaymentState,
+  ReferralState,
+  StaffRole,
+  SubscriptionState,
+} from '../generated/prisma/enums';
 import { deterministicId } from './deterministic-id';
 import type {
   DevelopmentFixtures,
@@ -22,6 +30,8 @@ export type DevelopmentFixtureSummary = {
   accounts: number;
   sessions: number;
   subscriptions: number;
+  payments: number;
+  referrals: number;
 };
 
 const upsertAccount = async (
@@ -155,6 +165,23 @@ export const applyDevelopmentFixtures = async (
         });
       }
 
+      // Payments, referrals, and ledger entries are immutable once written,
+      // so they are only created when missing instead of upserted.
+      for (const payment of fixtures.payments) {
+        const existing = await transaction.payment.findUnique({
+          where: { id: payment.id },
+          select: { id: true },
+        });
+        if (existing) continue;
+        await transaction.payment.create({
+          data: {
+            ...payment,
+            method: PaymentMethod.CASH,
+            state: PaymentState.CONFIRMED,
+          },
+        });
+      }
+
       for (const subscription of fixtures.subscriptions) {
         const { id, state, ...data } = subscription;
         const row = { ...data, state: subscriptionStates[state] };
@@ -165,12 +192,46 @@ export const applyDevelopmentFixtures = async (
         });
       }
 
+      for (const referral of fixtures.referrals) {
+        const existing = await transaction.referral.findUnique({
+          where: { id: referral.id },
+          select: { id: true },
+        });
+        if (existing) continue;
+        await transaction.referral.create({
+          data: {
+            ...referral,
+            state:
+              referral.state === 'awarded'
+                ? ReferralState.AWARDED
+                : ReferralState.PENDING,
+          },
+        });
+      }
+
+      for (const entry of fixtures.creditLedgerEntries) {
+        const existing = await transaction.creditLedgerEntry.findUnique({
+          where: { id: entry.id },
+          select: { id: true },
+        });
+        if (existing) continue;
+        await transaction.creditLedgerEntry.create({
+          data: {
+            ...entry,
+            kind: CreditLedgerEntryKind.REFERRAL_AWARD,
+            actorKind: CreditLedgerActorKind.ACCOUNT,
+          },
+        });
+      }
+
       return {
         accounts: fixtures.staffMembers.length + fixtures.clients.length,
         sessions: fixtures.sessions.length,
         subscriptions: fixtures.subscriptions.length,
+        payments: fixtures.payments.length,
+        referrals: fixtures.referrals.length,
       };
     },
-    { timeout: 60_000 },
+    { maxWait: 15_000, timeout: 60_000 },
   );
 };
