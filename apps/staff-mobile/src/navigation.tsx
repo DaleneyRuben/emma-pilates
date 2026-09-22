@@ -358,6 +358,7 @@ const accountScreens = {
 };
 
 const TrainerStack = createNativeStackNavigator({
+  screenOptions: { headerShown: false },
   screens: {
     Agenda: TrainerAgendaScreen,
     Roster: TrainerRosterScreen,
@@ -365,12 +366,15 @@ const TrainerStack = createNativeStackNavigator({
   },
 });
 const AssistantStack = createNativeStackNavigator({
+  screenOptions: { headerShown: false },
   screens: { ClientSearch: AssistantClientSearchScreen, ...accountScreens },
 });
 const AdministratorStack = createNativeStackNavigator({
+  screenOptions: { headerShown: false },
   screens: { Payments: AdministratorPaymentsScreen, ...accountScreens },
 });
 const NutritionistStack = createNativeStackNavigator({
+  screenOptions: { headerShown: false },
   screens: { Agenda: NutritionistAgendaScreen, ...accountScreens },
 });
 const roleNavigation: Record<
