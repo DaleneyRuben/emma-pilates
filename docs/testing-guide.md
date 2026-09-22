@@ -537,6 +537,13 @@ to see the `expiring_soon`, `expired`, and `none` Subscription statuses. A Staff
 credential receives `403` with `booking_access_denied` from the two
 `clients/current` endpoints.
 
+The notification inbox is available to every signed-in Account:
+`GET /api/v1/notifications` (cursor pages), `GET /api/v1/notifications/unread-count`,
+`POST /api/v1/notifications/{id}/read`, and `POST /api/v1/notifications/read-all`.
+A Client promoted from a Waitlist receives "¡Tienes un cupo!…" inside the same
+transaction, and the worker records "Tu plan vence en 3 días." once for every
+Subscription that ends in three days (Valeria's fixture qualifies today).
+
 ## Test 8: run the automated checks
 
 You do not need to understand the test code to run it. A successful Jest run
