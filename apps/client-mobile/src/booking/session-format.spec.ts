@@ -2,6 +2,7 @@ import {
   boliviaCivilDate,
   civilDateRange,
   dayChipLabel,
+  formatMonthHeading,
   formatSessionDate,
   formatTimeRange,
   isInsideCancellationWindow,
@@ -44,6 +45,13 @@ describe("Session formatting", () => {
       from: "2026-09-21T04:00:00.000Z",
       until: "2026-09-22T04:00:00.000Z",
     });
+  });
+
+  it("labels history months in capitalized Spanish", () => {
+    expect(formatMonthHeading("2026-09-05T13:00:00.000Z")).toBe(
+      "Septiembre 2026",
+    );
+    expect(formatMonthHeading("2026-08-19T11:00:00.000Z")).toBe("Agosto 2026");
   });
 
   it("formats Bolivia time ranges and long dates", () => {
