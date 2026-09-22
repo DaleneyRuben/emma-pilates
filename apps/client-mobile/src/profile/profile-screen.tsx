@@ -1,4 +1,5 @@
 import {
+  useGetCurrentClientCredit,
   useGetCurrentClientProfile,
   useGetCurrentClientSubscription,
   useGetUnreadNotificationCount,
@@ -22,10 +23,17 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { subscriptionBadge } from "../home/home-format";
+import { formatBolivianos } from "../plans/plan-format";
 
 type ProfileNavigation = {
   navigate: (
-    screen: "EditProfile" | "Subscription" | "Notifications" | "ChangePassword",
+    screen:
+      | "EditProfile"
+      | "Subscription"
+      | "Notifications"
+      | "ChangePassword"
+      | "Referrals"
+      | "Credit",
   ) => void;
 };
 
@@ -71,6 +79,7 @@ export function ProfileScreen() {
   const profile = useGetCurrentClientProfile(queryOptions);
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const unread = useGetUnreadNotificationCount(queryOptions);
+  const credit = useGetCurrentClientCredit(queryOptions);
 
   const header = <Heading accessibilityLabel="Perfil">Perfil</Heading>;
 
@@ -100,6 +109,8 @@ export function ProfileScreen() {
     subscription.data?.status === 200 ? subscription.data.data.status : null;
   const unreadCount =
     unread.data?.status === 200 ? unread.data.data.unread : undefined;
+  const availableCredit =
+    credit.data?.status === 200 ? credit.data.data.availableCentavos : undefined;
 
   return (
     <Screen style={styles.screen}>
@@ -127,6 +138,19 @@ export function ProfileScreen() {
               status === null || status === "none"
                 ? undefined
                 : subscriptionBadge(status)
+            }
+          />
+          <MenuRow
+            label="Mis referidos"
+            onPress={() => navigation.navigate("Referrals")}
+          />
+          <MenuRow
+            label="Mi crédito"
+            onPress={() => navigation.navigate("Credit")}
+            value={
+              availableCredit === undefined
+                ? undefined
+                : formatBolivianos(availableCredit)
             }
           />
           <MenuRow

@@ -14,7 +14,9 @@ import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientFetcherContext } from "./client-fetcher";
 import { HomeScreen } from "./home/home-screen";
+import { CreditScreen } from "./payments/credit-screen";
 import { PaymentScreen } from "./payments/payment-screen";
+import { ReferralsScreen } from "./payments/referrals-screen";
 import { PaymentStatusScreen } from "./payments/payment-status-screen";
 import { PlanDetailScreen } from "./plans/plan-detail-screen";
 import { PlansScreen } from "./plans/plans-screen";
@@ -67,6 +69,8 @@ const ProfileStack = createNativeStackNavigator({
     EditProfile: EditProfileScreen,
     Notifications: ClientNotificationsScreen,
     ChangePassword: ClientChangePasswordScreen,
+    Referrals: ReferralsScreen,
+    Credit: CreditScreen,
     ...planScreens,
   },
 });
