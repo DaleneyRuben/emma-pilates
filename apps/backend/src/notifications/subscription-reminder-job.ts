@@ -1,4 +1,4 @@
-import { boliviaDate } from '../booking/bolivia-time';
+import { boliviaDate } from '../time/bolivia-time';
 import type { PrismaClient } from '../generated/prisma/client';
 import { recordNotification } from './prisma-notification-store';
 import { remindExpiringSubscriptions } from './remind-expiring-subscriptions';

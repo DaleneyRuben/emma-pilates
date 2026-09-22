@@ -12,7 +12,7 @@ import {
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../bolivia-time';
+import { boliviaDate } from '../../time/bolivia-time';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
 import { joinWaitlist } from './join-waitlist';
@@ -20,7 +20,7 @@ import { leaveWaitlist } from './leave-waitlist';
 import { promoteWaitlist } from './promote-waitlist';
 import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendance } from './record-attendance';
-import { retrySerializable } from './retry-serializable';
+import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
   constructor(

@@ -22,7 +22,7 @@ import {
   trainerSchedule,
   trainerSessionRoster,
 } from './booking.controller';
-import { boliviaDate } from './bolivia-time';
+import { boliviaDate } from '../time/bolivia-time';
 import { createCatalogRepository } from './catalog/prisma-catalog-repository';
 import {
   BranchCatalogController,

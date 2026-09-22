@@ -1,5 +1,5 @@
 import { createPrismaAdapter } from './database/prisma-adapter';
-import { boliviaDate } from './booking/bolivia-time';
+import { boliviaDate } from './time/bolivia-time';
 import { validateEnvironment } from './config/environment';
 import { applyDevelopmentFixtures } from './development-fixtures/apply-development-fixtures';
 import {

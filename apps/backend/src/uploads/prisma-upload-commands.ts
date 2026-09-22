@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto';
 import type { PgBoss } from 'pg-boss';
 import { scheduleFinalizeUpload } from '../jobs/finalize-upload/schedule-finalize-upload';
-import { retrySerializable } from '../booking/commands/retry-serializable';
+import { retrySerializable } from '../database/retry-serializable';
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
 import {
   ImageAssetPurpose,
