@@ -535,3 +535,6 @@ describe('Client registration transaction', () => {
     ).resolves.toBeNull();
   });
 });
+
+const digestTestEmail = (email: string): Buffer =>
+  createHmac('sha256', 'test-email-digest-key').update(email).digest();

@@ -4,6 +4,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { jest } from '@jest/globals';
 import request from 'supertest';
 import { App } from 'supertest/types';
+import { PaymentRuleError } from '../src/booking/payments/payment-errors';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { CancelPendingClientRegistration } from '../src/system-identity/registration/cancel-pending-client-registration';
@@ -158,6 +159,38 @@ describe('client registration (e2e)', () => {
       email: 'CLIENT@example.com',
       password: 'correct horse battery staple',
     });
+  });
+
+  it('passes an optional referral code through and reports unknown codes as a problem', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/client-registrations')
+      .send({
+        name: 'Ana Clienta',
+        email: 'client@example.com',
+        password: 'correct horse battery staple',
+        referralCode: 'REF-LUCIA',
+      })
+      .expect(202);
+    expect(execute).toHaveBeenCalledWith(
+      expect.objectContaining({ referralCode: 'REF-LUCIA' }),
+    );
+
+    execute.mockRejectedValueOnce(
+      new PaymentRuleError('referral_code_invalid', 'Unknown referral code'),
+    );
+    await request(app.getHttpServer())
+      .post('/api/v1/client-registrations')
+      .send({
+        name: 'Ana Clienta',
+        email: 'client@example.com',
+        password: 'correct horse battery staple',
+        referralCode: 'REF-NOBODY',
+      })
+      .expect('Content-Type', /application\/problem\+json/)
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body).toMatchObject({ code: 'referral_code_invalid' });
+      });
   });
 
   afterEach(async () => {
