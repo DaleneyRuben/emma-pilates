@@ -1,10 +1,12 @@
 import {
   useGetCurrentClientProfile,
   useGetCurrentClientSubscription,
+  useGetUnreadNotificationCount,
 } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  confirmLogout,
   Heading,
   QueryFailure,
   radii,
@@ -21,7 +23,9 @@ import { useClientFetcher } from "../client-fetcher";
 import { subscriptionBadge } from "../home/home-format";
 
 type ProfileNavigation = {
-  navigate: (screen: "EditProfile" | "Subscription") => void;
+  navigate: (
+    screen: "EditProfile" | "Subscription" | "Notifications" | "ChangePassword",
+  ) => void;
 };
 
 export function initials(name: string): string {
@@ -34,10 +38,12 @@ export function initials(name: string): string {
 }
 
 function MenuRow({
+  badge,
   label,
   onPress,
   value,
 }: {
+  badge?: number;
   label: string;
   onPress: () => void;
   value?: string;
@@ -54,6 +60,11 @@ function MenuRow({
         {value === undefined ? null : (
           <BodyText style={styles.rowValue}>{value}</BodyText>
         )}
+        {badge === undefined || badge === 0 ? null : (
+          <View style={styles.badge}>
+            <Text style={styles.badgeText}>{String(badge)}</Text>
+          </View>
+        )}
         <Text style={styles.chevron}>›</Text>
       </View>
     </Pressable>
@@ -67,6 +78,7 @@ export function ProfileScreen() {
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const profile = useGetCurrentClientProfile(queryOptions);
   const subscription = useGetCurrentClientSubscription(queryOptions);
+  const unread = useGetUnreadNotificationCount(queryOptions);
 
   const header = <Heading accessibilityLabel="Perfil">Perfil</Heading>;
 
@@ -94,6 +106,8 @@ export function ProfileScreen() {
   const client = profile.data.data;
   const status =
     subscription.data?.status === 200 ? subscription.data.data.status : null;
+  const unreadCount =
+    unread.data?.status === 200 ? unread.data.data.unread : undefined;
 
   return (
     <Screen style={styles.screen}>
@@ -123,15 +137,31 @@ export function ProfileScreen() {
                 : subscriptionBadge(status)
             }
           />
+          <MenuRow
+            badge={unreadCount}
+            label="Notificaciones"
+            onPress={() => navigation.navigate("Notifications")}
+          />
+          <MenuRow
+            label="Cambiar contraseña"
+            onPress={() => navigation.navigate("ChangePassword")}
+          />
         </View>
         <Pressable
           accessibilityLabel="Cerrar sesión"
           accessibilityRole="button"
-          onPress={() => void identity.logout()}
-          style={styles.logout}
+          onPress={() => confirmLogout(identity.logout)}
+          style={({ pressed }) => [styles.logout, pressed && styles.logoutPressed]}
         >
-          <Text style={styles.logoutText}>Cerrar sesión</Text>
+          {({ pressed }) => (
+            <Text style={[styles.logoutText, pressed && styles.logoutTextPressed]}>
+              Cerrar sesión
+            </Text>
+          )}
         </Pressable>
+        <BodyText style={styles.footer}>
+          Emma Pilates Studio · versión 1.0
+        </BodyText>
       </ScrollView>
     </Screen>
   );
@@ -151,8 +181,23 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyLarge,
     fontWeight: "600",
   },
+  badge: {
+    alignItems: "center",
+    backgroundColor: colors.primary,
+    borderRadius: radii.pill,
+    justifyContent: "center",
+    minWidth: 22,
+    paddingHorizontal: spacing.smd,
+    paddingVertical: spacing.xxs,
+  },
+  badgeText: { color: colors.white, fontSize: typography.note, fontWeight: "600" },
   chevron: { color: colors.textSubtle, fontSize: typography.titleSecondary },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  footer: {
+    color: colors.textSubtle,
+    fontSize: typography.note,
+    textAlign: "center",
+  },
   logout: {
     alignItems: "center",
     borderColor: colors.borderStrong,
@@ -161,7 +206,9 @@ const styles = StyleSheet.create({
     minHeight: 52,
     justifyContent: "center",
   },
+  logoutPressed: { borderColor: colors.error },
   logoutText: { color: colors.textSecondary, fontSize: typography.body },
+  logoutTextPressed: { color: colors.errorText },
   menu: {
     backgroundColor: colors.surface,
     borderRadius: radii.card,

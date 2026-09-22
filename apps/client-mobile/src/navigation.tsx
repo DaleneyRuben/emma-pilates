@@ -16,7 +16,9 @@ import { ClientFetcherContext } from "./client-fetcher";
 import { HomeScreen } from "./home/home-screen";
 import { PlanDetailScreen } from "./plans/plan-detail-screen";
 import { PlansScreen } from "./plans/plans-screen";
+import { ClientChangePasswordScreen } from "./profile/change-password-screen";
 import { EditProfileScreen } from "./profile/edit-profile-screen";
+import { ClientNotificationsScreen } from "./profile/notifications-screen";
 import { ProfileScreen } from "./profile/profile-screen";
 import { SubscriptionScreen } from "./subscription/subscription-screen";
 
@@ -59,6 +61,8 @@ const ProfileStack = createNativeStackNavigator({
   screens: {
     Profile: ProfileScreen,
     EditProfile: EditProfileScreen,
+    Notifications: ClientNotificationsScreen,
+    ChangePassword: ClientChangePasswordScreen,
     ...planScreens,
   },
 });
