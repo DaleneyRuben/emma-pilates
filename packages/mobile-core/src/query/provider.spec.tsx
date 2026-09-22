@@ -99,7 +99,7 @@ describe("MobileQueryProvider", () => {
       expect(providedClient).toBeDefined();
     });
 
-    act(() => {
+    await act(async () => {
       providedClient?.setQueryData(["/api/v1/bookings"], [
         { bookingId: "booking-2" },
       ]);
@@ -127,14 +127,14 @@ describe("MobileQueryProvider", () => {
       </MobileQueryProvider>,
     );
 
-    act(() => {
+    await act(async () => {
       onlineManager.setOnline(false);
     });
     expect(
       screen.getByText("Sin conexión. Mostrando la última información guardada."),
     ).toBeOnTheScreen();
 
-    act(() => {
+    await act(async () => {
       onlineManager.setOnline(true);
     });
     expect(
