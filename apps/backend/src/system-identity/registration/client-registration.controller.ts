@@ -3,10 +3,12 @@ import {
   Body,
   Controller,
   HttpCode,
+  HttpException,
   HttpStatus,
   Inject,
   Post,
 } from '@nestjs/common';
+import { referralProblem } from '../../booking/payments/referral-attribution';
 import {
   ApiAcceptedResponse,
   ApiNoContentResponse,
@@ -111,11 +113,22 @@ export class ClientRegistrationController {
       throw new BadRequestException('Invalid client registration request');
     }
 
-    const result = await this.registerClient.execute(command);
+    try {
+      const result = await this.registerClient.execute(command);
 
-    return {
-      status: 'verification_required',
-      ...result,
-    };
+      return {
+        status: 'verification_required',
+        ...result,
+      };
+    } catch (error) {
+      const problem = referralProblem(error);
+      if (problem !== null) {
+        throw new HttpException(
+          { code: problem.code, detail: problem.detail },
+          problem.status,
+        );
+      }
+      throw error;
+    }
   }
 }

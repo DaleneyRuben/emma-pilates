@@ -20,6 +20,7 @@ type NewSelfRegistration = {
   email: string;
   passwordHash: string;
   referralCode: string;
+  referredByCode: string | null;
   pendingExpiresAt: Date;
   verificationToken: StoredAuthenticationToken;
   continuationToken: StoredAuthenticationToken;
@@ -79,6 +80,7 @@ export type RegisterClientCommand = {
   name: string;
   email: string;
   password: string;
+  referralCode?: string;
 };
 
 export type RegisterClientResult = {
@@ -215,6 +217,7 @@ export class RegisterClient {
           email,
           passwordHash,
           referralCode: this.dependencies.newReferralCode(),
+          referredByCode: command.referralCode?.trim().toUpperCase() || null,
           pendingExpiresAt,
           verificationToken: {
             id: verificationTokenId,

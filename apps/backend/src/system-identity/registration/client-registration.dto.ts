@@ -1,10 +1,11 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 
 const startClientRegistrationSchema = z.strictObject({
   name: z.string().trim().min(1),
   email: z.email(),
   password: z.string().min(1),
+  referralCode: z.string().trim().min(1).max(64).optional(),
 });
 
 const correctPendingClientEmailSchema = z.strictObject({
@@ -25,6 +26,12 @@ export class StartClientRegistrationDto {
 
   @ApiProperty({ format: 'password', writeOnly: true })
   password!: string;
+
+  @ApiPropertyOptional({
+    example: 'REF-LUCIA',
+    description: 'Referral code of the Client who invited this person',
+  })
+  referralCode?: string;
 }
 
 export class PendingClientRegistrationDto {

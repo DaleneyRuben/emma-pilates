@@ -1,4 +1,5 @@
 import type { PgBoss } from 'pg-boss';
+import { attributeReferral } from '../../booking/payments/referral-attribution';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
   AuditActorKind,
@@ -540,6 +541,13 @@ class PrismaClientRegistrationTransaction implements ClientRegistrationTransacti
         },
       },
     });
+
+    if (registration.referredByCode !== null) {
+      await attributeReferral(this.transaction, {
+        referredClientId: registration.clientId,
+        referralCode: registration.referredByCode,
+      });
+    }
   }
 
   async replaceSelfRegistrationVerification(
