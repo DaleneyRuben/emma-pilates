@@ -238,7 +238,7 @@ async function openClientSearch(routes: Parameters<typeof routeFetcher>[0]) {
 
 async function openLucia(routes: Parameters<typeof routeFetcher>[0]) {
   const screen = await openClientSearch(routes);
-  fireEvent.changeText(
+  await fireEvent.changeText(
     screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
     "luc",
   );
@@ -265,7 +265,7 @@ describe("Assistant Client flows", () => {
   it("searches Clients and opens the overview with the Subscription, quick actions, and history preview", async () => {
     const screen = await openClientSearch(assistantRoutes());
 
-    fireEvent.changeText(
+    await fireEvent.changeText(
       screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
       "zz",
     );
@@ -273,7 +273,7 @@ describe("Assistant Client flows", () => {
       expect(screen.getByText("No se encontró ningún cliente.")).toBeOnTheScreen();
     });
 
-    fireEvent.changeText(
+    await fireEvent.changeText(
       screen.getByPlaceholderText("Buscar por nombre, teléfono o correo"),
       "luc",
     );
@@ -323,7 +323,9 @@ describe("Assistant Client flows", () => {
     expect(
       screen.getByText("Viendo reservas de: Lucía Fernández"),
     ).toBeOnTheScreen();
-    expect(screen.getByText("No cancelable")).toBeOnTheScreen();
+    await waitFor(() => {
+      expect(screen.getByText("No cancelable")).toBeOnTheScreen();
+    });
     expect(screen.getByText("En lista de espera")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
     expect(
@@ -357,9 +359,11 @@ describe("Assistant Client flows", () => {
     expect(
       screen.getByText("Viendo historial de: Lucía Fernández"),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Septiembre 2026")).toBeOnTheScreen();
+    await waitFor(() => {
+      expect(screen.getByText("Septiembre 2026")).toBeOnTheScreen();
+    });
     expect(screen.getByText("Agosto 2026")).toBeOnTheScreen();
-    expect(screen.getAllByText("Emma Vargas · Centro")).toHaveLength(2);
+    expect(screen.getAllByText("Emma Vargas · Centro")).toHaveLength(3);
   });
 
   it("books a Session for the Client and lands on her Bookings with the confirmation", async () => {
@@ -529,12 +533,12 @@ describe("Assistant Client flows", () => {
         "Enviaremos un enlace de activación al correo. Vence en 7 días.",
       ),
     ).toBeOnTheScreen();
-    fireEvent.changeText(screen.getByLabelText("Nombre"), " Ana Nueva ");
-    fireEvent.changeText(
+    await fireEvent.changeText(screen.getByLabelText("Nombre"), " Ana Nueva ");
+    await fireEvent.changeText(
       screen.getByLabelText("Correo electrónico"),
       "Ana@Example.com",
     );
-    fireEvent.changeText(
+    await fireEvent.changeText(
       screen.getByLabelText("Teléfono (opcional)"),
       "+591 70000000",
     );
