@@ -117,6 +117,11 @@ describe("Assistant flows on a tablet", () => {
         flexWrap: "wrap",
       });
     });
+    // The spare tablet height must not stretch the day and class type strips.
+    expect(screen.getByTestId("assistant-day-strip")).toHaveStyle({ flexGrow: 0 });
+    expect(screen.getByTestId("assistant-class-type-strip")).toHaveStyle({
+      flexGrow: 0,
+    });
     await fireEvent.press(
       screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
     );
