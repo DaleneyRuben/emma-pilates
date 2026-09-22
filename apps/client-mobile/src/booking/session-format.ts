@@ -70,6 +70,17 @@ export function isInsideCancellationWindow(
   return new Date(startsAt).getTime() - now.getTime() <= cancellationWindowMs;
 }
 
+const monthFormatter = new Intl.DateTimeFormat("es-BO", {
+  month: "long",
+  timeZone,
+  year: "numeric",
+});
+
+export function formatMonthHeading(startsAt: string): string {
+  const label = monthFormatter.format(new Date(startsAt)).replace(" de ", " ");
+  return label.charAt(0).toUpperCase() + label.slice(1);
+}
+
 export function formatSessionDate(startsAt: string): string {
   return longDateFormatter.format(new Date(startsAt)).replace(",", "");
 }
