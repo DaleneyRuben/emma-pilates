@@ -17,6 +17,9 @@ const allowedContextEdges: Record<string, string[]> = {
 const sharedContextSlices = [
   'system-identity/authentication',
   'system-identity/system-identity.module',
+  // Registration attributes the referrer inside its own transaction through
+  // this Booking-owned slice (PAY-001 decision d).
+  'booking/payments/referral-attribution',
 ];
 // Shared kernel folders may depend on each other but never on a context.
 const sharedKernel = [
@@ -62,7 +65,10 @@ for (const file of listSourceFiles(sourceRoot)) {
     const targetPath = resolve(dirname(file), specifier);
     const targetParts = segments(targetPath);
     const target = targetParts[0];
-    const slice = targetParts.slice(0, 2).join('/');
+    const targetModule = targetParts.join('/');
+    const inSharedSlice = sharedContextSlices.some(
+      (slice) => targetModule === slice || targetModule.startsWith(`${slice}/`),
+    );
     if (target === from || target === '..') continue;
 
     // Root-level files are composition roots; only kernel scripts may read them.
@@ -71,8 +77,7 @@ for (const file of listSourceFiles(sourceRoot)) {
       (targetsCompositionRoot && sharedKernel.includes(from)) ||
       (!targetsCompositionRoot && sharedKernel.includes(target)) ||
       (contexts.includes(from) &&
-        (allowedContextEdges[from].includes(target) ||
-          sharedContextSlices.includes(slice)));
+        (allowedContextEdges[from].includes(target) || inSharedSlice));
 
     if (!allowed) {
       violations.push(
