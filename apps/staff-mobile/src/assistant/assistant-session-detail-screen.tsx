@@ -19,7 +19,11 @@ import {
   TextButton,
   typography,
 } from "@pilates/mobile-core";
-import { useNavigation } from "@react-navigation/native";
+import {
+  type NavigationProp,
+  type ParamListBase,
+  useNavigation,
+} from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -27,6 +31,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { ClientBanner } from "./client-banner";
+import { showClientBookings } from "./show-client-bookings";
 import type { ClientContext } from "./client-overview-screen";
 
 export type ConfirmedBooking = {
@@ -36,15 +41,9 @@ export type ConfirmedBooking = {
   endsAt: string;
 };
 
-type DetailNavigation = {
+type DetailNavigation = Pick<NavigationProp<ParamListBase>, "dispatch"> & {
   goBack: () => void;
-  navigate: {
-    (screen: "SelectPlan", params: ClientContext): void;
-    (
-      screen: "ClientBookings",
-      params: ClientContext & { confirmed: ConfirmedBooking },
-    ): void;
-  };
+  navigate: (screen: "SelectPlan", params: ClientContext) => void;
 };
 
 const bookingProblems: Record<string, string> = {
@@ -134,7 +133,7 @@ export function AssistantSessionDetailScreen({
     try {
       const booking = await api.bookForClient(detail.id, clientId);
       await refresh();
-      navigation.navigate("ClientBookings", {
+      showClientBookings(navigation, {
         clientId,
         clientName,
         confirmed: {

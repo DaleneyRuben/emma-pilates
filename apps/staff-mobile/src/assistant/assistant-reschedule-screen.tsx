@@ -18,7 +18,11 @@ import {
   spacing,
   typography,
 } from "@pilates/mobile-core";
-import { useNavigation } from "@react-navigation/native";
+import {
+  type NavigationProp,
+  type ParamListBase,
+  useNavigation,
+} from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
@@ -26,16 +30,12 @@ import { View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import type { ConfirmedBooking } from "./assistant-session-detail-screen";
 import { ClientBanner } from "./client-banner";
+import { showClientBookings } from "./show-client-bookings";
 import type { ClientContext } from "./client-overview-screen";
 
-type RescheduleNavigation = {
+type RescheduleNavigation = Pick<NavigationProp<ParamListBase>, "dispatch"> & {
   goBack: () => void;
-  navigate: (
-    screen: "ClientBookings",
-    params: ClientContext & { confirmed: ConfirmedBooking },
-  ) => void;
 };
 
 // Same-day alternatives at the Booking's own Branch: an Assistant may only
@@ -87,7 +87,7 @@ export function AssistantRescheduleScreen({
     setFailure(null);
     try {
       const rescheduled = await api.rescheduleBooking(booking.bookingId, selectedId);
-      navigation.navigate("ClientBookings", {
+      showClientBookings(navigation, {
         clientId,
         clientName,
         confirmed: {
