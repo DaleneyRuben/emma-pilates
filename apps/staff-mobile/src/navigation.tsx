@@ -384,6 +384,7 @@ const roleNavigation: Record<
 };
 
 export function StaffNavigation({
+  accountId,
   apiFetcher,
   authenticationApi,
   authenticationIntent,
@@ -395,7 +396,7 @@ export function StaffNavigation({
   if (role !== undefined && role !== "client") {
     const AuthenticatedStaffNavigation = roleNavigation[role];
     return (
-      <MobileQueryProvider>
+      <MobileQueryProvider accountId={accountId}>
         <StaffFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
           <AuthenticatedStaffNavigation />
         </StaffFetcherContext.Provider>

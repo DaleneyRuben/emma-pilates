@@ -19,5 +19,6 @@ export * from "./ui/text-button";
 export * from "./ui/primary-button";
 export * from "./ui/query-failure";
 export * from "./ui/heading";
+export * from "./ui/offline-banner";
 export * from "./ui/screen";
 export * from "./ui/tokens";

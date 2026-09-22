@@ -44,6 +44,7 @@ export type MobileRuntime = {
 };
 
 export type MobileNavigationProps = {
+  accountId?: string;
   authenticationApi: AuthenticationApi;
   authenticationIntent: AuthenticationLinkIntent | null;
   apiFetcher?: typeof globalThis.fetch;
@@ -131,6 +132,7 @@ function IdentityNavigation({
 
   return (
     <Navigation
+      accountId={identity.session?.accountId}
       authenticationApi={authenticationApi}
       authenticationIntent={intent}
       apiFetcher={apiFetcher}

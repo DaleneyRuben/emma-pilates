@@ -80,6 +80,7 @@ const ClientTabs = createBottomTabNavigator({
 const AuthenticatedClientNavigation = createStaticNavigation(ClientTabs);
 
 export function ClientNavigation({
+  accountId,
   apiFetcher,
   authenticationApi,
   authenticationIntent,
@@ -90,7 +91,7 @@ export function ClientNavigation({
 }: MobileNavigationProps) {
   if (role === "client") {
     return (
-      <MobileQueryProvider>
+      <MobileQueryProvider accountId={accountId}>
         <ClientFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
           <AuthenticatedClientNavigation />
         </ClientFetcherContext.Provider>
