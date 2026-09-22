@@ -14,6 +14,8 @@ import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientFetcherContext } from "./client-fetcher";
 import { HomeScreen } from "./home/home-screen";
+import { PaymentScreen } from "./payments/payment-screen";
+import { PaymentStatusScreen } from "./payments/payment-status-screen";
 import { PlanDetailScreen } from "./plans/plan-detail-screen";
 import { PlansScreen } from "./plans/plans-screen";
 import { ClientChangePasswordScreen } from "./profile/change-password-screen";
@@ -30,6 +32,8 @@ const unavailableFetcher: typeof globalThis.fetch = async () => {
 const planScreens = {
   Plans: PlansScreen,
   PlanDetail: PlanDetailScreen,
+  Payment: PaymentScreen,
+  PaymentStatus: PaymentStatusScreen,
   Subscription: SubscriptionScreen,
 };
 

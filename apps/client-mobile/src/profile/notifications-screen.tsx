@@ -6,7 +6,7 @@ import { useClientFetcher } from "../client-fetcher";
 type NotificationsNavigation = {
   goBack: () => void;
   navigate: (
-    screen: "Subscription" | "Bookings",
+    screen: "Subscription" | "Bookings" | "PaymentStatus",
     params?: { screen: "MyBookings" },
   ) => void;
 };
@@ -25,6 +25,8 @@ export function ClientNotificationsScreen() {
           navigation.navigate("Subscription");
         } else if (notification.destinationType === "booking") {
           navigation.navigate("Bookings", { screen: "MyBookings" });
+        } else if (notification.destinationType === "payment") {
+          navigation.navigate("PaymentStatus");
         }
       }}
     />
