@@ -39,6 +39,9 @@ describe('worker entrypoint', () => {
       finalizeUpload: {
         process: jest.fn(),
       },
+      subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
       pendingAccountCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
@@ -202,6 +205,9 @@ describe('worker entrypoint', () => {
       finalizeUpload: {
         process: jest.fn(),
       },
+      subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
       pendingAccountCleanup,
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
@@ -251,6 +257,9 @@ describe('worker entrypoint', () => {
       },
       finalizeUpload: {
         process: jest.fn(),
+      },
+      subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
       pendingAccountCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
