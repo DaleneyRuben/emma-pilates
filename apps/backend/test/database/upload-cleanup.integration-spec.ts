@@ -67,6 +67,7 @@ describe('Upload cleanup gateway', () => {
     ownerAccountId: string,
     overrides: Partial<{
       state: ImageAssetState;
+      purpose: 'PROFILE_PHOTO' | 'TRANSFER_RECEIPT';
       deletionDueAt: Date | null;
       deleteRequestedAt: Date | null;
     }>,
@@ -75,7 +76,7 @@ describe('Upload cleanup gateway', () => {
     return prisma.imageAsset.create({
       data: {
         ownerAccountId,
-        purpose: 'PROFILE_PHOTO',
+        purpose: overrides.purpose ?? 'PROFILE_PHOTO',
         pendingObjectKey,
         declaredMediaType: ImageMediaType.JPEG,
         declaredByteSize: 4,
@@ -128,6 +129,25 @@ describe('Upload cleanup gateway', () => {
     });
     expect(reloaded.state).toBe('ATTACHED');
     expect(reloaded.deletedAt).toBeNull();
+  });
+
+  it('deletes an attached transfer receipt once its retention has ended', async () => {
+    const account = await createAccount();
+    const now = new Date('2026-09-18T00:00:00Z');
+    const asset = await createImageAsset(account.id, {
+      state: ImageAssetState.ATTACHED,
+      purpose: 'TRANSFER_RECEIPT',
+      deletionDueAt: new Date('2026-09-17T00:00:00Z'),
+    });
+    await storage.put(asset.pendingObjectKey, Buffer.from('bytes'));
+
+    await expect(runCleanup(now)).resolves.toEqual({ cleaned: 1 });
+
+    const reloaded = await prisma.imageAsset.findUniqueOrThrow({
+      where: { id: asset.id },
+    });
+    expect(reloaded.state).toBe('DELETED');
+    expect(reloaded.deletedAt).toEqual(now);
   });
 
   it('leaves an upload that is not yet due untouched', async () => {
