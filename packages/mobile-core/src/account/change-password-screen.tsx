@@ -120,6 +120,7 @@ export function ChangePasswordScreen({
                   setCurrentPasswordError(undefined);
                   field.onChange(value);
                 }}
+                placeholder="••••••••"
                 secureTextEntry
                 value={field.value}
               />
@@ -135,6 +136,7 @@ export function ChangePasswordScreen({
                 label="Contraseña nueva"
                 onBlur={field.onBlur}
                 onChangeText={field.onChange}
+                placeholder="••••••••"
                 secureTextEntry
                 value={field.value}
               />
@@ -150,6 +152,7 @@ export function ChangePasswordScreen({
                 label="Confirmar contraseña"
                 onBlur={field.onBlur}
                 onChangeText={field.onChange}
+                placeholder="••••••••"
                 secureTextEntry
                 value={field.value}
               />
