@@ -8,6 +8,7 @@ import {
 } from "@pilates/api-contracts";
 import * as Crypto from "expo-crypto";
 import * as FileSystem from "expo-file-system/legacy";
+import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 
 import { decodeBase64, encodeBase64 } from "@pilates/mobile-core";
@@ -42,18 +43,30 @@ export async function pickReceipt(): Promise<PickedReceipt | null> {
   });
   const asset = result.canceled ? undefined : result.assets[0];
   if (asset === undefined) return null;
-  const mediaType = asset.mimeType ?? "image/jpeg";
-  if (!acceptedMediaTypes.has(mediaType)) {
-    throw new Error("unsupported_media_type");
-  }
-  const base64 = await FileSystem.readAsStringAsync(asset.uri, {
+  const { uri, mediaType } = await ensureAcceptedFormat(asset);
+  const base64 = await FileSystem.readAsStringAsync(uri, {
     encoding: FileSystem.EncodingType.Base64,
   });
-  return {
-    uri: asset.uri,
-    mediaType: mediaType as CreatePendingUploadDtoMediaType,
-    bytes: decodeBase64(base64),
-  };
+  return { uri, mediaType, bytes: decodeBase64(base64) };
+}
+
+// iPhone photos are usually HEIC, which the studio cannot review; anything
+// outside the accepted set (or without a known type) is re-encoded as JPEG.
+async function ensureAcceptedFormat(asset: {
+  uri: string;
+  mimeType?: string;
+}): Promise<{ uri: string; mediaType: CreatePendingUploadDtoMediaType }> {
+  if (asset.mimeType !== undefined && acceptedMediaTypes.has(asset.mimeType)) {
+    return {
+      uri: asset.uri,
+      mediaType: asset.mimeType as CreatePendingUploadDtoMediaType,
+    };
+  }
+  const converted = await ImageManipulator.manipulateAsync(asset.uri, [], {
+    compress: 0.9,
+    format: ImageManipulator.SaveFormat.JPEG,
+  });
+  return { uri: converted.uri, mediaType: "image/jpeg" };
 }
 
 // Declares, uploads, finalizes, and waits until the worker has verified the
