@@ -16,7 +16,7 @@ import { decodeBase64, encodeBase64 } from "@pilates/mobile-core";
 export type PickedReceipt = {
   uri: string;
   mediaType: CreatePendingUploadDtoMediaType;
-  bytes: Uint8Array;
+  bytes: Uint8Array<ArrayBuffer>;
 };
 
 export type AttachedReceipt = { imageAssetId: string; localUri: string };
@@ -77,12 +77,10 @@ export async function uploadReceipt(
   fetcher: typeof globalThis.fetch,
   sleep: (milliseconds: number) => Promise<void> = wait,
 ): Promise<AttachedReceipt> {
+  // expo-crypto's native digest only accepts typed arrays, never a bare buffer.
   const digest = await Crypto.digest(
     Crypto.CryptoDigestAlgorithm.SHA256,
-    receipt.bytes.buffer.slice(
-      receipt.bytes.byteOffset,
-      receipt.bytes.byteOffset + receipt.bytes.byteLength,
-    ) as ArrayBuffer,
+    receipt.bytes,
   );
   const declared = await createPendingUpload(
     {

@@ -117,6 +117,7 @@ export function PaymentScreen() {
       setUploading(true);
       setReceipt(await uploadReceipt(picked, current.id, fetcher));
     } catch (failure) {
+      if (__DEV__) console.warn("receipt upload failed", failure);
       const code = failure instanceof Error ? failure.message : "";
       setError(uploadErrorCopy[code] ?? "No pudimos subir el comprobante. Inténtalo de nuevo.");
     } finally {

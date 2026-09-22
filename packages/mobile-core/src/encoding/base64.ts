@@ -17,7 +17,7 @@ export function encodeBase64(bytes: Uint8Array): string {
   return output;
 }
 
-export function decodeBase64(text: string): Uint8Array {
+export function decodeBase64(text: string): Uint8Array<ArrayBuffer> {
   const clean = text.replace(/[^A-Za-z0-9+/]/g, "");
   const bytes: number[] = [];
   for (let index = 0; index < clean.length; index += 4) {
