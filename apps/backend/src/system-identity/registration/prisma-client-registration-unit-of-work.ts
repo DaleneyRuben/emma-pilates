@@ -1,4 +1,5 @@
 import type { PgBoss } from 'pg-boss';
+import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
   AuditActorKind,
   AuditOutcome,
@@ -634,10 +635,3 @@ const mapThrottlePurpose = (
   purpose === 'verification'
     ? AuthenticationThrottlePurpose.VERIFICATION
     : AuthenticationThrottlePurpose.ACTIVATION;
-
-const toPrismaBytes = (value: Uint8Array): Uint8Array<ArrayBuffer> => {
-  const bytes = new Uint8Array(value.byteLength);
-  bytes.set(value);
-
-  return bytes;
-};

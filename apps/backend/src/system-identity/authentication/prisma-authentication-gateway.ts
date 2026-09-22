@@ -1,4 +1,5 @@
 import type { PrismaClient } from '../../generated/prisma/client';
+import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
   AuthenticationSessionRevocationReason,
   AuthenticationSessionSurface,
@@ -230,10 +231,3 @@ export class PrismaAuthenticationGateway {
     });
   }
 }
-
-const toPrismaBytes = (value: Uint8Array): Uint8Array<ArrayBuffer> => {
-  const bytes = new Uint8Array(value.byteLength);
-  bytes.set(value);
-
-  return bytes;
-};

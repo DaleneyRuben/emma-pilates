@@ -1,4 +1,5 @@
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
+import { toPrismaBytes } from '../../database/prisma-bytes';
 import type { PgBoss } from 'pg-boss';
 import {
   AuditActorKind,
@@ -332,13 +333,6 @@ const findToken = (transaction: Prisma.TransactionClient, digest: Uint8Array) =>
     where: { tokenDigest: toPrismaBytes(digest) },
     include: { account: true },
   });
-
-const toPrismaBytes = (value: Uint8Array): Uint8Array<ArrayBuffer> => {
-  const bytes = new Uint8Array(value.byteLength);
-  bytes.set(value);
-
-  return bytes;
-};
 
 const minuteMilliseconds = 60 * 1_000;
 const hourMilliseconds = 60 * minuteMilliseconds;
