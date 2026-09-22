@@ -16,10 +16,12 @@ describe('UploadsController', () => {
   const createPendingUpload = jest.fn();
   const putPendingUploadObject = jest.fn();
   const finalizeUpload = jest.fn();
+  const readUploadStatus = jest.fn();
   const controller = new UploadsController(
     createPendingUpload,
     putPendingUploadObject,
     finalizeUpload,
+    readUploadStatus,
     resolvePrincipal,
     'test',
   );
@@ -113,6 +115,7 @@ describe('UploadsController', () => {
       createPendingUpload,
       putPendingUploadObject,
       finalizeUpload,
+      readUploadStatus,
       resolvePrincipal,
       'production',
     );
@@ -143,6 +146,31 @@ describe('UploadsController', () => {
     ).rejects.toMatchObject({
       response: { code: 'upload_access_denied' },
       status: 403,
+    });
+  });
+
+  it('reports the processing state of an owned upload and hides others', async () => {
+    const imageAssetId = '11111111-1111-4111-8111-111111111111';
+    readUploadStatus.mockResolvedValue({
+      id: imageAssetId,
+      state: 'ready',
+      mediaType: 'image/jpeg',
+    });
+
+    await expect(controller.status(imageAssetId, validAuthorization)).resolves.toEqual({
+      id: imageAssetId,
+      state: 'ready',
+      mediaType: 'image/jpeg',
+    });
+    expect(readUploadStatus).toHaveBeenCalledWith(imageAssetId, 'account-id');
+
+    readUploadStatus.mockResolvedValue(null);
+    await expect(controller.status(imageAssetId, validAuthorization)).rejects.toMatchObject({
+      status: 404,
+      response: { code: 'upload_not_found' },
+    });
+    await expect(controller.status('nope', validAuthorization)).rejects.toMatchObject({
+      status: 400,
     });
   });
 

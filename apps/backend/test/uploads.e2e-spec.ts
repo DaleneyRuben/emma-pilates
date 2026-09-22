@@ -11,6 +11,7 @@ import type { AuthenticatedPrincipal } from '../src/system-identity/authenticati
 import {
   createPendingUploadCommand,
   finalizeUploadCommand,
+  readUploadStatusCommand,
   putPendingUploadObjectCommand,
   UploadsController,
   uploadsNodeEnv,
@@ -30,6 +31,8 @@ describe('uploads (e2e)', () => {
         idempotencyKey: string,
       ) => Promise<unknown>
     >();
+  const readUploadStatus =
+    jest.fn<(imageAssetId: string, ownerAccountId: string) => Promise<unknown>>();
   const resolvePrincipal =
     jest.fn<
       (
@@ -54,6 +57,7 @@ describe('uploads (e2e)', () => {
           useValue: putPendingUploadObject,
         },
         { provide: finalizeUploadCommand, useValue: finalizeUpload },
+        { provide: readUploadStatusCommand, useValue: readUploadStatus },
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
         { provide: uploadsNodeEnv, useValue: 'test' },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
@@ -109,6 +113,35 @@ describe('uploads (e2e)', () => {
       { imageAssetId: '11111111-1111-4111-8111-111111111111', bytes },
       'account-id',
     );
+  });
+
+  it('serves the processing state of an owned upload', async () => {
+    readUploadStatus.mockResolvedValue({
+      id: '11111111-1111-4111-8111-111111111111',
+      state: 'processing',
+      mediaType: 'image/png',
+    });
+
+    await request(app.getHttpServer())
+      .get('/api/v1/uploads/11111111-1111-4111-8111-111111111111')
+      .set('authorization', `Bearer ${opaqueCredential}`)
+      .expect(200)
+      .expect('Cache-Control', 'no-store')
+      .expect({
+        id: '11111111-1111-4111-8111-111111111111',
+        state: 'processing',
+        mediaType: 'image/png',
+      });
+
+    readUploadStatus.mockResolvedValue(null);
+    await request(app.getHttpServer())
+      .get('/api/v1/uploads/11111111-1111-4111-8111-111111111111')
+      .set('authorization', `Bearer ${opaqueCredential}`)
+      .expect('Content-Type', /application\/problem\+json/)
+      .expect(404)
+      .expect(({ body }) => {
+        expect(body).toMatchObject({ code: 'upload_not_found' });
+      });
   });
 
   it('finalizes an upload given a valid idempotency key', async () => {
