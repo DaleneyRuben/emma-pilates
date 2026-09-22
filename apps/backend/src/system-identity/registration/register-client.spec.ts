@@ -60,6 +60,7 @@ describe('RegisterClient', () => {
         name: '  Ana Pérez  ',
         email: '  ANA@Example.COM ',
         password: 'correct horse battery staple',
+        referralCode: ' ref-lucia ',
       }),
     ).resolves.toEqual({
       email: 'ana@example.com',
@@ -72,6 +73,7 @@ describe('RegisterClient', () => {
       email: 'ana@example.com',
       passwordHash: 'argon2id-password-hash',
       referralCode: 'ANA-REFERRAL',
+      referredByCode: 'REF-LUCIA',
       pendingExpiresAt: new Date('2026-09-06T18:00:00.000Z'),
       verificationToken: {
         id: 'verification-token-id',

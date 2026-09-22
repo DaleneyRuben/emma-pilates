@@ -478,7 +478,60 @@ describe('Client registration transaction', () => {
       occurredAt: cleanupAt,
     });
   });
-});
 
-const digestTestEmail = (email: string): Buffer =>
-  createHmac('sha256', 'test-email-digest-key').update(email).digest();
+  it('attributes the referrer at signup and refuses unknown referral codes atomically', async () => {
+    const now = new Date(Date.now() + 60_000);
+    const referrer = await prisma.client.create({
+      data: { name: 'Lucía Referente', referralCode: `REF-LUCIA-${randomUUID().slice(0, 6).toUpperCase()}` },
+      select: { id: true, referralCode: true },
+    });
+    const registerClient = new RegisterClient({
+      unitOfWork: new PrismaClientRegistrationUnitOfWork({
+        prisma,
+        boss,
+        digestEmail: (email) =>
+          createHmac('sha256', 'test-email-digest-key').update(email).digest(),
+      }),
+      passwordHasher: {
+        hash: () => Promise.resolve('argon2id-password-hash'),
+      },
+      tokenIssuer: authenticationTokens,
+      linkCipher: new AuthenticationLinkCipher(
+        'local-test-key',
+        Buffer.alloc(32, 7),
+      ),
+      now: () => now,
+      newId: randomUUID,
+      newReferralCode: () => `REF-${randomUUID()}`,
+    });
+
+    const result = await registerClient.execute({
+      name: 'Referida Nueva',
+      email: `referida-${randomUUID()}@example.com`,
+      password: 'correct horse battery staple',
+      referralCode: referrer.referralCode.toLowerCase(),
+    });
+    const referred = await prisma.account.findUniqueOrThrow({
+      where: { email: result.email },
+      select: { clientId: true },
+    });
+    await expect(
+      prisma.referral.findUniqueOrThrow({
+        where: { referredClientId: referred.clientId! },
+      }),
+    ).resolves.toMatchObject({ referrerClientId: referrer.id, state: 'PENDING' });
+
+    const unknownEmail = `sin-referente-${randomUUID()}@example.com`;
+    await expect(
+      registerClient.execute({
+        name: 'Sin Referente',
+        email: unknownEmail,
+        password: 'correct horse battery staple',
+        referralCode: 'REF-NOBODY',
+      }),
+    ).rejects.toMatchObject({ code: 'referral_code_invalid' });
+    await expect(
+      prisma.account.findUnique({ where: { email: unknownEmail } }),
+    ).resolves.toBeNull();
+  });
+});
