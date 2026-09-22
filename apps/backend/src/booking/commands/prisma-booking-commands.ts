@@ -7,6 +7,10 @@ import {
   PrismaClient,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
+import {
+  recordNotification as defaultNotificationRecorder,
+  type NotificationRecorder,
+} from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../bolivia-time';
 import { createBooking } from './create-booking';
@@ -22,6 +26,7 @@ export class PrismaBookingCommands {
   constructor(
     private readonly prisma: PrismaClient,
     private readonly now: () => Date,
+    private readonly recordNotification: NotificationRecorder = defaultNotificationRecorder,
   ) {}
 
   async create(
@@ -552,14 +557,34 @@ export class PrismaBookingCommands {
           });
         },
         closeAsPromoted: async ({ entryId, bookingId }) => {
+          const closedAt = new Date();
           await transaction.waitlistEntry.update({
             where: { id: entryId },
             data: {
-              closedAt: new Date(),
+              closedAt,
               closureReason: WaitlistClosureReason.PROMOTED,
               promotedBookingId: bookingId,
             },
           });
+          const promoted = await transaction.booking.findUniqueOrThrow({
+            where: { id: bookingId },
+            select: {
+              client: { select: { account: { select: { id: true } } } },
+              session: { select: { classType: { select: { name: true } } } },
+            },
+          });
+          if (promoted.client.account !== null) {
+            await this.recordNotification(transaction, {
+              accountId: promoted.client.account.id,
+              category: 'booking_schedule',
+              type: 'waitlist_promoted',
+              businessEventKey: `waitlist-promoted:${entryId}`,
+              title: 'Cupo liberado',
+              message: `¡Tienes un cupo! Te promovimos de la lista de espera para tu clase de ${promoted.session.classType.name}.`,
+              destination: { type: 'booking', id: bookingId },
+              occurredAt: closedAt,
+            });
+          }
         },
         now: this.now,
       },
