@@ -8,7 +8,7 @@ you are starting with no project knowledge.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, Plans, Plan detail, Mi plan, Perfil, and Editar perfil with the fixture Accounts | Class browsing and bookings are still placeholders; paying for a Plan from the app is not available yet |
-| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable                  | Assistant, Administrator, and Nutritionist destinations are still placeholders                                                                |
+| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10) | Assistant and Nutritionist destinations are still placeholders                                                                |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, and active Client and Staff Accounts with one command                            | Promotions and receipt images are not included until image delivery is specified                                                              |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
@@ -338,10 +338,12 @@ pnpm --filter @pilates/backend db:fixtures
 ```
 
 The command refuses to run when `NODE_ENV=production`, and running it again is
-safe: it updates the same rows instead of duplicating them. It creates three
-Branches (Centro, Equipetrol, Urubó), three Class Types, the four designed
-Plans, weekly Session Schedules with the next 30 days of Sessions, and these
-active Accounts. Every fixture Account uses the password `emma-local-2026`.
+safe: it updates the same rows instead of duplicating them. Re-running it also
+resets every fixture Session to its scheduled start and end time while keeping
+cancellations, so run it again if class times ever look shifted by four hours.
+It creates three Branches (Centro, Equipetrol, Urubó), three Class Types, the
+four designed Plans, weekly Session Schedules with the next 30 days of
+Sessions, and these active Accounts. Every fixture Account uses the password `emma-local-2026`.
 
 | Email                        | Role          | Representative state                          |
 | ---------------------------- | ------------- | --------------------------------------------- |
@@ -853,9 +855,10 @@ Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
 with `Bs 500`, the **Pendiente** badge, "Transferencia · enviado el 22 de
 septiembre, 14:05", and the **Comprobante** image loaded through the
 authenticated API. **Ampliar** (or tapping the image) opens it full screen
-with pinch zoom; close it with the ✕. **Confirmar pago** returns to the list
-with a two-second "Pago confirmado" notice and the card gone. **Rechazar**
-does not reject yet: it unfolds **Motivo del rechazo** with "La clienta verá
+with pinch zoom; close it with the ✕ in the top-right corner, below the status
+bar. Scroll down: **Confirmar pago** returns to the list with a two-second
+"Pago confirmado" notice and the card gone. **Rechazar**, under it, does not
+reject yet: it unfolds **Motivo del rechazo** with "La clienta verá
 este mensaje para corregir y volver a enviar."; **Confirmar rechazo** stays
 disabled until you type a reason, then returns to the list with "Pago
 rechazado". The same endpoints remain available in Swagger (Test 7,
@@ -879,8 +882,9 @@ No match reads "No hay clases con estos filtros." / "Prueba otro día, otra
 sucursal u otro tipo de clase.". Tap a card: **Cancelar sesión** repeats the
 Session, "N clientes afectados", and the warning "Esto no se puede deshacer"
 above the red **Sí, cancelar sesión** and the plain **Cancelar**. Confirming
-shows **Sesión cancelada** with "Se notificó a los N clientes afectados." and
-"Se reembolsó una clase a cada cliente."; **Volver** returns to the search.
+shows **Sesión cancelada** with "Se notificó a los N clientes afectados." ("Se
+notificó al cliente afectado." for one) and "Se reembolsó una clase a cada
+cliente."; **Volver** returns to the search.
 The fixtures ship no Bookings, so book a class from the Client app first
 (Test 7); cancelling a Session without Bookings answers
 `409 session_has_no_bookings` and the screen shows "No pudimos cancelar la
