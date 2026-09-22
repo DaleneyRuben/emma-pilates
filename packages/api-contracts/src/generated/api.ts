@@ -22,6 +22,7 @@ import type {
 
 import type {
   AccountActivationResultDto,
+  AttachReceiptDto,
   AuthenticationLinkInspectionDto,
   AuthenticationLinkTokenDto,
   AuthenticationSessionCredentialDto,
@@ -38,7 +39,9 @@ import type {
   CreateAuthenticationSessionDto,
   CreateBookingDto,
   CreatePendingUploadDto,
+  CreatePurchaseIntentDto,
   CreatedBookingDto,
+  CreditDto,
   CurrentAuthenticationPrincipalDto,
   FinalizedUploadDto,
   ListNotificationsParams,
@@ -49,12 +52,15 @@ import type {
   NotificationPageDto,
   PasswordRecoveryRequestResultDto,
   PasswordRecoveryResultDto,
+  PaymentDto,
   PendingClientRegistrationDto,
   PendingEmailCorrectionDto,
   PendingRegistrationContinuationDto,
   PendingUploadDto,
   PendingVerificationResendDto,
   PlanDto,
+  PurchaseIntentDto,
+  ReferralsDto,
   RequestPasswordRecoveryDto,
   SessionAvailabilityDto,
   SessionDetailDto,
@@ -62,6 +68,7 @@ import type {
   StartClientRegistrationDto,
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
+  TransferInstructionsDto,
   UnreadNotificationCountDto,
   UpcomingBookingDto,
   UpdateClientProfileDto,
@@ -5126,6 +5133,1619 @@ export function useGetCurrentStaffMemberProfile<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetCurrentStaffMemberProfileQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createPurchaseIntentResponse201 = {
+  data: PurchaseIntentDto;
+  status: 201;
+};
+
+export type createPurchaseIntentResponseSuccess =
+  createPurchaseIntentResponse201 & {
+    headers: Headers;
+  };
+export type createPurchaseIntentResponse = createPurchaseIntentResponseSuccess;
+
+export const getCreatePurchaseIntentUrl = () => {
+  return `/api/v1/purchase-intents`;
+};
+
+export const createPurchaseIntent = async (
+  createPurchaseIntentDto: CreatePurchaseIntentDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createPurchaseIntentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreatePurchaseIntentUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createPurchaseIntentDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createPurchaseIntentResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createPurchaseIntentResponse;
+};
+
+export const getCreatePurchaseIntentMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createPurchaseIntent>>,
+    TError,
+    CreatePurchaseIntentMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createPurchaseIntent>>,
+  TError,
+  CreatePurchaseIntentMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createPurchaseIntent"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createPurchaseIntent>>,
+    CreatePurchaseIntentMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createPurchaseIntent(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreatePurchaseIntentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createPurchaseIntent>>
+>;
+export type CreatePurchaseIntentMutationBody = CreatePurchaseIntentDto;
+export type CreatePurchaseIntentMutationError = unknown;
+export type CreatePurchaseIntentMutationVariables = {
+  data: CreatePurchaseIntentDto;
+};
+
+export const useCreatePurchaseIntent = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createPurchaseIntent>>,
+      TError,
+      CreatePurchaseIntentMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createPurchaseIntent>>,
+  TError,
+  CreatePurchaseIntentMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreatePurchaseIntentMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getCurrentPurchaseIntentResponse200 = {
+  data: PurchaseIntentDto;
+  status: 200;
+};
+
+export type getCurrentPurchaseIntentResponseSuccess =
+  getCurrentPurchaseIntentResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentPurchaseIntentResponse =
+  getCurrentPurchaseIntentResponseSuccess;
+
+export const getGetCurrentPurchaseIntentUrl = () => {
+  return `/api/v1/purchase-intents/current`;
+};
+
+export const getCurrentPurchaseIntent = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentPurchaseIntentResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentPurchaseIntentUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentPurchaseIntentResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentPurchaseIntentResponse;
+};
+
+export const getGetCurrentPurchaseIntentQueryKey = () => {
+  return [`/api/v1/purchase-intents/current`] as const;
+};
+
+export const getGetCurrentPurchaseIntentQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentPurchaseIntentQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentPurchaseIntent>>
+  > = ({ signal }) =>
+    getCurrentPurchaseIntent({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentPurchaseIntentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentPurchaseIntent>>
+>;
+export type GetCurrentPurchaseIntentQueryError = unknown;
+
+export function useGetCurrentPurchaseIntent<
+  TData = Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentPurchaseIntent>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentPurchaseIntent<
+  TData = Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentPurchaseIntent>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentPurchaseIntent<
+  TData = Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentPurchaseIntent<
+  TData = Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentPurchaseIntent>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentPurchaseIntentQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type attachPurchaseIntentReceiptResponse200 = {
+  data: PurchaseIntentDto;
+  status: 200;
+};
+
+export type attachPurchaseIntentReceiptResponseSuccess =
+  attachPurchaseIntentReceiptResponse200 & {
+    headers: Headers;
+  };
+export type attachPurchaseIntentReceiptResponse =
+  attachPurchaseIntentReceiptResponseSuccess;
+
+export const getAttachPurchaseIntentReceiptUrl = (purchaseIntentId: string) => {
+  return `/api/v1/purchase-intents/${purchaseIntentId}/receipt`;
+};
+
+export const attachPurchaseIntentReceipt = async (
+  purchaseIntentId: string,
+  attachReceiptDto: AttachReceiptDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<attachPurchaseIntentReceiptResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getAttachPurchaseIntentReceiptUrl(purchaseIntentId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(attachReceiptDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: attachPurchaseIntentReceiptResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as attachPurchaseIntentReceiptResponse;
+};
+
+export const getAttachPurchaseIntentReceiptMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof attachPurchaseIntentReceipt>>,
+    TError,
+    AttachPurchaseIntentReceiptMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof attachPurchaseIntentReceipt>>,
+  TError,
+  AttachPurchaseIntentReceiptMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["attachPurchaseIntentReceipt"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof attachPurchaseIntentReceipt>>,
+    AttachPurchaseIntentReceiptMutationVariables
+  > = (props) => {
+    const { purchaseIntentId, data } = props ?? {};
+
+    return attachPurchaseIntentReceipt(
+      purchaseIntentId,
+      data,
+      fetchOptions,
+      fetcherFn,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type AttachPurchaseIntentReceiptMutationResult = NonNullable<
+  Awaited<ReturnType<typeof attachPurchaseIntentReceipt>>
+>;
+export type AttachPurchaseIntentReceiptMutationBody = AttachReceiptDto;
+export type AttachPurchaseIntentReceiptMutationError = unknown;
+export type AttachPurchaseIntentReceiptMutationVariables = {
+  purchaseIntentId: string;
+  data: AttachReceiptDto;
+};
+
+export const useAttachPurchaseIntentReceipt = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof attachPurchaseIntentReceipt>>,
+      TError,
+      AttachPurchaseIntentReceiptMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof attachPurchaseIntentReceipt>>,
+  TError,
+  AttachPurchaseIntentReceiptMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getAttachPurchaseIntentReceiptMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type submitPurchaseIntentTransferResponse201 = {
+  data: PaymentDto;
+  status: 201;
+};
+
+export type submitPurchaseIntentTransferResponseSuccess =
+  submitPurchaseIntentTransferResponse201 & {
+    headers: Headers;
+  };
+export type submitPurchaseIntentTransferResponse =
+  submitPurchaseIntentTransferResponseSuccess;
+
+export const getSubmitPurchaseIntentTransferUrl = (
+  purchaseIntentId: string,
+) => {
+  return `/api/v1/purchase-intents/${purchaseIntentId}/submit`;
+};
+
+export const submitPurchaseIntentTransfer = async (
+  purchaseIntentId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<submitPurchaseIntentTransferResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getSubmitPurchaseIntentTransferUrl(purchaseIntentId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: submitPurchaseIntentTransferResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as submitPurchaseIntentTransferResponse;
+};
+
+export const getSubmitPurchaseIntentTransferMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof submitPurchaseIntentTransfer>>,
+    TError,
+    SubmitPurchaseIntentTransferMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof submitPurchaseIntentTransfer>>,
+  TError,
+  SubmitPurchaseIntentTransferMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["submitPurchaseIntentTransfer"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof submitPurchaseIntentTransfer>>,
+    SubmitPurchaseIntentTransferMutationVariables
+  > = (props) => {
+    const { purchaseIntentId } = props ?? {};
+
+    return submitPurchaseIntentTransfer(
+      purchaseIntentId,
+      fetchOptions,
+      fetcherFn,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SubmitPurchaseIntentTransferMutationResult = NonNullable<
+  Awaited<ReturnType<typeof submitPurchaseIntentTransfer>>
+>;
+
+export type SubmitPurchaseIntentTransferMutationError = unknown;
+export type SubmitPurchaseIntentTransferMutationVariables = {
+  purchaseIntentId: string;
+};
+
+export const useSubmitPurchaseIntentTransfer = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof submitPurchaseIntentTransfer>>,
+      TError,
+      SubmitPurchaseIntentTransferMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof submitPurchaseIntentTransfer>>,
+  TError,
+  SubmitPurchaseIntentTransferMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getSubmitPurchaseIntentTransferMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type completeCreditPurchaseResponse201 = {
+  data: PaymentDto;
+  status: 201;
+};
+
+export type completeCreditPurchaseResponseSuccess =
+  completeCreditPurchaseResponse201 & {
+    headers: Headers;
+  };
+export type completeCreditPurchaseResponse =
+  completeCreditPurchaseResponseSuccess;
+
+export const getCompleteCreditPurchaseUrl = () => {
+  return `/api/v1/credit-purchases`;
+};
+
+export const completeCreditPurchase = async (
+  createPurchaseIntentDto: CreatePurchaseIntentDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<completeCreditPurchaseResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCompleteCreditPurchaseUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createPurchaseIntentDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: completeCreditPurchaseResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as completeCreditPurchaseResponse;
+};
+
+export const getCompleteCreditPurchaseMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof completeCreditPurchase>>,
+    TError,
+    CompleteCreditPurchaseMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof completeCreditPurchase>>,
+  TError,
+  CompleteCreditPurchaseMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["completeCreditPurchase"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof completeCreditPurchase>>,
+    CompleteCreditPurchaseMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return completeCreditPurchase(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CompleteCreditPurchaseMutationResult = NonNullable<
+  Awaited<ReturnType<typeof completeCreditPurchase>>
+>;
+export type CompleteCreditPurchaseMutationBody = CreatePurchaseIntentDto;
+export type CompleteCreditPurchaseMutationError = unknown;
+export type CompleteCreditPurchaseMutationVariables = {
+  data: CreatePurchaseIntentDto;
+};
+
+export const useCompleteCreditPurchase = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof completeCreditPurchase>>,
+      TError,
+      CompleteCreditPurchaseMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof completeCreditPurchase>>,
+  TError,
+  CompleteCreditPurchaseMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCompleteCreditPurchaseMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getCurrentPaymentResponse200 = {
+  data: PaymentDto;
+  status: 200;
+};
+
+export type getCurrentPaymentResponseSuccess = getCurrentPaymentResponse200 & {
+  headers: Headers;
+};
+export type getCurrentPaymentResponse = getCurrentPaymentResponseSuccess;
+
+export const getGetCurrentPaymentUrl = () => {
+  return `/api/v1/payments/current`;
+};
+
+export const getCurrentPayment = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentPaymentResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentPaymentUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentPaymentResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentPaymentResponse;
+};
+
+export const getGetCurrentPaymentQueryKey = () => {
+  return [`/api/v1/payments/current`] as const;
+};
+
+export const getGetCurrentPaymentQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentPayment>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentPayment>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetCurrentPaymentQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentPayment>>
+  > = ({ signal }) => getCurrentPayment({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentPayment>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentPaymentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentPayment>>
+>;
+export type GetCurrentPaymentQueryError = unknown;
+
+export function useGetCurrentPayment<
+  TData = Awaited<ReturnType<typeof getCurrentPayment>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentPayment>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentPayment>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentPayment>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentPayment<
+  TData = Awaited<ReturnType<typeof getCurrentPayment>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentPayment>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentPayment>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentPayment>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentPayment<
+  TData = Awaited<ReturnType<typeof getCurrentPayment>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentPayment>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentPayment<
+  TData = Awaited<ReturnType<typeof getCurrentPayment>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentPayment>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentPaymentQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getCurrentClientCreditResponse200 = {
+  data: CreditDto;
+  status: 200;
+};
+
+export type getCurrentClientCreditResponseSuccess =
+  getCurrentClientCreditResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentClientCreditResponse =
+  getCurrentClientCreditResponseSuccess;
+
+export const getGetCurrentClientCreditUrl = () => {
+  return `/api/v1/clients/current/credit`;
+};
+
+export const getCurrentClientCredit = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientCreditResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentClientCreditUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentClientCreditResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientCreditResponse;
+};
+
+export const getGetCurrentClientCreditQueryKey = () => {
+  return [`/api/v1/clients/current/credit`] as const;
+};
+
+export const getGetCurrentClientCreditQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientCredit>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentClientCredit>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentClientCreditQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientCredit>>
+  > = ({ signal }) =>
+    getCurrentClientCredit({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientCredit>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientCreditQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientCredit>>
+>;
+export type GetCurrentClientCreditQueryError = unknown;
+
+export function useGetCurrentClientCredit<
+  TData = Awaited<ReturnType<typeof getCurrentClientCredit>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientCredit>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientCredit>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientCredit>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientCredit<
+  TData = Awaited<ReturnType<typeof getCurrentClientCredit>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientCredit>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientCredit>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientCredit>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientCredit<
+  TData = Awaited<ReturnType<typeof getCurrentClientCredit>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientCredit>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientCredit<
+  TData = Awaited<ReturnType<typeof getCurrentClientCredit>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientCredit>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentClientCreditQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getCurrentClientReferralsResponse200 = {
+  data: ReferralsDto;
+  status: 200;
+};
+
+export type getCurrentClientReferralsResponseSuccess =
+  getCurrentClientReferralsResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentClientReferralsResponse =
+  getCurrentClientReferralsResponseSuccess;
+
+export const getGetCurrentClientReferralsUrl = () => {
+  return `/api/v1/clients/current/referrals`;
+};
+
+export const getCurrentClientReferrals = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientReferralsResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentClientReferralsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentClientReferralsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientReferralsResponse;
+};
+
+export const getGetCurrentClientReferralsQueryKey = () => {
+  return [`/api/v1/clients/current/referrals`] as const;
+};
+
+export const getGetCurrentClientReferralsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentClientReferralsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientReferrals>>
+  > = ({ signal }) =>
+    getCurrentClientReferrals({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientReferralsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientReferrals>>
+>;
+export type GetCurrentClientReferralsQueryError = unknown;
+
+export function useGetCurrentClientReferrals<
+  TData = Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientReferrals>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientReferrals<
+  TData = Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientReferrals>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientReferrals<
+  TData = Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientReferrals<
+  TData = Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientReferrals>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentClientReferralsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getTransferInstructionsResponse200 = {
+  data: TransferInstructionsDto;
+  status: 200;
+};
+
+export type getTransferInstructionsResponseSuccess =
+  getTransferInstructionsResponse200 & {
+    headers: Headers;
+  };
+export type getTransferInstructionsResponse =
+  getTransferInstructionsResponseSuccess;
+
+export const getGetTransferInstructionsUrl = () => {
+  return `/api/v1/transfer-instructions`;
+};
+
+export const getTransferInstructions = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getTransferInstructionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetTransferInstructionsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getTransferInstructionsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getTransferInstructionsResponse;
+};
+
+export const getGetTransferInstructionsQueryKey = () => {
+  return [`/api/v1/transfer-instructions`] as const;
+};
+
+export const getGetTransferInstructionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTransferInstructions>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getTransferInstructions>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetTransferInstructionsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getTransferInstructions>>
+  > = ({ signal }) =>
+    getTransferInstructions({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTransferInstructions>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetTransferInstructionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTransferInstructions>>
+>;
+export type GetTransferInstructionsQueryError = unknown;
+
+export function useGetTransferInstructions<
+  TData = Awaited<ReturnType<typeof getTransferInstructions>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTransferInstructions>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTransferInstructions>>,
+          TError,
+          Awaited<ReturnType<typeof getTransferInstructions>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTransferInstructions<
+  TData = Awaited<ReturnType<typeof getTransferInstructions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTransferInstructions>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTransferInstructions>>,
+          TError,
+          Awaited<ReturnType<typeof getTransferInstructions>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTransferInstructions<
+  TData = Awaited<ReturnType<typeof getTransferInstructions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTransferInstructions>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetTransferInstructions<
+  TData = Awaited<ReturnType<typeof getTransferInstructions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTransferInstructions>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetTransferInstructionsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getTransferQrImageResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getTransferQrImageResponseSuccess =
+  getTransferQrImageResponse200 & {
+    headers: Headers;
+  };
+export type getTransferQrImageResponse = getTransferQrImageResponseSuccess;
+
+export const getGetTransferQrImageUrl = () => {
+  return `/api/v1/transfer-instructions/qr`;
+};
+
+export const getTransferQrImage = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getTransferQrImageResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetTransferQrImageUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getTransferQrImageResponse["data"] =
+    body as getTransferQrImageResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getTransferQrImageResponse;
+};
+
+export const getGetTransferQrImageQueryKey = () => {
+  return [`/api/v1/transfer-instructions/qr`] as const;
+};
+
+export const getGetTransferQrImageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTransferQrImage>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getTransferQrImage>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetTransferQrImageQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getTransferQrImage>>
+  > = ({ signal }) =>
+    getTransferQrImage({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTransferQrImage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetTransferQrImageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTransferQrImage>>
+>;
+export type GetTransferQrImageQueryError = unknown;
+
+export function useGetTransferQrImage<
+  TData = Awaited<ReturnType<typeof getTransferQrImage>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTransferQrImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTransferQrImage>>,
+          TError,
+          Awaited<ReturnType<typeof getTransferQrImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTransferQrImage<
+  TData = Awaited<ReturnType<typeof getTransferQrImage>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTransferQrImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTransferQrImage>>,
+          TError,
+          Awaited<ReturnType<typeof getTransferQrImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTransferQrImage<
+  TData = Awaited<ReturnType<typeof getTransferQrImage>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTransferQrImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetTransferQrImage<
+  TData = Awaited<ReturnType<typeof getTransferQrImage>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTransferQrImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetTransferQrImageQueryOptions(options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

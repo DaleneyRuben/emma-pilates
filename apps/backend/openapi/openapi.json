@@ -1137,6 +1137,365 @@
         ]
       }
     },
+    "/api/v1/purchase-intents": {
+      "post": {
+        "operationId": "createPurchaseIntent",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePurchaseIntentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseIntentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PurchaseIntents"
+        ]
+      }
+    },
+    "/api/v1/purchase-intents/current": {
+      "get": {
+        "operationId": "getCurrentPurchaseIntent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseIntentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PurchaseIntents"
+        ]
+      }
+    },
+    "/api/v1/purchase-intents/{purchaseIntentId}/receipt": {
+      "post": {
+        "operationId": "attachPurchaseIntentReceipt",
+        "parameters": [
+          {
+            "name": "purchaseIntentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachReceiptDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseIntentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PurchaseIntents"
+        ]
+      }
+    },
+    "/api/v1/purchase-intents/{purchaseIntentId}/submit": {
+      "post": {
+        "operationId": "submitPurchaseIntentTransfer",
+        "parameters": [
+          {
+            "name": "purchaseIntentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PurchaseIntents"
+        ]
+      }
+    },
+    "/api/v1/credit-purchases": {
+      "post": {
+        "operationId": "completeCreditPurchase",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePurchaseIntentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CreditPurchases"
+        ]
+      }
+    },
+    "/api/v1/payments/current": {
+      "get": {
+        "operationId": "getCurrentPayment",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientPayments"
+        ]
+      }
+    },
+    "/api/v1/clients/current/credit": {
+      "get": {
+        "operationId": "getCurrentClientCredit",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientCredit"
+        ]
+      }
+    },
+    "/api/v1/clients/current/referrals": {
+      "get": {
+        "operationId": "getCurrentClientReferrals",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReferralsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientReferrals"
+        ]
+      }
+    },
+    "/api/v1/transfer-instructions": {
+      "get": {
+        "operationId": "getTransferInstructions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TransferInstructionsDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TransferInstructions"
+        ]
+      }
+    },
+    "/api/v1/transfer-instructions/qr": {
+      "get": {
+        "operationId": "getTransferQrImage",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TransferInstructions"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -2394,6 +2753,333 @@
           "email",
           "role",
           "branches"
+        ]
+      },
+      "CreatePurchaseIntentDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "planId"
+        ]
+      },
+      "PurchaseIntentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "durationMonths": {
+            "type": "number",
+            "enum": [
+              1,
+              3,
+              6,
+              12
+            ]
+          },
+          "classAllowance": {
+            "type": "number",
+            "minimum": 1
+          },
+          "planPriceCentavos": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Money Amount in BOB centavos"
+          },
+          "creditReservedCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Credit held for this purchase"
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Amount to transfer in BOB centavos"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "open",
+              "submitted",
+              "expired"
+            ]
+          },
+          "receiptAttached": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "planId",
+          "planName",
+          "durationMonths",
+          "classAllowance",
+          "planPriceCentavos",
+          "creditReservedCentavos",
+          "amountDueCentavos",
+          "state",
+          "receiptAttached",
+          "createdAt",
+          "expiresAt"
+        ]
+      },
+      "AttachReceiptDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "imageAssetId"
+        ]
+      },
+      "PaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "transfer",
+              "cash",
+              "credit_only"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "rejected"
+            ]
+          },
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "durationMonths": {
+            "type": "number",
+            "enum": [
+              1,
+              3,
+              6,
+              12
+            ]
+          },
+          "classAllowance": {
+            "type": "number",
+            "minimum": 1
+          },
+          "planPriceCentavos": {
+            "type": "number",
+            "minimum": 1
+          },
+          "creditAppliedCentavos": {
+            "type": "number",
+            "minimum": 0
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "minimum": 0
+          },
+          "submittedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "rejectionReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "method",
+          "state",
+          "planId",
+          "planName",
+          "durationMonths",
+          "classAllowance",
+          "planPriceCentavos",
+          "creditAppliedCentavos",
+          "amountDueCentavos",
+          "submittedAt"
+        ]
+      },
+      "CreditActivityDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "referral_award",
+              "payment_reservation",
+              "payment_spend",
+              "payment_release"
+            ]
+          },
+          "amountCentavos": {
+            "type": "number",
+            "minimum": 1
+          },
+          "occurredAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "amountCentavos",
+          "occurredAt"
+        ]
+      },
+      "CreditDto": {
+        "type": "object",
+        "properties": {
+          "availableCentavos": {
+            "type": "number",
+            "minimum": 0
+          },
+          "reservedCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Credit held for a Payment under review"
+          },
+          "activity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreditActivityDto"
+            }
+          }
+        },
+        "required": [
+          "availableCentavos",
+          "reservedCentavos",
+          "activity"
+        ]
+      },
+      "ReferredClientDto": {
+        "type": "object",
+        "properties": {
+          "referredClientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "referredName": {
+            "type": "string",
+            "description": "First name and surname initial"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "awarded"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "awardedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "awardCentavos": {
+            "type": "number",
+            "nullable": true
+          }
+        },
+        "required": [
+          "referredClientId",
+          "referredName",
+          "state",
+          "createdAt"
+        ]
+      },
+      "ReferralsDto": {
+        "type": "object",
+        "properties": {
+          "referralCode": {
+            "type": "string"
+          },
+          "referrals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReferredClientDto"
+            }
+          }
+        },
+        "required": [
+          "referralCode",
+          "referrals"
+        ]
+      },
+      "TransferInstructionsDto": {
+        "type": "object",
+        "properties": {
+          "beneficiaryName": {
+            "type": "string"
+          },
+          "bankName": {
+            "type": "string"
+          },
+          "accountNumber": {
+            "type": "string"
+          },
+          "qrImageUrl": {
+            "type": "string",
+            "description": "Backend route serving the studio QR image"
+          }
+        },
+        "required": [
+          "beneficiaryName",
+          "bankName",
+          "accountNumber",
+          "qrImageUrl"
         ]
       },
       "CreatePendingUploadDto": {
