@@ -1496,6 +1496,244 @@
         ]
       }
     },
+    "/api/v1/administrator/payments/pending": {
+      "get": {
+        "operationId": "listPendingPayments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PendingPaymentDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayments"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}": {
+      "get": {
+        "operationId": "getPaymentReview",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentReviewDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayments"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}/receipt": {
+      "get": {
+        "operationId": "getPaymentReceipt",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/png": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              },
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayments"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}/confirm": {
+      "post": {
+        "operationId": "confirmPayment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayments"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}/reject": {
+      "post": {
+        "operationId": "rejectPayment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayments"
+        ]
+      }
+    },
+    "/api/v1/administrator/sessions/{sessionId}/cancel": {
+      "post": {
+        "operationId": "cancelSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionCancellationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessions"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -3085,6 +3323,192 @@
           "bankName",
           "accountNumber",
           "qrImageUrl"
+        ]
+      },
+      "PendingPaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "minimum": 1
+          },
+          "submittedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "receiptAvailable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "clientName",
+          "planName",
+          "amountDueCentavos",
+          "submittedAt",
+          "receiptAvailable"
+        ]
+      },
+      "PaymentReceiptDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mediaType": {
+            "type": "string",
+            "enum": [
+              "image/jpeg",
+              "image/png",
+              "image/webp"
+            ]
+          }
+        },
+        "required": [
+          "imageAssetId",
+          "mediaType"
+        ]
+      },
+      "PaymentReviewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "transfer",
+              "cash",
+              "credit_only"
+            ]
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "rejected"
+            ]
+          },
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "durationMonths": {
+            "type": "number",
+            "enum": [
+              1,
+              3,
+              6,
+              12
+            ]
+          },
+          "classAllowance": {
+            "type": "number",
+            "minimum": 1
+          },
+          "planPriceCentavos": {
+            "type": "number",
+            "minimum": 1
+          },
+          "creditAppliedCentavos": {
+            "type": "number",
+            "minimum": 0
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "minimum": 0
+          },
+          "submittedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "rejectionReason": {
+            "type": "string",
+            "nullable": true
+          },
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "receipt": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PaymentReceiptDto"
+              }
+            ]
+          },
+          "receiptUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "Authenticated backend route streaming the receipt while it is retained"
+          }
+        },
+        "required": [
+          "id",
+          "method",
+          "state",
+          "planId",
+          "planName",
+          "durationMonths",
+          "classAllowance",
+          "planPriceCentavos",
+          "creditAppliedCentavos",
+          "amountDueCentavos",
+          "submittedAt",
+          "clientName"
+        ]
+      },
+      "RejectPaymentDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "SessionCancellationDto": {
+        "type": "object",
+        "properties": {
+          "affectedBookings": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "affectedBookings"
         ]
       },
       "CreatePendingUploadDto": {
