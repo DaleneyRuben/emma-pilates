@@ -619,6 +619,20 @@ These tests create a temporary PostgreSQL container, apply the committed
 migrations, verify real constraints and transactions, and remove the container
 afterward. They do not use or erase your `emma_pilates` database.
 
+Without Docker, point the suite at your local PostgreSQL server through a
+throwaway admin database whose name starts with `pilates_test_`:
+
+```sh
+createdb pilates_test_admin
+TEST_DATABASE_URL="postgresql://$USER@localhost:5432/pilates_test_admin" \
+  pnpm --filter @pilates/backend test:integration
+```
+
+Every test file still gets its own freshly migrated `pilates_test_*` database
+on that server and drops it when it finishes, so files never see each other's
+rows; the admin database itself stays empty. Any other database name is
+refused.
+
 ### Quality and generated-contract checks
 
 Run these from the project root:
