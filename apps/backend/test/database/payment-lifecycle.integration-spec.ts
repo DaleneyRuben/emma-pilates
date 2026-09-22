@@ -401,4 +401,84 @@ describe('Prisma payment lifecycle', () => {
       codeOf(commands(later).submitTransfer({ purchaseIntentId: intent.id }, buyer, randomUUID())),
     ).resolves.toBe('purchase_intent_not_open');
   });
+
+  it('records an instant cash Payment at an assigned Branch, spending Credit and activating the Subscription', async () => {
+    const buyer = await newClient('Efectivo');
+    await seedAward(buyer.clientId);
+    const assistant = await staffPrincipal('camila.rojas@example.com');
+    const centro = fixtures.branches.find((b) => b.name === 'Centro')!;
+    const equipetrol = fixtures.branches.find((b) => b.name === 'Equipetrol')!;
+    const key = randomUUID();
+
+    await expect(
+      codeOf(commands().recordCashPayment({ clientId: buyer.clientId, planId: plan.id, branchId: equipetrol.id }, assistant, randomUUID())),
+    ).resolves.toBe('branch_not_assigned');
+    await expect(
+      codeOf(commands().recordCashPayment({ clientId: buyer.clientId, planId: plan.id, branchId: centro.id }, buyer, randomUUID())),
+    ).resolves.toBe('access_denied');
+
+    const payment = await commands().recordCashPayment(
+      { clientId: buyer.clientId, planId: plan.id, branchId: centro.id },
+      assistant,
+      key,
+    );
+
+    expect(payment).toMatchObject({
+      method: 'cash',
+      state: 'confirmed',
+      creditAppliedCentavos: 6000,
+      amountDueCentavos: 50_000,
+      decidedAt: now,
+    });
+    expect(payment.subscriptionId).toEqual(expect.any(String));
+    await expect(commands().readCreditSummary(buyer)).resolves.toEqual({ availableCentavos: 0, reservedCentavos: 0 });
+    await expect(
+      prisma.auditRecord.findFirst({ where: { actionCode: 'payment.cash_confirmed', targetId: payment.id } }),
+    ).resolves.toMatchObject({ branchId: centro.id, actorRole: 'ASSISTANT' });
+    await expect(
+      commands().recordCashPayment({ clientId: buyer.clientId, planId: plan.id, branchId: centro.id }, assistant, key),
+    ).resolves.toMatchObject({ id: payment.id });
+    await expect(
+      codeOf(commands().recordCashPayment({ clientId: buyer.clientId, planId: plan.id, branchId: centro.id }, assistant, randomUUID())),
+    ).resolves.toBe('subscription_not_expired');
+  });
+
+  it('refuses cash while the Client has an open Purchase Intent', async () => {
+    const buyer = await newClient('Con intención');
+    const assistant = await staffPrincipal('camila.rojas@example.com');
+    const centro = fixtures.branches.find((b) => b.name === 'Centro')!;
+    await commands().createPurchaseIntent({ planId: plan.id }, buyer, randomUUID());
+
+    await expect(
+      codeOf(commands().recordCashPayment({ clientId: buyer.clientId, planId: plan.id, branchId: centro.id }, assistant, randomUUID())),
+    ).resolves.toBe('purchase_intent_open_exists');
+  });
+
+  it('completes a Credit-only purchase without any transfer when Credit covers the Plan', async () => {
+    const buyer = await newClient('Con crédito');
+    const poor = await newClient('Sin crédito');
+    for (let award = 0; award < 10; award += 1) await seedAward(buyer.clientId);
+    await seedAward(poor.clientId);
+
+    await expect(
+      codeOf(commands().completeCreditPurchase({ planId: plan.id }, poor, randomUUID())),
+    ).resolves.toBe('credit_insufficient');
+
+    const payment = await commands().completeCreditPurchase({ planId: plan.id }, buyer, randomUUID());
+
+    expect(payment).toMatchObject({
+      method: 'credit_only',
+      state: 'confirmed',
+      creditAppliedCentavos: 56_000,
+      amountDueCentavos: 0,
+    });
+    expect(payment.subscriptionId).toEqual(expect.any(String));
+    await expect(commands().readCreditSummary(buyer)).resolves.toEqual({ availableCentavos: 4000, reservedCentavos: 0 });
+    await expect(
+      prisma.auditRecord.findFirst({ where: { actionCode: 'payment.credit_only_confirmed', targetId: payment.id } }),
+    ).resolves.toMatchObject({ actorAccountId: buyer.accountId, branchId: null });
+    await expect(
+      prisma.notification.findFirst({ where: { accountId: buyer.accountId, type: 'payment_confirmed' } }),
+    ).resolves.not.toBeNull();
+  });
 });
