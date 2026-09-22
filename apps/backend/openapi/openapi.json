@@ -1110,6 +1110,33 @@
         ]
       }
     },
+    "/api/v1/staff-members/current": {
+      "get": {
+        "operationId": "getCurrentStaffMemberProfile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StaffProfile"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -2309,6 +2336,64 @@
           "branchName",
           "startsAt",
           "endsAt"
+        ]
+      },
+      "StaffBranchDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "StaffProfileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "trainer",
+              "nutritionist",
+              "assistant",
+              "administrator"
+            ]
+          },
+          "branches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StaffBranchDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "role",
+          "branches"
         ]
       },
       "CreatePendingUploadDto": {

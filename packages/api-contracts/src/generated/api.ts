@@ -58,6 +58,7 @@ import type {
   RequestPasswordRecoveryDto,
   SessionAvailabilityDto,
   SessionDetailDto,
+  StaffProfileDto,
   StartClientRegistrationDto,
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
@@ -4949,6 +4950,190 @@ export const useLeaveWaitlist = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(getLeaveWaitlistMutationOptions(options), queryClient);
 };
+
+export type getCurrentStaffMemberProfileResponse200 = {
+  data: StaffProfileDto;
+  status: 200;
+};
+
+export type getCurrentStaffMemberProfileResponseSuccess =
+  getCurrentStaffMemberProfileResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentStaffMemberProfileResponse =
+  getCurrentStaffMemberProfileResponseSuccess;
+
+export const getGetCurrentStaffMemberProfileUrl = () => {
+  return `/api/v1/staff-members/current`;
+};
+
+export const getCurrentStaffMemberProfile = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentStaffMemberProfileResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentStaffMemberProfileUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentStaffMemberProfileResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentStaffMemberProfileResponse;
+};
+
+export const getGetCurrentStaffMemberProfileQueryKey = () => {
+  return [`/api/v1/staff-members/current`] as const;
+};
+
+export const getGetCurrentStaffMemberProfileQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentStaffMemberProfileQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>
+  > = ({ signal }) =>
+    getCurrentStaffMemberProfile({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentStaffMemberProfileQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>
+>;
+export type GetCurrentStaffMemberProfileQueryError = unknown;
+
+export function useGetCurrentStaffMemberProfile<
+  TData = Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentStaffMemberProfile<
+  TData = Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentStaffMemberProfile<
+  TData = Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentStaffMemberProfile<
+  TData = Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentStaffMemberProfile>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentStaffMemberProfileQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export type createPendingUploadResponse201 = {
   data: PendingUploadDto;
