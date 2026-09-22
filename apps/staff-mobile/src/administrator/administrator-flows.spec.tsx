@@ -10,10 +10,22 @@ import {
   clearMobileQueryCache,
 } from "@pilates/mobile-core";
 
+import { SafeAreaView } from "react-native-safe-area-context";
+import type { ReactTestInstance } from "react-test-renderer";
+
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
 
 jest.setTimeout(20_000);
+
+const isInsideSafeArea = (element: ReactTestInstance): boolean => {
+  let current: ReactTestInstance | null = element.parent;
+  while (current !== null) {
+    if (current.type === SafeAreaView) return true;
+    current = current.parent;
+  }
+  return false;
+};
 
 const administrator = {
   id: "staff-2",
@@ -177,6 +189,9 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Comprobante ampliado")).toBeOnTheScreen();
     });
+    expect(
+      isInsideSafeArea(screen.getByRole("button", { name: "Cerrar" })),
+    ).toBe(true);
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar" }));
     await waitFor(() => {
       expect(screen.queryByLabelText("Comprobante ampliado")).not.toBeOnTheScreen();
