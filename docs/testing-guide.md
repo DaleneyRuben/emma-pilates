@@ -544,6 +544,33 @@ A Client promoted from a Waitlist receives "¡Tienes un cupo!…" inside the sam
 transaction, and the worker records "Tu plan vence en 3 días." once for every
 Subscription that ends in three days (Valeria's fixture qualifies today).
 
+### Buying a Plan through Swagger (PAY-002)
+
+Log in through Swagger as `mariana@example.com` (no Subscription). Every
+command below needs an `idempotency-key` header with a fresh UUID; sending the
+same key again returns the same result instead of a duplicate.
+
+| Step | Endpoint                                              | What you should see                                                                     |
+| ---- | ----------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| 1    | `GET /api/v1/transfer-instructions`                   | Beneficiary, bank, account number, and `qrImageUrl` (`…/transfer-instructions/qr`)      |
+| 2    | `POST /api/v1/purchase-intents` `{ "planId": … }`     | `201` with frozen Plan snapshots, `amountDueCentavos`, `state: open`, 24 h `expiresAt`  |
+| 3    | `GET /api/v1/purchase-intents/current`                | The same open Intent; `404 purchase_intent_not_found` once it is submitted or expired    |
+| 4    | `POST /api/v1/uploads` + `PUT …/object` + `…/finalize`| A `TRANSFER_RECEIPT` image asset that the worker leaves `READY` (Test 6 upload flow)     |
+| 5    | `POST /api/v1/purchase-intents/{id}/receipt`          | `receiptAttached: true`; another asset replaces the first one                            |
+| 6    | `POST /api/v1/purchase-intents/{id}/submit`           | `201` pending transfer Payment; the Administrator inbox gets "Comprobante por revisar"  |
+| 7    | `GET /api/v1/payments/current`                        | Your latest Payment with `state`, amounts, and `rejectionReason` once decided            |
+| 8    | `GET /api/v1/clients/current/credit`                  | `availableCentavos`, `reservedCentavos` (held while a transfer is under review), activity |
+| 9    | `GET /api/v1/clients/current/referrals`               | Your referral code and referred Clients as "Nombre A."                                  |
+
+Rules you can check: a second open Intent returns `409 purchase_intent_open_exists`;
+`lucia@example.com` (active Plan) gets `409 subscription_not_expired`; a Client
+whose Credit covers the price can call `POST /api/v1/credit-purchases` and is
+activated immediately without a QR. Registration accepts an optional
+`referralCode` (another Client's code); an unknown code fails the whole
+registration with `400 referral_code_invalid`. Open Intents expire 24 h later
+through the worker, releasing their Credit. Administrator confirmation and
+rejection endpoints arrive with STAFF-001.
+
 ## Test 8: run the automated checks
 
 You do not need to understand the test code to run it. A successful Jest run
