@@ -8,7 +8,7 @@ import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
-import { boliviaCivilDate, civilDateRange } from "./session-format";
+import { boliviaCivilDate, civilDateRange } from "@pilates/mobile-core";
 
 jest.setTimeout(20_000);
 

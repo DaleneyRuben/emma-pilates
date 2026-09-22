@@ -10,7 +10,7 @@ import * as Crypto from "expo-crypto";
 import * as FileSystem from "expo-file-system/legacy";
 import * as ImagePicker from "expo-image-picker";
 
-import { decodeBase64, encodeBase64 } from "./base64";
+import { decodeBase64, encodeBase64 } from "@pilates/mobile-core";
 
 export type PickedReceipt = {
   uri: string;

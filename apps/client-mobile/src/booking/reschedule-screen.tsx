@@ -28,7 +28,7 @@ import {
   boliviaCivilDate,
   civilDateRange,
   formatTimeRange,
-} from "./session-format";
+} from "@pilates/mobile-core";
 
 type RescheduleNavigation = {
   goBack: () => void;

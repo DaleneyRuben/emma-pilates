@@ -31,7 +31,7 @@ import {
   formatSessionDate,
   formatTimeRange,
   isInsideCancellationWindow,
-} from "./session-format";
+} from "@pilates/mobile-core";
 
 const noticeVisibleMs = 8_000;
 

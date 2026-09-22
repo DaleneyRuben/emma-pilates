@@ -26,7 +26,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { BackLink } from "../ui/back-link";
-import { formatSessionDate, formatTimeRange } from "./session-format";
+import { formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
 
 export type ConfirmedBooking = {
   bookingId: string;

@@ -17,7 +17,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { BackLink } from "../ui/back-link";
-import { formatMonthHeading, formatSessionDate } from "./session-format";
+import { formatMonthHeading, formatSessionDate } from "@pilates/mobile-core";
 
 function groupByMonth(
   entries: ClassHistoryEntryDto[],

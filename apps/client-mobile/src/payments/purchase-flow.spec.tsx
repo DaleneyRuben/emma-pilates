@@ -10,7 +10,7 @@ import * as FileSystem from "expo-file-system/legacy";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
-import { encodeBase64 } from "./base64";
+import { encodeBase64 } from "@pilates/mobile-core";
 
 jest.setTimeout(30_000);
 

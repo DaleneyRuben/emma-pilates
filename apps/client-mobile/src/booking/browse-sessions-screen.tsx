@@ -26,7 +26,7 @@ import {
   dayChipLabel,
   formatTimeRange,
   upcomingCivilDates,
-} from "./session-format";
+} from "@pilates/mobile-core";
 
 type BrowseNavigation = {
   navigate: (screen: "SessionDetail", params: { sessionId: string }) => void;
