@@ -23,6 +23,8 @@ import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { CenteredCard } from "./assistant-layout";
+import { useAssistantWorkspace } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses, formatCivilDate } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
@@ -31,7 +33,10 @@ import type { ClientContext } from "./client-overview-screen";
 type ConfirmNavigation = {
   goBack: () => void;
   // Back to the overview already in the stack, dropping plan and payment.
-  popTo: (screen: "ClientOverview", params: { clientId: string }) => void;
+  popTo: {
+    (screen: "ClientOverview", params: { clientId: string }): void;
+    (screen: "ClientSearch"): void;
+  };
 };
 
 const paymentProblems: Record<string, string> = {
@@ -58,6 +63,7 @@ export function ConfirmCashPaymentScreen({
 }) {
   const { clientId, clientName, quote } = route.params;
   const navigation = useNavigation<ConfirmNavigation>();
+  const workspace = useAssistantWorkspace();
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
@@ -105,6 +111,7 @@ export function ConfirmCashPaymentScreen({
     const activated = result.subscription;
     return (
       <Screen style={styles.screen}>
+        <CenteredCard maxWidth={520}>
         <View style={styles.success}>
           <View style={styles.successIcon}>
             <Text style={styles.successGlyph}>✓</Text>
@@ -126,15 +133,24 @@ export function ConfirmCashPaymentScreen({
           </View>
           <PrimaryButton
             label="Volver al cliente"
-            onPress={() => navigation.popTo("ClientOverview", { clientId })}
+            onPress={() => {
+              if (workspace.split) {
+                workspace.show({ view: "overview", clientId });
+                navigation.popTo("ClientSearch");
+                return;
+              }
+              navigation.popTo("ClientOverview", { clientId });
+            }}
           />
         </View>
+        </CenteredCard>
       </Screen>
     );
   }
 
   return (
     <Screen style={styles.screen}>
+      <CenteredCard maxWidth={520}>
       <BackLink onPress={() => navigation.goBack()} />
       <Heading accessibilityLabel="Confirmar pago en efectivo">
         Confirmar pago en efectivo
@@ -196,6 +212,7 @@ export function ConfirmCashPaymentScreen({
           onPress={() => void confirm()}
         />
       </ScrollView>
+      </CenteredCard>
     </Screen>
   );
 }

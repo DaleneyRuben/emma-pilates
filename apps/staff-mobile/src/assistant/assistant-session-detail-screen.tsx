@@ -19,19 +19,16 @@ import {
   TextButton,
   typography,
 } from "@pilates/mobile-core";
-import {
-  type NavigationProp,
-  type ParamListBase,
-  useNavigation,
-} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { CenteredCard } from "./assistant-layout";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { ClientBanner } from "./client-banner";
-import { showClientBookings } from "./show-client-bookings";
+import { useShowClientBookings } from "./show-client-bookings";
 import type { ClientContext } from "./client-overview-screen";
 
 export type ConfirmedBooking = {
@@ -41,7 +38,7 @@ export type ConfirmedBooking = {
   endsAt: string;
 };
 
-type DetailNavigation = Pick<NavigationProp<ParamListBase>, "dispatch"> & {
+type DetailNavigation = {
   goBack: () => void;
   navigate: (screen: "SelectPlan", params: ClientContext) => void;
 };
@@ -62,6 +59,7 @@ export function AssistantSessionDetailScreen({
   route: { params: ClientContext & { sessionId: string } };
 }) {
   const { clientId, clientName, sessionId } = route.params;
+  const showClientBookings = useShowClientBookings();
   const navigation = useNavigation<DetailNavigation>();
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
@@ -133,7 +131,7 @@ export function AssistantSessionDetailScreen({
     try {
       const booking = await api.bookForClient(detail.id, clientId);
       await refresh();
-      showClientBookings(navigation, {
+      showClientBookings({
         clientId,
         clientName,
         confirmed: {
@@ -177,6 +175,7 @@ export function AssistantSessionDetailScreen({
 
   return (
     <Screen style={styles.screen}>
+      <CenteredCard maxWidth={640}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
         <Heading accessibilityLabel={detail.classType.name}>
@@ -264,6 +263,7 @@ export function AssistantSessionDetailScreen({
           </>
         )}
       </View>
+      </CenteredCard>
     </Screen>
   );
 }

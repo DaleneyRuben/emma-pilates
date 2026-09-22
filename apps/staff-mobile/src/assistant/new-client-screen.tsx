@@ -15,10 +15,13 @@ import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { CenteredCard } from "./assistant-layout";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
+import { useAssistantWorkspace } from "./assistant-workspace";
 
 type NewClientNavigation = {
   goBack: () => void;
+  popTo: (screen: "ClientSearch") => void;
   // The form is done once the account exists, so the overview replaces it.
   replace: (screen: "ClientOverview", params: { clientId: string }) => void;
 };
@@ -52,6 +55,16 @@ export function NewClientScreen() {
       ? "Escribe un correo válido."
       : undefined;
 
+  const workspace = useAssistantWorkspace();
+  const openClient = (clientId: string) => {
+    if (workspace.split) {
+      workspace.show({ view: "overview", clientId });
+      navigation.popTo("ClientSearch");
+      return;
+    }
+    navigation.replace("ClientOverview", { clientId });
+  };
+
   const create = async () => {
     setSubmitted(true);
     setFailure(null);
@@ -67,7 +80,7 @@ export function NewClientScreen() {
         setVerificationPending(result.clientId);
         return;
       }
-      navigation.replace("ClientOverview", { clientId: result.clientId });
+      openClient(result.clientId);
     } catch (error) {
       const code = error instanceof AssistantApiError ? error.code : null;
       setFailure(
@@ -81,6 +94,7 @@ export function NewClientScreen() {
 
   return (
     <Screen style={styles.screen}>
+      <CenteredCard maxWidth={560}>
       <BackLink onPress={() => navigation.goBack()} />
       <Heading accessibilityLabel="Nuevo cliente">Nuevo cliente</Heading>
       <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
@@ -123,9 +137,7 @@ export function NewClientScreen() {
             <TextButton
               label="Ver cliente"
               onPress={() =>
-                navigation.replace("ClientOverview", {
-                  clientId: verificationPending,
-                })
+                openClient(verificationPending)
               }
             />
           </>
@@ -137,6 +149,7 @@ export function NewClientScreen() {
           />
         )}
       </ScrollView>
+      </CenteredCard>
     </Screen>
   );
 }

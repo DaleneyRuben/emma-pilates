@@ -29,6 +29,7 @@ import { CancelClassScreen } from "./administrator/cancel-class-screen";
 import { CancelSessionScreen } from "./administrator/cancel-session-screen";
 import { PendingPaymentsScreen } from "./administrator/pending-payments-screen";
 import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
+import { AssistantWorkspaceProvider } from "./assistant/assistant-workspace";
 import { AssistantRescheduleScreen } from "./assistant/assistant-reschedule-screen";
 import { AssistantSessionDetailScreen } from "./assistant/assistant-session-detail-screen";
 import { BrowseSessionsScreen } from "./assistant/browse-sessions-screen";
@@ -416,7 +417,9 @@ export function StaffNavigation({
     return (
       <MobileQueryProvider accountId={accountId}>
         <StaffFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
-          <AuthenticatedStaffNavigation />
+          <AssistantWorkspaceProvider>
+            <AuthenticatedStaffNavigation />
+          </AssistantWorkspaceProvider>
         </StaffFetcherContext.Provider>
       </MobileQueryProvider>
     );

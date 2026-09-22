@@ -27,6 +27,7 @@ import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { useInClientPanel } from "./assistant-workspace";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import {
   describeClasses,
@@ -281,7 +282,9 @@ export function ClientOverviewScreen({
     query: { refetchOnMount: "always" },
   });
 
-  const back = <BackLink onPress={() => navigation.goBack()} />;
+  // Beside the search on a tablet there is nowhere to go back to.
+  const inPanel = useInClientPanel();
+  const back = inPanel ? null : <BackLink onPress={() => navigation.goBack()} />;
 
   if (overview.isPending) {
     return (

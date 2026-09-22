@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
+import { TabletGrid } from "./assistant-layout";
 import { describeClasses } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
@@ -85,6 +86,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
         </View>
       ) : null}
       <ScrollView contentContainerStyle={styles.list}>
+        <TabletGrid testID="assistant-plan-grid">
         {plans.map((plan) => (
           <Pressable
             accessibilityLabel={plan.name}
@@ -113,6 +115,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
             </View>
           </Pressable>
         ))}
+        </TabletGrid>
       </ScrollView>
     </Screen>
   );
@@ -136,7 +139,7 @@ const styles = StyleSheet.create({
     padding: spacing.md,
   },
   creditText: { color: colors.successText, fontSize: typography.note, fontWeight: "600" },
-  list: { gap: spacing.md, paddingBottom: spacing.xxl },
+  list: { paddingBottom: spacing.xxl },
   originalPrice: {
     color: colors.textSubtle,
     fontSize: typography.note,

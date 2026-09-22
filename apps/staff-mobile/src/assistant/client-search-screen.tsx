@@ -22,6 +22,8 @@ import {
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 import { describeContact } from "./assistant-format";
+import { useAssistantWorkspace } from "./assistant-workspace";
+import { ClientDetailPanel } from "./client-panel";
 
 export type ClientSearchNavigation = {
   navigate: {
@@ -64,9 +66,15 @@ export function ClientSearchScreen() {
     { fetcher, query: { enabled: searching, refetchOnMount: "always" } },
   );
   const clients = results.data?.status === 200 ? results.data.data : [];
+  const workspace = useAssistantWorkspace();
+  const selectedId = workspace.split ? workspace.panel?.clientId : undefined;
+  const open = (clientId: string) =>
+    workspace.split
+      ? workspace.show({ view: "overview", clientId })
+      : navigation.navigate("ClientOverview", { clientId });
 
-  return (
-    <Screen style={styles.screen}>
+  const search = (
+    <>
       <RootHeader label="Buscar cliente" title="Buscar cliente" />
       <TextInput
         accessibilityLabel={placeholder}
@@ -103,11 +111,10 @@ export function ClientSearchScreen() {
             <Pressable
               accessibilityLabel={`Ver cliente ${client.name}`}
               accessibilityRole="button"
+              accessibilityState={{ selected: client.id === selectedId }}
               key={client.id}
-              onPress={() =>
-                navigation.navigate("ClientOverview", { clientId: client.id })
-              }
-              style={styles.row}
+              onPress={() => open(client.id)}
+              style={[styles.row, client.id === selectedId && styles.rowSelected]}
             >
               <View style={styles.rowBody}>
                 <Text style={styles.name}>{client.name}</Text>
@@ -124,6 +131,18 @@ export function ClientSearchScreen() {
           ))}
         </ScrollView>
       )}
+    </>
+  );
+
+  if (!workspace.split) {
+    return <Screen style={styles.screen}>{search}</Screen>;
+  }
+  return (
+    <Screen style={styles.split}>
+      <View style={styles.searchPanel}>{search}</View>
+      <View style={styles.detailPanel}>
+        <ClientDetailPanel />
+      </View>
     </Screen>
   );
 }
@@ -175,5 +194,13 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   rowBody: { flex: 1, gap: spacing.xxs },
+  rowSelected: { borderColor: colors.primary, borderWidth: 2 },
   screen: { gap: spacing.md },
+  detailPanel: {
+    borderLeftColor: colors.divider,
+    borderLeftWidth: 1,
+    flex: 1,
+  },
+  searchPanel: { gap: spacing.md, paddingRight: spacing.lg, width: 360 },
+  split: { flexDirection: "row", paddingRight: 0 },
 });

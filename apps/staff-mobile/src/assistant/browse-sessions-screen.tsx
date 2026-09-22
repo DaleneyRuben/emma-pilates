@@ -27,6 +27,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { describeCount } from "../administrator/administrator-format";
 import { useStaffFetcher } from "../staff-fetcher";
+import { TabletGrid } from "./assistant-layout";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
 
@@ -229,6 +230,7 @@ export function BrowseSessionsScreen({
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
+          <TabletGrid testID="assistant-session-grid">
           {visible.map((session) => {
             const full = session.availableSeats === 0;
             return (
@@ -260,6 +262,7 @@ export function BrowseSessionsScreen({
               </Pressable>
             );
           })}
+          </TabletGrid>
         </ScrollView>
       )}
     </Screen>
@@ -313,7 +316,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
   },
-  list: { gap: spacing.md, paddingBottom: spacing.xxl },
+  list: { paddingBottom: spacing.xxl },
   screen: { gap: spacing.md },
   tag: {
     backgroundColor: colors.primaryTint,
