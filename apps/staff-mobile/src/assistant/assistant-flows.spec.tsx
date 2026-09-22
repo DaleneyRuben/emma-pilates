@@ -551,6 +551,53 @@ describe("Assistant Client flows", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
     });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+    });
+    expect(screen.queryByText("¡Pago registrado!")).toBeNull();
+  });
+
+  it("goes back from a newly invited Client's overview to the search, not the form", async () => {
+    const screen = await openClientSearch({
+      ...assistantRoutes(),
+      "POST /api/v1/assistant/client-invitations": () =>
+        jsonResponse(
+          { status: "invited", clientId: "client-new", email: "ana@example.com" },
+          201,
+        ),
+      "/api/v1/assistant/clients/client-new": () =>
+        jsonResponse({
+          client: newClient,
+          subscription: { status: "none", subscription: null },
+          nextBooking: null,
+          recentHistory: [],
+          creditAvailableCentavos: 0,
+        }),
+      "/api/v1/assistant/client-invitations/client-new": () =>
+        jsonResponse(invitation),
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+    });
+    await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
+    await fireEvent.changeText(
+      screen.getByLabelText("Correo electrónico"),
+      "ana@example.com",
+    );
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Ana Nueva")).toBeOnTheScreen();
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Buscar cliente")).toBeOnTheScreen();
+    });
+    expect(screen.queryByRole("button", { name: "Crear cuenta" })).toBeNull();
   });
 
   it("invites a new Client, shows the pending invitation on her overview, and cancels it", async () => {
