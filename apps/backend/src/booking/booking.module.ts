@@ -51,6 +51,11 @@ import { loadClientSubscription } from './client/client-subscription';
 import { updateClientProfile } from './client/update-client-profile';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
 import { LocalObjectStorage } from '../uploads/local-object-storage';
+import { createAssistantClientOperations } from './assistant/assistant-operations';
+import {
+  AssistantClientsController,
+  assistantClientOperations,
+} from './assistant/assistant.controller';
 import {
   AdministratorPaymentsController,
   AdministratorSessionsController,
@@ -115,6 +120,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     TransferInstructionsController,
     AdministratorPaymentsController,
     AdministratorSessionsController,
+    AssistantClientsController,
   ],
   providers: [
     {
@@ -430,6 +436,19 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
         createPrismaPaymentCommands(prisma, {
           now: () => new Date(),
           referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
+        }),
+    },
+    {
+      provide: assistantClientOperations,
+      inject: [bookingPrisma, paymentCommands],
+      useFactory: (
+        prisma: PrismaClient,
+        payments: import('./payments/prisma-payment-commands').PaymentCommands,
+      ) =>
+        createAssistantClientOperations({
+          prisma,
+          payments,
+          now: () => new Date(),
         }),
     },
     {

@@ -54,6 +54,9 @@ export class UpcomingBookingDto {
   @ApiProperty({ format: 'uuid' })
   sessionId!: string;
 
+  @ApiProperty({ format: 'uuid' })
+  branchId!: string;
+
   @ApiProperty()
   classTypeName!: string;
 

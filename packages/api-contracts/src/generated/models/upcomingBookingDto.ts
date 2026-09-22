@@ -11,6 +11,7 @@ export interface UpcomingBookingDto {
   bookingId?: string;
   waitlistEntryId?: string;
   sessionId: string;
+  branchId: string;
   classTypeName: string;
   trainerName: string;
   branchName: string;

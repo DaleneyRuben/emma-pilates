@@ -1734,6 +1734,254 @@
         ]
       }
     },
+    "/api/v1/assistant/clients": {
+      "get": {
+        "operationId": "searchAssistantClients",
+        "parameters": [
+          {
+            "name": "query",
+            "required": true,
+            "in": "query",
+            "description": "Name, email, or phone fragment (2 to 100 characters)",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantClientDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
+    "/api/v1/assistant/clients/{clientId}": {
+      "get": {
+        "operationId": "getAssistantClientOverview",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientOverviewDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
+    "/api/v1/assistant/clients/{clientId}/bookings": {
+      "get": {
+        "operationId": "listAssistantClientBookings",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantClientBookingDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
+    "/api/v1/assistant/clients/{clientId}/class-history": {
+      "get": {
+        "operationId": "listAssistantClientHistory",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ClassHistoryEntryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
+    "/api/v1/assistant/clients/{clientId}/plan-quotes": {
+      "get": {
+        "operationId": "quoteAssistantClientPlans",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlanQuotesDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
+    "/api/v1/assistant/clients/{clientId}/cash-payments": {
+      "post": {
+        "operationId": "recordAssistantCashPayment",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordCashPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantCashPaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -2949,6 +3197,10 @@
             "type": "string",
             "format": "uuid"
           },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "classTypeName": {
             "type": "string"
           },
@@ -2970,6 +3222,7 @@
         "required": [
           "kind",
           "sessionId",
+          "branchId",
           "classTypeName",
           "trainerName",
           "branchName",
@@ -3546,6 +3799,243 @@
         },
         "required": [
           "affectedBookings"
+        ]
+      },
+      "AssistantClientDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "active",
+              "pending",
+              "disabled"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "accountStatus"
+        ]
+      },
+      "ClientOverviewDto": {
+        "type": "object",
+        "properties": {
+          "client": {
+            "$ref": "#/components/schemas/AssistantClientDto"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/ClientSubscriptionDto"
+          },
+          "nextBooking": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpcomingBookingDto"
+              }
+            ]
+          },
+          "recentHistory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClassHistoryEntryDto"
+            }
+          },
+          "creditAvailableCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Available Credit in BOB centavos"
+          }
+        },
+        "required": [
+          "client",
+          "subscription",
+          "recentHistory",
+          "creditAvailableCentavos"
+        ]
+      },
+      "AssistantClientBookingDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "booking",
+              "waitlist"
+            ]
+          },
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "waitlistEntryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeName": {
+            "type": "string"
+          },
+          "trainerName": {
+            "type": "string"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "actionable": {
+            "type": "boolean",
+            "description": "Whether the signed-in Staff Member may cancel, reschedule, or leave this item"
+          }
+        },
+        "required": [
+          "kind",
+          "sessionId",
+          "branchId",
+          "classTypeName",
+          "trainerName",
+          "branchName",
+          "startsAt",
+          "endsAt",
+          "actionable"
+        ]
+      },
+      "PlanQuoteDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "durationMonths": {
+            "type": "number",
+            "enum": [
+              1,
+              3,
+              6,
+              12
+            ]
+          },
+          "classAllowance": {
+            "type": "number",
+            "minimum": 1
+          },
+          "priceCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Money Amount in BOB centavos"
+          },
+          "creditAppliedCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Credit this purchase would spend"
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Cash to collect in BOB centavos"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "durationMonths",
+          "classAllowance",
+          "priceCentavos",
+          "creditAppliedCentavos",
+          "amountDueCentavos"
+        ]
+      },
+      "PlanQuotesDto": {
+        "type": "object",
+        "properties": {
+          "creditAvailableCentavos": {
+            "type": "number",
+            "minimum": 0
+          },
+          "plans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanQuoteDto"
+            }
+          }
+        },
+        "required": [
+          "creditAvailableCentavos",
+          "plans"
+        ]
+      },
+      "RecordCashPaymentDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Branch where the cash was collected"
+          }
+        },
+        "required": [
+          "planId",
+          "branchId"
+        ]
+      },
+      "AssistantCashPaymentDto": {
+        "type": "object",
+        "properties": {
+          "payment": {
+            "$ref": "#/components/schemas/PaymentDto"
+          },
+          "subscription": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSubscriptionSummaryDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "payment"
         ]
       },
       "CreatePendingUploadDto": {
