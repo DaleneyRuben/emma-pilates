@@ -181,7 +181,11 @@ export function PaymentScreen() {
           )}
         </View>
         <Pressable
-          accessibilityLabel="Sube tu comprobante de transferencia"
+          accessibilityLabel={
+            receipt === null
+              ? "Sube tu comprobante de transferencia"
+              : "Comprobante adjunto. Toca para cambiarlo."
+          }
           accessibilityRole="button"
           accessibilityState={{ disabled: uploading }}
           disabled={uploading}
