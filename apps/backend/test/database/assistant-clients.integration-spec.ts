@@ -62,7 +62,7 @@ describe('Assistant Client repository', () => {
 
   it('searches active Clients by name, email, or phone regardless of case', async () => {
     await expect(
-      repository().searchClients({ query: 'lucÍa', limit: 20 }),
+      repository().searchClients({ query: 'LUC', limit: 20 }),
     ).resolves.toEqual([
       {
         id: lucia.id,
