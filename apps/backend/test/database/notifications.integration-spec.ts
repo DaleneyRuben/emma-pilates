@@ -1,5 +1,7 @@
+import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
+import { PrismaBookingCommands } from '../../src/booking/commands/prisma-booking-commands';
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
 import { buildDevelopmentFixtures } from '../../src/development-fixtures/development-fixtures';
 import { createNotificationStore } from '../../src/notifications/prisma-notification-store';
@@ -82,6 +84,70 @@ describe('Notification store', () => {
       readAt: null,
     });
     await expect(store.countUnread(accountId)).resolves.toBe(2);
+  });
+
+  it('notifies a promoted Waitlist Client inside the booking transaction', async () => {
+    const valeria = fixtures.clients.find(
+      (c) => c.email === 'valeria@example.com',
+    )!;
+    const valeriaAccount = await prisma.account.findUniqueOrThrow({
+      where: { email: valeria.email },
+      select: { id: true },
+    });
+    const luciaAccount = await prisma.account.findUniqueOrThrow({
+      where: { email: 'lucia@example.com' },
+      select: { id: true },
+    });
+    const now = new Date('2026-09-21T12:00:00.000Z');
+    const session = fixtures.sessions
+      .filter((s) => s.startsAt > new Date('2026-09-22T12:00:00.000Z'))
+      .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())[0];
+    await prisma.waitlistEntry.deleteMany({ where: { sessionId: session.id } });
+    await prisma.booking.deleteMany({ where: { sessionId: session.id } });
+    await prisma.notification.deleteMany({
+      where: { accountId: valeriaAccount.id },
+    });
+    await prisma.session.update({
+      where: { id: session.id },
+      data: { capacity: 1 },
+    });
+    const commands = new PrismaBookingCommands(prisma, () => now);
+    const luciaPrincipal = {
+      accountId: luciaAccount.id,
+      authenticationSessionId: randomUUID(),
+      identity: { kind: 'client' as const, clientId: fixtures.clients[0].id },
+    };
+    const booking = await commands.create(
+      { sessionId: session.id },
+      luciaPrincipal,
+    );
+    await commands.joinWaitlist(
+      { sessionId: session.id },
+      {
+        accountId: valeriaAccount.id,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: valeria.id },
+      },
+    );
+
+    await commands.cancel({ bookingId: booking.id }, luciaPrincipal);
+
+    const store = createNotificationStore(prisma);
+    const [notification] = await store.findPage({
+      accountId: valeriaAccount.id,
+      after: null,
+      limit: 5,
+    });
+    const className = fixtures.classTypes.find(
+      (classType) => classType.id === session.classTypeId,
+    )!.name;
+    expect(notification).toMatchObject({
+      category: 'booking_schedule',
+      type: 'waitlist_promoted',
+      title: 'Cupo liberado',
+      message: `¡Tienes un cupo! Te promovimos de la lista de espera para tu clase de ${className}.`,
+      destinationType: 'booking',
+    });
   });
 
   it('pages after a cursor and marks single and all notifications read', async () => {
