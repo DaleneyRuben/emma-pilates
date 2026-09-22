@@ -171,6 +171,66 @@ export class ReferralsDto {
   referrals!: ReferredClientDto[];
 }
 
+export class PendingPaymentDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  clientName!: string;
+
+  @ApiProperty()
+  planName!: string;
+
+  @ApiProperty({ minimum: 1 })
+  amountDueCentavos!: number;
+
+  @ApiProperty({ format: 'date-time' })
+  submittedAt!: Date;
+
+  @ApiProperty()
+  receiptAvailable!: boolean;
+}
+
+export class PaymentReceiptDto {
+  @ApiProperty({ format: 'uuid' })
+  imageAssetId!: string;
+
+  @ApiProperty({ enum: ['image/jpeg', 'image/png', 'image/webp'] })
+  mediaType!: string;
+}
+
+export class PaymentReviewDto extends PaymentDto {
+  @ApiProperty()
+  clientName!: string;
+
+  @ApiPropertyOptional({ type: PaymentReceiptDto, nullable: true })
+  receipt!: PaymentReceiptDto | null;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description: 'Authenticated backend route streaming the receipt while it is retained',
+  })
+  receiptUrl!: string | null;
+}
+
+export class RejectPaymentDto {
+  @ApiProperty({ minLength: 1, maxLength: 300 })
+  reason!: string;
+}
+
+export const parseRejectPayment = (value: unknown): RejectPaymentDto | null => {
+  const result = z
+    .strictObject({ reason: z.string().trim().min(1).max(300) })
+    .safeParse(value);
+  return result.success ? result.data : null;
+};
+
+export class SessionCancellationDto {
+  @ApiProperty({ minimum: 0 })
+  affectedBookings!: number;
+}
+
 export class TransferInstructionsDto {
   @ApiProperty()
   beneficiaryName!: string;
