@@ -41,6 +41,19 @@ import { ClientRegistrationController } from './registration/client-registration
 import { CorrectPendingClientEmail } from './registration/correct-pending-client-email';
 import { PrismaClientRegistrationUnitOfWork } from './registration/prisma-client-registration-unit-of-work';
 import { RegisterClient } from './registration/register-client';
+import {
+  cancelClientInvitation,
+  correctClientInvitationEmail,
+  inviteClient,
+  readClientInvitation,
+  resendClientInvitation,
+} from './invitations/client-invitations';
+import {
+  AssistantClientInvitationsController,
+  clientInvitationOperations,
+  type ClientInvitationOperations,
+} from './invitations/client-invitations.controller';
+import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-invitation-unit-of-work';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { argon2PasswordHasher } from './security/argon2-password-hasher';
@@ -76,6 +89,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
 @Module({
   controllers: [
     AccountSecurityController,
+    AssistantClientInvitationsController,
     AuthenticationController,
     ClientEmailVerificationController,
     ClientRegistrationController,
@@ -297,6 +311,52 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
             now: () => new Date(),
             revokeSession: (input) => gateway.revokeSession(input),
           }),
+    },
+    {
+      provide: clientInvitationOperations,
+      inject: [
+        systemIdentityPrisma,
+        registrationPgBoss,
+        ConfigService,
+        AuthenticationLinkCipher,
+      ],
+      useFactory: (
+        prisma: PrismaClient,
+        boss: PgBoss,
+        config: ConfigService<Environment, true>,
+        linkCipher: AuthenticationLinkCipher,
+      ): ClientInvitationOperations => {
+        const dependencies = {
+          unitOfWork: new PrismaClientInvitationUnitOfWork({
+            prisma,
+            boss,
+            digestEmail: (email) =>
+              createHmac(
+                'sha256',
+                config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
+              )
+                .update(email)
+                .digest(),
+          }),
+          tokenIssuer: authenticationTokens,
+          linkCipher,
+          now: () => new Date(),
+          newId: randomUUID,
+          newReferralCode: () => `REF-${randomUUID()}`,
+        };
+        return {
+          invite: (command, principal) =>
+            inviteClient(command, principal, dependencies),
+          read: (command, principal) =>
+            readClientInvitation(command, principal, dependencies),
+          correctEmail: (command, principal) =>
+            correctClientInvitationEmail(command, principal, dependencies),
+          resend: (command, principal) =>
+            resendClientInvitation(command, principal, dependencies),
+          cancel: (command, principal) =>
+            cancelClientInvitation(command, principal, dependencies),
+        };
+      },
     },
     {
       provide: RegisterClient,

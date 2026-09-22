@@ -34,11 +34,14 @@ import type {
   ClassHistoryEntryDto,
   ClassTypeDto,
   ClientEmailVerificationResultDto,
+  ClientInvitationDto,
+  ClientInvitationResultDto,
   ClientOverviewDto,
   ClientProfileDto,
   ClientSubscriptionDto,
   CompleteAccountActivationDto,
   CompletePasswordRecoveryDto,
+  CorrectInvitationEmailDto,
   CorrectPendingClientEmailDto,
   CreateAuthenticationSessionDto,
   CreateBookingDto,
@@ -48,6 +51,7 @@ import type {
   CreditDto,
   CurrentAuthenticationPrincipalDto,
   FinalizedUploadDto,
+  InviteClientDto,
   ListNotificationsParams,
   ListSessionAvailabilityParams,
   ListTrainerScheduleParams,
@@ -925,6 +929,685 @@ export const useChangeCurrentAccountPassword = <
 > => {
   return useMutation(
     getChangeCurrentAccountPasswordMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type inviteClientResponse201 = {
+  data: ClientInvitationResultDto;
+  status: 201;
+};
+
+export type inviteClientResponseSuccess = inviteClientResponse201 & {
+  headers: Headers;
+};
+export type inviteClientResponse = inviteClientResponseSuccess;
+
+export const getInviteClientUrl = () => {
+  return `/api/v1/assistant/client-invitations`;
+};
+
+export const inviteClient = async (
+  inviteClientDto: InviteClientDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<inviteClientResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getInviteClientUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(inviteClientDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: inviteClientResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as inviteClientResponse;
+};
+
+export const getInviteClientMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof inviteClient>>,
+    TError,
+    InviteClientMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof inviteClient>>,
+  TError,
+  InviteClientMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["inviteClient"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof inviteClient>>,
+    InviteClientMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return inviteClient(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type InviteClientMutationResult = NonNullable<
+  Awaited<ReturnType<typeof inviteClient>>
+>;
+export type InviteClientMutationBody = InviteClientDto;
+export type InviteClientMutationError = unknown;
+export type InviteClientMutationVariables = { data: InviteClientDto };
+
+export const useInviteClient = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof inviteClient>>,
+      TError,
+      InviteClientMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof inviteClient>>,
+  TError,
+  InviteClientMutationVariables,
+  TContext
+> => {
+  return useMutation(getInviteClientMutationOptions(options), queryClient);
+};
+
+export type getClientInvitationResponse200 = {
+  data: ClientInvitationDto;
+  status: 200;
+};
+
+export type getClientInvitationResponseSuccess =
+  getClientInvitationResponse200 & {
+    headers: Headers;
+  };
+export type getClientInvitationResponse = getClientInvitationResponseSuccess;
+
+export const getGetClientInvitationUrl = (clientId: string) => {
+  return `/api/v1/assistant/client-invitations/${clientId}`;
+};
+
+export const getClientInvitation = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getClientInvitationResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetClientInvitationUrl(clientId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getClientInvitationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getClientInvitationResponse;
+};
+
+export const getGetClientInvitationQueryKey = (clientId: string) => {
+  return [`/api/v1/assistant/client-invitations/${clientId}`] as const;
+};
+
+export const getGetClientInvitationQueryOptions = <
+  TData = Awaited<ReturnType<typeof getClientInvitation>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientInvitation>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetClientInvitationQueryKey(clientId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getClientInvitation>>
+  > = ({ signal }) =>
+    getClientInvitation(clientId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: clientId !== null && clientId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getClientInvitation>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetClientInvitationQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getClientInvitation>>
+>;
+export type GetClientInvitationQueryError = unknown;
+
+export function useGetClientInvitation<
+  TData = Awaited<ReturnType<typeof getClientInvitation>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientInvitation>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientInvitation>>,
+          TError,
+          Awaited<ReturnType<typeof getClientInvitation>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientInvitation<
+  TData = Awaited<ReturnType<typeof getClientInvitation>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientInvitation>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientInvitation>>,
+          TError,
+          Awaited<ReturnType<typeof getClientInvitation>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientInvitation<
+  TData = Awaited<ReturnType<typeof getClientInvitation>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientInvitation>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetClientInvitation<
+  TData = Awaited<ReturnType<typeof getClientInvitation>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientInvitation>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetClientInvitationQueryOptions(clientId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type correctClientInvitationEmailResponse200 = {
+  data: ClientInvitationDto;
+  status: 200;
+};
+
+export type correctClientInvitationEmailResponseSuccess =
+  correctClientInvitationEmailResponse200 & {
+    headers: Headers;
+  };
+export type correctClientInvitationEmailResponse =
+  correctClientInvitationEmailResponseSuccess;
+
+export const getCorrectClientInvitationEmailUrl = (clientId: string) => {
+  return `/api/v1/assistant/client-invitations/${clientId}/email-corrections`;
+};
+
+export const correctClientInvitationEmail = async (
+  clientId: string,
+  correctInvitationEmailDto: CorrectInvitationEmailDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<correctClientInvitationEmailResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getCorrectClientInvitationEmailUrl(clientId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(correctInvitationEmailDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: correctClientInvitationEmailResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as correctClientInvitationEmailResponse;
+};
+
+export const getCorrectClientInvitationEmailMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof correctClientInvitationEmail>>,
+    TError,
+    CorrectClientInvitationEmailMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof correctClientInvitationEmail>>,
+  TError,
+  CorrectClientInvitationEmailMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["correctClientInvitationEmail"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof correctClientInvitationEmail>>,
+    CorrectClientInvitationEmailMutationVariables
+  > = (props) => {
+    const { clientId, data } = props ?? {};
+
+    return correctClientInvitationEmail(
+      clientId,
+      data,
+      fetchOptions,
+      fetcherFn,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CorrectClientInvitationEmailMutationResult = NonNullable<
+  Awaited<ReturnType<typeof correctClientInvitationEmail>>
+>;
+export type CorrectClientInvitationEmailMutationBody =
+  CorrectInvitationEmailDto;
+export type CorrectClientInvitationEmailMutationError = unknown;
+export type CorrectClientInvitationEmailMutationVariables = {
+  clientId: string;
+  data: CorrectInvitationEmailDto;
+};
+
+export const useCorrectClientInvitationEmail = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof correctClientInvitationEmail>>,
+      TError,
+      CorrectClientInvitationEmailMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof correctClientInvitationEmail>>,
+  TError,
+  CorrectClientInvitationEmailMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCorrectClientInvitationEmailMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type resendClientInvitationResponse200 = {
+  data: ClientInvitationDto;
+  status: 200;
+};
+
+export type resendClientInvitationResponseSuccess =
+  resendClientInvitationResponse200 & {
+    headers: Headers;
+  };
+export type resendClientInvitationResponse =
+  resendClientInvitationResponseSuccess;
+
+export const getResendClientInvitationUrl = (clientId: string) => {
+  return `/api/v1/assistant/client-invitations/${clientId}/resends`;
+};
+
+export const resendClientInvitation = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resendClientInvitationResponse> => {
+  const res = await (fetchFn ?? fetch)(getResendClientInvitationUrl(clientId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resendClientInvitationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as resendClientInvitationResponse;
+};
+
+export const getResendClientInvitationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resendClientInvitation>>,
+    TError,
+    ResendClientInvitationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resendClientInvitation>>,
+  TError,
+  ResendClientInvitationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["resendClientInvitation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resendClientInvitation>>,
+    ResendClientInvitationMutationVariables
+  > = (props) => {
+    const { clientId } = props ?? {};
+
+    return resendClientInvitation(clientId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResendClientInvitationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resendClientInvitation>>
+>;
+
+export type ResendClientInvitationMutationError = unknown;
+export type ResendClientInvitationMutationVariables = { clientId: string };
+
+export const useResendClientInvitation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resendClientInvitation>>,
+      TError,
+      ResendClientInvitationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resendClientInvitation>>,
+  TError,
+  ResendClientInvitationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getResendClientInvitationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type cancelClientInvitationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type cancelClientInvitationResponseSuccess =
+  cancelClientInvitationResponse204 & {
+    headers: Headers;
+  };
+export type cancelClientInvitationResponse =
+  cancelClientInvitationResponseSuccess;
+
+export const getCancelClientInvitationUrl = (clientId: string) => {
+  return `/api/v1/assistant/client-invitations/${clientId}/cancellation`;
+};
+
+export const cancelClientInvitation = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelClientInvitationResponse> => {
+  const res = await (fetchFn ?? fetch)(getCancelClientInvitationUrl(clientId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelClientInvitationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as cancelClientInvitationResponse;
+};
+
+export const getCancelClientInvitationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelClientInvitation>>,
+    TError,
+    CancelClientInvitationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelClientInvitation>>,
+  TError,
+  CancelClientInvitationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["cancelClientInvitation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cancelClientInvitation>>,
+    CancelClientInvitationMutationVariables
+  > = (props) => {
+    const { clientId } = props ?? {};
+
+    return cancelClientInvitation(clientId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelClientInvitationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cancelClientInvitation>>
+>;
+
+export type CancelClientInvitationMutationError = unknown;
+export type CancelClientInvitationMutationVariables = { clientId: string };
+
+export const useCancelClientInvitation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelClientInvitation>>,
+      TError,
+      CancelClientInvitationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelClientInvitation>>,
+  TError,
+  CancelClientInvitationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCancelClientInvitationMutationOptions(options),
     queryClient,
   );
 };

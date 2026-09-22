@@ -180,6 +180,194 @@
         ]
       }
     },
+    "/api/v1/assistant/client-invitations": {
+      "post": {
+        "operationId": "inviteClient",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteClientDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientInvitationResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClientInvitations"
+        ]
+      }
+    },
+    "/api/v1/assistant/client-invitations/{clientId}": {
+      "get": {
+        "operationId": "getClientInvitation",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientInvitationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClientInvitations"
+        ]
+      }
+    },
+    "/api/v1/assistant/client-invitations/{clientId}/email-corrections": {
+      "post": {
+        "operationId": "correctClientInvitationEmail",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectInvitationEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientInvitationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClientInvitations"
+        ]
+      }
+    },
+    "/api/v1/assistant/client-invitations/{clientId}/resends": {
+      "post": {
+        "operationId": "resendClientInvitation",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientInvitationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClientInvitations"
+        ]
+      }
+    },
+    "/api/v1/assistant/client-invitations/{clientId}/cancellation": {
+      "post": {
+        "operationId": "cancelClientInvitation",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClientInvitations"
+        ]
+      }
+    },
     "/api/v1/authentication-sessions": {
       "post": {
         "operationId": "createMobileAuthenticationSession",
@@ -2446,6 +2634,111 @@
         "required": [
           "currentPassword",
           "newPassword"
+        ]
+      },
+      "InviteClientDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Ana Nueva"
+          },
+          "email": {
+            "type": "string",
+            "example": "ana@example.com",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "example": "+591 70000000"
+          }
+        },
+        "required": [
+          "name",
+          "email"
+        ]
+      },
+      "ClientInvitationResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "invited",
+              "invitation_resent",
+              "verification_pending"
+            ],
+            "description": "invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration and received a fresh verification link"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "status",
+          "clientId",
+          "email"
+        ]
+      },
+      "ClientInvitationDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "pendingExpiresAt": {
+            "format": "date-time",
+            "type": "string",
+            "description": "When the pending invitation is removed unless activated"
+          },
+          "activationExpiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Expiry of the current activation link"
+          },
+          "cancellable": {
+            "type": "boolean",
+            "description": "False once the Client holds a Subscription, Payment, or Booking"
+          }
+        },
+        "required": [
+          "clientId",
+          "name",
+          "email",
+          "pendingExpiresAt",
+          "cancellable"
+        ]
+      },
+      "CorrectInvitationEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "corregida@example.com",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
         ]
       },
       "ClientAuthenticationIdentityDto": {
