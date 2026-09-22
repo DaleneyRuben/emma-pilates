@@ -507,7 +507,7 @@ export function createPrismaPaymentCommands(
       actionCode: string;
       principal: AuthenticatedPrincipal;
       payment: PaymentRow;
-      priorState: PaymentView['state'];
+      priorState: PaymentView['state'] | null;
       newState: PaymentView['state'];
       branchId?: string | null;
       now: Date;
@@ -600,6 +600,224 @@ export function createPrismaPaymentCommands(
     }
 
     return subscription.id;
+  };
+
+  const notifyPaymentConfirmed = async (
+    transaction: Transaction,
+    input: { clientId: string; paymentId: string; subscriptionId: string; now: Date },
+  ): Promise<void> => {
+    const client = await transaction.client.findUniqueOrThrow({
+      where: { id: input.clientId },
+      select: { account: { select: { id: true } } },
+    });
+    if (client.account === null) return;
+    await recordNotification(transaction, {
+      accountId: client.account.id,
+      category: 'subscription_payment',
+      type: 'payment_confirmed',
+      businessEventKey: `payment-confirmed:${input.paymentId}`,
+      title: 'Pago confirmado',
+      message: 'Tu pago fue confirmado. ¡Ya puedes reservar clases!',
+      destination: { type: 'subscription', id: input.subscriptionId },
+      occurredAt: input.now,
+    });
+  };
+
+  const requireCashCollector = (
+    principal: AuthenticatedPrincipal,
+    branchId: string,
+  ): void => {
+    if (
+      principal.identity.kind !== 'staff' ||
+      (principal.identity.role !== 'assistant' &&
+        principal.identity.role !== 'administrator')
+    ) {
+      throw new BookingAccessDeniedError();
+    }
+    if (
+      principal.identity.role === 'assistant' &&
+      !principal.identity.branchIds.includes(branchId)
+    ) {
+      throw rule(
+        'branch_not_assigned',
+        'Branch is not assigned to this Staff Member',
+      );
+    }
+  };
+
+  // Cash and Credit-only Payments are created confirmed by their submitter:
+  // Credit is reserved and spent in the same transaction, the Subscription
+  // activates, and any pending Referral is awarded.
+  const settleImmediatePayment = async (
+    transaction: Transaction,
+    input: {
+      clientId: string;
+      planId: string;
+      principal: AuthenticatedPrincipal;
+      branchId: string | null;
+      requireFullCredit: boolean;
+    },
+  ): Promise<{ id: string }> => {
+    const now = dependencies.now();
+    const referral = await transaction.referral.findFirst({
+      where: { referredClientId: input.clientId, state: ReferralState.PENDING },
+      select: { referrerClientId: true },
+    });
+    await lockClients(transaction, [
+      input.clientId,
+      ...(referral ? [referral.referrerClientId] : []),
+    ]);
+    const plan = await assertEligible(transaction, {
+      clientId: input.clientId,
+      planId: input.planId,
+    });
+    const credit = await readLedgerSummary(transaction, input.clientId);
+    if (input.requireFullCredit && credit.availableCentavos < plan.priceCentavos) {
+      throw rule('credit_insufficient', 'Credit does not cover the Plan price');
+    }
+    const applied = Math.min(credit.availableCentavos, plan.priceCentavos);
+    const amountDue = plan.priceCentavos - applied;
+    const method = amountDue === 0 ? PaymentMethod.CREDIT_ONLY : PaymentMethod.CASH;
+
+    const payment = await transaction.payment.create({
+      data: {
+        clientId: input.clientId,
+        planId: plan.id,
+        planNameSnapshot: plan.name,
+        durationMonthsSnapshot: plan.durationMonths,
+        classAllowanceSnapshot: plan.classAllowance,
+        planPriceCentavos: plan.priceCentavos,
+        creditAppliedCentavos: applied,
+        amountDueCentavos: amountDue,
+        method,
+        state: PaymentState.CONFIRMED,
+        collectedAtBranchId: method === PaymentMethod.CASH ? input.branchId : null,
+        submittedByAccountId: input.principal.accountId,
+        submittedAt: now,
+        decidedByAccountId: input.principal.accountId,
+        decidedAt: now,
+        createdAt: now,
+      },
+      select: paymentSelect,
+    });
+
+    if (applied > 0) {
+      const reservation = await transaction.creditReservation.create({
+        data: {
+          clientId: input.clientId,
+          amountCentavos: applied,
+          paymentId: payment.id,
+          state: CreditReservationState.SPENT,
+          reservedAt: now,
+          settledAt: now,
+        },
+        select: { id: true },
+      });
+      for (const kind of [
+        CreditLedgerEntryKind.PAYMENT_RESERVATION,
+        CreditLedgerEntryKind.PAYMENT_SPEND,
+      ]) {
+        await transaction.creditLedgerEntry.create({
+          data: {
+            clientId: input.clientId,
+            kind,
+            amountCentavos: applied,
+            occurredAt: now,
+            reservationId: reservation.id,
+            actorKind: CreditLedgerActorKind.ACCOUNT,
+            actorAccountId: input.principal.accountId,
+            correlationId: payment.id,
+          },
+        });
+      }
+    }
+
+    const subscriptionId = await activateSubscription(
+      transaction,
+      payment,
+      input.principal,
+      now,
+    );
+    await recordPaymentAudit(transaction, {
+      actionCode:
+        method === PaymentMethod.CASH
+          ? 'payment.cash_confirmed'
+          : 'payment.credit_only_confirmed',
+      principal: input.principal,
+      payment,
+      priorState: null,
+      newState: 'confirmed',
+      branchId: method === PaymentMethod.CASH ? input.branchId : null,
+      now,
+    });
+    await notifyPaymentConfirmed(transaction, {
+      clientId: input.clientId,
+      paymentId: payment.id,
+      subscriptionId,
+      now,
+    });
+
+    return { id: payment.id };
+  };
+
+  const recordCashPayment = async (
+    command: { clientId: string; planId: string; branchId: string },
+    principal: AuthenticatedPrincipal,
+    idempotencyKey: string,
+  ): Promise<PaymentView> => {
+    requireCashCollector(principal, command.branchId);
+
+    const stored = await serializable((transaction) =>
+      withIdempotency(
+        transaction,
+        {
+          accountId: principal.accountId,
+          command: 'record_cash_payment',
+          idempotencyKey,
+          request: command,
+        },
+        () =>
+          settleImmediatePayment(transaction, {
+            clientId: command.clientId,
+            planId: command.planId,
+            principal,
+            branchId: command.branchId,
+            requireFullCredit: false,
+          }),
+      ),
+    );
+
+    return readPaymentView(stored.id);
+  };
+
+  const completeCreditPurchase = async (
+    command: { planId: string },
+    principal: AuthenticatedPrincipal,
+    idempotencyKey: string,
+  ): Promise<PaymentView> => {
+    const clientId = requireClient(principal);
+
+    const stored = await serializable((transaction) =>
+      withIdempotency(
+        transaction,
+        {
+          accountId: principal.accountId,
+          command: 'complete_credit_purchase',
+          idempotencyKey,
+          request: command,
+        },
+        () =>
+          settleImmediatePayment(transaction, {
+            clientId,
+            planId: command.planId,
+            principal,
+            branchId: null,
+            requireFullCredit: true,
+          }),
+      ),
+    );
+
+    return readPaymentView(stored.id);
   };
 
   const readPaymentView = async (paymentId: string): Promise<PaymentView> =>
@@ -1025,22 +1243,12 @@ export function createPrismaPaymentCommands(
         now,
         true,
       );
-      const client = await transaction.client.findUniqueOrThrow({
-        where: { id: payment.clientId },
-        select: { account: { select: { id: true } } },
+      await notifyPaymentConfirmed(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+        subscriptionId,
+        now,
       });
-      if (client.account !== null) {
-        await recordNotification(transaction, {
-          accountId: client.account.id,
-          category: 'subscription_payment',
-          type: 'payment_confirmed',
-          businessEventKey: `payment-confirmed:${payment.id}`,
-          title: 'Pago confirmado',
-          message: 'Tu pago fue confirmado. ¡Ya puedes reservar clases!',
-          destination: { type: 'subscription', id: subscriptionId },
-          occurredAt: now,
-        });
-      }
 
       return payment.id;
     });
@@ -1170,6 +1378,8 @@ export function createPrismaPaymentCommands(
     expirePurchaseIntents,
     confirmTransfer,
     rejectTransfer,
+    recordCashPayment,
+    completeCreditPurchase,
     readOpenPurchaseIntent,
     readCurrentPayment,
     readCreditSummary,
