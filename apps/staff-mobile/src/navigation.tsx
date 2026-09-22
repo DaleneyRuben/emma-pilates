@@ -29,6 +29,16 @@ import { CancelClassScreen } from "./administrator/cancel-class-screen";
 import { CancelSessionScreen } from "./administrator/cancel-session-screen";
 import { PendingPaymentsScreen } from "./administrator/pending-payments-screen";
 import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
+import { AssistantRescheduleScreen } from "./assistant/assistant-reschedule-screen";
+import { AssistantSessionDetailScreen } from "./assistant/assistant-session-detail-screen";
+import { BrowseSessionsScreen } from "./assistant/browse-sessions-screen";
+import { ClientBookingsScreen } from "./assistant/client-bookings-screen";
+import { ClientHistoryScreen } from "./assistant/client-history-screen";
+import { ClientOverviewScreen } from "./assistant/client-overview-screen";
+import { ClientSearchScreen } from "./assistant/client-search-screen";
+import { ConfirmCashPaymentScreen } from "./assistant/confirm-cash-payment-screen";
+import { NewClientScreen } from "./assistant/new-client-screen";
+import { SelectPlanScreen } from "./assistant/select-plan-screen";
 import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
@@ -333,9 +343,6 @@ function TrainerRosterScreen({
   );
 }
 
-function AssistantClientSearchScreen() {
-  return <NavigationPlaceholder title="Buscar cliente" />;
-}
 function NutritionistAgendaScreen() {
   return <NavigationPlaceholder title="Mi agenda" />;
 }
@@ -356,7 +363,19 @@ const TrainerStack = createNativeStackNavigator({
 });
 const AssistantStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },
-  screens: { ClientSearch: AssistantClientSearchScreen, ...accountScreens },
+  screens: {
+    ClientSearch: ClientSearchScreen,
+    NewClient: NewClientScreen,
+    ClientOverview: ClientOverviewScreen,
+    BrowseSessions: BrowseSessionsScreen,
+    SessionDetail: AssistantSessionDetailScreen,
+    SelectPlan: SelectPlanScreen,
+    ConfirmCashPayment: ConfirmCashPaymentScreen,
+    ClientBookings: ClientBookingsScreen,
+    Reschedule: AssistantRescheduleScreen,
+    ClientHistory: ClientHistoryScreen,
+    ...accountScreens,
+  },
 });
 const AdministratorStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },

@@ -1,0 +1,149 @@
+import {
+  useQuoteAssistantClientPlans,
+  type PlanQuoteDto,
+} from "@pilates/api-contracts";
+import {
+  BackLink,
+  BodyText,
+  colors,
+  formatBolivianos,
+  Heading,
+  QueryFailure,
+  radii,
+  Screen,
+  spacing,
+  typography,
+} from "@pilates/mobile-core";
+import { useNavigation } from "@react-navigation/native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+
+import { useStaffFetcher } from "../staff-fetcher";
+import { describeClasses } from "./assistant-format";
+import { ClientBanner } from "./client-banner";
+import type { ClientContext } from "./client-overview-screen";
+
+type SelectPlanNavigation = {
+  goBack: () => void;
+  navigate: (
+    screen: "ConfirmCashPayment",
+    params: ClientContext & { quote: PlanQuoteDto },
+  ) => void;
+};
+
+function planTerms(plan: PlanQuoteDto): string {
+  const months = plan.durationMonths === 1 ? "1 mes" : `${plan.durationMonths} meses`;
+  return `${describeClasses(plan.classAllowance)} · válido por ${months}`;
+}
+
+export function SelectPlanScreen({ route }: { route: { params: ClientContext } }) {
+  const { clientId, clientName } = route.params;
+  const navigation = useNavigation<SelectPlanNavigation>();
+  const fetcher = useStaffFetcher();
+  const quotes = useQuoteAssistantClientPlans(clientId, {
+    fetcher,
+    query: { refetchOnMount: "always" },
+  });
+
+  const header = (
+    <>
+      <BackLink onPress={() => navigation.goBack()} />
+      <Heading accessibilityLabel="Elige un plan">Elige un plan</Heading>
+      <ClientBanner action="Registrando pago para" clientName={clientName} />
+    </>
+  );
+
+  if (quotes.isPending) {
+    return (
+      <Screen style={styles.screen}>
+        {header}
+        <BodyText accessibilityLabel="Cargando planes">Cargando…</BodyText>
+      </Screen>
+    );
+  }
+  if (quotes.isError || quotes.data.status !== 200) {
+    return (
+      <Screen style={styles.screen}>
+        {header}
+        <QueryFailure
+          label="No pudimos cargar los planes."
+          onRetry={() => void quotes.refetch()}
+        />
+      </Screen>
+    );
+  }
+
+  const { creditAvailableCentavos, plans } = quotes.data.data;
+
+  return (
+    <Screen style={styles.screen}>
+      {header}
+      {creditAvailableCentavos > 0 ? (
+        <View style={styles.credit}>
+          <Text style={styles.creditText}>
+            {`Este cliente tiene ${formatBolivianos(creditAvailableCentavos)} de crédito disponible.`}
+          </Text>
+        </View>
+      ) : null}
+      <ScrollView contentContainerStyle={styles.list}>
+        {plans.map((plan) => (
+          <Pressable
+            accessibilityLabel={plan.name}
+            accessibilityRole="button"
+            key={plan.id}
+            onPress={() =>
+              navigation.navigate("ConfirmCashPayment", {
+                clientId,
+                clientName,
+                quote: plan,
+              })
+            }
+            style={styles.card}
+          >
+            <View style={styles.cardBody}>
+              <Text style={styles.planName}>{plan.name}</Text>
+              <BodyText>{planTerms(plan)}</BodyText>
+            </View>
+            <View style={styles.prices}>
+              {plan.creditAppliedCentavos > 0 ? (
+                <Text style={styles.originalPrice}>
+                  {formatBolivianos(plan.priceCentavos)}
+                </Text>
+              ) : null}
+              <Text style={styles.price}>{formatBolivianos(plan.amountDueCentavos)}</Text>
+            </View>
+          </Pressable>
+        ))}
+      </ScrollView>
+    </Screen>
+  );
+}
+
+const styles = StyleSheet.create({
+  card: {
+    alignItems: "center",
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radii.card,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.md,
+    padding: spacing.lg,
+  },
+  cardBody: { flex: 1, gap: spacing.xs },
+  credit: {
+    backgroundColor: "rgba(124,148,115,0.14)",
+    borderRadius: radii.card,
+    padding: spacing.md,
+  },
+  creditText: { color: colors.successText, fontSize: typography.note, fontWeight: "600" },
+  list: { gap: spacing.md, paddingBottom: spacing.xxl },
+  originalPrice: {
+    color: colors.textSubtle,
+    fontSize: typography.note,
+    textDecorationLine: "line-through",
+  },
+  planName: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  price: { color: colors.text, fontFamily: "Lora_500Medium", fontSize: typography.titleSecondary },
+  prices: { alignItems: "flex-end" },
+  screen: { gap: spacing.lg },
+});
