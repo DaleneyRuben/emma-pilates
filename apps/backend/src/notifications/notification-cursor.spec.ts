@@ -28,7 +28,9 @@ describe('notification cursor', () => {
     ).toBeNull();
     expect(
       decodeNotificationCursor(
-        Buffer.from('2026-09-21T12:00:00.000Z|not-a-uuid').toString('base64url'),
+        Buffer.from('2026-09-21T12:00:00.000Z|not-a-uuid').toString(
+          'base64url',
+        ),
       ),
     ).toBeNull();
   });
