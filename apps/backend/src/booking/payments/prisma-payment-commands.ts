@@ -1,20 +1,37 @@
 import { createHash } from 'node:crypto';
 import type { Prisma } from '../../generated/prisma/client';
 import {
+  AuditActorKind,
+  AuditOutcome,
   CreditLedgerActorKind,
   CreditLedgerEntryKind,
+  CreditReservationState,
+  ImageAssetPurpose,
+  ImageAssetState,
+  PaymentMethod,
+  PaymentState,
   PrismaClient,
   PurchaseIntentState,
+  ReferralState,
+  StaffRole,
   SubscriptionState,
 } from '../../generated/prisma/client';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import { retrySerializable } from '../../database/retry-serializable';
+import {
+  recordNotification as defaultNotificationRecorder,
+  type NotificationRecorder,
+} from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { summarizeCredit, type CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
 import { evaluatePurchaseEligibility } from './purchase-eligibility';
+import {
+  computeSubscriptionTerm,
+  type SubscriptionDurationMonths,
+} from './subscription-term';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -33,15 +50,39 @@ export type PurchaseIntentView = {
   expiresAt: Date;
 };
 
+export type PaymentView = {
+  id: string;
+  method: 'transfer' | 'cash' | 'credit_only';
+  state: 'pending' | 'confirmed' | 'rejected';
+  planId: string;
+  planName: string;
+  durationMonths: number;
+  classAllowance: number;
+  planPriceCentavos: number;
+  creditAppliedCentavos: number;
+  amountDueCentavos: number;
+  submittedAt: Date;
+  decidedAt: Date | null;
+  rejectionReason: string | null;
+  subscriptionId: string | null;
+};
+
 export type PaymentCommandsDependencies = {
   now: () => Date;
   referralRewardCentavos: number;
+  recordNotification?: NotificationRecorder;
 };
 
 const hourMilliseconds = 60 * 60 * 1_000;
+const dayMilliseconds = 24 * hourMilliseconds;
 const purchaseIntentLifetimeMilliseconds = 24 * hourMilliseconds;
 // Retained at least 48 hours after the Intent's 24-hour lifetime ends.
 const idempotencyRetentionMilliseconds = 72 * hourMilliseconds;
+// Receipts are deleted at the later of 45 days after finalization or 7 days
+// after the decision, keeping the metadata tombstone.
+const receiptRetentionAfterFinalizationMilliseconds = 45 * dayMilliseconds;
+const receiptRetentionAfterDecisionMilliseconds = 7 * dayMilliseconds;
+const rejectionReasonMaxLength = 300;
 
 const intentStates: Record<PurchaseIntentState, PurchaseIntentView['state']> =
   {
@@ -49,9 +90,20 @@ const intentStates: Record<PurchaseIntentState, PurchaseIntentView['state']> =
     [PurchaseIntentState.SUBMITTED]: 'submitted',
     [PurchaseIntentState.EXPIRED]: 'expired',
   };
+const paymentMethods: Record<PaymentMethod, PaymentView['method']> = {
+  [PaymentMethod.TRANSFER]: 'transfer',
+  [PaymentMethod.CASH]: 'cash',
+  [PaymentMethod.CREDIT_ONLY]: 'credit_only',
+};
+const paymentStates: Record<PaymentState, PaymentView['state']> = {
+  [PaymentState.PENDING]: 'pending',
+  [PaymentState.CONFIRMED]: 'confirmed',
+  [PaymentState.REJECTED]: 'rejected',
+};
 
 const intentSelect = {
   id: true,
+  clientId: true,
   planId: true,
   planNameSnapshot: true,
   durationMonthsSnapshot: true,
@@ -65,7 +117,27 @@ const intentSelect = {
   expiresAt: true,
 } as const;
 
+const paymentSelect = {
+  id: true,
+  clientId: true,
+  planId: true,
+  purchaseIntentId: true,
+  planNameSnapshot: true,
+  durationMonthsSnapshot: true,
+  classAllowanceSnapshot: true,
+  planPriceCentavos: true,
+  creditAppliedCentavos: true,
+  amountDueCentavos: true,
+  method: true,
+  state: true,
+  submittedAt: true,
+  decidedAt: true,
+  rejectionReason: true,
+  subscription: { select: { id: true } },
+} as const;
+
 type IntentRow = Prisma.PurchaseIntentGetPayload<{ select: typeof intentSelect }>;
+type PaymentRow = Prisma.PaymentGetPayload<{ select: typeof paymentSelect }>;
 
 const toIntentView = (row: IntentRow): PurchaseIntentView => ({
   id: row.id,
@@ -82,11 +154,37 @@ const toIntentView = (row: IntentRow): PurchaseIntentView => ({
   expiresAt: row.expiresAt,
 });
 
+const toPaymentView = (row: PaymentRow): PaymentView => ({
+  id: row.id,
+  method: paymentMethods[row.method],
+  state: paymentStates[row.state],
+  planId: row.planId,
+  planName: row.planNameSnapshot,
+  durationMonths: row.durationMonthsSnapshot,
+  classAllowance: row.classAllowanceSnapshot,
+  planPriceCentavos: row.planPriceCentavos,
+  creditAppliedCentavos: row.creditAppliedCentavos,
+  amountDueCentavos: row.amountDueCentavos,
+  submittedAt: row.submittedAt,
+  decidedAt: row.decidedAt,
+  rejectionReason: row.rejectionReason,
+  subscriptionId: row.subscription?.id ?? null,
+});
+
 const requireClient = (principal: AuthenticatedPrincipal): string => {
   if (principal.identity.kind !== 'client') {
     throw new BookingAccessDeniedError();
   }
   return principal.identity.clientId;
+};
+
+const requireAdministrator = (principal: AuthenticatedPrincipal): void => {
+  if (
+    principal.identity.kind !== 'staff' ||
+    principal.identity.role !== 'administrator'
+  ) {
+    throw new BookingAccessDeniedError();
+  }
 };
 
 const isUniqueViolation = (error: unknown): boolean =>
@@ -98,10 +196,27 @@ const isUniqueViolation = (error: unknown): boolean =>
 const hashRequest = (request: unknown): Uint8Array<ArrayBuffer> =>
   toPrismaBytes(createHash('sha256').update(JSON.stringify(request)).digest());
 
+const rule = (code: PaymentRuleError['code'], message: string) =>
+  new PaymentRuleError(code, message);
+
+const normalizeRejectionReason = (reason: string): string => {
+  const normalized = reason.trim();
+  if (
+    normalized.length === 0 ||
+    normalized.length > rejectionReasonMaxLength
+  ) {
+    throw new Error('Rejection reason is required');
+  }
+  return normalized;
+};
+
 export function createPrismaPaymentCommands(
   prisma: PrismaClient,
   dependencies: PaymentCommandsDependencies,
 ) {
+  const recordNotification =
+    dependencies.recordNotification ?? defaultNotificationRecorder;
+
   const serializable = <Result>(
     work: (transaction: Transaction) => Promise<Result>,
   ): Promise<Result> =>
@@ -161,7 +276,7 @@ export function createPrismaPaymentCommands(
       if (
         !Buffer.from(existing.requestHash).equals(Buffer.from(requestHash))
       ) {
-        throw new PaymentRuleError(
+        throw rule(
           'idempotency_key_reused',
           'Idempotency Key was reused with a different request',
         );
@@ -186,19 +301,63 @@ export function createPrismaPaymentCommands(
     return result;
   };
 
+  const loadActiveSubscription = async (
+    transaction: Transaction,
+    clientId: string,
+    now: Date,
+  ) => {
+    const active = await transaction.subscription.findFirst({
+      where: { clientId, state: SubscriptionState.ACTIVE },
+      orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
+      select: {
+        id: true,
+        endsOn: true,
+        remainingClassAllowance: true,
+        _count: {
+          select: {
+            bookings: {
+              where: { state: 'BOOKED', session: { startsAt: { gt: now } } },
+            },
+          },
+        },
+      },
+    });
+    return active === null
+      ? null
+      : {
+          id: active.id,
+          endsOn: active.endsOn,
+          remainingClassAllowance: active.remainingClassAllowance,
+          futureBookedCount: active._count.bookings,
+        };
+  };
+
+  const expireSubscription = (
+    transaction: Transaction,
+    subscriptionId: string,
+    now: Date,
+  ) =>
+    transaction.subscription.update({
+      where: { id: subscriptionId },
+      data: { state: SubscriptionState.EXPIRED, expiredAt: now },
+    });
+
   // Eligibility reloads the effective Subscription, open Intent, pending
   // Payment, and Plan inside the locked transaction; a Subscription that no
   // longer holds is expired here before the new allocation record is created.
   const assertEligible = async (
     transaction: Transaction,
-    clientId: string,
-    planId: string,
+    input: {
+      clientId: string;
+      planId: string;
+      ignorePurchaseIntentId?: string;
+      ignorePaymentId?: string;
+    },
   ) => {
     const now = dependencies.now();
-    const today = boliviaDate(now);
     const [plan, active, openIntent, pendingPayment] = await Promise.all([
       transaction.plan.findUnique({
-        where: { id: planId },
+        where: { id: input.planId },
         select: {
           id: true,
           name: true,
@@ -208,62 +367,256 @@ export function createPrismaPaymentCommands(
           hiddenAt: true,
         },
       }),
-      transaction.subscription.findFirst({
-        where: { clientId, state: SubscriptionState.ACTIVE },
-        orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
-        select: {
-          id: true,
-          endsOn: true,
-          remainingClassAllowance: true,
-          _count: {
-            select: {
-              bookings: {
-                where: { state: 'BOOKED', session: { startsAt: { gt: now } } },
-              },
-            },
-          },
-        },
-      }),
+      loadActiveSubscription(transaction, input.clientId, now),
       transaction.purchaseIntent.findFirst({
         where: {
-          clientId,
+          clientId: input.clientId,
           state: PurchaseIntentState.OPEN,
           expiresAt: { gt: now },
+          ...(input.ignorePurchaseIntentId
+            ? { id: { not: input.ignorePurchaseIntentId } }
+            : {}),
         },
         select: { id: true },
       }),
       transaction.payment.findFirst({
-        where: { clientId, state: 'PENDING' },
+        where: {
+          clientId: input.clientId,
+          state: PaymentState.PENDING,
+          ...(input.ignorePaymentId ? { id: { not: input.ignorePaymentId } } : {}),
+        },
         select: { id: true },
       }),
     ]);
 
     const eligibility = evaluatePurchaseEligibility({
-      today,
+      today: boliviaDate(now),
       plan,
-      activeSubscription:
-        active === null
-          ? null
-          : {
-              id: active.id,
-              endsOn: active.endsOn,
-              remainingClassAllowance: active.remainingClassAllowance,
-              futureBookedCount: active._count.bookings,
-            },
+      activeSubscription: active,
       openPurchaseIntentId: openIntent?.id ?? null,
       pendingPaymentId: pendingPayment?.id ?? null,
     });
 
     if (eligibility.subscriptionIdToExpire !== null) {
-      await transaction.subscription.update({
-        where: { id: eligibility.subscriptionIdToExpire },
-        data: { state: SubscriptionState.EXPIRED, expiredAt: now },
-      });
+      await expireSubscription(
+        transaction,
+        eligibility.subscriptionIdToExpire,
+        now,
+      );
     }
 
     // evaluatePurchaseEligibility has thrown when the Plan is not purchasable.
     return plan!;
   };
+
+  const loadOwnedIntent = async (
+    transaction: Transaction,
+    purchaseIntentId: string,
+    clientId: string,
+  ): Promise<IntentRow> => {
+    const intent = await transaction.purchaseIntent.findFirst({
+      where: { id: purchaseIntentId, clientId },
+      select: intentSelect,
+    });
+    if (intent === null) {
+      throw rule('purchase_intent_not_found', 'Purchase Intent not found');
+    }
+    if (intent.state !== PurchaseIntentState.OPEN) {
+      throw rule('purchase_intent_not_open', 'Purchase Intent is settled');
+    }
+    if (intent.expiresAt.getTime() <= dependencies.now().getTime()) {
+      throw rule('purchase_intent_expired', 'Purchase Intent has expired');
+    }
+    return intent;
+  };
+
+  const settleReservation = async (
+    transaction: Transaction,
+    input: {
+      purchaseIntentId: string;
+      outcome: 'spent' | 'released';
+      now: Date;
+      actor: { kind: CreditLedgerActorKind; accountId: string | null };
+      correlationId: string;
+    },
+  ): Promise<void> => {
+    const reservation = await transaction.creditReservation.findUnique({
+      where: { purchaseIntentId: input.purchaseIntentId },
+      select: { id: true, clientId: true, amountCentavos: true, state: true },
+    });
+    if (reservation === null || reservation.state !== CreditReservationState.RESERVED) {
+      return;
+    }
+    await transaction.creditReservation.update({
+      where: { id: reservation.id },
+      data: {
+        state:
+          input.outcome === 'spent'
+            ? CreditReservationState.SPENT
+            : CreditReservationState.RELEASED,
+        settledAt: input.now,
+      },
+    });
+    await transaction.creditLedgerEntry.create({
+      data: {
+        clientId: reservation.clientId,
+        kind:
+          input.outcome === 'spent'
+            ? CreditLedgerEntryKind.PAYMENT_SPEND
+            : CreditLedgerEntryKind.PAYMENT_RELEASE,
+        amountCentavos: reservation.amountCentavos,
+        occurredAt: input.now,
+        reservationId: reservation.id,
+        actorKind: input.actor.kind,
+        actorAccountId: input.actor.accountId,
+        correlationId: input.correlationId,
+      },
+    });
+  };
+
+  const scheduleReceiptDeletion = async (
+    transaction: Transaction,
+    receiptImageAssetId: string | null,
+    now: Date,
+    afterDecision: boolean,
+  ): Promise<void> => {
+    if (receiptImageAssetId === null) return;
+    const asset = await transaction.imageAsset.findUnique({
+      where: { id: receiptImageAssetId },
+      select: { finalizedAt: true },
+    });
+    if (asset === null) return;
+    const dueAt = afterDecision
+      ? new Date(
+          Math.max(
+            (asset.finalizedAt ?? now).getTime() +
+              receiptRetentionAfterFinalizationMilliseconds,
+            now.getTime() + receiptRetentionAfterDecisionMilliseconds,
+          ),
+        )
+      : now;
+    await transaction.imageAsset.update({
+      where: { id: receiptImageAssetId },
+      data: { deletionDueAt: dueAt },
+    });
+  };
+
+  const recordPaymentAudit = (
+    transaction: Transaction,
+    input: {
+      actionCode: string;
+      principal: AuthenticatedPrincipal;
+      payment: PaymentRow;
+      priorState: PaymentView['state'];
+      newState: PaymentView['state'];
+      branchId?: string | null;
+      now: Date;
+    },
+  ) =>
+    transaction.auditRecord.create({
+      data: {
+        actionCode: input.actionCode,
+        outcome: AuditOutcome.SUCCEEDED,
+        actorKind: AuditActorKind.ACCOUNT,
+        actorAccountId: input.principal.accountId,
+        actorRole:
+          input.principal.identity.kind === 'staff'
+            ? (input.principal.identity.role.toUpperCase() as StaffRole)
+            : null,
+        targetType: 'payment',
+        targetId: input.payment.id,
+        branchId: input.branchId ?? null,
+        correlationId: input.payment.id,
+        occurredAt: input.now,
+        metadata: {
+          method: paymentMethods[input.payment.method],
+          priorState: input.priorState,
+          newState: input.newState,
+          amountDueCentavos: input.payment.amountDueCentavos,
+          creditAppliedCentavos: input.payment.creditAppliedCentavos,
+        },
+      },
+    });
+
+  // A confirmed Payment activates exactly one Subscription and qualifies the
+  // Client's pending Referral, awarding the referrer once.
+  const activateSubscription = async (
+    transaction: Transaction,
+    payment: PaymentRow,
+    principal: AuthenticatedPrincipal,
+    now: Date,
+  ): Promise<string> => {
+    const term = computeSubscriptionTerm(
+      boliviaDate(now),
+      payment.durationMonthsSnapshot as SubscriptionDurationMonths,
+    );
+    const subscription = await transaction.subscription.create({
+      data: {
+        clientId: payment.clientId,
+        planId: payment.planId,
+        paymentId: payment.id,
+        planNameSnapshot: payment.planNameSnapshot,
+        durationMonthsSnapshot: payment.durationMonthsSnapshot,
+        originalClassAllowance: payment.classAllowanceSnapshot,
+        remainingClassAllowance: payment.classAllowanceSnapshot,
+        startsOn: term.startsOn,
+        endsOn: term.endsOn,
+        state: SubscriptionState.ACTIVE,
+        activatedAt: now,
+      },
+      select: { id: true },
+    });
+
+    const referral = await transaction.referral.findFirst({
+      where: {
+        referredClientId: payment.clientId,
+        state: ReferralState.PENDING,
+      },
+      select: { id: true, referrerClientId: true },
+    });
+    if (referral !== null) {
+      await transaction.referral.update({
+        where: { id: referral.id },
+        data: {
+          state: ReferralState.AWARDED,
+          qualifiedPaymentId: payment.id,
+          qualifiedAt: now,
+          awardCentavos: dependencies.referralRewardCentavos,
+          awardedAt: now,
+        },
+      });
+      await transaction.creditLedgerEntry.create({
+        data: {
+          clientId: referral.referrerClientId,
+          kind: CreditLedgerEntryKind.REFERRAL_AWARD,
+          amountCentavos: dependencies.referralRewardCentavos,
+          occurredAt: now,
+          referralId: referral.id,
+          actorKind: CreditLedgerActorKind.ACCOUNT,
+          actorAccountId: principal.accountId,
+          correlationId: payment.id,
+        },
+      });
+    }
+
+    return subscription.id;
+  };
+
+  const readPaymentView = async (paymentId: string): Promise<PaymentView> =>
+    toPaymentView(
+      await prisma.payment.findUniqueOrThrow({
+        where: { id: paymentId },
+        select: paymentSelect,
+      }),
+    );
+
+  const readIntentView = async (intentId: string): Promise<PurchaseIntentView> =>
+    toIntentView(
+      await prisma.purchaseIntent.findUniqueOrThrow({
+        where: { id: intentId },
+        select: intentSelect,
+      }),
+    );
 
   const createPurchaseIntent = async (
     command: { planId: string },
@@ -284,11 +637,10 @@ export function createPrismaPaymentCommands(
           },
           async () => {
             await lockClients(transaction, [clientId]);
-            const plan = await assertEligible(
-              transaction,
+            const plan = await assertEligible(transaction, {
               clientId,
-              command.planId,
-            );
+              planId: command.planId,
+            });
             const now = dependencies.now();
             const credit = await readLedgerSummary(transaction, clientId);
             const reserved = Math.min(
@@ -312,7 +664,7 @@ export function createPrismaPaymentCommands(
                   now.getTime() + purchaseIntentLifetimeMilliseconds,
                 ),
               },
-              select: intentSelect,
+              select: { id: true },
             });
 
             if (reserved > 0) {
@@ -344,20 +696,439 @@ export function createPrismaPaymentCommands(
         ),
       );
 
-      const intent = await prisma.purchaseIntent.findUniqueOrThrow({
-        where: { id: stored.id },
-        select: intentSelect,
-      });
-      return toIntentView(intent);
+      return readIntentView(stored.id);
     } catch (error) {
       if (isUniqueViolation(error)) {
-        throw new PaymentRuleError(
+        throw rule(
           'purchase_intent_open_exists',
           'An open Purchase Intent already exists',
         );
       }
       throw error;
     }
+  };
+
+  const attachReceipt = async (
+    command: { purchaseIntentId: string; imageAssetId: string },
+    principal: AuthenticatedPrincipal,
+    idempotencyKey: string,
+  ): Promise<PurchaseIntentView> => {
+    const clientId = requireClient(principal);
+
+    const stored = await serializable((transaction) =>
+      withIdempotency(
+        transaction,
+        {
+          accountId: principal.accountId,
+          command: 'attach_receipt',
+          idempotencyKey,
+          request: command,
+        },
+        async () => {
+          await lockClients(transaction, [clientId]);
+          const now = dependencies.now();
+          const intent = await loadOwnedIntent(
+            transaction,
+            command.purchaseIntentId,
+            clientId,
+          );
+          const asset = await transaction.imageAsset.findUnique({
+            where: { id: command.imageAssetId },
+            select: { id: true, ownerAccountId: true, purpose: true, state: true },
+          });
+          if (
+            asset === null ||
+            asset.ownerAccountId !== principal.accountId ||
+            asset.purpose !== ImageAssetPurpose.TRANSFER_RECEIPT
+          ) {
+            throw rule(
+              'payment_receipt_invalid_owner',
+              'Receipt does not belong to this Account',
+            );
+          }
+          if (intent.receiptImageAssetId === asset.id) {
+            return { id: intent.id };
+          }
+          if (asset.state !== ImageAssetState.READY) {
+            throw rule('payment_receipt_not_ready', 'Receipt is not ready');
+          }
+
+          if (intent.receiptImageAssetId !== null) {
+            await transaction.imageAsset.update({
+              where: { id: intent.receiptImageAssetId },
+              data: {
+                state: ImageAssetState.READY,
+                attachedAt: null,
+                deletionDueAt: now,
+              },
+            });
+          }
+          await transaction.purchaseIntent.update({
+            where: { id: intent.id },
+            data: { receiptImageAssetId: asset.id },
+          });
+          await transaction.imageAsset.update({
+            where: { id: asset.id },
+            data: {
+              state: ImageAssetState.ATTACHED,
+              attachedAt: now,
+              deletionDueAt: null,
+            },
+          });
+
+          return { id: intent.id };
+        },
+      ),
+    );
+
+    return readIntentView(stored.id);
+  };
+
+  const notifyAdministrators = async (
+    transaction: Transaction,
+    paymentId: string,
+    now: Date,
+  ): Promise<void> => {
+    const administrators = await transaction.account.findMany({
+      where: {
+        activatedAt: { not: null },
+        disabledAt: null,
+        staffMember: { role: StaffRole.ADMINISTRATOR },
+      },
+      select: { id: true },
+    });
+    for (const administrator of administrators) {
+      await recordNotification(transaction, {
+        accountId: administrator.id,
+        category: 'subscription_payment',
+        type: 'payment_submitted',
+        businessEventKey: `payment-submitted:${paymentId}`,
+        title: 'Comprobante por revisar',
+        message: 'Tienes un comprobante de pago pendiente de revisión.',
+        destination: { type: 'payment', id: paymentId },
+        occurredAt: now,
+      });
+    }
+  };
+
+  const submitTransfer = async (
+    command: { purchaseIntentId: string },
+    principal: AuthenticatedPrincipal,
+    idempotencyKey: string,
+  ): Promise<PaymentView> => {
+    const clientId = requireClient(principal);
+
+    const stored = await serializable((transaction) =>
+      withIdempotency(
+        transaction,
+        {
+          accountId: principal.accountId,
+          command: 'submit_transfer',
+          idempotencyKey,
+          request: command,
+        },
+        async () => {
+          await lockClients(transaction, [clientId]);
+          const now = dependencies.now();
+          const intent = await loadOwnedIntent(
+            transaction,
+            command.purchaseIntentId,
+            clientId,
+          );
+          if (intent.receiptImageAssetId === null) {
+            throw rule('payment_receipt_required', 'Attach a receipt first');
+          }
+          await assertEligible(transaction, {
+            clientId,
+            planId: intent.planId,
+            ignorePurchaseIntentId: intent.id,
+          });
+
+          const payment = await transaction.payment.create({
+            data: {
+              clientId,
+              planId: intent.planId,
+              purchaseIntentId: intent.id,
+              planNameSnapshot: intent.planNameSnapshot,
+              durationMonthsSnapshot: intent.durationMonthsSnapshot,
+              classAllowanceSnapshot: intent.classAllowanceSnapshot,
+              planPriceCentavos: intent.planPriceCentavos,
+              creditAppliedCentavos: intent.creditReservedCentavos,
+              amountDueCentavos: intent.amountDueCentavos,
+              method: PaymentMethod.TRANSFER,
+              state: PaymentState.PENDING,
+              submittedByAccountId: principal.accountId,
+              submittedAt: now,
+              createdAt: now,
+            },
+            select: { id: true },
+          });
+          await transaction.purchaseIntent.update({
+            where: { id: intent.id },
+            data: { state: PurchaseIntentState.SUBMITTED, submittedAt: now },
+          });
+          await notifyAdministrators(transaction, payment.id, now);
+
+          return { id: payment.id };
+        },
+      ),
+    );
+
+    return readPaymentView(stored.id);
+  };
+
+  const expirePurchaseIntents = async (): Promise<number> => {
+    const now = dependencies.now();
+    const due = await prisma.purchaseIntent.findMany({
+      where: { state: PurchaseIntentState.OPEN, expiresAt: { lte: now } },
+      select: { id: true },
+    });
+    let expired = 0;
+
+    for (const { id } of due) {
+      const changed = await serializable(async (transaction) => {
+        const intent = await transaction.purchaseIntent.findUnique({
+          where: { id },
+          select: intentSelect,
+        });
+        if (intent === null || intent.state !== PurchaseIntentState.OPEN) {
+          return false;
+        }
+        await lockClients(transaction, [intent.clientId]);
+        await transaction.purchaseIntent.update({
+          where: { id },
+          data: { state: PurchaseIntentState.EXPIRED, expiredAt: now },
+        });
+        await settleReservation(transaction, {
+          purchaseIntentId: id,
+          outcome: 'released',
+          now,
+          actor: { kind: CreditLedgerActorKind.WORKER, accountId: null },
+          correlationId: id,
+        });
+        await scheduleReceiptDeletion(
+          transaction,
+          intent.receiptImageAssetId,
+          now,
+          false,
+        );
+        return true;
+      });
+      if (changed) expired += 1;
+    }
+
+    return expired;
+  };
+
+  const loadTransferPayment = async (
+    transaction: Transaction,
+    paymentId: string,
+  ): Promise<PaymentRow> => {
+    const payment = await transaction.payment.findUnique({
+      where: { id: paymentId },
+      select: paymentSelect,
+    });
+    if (payment === null) {
+      throw rule('payment_not_found', 'Payment not found');
+    }
+    if (payment.method !== PaymentMethod.TRANSFER) {
+      throw rule('payment_not_pending', 'Only transfer Payments are reviewed');
+    }
+    return payment;
+  };
+
+  const confirmTransfer = async (
+    command: { paymentId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<PaymentView> => {
+    requireAdministrator(principal);
+
+    const paymentId = await serializable(async (transaction) => {
+      const payment = await loadTransferPayment(transaction, command.paymentId);
+      if (payment.state === PaymentState.CONFIRMED) return payment.id;
+      if (payment.state === PaymentState.REJECTED) {
+        throw rule(
+          'payment_confirmation_conflict',
+          'Payment was already rejected',
+        );
+      }
+
+      const now = dependencies.now();
+      const referral = await transaction.referral.findFirst({
+        where: { referredClientId: payment.clientId, state: ReferralState.PENDING },
+        select: { referrerClientId: true },
+      });
+      await lockClients(transaction, [
+        payment.clientId,
+        ...(referral ? [referral.referrerClientId] : []),
+      ]);
+
+      const active = await loadActiveSubscription(transaction, payment.clientId, now);
+      if (active !== null) {
+        const eligibility = (() => {
+          try {
+            return evaluatePurchaseEligibility({
+              today: boliviaDate(now),
+              plan: { hiddenAt: null, priceCentavos: payment.planPriceCentavos },
+              activeSubscription: active,
+              openPurchaseIntentId: null,
+              pendingPaymentId: null,
+            });
+          } catch {
+            throw rule(
+              'payment_confirmation_conflict',
+              'The Client already has an active Subscription',
+            );
+          }
+        })();
+        if (eligibility.subscriptionIdToExpire !== null) {
+          await expireSubscription(transaction, eligibility.subscriptionIdToExpire, now);
+        }
+      }
+
+      await transaction.payment.update({
+        where: { id: payment.id },
+        data: {
+          state: PaymentState.CONFIRMED,
+          decidedByAccountId: principal.accountId,
+          decidedAt: now,
+        },
+      });
+      await settleReservation(transaction, {
+        purchaseIntentId: payment.purchaseIntentId!,
+        outcome: 'spent',
+        now,
+        actor: { kind: CreditLedgerActorKind.ACCOUNT, accountId: principal.accountId },
+        correlationId: payment.id,
+      });
+      const subscriptionId = await activateSubscription(
+        transaction,
+        payment,
+        principal,
+        now,
+      );
+      await recordPaymentAudit(transaction, {
+        actionCode: 'payment.transfer_confirmed',
+        principal,
+        payment,
+        priorState: 'pending',
+        newState: 'confirmed',
+        now,
+      });
+      const intent = await transaction.purchaseIntent.findUnique({
+        where: { id: payment.purchaseIntentId! },
+        select: { receiptImageAssetId: true },
+      });
+      await scheduleReceiptDeletion(
+        transaction,
+        intent?.receiptImageAssetId ?? null,
+        now,
+        true,
+      );
+      const client = await transaction.client.findUniqueOrThrow({
+        where: { id: payment.clientId },
+        select: { account: { select: { id: true } } },
+      });
+      if (client.account !== null) {
+        await recordNotification(transaction, {
+          accountId: client.account.id,
+          category: 'subscription_payment',
+          type: 'payment_confirmed',
+          businessEventKey: `payment-confirmed:${payment.id}`,
+          title: 'Pago confirmado',
+          message: 'Tu pago fue confirmado. ¡Ya puedes reservar clases!',
+          destination: { type: 'subscription', id: subscriptionId },
+          occurredAt: now,
+        });
+      }
+
+      return payment.id;
+    });
+
+    return readPaymentView(paymentId);
+  };
+
+  const rejectTransfer = async (
+    command: { paymentId: string; reason: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<PaymentView> => {
+    requireAdministrator(principal);
+    const reason = normalizeRejectionReason(command.reason);
+
+    const paymentId = await serializable(async (transaction) => {
+      const payment = await loadTransferPayment(transaction, command.paymentId);
+      if (payment.state === PaymentState.REJECTED) {
+        if (payment.rejectionReason === reason) return payment.id;
+        throw rule(
+          'payment_confirmation_conflict',
+          'Payment was already rejected with another reason',
+        );
+      }
+      if (payment.state === PaymentState.CONFIRMED) {
+        throw rule(
+          'payment_confirmation_conflict',
+          'Payment was already confirmed',
+        );
+      }
+
+      const now = dependencies.now();
+      await lockClients(transaction, [payment.clientId]);
+      await transaction.payment.update({
+        where: { id: payment.id },
+        data: {
+          state: PaymentState.REJECTED,
+          decidedByAccountId: principal.accountId,
+          decidedAt: now,
+          rejectionReason: reason,
+        },
+      });
+      await settleReservation(transaction, {
+        purchaseIntentId: payment.purchaseIntentId!,
+        outcome: 'released',
+        now,
+        actor: { kind: CreditLedgerActorKind.ACCOUNT, accountId: principal.accountId },
+        correlationId: payment.id,
+      });
+      await recordPaymentAudit(transaction, {
+        actionCode: 'payment.transfer_rejected',
+        principal,
+        payment,
+        priorState: 'pending',
+        newState: 'rejected',
+        now,
+      });
+      const intent = await transaction.purchaseIntent.findUnique({
+        where: { id: payment.purchaseIntentId! },
+        select: { receiptImageAssetId: true },
+      });
+      await scheduleReceiptDeletion(
+        transaction,
+        intent?.receiptImageAssetId ?? null,
+        now,
+        true,
+      );
+      const client = await transaction.client.findUniqueOrThrow({
+        where: { id: payment.clientId },
+        select: { account: { select: { id: true } } },
+      });
+      if (client.account !== null) {
+        const sentence = reason.endsWith('.') ? reason : `${reason}.`;
+        await recordNotification(transaction, {
+          accountId: client.account.id,
+          category: 'subscription_payment',
+          type: 'payment_rejected',
+          businessEventKey: `payment-rejected:${payment.id}`,
+          title: 'Comprobante rechazado',
+          message: `Tu comprobante fue rechazado: ${sentence} Sube uno nuevo para activar tu plan.`,
+          destination: { type: 'payment', id: payment.id },
+          occurredAt: now,
+        });
+      }
+
+      return payment.id;
+    });
+
+    return readPaymentView(paymentId);
   };
 
   const readOpenPurchaseIntent = async (
@@ -375,12 +1146,34 @@ export function createPrismaPaymentCommands(
     return intent === null ? null : toIntentView(intent);
   };
 
+  const readCurrentPayment = async (
+    principal: AuthenticatedPrincipal,
+  ): Promise<PaymentView | null> => {
+    const clientId = requireClient(principal);
+    const payment = await prisma.payment.findFirst({
+      where: { clientId },
+      orderBy: [{ submittedAt: 'desc' }, { id: 'desc' }],
+      select: paymentSelect,
+    });
+    return payment === null ? null : toPaymentView(payment);
+  };
+
   const readCreditSummary = (
     principal: AuthenticatedPrincipal,
   ): Promise<CreditSummary> =>
     readLedgerSummary(prisma, requireClient(principal));
 
-  return { createPurchaseIntent, readOpenPurchaseIntent, readCreditSummary };
+  return {
+    createPurchaseIntent,
+    attachReceipt,
+    submitTransfer,
+    expirePurchaseIntents,
+    confirmTransfer,
+    rejectTransfer,
+    readOpenPurchaseIntent,
+    readCurrentPayment,
+    readCreditSummary,
+  };
 }
 
 export type PaymentCommands = ReturnType<typeof createPrismaPaymentCommands>;
