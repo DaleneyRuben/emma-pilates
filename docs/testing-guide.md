@@ -390,7 +390,9 @@ than 2 h 30 before its start offers **Cancelar** behind a confirmation sheet
 (the class returns to the balance); one inside that window shows **No
 cancelable** and **Reprogramar** to another Session of the same day; a
 Waitlist entry offers **Salir de la lista de espera**. With nothing upcoming,
-the screen offers **Reservar una clase**.
+the screen offers **Reservar una clase**. **Ver historial** opens the attended
+classes grouped by month (empty for the fixtures until a Trainer records
+attendance).
 
 That Client Account must not authenticate in the Staff app. Use a Staff fixture
 such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
