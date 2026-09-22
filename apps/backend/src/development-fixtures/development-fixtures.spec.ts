@@ -187,6 +187,81 @@ describe('development fixtures', () => {
     }
   });
 
+  it("backs Valeria's Subscription with a confirmed cash Payment", () => {
+    const valeria = clientByEmail(fixtures, 'valeria@example.com');
+    const [subscription] = subscriptionsOf(fixtures, 'valeria@example.com');
+    const payment = fixtures.payments.find(
+      (candidate) => candidate.id === subscription.paymentId,
+    );
+
+    expect(payment).toMatchObject({
+      clientId: valeria.id,
+      planId: subscription.planId,
+      planNameSnapshot: 'Paquete de 12 clases',
+      method: 'cash',
+      state: 'confirmed',
+      planPriceCentavos: 78_000,
+      creditAppliedCentavos: 0,
+      amountDueCentavos: 78_000,
+    });
+    expect(payment?.collectedAtBranchId).toBe(
+      fixtures.branches.find((branch) => branch.name === 'Centro')?.id,
+    );
+    expect(payment?.decidedByAccountId).toBe(payment?.submittedByAccountId);
+    expect(payment?.decidedAt.getTime()).toBeGreaterThanOrEqual(
+      payment?.submittedAt.getTime() ?? Number.POSITIVE_INFINITY,
+    );
+    expect(payment?.decidedAt).toEqual(subscription.activatedAt);
+    expect(
+      fixtures.subscriptions.filter((candidate) => candidate.paymentId),
+    ).toHaveLength(1);
+  });
+
+  it('gives Sofía an awarded and a pending referral worth Bs 60 of credit', () => {
+    const sofia = clientByEmail(fixtures, 'sofia@example.com');
+    const valeria = clientByEmail(fixtures, 'valeria@example.com');
+    const mariana = clientByEmail(fixtures, 'mariana@example.com');
+    const referrals = fixtures.referrals.filter(
+      (referral) => referral.referrerClientId === sofia.id,
+    );
+
+    expect(referrals).toMatchObject([
+      { referredClientId: valeria.id, state: 'awarded', awardCentavos: 6_000 },
+      {
+        referredClientId: mariana.id,
+        state: 'pending',
+        qualifiedPaymentId: null,
+        qualifiedAt: null,
+        awardCentavos: null,
+        awardedAt: null,
+      },
+    ]);
+    expect(fixtures.referrals).toHaveLength(2);
+
+    const [awarded, pending] = referrals;
+    const payment = fixtures.payments.find(
+      (candidate) => candidate.id === awarded.qualifiedPaymentId,
+    );
+    expect(payment?.clientId).toBe(valeria.id);
+    expect(awarded.qualifiedAt).toEqual(payment?.decidedAt);
+    expect(awarded.awardedAt).toEqual(payment?.decidedAt);
+    expect(awarded.createdAt.getTime()).toBeLessThan(
+      awarded.qualifiedAt?.getTime() ?? 0,
+    );
+    expect(pending.createdAt.getTime()).toBeLessThan(today.getTime());
+
+    expect(fixtures.creditLedgerEntries).toEqual([
+      expect.objectContaining({
+        clientId: sofia.id,
+        kind: 'referral_award',
+        amountCentavos: 6_000,
+        referralId: awarded.id,
+        occurredAt: awarded.awardedAt,
+        actorAccountId: payment?.decidedByAccountId,
+      }),
+    ]);
+  });
+
   it('uses unique emails and referral codes', () => {
     const emails = [
       ...fixtures.staffMembers.map((member) => member.email),
