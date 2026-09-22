@@ -1,5 +1,5 @@
 import { BookingAccessDeniedError } from './create-booking';
-import { cancelSession } from './cancel-session';
+import { cancelSession, type SessionForCancellation } from './cancel-session';
 
 const now = new Date('2026-09-21T15:00:00.000Z');
 const administrator = {
@@ -16,11 +16,11 @@ const trainer = {
   ...administrator,
   identity: { ...administrator.identity, role: 'trainer' as const },
 };
-const session = {
+const session: SessionForCancellation = {
   id: 'session-1',
   branchId: 'branch-1',
   startsAt: new Date('2026-09-22T11:00:00.000Z'),
-  state: 'scheduled' as const,
+  state: 'scheduled',
   liveBookingCount: 2,
 };
 

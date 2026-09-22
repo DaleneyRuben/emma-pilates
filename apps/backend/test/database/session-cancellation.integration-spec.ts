@@ -11,7 +11,9 @@ import {
 } from './database-test-context';
 
 const today = new Date('2026-09-21T00:00:00.000Z');
-const now = new Date('2026-09-21T12:00:00.000Z');
+// Bookings take the database clock as created_at, so the command clock must
+// not run behind it.
+const now = new Date();
 
 describe('Administrator Session cancellation', () => {
   let context: DatabaseTestContext;
@@ -60,14 +62,16 @@ describe('Administrator Session cancellation', () => {
   });
 
   it('cancels the Session, refunds every booked Client, closes the waitlist, audits, and notifies', async () => {
-    const commands = new PrismaBookingCommands(prisma, () => now);
+    const commands = new PrismaBookingCommands(prisma, () => new Date());
     const lucia = await principalOf('lucia@example.com');
     const valeria = await principalOf('valeria@example.com');
     const admin = await principalOf('paola.mendoza@example.com');
-    const trainer = await principalOf('emma.vargas@example.com');
     const session = fixtures.sessions
       .filter((s) => s.startsAt.getTime() > now.getTime() + 3 * 60 * 60 * 1_000)
       .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())[0];
+    const trainer = await principalOf(
+      fixtures.staffMembers.find((m) => m.id === session.trainerStaffMemberId)!.email,
+    );
     const luciaSubscription = await prisma.subscription.findFirstOrThrow({
       where: { clientId: lucia.identity.kind === 'client' ? lucia.identity.clientId : '' , state: 'ACTIVE' },
       select: { id: true, remainingClassAllowance: true },
@@ -95,7 +99,7 @@ describe('Administrator Session cancellation', () => {
     ).resolves.toMatchObject({
       state: 'CANCELLED',
       cancellationCause: 'NO_SUBSTITUTE_TRAINER',
-      cancelledAt: now,
+      cancelledAt: expect.any(Date),
       cancelledByAccountId: admin.accountId,
     });
     await expect(
@@ -112,7 +116,7 @@ describe('Administrator Session cancellation', () => {
     });
     await expect(
       prisma.waitlistEntry.findUniqueOrThrow({ where: { id: waitlistEntry.id } }),
-    ).resolves.toMatchObject({ closureReason: 'SESSION_CANCELLED', closedAt: now });
+    ).resolves.toMatchObject({ closureReason: 'SESSION_CANCELLED', closedAt: expect.any(Date) });
     await expect(
       prisma.auditRecord.findFirst({ where: { actionCode: 'session.cancelled', targetId: session.id } }),
     ).resolves.toMatchObject({ actorAccountId: admin.accountId, branchId: session.branchId });
