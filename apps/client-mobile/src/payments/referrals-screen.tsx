@@ -1,4 +1,5 @@
 import {
+  type ReferredClientDto,
   useGetCurrentClientCredit,
   useGetCurrentClientReferrals,
 } from "@pilates/api-contracts";
@@ -6,6 +7,7 @@ import {
   BodyText,
   colors,
   Heading,
+  initials,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -19,14 +21,49 @@ import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-nati
 import { useClientFetcher } from "../client-fetcher";
 import { formatBolivianos } from "../plans/plan-format";
 import { BackLink } from "../ui/back-link";
+import { formatReferralDate } from "./referral-format";
 
 type ReferralsNavigation = {
   goBack: () => void;
   navigate: (screen: "Credit") => void;
 };
 
+// The design system defines tints as the semantic color at low alpha.
+const successTint = "rgba(124, 148, 115, 0.16)";
+const warningTint = "rgba(201, 154, 78, 0.16)";
+
 const shareMessage = (code: string): string =>
   `Únete a Emma Pilates Studio con mi código ${code}: regístrate en la app y úsalo al crear tu cuenta.`;
+
+function ReferredRow({ entry }: { entry: ReferredClientDto }) {
+  const awarded = entry.state === "awarded";
+  const detail =
+    awarded && entry.awardedAt
+      ? `Primer pago el ${formatReferralDate(entry.awardedAt)}`
+      : `Se registró el ${formatReferralDate(entry.createdAt)}`;
+
+  return (
+    <View style={styles.row}>
+      <View style={styles.avatar}>
+        <Text style={styles.avatarText}>{initials(entry.referredName)}</Text>
+      </View>
+      <View style={styles.rowBody}>
+        <Text style={styles.name}>{entry.referredName}</Text>
+        <BodyText style={styles.detail}>{detail}</BodyText>
+      </View>
+      <View style={[styles.badge, awarded ? styles.awarded : styles.pending]}>
+        <Text
+          style={[
+            styles.badgeText,
+            awarded ? styles.awardedText : styles.pendingText,
+          ]}
+        >
+          {awarded ? "Crédito ganado" : "Esperando su primer pago"}
+        </Text>
+      </View>
+    </View>
+  );
+}
 
 export function ReferralsScreen() {
   const navigation = useNavigation<ReferralsNavigation>();
@@ -65,58 +102,47 @@ export function ReferralsScreen() {
   const { referralCode, referrals: referred } = referrals.data.data;
   const available =
     credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
-  const creditLabel = `Tu crédito: ${formatBolivianos(available)}`;
+  const creditValue = formatBolivianos(available);
 
   return (
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.codeCard}>
-          <BodyText>Tu código</BodyText>
+          <BodyText style={styles.codeLabel}>Tu código</BodyText>
           <Text style={styles.code}>{referralCode}</Text>
           <PrimaryButton
             label="Compartir"
             onPress={() => void Share.share({ message: shareMessage(referralCode) })}
           />
         </View>
-        <BodyText>
+        <BodyText style={styles.explanation}>
           Comparte tu código. Cuando un amigo se registre y haga su primer pago,
           ganas crédito.
         </BodyText>
         <Pressable
-          accessibilityLabel={creditLabel}
+          accessibilityLabel={`Tu crédito: ${creditValue}`}
           accessibilityRole="button"
           onPress={() => navigation.navigate("Credit")}
           style={styles.creditRow}
         >
-          <Text style={styles.creditLabel}>{creditLabel}</Text>
-          <Text style={styles.chevron}>›</Text>
+          <Text style={styles.creditLabel}>Tu crédito</Text>
+          <View style={styles.creditTrailing}>
+            <Text style={styles.creditValue}>{creditValue}</Text>
+            <Text style={styles.chevron}>›</Text>
+          </View>
         </Pressable>
         {referred.length === 0 ? (
-          <BodyText style={styles.empty}>
-            Aún no has invitado a nadie. ¡Comparte tu código!
-          </BodyText>
+          <View style={styles.emptyState}>
+            <BodyText style={styles.empty}>
+              Aún no has invitado a nadie. ¡Comparte tu código!
+            </BodyText>
+          </View>
         ) : (
           <View style={styles.list}>
+            <Text style={styles.sectionTitle}>Tus invitaciones</Text>
             {referred.map((entry) => (
-              <View key={entry.referredClientId} style={styles.row}>
-                <Text style={styles.name}>{entry.referredName}</Text>
-                <View
-                  style={[
-                    styles.badge,
-                    entry.state === "awarded" ? styles.awarded : styles.pending,
-                  ]}
-                >
-                  <Text
-                    style={[
-                      styles.badgeText,
-                      entry.state === "awarded" ? styles.awardedText : styles.pendingText,
-                    ]}
-                  >
-                    {entry.state === "awarded" ? "Crédito ganado" : "Esperando su primer pago"}
-                  </Text>
-                </View>
-              </View>
+              <ReferredRow entry={entry} key={entry.referredClientId} />
             ))}
           </View>
         )}
@@ -126,20 +152,33 @@ export function ReferralsScreen() {
 }
 
 const styles = StyleSheet.create({
-  awarded: { backgroundColor: "#E4EBDF" },
+  avatar: {
+    alignItems: "center",
+    backgroundColor: colors.primaryTint,
+    borderRadius: radii.pill,
+    height: 40,
+    justifyContent: "center",
+    width: 40,
+  },
+  avatarText: {
+    color: colors.primaryDeep,
+    fontSize: typography.note,
+    fontWeight: "600",
+  },
+  awarded: { backgroundColor: successTint },
   awardedText: { color: colors.successText },
   badge: {
     borderRadius: radii.pill,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.smd,
+    paddingVertical: spacing.xxs,
   },
-  badgeText: { fontSize: typography.note, fontWeight: "500" },
+  badgeText: { fontSize: typography.label, fontWeight: "500" },
   chevron: { color: colors.textSubtle, fontSize: typography.titleSecondary },
   code: {
     color: colors.text,
     fontFamily: "Lora_500Medium",
-    fontSize: typography.title,
-    letterSpacing: 2,
+    fontSize: typography.display,
+    letterSpacing: 3,
   },
   codeCard: {
     alignItems: "center",
@@ -147,6 +186,12 @@ const styles = StyleSheet.create({
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.xl,
+  },
+  codeLabel: {
+    color: colors.textMuted,
+    fontSize: typography.note,
+    letterSpacing: 1,
+    textTransform: "uppercase",
   },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   creditLabel: { color: colors.text, fontSize: typography.body },
@@ -159,19 +204,35 @@ const styles = StyleSheet.create({
     minHeight: 56,
     paddingHorizontal: spacing.lg,
   },
+  creditTrailing: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
+  creditValue: {
+    color: colors.primaryDeep,
+    fontFamily: "Lora_500Medium",
+    fontSize: typography.bodyLarge,
+  },
+  detail: { color: colors.textMuted, fontSize: typography.note },
   empty: { color: colors.textMuted, textAlign: "center" },
+  emptyState: { gap: spacing.xxs, paddingVertical: spacing.lg },
+  explanation: { textAlign: "center" },
   list: { gap: spacing.sm },
-  name: { color: colors.text, fontSize: typography.body },
-  pending: { backgroundColor: "#F3E7D3" },
+  name: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
+  pending: { backgroundColor: warningTint },
   pendingText: { color: colors.warningText },
   row: {
     alignItems: "center",
     backgroundColor: colors.surface,
     borderRadius: radii.card,
     flexDirection: "row",
-    justifyContent: "space-between",
-    minHeight: 60,
+    gap: spacing.md,
+    minHeight: 64,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
+  rowBody: { flex: 1, gap: spacing.xxs },
   screen: { gap: spacing.lg },
+  sectionTitle: {
+    color: colors.text,
+    fontSize: typography.bodyLarge,
+    fontWeight: "500",
+  },
 });
