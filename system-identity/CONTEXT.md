@@ -21,7 +21,7 @@ A single-use email link through which a self-registering Client proves control o
 _Avoid_: Activation Link, confirmation link
 
 **Activation Link**:
-A single-use email link through which a staff-created Client or Staff Member proves control of their email address and creates their first password. Completing it activates the pending Account but does not sign the person in.
+A single-use email link through which a staff-created Client or Staff Member proves control of their email address and creates their first password. Completing it activates the pending Account but does not sign the person in. While the invitation is pending, the Assistant who manages it may correct the email or resend the link (each resend renews the 30-day pending window) and may cancel it — which removes the Account and Client — only while the Client holds no Subscription, Payment, or Booking; an invited Client who already paid or booked stays pending until activated and is never removed by the expiry cleanup.
 _Avoid_: Verification Link, invitation code
 
 **Password-Recovery Link**:

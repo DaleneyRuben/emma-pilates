@@ -73,7 +73,7 @@ A studio customer who holds Subscriptions and creates Bookings/Evaluations. Has 
 _Avoid_: Customer, member, user
 
 **Staff Member**:
-A person working for the studio, with exactly one Role (Trainer / Nutritionist / Assistant / Administrator) and a set of assigned Branches (all, implicitly, for Administrator). The Roles divide on one line: Assistants act on behalf of clients — Bookings, cash Payments, account creation — at their assigned Branches, while Administrators act on the schedule and on staff — creating Sessions, assigning and swapping Trainers, cancelling a Session that has Bookings — across every Branch. Trainers record Attendance for their own Sessions; the Nutritionist publishes Availability Blocks and holds Evaluations.
+A person working for the studio, with exactly one Role (Trainer / Nutritionist / Assistant / Administrator) and a set of assigned Branches (all, implicitly, for Administrator). The Roles divide on one line: Assistants act on behalf of clients — Bookings, cash Payments, account creation — at their assigned Branches (they may look up and read any Client, since Clients have no Branch, but may create, cancel, reschedule, or leave a Booking or Waitlist Entry only for Sessions at a Branch assigned to them), while Administrators act on the schedule and on staff — creating Sessions, assigning and swapping Trainers, cancelling a Session that has Bookings — across every Branch. Trainers record Attendance for their own Sessions; the Nutritionist publishes Availability Blocks and holds Evaluations.
 _Avoid_: User, employee, personal
 
 **Payment**:

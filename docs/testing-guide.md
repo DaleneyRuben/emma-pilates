@@ -8,7 +8,7 @@ you are starting with no project knowledge.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, Plans, Plan detail, Mi plan, Perfil, and Editar perfil with the fixture Accounts | Class browsing and bookings are still placeholders; paying for a Plan from the app is not available yet |
-| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10) | Assistant and Nutritionist destinations are still placeholders                                                                |
+| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10) | Assistant and Nutritionist destinations are still placeholders; the Assistant APIs can be exercised through Swagger (Test 7) |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, and active Client and Staff Accounts with one command                            | Promotions and receipt images are not included until image delivery is specified                                                              |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
@@ -590,6 +590,37 @@ Repeating the same decision returns the same result; the opposite decision
 answers `409 payment_confirmation_conflict`. A Session without Bookings answers
 `409 session_has_no_bookings` (the worker's empty check handles those), and a
 started or cancelled one `409 session_not_cancellable`.
+
+### Acting for a Client as the Assistant (STAFF-003)
+
+Log in through Swagger as `camila.rojas@example.com` (Assistant assigned to
+Centro) and authorize that credential. Administrators may call the same
+endpoints; Trainers and Clients get `403`.
+
+| Endpoint                                                   | What you should see                                                                                      |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `GET /api/v1/assistant/clients?query=luc`                  | Up to 20 Clients whose name, email, or phone contains the text (2+ characters), with `accountStatus`     |
+| `GET /api/v1/assistant/clients/{clientId}`                 | Name and contact, Subscription status with `YYYY-MM-DD` dates, next Booking, last two classes, Credit   |
+| `GET …/clients/{clientId}/bookings`                        | Upcoming Bookings and Waitlist Entries with `branchId` and `actionable` (true only at your Branches)     |
+| `GET …/clients/{clientId}/class-history`                   | Attended classes, newest first                                                                           |
+| `GET …/clients/{clientId}/plan-quotes`                     | Every Plan with `creditAppliedCentavos` and the cash `amountDueCentavos` for this Client                 |
+| `POST …/clients/{clientId}/cash-payments` `{ planId, branchId }` | `201` with the confirmed cash Payment and the new Subscription; needs an `idempotency-key` UUID     |
+| `POST /api/v1/assistant/client-invitations` `{ name, email, phone? }` | `201 invited` with the new `clientId`; the worker queues the 7-day activation email           |
+| `GET /api/v1/assistant/client-invitations/{clientId}`      | The pending invitation with `pendingExpiresAt` (30 days), `activationExpiresAt`, and `cancellable`       |
+| `POST …/client-invitations/{clientId}/email-corrections` `{ email }` | New email, old links invalidated, fresh link sent                                              |
+| `POST …/client-invitations/{clientId}/resends`             | A fresh link; a second send within a minute answers `429 email_throttled`                                |
+| `POST …/client-invitations/{clientId}/cancellation`        | `204`; afterwards the invitation, Account, and Client are gone (`404 client_invitation_not_found`)       |
+
+Inviting an email that already has a pending invitation answers `201
+invitation_resent`; a pending self-registration answers `201
+verification_pending` with a fresh 24-hour verification link; an active Client
+or a Staff Member answers `409 email_in_use`. Booking for a Client uses the
+existing `POST /api/v1/sessions/{id}/bookings` with `clientId` in the body, and
+cancelling, rescheduling, or leaving the Waitlist uses the same endpoints as the
+Client — all of them only for Sessions at your assigned Branch. A cash Payment
+for a just-invited Client works before activation; from then on the invitation
+cannot be cancelled (`409 invitation_has_activity`) and the 30-day cleanup keeps
+the Client.
 
 ## Test 8: run the automated checks
 
