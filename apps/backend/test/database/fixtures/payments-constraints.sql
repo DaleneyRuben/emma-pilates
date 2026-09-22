@@ -73,9 +73,9 @@ SELECT pg_temp.expect_failure(
   'INSERT INTO booking.payments (id, client_id, plan_id, purchase_intent_id, plan_name_snapshot, duration_months_snapshot, class_allowance_snapshot, plan_price_centavos, credit_applied_centavos, amount_due_centavos, method, state, collected_at_branch_id, submitted_by_account_id, submitted_at, decided_by_account_id, decided_at, updated_at) VALUES (''00000000-0000-0000-0000-000000000002'', ''00000000-0000-0000-0000-000000000001'', ''00000000-0000-0000-0000-000000000001'', ''00000000-0000-0000-0000-000000000001'', ''Paquete de 8 clases'', 1, 8, 30000, 0, 30000, ''cash'', ''confirmed'', ''00000000-0000-0000-0000-000000000001'', ''00000000-0000-0000-0000-000000000003'', now(), ''00000000-0000-0000-0000-000000000003'', now(), now())',
   '23514'
 );
--- A Subscription cannot borrow another Client's Payment.
+-- A transfer Payment cannot borrow another Client's Purchase Intent.
 SELECT pg_temp.expect_failure(
-  'INSERT INTO booking.subscriptions (id, client_id, plan_id, payment_id, plan_name_snapshot, duration_months_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at) VALUES (''00000000-0000-0000-0000-000000000002'', ''00000000-0000-0000-0000-000000000001'', ''00000000-0000-0000-0000-000000000001'', ''00000000-0000-0000-0000-000000000001'', ''Paquete de 8 clases'', 1, 8, 8, ''2026-09-22'', ''2026-10-22'', now(), now())',
+  'INSERT INTO booking.payments (id, client_id, plan_id, purchase_intent_id, plan_name_snapshot, duration_months_snapshot, class_allowance_snapshot, plan_price_centavos, credit_applied_centavos, amount_due_centavos, method, state, submitted_by_account_id, submitted_at, updated_at) VALUES (''00000000-0000-0000-0000-000000000002'', ''00000000-0000-0000-0000-000000000002'', ''00000000-0000-0000-0000-000000000001'', ''00000000-0000-0000-0000-000000000001'', ''Paquete de 8 clases'', 1, 8, 30000, 6000, 24000, ''transfer'', ''pending'', ''00000000-0000-0000-0000-000000000002'', now(), now())',
   '23503'
 );
 
