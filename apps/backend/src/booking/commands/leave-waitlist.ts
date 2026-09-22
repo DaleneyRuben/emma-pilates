@@ -24,17 +24,24 @@ type LeaveWaitlistDependencies = {
   now(): Date;
 };
 
+// The Client leaves their own entry; an Assistant leaves it for the Client at
+// an assigned Branch, mirroring who may join the Waitlist.
+const mayLeave = (
+  principal: AuthenticatedPrincipal,
+  entry: WaitlistEntryForLeaving,
+): boolean =>
+  principal.identity.kind === 'client'
+    ? principal.identity.clientId === entry.clientId
+    : principal.identity.role === 'assistant' &&
+      principal.identity.branchIds.includes(entry.session.branchId);
+
 export const leaveWaitlist = async (
   command: { waitlistEntryId: string },
   dependencies: LeaveWaitlistDependencies,
 ): Promise<void> => {
   const entry = await dependencies.loadEntry(command.waitlistEntryId);
 
-  if (
-    entry === null ||
-    dependencies.principal.identity.kind !== 'client' ||
-    dependencies.principal.identity.clientId !== entry.clientId
-  ) {
+  if (entry === null || !mayLeave(dependencies.principal, entry)) {
     throw new BookingAccessDeniedError();
   }
 
