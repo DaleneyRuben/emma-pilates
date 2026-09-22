@@ -10,12 +10,18 @@ function jsonResponse(body: unknown, status: number) {
 }
 
 async function fillForm(
-  screen: ReturnType<typeof render>,
+  screen: Awaited<ReturnType<typeof render>>,
   values: { current: string; next: string; confirm: string },
 ) {
-  fireEvent.changeText(screen.getByLabelText("Contraseña actual"), values.current);
-  fireEvent.changeText(screen.getByLabelText("Contraseña nueva"), values.next);
-  fireEvent.changeText(
+  await fireEvent.changeText(
+    screen.getByLabelText("Contraseña actual"),
+    values.current,
+  );
+  await fireEvent.changeText(
+    screen.getByLabelText("Contraseña nueva"),
+    values.next,
+  );
+  await fireEvent.changeText(
     screen.getByLabelText("Confirmar contraseña"),
     values.confirm,
   );
@@ -59,7 +65,9 @@ describe("ChangePasswordScreen", () => {
       next: "Reformer2026lm",
       confirm: "Reformer2026lm",
     });
-    fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Guardar contraseña" }),
+    );
 
     await waitFor(() => {
       expect(onSaved).toHaveBeenCalled();
@@ -92,7 +100,9 @@ describe("ChangePasswordScreen", () => {
       next: "Reformer2026lm",
       confirm: "Reformer2026lm",
     });
-    fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Guardar contraseña" }),
+    );
 
     await waitFor(() => {
       expect(
