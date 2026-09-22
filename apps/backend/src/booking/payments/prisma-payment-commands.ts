@@ -67,6 +67,33 @@ export type PaymentView = {
   subscriptionId: string | null;
 };
 
+export type CreditActivityEntry = {
+  id: string;
+  kind: 'referral_award' | 'payment_reservation' | 'payment_spend' | 'payment_release';
+  amountCentavos: number;
+  occurredAt: Date;
+};
+
+export type ReferralsView = {
+  referralCode: string;
+  referrals: {
+    referredClientId: string;
+    referredName: string;
+    state: 'pending' | 'awarded';
+    createdAt: Date;
+    awardedAt: Date | null;
+    awardCentavos: number | null;
+  }[];
+};
+
+const creditActivityLimit = 20;
+
+const abbreviateName = (name: string): string => {
+  const [first, ...rest] = name.trim().split(/\s+/);
+  const surname = rest[0];
+  return surname ? `${first} ${surname.charAt(0).toUpperCase()}.` : first;
+};
+
 export type PaymentCommandsDependencies = {
   now: () => Date;
   referralRewardCentavos: number;
@@ -1371,6 +1398,59 @@ export function createPrismaPaymentCommands(
   ): Promise<CreditSummary> =>
     readLedgerSummary(prisma, requireClient(principal));
 
+  const readCreditActivity = async (
+    principal: AuthenticatedPrincipal,
+  ): Promise<CreditActivityEntry[]> => {
+    const entries = await prisma.creditLedgerEntry.findMany({
+      where: { clientId: requireClient(principal) },
+      orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+      take: creditActivityLimit,
+      select: { id: true, kind: true, amountCentavos: true, occurredAt: true },
+    });
+    return entries.map((entry) => ({
+      id: entry.id,
+      kind: entry.kind.toLowerCase() as CreditActivityEntry['kind'],
+      amountCentavos: entry.amountCentavos,
+      occurredAt: entry.occurredAt,
+    }));
+  };
+
+  // Referred Clients appear as first name plus surname initial only.
+  const readReferrals = async (
+    principal: AuthenticatedPrincipal,
+  ): Promise<ReferralsView> => {
+    const clientId = requireClient(principal);
+    const [client, referrals] = await Promise.all([
+      prisma.client.findUniqueOrThrow({
+        where: { id: clientId },
+        select: { referralCode: true },
+      }),
+      prisma.referral.findMany({
+        where: { referrerClientId: clientId },
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        select: {
+          state: true,
+          createdAt: true,
+          awardedAt: true,
+          awardCentavos: true,
+          referred: { select: { id: true, name: true } },
+        },
+      }),
+    ]);
+
+    return {
+      referralCode: client.referralCode,
+      referrals: referrals.map((referral) => ({
+        referredClientId: referral.referred.id,
+        referredName: abbreviateName(referral.referred.name),
+        state: referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
+        createdAt: referral.createdAt,
+        awardedAt: referral.awardedAt,
+        awardCentavos: referral.awardCentavos,
+      })),
+    };
+  };
+
   return {
     createPurchaseIntent,
     attachReceipt,
@@ -1383,6 +1463,8 @@ export function createPrismaPaymentCommands(
     readOpenPurchaseIntent,
     readCurrentPayment,
     readCreditSummary,
+    readCreditActivity,
+    readReferrals,
   };
 }
 

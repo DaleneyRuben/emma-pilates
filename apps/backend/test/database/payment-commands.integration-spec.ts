@@ -185,6 +185,7 @@ describe('Prisma payment commands', () => {
           clientId: isabelId,
           kind: 'REFERRAL_AWARD',
           amountCentavos: 6000,
+          occurredAt: new Date(now.getTime() - 60 * 60 * 1_000),
           referralId: referral.id,
           actorKind: 'WORKER',
           correlationId: randomUUID(),
