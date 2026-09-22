@@ -24,10 +24,12 @@ describe('development fixtures', () => {
   const today = new Date('2026-09-21T00:00:00.000Z');
   const fixtures = buildDevelopmentFixtures({ today });
 
+  let passwordHash: string;
+
   beforeAll(async () => {
     context = await startDatabaseTestContext();
     prisma = new PrismaClient({ adapter: new PrismaPg(context.pool) });
-    const passwordHash = await hashPassword(DEVELOPMENT_FIXTURE_PASSWORD);
+    passwordHash = await hashPassword(DEVELOPMENT_FIXTURE_PASSWORD);
     await applyDevelopmentFixtures(prisma, { fixtures, passwordHash });
     await applyDevelopmentFixtures(prisma, { fixtures, passwordHash });
   });
@@ -59,6 +61,28 @@ describe('development fixtures', () => {
     await expect(prisma.creditLedgerEntry.count()).resolves.toBe(
       fixtures.creditLedgerEntries.length,
     );
+  });
+
+  it('restores drifted Session times on re-application without touching Session state', async () => {
+    const session = fixtures.sessions[0];
+    await prisma.$executeRaw`
+      UPDATE booking.sessions
+      SET starts_at = starts_at + interval '4 hours',
+          ends_at = ends_at + interval '4 hours',
+          state = 'cancelled'::booking."SessionState",
+          cancellation_cause = 'no_substitute_trainer'::booking."SessionCancellationCause",
+          cancelled_at = now()
+      WHERE id = ${session.id}::uuid
+    `;
+
+    await applyDevelopmentFixtures(prisma, { fixtures, passwordHash });
+
+    const stored = await prisma.session.findUniqueOrThrow({
+      where: { id: session.id },
+    });
+    expect(stored.startsAt).toEqual(session.startsAt);
+    expect(stored.endsAt).toEqual(session.endsAt);
+    expect(stored.state).toBe('CANCELLED');
   });
 
   it('lets Sofía read Bs 60 of referral credit and both referrals through the payment reads', async () => {
