@@ -1,8 +1,6 @@
 import {
   AuthenticationFlow,
-  Heading,
   MobileQueryProvider,
-  Screen,
   type MobileNavigationProps,
 } from "@pilates/mobile-core";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -11,6 +9,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import { BookingsScreen } from "./booking/bookings-screen";
 import { BrowseSessionsScreen } from "./booking/browse-sessions-screen";
+import { ClassHistoryScreen } from "./booking/class-history-screen";
 import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientFetcherContext } from "./client-fetcher";
@@ -37,20 +36,12 @@ const HomeStack = createNativeStackNavigator({
   screens: { Home: HomeScreen, ...planScreens },
 });
 
-function ClientHistoryScreen() {
-  return (
-    <Screen>
-      <Heading accessibilityLabel="Historial de clases">Historial de clases</Heading>
-    </Screen>
-  );
-}
-
 const BookingsStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },
   screens: {
     MyBookings: BookingsScreen,
     Reschedule: RescheduleScreen,
-    History: ClientHistoryScreen,
+    History: ClassHistoryScreen,
   },
 });
 
