@@ -1,10 +1,15 @@
 import { createHash } from 'node:crypto';
 import type { Prisma } from '../../generated/prisma/client';
 import {
+  AuditActorKind,
+  AuditOutcome,
   BookingCancellationCause,
   BookingState,
   AttendanceOutcome,
   PrismaClient,
+  SessionCancellationCause,
+  SessionState,
+  StaffRole,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
 import {
@@ -15,6 +20,10 @@ import type { AuthenticatedPrincipal } from '../../system-identity/authenticatio
 import { boliviaDate } from '../../time/bolivia-time';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
+import {
+  cancelSession,
+  type SessionCancellationResult,
+} from './cancel-session';
 import { joinWaitlist } from './join-waitlist';
 import { leaveWaitlist } from './leave-waitlist';
 import { promoteWaitlist } from './promote-waitlist';
@@ -154,6 +163,178 @@ export class PrismaBookingCommands {
         { isolationLevel: 'Serializable' },
       ),
     );
+  }
+
+  async cancelSession(
+    command: { sessionId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<SessionCancellationResult> {
+    return retrySerializable(() =>
+      this.prisma.$transaction(
+        (transaction) =>
+          cancelSession(command, {
+            principal,
+            loadSession: async (sessionId) => {
+              const session = await transaction.session.findUnique({
+                where: { id: sessionId },
+                select: {
+                  id: true,
+                  branchId: true,
+                  startsAt: true,
+                  state: true,
+                  _count: {
+                    select: { bookings: { where: { state: BookingState.BOOKED } } },
+                  },
+                },
+              });
+              return session === null
+                ? null
+                : {
+                    id: session.id,
+                    branchId: session.branchId,
+                    startsAt: session.startsAt,
+                    state: session.state.toLowerCase() as
+                      | 'scheduled'
+                      | 'cancelled',
+                    liveBookingCount: session._count.bookings,
+                  };
+            },
+            cancel: (input) =>
+              this.executeSessionCancellation(transaction, input, principal),
+            now: this.now,
+          }),
+        { isolationLevel: 'Serializable' },
+      ),
+    );
+  }
+
+  // Cancels every live Booking as session_cancelled, refunds one unit to each
+  // Subscription, closes the active waitlist, audits, and notifies the booked
+  // and queued Clients plus the assigned Trainer.
+  private async executeSessionCancellation(
+    transaction: Prisma.TransactionClient,
+    input: { sessionId: string; cancelledByAccountId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<SessionCancellationResult> {
+    const now = this.now();
+    const session = await transaction.session.findUniqueOrThrow({
+      where: { id: input.sessionId },
+      select: {
+        id: true,
+        branchId: true,
+        classType: { select: { name: true } },
+        trainer: { select: { account: { select: { id: true } } } },
+        bookings: {
+          where: { state: BookingState.BOOKED },
+          select: {
+            id: true,
+            subscriptionId: true,
+            client: { select: { account: { select: { id: true } } } },
+          },
+        },
+        waitlistEntries: {
+          where: { closedAt: null },
+          select: {
+            id: true,
+            client: { select: { account: { select: { id: true } } } },
+          },
+        },
+      },
+    });
+
+    const cancelled = await transaction.session.updateMany({
+      where: { id: session.id, state: SessionState.SCHEDULED },
+      data: {
+        state: SessionState.CANCELLED,
+        cancellationCause: SessionCancellationCause.NO_SUBSTITUTE_TRAINER,
+        cancelledAt: now,
+        cancelledByAccountId: input.cancelledByAccountId,
+      },
+    });
+    if (cancelled.count !== 1) {
+      throw new Error('Session is not cancellable');
+    }
+
+    const notify = (accountId: string, message: string) =>
+      this.recordNotification(transaction, {
+        accountId,
+        category: 'booking_schedule',
+        type: 'session_cancelled',
+        businessEventKey: `session-cancelled:${session.id}`,
+        title: 'Clase cancelada',
+        message,
+        destination: { type: 'session', id: session.id },
+        occurredAt: now,
+      });
+
+    for (const booking of session.bookings) {
+      await transaction.booking.update({
+        where: { id: booking.id },
+        data: {
+          state: BookingState.CANCELLED,
+          cancelledAt: now,
+          cancelledByAccountId: input.cancelledByAccountId,
+          cancellationCause: BookingCancellationCause.SESSION_CANCELLED,
+        },
+      });
+      await transaction.subscription.update({
+        where: { id: booking.subscriptionId },
+        data: { remainingClassAllowance: { increment: 1 } },
+      });
+      if (booking.client.account !== null) {
+        await notify(
+          booking.client.account.id,
+          `Tu clase de ${session.classType.name} fue cancelada. Tu clase fue reembolsada a tu plan.`,
+        );
+      }
+    }
+
+    await transaction.waitlistEntry.updateMany({
+      where: { sessionId: session.id, closedAt: null },
+      data: {
+        closedAt: now,
+        closureReason: WaitlistClosureReason.SESSION_CANCELLED,
+      },
+    });
+    for (const entry of session.waitlistEntries) {
+      if (entry.client.account !== null) {
+        await notify(
+          entry.client.account.id,
+          `La clase de ${session.classType.name} a la que estabas en lista de espera fue cancelada.`,
+        );
+      }
+    }
+    if (session.trainer.account !== null) {
+      await notify(
+        session.trainer.account.id,
+        `Tu clase de ${session.classType.name} fue cancelada por administración.`,
+      );
+    }
+
+    await transaction.auditRecord.create({
+      data: {
+        actionCode: 'session.cancelled',
+        outcome: AuditOutcome.SUCCEEDED,
+        actorKind: AuditActorKind.ACCOUNT,
+        actorAccountId: input.cancelledByAccountId,
+        actorRole:
+          principal.identity.kind === 'staff'
+            ? (principal.identity.role.toUpperCase() as StaffRole)
+            : null,
+        targetType: 'session',
+        targetId: session.id,
+        branchId: session.branchId,
+        correlationId: session.id,
+        occurredAt: now,
+        metadata: {
+          cause: 'no_substitute_trainer',
+          cancelledBookings: session.bookings.length,
+          closedWaitlistEntries: session.waitlistEntries.length,
+        },
+      },
+    });
+
+    return { affectedBookings: session.bookings.length };
   }
 
   async joinWaitlistIdempotent(

@@ -8,6 +8,7 @@ import {
   CreditReservationState,
   ImageAssetPurpose,
   ImageAssetState,
+  ImageMediaType,
   PaymentMethod,
   PaymentState,
   PrismaClient,
@@ -87,6 +88,26 @@ export type ReferralsView = {
 };
 
 const creditActivityLimit = 20;
+
+export type PendingPaymentSummary = {
+  id: string;
+  clientName: string;
+  planName: string;
+  amountDueCentavos: number;
+  submittedAt: Date;
+  receiptAvailable: boolean;
+};
+
+export type PaymentReview = PaymentView & {
+  clientName: string;
+  receipt: { imageAssetId: string; mediaType: string } | null;
+};
+
+const mediaTypes: Record<ImageMediaType, string> = {
+  [ImageMediaType.JPEG]: 'image/jpeg',
+  [ImageMediaType.PNG]: 'image/png',
+  [ImageMediaType.WEBP]: 'image/webp',
+};
 
 const abbreviateName = (name: string): string => {
   const [first, ...rest] = name.trim().split(/\s+/);
@@ -1451,9 +1472,99 @@ export function createPrismaPaymentCommands(
     };
   };
 
+  const receiptSelect = {
+    id: true,
+    pendingObjectKey: true,
+    deletedAt: true,
+    declaredMediaType: true,
+    verifiedMediaType: true,
+  } as const;
+  type ReceiptRow = Prisma.ImageAssetGetPayload<{ select: typeof receiptSelect }>;
+  const receiptOf = (asset: ReceiptRow | null | undefined) =>
+    asset && asset.deletedAt === null
+      ? {
+          imageAssetId: asset.id,
+          objectKey: asset.pendingObjectKey,
+          mediaType: mediaTypes[asset.verifiedMediaType ?? asset.declaredMediaType],
+        }
+      : null;
+
+  const listPendingPayments = async (
+    principal: AuthenticatedPrincipal,
+  ): Promise<PendingPaymentSummary[]> => {
+    requireAdministrator(principal);
+    const rows = await prisma.payment.findMany({
+      where: { state: PaymentState.PENDING, method: PaymentMethod.TRANSFER },
+      orderBy: [{ submittedAt: 'asc' }, { id: 'asc' }],
+      select: {
+        id: true,
+        planNameSnapshot: true,
+        amountDueCentavos: true,
+        submittedAt: true,
+        client: { select: { name: true } },
+        purchaseIntent: { select: { receiptImageAsset: { select: receiptSelect } } },
+      },
+    });
+    return rows.map((row) => ({
+      id: row.id,
+      clientName: row.client.name,
+      planName: row.planNameSnapshot,
+      amountDueCentavos: row.amountDueCentavos,
+      submittedAt: row.submittedAt,
+      receiptAvailable: receiptOf(row.purchaseIntent?.receiptImageAsset) !== null,
+    }));
+  };
+
+  const loadReview = async (paymentId: string) => {
+    const row = await prisma.payment.findUnique({
+      where: { id: paymentId },
+      select: {
+        ...paymentSelect,
+        client: { select: { name: true } },
+        purchaseIntent: { select: { receiptImageAsset: { select: receiptSelect } } },
+      },
+    });
+    if (row === null) throw rule('payment_not_found', 'Payment not found');
+    return row;
+  };
+
+  const readPaymentReview = async (
+    command: { paymentId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<PaymentReview> => {
+    requireAdministrator(principal);
+    const row = await loadReview(command.paymentId);
+    const receipt = receiptOf(row.purchaseIntent?.receiptImageAsset);
+    return {
+      ...toPaymentView(row),
+      clientName: row.client.name,
+      receipt:
+        receipt === null
+          ? null
+          : { imageAssetId: receipt.imageAssetId, mediaType: receipt.mediaType },
+    };
+  };
+
+  // Only an Administrator reviewing the Payment may read its receipt object.
+  const readReceiptObject = async (
+    command: { paymentId: string },
+    principal: AuthenticatedPrincipal,
+  ): Promise<{ objectKey: string; mediaType: string }> => {
+    requireAdministrator(principal);
+    const row = await loadReview(command.paymentId);
+    const receipt = receiptOf(row.purchaseIntent?.receiptImageAsset);
+    if (receipt === null) {
+      throw rule('payment_receipt_not_ready', 'Receipt is no longer available');
+    }
+    return { objectKey: receipt.objectKey, mediaType: receipt.mediaType };
+  };
+
   return {
     createPurchaseIntent,
     attachReceipt,
+    listPendingPayments,
+    readPaymentReview,
+    readReceiptObject,
     submitTransfer,
     expirePurchaseIntents,
     confirmTransfer,
