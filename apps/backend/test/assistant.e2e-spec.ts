@@ -162,7 +162,9 @@ describe('assistant clients (e2e)', () => {
       .get('/api/v1/assistant/clients?query=l')
       .set('authorization', bearer)
       .expect(400)
-      .expect(({ body }) => expect(body.code).toBe('invalid_request'));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'invalid_request' }),
+      );
     await request(app.getHttpServer())
       .get('/api/v1/assistant/clients')
       .set('authorization', bearer)
@@ -259,17 +261,14 @@ describe('assistant clients (e2e)', () => {
       .expect(201)
       .expect('Cache-Control', 'no-store')
       .expect(({ body }) => {
-        expect(body).toEqual({
-          payment: expect.objectContaining({
+        expect(body).toMatchObject({
+          payment: {
             id: payment.id,
             method: 'cash',
             state: 'confirmed',
             submittedAt: '2026-09-22T20:00:00.000Z',
-          }),
-          subscription: expect.objectContaining({
-            id: subscription.id,
-            endsOn: '2026-10-10',
-          }),
+          },
+          subscription: { id: subscription.id, endsOn: '2026-10-10' },
         });
       });
     expect(operations.recordCashPayment).toHaveBeenCalledWith(
@@ -283,7 +282,9 @@ describe('assistant clients (e2e)', () => {
       .set('authorization', bearer)
       .send({ planId, branchId })
       .expect(400)
-      .expect(({ body }) => expect(body.code).toBe('invalid_request'));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'invalid_request' }),
+      );
     await request(app.getHttpServer())
       .post(`/api/v1/assistant/clients/${clientId}/cash-payments`)
       .set('authorization', bearer)
@@ -298,14 +299,18 @@ describe('assistant clients (e2e)', () => {
       .get(`/api/v1/assistant/clients/${clientId}`)
       .set('authorization', bearer)
       .expect(403)
-      .expect(({ body }) => expect(body.code).toBe('booking_access_denied'));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'booking_access_denied' }),
+      );
 
     operations.overview.mockRejectedValueOnce(new ClientNotFoundError());
     await request(app.getHttpServer())
       .get(`/api/v1/assistant/clients/${clientId}`)
       .set('authorization', bearer)
       .expect(404)
-      .expect(({ body }) => expect(body.code).toBe('client_not_found'));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'client_not_found' }),
+      );
 
     operations.recordCashPayment.mockRejectedValueOnce(
       new PaymentRuleError(
@@ -319,7 +324,9 @@ describe('assistant clients (e2e)', () => {
       .set('idempotency-key', idempotencyKey)
       .send({ planId, branchId })
       .expect(409)
-      .expect(({ body }) => expect(body.code).toBe('subscription_not_expired'));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'subscription_not_expired' }),
+      );
 
     await request(app.getHttpServer())
       .get(`/api/v1/assistant/clients/not-a-uuid`)
