@@ -172,6 +172,9 @@ describe('worker entrypoint', () => {
           .mockResolvedValueOnce({ reminded: 0 })
           .mockRejectedValueOnce(new Error('sensitive database failure')),
       },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
+      },
       serviceVersion: '1.2.3',
       emit,
     });
@@ -220,6 +223,9 @@ describe('worker entrypoint', () => {
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
       pendingAccountCleanup,
       imageUploadCleanup: {
