@@ -53,7 +53,7 @@ async function openPerfil(fetcher: ReturnType<typeof routeFetcher>) {
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
   await waitFor(() => {
     expect(screen.getByRole("button", { name: "Mis referidos" })).toBeOnTheScreen();
   });
@@ -92,7 +92,7 @@ describe("Referrals and Credit", () => {
     );
 
     expect(screen.getByText("Bs 60")).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole("button", { name: "Mis referidos" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Mis referidos" }));
 
     await waitFor(() => {
       expect(screen.getByText("REF-LUCIA")).toBeOnTheScreen();
@@ -108,12 +108,12 @@ describe("Referrals and Credit", () => {
     expect(screen.getByText("Mariana P.")).toBeOnTheScreen();
     expect(screen.getByText("Esperando su primer pago")).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Compartir" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Compartir" }));
     expect(share).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining("REF-LUCIA") }),
     );
 
-    fireEvent.press(screen.getByRole("button", { name: "Tu crédito: Bs 60" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Tu crédito: Bs 60" }));
     await waitFor(() => {
       expect(screen.getByText("Bs 60 disponibles")).toBeOnTheScreen();
     });
@@ -128,7 +128,7 @@ describe("Referrals and Credit", () => {
   it("encourages inviting friends when there is no credit and no referral yet", async () => {
     const screen = await openPerfil(routeFetcher(routes(0, [])));
 
-    fireEvent.press(screen.getByRole("button", { name: "Mi crédito" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Mi crédito" }));
     await waitFor(() => {
       expect(screen.getByText("Bs 0")).toBeOnTheScreen();
     });
@@ -136,7 +136,7 @@ describe("Referrals and Credit", () => {
       screen.getByText("Aún no tienes crédito. Invita a tus amigos para ganar."),
     ).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Ver mi código" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Ver mi código" }));
     await waitFor(() => {
       expect(screen.getByText("REF-LUCIA")).toBeOnTheScreen();
     });

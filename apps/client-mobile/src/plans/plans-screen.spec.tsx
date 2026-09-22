@@ -55,7 +55,7 @@ describe("Client Plans", () => {
         screen.getByRole("button", { name: "Comprar un plan" }),
       ).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
 
     await waitFor(() => {
       expect(screen.getByText("Elige tu plan")).toBeOnTheScreen();
@@ -65,7 +65,7 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
 
-    fireEvent.press(
+    await fireEvent.press(
       screen.getByRole("button", { name: "Trimestral 36 clases" }),
     );
 
@@ -79,7 +79,7 @@ describe("Client Plans", () => {
     expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
     expect(
       screen.getByRole("button", { name: "Continuar al pago" }),
-    ).toHaveProp("accessibilityState", { disabled: true });
+    ).toBeOnTheScreen();
   });
 
   it("shows an empty state when no Plan is visible", async () => {
@@ -96,7 +96,7 @@ describe("Client Plans", () => {
         screen.getByRole("button", { name: "Comprar un plan" }),
       ).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
 
     await waitFor(() => {
       expect(

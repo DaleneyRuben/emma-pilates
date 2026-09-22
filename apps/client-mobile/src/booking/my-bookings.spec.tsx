@@ -88,7 +88,7 @@ async function openMyBookings(routes: Parameters<typeof routeFetcher>[0]) {
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
   await waitFor(
     () => {
       expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
@@ -131,7 +131,7 @@ describe("Client My Bookings", () => {
         screen.getByText("Aún no tienes reservas próximas."),
       ).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
 
     await waitFor(() => {
       expect(screen.getByText("Reservar una clase")).toBeOnTheScreen();
@@ -153,12 +153,12 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Cancelar" })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar" }));
 
     await waitFor(() => {
       expect(screen.getByText("¿Cancelar esta reserva?")).toBeOnTheScreen();
     });
-    fireEvent.press(
+    await fireEvent.press(
       screen.getByRole("button", { name: "Sí, cancelar reserva" }),
     );
 
@@ -185,7 +185,7 @@ describe("Client My Bookings", () => {
         screen.getByRole("button", { name: "Salir de la lista de espera" }),
       ).toBeOnTheScreen();
     });
-    fireEvent.press(
+    await fireEvent.press(
       screen.getByRole("button", { name: "Salir de la lista de espera" }),
     );
 
@@ -233,7 +233,7 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Reprogramar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reprogramar" }));
 
     await waitFor(() => {
       expect(screen.getByText("Reprogramar clase")).toBeOnTheScreen();
@@ -241,16 +241,16 @@ describe("Client My Bookings", () => {
     expect(
       screen.getByText("Puedes cambiar a otra clase disponible el mismo día."),
     ).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Confirmar cambio" }),
-    ).toHaveProp("accessibilityState", { disabled: true });
 
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
       ).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+    expect(
+      screen.getByRole("button", { name: "Confirmar cambio" }),
+    ).toHaveProp("accessibilityState", { disabled: true });
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
@@ -259,7 +259,7 @@ describe("Client My Bookings", () => {
         screen.getByRole("button", { name: "Confirmar cambio" }),
       ).toHaveProp("accessibilityState", { disabled: false });
     });
-    fireEvent.press(screen.getByRole("button", { name: "Confirmar cambio" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar cambio" }));
 
     await waitFor(() => {
       expect(rescheduled).toHaveBeenCalledWith({ targetSessionId: "session-alt" });
