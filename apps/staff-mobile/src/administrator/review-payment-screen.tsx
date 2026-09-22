@@ -17,6 +17,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useMemo, useState } from "react";
 import {
   Image,
@@ -232,7 +233,7 @@ export function ReviewPaymentScreen({
         onRequestClose={() => setEnlarged(false)}
         visible={enlarged && receiptUri !== null}
       >
-        <View style={styles.viewer}>
+        <SafeAreaView style={styles.viewer}>
           <Pressable
             accessibilityLabel="Cerrar"
             accessibilityRole="button"
@@ -256,7 +257,7 @@ export function ReviewPaymentScreen({
               />
             )}
           </ScrollView>
-        </View>
+        </SafeAreaView>
       </Modal>
     </Screen>
   );
