@@ -158,10 +158,12 @@ export const applyDevelopmentFixtures = async (
       }
 
       for (const session of fixtures.sessions) {
+        // Scheduled times follow the schedule; state, capacity, and
+        // cancellations belong to the running system and are kept.
         await transaction.session.upsert({
           where: { id: session.id },
           create: session,
-          update: {},
+          update: { startsAt: session.startsAt, endsAt: session.endsAt },
         });
       }
 
