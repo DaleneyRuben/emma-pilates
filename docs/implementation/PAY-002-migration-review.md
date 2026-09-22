@@ -1,6 +1,12 @@
 # PAY-002 — Payment persistence migration review
 
-Status: **awaiting approval**. This package turns the approved
+Status: **approved 2026-09-22** with the recommended option for every decision
+below (nullable `payment_id`, READY original receipt, snake_case codes, optional
+`referralCode` at registration, the listed environment variables). The migration
+`20260922000000_payments` was created from this text; the only change while
+applying it was renaming the plpgsql variables `payment_id`, `reservation_id`,
+and `referral_id` to `target_*` because PostgreSQL reported them as ambiguous
+against the same-named columns. This package turns the approved
 [PAY-001 proposal](./PAY-001-payment-schema-proposal.md) (approved 2026-09-11)
 into the exact Prisma model text and migration SQL that PAY-002 would add. It
 follows the format of the [BKM-001](./BKM-001-schema-review-package.md) and
@@ -776,27 +782,27 @@ RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    payment_id UUID;
+    target_payment_id UUID;
     payment_state "booking"."PaymentState";
     subscription_count INTEGER;
 BEGIN
     IF TG_TABLE_NAME = 'payments' THEN
-        payment_id := NEW."id";
+        target_payment_id := NEW."id";
     ELSE
-        payment_id := NEW."payment_id";
-        IF payment_id IS NULL THEN
+        target_payment_id := NEW."payment_id";
+        IF target_payment_id IS NULL THEN
             RETURN NULL;
         END IF;
     END IF;
 
-    SELECT "state" INTO payment_state FROM "booking"."payments" WHERE "id" = payment_id;
-    SELECT count(*) INTO subscription_count FROM "booking"."subscriptions" WHERE "payment_id" = payment_id;
+    SELECT "state" INTO payment_state FROM "booking"."payments" WHERE "id" = target_payment_id;
+    SELECT count(*) INTO subscription_count FROM "booking"."subscriptions" WHERE "payment_id" = target_payment_id;
 
     IF payment_state = 'confirmed' AND subscription_count <> 1 THEN
-        RAISE EXCEPTION 'confirmed payment % must have exactly one subscription', payment_id USING ERRCODE = '23514';
+        RAISE EXCEPTION 'confirmed payment % must have exactly one subscription', target_payment_id USING ERRCODE = '23514';
     END IF;
     IF payment_state <> 'confirmed' AND subscription_count <> 0 THEN
-        RAISE EXCEPTION 'payment % is not confirmed and cannot have a subscription', payment_id USING ERRCODE = '23514';
+        RAISE EXCEPTION 'payment % is not confirmed and cannot have a subscription', target_payment_id USING ERRCODE = '23514';
     END IF;
     RETURN NULL;
 END;
@@ -862,45 +868,45 @@ RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    reservation_id UUID;
+    target_reservation_id UUID;
     reservation RECORD;
     reservation_entries INTEGER;
     spend_entries INTEGER;
     release_entries INTEGER;
 BEGIN
     IF TG_TABLE_NAME = 'credit_reservations' THEN
-        reservation_id := NEW."id";
+        target_reservation_id := NEW."id";
     ELSE
-        reservation_id := NEW."reservation_id";
-        IF reservation_id IS NULL THEN
+        target_reservation_id := NEW."reservation_id";
+        IF target_reservation_id IS NULL THEN
             RETURN NULL;
         END IF;
     END IF;
 
     SELECT "state", "amount_centavos", "client_id" INTO reservation
-      FROM "booking"."credit_reservations" WHERE "id" = reservation_id;
+      FROM "booking"."credit_reservations" WHERE "id" = target_reservation_id;
 
     SELECT count(*) INTO reservation_entries FROM "booking"."credit_ledger_entries"
-      WHERE "reservation_id" = reservation_id AND "kind" = 'payment_reservation'
+      WHERE "reservation_id" = target_reservation_id AND "kind" = 'payment_reservation'
         AND "amount_centavos" = reservation."amount_centavos" AND "client_id" = reservation."client_id";
     SELECT count(*) INTO spend_entries FROM "booking"."credit_ledger_entries"
-      WHERE "reservation_id" = reservation_id AND "kind" = 'payment_spend'
+      WHERE "reservation_id" = target_reservation_id AND "kind" = 'payment_spend'
         AND "amount_centavos" = reservation."amount_centavos" AND "client_id" = reservation."client_id";
     SELECT count(*) INTO release_entries FROM "booking"."credit_ledger_entries"
-      WHERE "reservation_id" = reservation_id AND "kind" = 'payment_release'
+      WHERE "reservation_id" = target_reservation_id AND "kind" = 'payment_release'
         AND "amount_centavos" = reservation."amount_centavos" AND "client_id" = reservation."client_id";
 
     IF reservation_entries <> 1 THEN
-        RAISE EXCEPTION 'credit reservation % must have exactly one matching reservation entry', reservation_id USING ERRCODE = '23514';
+        RAISE EXCEPTION 'credit reservation % must have exactly one matching reservation entry', target_reservation_id USING ERRCODE = '23514';
     END IF;
     IF reservation."state" = 'reserved' AND (spend_entries + release_entries) <> 0 THEN
-        RAISE EXCEPTION 'reserved credit reservation % cannot have a settlement entry', reservation_id USING ERRCODE = '23514';
+        RAISE EXCEPTION 'reserved credit reservation % cannot have a settlement entry', target_reservation_id USING ERRCODE = '23514';
     END IF;
     IF reservation."state" = 'spent' AND NOT (spend_entries = 1 AND release_entries = 0) THEN
-        RAISE EXCEPTION 'spent credit reservation % must have exactly one matching spend entry', reservation_id USING ERRCODE = '23514';
+        RAISE EXCEPTION 'spent credit reservation % must have exactly one matching spend entry', target_reservation_id USING ERRCODE = '23514';
     END IF;
     IF reservation."state" = 'released' AND NOT (release_entries = 1 AND spend_entries = 0) THEN
-        RAISE EXCEPTION 'released credit reservation % must have exactly one matching release entry', reservation_id USING ERRCODE = '23514';
+        RAISE EXCEPTION 'released credit reservation % must have exactly one matching release entry', target_reservation_id USING ERRCODE = '23514';
     END IF;
     RETURN NULL;
 END;
@@ -922,41 +928,41 @@ RETURNS trigger
 LANGUAGE plpgsql
 AS $$
 DECLARE
-    referral_id UUID;
+    target_referral_id UUID;
     referral RECORD;
     payment RECORD;
     award_entries INTEGER;
 BEGIN
     IF TG_TABLE_NAME = 'referrals' THEN
-        referral_id := NEW."id";
+        target_referral_id := NEW."id";
     ELSE
-        referral_id := NEW."referral_id";
-        IF referral_id IS NULL THEN
+        target_referral_id := NEW."referral_id";
+        IF target_referral_id IS NULL THEN
             RETURN NULL;
         END IF;
     END IF;
 
     SELECT "state", "referrer_client_id", "referred_client_id", "qualified_payment_id", "award_centavos"
-      INTO referral FROM "booking"."referrals" WHERE "id" = referral_id;
+      INTO referral FROM "booking"."referrals" WHERE "id" = target_referral_id;
 
     SELECT count(*) INTO award_entries FROM "booking"."credit_ledger_entries"
-      WHERE "referral_id" = referral_id AND "kind" = 'referral_award'
+      WHERE "referral_id" = target_referral_id AND "kind" = 'referral_award'
         AND "client_id" = referral."referrer_client_id"
         AND "amount_centavos" = referral."award_centavos";
 
     IF referral."state" = 'pending' THEN
         IF award_entries <> 0 THEN
-            RAISE EXCEPTION 'pending referral % cannot have an award entry', referral_id USING ERRCODE = '23514';
+            RAISE EXCEPTION 'pending referral % cannot have an award entry', target_referral_id USING ERRCODE = '23514';
         END IF;
         RETURN NULL;
     END IF;
 
     SELECT "state", "client_id" INTO payment FROM "booking"."payments" WHERE "id" = referral."qualified_payment_id";
     IF payment."state" IS DISTINCT FROM 'confirmed' OR payment."client_id" <> referral."referred_client_id" THEN
-        RAISE EXCEPTION 'awarded referral % requires a confirmed payment of the referred client', referral_id USING ERRCODE = '23514';
+        RAISE EXCEPTION 'awarded referral % requires a confirmed payment of the referred client', target_referral_id USING ERRCODE = '23514';
     END IF;
     IF award_entries <> 1 THEN
-        RAISE EXCEPTION 'awarded referral % must have exactly one matching award entry', referral_id USING ERRCODE = '23514';
+        RAISE EXCEPTION 'awarded referral % must have exactly one matching award entry', target_referral_id USING ERRCODE = '23514';
     END IF;
     RETURN NULL;
 END;
