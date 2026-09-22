@@ -50,11 +50,15 @@ export async function pickReceipt(): Promise<PickedReceipt | null> {
   return { uri, mediaType, bytes: decodeBase64(base64) };
 }
 
+const convertedMaxWidth = 1600;
+
 // iPhone photos are usually HEIC, which the studio cannot review; anything
-// outside the accepted set (or without a known type) is re-encoded as JPEG.
+// outside the accepted set (or without a known type) is re-encoded as JPEG
+// and downscaled so a receipt uploads in seconds instead of minutes.
 async function ensureAcceptedFormat(asset: {
   uri: string;
   mimeType?: string;
+  width?: number;
 }): Promise<{ uri: string; mediaType: CreatePendingUploadDtoMediaType }> {
   if (asset.mimeType !== undefined && acceptedMediaTypes.has(asset.mimeType)) {
     return {
@@ -62,7 +66,11 @@ async function ensureAcceptedFormat(asset: {
       mediaType: asset.mimeType as CreatePendingUploadDtoMediaType,
     };
   }
-  const converted = await ImageManipulator.manipulateAsync(asset.uri, [], {
+  const actions: ImageManipulator.Action[] =
+    asset.width !== undefined && asset.width > convertedMaxWidth
+      ? [{ resize: { width: convertedMaxWidth } }]
+      : [];
+  const converted = await ImageManipulator.manipulateAsync(asset.uri, actions, {
     compress: 0.9,
     format: ImageManipulator.SaveFormat.JPEG,
   });
