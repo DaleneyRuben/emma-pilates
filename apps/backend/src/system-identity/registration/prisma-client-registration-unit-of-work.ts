@@ -360,11 +360,23 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
 
   cleanup(request: ExpiredPendingAccountCleanup): Promise<number> {
     return this.dependencies.prisma.$transaction(async (transaction) => {
+      // An invited Client who already holds a Subscription, Payment, or
+      // Booking stays pending until activated; only untouched Accounts expire.
       const expiredAccounts = await transaction.account.findMany({
         where: {
           pendingExpiresAt: { lte: request.now },
           emailVerifiedAt: null,
           activatedAt: null,
+          OR: [
+            { clientId: null },
+            {
+              client: {
+                subscriptions: { none: {} },
+                payments: { none: {} },
+                bookings: { none: {} },
+              },
+            },
+          ],
         },
         select: { id: true, clientId: true, staffMemberId: true },
       });
@@ -405,7 +417,7 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
   }
 }
 
-class PrismaClientRegistrationTransaction implements ClientRegistrationTransaction {
+export class PrismaClientRegistrationTransaction implements ClientRegistrationTransaction {
   constructor(
     private readonly transaction: Prisma.TransactionClient,
     private readonly boss: Pick<PgBoss, 'send'>,
