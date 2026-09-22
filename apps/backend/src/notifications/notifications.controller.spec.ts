@@ -39,14 +39,19 @@ describe('NotificationsController', () => {
     expect(list).toHaveBeenCalledWith({ limit: 20, cursor: null }, principal);
 
     await controller.list(bearer, { limit: '5', cursor: 'abc' });
-    expect(list).toHaveBeenLastCalledWith({ limit: 5, cursor: 'abc' }, principal);
+    expect(list).toHaveBeenLastCalledWith(
+      { limit: 5, cursor: 'abc' },
+      principal,
+    );
   });
 
   it('rejects an invalid page size or cursor', async () => {
-    await expect(controller.list(bearer, { limit: '0' })).rejects.toMatchObject({
-      response: { code: 'invalid_request' },
-      status: 400,
-    });
+    await expect(controller.list(bearer, { limit: '0' })).rejects.toMatchObject(
+      {
+        response: { code: 'invalid_request' },
+        status: 400,
+      },
+    );
     list.mockRejectedValue(new Error('Invalid notification cursor'));
     await expect(
       controller.list(bearer, { cursor: 'garbage' }),
@@ -59,17 +64,23 @@ describe('NotificationsController', () => {
   it('reports the unread count', async () => {
     countUnread.mockResolvedValue(3);
 
-    await expect(controller.unreadCount(bearer)).resolves.toEqual({ unread: 3 });
+    await expect(controller.unreadCount(bearer)).resolves.toEqual({
+      unread: 3,
+    });
     expect(countUnread).toHaveBeenCalledWith(principal);
   });
 
   it('marks one notification read and maps unknown ones to not found', async () => {
     markRead.mockResolvedValue(undefined);
-    await expect(controller.markRead(notificationId, bearer)).resolves.toBeUndefined();
+    await expect(
+      controller.markRead(notificationId, bearer),
+    ).resolves.toBeUndefined();
     expect(markRead).toHaveBeenCalledWith({ notificationId }, principal);
 
     markRead.mockRejectedValue(new NotificationNotFoundError());
-    await expect(controller.markRead(notificationId, bearer)).rejects.toMatchObject({
+    await expect(
+      controller.markRead(notificationId, bearer),
+    ).rejects.toMatchObject({
       response: { code: 'notification_not_found' },
       status: 404,
     });
@@ -82,7 +93,9 @@ describe('NotificationsController', () => {
   it('marks all notifications read and requires a bearer credential', async () => {
     markAllRead.mockResolvedValue({ marked: 2 });
 
-    await expect(controller.markAllRead(bearer)).resolves.toEqual({ marked: 2 });
+    await expect(controller.markAllRead(bearer)).resolves.toEqual({
+      marked: 2,
+    });
     await expect(controller.markAllRead(undefined)).rejects.toBeInstanceOf(
       UnauthorizedException,
     );
