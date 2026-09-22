@@ -30,6 +30,8 @@ model Plan {
   createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime       @updatedAt @map("updated_at") @db.Timestamptz(3)
   subscriptions  Subscription[]
+  purchaseIntents PurchaseIntent[]
+  payments       Payment[]
 
   @@index([hiddenAt, displayOrder, id])
   @@map("plans")
@@ -125,10 +127,12 @@ model Subscription {
   state                   SubscriptionState @default(ACTIVE)
   activatedAt             DateTime          @map("activated_at") @db.Timestamptz(3)
   expiredAt               DateTime?         @map("expired_at") @db.Timestamptz(3)
+  paymentId               String?           @unique @map("payment_id") @db.Uuid
   createdAt               DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt               DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
   client                  Client            @relation(fields: [clientId], references: [id], onDelete: Restrict)
   plan                    Plan              @relation(fields: [planId], references: [id], onDelete: Restrict)
+  payment                 Payment?          @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   bookings                Booking[]
 
   @@unique([id, clientId])

@@ -20,6 +20,12 @@ model Client {
   bookings            Booking[]
   waitlistEntries     WaitlistEntry[]
   profileImageAsset   ImageAsset?     @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
+  purchaseIntents     PurchaseIntent[]
+  payments            Payment[]
+  creditReservations  CreditReservation[]
+  creditLedgerEntries CreditLedgerEntry[]
+  referralsMade       Referral[]      @relation("ReferralReferrer")
+  referralReceived    Referral?       @relation("ReferralReferred")
 
   @@map("clients")
   @@schema("booking")
@@ -54,6 +60,7 @@ model Branch {
   auditRecords     AuditRecord[]
   schedules        SessionSchedule[]
   sessions         Session[]
+  cashPayments     Payment[]
 
   @@map("branches")
   @@schema("booking")

@@ -176,6 +176,10 @@ model Account {
   notifications             Notification[]
   devices                   AccountDevice[]
   ownedImageAssets          ImageAsset[]            @relation("ImageAssetOwner")
+  createdPurchaseIntents    PurchaseIntent[]        @relation("PurchaseIntentCreatedBy")
+  submittedPayments         Payment[]               @relation("PaymentSubmittedBy")
+  decidedPayments           Payment[]               @relation("PaymentDecidedBy")
+  creditLedgerEntries       CreditLedgerEntry[]     @relation("CreditLedgerActor")
 
   @@map("accounts")
   @@schema("system")
@@ -394,6 +398,7 @@ model ImageAsset {
   staffProfile      StaffMember?      @relation("StaffProfileImage")
   promotions        Promotion[]
   variants          ImageVariant[]
+  receiptPurchaseIntent PurchaseIntent? @relation("PurchaseIntentReceipt")
 
   @@index([ownerAccountId, state])
   @@index([state, expiresAt])
