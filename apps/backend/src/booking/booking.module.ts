@@ -50,6 +50,18 @@ import { loadClientProfile } from './client/client-profile';
 import { loadClientSubscription } from './client/client-subscription';
 import { updateClientProfile } from './client/update-client-profile';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
+import {
+  ClientCreditController,
+  ClientPaymentsController,
+  ClientReferralsController,
+  CreditPurchasesController,
+  paymentCommands,
+  PurchaseIntentsController,
+  transferInstructions,
+  TransferInstructionsController,
+  type TransferInstructions,
+} from './payments/payments.controller';
+import { createPrismaPaymentCommands } from './payments/prisma-payment-commands';
 import { loadStaffProfile } from './staff/staff-profile';
 import {
   StaffProfileController,
@@ -88,6 +100,12 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     ClientBookingsController,
     WaitlistEntriesController,
     StaffProfileController,
+    PurchaseIntentsController,
+    CreditPurchasesController,
+    ClientPaymentsController,
+    ClientCreditController,
+    ClientReferralsController,
+    TransferInstructionsController,
   ],
   providers: [
     {
@@ -392,6 +410,30 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
       inject: [bookingPrisma],
       useFactory: (prisma: PrismaClient) => (sessionId: string) =>
         createCatalogRepository(prisma).findSessionDetail(sessionId),
+    },
+    {
+      provide: paymentCommands,
+      inject: [bookingPrisma, ConfigService],
+      useFactory: (
+        prisma: PrismaClient,
+        config: ConfigService<Environment, true>,
+      ) =>
+        createPrismaPaymentCommands(prisma, {
+          now: () => new Date(),
+          referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
+        }),
+    },
+    {
+      provide: transferInstructions,
+      inject: [ConfigService],
+      useFactory: (
+        config: ConfigService<Environment, true>,
+      ): TransferInstructions => ({
+        beneficiaryName: config.getOrThrow('TRANSFER_BENEFICIARY_NAME'),
+        bankName: config.getOrThrow('TRANSFER_BANK_NAME'),
+        accountNumber: config.getOrThrow('TRANSFER_ACCOUNT_NUMBER'),
+        qrImagePath: config.getOrThrow('TRANSFER_QR_IMAGE_PATH'),
+      }),
     },
     {
       provide: BookingRuntimeCleanup,
