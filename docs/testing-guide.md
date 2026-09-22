@@ -638,6 +638,84 @@ What they mean:
 - `check:api` proves that the committed OpenAPI document and generated API
   client match the backend controllers.
 
+## Test 9: try Perfil, the inbox, and password change in the apps
+
+Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
+
+### A. Client Perfil
+
+Log in as `sofia@example.com` and open the **Perfil** tab. Below the summary
+card you should see the rows **Mi plan**, **Notificaciones**, and **Cambiar
+contraseña**, an outlined **Cerrar sesión** button, and the footer
+"Emma Pilates Studio · versión 1.0". The Notificaciones row shows a small badge
+with the unread count when it is greater than zero.
+
+### B. The notification inbox
+
+Sofia has no notifications by default, so the inbox shows "No tienes
+notificaciones." with its supporting line. To see the full screen, create a few
+rows for her Account with `psql` (development database only):
+
+```sql
+insert into system.notifications
+  (id, account_id, category, type, business_event_key, title, message, created_at)
+select gen_random_uuid(), a.id, 'booking_schedule', 'session_cancelled',
+       'manual:' || gen_random_uuid(), 'Clase cancelada',
+       'Tu clase de Reformer Pilates fue cancelada. Tu clase fue reembolsada a tu plan.',
+       now() - interval '40 minutes'
+from system.accounts a where a.email = 'sofia@example.com';
+```
+
+Pull the Perfil tab again: the badge shows `1`, and **Notificaciones** lists the
+row under **Sin leer** with a dot and a relative time such as "Hace 40 minutos"
+(yesterday's rows read "Ayer, 18:05", older ones "Hace 2 días"). Tap **Marcar
+leídas**: the action disappears, everything moves under **Anteriores**, and the
+badge is gone when you go back. Tapping a single row also marks it read.
+
+### C. Change the signed-in password from the app
+
+Open **Cambiar contraseña**. The **Guardar contraseña** button stays disabled
+until the three fields are filled and the two new passwords match; a mismatch
+shows "Las contraseñas no coinciden." under the last field. A wrong current
+password returns you to the form with "La contraseña actual no es correcta."
+under the first field. A correct change returns to Perfil, and the new password
+works on the next login. Reload the fixtures afterwards to restore the shared
+test password.
+
+### D. Log out with confirmation
+
+Tap **Cerrar sesión**. The app asks "¿Cerrar sesión?" first; **Cancelar** keeps
+you signed in and **Cerrar sesión** returns to Login.
+
+### E. Staff Perfil
+
+Start the Staff app on port 8082 (`pnpm --filter @pilates/staff-mobile start`)
+and open `exp://127.0.0.1:8082` in Expo Go. Log in as
+`emma.vargas@example.com`. Every role root shows a circular avatar with two
+initials at the top right (accessibility label "Tu cuenta"); tap it to open
+**Perfil**. The screen is read-only: name, email, "Tus datos los actualiza
+administración.", **Rol** (`Entrenadora`), **Sucursales** (`Centro, Equipetrol,
+Urubó`), the **Notificaciones** and **Cambiar contraseña** rows, the outlined
+**Cerrar sesión** button, and the version footer. Log in as
+`paola.mendoza@example.com` to see **Administración** with "Todas las
+sucursales". The staff inbox uses the empty-state line "Te avisaremos aquí
+cuando haya algo que necesite tu atención."
+
+### F. Offline behaviour
+
+The apps are online-first. When the device loses connectivity, a banner reads
+"Sin conexión. Mostrando la última información guardada." and only the class
+schedule, upcoming Bookings, and the Subscription summary stay visible from the
+Account-scoped cache; everything else needs the connection back. The iOS
+Simulator shares the Mac's network, so this is easiest to see on a device with
+airplane mode.
+
+### Time zones
+
+The backend pins every Prisma connection to UTC. If a timestamp you inserted
+with `psql` shows up four hours off in the app, the API you are running is
+older than this guide: rebuild it with `pnpm --filter @pilates/backend build`.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -647,14 +725,13 @@ The following are not ready for manual product testing:
 - automatic cleanup of expired pending accounts through a running worker;
 - retrieving a valid activation or password-recovery link from a local inbox;
 - completing successful activation or password recovery manually;
-- visible mobile logout or signed-in password-change screens;
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
-- Promotions on Client Home, class browsing, booking, payments, or
-  notifications;
-- authenticated Trainer, Assistant, Administrator, or Nutritionist journeys and
-  their working destination screens;
+- Promotions on Client Home, payments, or push notifications (the in-app inbox
+  works, see Test 9);
+- authenticated Assistant, Administrator, or Nutritionist journeys beyond
+  Perfil and the inbox;
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, or production deployment; and
 - Maestro release-journey tests.
