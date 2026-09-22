@@ -385,6 +385,13 @@ class balance. A full Session offers **Unirme a la lista de espera**, and a
 Client without remaining classes sees the disabled button with a link to the
 Plans.
 
+**Mis reservas** lists upcoming Bookings and Waitlist entries. A Booking more
+than 2 h 30 before its start offers **Cancelar** behind a confirmation sheet
+(the class returns to the balance); one inside that window shows **No
+cancelable** and **Reprogramar** to another Session of the same day; a
+Waitlist entry offers **Salir de la lista de espera**. With nothing upcoming,
+the screen offers **Reservar una clase**.
+
 That Client Account must not authenticate in the Staff app. Use a Staff fixture
 such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
 by the Client app.
