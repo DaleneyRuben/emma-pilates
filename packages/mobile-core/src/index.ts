@@ -16,6 +16,7 @@ export * from "./notifications/notification-time";
 export * from "./notifications/notifications-screen";
 export * from "./query/provider";
 export * from "./time/session-format";
+export * from "./ui/back-link";
 export * from "./ui/body-text";
 export * from "./ui/form-field";
 export * from "./ui/text-button";

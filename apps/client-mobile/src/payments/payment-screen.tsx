@@ -25,7 +25,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatBolivianos } from "../plans/plan-format";
-import { BackLink } from "../ui/back-link";
+import { BackLink } from "@pilates/mobile-core";
 import { encodeBase64 } from "@pilates/mobile-core";
 import { pickReceipt, uploadReceipt, type AttachedReceipt } from "./receipt-upload";
 

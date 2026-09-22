@@ -1,4 +1,4 @@
-import { colors, spacing, typography } from "@pilates/mobile-core";
+import { colors, spacing, typography } from "./tokens";
 import { Pressable, StyleSheet, Text } from "react-native";
 
 export function BackLink({ onPress }: { onPress: () => void }) {

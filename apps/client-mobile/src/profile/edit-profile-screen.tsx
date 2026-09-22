@@ -29,7 +29,7 @@ import {
 import { z } from "zod";
 
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "../ui/back-link";
+import { BackLink } from "@pilates/mobile-core";
 
 const profileSchema = z.object({
   name: z.string().trim().min(1, "Escribe tu nombre."),

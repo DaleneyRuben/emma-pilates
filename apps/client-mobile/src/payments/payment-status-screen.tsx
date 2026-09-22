@@ -24,7 +24,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { formatCivilDate } from "../home/home-format";
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "../ui/back-link";
+import { BackLink } from "@pilates/mobile-core";
 
 type StatusNavigation = {
   goBack: () => void;

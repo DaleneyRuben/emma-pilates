@@ -27,7 +27,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "../ui/back-link";
+import { BackLink } from "@pilates/mobile-core";
 import { describeValidity, formatBolivianos } from "./plan-format";
 
 type PlanDetailNavigation = {

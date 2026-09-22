@@ -19,7 +19,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatBolivianos } from "../plans/plan-format";
-import { BackLink } from "../ui/back-link";
+import { BackLink } from "@pilates/mobile-core";
 import { formatReferralDate } from "./referral-format";
 
 type CreditNavigation = {

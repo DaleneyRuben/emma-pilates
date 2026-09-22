@@ -19,7 +19,7 @@ import {
   formatCivilDate,
   subscriptionBadge,
 } from "../home/home-format";
-import { BackLink } from "../ui/back-link";
+import { BackLink } from "@pilates/mobile-core";
 
 type SubscriptionNavigation = {
   goBack: () => void;
