@@ -402,6 +402,48 @@ describe('Prisma payment lifecycle', () => {
     ).resolves.toBe('purchase_intent_not_open');
   });
 
+  it('lists pending transfers oldest first and describes one for review', async () => {
+    const admin = await staffPrincipal('paola.mendoza@example.com');
+    const trainer = await staffPrincipal('emma.vargas@example.com');
+    const first = await newClient('Primera Pendiente');
+    const second = await newClient('Segunda Pendiente');
+    const submit = async (buyer: typeof first, at: Date) => {
+      const intent = await commands(at).createPurchaseIntent({ planId: plan.id }, buyer, randomUUID());
+      const receipt = await readyReceipt(buyer.accountId);
+      await commands(at).attachReceipt({ purchaseIntentId: intent.id, imageAssetId: receipt.id }, buyer, randomUUID());
+      return { payment: await commands(at).submitTransfer({ purchaseIntentId: intent.id }, buyer, randomUUID()), receipt };
+    };
+    const later = new Date(now.getTime() + 30 * 60 * 1_000);
+    const { payment: newer } = await submit(second, later);
+    const { payment: older, receipt } = await submit(first, now);
+
+    await expect(codeOf(commands().listPendingPayments(trainer))).resolves.toBe('access_denied');
+
+    const pending = await commands().listPendingPayments(admin);
+    const ids = pending.map((entry) => entry.id);
+    expect(ids.indexOf(older.id)).toBeLessThan(ids.indexOf(newer.id));
+    expect(pending.find((entry) => entry.id === older.id)).toMatchObject({
+      clientName: 'Primera Pendiente',
+      planName: 'Paquete de 8 clases',
+      amountDueCentavos: 56_000,
+      submittedAt: now,
+      receiptAvailable: true,
+    });
+
+    await expect(commands().readPaymentReview({ paymentId: older.id }, admin)).resolves.toMatchObject({
+      id: older.id,
+      clientName: 'Primera Pendiente',
+      state: 'pending',
+      receipt: { imageAssetId: receipt.id, mediaType: 'image/jpeg' },
+    });
+    await expect(
+      codeOf(commands().readPaymentReview({ paymentId: randomUUID() }, admin)),
+    ).resolves.toBe('payment_not_found');
+    await expect(
+      commands().readReceiptObject({ paymentId: older.id }, admin),
+    ).resolves.toMatchObject({ mediaType: 'image/jpeg', objectKey: expect.stringContaining('pending/') });
+  });
+
   it('records an instant cash Payment at an assigned Branch, spending Credit and activating the Subscription', async () => {
     const buyer = await newClient('Efectivo');
     await seedAward(buyer.clientId);
