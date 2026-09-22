@@ -1847,6 +1847,43 @@
         ]
       }
     },
+    "/api/v1/uploads/{id}": {
+      "get": {
+        "operationId": "getUploadStatus",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadStatusDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Uploads"
+        ]
+      }
+    },
     "/api/v1/notifications": {
       "get": {
         "operationId": "listNotifications",
@@ -3585,6 +3622,35 @@
               "failed",
               "deleted"
             ]
+          }
+        },
+        "required": [
+          "id",
+          "state"
+        ]
+      },
+      "UploadStatusDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "processing",
+              "ready",
+              "attached",
+              "failed",
+              "deleted"
+            ]
+          },
+          "mediaType": {
+            "type": "string",
+            "nullable": true,
+            "description": "Verified media type once the worker has processed the bytes"
           }
         },
         "required": [

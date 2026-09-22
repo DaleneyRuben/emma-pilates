@@ -102,4 +102,6 @@ export * from "./unreadNotificationCountDto";
 export * from "./upcomingBookingDto";
 export * from "./upcomingBookingDtoKind";
 export * from "./updateClientProfileDto";
+export * from "./uploadStatusDto";
+export * from "./uploadStatusDtoState";
 export * from "./verifyClientEmailDto";

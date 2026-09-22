@@ -76,6 +76,7 @@ import type {
   UnreadNotificationCountDto,
   UpcomingBookingDto,
   UpdateClientProfileDto,
+  UploadStatusDto,
   VerifyClientEmailDto,
 } from "./models";
 
@@ -8015,6 +8016,197 @@ export const useFinalizeUpload = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(getFinalizeUploadMutationOptions(options), queryClient);
 };
+
+export type getUploadStatusResponse200 = {
+  data: UploadStatusDto;
+  status: 200;
+};
+
+export type getUploadStatusResponseSuccess = getUploadStatusResponse200 & {
+  headers: Headers;
+};
+export type getUploadStatusResponse = getUploadStatusResponseSuccess;
+
+export const getGetUploadStatusUrl = (id: string) => {
+  return `/api/v1/uploads/${id}`;
+};
+
+export const getUploadStatus = async (
+  id: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getUploadStatusResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetUploadStatusUrl(id), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getUploadStatusResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getUploadStatusResponse;
+};
+
+export const getGetUploadStatusQueryKey = (id: string) => {
+  return [`/api/v1/uploads/${id}`] as const;
+};
+
+export const getGetUploadStatusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getUploadStatus>>,
+  TError = unknown,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUploadStatus>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetUploadStatusQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getUploadStatus>>> = ({
+    signal,
+  }) => getUploadStatus(id, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: id !== null && id !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getUploadStatus>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetUploadStatusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getUploadStatus>>
+>;
+export type GetUploadStatusQueryError = unknown;
+
+export function useGetUploadStatus<
+  TData = Awaited<ReturnType<typeof getUploadStatus>>,
+  TError = unknown,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUploadStatus>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUploadStatus>>,
+          TError,
+          Awaited<ReturnType<typeof getUploadStatus>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUploadStatus<
+  TData = Awaited<ReturnType<typeof getUploadStatus>>,
+  TError = unknown,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUploadStatus>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getUploadStatus>>,
+          TError,
+          Awaited<ReturnType<typeof getUploadStatus>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetUploadStatus<
+  TData = Awaited<ReturnType<typeof getUploadStatus>>,
+  TError = unknown,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUploadStatus>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetUploadStatus<
+  TData = Awaited<ReturnType<typeof getUploadStatus>>,
+  TError = unknown,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getUploadStatus>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetUploadStatusQueryOptions(id, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export type listNotificationsResponse200 = {
   data: NotificationPageDto;
