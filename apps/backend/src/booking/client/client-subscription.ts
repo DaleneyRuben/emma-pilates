@@ -34,14 +34,21 @@ type LoadClientSubscriptionDependencies = {
 const renewalReminderDays = 3;
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
 
-export const loadClientSubscription = async (
-  dependencies: LoadClientSubscriptionDependencies,
-): Promise<ClientSubscriptionView> => {
-  if (dependencies.principal.identity.kind !== 'client') {
-    throw new BookingAccessDeniedError();
-  }
+type SubscriptionLookup = {
+  today: Date;
+  findActiveSubscription(
+    clientId: string,
+    onDate: Date,
+  ): Promise<ClientSubscriptionSummary | null>;
+  findLatestSubscription(
+    clientId: string,
+  ): Promise<ClientSubscriptionSummary | null>;
+};
 
-  const { clientId } = dependencies.principal.identity;
+export const describeSubscription = async (
+  clientId: string,
+  dependencies: SubscriptionLookup,
+): Promise<ClientSubscriptionView> => {
   const active = await dependencies.findActiveSubscription(
     clientId,
     dependencies.today,
@@ -63,4 +70,17 @@ export const loadClientSubscription = async (
   return latest === null
     ? { status: 'none', subscription: null }
     : { status: 'expired', subscription: latest };
+};
+
+export const loadClientSubscription = async (
+  dependencies: LoadClientSubscriptionDependencies,
+): Promise<ClientSubscriptionView> => {
+  if (dependencies.principal.identity.kind !== 'client') {
+    throw new BookingAccessDeniedError();
+  }
+
+  return describeSubscription(
+    dependencies.principal.identity.clientId,
+    dependencies,
+  );
 };

@@ -3,6 +3,7 @@ import { BookingAccessDeniedError } from '../commands/create-booking';
 
 type UpcomingSessionFacts = {
   sessionId: string;
+  branchId: string;
   classTypeName: string;
   trainerName: string;
   branchName: string;

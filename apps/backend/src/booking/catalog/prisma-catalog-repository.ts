@@ -156,7 +156,7 @@ export function createCatalogRepository(
         endsAt: true,
         classType: { select: { name: true } },
         trainer: { select: { name: true } },
-        branch: { select: { name: true } },
+        branch: { select: { id: true, name: true } },
       } as const;
       const [bookings, entries] = await Promise.all([
         prisma.booking.findMany({
@@ -178,6 +178,7 @@ export function createCatalogRepository(
       ]);
       const facts = (session: (typeof bookings)[number]['session']) => ({
         sessionId: session.id,
+        branchId: session.branch.id,
         classTypeName: session.classType.name,
         trainerName: session.trainer.name,
         branchName: session.branch.name,
