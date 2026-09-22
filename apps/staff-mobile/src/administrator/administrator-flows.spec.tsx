@@ -275,6 +275,11 @@ describe("Administrator payments and Session cancellation", () => {
       },
     });
 
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Cancelar una clase" }),
+      ).toBeOnTheScreen();
+    });
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Cancelar una clase")).toBeOnTheScreen();
