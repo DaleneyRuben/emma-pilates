@@ -101,6 +101,25 @@ describe('operational health (e2e)', () => {
     });
   });
 
+  it('publishes the purchase and payment endpoints from the application module', () => {
+    const document = configureApplication(app);
+
+    for (const path of [
+      '/api/v1/purchase-intents',
+      '/api/v1/purchase-intents/current',
+      '/api/v1/purchase-intents/{purchaseIntentId}/receipt',
+      '/api/v1/purchase-intents/{purchaseIntentId}/submit',
+      '/api/v1/credit-purchases',
+      '/api/v1/payments/current',
+      '/api/v1/clients/current/credit',
+      '/api/v1/clients/current/referrals',
+      '/api/v1/transfer-instructions',
+      '/api/v1/transfer-instructions/qr',
+    ]) {
+      expect(document.paths).toHaveProperty(path);
+    }
+  });
+
   it('publishes the client registration lifecycle from the application module', () => {
     const document = configureApplication(app);
 
