@@ -14,6 +14,7 @@ export * from "./authenticationLinkTokenDto";
 export * from "./authenticationSessionCredentialDto";
 export * from "./branchDto";
 export * from "./changeCurrentPasswordDto";
+export * from "./classHistoryEntryDto";
 export * from "./classTypeDto";
 export * from "./clientAuthenticationIdentityDto";
 export * from "./clientAuthenticationIdentityDtoKind";

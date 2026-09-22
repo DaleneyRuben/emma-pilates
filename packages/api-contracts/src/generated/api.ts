@@ -27,6 +27,7 @@ import type {
   AuthenticationSessionCredentialDto,
   BranchDto,
   ChangeCurrentPasswordDto,
+  ClassHistoryEntryDto,
   ClassTypeDto,
   ClientEmailVerificationResultDto,
   ClientProfileDto,
@@ -2647,7 +2648,7 @@ export const useRescheduleBooking = <TError = unknown, TContext = unknown>(
 };
 
 export type listClassHistoryResponse200 = {
-  data: CreatedBookingDto[];
+  data: ClassHistoryEntryDto[];
   status: 200;
 };
 

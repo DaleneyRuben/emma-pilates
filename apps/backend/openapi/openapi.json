@@ -674,7 +674,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CreatedBookingDto"
+                    "$ref": "#/components/schemas/ClassHistoryEntryDto"
                   }
                 }
               }
@@ -1748,6 +1748,45 @@
         },
         "required": [
           "id"
+        ]
+      },
+      "ClassHistoryEntryDto": {
+        "type": "object",
+        "properties": {
+          "bookingId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeName": {
+            "type": "string"
+          },
+          "trainerName": {
+            "type": "string"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "bookingId",
+          "sessionId",
+          "classTypeName",
+          "trainerName",
+          "branchName",
+          "startsAt",
+          "endsAt"
         ]
       },
       "TrainerScheduleSessionDto": {
