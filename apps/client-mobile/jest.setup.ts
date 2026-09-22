@@ -12,10 +12,15 @@ jest.mock("@react-native-community/netinfo", () => ({
 
 jest.mock("expo-crypto", () => ({
   CryptoDigestAlgorithm: { SHA256: "SHA-256" },
-  digest: async (_algorithm: string, data: ArrayBuffer) => {
+  // The native module only accepts typed arrays; a bare ArrayBuffer fails on
+  // the device with NotTypedArrayException, so the mock refuses it too.
+  digest: async (_algorithm: string, data: ArrayBufferView) => {
+    if (!ArrayBuffer.isView(data)) {
+      throw new Error("Given argument is not an instance of TypedArray");
+    }
     const hash = require("node:crypto")
       .createHash("sha256")
-      .update(Buffer.from(data))
+      .update(Buffer.from(data.buffer, data.byteOffset, data.byteLength))
       .digest();
     return hash.buffer.slice(hash.byteOffset, hash.byteOffset + hash.byteLength);
   },
