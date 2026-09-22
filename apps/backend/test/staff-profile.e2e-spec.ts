@@ -31,7 +31,12 @@ describe('staff profile (e2e)', () => {
     resolvePrincipal.mockResolvedValue({
       accountId: 'account-id',
       authenticationSessionId: 'authentication-session-id',
-      identity: { kind: 'staff', staffMemberId: 'staff-member-id' },
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'staff-member-id',
+        role: 'trainer',
+        branchIds: ['11111111-1111-4111-8111-111111111111'],
+      },
     });
     loadProfile.mockImplementation((principal) =>
       principal.identity.kind === 'staff'

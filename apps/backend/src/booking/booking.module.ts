@@ -50,6 +50,11 @@ import { loadClientProfile } from './client/client-profile';
 import { loadClientSubscription } from './client/client-subscription';
 import { updateClientProfile } from './client/update-client-profile';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
+import { loadStaffProfile } from './staff/staff-profile';
+import {
+  StaffProfileController,
+  staffProfile,
+} from './staff/staff-profile.controller';
 import { listClassHistory } from './class-history';
 import { listSessionAvailability } from './session-availability';
 import { listTrainerSchedule } from './trainer-schedule';
@@ -82,6 +87,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     SessionDetailController,
     ClientBookingsController,
     WaitlistEntriesController,
+    StaffProfileController,
   ],
   providers: [
     {
@@ -269,6 +275,20 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
             principal,
             findProfile: (clientId) =>
               createCatalogRepository(prisma).findClientProfile(clientId),
+          }),
+    },
+    {
+      provide: staffProfile,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient) =>
+        (
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          loadStaffProfile({
+            principal,
+            findProfile: (staffMemberId) =>
+              createCatalogRepository(prisma).findStaffProfile(staffMemberId),
           }),
     },
     {
