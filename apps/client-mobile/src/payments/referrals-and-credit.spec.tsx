@@ -141,6 +141,11 @@ describe("Referrals and Credit", () => {
   it("encourages inviting friends when there is no credit and no referral yet", async () => {
     const screen = await openPerfil(routeFetcher(routes(0, [])));
 
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Mi crédito: Bs 0" }),
+      ).toBeOnTheScreen();
+    });
     await fireEvent.press(screen.getByRole("button", { name: "Mi crédito: Bs 0" }));
     await waitFor(() => {
       expect(screen.getByText("Bs 0")).toBeOnTheScreen();

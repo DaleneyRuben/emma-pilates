@@ -50,7 +50,7 @@ function MenuRow({
 }) {
   return (
     <Pressable
-      accessibilityLabel={label}
+      accessibilityLabel={value === undefined ? label : `${label}: ${value}`}
       accessibilityRole="button"
       onPress={onPress}
       style={styles.row}
