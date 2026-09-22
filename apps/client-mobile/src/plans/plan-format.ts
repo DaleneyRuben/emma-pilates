@@ -1,16 +1,6 @@
-const wholeBolivianos = new Intl.NumberFormat("es-BO", {
-  maximumFractionDigits: 0,
-});
-const fractionalBolivianos = new Intl.NumberFormat("es-BO", {
-  maximumFractionDigits: 2,
-  minimumFractionDigits: 2,
-});
+import { formatBolivianos } from "@pilates/mobile-core";
 
-export function formatBolivianos(centavos: number): string {
-  const formatter =
-    centavos % 100 === 0 ? wholeBolivianos : fractionalBolivianos;
-  return `Bs ${formatter.format(centavos / 100)}`;
-}
+export { formatBolivianos };
 
 function months(durationMonths: number): string {
   return durationMonths === 1 ? "1 mes" : `${durationMonths} meses`;

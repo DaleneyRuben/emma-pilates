@@ -11,6 +11,7 @@ export * from "./auth/session-api";
 export * from "./auth/session-manager";
 export * from "./encoding/base64";
 export * from "./ingress/verified-link";
+export * from "./money/bolivianos";
 export * from "./notifications/notification-time";
 export * from "./notifications/notifications-screen";
 export * from "./query/provider";
