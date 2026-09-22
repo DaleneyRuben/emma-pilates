@@ -10,6 +10,7 @@ import * as FileSystem from "expo-file-system/legacy";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+import { encodeBase64 } from "./base64";
 
 jest.setTimeout(30_000);
 
@@ -73,6 +74,7 @@ const baseRoutes = (credit: number) => ({
     jsonResponse({ availableCentavos: credit, reservedCentavos: 0, activity: [] }),
   "/api/v1/plans": () => jsonResponse([plan]),
   "/api/v1/plans/plan-8": () => jsonResponse(plan),
+  "/api/v1/purchase-intents/current": () => jsonResponse(intent),
   "/api/v1/transfer-instructions": () => jsonResponse(instructions),
   "/api/v1/transfer-instructions/qr": () =>
     new Response(receiptBytes, {
@@ -161,7 +163,7 @@ describe("Client purchase flow", () => {
     } as never);
     jest
       .mocked(FileSystem.readAsStringAsync)
-      .mockResolvedValue(Buffer.from(receiptBytes).toString("base64"));
+      .mockResolvedValue(encodeBase64(receiptBytes));
     const calls: string[] = [];
     let statusReads = 0;
     const fetcher = routeFetcher({
@@ -219,7 +221,7 @@ describe("Client purchase flow", () => {
     );
     const checksum = require("node:crypto")
       .createHash("sha256")
-      .update(Buffer.from(receiptBytes))
+      .update(receiptBytes)
       .digest("base64");
     expect(calls).toEqual([
       `upload ${JSON.stringify({ purpose: "transfer_receipt", mediaType: "image/png", byteSize: 8, checksum })}`,
@@ -248,23 +250,22 @@ describe("Client purchase flow", () => {
 
   it("activates immediately through Credit when it covers the whole Plan", async () => {
     const purchased = jest.fn();
+    const confirmed = {
+      ...payment,
+      method: "credit_only",
+      state: "confirmed",
+      creditAppliedCentavos: 56_000,
+      amountDueCentavos: 0,
+      decidedAt: "2026-09-21T16:00:00.000Z",
+      subscriptionId: "subscription-1",
+    };
     const fetcher = routeFetcher({
       ...baseRoutes(60_000),
       "POST /api/v1/credit-purchases": (init) => {
         purchased(JSON.parse(String(init?.body)));
-        return jsonResponse(
-          {
-            ...payment,
-            method: "credit_only",
-            state: "confirmed",
-            creditAppliedCentavos: 56_000,
-            amountDueCentavos: 0,
-            decidedAt: "2026-09-21T16:00:00.000Z",
-            subscriptionId: "subscription-1",
-          },
-          201,
-        );
+        return jsonResponse(confirmed, 201);
       },
+      "/api/v1/payments/current": () => jsonResponse(confirmed),
     });
     const screen = await openPlanDetail(fetcher);
 
