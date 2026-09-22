@@ -13,6 +13,7 @@
     "expo": "~57.0.17",
     "expo-crypto": "~57.0.2",
     "expo-file-system": "~57.0.7",
+    "expo-image-manipulator": "~57.0.19",
     "expo-image-picker": "~57.0.19",
     "react": "19.2.3",
     "react-hook-form": "^7.87.0",

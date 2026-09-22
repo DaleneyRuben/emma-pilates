@@ -31,6 +31,11 @@ jest.mock("expo-image-picker", () => ({
     .mockResolvedValue({ canceled: true, assets: [] }),
 }));
 
+jest.mock("expo-image-manipulator", () => ({
+  SaveFormat: { JPEG: "jpeg", PNG: "png", WEBP: "webp" },
+  manipulateAsync: jest.fn(),
+}));
+
 jest.mock("expo-file-system/legacy", () => ({
   EncodingType: { Base64: "base64" },
   readAsStringAsync: jest.fn().mockResolvedValue(""),
