@@ -32,7 +32,7 @@ describe('database test context', () => {
     const first = await startDatabaseTestContext();
     contexts.push(first);
     await first.pool.query(
-      `insert into booking.branches (id, name, address) values (gen_random_uuid(), 'Isolation probe', 'Nowhere 1')`,
+      `insert into booking.branches (id, name, address, updated_at) values (gen_random_uuid(), 'Isolation probe', 'Nowhere 1', now())`,
     );
 
     const second = await startDatabaseTestContext();
