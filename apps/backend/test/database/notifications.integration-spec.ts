@@ -5,6 +5,7 @@ import { PrismaBookingCommands } from '../../src/booking/commands/prisma-booking
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
 import { buildDevelopmentFixtures } from '../../src/development-fixtures/development-fixtures';
 import { createNotificationStore } from '../../src/notifications/prisma-notification-store';
+import { createSubscriptionReminderJob } from '../../src/notifications/subscription-reminder-job';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -147,6 +148,33 @@ describe('Notification store', () => {
       title: 'Cupo liberado',
       message: `¡Tienes un cupo! Te promovimos de la lista de espera para tu clase de ${className}.`,
       destinationType: 'booking',
+    });
+  });
+
+  it('reminds Clients whose Subscription ends in three days exactly once', async () => {
+    const valeriaAccount = await prisma.account.findUniqueOrThrow({
+      where: { email: 'valeria@example.com' },
+      select: { id: true },
+    });
+    await prisma.notification.deleteMany({
+      where: { accountId: valeriaAccount.id, type: 'subscription_expiring' },
+    });
+    const job = createSubscriptionReminderJob(
+      prisma,
+      () => new Date('2026-09-21T15:00:00.000Z'),
+    );
+
+    await expect(job.execute()).resolves.toEqual({ reminded: 1 });
+    await expect(job.execute()).resolves.toEqual({ reminded: 1 });
+
+    const reminders = await prisma.notification.findMany({
+      where: { accountId: valeriaAccount.id, type: 'subscription_expiring' },
+    });
+    expect(reminders).toHaveLength(1);
+    expect(reminders[0]).toMatchObject({
+      category: 'REMINDER',
+      message: 'Tu plan vence en 3 días.',
+      destinationType: 'subscription',
     });
   });
 
