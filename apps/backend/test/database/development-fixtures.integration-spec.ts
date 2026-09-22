@@ -70,7 +70,7 @@ describe('development fixtures', () => {
       SET starts_at = starts_at + interval '4 hours',
           ends_at = ends_at + interval '4 hours',
           state = 'cancelled'::booking."SessionState",
-          cancellation_cause = 'no_substitute_trainer'::booking."SessionCancellationCause",
+          cancellation_cause = 'zero_bookings'::booking."SessionCancellationCause",
           cancelled_at = now()
       WHERE id = ${session.id}::uuid
     `;
