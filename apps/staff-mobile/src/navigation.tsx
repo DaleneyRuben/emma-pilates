@@ -22,9 +22,18 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { AccountAvatar } from "./profile/account-avatar";
+import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
+import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
+import { StaffProfileScreen } from "./profile/staff-profile-screen";
+import {
+  StaffFetcherContext,
+  unavailableFetcher,
+  useStaffFetcher,
+} from "./staff-fetcher";
 import { createTrainerApi } from "./trainer-api";
 
 type StaffRole = Exclude<AppRole, "client">;
@@ -33,12 +42,6 @@ type TrainerAgendaNavigation = {
   navigate: (screen: "Roster", params: { sessionId: string }) => void;
 };
 type TrainerRosterNavigation = { goBack: () => void };
-
-const unavailableFetcher: typeof globalThis.fetch = async () => {
-  throw new Error("The authenticated API fetcher is unavailable");
-};
-const TrainerFetcherContext =
-  createContext<typeof globalThis.fetch>(unavailableFetcher);
 
 function boliviaDate(now = new Date()): string {
   const parts = new Intl.DateTimeFormat("en-CA", {
@@ -70,17 +73,29 @@ function formatTimeRange(startsAt: string, endsAt: string): string {
   return `${formatter.format(new Date(startsAt))}–${formatter.format(new Date(endsAt))}`;
 }
 
+// Every role root carries the account avatar: it is the only route to Perfil.
+function RootHeader({ label, title }: { label: string; title: string }) {
+  return (
+    <View style={styles.rootHeader}>
+      <Heading accessibilityLabel={label} style={styles.rootTitle}>
+        {title}
+      </Heading>
+      <AccountAvatar />
+    </View>
+  );
+}
+
 function NavigationPlaceholder({ title }: { title: string }) {
   return (
     <Screen>
-      <Heading accessibilityLabel={title}>{title}</Heading>
+      <RootHeader label={title} title={title} />
     </Screen>
   );
 }
 
 function TrainerAgendaScreen() {
   const navigation = useNavigation<TrainerAgendaNavigation>();
-  const fetcher = useContext(TrainerFetcherContext);
+  const fetcher = useStaffFetcher();
   const [selectedDate, setSelectedDate] = useState(boliviaDate);
   const schedule = useListTrainerSchedule(
     { on: selectedDate },
@@ -95,7 +110,7 @@ function TrainerAgendaScreen() {
   if (schedule.isPending)
     return (
       <Screen style={styles.centered}>
-        <Heading accessibilityLabel="Mi agenda">Hola</Heading>
+        <RootHeader label="Mi agenda" title="Hola" />
         <BodyText accessibilityLabel="Cargando agenda">
           Cargando agenda…
         </BodyText>
@@ -104,7 +119,7 @@ function TrainerAgendaScreen() {
   if (schedule.isError)
     return (
       <Screen>
-        <Heading accessibilityLabel="Mi agenda">Hola</Heading>
+        <RootHeader label="Mi agenda" title="Hola" />
         <QueryFailure
           label="No pudimos cargar tu agenda."
           onRetry={() => void schedule.refetch()}
@@ -115,7 +130,7 @@ function TrainerAgendaScreen() {
   const sessions = schedule.data?.data ?? [];
   return (
     <Screen style={styles.screen}>
-      <Heading accessibilityLabel="Mi agenda">Hola</Heading>
+      <RootHeader label="Mi agenda" title="Hola" />
       <ScrollView
         horizontal
         contentContainerStyle={styles.datePicker}
@@ -180,7 +195,7 @@ function TrainerRosterScreen({
   route: { params: { sessionId: string } };
 }) {
   const navigation = useNavigation<TrainerRosterNavigation>();
-  const fetcher = useContext(TrainerFetcherContext);
+  const fetcher = useStaffFetcher();
   const roster = useGetTrainerSessionRoster(route.params.sessionId, {
     fetcher,
     query: { refetchOnMount: "always" },
@@ -336,17 +351,27 @@ function NutritionistAgendaScreen() {
   return <NavigationPlaceholder title="Mi agenda" />;
 }
 
+const accountScreens = {
+  Profile: StaffProfileScreen,
+  Notifications: StaffNotificationsScreen,
+  ChangePassword: StaffChangePasswordScreen,
+};
+
 const TrainerStack = createNativeStackNavigator({
-  screens: { Agenda: TrainerAgendaScreen, Roster: TrainerRosterScreen },
+  screens: {
+    Agenda: TrainerAgendaScreen,
+    Roster: TrainerRosterScreen,
+    ...accountScreens,
+  },
 });
 const AssistantStack = createNativeStackNavigator({
-  screens: { ClientSearch: AssistantClientSearchScreen },
+  screens: { ClientSearch: AssistantClientSearchScreen, ...accountScreens },
 });
 const AdministratorStack = createNativeStackNavigator({
-  screens: { Payments: AdministratorPaymentsScreen },
+  screens: { Payments: AdministratorPaymentsScreen, ...accountScreens },
 });
 const NutritionistStack = createNativeStackNavigator({
-  screens: { Agenda: NutritionistAgendaScreen },
+  screens: { Agenda: NutritionistAgendaScreen, ...accountScreens },
 });
 const roleNavigation: Record<
   StaffRole,
@@ -371,11 +396,9 @@ export function StaffNavigation({
     const AuthenticatedStaffNavigation = roleNavigation[role];
     return (
       <MobileQueryProvider>
-        <TrainerFetcherContext.Provider
-          value={apiFetcher ?? unavailableFetcher}
-        >
+        <StaffFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
           <AuthenticatedStaffNavigation />
-        </TrainerFetcherContext.Provider>
+        </StaffFetcherContext.Provider>
       </MobileQueryProvider>
     );
   }
@@ -434,6 +457,13 @@ const styles = StyleSheet.create({
   dateLabelSelected: { color: colors.white },
   datePicker: { gap: spacing.sm, paddingVertical: spacing.lg },
   list: { gap: spacing.md, paddingBottom: spacing.lg },
+  rootHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.smLg,
+    justifyContent: "space-between",
+  },
+  rootTitle: { flex: 1 },
   rosterRow: {
     backgroundColor: colors.surface,
     borderRadius: radii.card,
