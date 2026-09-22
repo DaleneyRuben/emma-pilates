@@ -401,6 +401,63 @@ describe("Assistant Client flows", () => {
     });
     expect(booked).toHaveBeenCalledWith({ clientId: "client-lucia" });
     expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
+    });
+    expect(screen.queryByText("Reservando para: Lucía Fernández")).toBeNull();
+  });
+
+  it("reschedules a Booking inside the cancellation window and goes back to the overview from her Bookings", async () => {
+    const rescheduled = jest.fn();
+    const alternativeStart = new Date(new Date(soonBooking.startsAt).getTime() + minute);
+    const { from: dayFrom, until: dayUntil } = civilDateRange(
+      boliviaCivilDate(alternativeStart),
+    );
+    const alternative = {
+      ...session,
+      id: "session-alt",
+      startsAt: alternativeStart.toISOString(),
+      endsAt: new Date(alternativeStart.getTime() + 50 * minute).toISOString(),
+    };
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(dayFrom)}&until=${encodeURIComponent(dayUntil)}&limit=100`]:
+        () => jsonResponse([alternative]),
+      "POST /api/v1/bookings/booking-soon/reschedule": (init) => {
+        rescheduled(JSON.parse(String(init?.body)));
+        return jsonResponse({ id: "booking-moved" });
+      },
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Ver reservas" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Reprogramar" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Reprogramar clase")).toBeOnTheScreen();
+    });
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
+      ).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+    await fireEvent.press(screen.getByRole("button", { name: "Confirmar cambio" }));
+    await waitFor(() => {
+      expect(rescheduled).toHaveBeenCalledWith({ targetSessionId: "session-alt" });
+    });
+    await waitFor(() => {
+      expect(screen.getByLabelText("Reservas de la clienta")).toBeOnTheScreen();
+    });
+
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
+    });
+    expect(screen.queryByLabelText("Reprogramar clase")).toBeNull();
   });
 
   it("records a cash Payment with the Client's Credit applied and returns to the overview", async () => {
