@@ -3,6 +3,14 @@ import { z } from 'zod';
 const localLinkEncryptionKey = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
 const localLinkEncryptionKeyId = 'local-development-v1';
 const localEmailDigestKey = 'local-development-email-digest-key';
+const localTransferInstructions = {
+  TRANSFER_BENEFICIARY_NAME: 'Emma Pilates Studio',
+  TRANSFER_BANK_NAME: 'Banco de desarrollo local',
+  TRANSFER_ACCOUNT_NUMBER: '0000000000',
+  TRANSFER_QR_IMAGE_PATH: '.data/transfer-qr.png',
+} as const;
+// Bs 60; any other reward needs separate product approval (PAY-001).
+const approvedReferralRewardCentavos = 6000;
 
 const environmentSchema = z
   .object({
@@ -32,6 +40,29 @@ const environmentSchema = z
       .enum(['development', 'test', 'production'])
       .default('development'),
     PORT: z.coerce.number().int().positive().max(65_535).default(3100),
+    REFERRAL_REWARD_CENTAVOS: z.coerce
+      .number()
+      .refine(
+        (value) => value === approvedReferralRewardCentavos,
+        `REFERRAL_REWARD_CENTAVOS must be ${approvedReferralRewardCentavos}`,
+      )
+      .default(approvedReferralRewardCentavos),
+    TRANSFER_ACCOUNT_NUMBER: z
+      .string()
+      .min(1)
+      .default(localTransferInstructions.TRANSFER_ACCOUNT_NUMBER),
+    TRANSFER_BANK_NAME: z
+      .string()
+      .min(1)
+      .default(localTransferInstructions.TRANSFER_BANK_NAME),
+    TRANSFER_BENEFICIARY_NAME: z
+      .string()
+      .min(1)
+      .default(localTransferInstructions.TRANSFER_BENEFICIARY_NAME),
+    TRANSFER_QR_IMAGE_PATH: z
+      .string()
+      .min(1)
+      .default(localTransferInstructions.TRANSFER_QR_IMAGE_PATH),
     UPLOADS_LOCAL_STORAGE_ROOT: z.string().min(1).default('.data/uploads'),
   })
   .superRefine((environment, context) => {
@@ -39,11 +70,18 @@ const environmentSchema = z
       return;
     }
 
-    const localDefaults = [
+    const localDefaults: readonly (readonly [
+      keyof typeof environment,
+      string,
+    ])[] = [
       ['AUTHENTICATION_EMAIL_DIGEST_KEY', localEmailDigestKey],
       ['AUTHENTICATION_LINK_ENCRYPTION_KEY', localLinkEncryptionKey],
       ['AUTHENTICATION_LINK_ENCRYPTION_KEY_ID', localLinkEncryptionKeyId],
-    ] as const;
+      ...(Object.entries(localTransferInstructions) as [
+        keyof typeof localTransferInstructions,
+        string,
+      ][]),
+    ];
 
     localDefaults.forEach(([name, localDefault]) => {
       if (environment[name] === localDefault) {
