@@ -9,6 +9,7 @@ import {
   BodyText,
   colors,
   Heading,
+  initials,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -24,7 +25,6 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { initials } from "../profile/profile-screen";
 import { BackLink } from "../ui/back-link";
 import { formatSessionDate, formatTimeRange } from "./session-format";
 
