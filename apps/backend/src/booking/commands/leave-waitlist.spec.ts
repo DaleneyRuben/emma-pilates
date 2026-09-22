@@ -81,25 +81,63 @@ describe('leaveWaitlist', () => {
     expect(close).not.toHaveBeenCalled();
   });
 
-  it('denies Staff principals', async () => {
-    await expect(
-      leaveWaitlist(
-        { waitlistEntryId: 'entry-id' },
-        {
-          principal: {
-            ...principal,
-            identity: {
-              kind: 'staff',
-              staffMemberId: 'staff-id',
-              role: 'assistant',
-              branchIds: ['branch-id'],
-            },
+  it('lets an Assistant assigned to the Session’s Branch leave it for the Client', async () => {
+    const close = jest.fn().mockResolvedValue(undefined);
+    const assistant = {
+      ...principal,
+      accountId: 'assistant-account',
+      identity: {
+        kind: 'staff' as const,
+        staffMemberId: 'staff-id',
+        role: 'assistant' as const,
+        branchIds: [entry.session.branchId],
+      },
+    };
+
+    await leaveWaitlist(
+      { waitlistEntryId: 'entry-id' },
+      {
+        principal: assistant,
+        loadEntry: jest.fn().mockResolvedValue(entry),
+        close,
+        now: () => now,
+      },
+    );
+
+    expect(close).toHaveBeenCalledWith({
+      waitlistEntryId: entry.id,
+      closedByAccountId: 'assistant-account',
+      closedAt: now,
+    });
+  });
+
+  it('denies Staff outside the Session’s Branch and every other Role', async () => {
+    const deny = (
+      identity: Parameters<typeof leaveWaitlist>[1]['principal']['identity'],
+    ) =>
+      expect(
+        leaveWaitlist(
+          { waitlistEntryId: 'entry-id' },
+          {
+            principal: { ...principal, identity },
+            loadEntry: jest.fn().mockResolvedValue(entry),
+            close: jest.fn(),
+            now: () => now,
           },
-          loadEntry: jest.fn().mockResolvedValue(entry),
-          close: jest.fn(),
-          now: () => now,
-        },
-      ),
-    ).rejects.toBeInstanceOf(BookingAccessDeniedError);
+        ),
+      ).rejects.toBeInstanceOf(BookingAccessDeniedError);
+
+    await deny({
+      kind: 'staff',
+      staffMemberId: 'staff-id',
+      role: 'assistant',
+      branchIds: ['another-branch'],
+    });
+    await deny({
+      kind: 'staff',
+      staffMemberId: 'staff-id',
+      role: 'trainer',
+      branchIds: [entry.session.branchId],
+    });
   });
 });
