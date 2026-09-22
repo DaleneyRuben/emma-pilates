@@ -115,6 +115,12 @@ describe('operational health (e2e)', () => {
       '/api/v1/clients/current/referrals',
       '/api/v1/transfer-instructions',
       '/api/v1/transfer-instructions/qr',
+      '/api/v1/administrator/payments/pending',
+      '/api/v1/administrator/payments/{paymentId}',
+      '/api/v1/administrator/payments/{paymentId}/receipt',
+      '/api/v1/administrator/payments/{paymentId}/confirm',
+      '/api/v1/administrator/payments/{paymentId}/reject',
+      '/api/v1/administrator/sessions/{sessionId}/cancel',
     ]) {
       expect(document.paths).toHaveProperty(path);
     }
