@@ -11,6 +11,29 @@ export class CreatedBookingDto {
   id!: string;
 }
 
+export class ClassHistoryEntryDto {
+  @ApiProperty({ format: 'uuid' })
+  bookingId!: string;
+
+  @ApiProperty({ format: 'uuid' })
+  sessionId!: string;
+
+  @ApiProperty()
+  classTypeName!: string;
+
+  @ApiProperty()
+  trainerName!: string;
+
+  @ApiProperty()
+  branchName!: string;
+
+  @ApiProperty({ format: 'date-time' })
+  startsAt!: Date;
+
+  @ApiProperty({ format: 'date-time' })
+  endsAt!: Date;
+}
+
 export class RescheduleBookingDto {
   @ApiProperty({ format: 'uuid' })
   targetSessionId!: string;

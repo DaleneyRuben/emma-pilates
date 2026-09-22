@@ -28,6 +28,7 @@ import { authenticatedPrincipalResolver } from '../system-identity/authenticatio
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
 import { AuthenticationRequiredError } from '../system-identity/authentication/resolve-authenticated-principal';
 import {
+  ClassHistoryEntryDto,
   CreatedBookingDto,
   CreateBookingDto,
   parseAvailabilityQuery,
@@ -74,7 +75,7 @@ type RescheduleCommandHandler = (
 ) => Promise<{ id: string }>;
 type ClassHistoryHandler = (
   principal: AuthenticatedPrincipal,
-) => Promise<{ bookingId: string; sessionId: string }[]>;
+) => Promise<ClassHistoryEntryDto[]>;
 type AttendanceHandler = (
   command: {
     sessionId: string;
@@ -410,10 +411,10 @@ export class ClassHistoryController {
 
   @Get('history')
   @ApiOperation({ operationId: 'listClassHistory' })
-  @ApiOkResponse({ type: CreatedBookingDto, isArray: true })
+  @ApiOkResponse({ type: ClassHistoryEntryDto, isArray: true })
   async list(
     @Headers('authorization') authorization: string | undefined,
-  ): Promise<{ bookingId: string; sessionId: string }[]> {
+  ): Promise<ClassHistoryEntryDto[]> {
     const principal = await this.authenticate(authorization);
     return this.listClassHistory(principal);
   }

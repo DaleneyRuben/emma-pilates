@@ -57,6 +57,7 @@ export type PromotionSummary = {
   displayOrder: number;
 };
 
+import type { ClassHistoryEntry } from '../class-history';
 import type { UpcomingClientBooking } from '../client/client-bookings';
 
 export type BranchSummary = {
@@ -122,4 +123,5 @@ export type CatalogRepository = {
     clientId: string;
     from: Date;
   }): Promise<UpcomingClientBooking[]>;
+  findAttendedBookings(clientId: string): Promise<ClassHistoryEntry[]>;
 };

@@ -136,22 +136,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
         ) =>
           listClassHistory(principal, {
             findAttendedBookings: (clientId) =>
-              prisma.booking
-                .findMany({
-                  where: {
-                    clientId,
-                    state: 'BOOKED',
-                    attendanceRecord: { outcome: 'ATTENDED' },
-                  },
-                  select: { id: true, sessionId: true },
-                  orderBy: { session: { endsAt: 'desc' } },
-                })
-                .then((bookings) =>
-                  bookings.map((booking) => ({
-                    bookingId: booking.id,
-                    sessionId: booking.sessionId,
-                  })),
-                ),
+              createCatalogRepository(prisma).findAttendedBookings(clientId),
           }),
     },
     {

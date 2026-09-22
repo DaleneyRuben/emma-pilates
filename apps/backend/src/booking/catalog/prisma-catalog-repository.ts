@@ -201,6 +201,40 @@ export function createCatalogRepository(
           left.sessionId.localeCompare(right.sessionId),
       );
     },
+    findAttendedBookings: (clientId) =>
+      prisma.booking
+        .findMany({
+          where: {
+            clientId,
+            state: 'BOOKED',
+            attendanceRecord: { outcome: 'ATTENDED' },
+          },
+          orderBy: [{ session: { startsAt: 'desc' } }, { id: 'desc' }],
+          select: {
+            id: true,
+            session: {
+              select: {
+                id: true,
+                startsAt: true,
+                endsAt: true,
+                classType: { select: { name: true } },
+                trainer: { select: { name: true } },
+                branch: { select: { name: true } },
+              },
+            },
+          },
+        })
+        .then((bookings) =>
+          bookings.map((booking) => ({
+            bookingId: booking.id,
+            sessionId: booking.session.id,
+            classTypeName: booking.session.classType.name,
+            trainerName: booking.session.trainer.name,
+            branchName: booking.session.branch.name,
+            startsAt: booking.session.startsAt,
+            endsAt: booking.session.endsAt,
+          })),
+        ),
     findClassType: (id) =>
       prisma.classType.findUnique({ where: { id }, select: classTypeSelect }),
     findSessionSchedule: (id) =>
