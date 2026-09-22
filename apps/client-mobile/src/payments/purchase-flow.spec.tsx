@@ -230,6 +230,9 @@ describe("Client purchase flow", () => {
       `attach ${JSON.stringify({ imageAssetId: "asset-1" })}`,
     ]);
     expect(screen.getByLabelText("Comprobante adjunto")).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", { name: "Comprobante adjunto. Toca para cambiarlo." }),
+    ).toBeOnTheScreen();
 
     fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
 
