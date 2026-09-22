@@ -17,7 +17,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useMemo, useState } from "react";
 import {
   Image,
@@ -233,31 +233,33 @@ export function ReviewPaymentScreen({
         onRequestClose={() => setEnlarged(false)}
         visible={enlarged && receiptUri !== null}
       >
-        <SafeAreaView style={styles.viewer}>
-          <Pressable
-            accessibilityLabel="Cerrar"
-            accessibilityRole="button"
-            hitSlop={spacing.md}
-            onPress={() => setEnlarged(false)}
-            style={styles.close}
-          >
-            <Text style={styles.closeLabel}>✕</Text>
-          </Pressable>
-          <ScrollView
-            contentContainerStyle={styles.viewerContent}
-            maximumZoomScale={4}
-            minimumZoomScale={1}
-          >
-            {receiptUri === null ? null : (
-              <Image
-                accessibilityLabel="Comprobante ampliado"
-                resizeMode="contain"
-                source={{ uri: receiptUri }}
-                style={styles.enlarged}
-              />
-            )}
-          </ScrollView>
-        </SafeAreaView>
+        <SafeAreaProvider>
+          <SafeAreaView style={styles.viewer}>
+            <Pressable
+              accessibilityLabel="Cerrar"
+              accessibilityRole="button"
+              hitSlop={spacing.md}
+              onPress={() => setEnlarged(false)}
+              style={styles.close}
+            >
+              <Text style={styles.closeLabel}>✕</Text>
+            </Pressable>
+            <ScrollView
+              contentContainerStyle={styles.viewerContent}
+              maximumZoomScale={4}
+              minimumZoomScale={1}
+            >
+              {receiptUri === null ? null : (
+                <Image
+                  accessibilityLabel="Comprobante ampliado"
+                  resizeMode="contain"
+                  source={{ uri: receiptUri }}
+                  style={styles.enlarged}
+                />
+              )}
+            </ScrollView>
+          </SafeAreaView>
+        </SafeAreaProvider>
       </Modal>
     </Screen>
   );
