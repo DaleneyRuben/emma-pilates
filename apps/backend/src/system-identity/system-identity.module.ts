@@ -1,7 +1,7 @@
 import { createHmac, randomUUID } from 'node:crypto';
 import { Module, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { createPrismaAdapter } from '../database/prisma-adapter';
 import type { PgBoss } from 'pg-boss';
 import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
@@ -86,9 +86,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
       inject: [ConfigService],
       useFactory: (config: ConfigService<Environment, true>) =>
         new PrismaClient({
-          adapter: new PrismaPg({
-            connectionString: config.getOrThrow('DATABASE_URL'),
-          }),
+          adapter: createPrismaAdapter(config.getOrThrow('DATABASE_URL')),
         }),
     },
     {

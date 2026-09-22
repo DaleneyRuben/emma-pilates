@@ -1,4 +1,4 @@
-import { PrismaPg } from '@prisma/adapter-pg';
+import { createPrismaAdapter } from './database/prisma-adapter';
 import { boliviaDate } from './booking/bolivia-time';
 import { validateEnvironment } from './config/environment';
 import { applyDevelopmentFixtures } from './development-fixtures/apply-development-fixtures';
@@ -19,7 +19,7 @@ async function bootstrap(): Promise<void> {
   }
 
   const prisma = new PrismaClient({
-    adapter: new PrismaPg({ connectionString: environment.DATABASE_URL }),
+    adapter: createPrismaAdapter(environment.DATABASE_URL),
   });
 
   try {

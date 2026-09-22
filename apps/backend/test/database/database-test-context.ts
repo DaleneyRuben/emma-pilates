@@ -5,6 +5,7 @@ import {
   StartedPostgreSqlContainer,
 } from '@testcontainers/postgresql';
 import { Pool } from 'pg';
+import { prismaSessionOptions } from '../../src/database/prisma-adapter';
 
 const backendRoot = resolve(process.cwd());
 const disposableDatabasePrefix = 'pilates_test_';
@@ -56,7 +57,10 @@ export const startDatabaseTestContext =
       applyMigrations(databaseUrl);
     }
 
-    const pool = new Pool({ connectionString: databaseUrl });
+    const pool = new Pool({
+      connectionString: databaseUrl,
+      options: prismaSessionOptions,
+    });
 
     return {
       databaseUrl,

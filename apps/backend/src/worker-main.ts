@@ -1,5 +1,5 @@
 import { createHmac, randomUUID } from 'node:crypto';
-import { PrismaPg } from '@prisma/adapter-pg';
+import { createPrismaAdapter } from './database/prisma-adapter';
 import { validateEnvironment } from './config/environment';
 import { PrismaClient } from './generated/prisma/client';
 import { LocalEmailCapture } from './jobs/authentication-email/local-email-capture';
@@ -27,7 +27,7 @@ async function bootstrap(): Promise<void> {
 
   const now = () => new Date();
   const prisma = new PrismaClient({
-    adapter: new PrismaPg({ connectionString: environment.DATABASE_URL }),
+    adapter: createPrismaAdapter(environment.DATABASE_URL),
   });
   const boss = await createPgBoss(environment.DATABASE_URL);
   const storage = new LocalObjectStorage(

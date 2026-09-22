@@ -1,7 +1,7 @@
 import { Module, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { PrismaPg } from '@prisma/adapter-pg';
 import type { Environment } from '../config/environment';
+import { createPrismaAdapter } from '../database/prisma-adapter';
 import { PrismaClient } from '../generated/prisma/client';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import {
@@ -95,9 +95,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
       inject: [ConfigService],
       useFactory: (config: ConfigService<Environment, true>) =>
         new PrismaClient({
-          adapter: new PrismaPg({
-            connectionString: config.getOrThrow('DATABASE_URL'),
-          }),
+          adapter: createPrismaAdapter(config.getOrThrow('DATABASE_URL')),
         }),
     },
     {
