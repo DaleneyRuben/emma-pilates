@@ -4,10 +4,10 @@ import * as ImagePicker from "expo-image-picker";
 
 import { pickReceipt } from "./receipt-upload";
 
-const picked = (uri: string, mimeType: string | undefined) =>
+const picked = (uri: string, mimeType: string | undefined, width = 10) =>
   ({
     canceled: false,
-    assets: [{ uri, mimeType, width: 10, height: 10 }],
+    assets: [{ uri, mimeType, width, height: 10 }],
   }) as never;
 
 describe("pickReceipt", () => {
@@ -21,16 +21,17 @@ describe("pickReceipt", () => {
   it("re-encodes a HEIC photo as JPEG so the studio can review it", async () => {
     jest
       .mocked(ImagePicker.launchImageLibraryAsync)
-      .mockResolvedValue(picked("file:///photo.heic", "image/heic"));
+      .mockResolvedValue(picked("file:///photo.heic", "image/heic", 4032));
     jest
       .mocked(ImageManipulator.manipulateAsync)
-      .mockResolvedValue({ uri: "file:///photo.jpg", width: 10, height: 10 });
+      .mockResolvedValue({ uri: "file:///photo.jpg", width: 1600, height: 10 });
 
     const receipt = await pickReceipt();
 
+    // Camera photos are downscaled so a receipt uploads in seconds.
     expect(ImageManipulator.manipulateAsync).toHaveBeenCalledWith(
       "file:///photo.heic",
-      [],
+      [{ resize: { width: 1600 } }],
       expect.objectContaining({ format: "jpeg" }),
     );
     expect(receipt).toMatchObject({
@@ -53,7 +54,11 @@ describe("pickReceipt", () => {
 
     const receipt = await pickReceipt();
 
-    expect(ImageManipulator.manipulateAsync).toHaveBeenCalled();
+    expect(ImageManipulator.manipulateAsync).toHaveBeenCalledWith(
+      "file:///IMG_0001",
+      [],
+      expect.objectContaining({ format: "jpeg" }),
+    );
     expect(receipt?.mediaType).toBe("image/jpeg");
   });
 
