@@ -444,6 +444,31 @@ describe('Prisma payment lifecycle', () => {
     ).resolves.toMatchObject({ mediaType: 'image/jpeg', objectKey: expect.stringContaining('pending/') });
   });
 
+  it('lets two Administrators decide the same Payment at once with exactly one outcome', async () => {
+    const buyer = await newClient('Disputada');
+    const admin = await staffPrincipal('paola.mendoza@example.com');
+    const intent = await commands().createPurchaseIntent({ planId: plan.id }, buyer, randomUUID());
+    const receipt = await readyReceipt(buyer.accountId);
+    await commands().attachReceipt({ purchaseIntentId: intent.id, imageAssetId: receipt.id }, buyer, randomUUID());
+    const pending = await commands().submitTransfer({ purchaseIntentId: intent.id }, buyer, randomUUID());
+
+    const results = await Promise.allSettled([
+      commands().confirmTransfer({ paymentId: pending.id }, admin),
+      commands().rejectTransfer({ paymentId: pending.id, reason: 'Monto incorrecto' }, admin),
+    ]);
+
+    const fulfilled = results.filter((result) => result.status === 'fulfilled');
+    const rejected = results.filter(
+      (result): result is PromiseRejectedResult => result.status === 'rejected',
+    );
+    expect(fulfilled).toHaveLength(1);
+    expect(rejected).toHaveLength(1);
+    expect((rejected[0].reason as PaymentRuleError).code).toBe('payment_confirmation_conflict');
+    const settled = await prisma.payment.findUniqueOrThrow({ where: { id: pending.id }, include: { subscription: true } });
+    expect(['CONFIRMED', 'REJECTED']).toContain(settled.state);
+    expect(settled.subscription === null).toBe(settled.state === 'REJECTED');
+  });
+
   it('records an instant cash Payment at an assigned Branch, spending Credit and activating the Subscription', async () => {
     const buyer = await newClient('Efectivo');
     await seedAward(buyer.clientId);
