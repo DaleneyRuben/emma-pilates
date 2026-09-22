@@ -54,17 +54,21 @@ describe('Client class history', () => {
     ];
 
     for (const [index, startsAt] of pastStarts.entries()) {
-      const session = await prisma.session.create({
-        data: {
-          branchId: template.branchId,
-          classTypeId: template.classTypeId,
-          trainerStaffMemberId: template.trainerStaffMemberId,
-          startsAt,
-          endsAt: new Date(startsAt.getTime() + 50 * 60 * 1_000),
-          capacity: 12,
-          isException: true,
-        },
-      });
+      const session =
+        (await prisma.session.findFirst({
+          where: { branchId: template.branchId, startsAt },
+        })) ??
+        (await prisma.session.create({
+          data: {
+            branchId: template.branchId,
+            classTypeId: template.classTypeId,
+            trainerStaffMemberId: template.trainerStaffMemberId,
+            startsAt,
+            endsAt: new Date(startsAt.getTime() + 50 * 60 * 1_000),
+            capacity: 12,
+            isException: true,
+          },
+        }));
       const booking = await prisma.booking.create({
         data: {
           sessionId: session.id,
