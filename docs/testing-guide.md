@@ -346,10 +346,10 @@ active Accounts. Every fixture Account uses the password `emma-local-2026`.
 | Email                        | Role          | Representative state                          |
 | ---------------------------- | ------------- | --------------------------------------------- |
 | `lucia@example.com`          | Client        | Active Plan with 5 of 8 classes left          |
-| `valeria@example.com`        | Client        | Active Plan expiring in 3 days, 2 classes left |
+| `valeria@example.com`        | Client        | Active Plan expiring in 3 days, 2 classes left; paid in cash; referred by Sofía |
 | `isabel@example.com`         | Client        | Active Plan with no classes left              |
-| `sofia@example.com`          | Client        | Expired Plan                                  |
-| `mariana@example.com`        | Client        | Never purchased a Plan                        |
+| `sofia@example.com`          | Client        | Expired Plan; Bs 60 of referral Credit; referred Valeria (awarded) and Mariana (pending) |
+| `mariana@example.com`        | Client        | Never purchased a Plan; referred by Sofía     |
 | `emma.vargas@example.com`    | Trainer       | Leads Sessions in all three Branches          |
 | `daniela.ortiz@example.com`  | Trainer       | Leads Sessions in Centro and Urubó            |
 | `andrea.suarez@example.com`  | Trainer       | Leads Pilates Prenatal in Equipetrol          |
@@ -373,7 +373,7 @@ should return to **Inicio** without asking for the password again.
 
 From Home, **Ver detalle** opens **Mi plan** and **Comprar un plan** opens
 **Elige tu plan**; tapping a Plan shows its detail with the price breakdown
-(the payment step is not available yet). The **Perfil** tab shows the Account
+(Test 10 walks through the payment). The **Perfil** tab shows the Account
 summary, a **Mi plan** row, and **Cerrar sesión**; **Editar** lets you change
 the name and phone (the email stays read-only) and saves through the API.
 
@@ -775,6 +775,124 @@ The backend pins every Prisma connection to UTC. If a timestamp you inserted
 with `psql` shows up four hours off in the app, the API you are running is
 older than this guide: rebuild it with `pnpm --filter @pilates/backend build`.
 
+## Test 10: buy a Plan and check referrals and Credit in the Client app
+
+Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
+The fixtures give Sofía an expired Plan, two referred friends, and Bs 60 of
+referral Credit; Mariana has no Plan, no Credit, and no referrals.
+
+### A. Referrals and Credit from Perfil
+
+Log in as `sofia@example.com` and open **Perfil**. The menu now reads **Mi
+plan**, **Mis referidos**, **Mi crédito** (with the value `Bs 60` on the
+right), **Notificaciones**, and **Cambiar contraseña**.
+
+Tap **Mis referidos**. The card shows the code `REF-SOFIA` with a
+**Compartir** button that opens the system share sheet with a message that
+contains the code. Below it: "Comparte tu código. Cuando un amigo se registre y
+haga su primer pago, ganas crédito.", a **Tu crédito** row with `Bs 60`, and
+**Tus invitaciones** with one row per referred Client: initials, "Nombre A.",
+either "Primer pago el 26 de agosto" with the green **Crédito ganado** badge
+(Valeria Q.) or "Se registró el 17 de septiembre" with the amber **Esperando su
+primer pago** badge (Mariana P.). Dates follow the fixture clock.
+
+Tap **Tu crédito**. **Mi crédito** shows **Saldo a favor**, the amount `Bs 60`
+in the largest type of the app, "disponibles", the line "Este crédito se aplica
+automáticamente al monto que pagues por tu próximo plan.", a **De dónde viene**
+list ("Valeria Q. · 26 de agosto" and `+Bs 60`), and the text link **Ver mis
+referidos**.
+
+Log in as `mariana@example.com` to see the empty states: **Mi crédito** reads
+`Bs 0`, "Aún no tienes crédito. Invita a tus amigos para ganar." and a solid
+**Ver mi código** button; **Mis referidos** shows `REF-MARIANA`, `Tu crédito
+Bs 0`, and "Aún no has invitado a nadie. ¡Comparte tu código!".
+
+### B. Buy a Plan with a bank transfer
+
+The receipt upload is verified by the background worker, so start it next to
+the API before this step:
+
+```sh
+pnpm --filter @pilates/backend start:worker
+```
+
+As Sofía, tap **Comprar un plan** on Home (her Plan is expired), pick
+**Paquete de 8 clases**, and check **Detalle del plan**: price `Bs 560`, a
+**Crédito aplicado** line with `−Bs 60`, and **Total a pagar** `Bs 500`. Tap
+**Continuar al pago**.
+
+**Pago por transferencia** shows the amount, the studio QR (locally the
+placeholder image from `apps/backend/.data/transfer-qr.png`), the beneficiary,
+bank, and account number from `TRANSFER_*`, and the line "Escanea el código con
+tu app bancaria y transfiere el monto exacto.". Tap **Sube tu comprobante de
+transferencia**: iOS asks for photo access the first time, then opens the
+library (the Simulator ships with sample photos). Picking one uploads it
+through `/api/v1/uploads` (hash, PUT, finalize, wait until `READY`) and attaches
+it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
+**Enviar comprobante** becomes available. Tap it.
+
+**Estado del pago** reads "Tu pago está en revisión" with "Un administrador va
+a confirmar tu comprobante pronto. Te avisaremos apenas esté listo." and a
+**Volver al inicio** button. While the transfer is under review, **Mi crédito**
+shows `Bs 0` disponibles and "Bs 60 están reservados para un pago en
+revisión.", and **Comprar un plan** answers with the pending Payment instead
+of a new Intent. Coming back to **Continuar al pago** with an open Intent
+reopens the same Intent (the API answers `409 purchase_intent_open_exists`).
+
+### C. Review the transfer in the Staff app
+
+Start the Staff app (Test 9E) and log in as `paola.mendoza@example.com`. The
+Administrator root is **Pagos pendientes**: a **Por confirmar** line with the
+count and "Bs 500 en total", then one card per transfer, oldest first, with the
+Client's initials, name, Plan, amount, and how long ago it was sent ("Hace 3
+minutos", "Ayer, 19:40"). With nothing to review the screen reads "No hay
+pagos pendientes." and "Todo al día. Te avisaremos cuando llegue una
+transferencia nueva.".
+
+Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
+with `Bs 500`, the **Pendiente** badge, "Transferencia · enviado el 22 de
+septiembre, 14:05", and the **Comprobante** image loaded through the
+authenticated API. **Ampliar** (or tapping the image) opens it full screen
+with pinch zoom; close it with the ✕. **Confirmar pago** returns to the list
+with a two-second "Pago confirmado" notice and the card gone. **Rechazar**
+does not reject yet: it unfolds **Motivo del rechazo** with "La clienta verá
+este mensaje para corregir y volver a enviar."; **Confirmar rechazo** stays
+disabled until you type a reason, then returns to the list with "Pago
+rechazado". The same endpoints remain available in Swagger (Test 7,
+"Reviewing transfers").
+
+Back in the Client app, after a confirmation Sofía's Home shows the new Plan
+and the inbox row "Tu pago fue confirmado…" opens **Estado del pago** with
+"¡Pago confirmado!" and **Ir al inicio**. After a rejection the same screen
+reads "Tu comprobante fue rechazado", shows the reason, explains "Sube un
+nuevo comprobante para activar tu plan. Tu crédito volvió a estar disponible.",
+and **Subir un nuevo comprobante** opens a fresh **Pago por transferencia**
+for the same Plan.
+
+### E. Cancel a Session as the Administrator
+
+From **Pagos pendientes** tap **Cancelar una clase**. Pick the Branch
+(**Sucursal:** row, then a Branch chip), a day chip, and a Class Type chip
+(**Todas** by default); the list shows every Session of that day including full
+ones, with time, Class Type, Trainer, "N reservas", and "Llena" or "N cupos".
+No match reads "No hay clases con estos filtros." / "Prueba otro día, otra
+sucursal u otro tipo de clase.". Tap a card: **Cancelar sesión** repeats the
+Session, "N clientes afectados", and the warning "Esto no se puede deshacer"
+above the red **Sí, cancelar sesión** and the plain **Cancelar**. Confirming
+shows **Sesión cancelada** with "Se notificó a los N clientes afectados." and
+"Se reembolsó una clase a cada cliente."; **Volver** returns to the search.
+The fixtures ship no Bookings, so book a class from the Client app first
+(Test 7); cancelling a Session without Bookings answers
+`409 session_has_no_bookings` and the screen shows "No pudimos cancelar la
+sesión. Inténtalo de nuevo.".
+
+### D. Paying fully with Credit
+
+When the available Credit covers the whole price, **Continuar al pago**
+activates the Plan immediately (`POST /api/v1/credit-purchases`) and lands on
+"¡Pago confirmado!" without a QR. The fixtures cannot reach this (Bs 60 is
+below the cheapest Plan), so the automated purchase-flow spec covers it.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -787,10 +905,11 @@ The following are not ready for manual product testing:
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
-- Promotions on Client Home, payments, or push notifications (the in-app inbox
-  works, see Test 9);
-- authenticated Assistant, Administrator, or Nutritionist journeys beyond
-  Perfil and the inbox;
+- Promotions on Client Home or push notifications (the in-app inbox works, see
+  Test 9; buying a Plan works, see Test 10);
+- authenticated Assistant or Nutritionist journeys beyond Perfil and the inbox
+  (the Administrator payment review and Session cancellation work, see Test
+  10);
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, or production deployment; and
 - Maestro release-journey tests.
