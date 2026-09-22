@@ -156,12 +156,12 @@ describe('inviteClient', () => {
       email: 'ana@example.com',
     });
     expect(transaction.createInvitation).not.toHaveBeenCalled();
-    expect(transaction.replaceStaffInvitationActivation).toHaveBeenCalledWith({
+    expect(
+      transaction.replaceStaffInvitationActivation.mock.calls[0]?.[0],
+    ).toMatchObject({
       accountId: 'account-1',
       pendingExpiresAt: new Date(now.getTime() + 30 * day),
-      activationToken: expect.objectContaining({
-        expiresAt: new Date(now.getTime() + 7 * day),
-      }),
+      activationToken: { expiresAt: new Date(now.getTime() + 7 * day) },
     });
     expect(transaction.scheduleAuthenticationEmail).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -192,13 +192,11 @@ describe('inviteClient', () => {
       email: 'ana@example.com',
     });
     expect(
-      transaction.replaceSelfRegistrationVerification,
-    ).toHaveBeenCalledWith({
+      transaction.replaceSelfRegistrationVerification.mock.calls[0]?.[0],
+    ).toMatchObject({
       accountId: 'account-2',
       pendingExpiresAt: new Date(now.getTime() + 7 * day),
-      verificationToken: expect.objectContaining({
-        expiresAt: new Date(now.getTime() + day),
-      }),
+      verificationToken: { expiresAt: new Date(now.getTime() + day) },
     });
     expect(transaction.scheduleAuthenticationEmail).toHaveBeenCalledWith(
       expect.objectContaining({ purpose: 'verification' }),
