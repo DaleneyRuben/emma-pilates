@@ -104,7 +104,7 @@ describe("Client Profile", () => {
     expect(screen.getByText("sofia@example.com")).toBeOnTheScreen();
     expect(screen.getByText("+591 70011004")).toBeOnTheScreen();
     expect(screen.getByText("Vencida")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Mi plan" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Mi plan: Vencida" })).toBeOnTheScreen();
     expect(
       screen.getByRole("button", { name: "Cerrar sesión" }),
     ).toBeOnTheScreen();
@@ -113,7 +113,7 @@ describe("Client Profile", () => {
   it("opens the expired Plan detail with a purchase action", async () => {
     const screen = await openProfile();
 
-    fireEvent.press(screen.getByRole("button", { name: "Mi plan" }));
+    fireEvent.press(screen.getByRole("button", { name: "Mi plan: Vencida" }));
 
     await waitFor(() => {
       expect(screen.getByText("Último plan")).toBeOnTheScreen();
