@@ -42,6 +42,9 @@ describe('worker entrypoint', () => {
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
+      },
       pendingAccountCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
@@ -90,6 +93,9 @@ describe('worker entrypoint', () => {
     const subscriptionReminders = {
       execute: jest.fn().mockResolvedValue({ reminded: 1 }),
     };
+    const purchaseIntentExpiry = {
+      execute: jest.fn().mockResolvedValue({ expired: 1 }),
+    };
     const dependencies = {
       boss,
       authenticationEmail: {
@@ -104,6 +110,7 @@ describe('worker entrypoint', () => {
       pendingAccountCleanup,
       imageUploadCleanup,
       subscriptionReminders,
+      purchaseIntentExpiry,
       serviceVersion: '1.2.3',
       emit: jest.fn(),
     };
@@ -113,8 +120,14 @@ describe('worker entrypoint', () => {
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(1);
     expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(1);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(1);
+    expect(purchaseIntentExpiry.execute).toHaveBeenCalledTimes(1);
 
-    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    // Purchase Intents expire on a five-minute sweep, the rest hourly.
+    await jest.advanceTimersByTimeAsync(5 * 60 * 1_000);
+    expect(purchaseIntentExpiry.execute).toHaveBeenCalledTimes(2);
+    expect(subscriptionReminders.execute).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(55 * 60 * 1_000);
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
     expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(2);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(2);
@@ -260,6 +273,9 @@ describe('worker entrypoint', () => {
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
       pendingAccountCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),

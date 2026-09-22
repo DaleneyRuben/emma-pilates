@@ -220,6 +220,32 @@ describe('Prisma payment commands', () => {
     expect(reservation.ledgerEntries).toHaveLength(1);
   });
 
+  it('lists recent Credit activity newest first and the Client referral code with referred Clients', async () => {
+    const isabel = await principalOf('isabel@example.com');
+    const sofia = await principalOf('sofia@example.com');
+    const sofiaId = sofia.identity.kind === 'client' ? sofia.identity.clientId : '';
+
+    const activity = await commands().readCreditActivity(isabel);
+    expect(activity.map((entry) => entry.kind)).toEqual([
+      'payment_reservation',
+      'referral_award',
+    ]);
+    expect(activity[0]).toMatchObject({ amountCentavos: 6000, occurredAt: expect.any(Date) });
+
+    const referrals = await commands().readReferrals(isabel);
+    expect(referrals.referralCode).toEqual(expect.any(String));
+    expect(referrals.referrals).toEqual([
+      {
+        referredClientId: sofiaId,
+        referredName: 'Sofía G.',
+        state: 'awarded',
+        createdAt: now,
+        awardedAt: now,
+        awardCentavos: 6000,
+      },
+    ]);
+  });
+
   it('lets exactly one of two simultaneous Purchase Intent requests win', async () => {
     const account = await prisma.account.create({
       data: {
