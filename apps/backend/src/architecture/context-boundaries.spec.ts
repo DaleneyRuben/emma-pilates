@@ -7,7 +7,9 @@ const sourceRoot = resolve(process.cwd(), 'src');
 // other through the edges listed here.
 const contexts = ['booking', 'notifications', 'system-identity', 'uploads'];
 const allowedContextEdges: Record<string, string[]> = {
-  booking: ['notifications'],
+  // Booking records notifications and streams receipt objects through the
+  // uploads storage port.
+  booking: ['notifications', 'uploads'],
   notifications: [],
   'system-identity': [],
   uploads: [],

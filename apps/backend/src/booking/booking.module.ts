@@ -50,6 +50,13 @@ import { loadClientProfile } from './client/client-profile';
 import { loadClientSubscription } from './client/client-subscription';
 import { updateClientProfile } from './client/update-client-profile';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
+import { LocalObjectStorage } from '../uploads/local-object-storage';
+import {
+  AdministratorPaymentsController,
+  AdministratorSessionsController,
+  cancelSessionCommand,
+  receiptObjectStorage,
+} from './payments/administrator.controller';
 import {
   ClientCreditController,
   ClientPaymentsController,
@@ -106,6 +113,8 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     ClientCreditController,
     ClientReferralsController,
     TransferInstructionsController,
+    AdministratorPaymentsController,
+    AdministratorSessionsController,
   ],
   providers: [
     {
@@ -422,6 +431,20 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
           now: () => new Date(),
           referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
         }),
+    },
+    {
+      provide: receiptObjectStorage,
+      inject: [ConfigService],
+      useFactory: (config: ConfigService<Environment, true>) =>
+        new LocalObjectStorage(config.getOrThrow('UPLOADS_LOCAL_STORAGE_ROOT')),
+    },
+    {
+      provide: cancelSessionCommand,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) => {
+        const commands = new PrismaBookingCommands(prisma, () => new Date());
+        return commands.cancelSession.bind(commands);
+      },
     },
     {
       provide: transferInstructions,
