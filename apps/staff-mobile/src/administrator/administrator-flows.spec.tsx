@@ -11,17 +11,20 @@ import {
 } from "@pilates/mobile-core";
 
 import { SafeAreaView } from "react-native-safe-area-context";
-import type { ReactTestInstance } from "react-test-renderer";
 
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
 
 jest.setTimeout(20_000);
 
-const isInsideSafeArea = (element: ReactTestInstance): boolean => {
-  let current: ReactTestInstance | null = element.parent;
+type RenderedNode = { parent: RenderedNode | null; type: unknown };
+
+const isInsideSafeArea = (element: RenderedNode): boolean => {
+  let current = element.parent;
   while (current !== null) {
-    if (current.type === SafeAreaView) return true;
+    if (current.type === SafeAreaView || current.type === "RNCSafeAreaView") {
+      return true;
+    }
     current = current.parent;
   }
   return false;
@@ -299,7 +302,9 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Cancelar una clase")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Centro")).toBeOnTheScreen();
+    await waitFor(() => {
+      expect(screen.getByText("Centro")).toBeOnTheScreen();
+    });
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
