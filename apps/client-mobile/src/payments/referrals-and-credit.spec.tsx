@@ -102,10 +102,14 @@ describe("Referrals and Credit", () => {
         "Comparte tu código. Cuando un amigo se registre y haga su primer pago, ganas crédito.",
       ),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Tu crédito: Bs 60")).toBeOnTheScreen();
+    expect(screen.getByText("Tu crédito")).toBeOnTheScreen();
+    expect(screen.getByText("Bs 60")).toBeOnTheScreen();
+    expect(screen.getByText("Tus invitaciones")).toBeOnTheScreen();
     expect(screen.getByText("Sofía G.")).toBeOnTheScreen();
+    expect(screen.getByText("Primer pago el 12 de septiembre")).toBeOnTheScreen();
     expect(screen.getByText("Crédito ganado")).toBeOnTheScreen();
     expect(screen.getByText("Mariana P.")).toBeOnTheScreen();
+    expect(screen.getByText("Se registró el 18 de septiembre")).toBeOnTheScreen();
     expect(screen.getByText("Esperando su primer pago")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Compartir" }));
@@ -115,13 +119,19 @@ describe("Referrals and Credit", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Tu crédito: Bs 60" }));
     await waitFor(() => {
-      expect(screen.getByText("Bs 60 disponibles")).toBeOnTheScreen();
+      expect(screen.getByText("Saldo a favor")).toBeOnTheScreen();
     });
+    expect(screen.getByText("Bs 60")).toBeOnTheScreen();
+    expect(screen.getByText("disponibles")).toBeOnTheScreen();
     expect(
       screen.getByText(
         "Este crédito se aplica automáticamente al monto que pagues por tu próximo plan.",
       ),
     ).toBeOnTheScreen();
+    expect(screen.getByText("De dónde viene")).toBeOnTheScreen();
+    expect(screen.getByText("Sofía G. · 12 de septiembre")).toBeOnTheScreen();
+    expect(screen.getByText("+Bs 60")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Ver mis referidos" })).toBeOnTheScreen();
     share.mockRestore();
   });
 
