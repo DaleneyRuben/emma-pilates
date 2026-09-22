@@ -9,4 +9,6 @@ export interface StartClientRegistrationDto {
   name: string;
   email: string;
   password: string;
+  /** Referral code of the Client who invited this person */
+  referralCode?: string;
 }

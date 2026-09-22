@@ -2145,6 +2145,11 @@
             "type": "string",
             "format": "password",
             "writeOnly": true
+          },
+          "referralCode": {
+            "type": "string",
+            "example": "REF-LUCIA",
+            "description": "Referral code of the Client who invited this person"
           }
         },
         "required": [
