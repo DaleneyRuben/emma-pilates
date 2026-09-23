@@ -4,6 +4,7 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Logger,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 
@@ -29,6 +30,8 @@ function getTitle(status: number): string {
 
 @Catch()
 export class ProblemDetailsFilter implements ExceptionFilter {
+  private readonly logger = new Logger(ProblemDetailsFilter.name);
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const http = host.switchToHttp();
     const request = http.getRequest<Request>();
@@ -37,6 +40,9 @@ export class ProblemDetailsFilter implements ExceptionFilter {
     const status = isHttpException
       ? exception.getStatus()
       : HttpStatus.INTERNAL_SERVER_ERROR;
+    if (status >= 500) {
+      this.logger.error({ err: exception }, 'Unexpected request failure');
+    }
     const exceptionResponse = isHttpException ? exception.getResponse() : null;
     const problem =
       typeof exceptionResponse === 'object' && exceptionResponse !== null

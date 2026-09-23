@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { isNativeError } from 'node:util/types';
 import type { Params } from 'nestjs-pino';
 import type { DestinationStream } from 'pino';
 import type { Options } from 'pino-http';
@@ -10,6 +11,26 @@ export function correlationId(header: string | string[] | undefined): string {
   return typeof header === 'string' && requestIdPattern.test(header)
     ? header
     : randomUUID();
+}
+
+// Only an allowlist of error fields reaches the logs: driver and ORM errors
+// carry `detail`, `meta`, or query parameters that can echo personal data.
+// pino-http hands this serializer pino's own serialized error, which already
+// names the class in `type`; a raw error names it through its constructor.
+export function describeFailure(error: unknown): Record<string, unknown> {
+  if (typeof error !== 'object' || error === null) {
+    return { type: typeof error };
+  }
+  const fields = error as Record<string, unknown>;
+  const type =
+    typeof fields.type === 'string'
+      ? fields.type
+      : isNativeError(error)
+        ? error.constructor.name
+        : 'object';
+  const pick = (key: 'code' | 'message' | 'stack') =>
+    typeof fields[key] === 'string' ? { [key]: fields[key] } : {};
+  return { type, ...pick('code'), ...pick('message'), ...pick('stack') };
 }
 
 export type LoggerSettings = {
@@ -44,6 +65,7 @@ export function createLoggerParams(settings: LoggerSettings): Params {
       res: (response: { statusCode?: number }) => ({
         statusCode: response.statusCode,
       }),
+      err: describeFailure,
     },
     // Expected RFC 9457 client errors are not application failures.
     customLogLevel: (_request, response, error) =>

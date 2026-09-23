@@ -99,7 +99,7 @@ describe('error logging (e2e)', () => {
         message: 'duplicate key value violates unique constraint',
       },
     });
-    expect((line.err as { stack?: string }).stack).toContain('DriverError');
+    expect((line.err as { stack?: string }).stack).toContain('FailingController.fail');
     const serialized = JSON.stringify(lines);
     expect(serialized).not.toContain('lucia@example.com');
     expect(serialized).not.toContain('emma-local-2026');
@@ -109,6 +109,6 @@ describe('error logging (e2e)', () => {
     await request(app.getHttpServer()).get('/v1/failing/missing').expect(404);
 
     expect(errorLines()).toEqual([]);
-    expect(lines.some((line) => line.level >= 50)).toBe(false);
+    expect(lines.some((line) => Number(line.level) >= 50)).toBe(false);
   });
 });
