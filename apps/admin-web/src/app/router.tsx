@@ -1,4 +1,5 @@
 import type { QueryClient } from "@tanstack/react-query";
+import { z } from "zod";
 import {
   createRootRouteWithContext,
   createRoute,
@@ -9,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import type { SessionExpiry } from "../api/session-expiry";
 import { loginSearchSchema } from "../auth/auth-search";
+import { CreatePasswordPage } from "../auth/create-password-page";
 import { LoginPage } from "../auth/login-page";
 import { RecoverPasswordPage } from "../auth/recover-password-page";
 import { listSearchSchema } from "../components/table/pagination";
@@ -54,6 +56,20 @@ const recoverPasswordRoute = createRoute({
   component: RecoverPasswordPage,
 });
 
+// AW32: the one page every emailed Activation or Password-Recovery Link
+// opens; the inspected purpose, not the address, picks the variant.
+const createPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/crear-contrasena",
+  validateSearch: z.object({
+    token: z.string().min(1).optional().catch(undefined),
+  }),
+  component: function CreatePasswordRoute() {
+    const { token } = createPasswordRoute.useSearch();
+    return <CreatePasswordPage key={token} token={token} />;
+  },
+});
+
 // Every sidebar page sits behind the session probe; a signed-out visitor
 // goes to Login and comes back to the exact address afterwards.
 const authenticatedRoute = createRoute({
@@ -94,6 +110,7 @@ const placeholderRoutes = navigationItems.map((item) =>
 const routeTree = rootRoute.addChildren([
   loginRoute,
   recoverPasswordRoute,
+  createPasswordRoute,
   authenticatedRoute.addChildren(placeholderRoutes),
 ]);
 
