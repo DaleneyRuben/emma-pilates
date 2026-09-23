@@ -275,6 +275,18 @@ describe('Prisma Session materialization', () => {
       '2026-10-12T11:00:00.000Z',
     );
     await expect(sessionsOf('monday-reformer')).resolves.toHaveLength(4);
+
+    await prisma.session.updateMany({
+      where: {
+        sessionScheduleId: idOf('schedule:monday-reformer'),
+        startsAt: at('2026-10-12T13:00:00.000Z'),
+      },
+      data: {
+        startsAt: at('2026-10-12T11:00:00.000Z'),
+        endsAt: at('2026-10-12T11:50:00.000Z'),
+        isException: false,
+      },
+    });
   });
 
   it('extends the horizon as Bolivia days pass without touching started or existing Sessions', async () => {
