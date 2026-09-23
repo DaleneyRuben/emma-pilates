@@ -101,6 +101,25 @@ describe('operational health (e2e)', () => {
     });
   });
 
+  it('publishes the evaluation and nutritionist availability endpoints from the application module', () => {
+    const document = configureApplication(app);
+
+    for (const path of [
+      '/api/v1/evaluation-slots',
+      '/api/v1/evaluation-slots/{slotId}',
+      '/api/v1/evaluation-slots/{slotId}/evaluations',
+      '/api/v1/evaluations',
+      '/api/v1/evaluations/{evaluationId}',
+      '/api/v1/nutritionist/evaluations',
+      '/api/v1/nutritionist/evaluations/{evaluationId}',
+      '/api/v1/nutritionist/availability-blocks',
+      '/api/v1/nutritionist/availability-blocks/{blockId}/replacement',
+      '/api/v1/nutritionist/availability-blocks/{blockId}/end',
+    ]) {
+      expect(document.paths).toHaveProperty(path);
+    }
+  });
+
   it('publishes the purchase and payment endpoints from the application module', () => {
     const document = configureApplication(app);
 
