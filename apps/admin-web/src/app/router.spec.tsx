@@ -97,6 +97,29 @@ describe("admin routes", () => {
     ).toBeInTheDocument();
   });
 
+  it("validates the page-and-offset search of every list page and leaves the schedule and report alone", async () => {
+    const listPaths = navigationItems
+      .filter((item) => item.list)
+      .map((item) => item.to);
+    expect(listPaths).toHaveLength(14);
+    expect(listPaths).not.toContain("/");
+    expect(listPaths).not.toContain("/reporte");
+
+    const router = renderAt("/catalogo/planes?page=abc&pageSize=500");
+    await screen.findByRole("heading", { level: 1, name: "Planes" });
+    expect(router.state.location.search).toEqual({ page: 1, pageSize: 20 });
+
+    await router.navigate({
+      to: "/back-office/gastos",
+      search: { page: 3, pageSize: 50 },
+    });
+    await screen.findByRole("heading", { level: 1, name: "Gastos" });
+    expect(router.state.location.search).toEqual({ page: 3, pageSize: 50 });
+    expect(router.state.location.href).toBe(
+      "/back-office/gastos?page=3&pageSize=50",
+    );
+  });
+
   it("explains an unknown path and offers the way back to the schedule", async () => {
     renderAt("/no-existe");
 
