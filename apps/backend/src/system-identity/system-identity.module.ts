@@ -1,5 +1,10 @@
 import { createHmac, randomUUID } from 'node:crypto';
-import { Module, OnApplicationShutdown } from '@nestjs/common';
+import {
+  type MiddlewareConsumer,
+  Module,
+  type NestModule,
+  OnApplicationShutdown,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { createPrismaAdapter } from '../database/prisma-adapter';
 import type { PgBoss } from 'pg-boss';
@@ -31,7 +36,13 @@ import {
   currentSessionLogout,
   mobileLogin,
 } from './authentication/authentication.controller';
+import { adminWebProviders } from './admin-web/admin-web-providers';
+import { createAdminWebRequestMiddleware } from './admin-web/admin-web-request.middleware';
+import { AdminWebSessionController } from './admin-web/admin-web-session.controller';
+import { passwordRecoveryDependencies } from './account-security/password-recovery-dependencies';
+import type { AuthenticationSurface } from './authentication/create-authentication-session';
 import { login } from './authentication/login';
+import { loginDependencies } from './authentication/login-dependencies';
 import { logout } from './authentication/logout';
 import { PrismaAuthenticationGateway } from './authentication/prisma-authentication-gateway';
 import { resolveAuthenticatedPrincipal } from './authentication/resolve-authenticated-principal';
@@ -57,7 +68,6 @@ import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-in
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { argon2PasswordHasher } from './security/argon2-password-hasher';
-import { dummyPasswordHash } from './security/argon2-password-hasher';
 import { AuthenticationLinkCipher } from './security/authentication-link-cipher';
 import { authenticationTokens } from './security/authentication-token-service';
 import {
@@ -93,6 +103,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
 @Module({
   controllers: [
     AccountSecurityController,
+    AdminWebSessionController,
     AssistantClientInvitationsController,
     AuthenticationController,
     ClientEmailVerificationController,
@@ -209,18 +220,10 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
           linkCipher: AuthenticationLinkCipher,
         ) =>
         (command: Parameters<typeof requestPasswordRecovery>[0]) =>
-          requestPasswordRecovery(command, {
-            gateway,
-            issueLinkToken: authenticationTokens.issue,
-            issueSessionCredential: authenticationTokens.issue,
-            digestToken: authenticationTokens.digest,
-            encryptLinkSecret: (secret) => linkCipher.encrypt(secret),
-            hashPassword: argon2PasswordHasher.hash,
-            now: () => new Date(),
-            newTokenId: randomUUID,
-            newSessionId: randomUUID,
-            newAuditRecordId: randomUUID,
-          }),
+          requestPasswordRecovery(
+            command,
+            passwordRecoveryDependencies(gateway, linkCipher),
+          ),
     },
     {
       provide: passwordRecoveryCompletion,
@@ -231,18 +234,10 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
           linkCipher: AuthenticationLinkCipher,
         ) =>
         (command: Parameters<typeof completePasswordRecovery>[0]) =>
-          completePasswordRecovery(command, {
-            gateway,
-            issueLinkToken: authenticationTokens.issue,
-            issueSessionCredential: authenticationTokens.issue,
-            digestToken: authenticationTokens.digest,
-            encryptLinkSecret: (secret) => linkCipher.encrypt(secret),
-            hashPassword: argon2PasswordHasher.hash,
-            now: () => new Date(),
-            newTokenId: randomUUID,
-            newSessionId: randomUUID,
-            newAuditRecordId: randomUUID,
-          }),
+          completePasswordRecovery(
+            command,
+            passwordRecoveryDependencies(gateway, linkCipher),
+          ),
     },
     {
       provide: currentPasswordChange,
@@ -267,26 +262,12 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
           config: ConfigService<Environment, true>,
         ) =>
         (command: Parameters<typeof login>[0]) =>
-          login(command, {
-            findAccountByEmail: (email) => gateway.findAccountByEmail(email),
-            verifyPassword: argon2PasswordHasher.verify,
-            dummyPasswordHash,
-            digestSignal: (value) =>
-              createHmac(
-                'sha256',
-                config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
-              )
-                .update(value)
-                .digest(),
-            readThrottleEvents: (input) => gateway.readThrottleEvents(input),
-            recordFailedCredentialCheck: (input) =>
-              gateway.recordFailedCredentialCheck(input),
-            completeLogin: (input) => gateway.completeLogin(input),
-            issueCredential: authenticationTokens.issue,
-            now: () => new Date(),
-            newId: randomUUID,
-          }),
+          login(command, loginDependencies(gateway, config)),
     },
+    ...adminWebProviders({
+      authentication: authenticationGateway,
+      accountSecurity: accountSecurityGateway,
+    }),
     {
       provide: authenticatedPrincipalResolver,
       inject: [authenticationGateway],
@@ -295,15 +276,21 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         (
           credential: string,
           meaningfulActivity: boolean,
+          surface?: AuthenticationSurface,
         ): ReturnType<typeof resolveAuthenticatedPrincipal> =>
-          resolveAuthenticatedPrincipal(credential, meaningfulActivity, {
-            digestCredential: authenticationTokens.digest,
-            findSessionByCredentialDigest: (digest) =>
-              gateway.findSessionByCredentialDigest(digest),
-            recordMeaningfulActivity: (input) =>
-              gateway.recordMeaningfulActivity(input),
-            now: () => new Date(),
-          }),
+          resolveAuthenticatedPrincipal(
+            credential,
+            meaningfulActivity,
+            {
+              digestCredential: authenticationTokens.digest,
+              findSessionByCredentialDigest: (digest) =>
+                gateway.findSessionByCredentialDigest(digest),
+              recordMeaningfulActivity: (input) =>
+                gateway.recordMeaningfulActivity(input),
+              now: () => new Date(),
+            },
+            surface,
+          ),
     },
     {
       provide: currentSessionLogout,
@@ -459,4 +446,16 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
   ],
   exports: [authenticatedPrincipalResolver, staffAccountRuntime],
 })
-export class SystemIdentityModule {}
+export class SystemIdentityModule implements NestModule {
+  constructor(private readonly config: ConfigService<Environment, true>) {}
+
+  configure(consumer: MiddlewareConsumer): void {
+    consumer
+      .apply(
+        createAdminWebRequestMiddleware(
+          this.config.getOrThrow('ADMIN_WEB_TRUSTED_ORIGINS'),
+        ),
+      )
+      .forRoutes('{*splat}');
+  }
+}

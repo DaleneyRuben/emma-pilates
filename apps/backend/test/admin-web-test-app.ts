@@ -88,7 +88,7 @@ class AdminWebTestModule implements NestModule {
   configure(consumer: MiddlewareConsumer): void {
     consumer
       .apply(createAdminWebRequestMiddleware([trustedOrigin]))
-      .forRoutes('*');
+      .forRoutes('{*splat}');
   }
 }
 
