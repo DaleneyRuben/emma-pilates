@@ -140,7 +140,9 @@ describe('compareContracts', () => {
   });
 
   it('reports response fields that disappear, become optional, become nullable, or change type, through refs and arrays', () => {
-    const { note: _note, ...withoutNote } = bookingDto.properties;
+    const withoutNote = Object.fromEntries(
+      Object.entries(bookingDto.properties).filter(([name]) => name !== 'note'),
+    );
     expect(
       rules(
         withSchemas({ BookingDto: { ...bookingDto, properties: withoutNote } }),
