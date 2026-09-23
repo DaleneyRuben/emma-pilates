@@ -29,11 +29,18 @@ import type {
   AuthenticationLinkInspectionDto,
   AuthenticationLinkTokenDto,
   AuthenticationSessionCredentialDto,
+  AvailabilityBlockDto,
+  AvailabilityBlockEndDto,
+  AvailabilityBlockEndInputDto,
+  AvailabilityBlockInputDto,
+  AvailabilityBlockReplacementDto,
   BranchDto,
   ChangeCurrentPasswordDto,
   ClassHistoryEntryDto,
   ClassTypeDto,
   ClientEmailVerificationResultDto,
+  ClientEvaluationDto,
+  ClientEvaluationPageDto,
   ClientInvitationDto,
   ClientInvitationResultDto,
   ClientOverviewDto,
@@ -50,14 +57,20 @@ import type {
   CreatedBookingDto,
   CreditDto,
   CurrentAuthenticationPrincipalDto,
+  EvaluationAvailabilityDto,
+  EvaluationSlotDto,
   FinalizedUploadDto,
   InviteClientDto,
+  ListEvaluationSlotsParams,
+  ListEvaluationsParams,
   ListNotificationsParams,
+  ListNutritionistAgendaParams,
   ListSessionAvailabilityParams,
   ListTrainerScheduleParams,
   LivenessResponseDto,
   MarkedNotificationsDto,
   NotificationPageDto,
+  NutritionistAgendaPageDto,
   PasswordRecoveryRequestResultDto,
   PasswordRecoveryResultDto,
   PaymentDto,
@@ -9726,6 +9739,1724 @@ export const useRecordAssistantCashPayment = <
 > => {
   return useMutation(
     getRecordAssistantCashPaymentMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type listEvaluationSlotsResponse200 = {
+  data: EvaluationAvailabilityDto;
+  status: 200;
+};
+
+export type listEvaluationSlotsResponseSuccess =
+  listEvaluationSlotsResponse200 & {
+    headers: Headers;
+  };
+export type listEvaluationSlotsResponse = listEvaluationSlotsResponseSuccess;
+
+export const getListEvaluationSlotsUrl = (
+  params?: ListEvaluationSlotsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/evaluation-slots?${stringifiedParams}`
+    : `/api/v1/evaluation-slots`;
+};
+
+export const listEvaluationSlots = async (
+  params?: ListEvaluationSlotsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listEvaluationSlotsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListEvaluationSlotsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listEvaluationSlotsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listEvaluationSlotsResponse;
+};
+
+export const getListEvaluationSlotsQueryKey = (
+  params?: ListEvaluationSlotsParams,
+) => {
+  return [`/api/v1/evaluation-slots`, ...(params ? [params] : [])] as const;
+};
+
+export const getListEvaluationSlotsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listEvaluationSlots>>,
+  TError = unknown,
+>(
+  params?: ListEvaluationSlotsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluationSlots>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListEvaluationSlotsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listEvaluationSlots>>
+  > = ({ signal }) =>
+    listEvaluationSlots(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listEvaluationSlots>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListEvaluationSlotsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listEvaluationSlots>>
+>;
+export type ListEvaluationSlotsQueryError = unknown;
+
+export function useListEvaluationSlots<
+  TData = Awaited<ReturnType<typeof listEvaluationSlots>>,
+  TError = unknown,
+>(
+  params: undefined | ListEvaluationSlotsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluationSlots>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEvaluationSlots>>,
+          TError,
+          Awaited<ReturnType<typeof listEvaluationSlots>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListEvaluationSlots<
+  TData = Awaited<ReturnType<typeof listEvaluationSlots>>,
+  TError = unknown,
+>(
+  params?: ListEvaluationSlotsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluationSlots>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEvaluationSlots>>,
+          TError,
+          Awaited<ReturnType<typeof listEvaluationSlots>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListEvaluationSlots<
+  TData = Awaited<ReturnType<typeof listEvaluationSlots>>,
+  TError = unknown,
+>(
+  params?: ListEvaluationSlotsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluationSlots>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListEvaluationSlots<
+  TData = Awaited<ReturnType<typeof listEvaluationSlots>>,
+  TError = unknown,
+>(
+  params?: ListEvaluationSlotsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluationSlots>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListEvaluationSlotsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getEvaluationSlotResponse200 = {
+  data: EvaluationSlotDto;
+  status: 200;
+};
+
+export type getEvaluationSlotResponseSuccess = getEvaluationSlotResponse200 & {
+  headers: Headers;
+};
+export type getEvaluationSlotResponse = getEvaluationSlotResponseSuccess;
+
+export const getGetEvaluationSlotUrl = (slotId: string) => {
+  return `/api/v1/evaluation-slots/${slotId}`;
+};
+
+export const getEvaluationSlot = async (
+  slotId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getEvaluationSlotResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetEvaluationSlotUrl(slotId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getEvaluationSlotResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getEvaluationSlotResponse;
+};
+
+export const getGetEvaluationSlotQueryKey = (slotId: string) => {
+  return [`/api/v1/evaluation-slots/${slotId}`] as const;
+};
+
+export const getGetEvaluationSlotQueryOptions = <
+  TData = Awaited<ReturnType<typeof getEvaluationSlot>>,
+  TError = unknown,
+>(
+  slotId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEvaluationSlot>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetEvaluationSlotQueryKey(slotId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getEvaluationSlot>>
+  > = ({ signal }) =>
+    getEvaluationSlot(slotId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: slotId !== null && slotId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getEvaluationSlot>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetEvaluationSlotQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getEvaluationSlot>>
+>;
+export type GetEvaluationSlotQueryError = unknown;
+
+export function useGetEvaluationSlot<
+  TData = Awaited<ReturnType<typeof getEvaluationSlot>>,
+  TError = unknown,
+>(
+  slotId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEvaluationSlot>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationSlot>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationSlot>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetEvaluationSlot<
+  TData = Awaited<ReturnType<typeof getEvaluationSlot>>,
+  TError = unknown,
+>(
+  slotId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEvaluationSlot>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getEvaluationSlot>>,
+          TError,
+          Awaited<ReturnType<typeof getEvaluationSlot>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetEvaluationSlot<
+  TData = Awaited<ReturnType<typeof getEvaluationSlot>>,
+  TError = unknown,
+>(
+  slotId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEvaluationSlot>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetEvaluationSlot<
+  TData = Awaited<ReturnType<typeof getEvaluationSlot>>,
+  TError = unknown,
+>(
+  slotId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getEvaluationSlot>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetEvaluationSlotQueryOptions(slotId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type bookEvaluationResponse201 = {
+  data: ClientEvaluationDto;
+  status: 201;
+};
+
+export type bookEvaluationResponseSuccess = bookEvaluationResponse201 & {
+  headers: Headers;
+};
+export type bookEvaluationResponse = bookEvaluationResponseSuccess;
+
+export const getBookEvaluationUrl = (slotId: string) => {
+  return `/api/v1/evaluation-slots/${slotId}/evaluations`;
+};
+
+export const bookEvaluation = async (
+  slotId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<bookEvaluationResponse> => {
+  const res = await (fetchFn ?? fetch)(getBookEvaluationUrl(slotId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: bookEvaluationResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as bookEvaluationResponse;
+};
+
+export const getBookEvaluationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof bookEvaluation>>,
+    TError,
+    BookEvaluationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof bookEvaluation>>,
+  TError,
+  BookEvaluationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["bookEvaluation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof bookEvaluation>>,
+    BookEvaluationMutationVariables
+  > = (props) => {
+    const { slotId } = props ?? {};
+
+    return bookEvaluation(slotId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type BookEvaluationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof bookEvaluation>>
+>;
+
+export type BookEvaluationMutationError = unknown;
+export type BookEvaluationMutationVariables = { slotId: string };
+
+export const useBookEvaluation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof bookEvaluation>>,
+      TError,
+      BookEvaluationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof bookEvaluation>>,
+  TError,
+  BookEvaluationMutationVariables,
+  TContext
+> => {
+  return useMutation(getBookEvaluationMutationOptions(options), queryClient);
+};
+
+export type listEvaluationsResponse200 = {
+  data: ClientEvaluationPageDto;
+  status: 200;
+};
+
+export type listEvaluationsResponseSuccess = listEvaluationsResponse200 & {
+  headers: Headers;
+};
+export type listEvaluationsResponse = listEvaluationsResponseSuccess;
+
+export const getListEvaluationsUrl = (params: ListEvaluationsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/evaluations?${stringifiedParams}`
+    : `/api/v1/evaluations`;
+};
+
+export const listEvaluations = async (
+  params: ListEvaluationsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listEvaluationsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListEvaluationsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listEvaluationsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listEvaluationsResponse;
+};
+
+export const getListEvaluationsQueryKey = (params?: ListEvaluationsParams) => {
+  return [`/api/v1/evaluations`, ...(params ? [params] : [])] as const;
+};
+
+export const getListEvaluationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listEvaluations>>,
+  TError = unknown,
+>(
+  params: ListEvaluationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListEvaluationsQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listEvaluations>>> = ({
+    signal,
+  }) => listEvaluations(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listEvaluations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListEvaluationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listEvaluations>>
+>;
+export type ListEvaluationsQueryError = unknown;
+
+export function useListEvaluations<
+  TData = Awaited<ReturnType<typeof listEvaluations>>,
+  TError = unknown,
+>(
+  params: ListEvaluationsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEvaluations>>,
+          TError,
+          Awaited<ReturnType<typeof listEvaluations>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListEvaluations<
+  TData = Awaited<ReturnType<typeof listEvaluations>>,
+  TError = unknown,
+>(
+  params: ListEvaluationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listEvaluations>>,
+          TError,
+          Awaited<ReturnType<typeof listEvaluations>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListEvaluations<
+  TData = Awaited<ReturnType<typeof listEvaluations>>,
+  TError = unknown,
+>(
+  params: ListEvaluationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListEvaluations<
+  TData = Awaited<ReturnType<typeof listEvaluations>>,
+  TError = unknown,
+>(
+  params: ListEvaluationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listEvaluations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListEvaluationsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type cancelEvaluationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type cancelEvaluationResponseSuccess = cancelEvaluationResponse204 & {
+  headers: Headers;
+};
+export type cancelEvaluationResponse = cancelEvaluationResponseSuccess;
+
+export const getCancelEvaluationUrl = (evaluationId: string) => {
+  return `/api/v1/evaluations/${evaluationId}`;
+};
+
+export const cancelEvaluation = async (
+  evaluationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelEvaluationResponse> => {
+  const res = await (fetchFn ?? fetch)(getCancelEvaluationUrl(evaluationId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelEvaluationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as cancelEvaluationResponse;
+};
+
+export const getCancelEvaluationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelEvaluation>>,
+    TError,
+    CancelEvaluationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelEvaluation>>,
+  TError,
+  CancelEvaluationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["cancelEvaluation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cancelEvaluation>>,
+    CancelEvaluationMutationVariables
+  > = (props) => {
+    const { evaluationId } = props ?? {};
+
+    return cancelEvaluation(evaluationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelEvaluationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cancelEvaluation>>
+>;
+
+export type CancelEvaluationMutationError = unknown;
+export type CancelEvaluationMutationVariables = { evaluationId: string };
+
+export const useCancelEvaluation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelEvaluation>>,
+      TError,
+      CancelEvaluationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelEvaluation>>,
+  TError,
+  CancelEvaluationMutationVariables,
+  TContext
+> => {
+  return useMutation(getCancelEvaluationMutationOptions(options), queryClient);
+};
+
+export type listNutritionistAgendaResponse200 = {
+  data: NutritionistAgendaPageDto;
+  status: 200;
+};
+
+export type listNutritionistAgendaResponseSuccess =
+  listNutritionistAgendaResponse200 & {
+    headers: Headers;
+  };
+export type listNutritionistAgendaResponse =
+  listNutritionistAgendaResponseSuccess;
+
+export const getListNutritionistAgendaUrl = (
+  params?: ListNutritionistAgendaParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/nutritionist/evaluations?${stringifiedParams}`
+    : `/api/v1/nutritionist/evaluations`;
+};
+
+export const listNutritionistAgenda = async (
+  params?: ListNutritionistAgendaParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listNutritionistAgendaResponse> => {
+  const res = await (fetchFn ?? fetch)(getListNutritionistAgendaUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listNutritionistAgendaResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listNutritionistAgendaResponse;
+};
+
+export const getListNutritionistAgendaQueryKey = (
+  params?: ListNutritionistAgendaParams,
+) => {
+  return [
+    `/api/v1/nutritionist/evaluations`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListNutritionistAgendaQueryOptions = <
+  TData = Awaited<ReturnType<typeof listNutritionistAgenda>>,
+  TError = unknown,
+>(
+  params?: ListNutritionistAgendaParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listNutritionistAgenda>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListNutritionistAgendaQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listNutritionistAgenda>>
+  > = ({ signal }) =>
+    listNutritionistAgenda(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listNutritionistAgenda>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListNutritionistAgendaQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listNutritionistAgenda>>
+>;
+export type ListNutritionistAgendaQueryError = unknown;
+
+export function useListNutritionistAgenda<
+  TData = Awaited<ReturnType<typeof listNutritionistAgenda>>,
+  TError = unknown,
+>(
+  params: undefined | ListNutritionistAgendaParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listNutritionistAgenda>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listNutritionistAgenda>>,
+          TError,
+          Awaited<ReturnType<typeof listNutritionistAgenda>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListNutritionistAgenda<
+  TData = Awaited<ReturnType<typeof listNutritionistAgenda>>,
+  TError = unknown,
+>(
+  params?: ListNutritionistAgendaParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listNutritionistAgenda>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listNutritionistAgenda>>,
+          TError,
+          Awaited<ReturnType<typeof listNutritionistAgenda>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListNutritionistAgenda<
+  TData = Awaited<ReturnType<typeof listNutritionistAgenda>>,
+  TError = unknown,
+>(
+  params?: ListNutritionistAgendaParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listNutritionistAgenda>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListNutritionistAgenda<
+  TData = Awaited<ReturnType<typeof listNutritionistAgenda>>,
+  TError = unknown,
+>(
+  params?: ListNutritionistAgendaParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listNutritionistAgenda>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListNutritionistAgendaQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type cancelNutritionistEvaluationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type cancelNutritionistEvaluationResponseSuccess =
+  cancelNutritionistEvaluationResponse204 & {
+    headers: Headers;
+  };
+export type cancelNutritionistEvaluationResponse =
+  cancelNutritionistEvaluationResponseSuccess;
+
+export const getCancelNutritionistEvaluationUrl = (evaluationId: string) => {
+  return `/api/v1/nutritionist/evaluations/${evaluationId}`;
+};
+
+export const cancelNutritionistEvaluation = async (
+  evaluationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelNutritionistEvaluationResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getCancelNutritionistEvaluationUrl(evaluationId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelNutritionistEvaluationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as cancelNutritionistEvaluationResponse;
+};
+
+export const getCancelNutritionistEvaluationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelNutritionistEvaluation>>,
+    TError,
+    CancelNutritionistEvaluationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelNutritionistEvaluation>>,
+  TError,
+  CancelNutritionistEvaluationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["cancelNutritionistEvaluation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cancelNutritionistEvaluation>>,
+    CancelNutritionistEvaluationMutationVariables
+  > = (props) => {
+    const { evaluationId } = props ?? {};
+
+    return cancelNutritionistEvaluation(evaluationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelNutritionistEvaluationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cancelNutritionistEvaluation>>
+>;
+
+export type CancelNutritionistEvaluationMutationError = unknown;
+export type CancelNutritionistEvaluationMutationVariables = {
+  evaluationId: string;
+};
+
+export const useCancelNutritionistEvaluation = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelNutritionistEvaluation>>,
+      TError,
+      CancelNutritionistEvaluationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelNutritionistEvaluation>>,
+  TError,
+  CancelNutritionistEvaluationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCancelNutritionistEvaluationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type listAvailabilityBlocksResponse200 = {
+  data: AvailabilityBlockDto[];
+  status: 200;
+};
+
+export type listAvailabilityBlocksResponseSuccess =
+  listAvailabilityBlocksResponse200 & {
+    headers: Headers;
+  };
+export type listAvailabilityBlocksResponse =
+  listAvailabilityBlocksResponseSuccess;
+
+export const getListAvailabilityBlocksUrl = () => {
+  return `/api/v1/nutritionist/availability-blocks`;
+};
+
+export const listAvailabilityBlocks = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAvailabilityBlocksResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAvailabilityBlocksUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAvailabilityBlocksResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAvailabilityBlocksResponse;
+};
+
+export const getListAvailabilityBlocksQueryKey = () => {
+  return [`/api/v1/nutritionist/availability-blocks`] as const;
+};
+
+export const getListAvailabilityBlocksQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAvailabilityBlocksQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAvailabilityBlocks>>
+  > = ({ signal }) =>
+    listAvailabilityBlocks({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAvailabilityBlocksQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAvailabilityBlocks>>
+>;
+export type ListAvailabilityBlocksQueryError = unknown;
+
+export function useListAvailabilityBlocks<
+  TData = Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+          TError,
+          Awaited<ReturnType<typeof listAvailabilityBlocks>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAvailabilityBlocks<
+  TData = Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+          TError,
+          Awaited<ReturnType<typeof listAvailabilityBlocks>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAvailabilityBlocks<
+  TData = Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAvailabilityBlocks<
+  TData = Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAvailabilityBlocks>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAvailabilityBlocksQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createAvailabilityBlockResponse201 = {
+  data: AvailabilityBlockDto;
+  status: 201;
+};
+
+export type createAvailabilityBlockResponseSuccess =
+  createAvailabilityBlockResponse201 & {
+    headers: Headers;
+  };
+export type createAvailabilityBlockResponse =
+  createAvailabilityBlockResponseSuccess;
+
+export const getCreateAvailabilityBlockUrl = () => {
+  return `/api/v1/nutritionist/availability-blocks`;
+};
+
+export const createAvailabilityBlock = async (
+  availabilityBlockInputDto: AvailabilityBlockInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createAvailabilityBlockResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateAvailabilityBlockUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(availabilityBlockInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createAvailabilityBlockResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createAvailabilityBlockResponse;
+};
+
+export const getCreateAvailabilityBlockMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createAvailabilityBlock>>,
+    TError,
+    CreateAvailabilityBlockMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createAvailabilityBlock>>,
+  TError,
+  CreateAvailabilityBlockMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createAvailabilityBlock"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createAvailabilityBlock>>,
+    CreateAvailabilityBlockMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createAvailabilityBlock(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateAvailabilityBlockMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createAvailabilityBlock>>
+>;
+export type CreateAvailabilityBlockMutationBody = AvailabilityBlockInputDto;
+export type CreateAvailabilityBlockMutationError = unknown;
+export type CreateAvailabilityBlockMutationVariables = {
+  data: AvailabilityBlockInputDto;
+};
+
+export const useCreateAvailabilityBlock = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createAvailabilityBlock>>,
+      TError,
+      CreateAvailabilityBlockMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createAvailabilityBlock>>,
+  TError,
+  CreateAvailabilityBlockMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreateAvailabilityBlockMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type replaceAvailabilityBlockResponse201 = {
+  data: AvailabilityBlockReplacementDto;
+  status: 201;
+};
+
+export type replaceAvailabilityBlockResponseSuccess =
+  replaceAvailabilityBlockResponse201 & {
+    headers: Headers;
+  };
+export type replaceAvailabilityBlockResponse =
+  replaceAvailabilityBlockResponseSuccess;
+
+export const getReplaceAvailabilityBlockUrl = (blockId: string) => {
+  return `/api/v1/nutritionist/availability-blocks/${blockId}/replacement`;
+};
+
+export const replaceAvailabilityBlock = async (
+  blockId: string,
+  availabilityBlockInputDto: AvailabilityBlockInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<replaceAvailabilityBlockResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getReplaceAvailabilityBlockUrl(blockId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(availabilityBlockInputDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: replaceAvailabilityBlockResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as replaceAvailabilityBlockResponse;
+};
+
+export const getReplaceAvailabilityBlockMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof replaceAvailabilityBlock>>,
+    TError,
+    ReplaceAvailabilityBlockMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof replaceAvailabilityBlock>>,
+  TError,
+  ReplaceAvailabilityBlockMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["replaceAvailabilityBlock"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof replaceAvailabilityBlock>>,
+    ReplaceAvailabilityBlockMutationVariables
+  > = (props) => {
+    const { blockId, data } = props ?? {};
+
+    return replaceAvailabilityBlock(blockId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ReplaceAvailabilityBlockMutationResult = NonNullable<
+  Awaited<ReturnType<typeof replaceAvailabilityBlock>>
+>;
+export type ReplaceAvailabilityBlockMutationBody = AvailabilityBlockInputDto;
+export type ReplaceAvailabilityBlockMutationError = unknown;
+export type ReplaceAvailabilityBlockMutationVariables = {
+  blockId: string;
+  data: AvailabilityBlockInputDto;
+};
+
+export const useReplaceAvailabilityBlock = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof replaceAvailabilityBlock>>,
+      TError,
+      ReplaceAvailabilityBlockMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof replaceAvailabilityBlock>>,
+  TError,
+  ReplaceAvailabilityBlockMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getReplaceAvailabilityBlockMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type endAvailabilityBlockResponse200 = {
+  data: AvailabilityBlockEndDto;
+  status: 200;
+};
+
+export type endAvailabilityBlockResponseSuccess =
+  endAvailabilityBlockResponse200 & {
+    headers: Headers;
+  };
+export type endAvailabilityBlockResponse = endAvailabilityBlockResponseSuccess;
+
+export const getEndAvailabilityBlockUrl = (blockId: string) => {
+  return `/api/v1/nutritionist/availability-blocks/${blockId}/end`;
+};
+
+export const endAvailabilityBlock = async (
+  blockId: string,
+  availabilityBlockEndInputDto: AvailabilityBlockEndInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<endAvailabilityBlockResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getEndAvailabilityBlockUrl(blockId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(availabilityBlockEndInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: endAvailabilityBlockResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as endAvailabilityBlockResponse;
+};
+
+export const getEndAvailabilityBlockMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof endAvailabilityBlock>>,
+    TError,
+    EndAvailabilityBlockMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof endAvailabilityBlock>>,
+  TError,
+  EndAvailabilityBlockMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["endAvailabilityBlock"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof endAvailabilityBlock>>,
+    EndAvailabilityBlockMutationVariables
+  > = (props) => {
+    const { blockId, data } = props ?? {};
+
+    return endAvailabilityBlock(blockId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type EndAvailabilityBlockMutationResult = NonNullable<
+  Awaited<ReturnType<typeof endAvailabilityBlock>>
+>;
+export type EndAvailabilityBlockMutationBody = AvailabilityBlockEndInputDto;
+export type EndAvailabilityBlockMutationError = unknown;
+export type EndAvailabilityBlockMutationVariables = {
+  blockId: string;
+  data: AvailabilityBlockEndInputDto;
+};
+
+export const useEndAvailabilityBlock = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof endAvailabilityBlock>>,
+      TError,
+      EndAvailabilityBlockMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof endAvailabilityBlock>>,
+  TError,
+  EndAvailabilityBlockMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getEndAvailabilityBlockMutationOptions(options),
     queryClient,
   );
 };

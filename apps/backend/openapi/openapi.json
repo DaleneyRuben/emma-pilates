@@ -2194,6 +2194,483 @@
         ]
       }
     },
+    "/api/v1/evaluation-slots": {
+      "get": {
+        "operationId": "listEvaluationSlots",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationAvailabilityDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EvaluationSlots"
+        ]
+      }
+    },
+    "/api/v1/evaluation-slots/{slotId}": {
+      "get": {
+        "operationId": "getEvaluationSlot",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EvaluationSlotDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EvaluationSlots"
+        ]
+      }
+    },
+    "/api/v1/evaluation-slots/{slotId}/evaluations": {
+      "post": {
+        "operationId": "bookEvaluation",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientEvaluationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EvaluationSlots"
+        ]
+      }
+    },
+    "/api/v1/evaluations": {
+      "get": {
+        "operationId": "listEvaluations",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "scope",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "upcoming",
+                "past"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientEvaluationPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientEvaluations"
+        ]
+      }
+    },
+    "/api/v1/evaluations/{evaluationId}": {
+      "delete": {
+        "operationId": "cancelEvaluation",
+        "parameters": [
+          {
+            "name": "evaluationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientEvaluations"
+        ]
+      }
+    },
+    "/api/v1/nutritionist/evaluations": {
+      "get": {
+        "operationId": "listNutritionistAgenda",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "cursor",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NutritionistAgendaPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NutritionistEvaluations"
+        ]
+      }
+    },
+    "/api/v1/nutritionist/evaluations/{evaluationId}": {
+      "delete": {
+        "operationId": "cancelNutritionistEvaluation",
+        "parameters": [
+          {
+            "name": "evaluationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NutritionistEvaluations"
+        ]
+      }
+    },
+    "/api/v1/nutritionist/availability-blocks": {
+      "get": {
+        "operationId": "listAvailabilityBlocks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AvailabilityBlockDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NutritionistAvailabilityBlocks"
+        ]
+      },
+      "post": {
+        "operationId": "createAvailabilityBlock",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvailabilityBlockInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailabilityBlockDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NutritionistAvailabilityBlocks"
+        ]
+      }
+    },
+    "/api/v1/nutritionist/availability-blocks/{blockId}/replacement": {
+      "post": {
+        "operationId": "replaceAvailabilityBlock",
+        "parameters": [
+          {
+            "name": "blockId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvailabilityBlockInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailabilityBlockReplacementDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NutritionistAvailabilityBlocks"
+        ]
+      }
+    },
+    "/api/v1/nutritionist/availability-blocks/{blockId}/end": {
+      "post": {
+        "operationId": "endAvailabilityBlock",
+        "parameters": [
+          {
+            "name": "blockId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvailabilityBlockEndInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailabilityBlockEndDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NutritionistAvailabilityBlocks"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -4372,6 +4849,449 @@
         },
         "required": [
           "payment"
+        ]
+      },
+      "EvaluationSlotDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "example": 45
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "nutritionistName": {
+            "type": "string"
+          },
+          "bookable": {
+            "type": "boolean",
+            "description": "Published, unbooked, more than 3 hours away, and in a month the Client has not used"
+          }
+        },
+        "required": [
+          "id",
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "branchId",
+          "branchName",
+          "nutritionistName",
+          "bookable"
+        ]
+      },
+      "EvaluationDayDto": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil date"
+          },
+          "slots": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvaluationSlotDto"
+            }
+          }
+        },
+        "required": [
+          "date",
+          "slots"
+        ]
+      },
+      "EvaluationMonthUseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "startsAt"
+        ]
+      },
+      "EvaluationMonthDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "description": "First day of the Bolivia month"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "available",
+              "used"
+            ]
+          },
+          "evaluation": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/EvaluationMonthUseDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "month",
+          "status",
+          "evaluation"
+        ]
+      },
+      "EvaluationAvailabilityDto": {
+        "type": "object",
+        "properties": {
+          "days": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvaluationDayDto"
+            }
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EvaluationMonthDto"
+            }
+          }
+        },
+        "required": [
+          "days",
+          "months"
+        ]
+      },
+      "ClientEvaluationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slotId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "booked",
+              "cancelled"
+            ]
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "example": 45
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "nutritionistName": {
+            "type": "string"
+          },
+          "cancellableUntil": {
+            "format": "date-time",
+            "type": "string",
+            "description": "Start minus 3 hours; the Client cannot cancel after it"
+          },
+          "cancellable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "slotId",
+          "state",
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "branchId",
+          "branchName",
+          "nutritionistName",
+          "cancellableUntil",
+          "cancellable"
+        ]
+      },
+      "ClientEvaluationPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClientEvaluationDto"
+            }
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "items",
+          "hasMore",
+          "nextCursor"
+        ]
+      },
+      "NutritionistAgendaEntryDto": {
+        "type": "object",
+        "properties": {
+          "evaluationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "example": 45
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "first",
+              "follow_up"
+            ],
+            "description": "first unless the Client has an earlier booked Evaluation"
+          }
+        },
+        "required": [
+          "evaluationId",
+          "clientName",
+          "startsAt",
+          "endsAt",
+          "durationMinutes",
+          "branchId",
+          "branchName",
+          "kind"
+        ]
+      },
+      "NutritionistAgendaPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutritionistAgendaEntryDto"
+            }
+          },
+          "hasMore": {
+            "type": "boolean"
+          },
+          "nextCursor": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "items",
+          "hasMore",
+          "nextCursor"
+        ]
+      },
+      "AvailabilityBlockDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "weekday": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 7
+          },
+          "startsAtLocal": {
+            "type": "string",
+            "example": "09:00"
+          },
+          "endsAtLocal": {
+            "type": "string",
+            "example": "13:00"
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveUntil": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Exclusive end; null while open-ended"
+          },
+          "slotsPerWeek": {
+            "type": "number"
+          },
+          "upcomingBookedCount": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "branchName",
+          "weekday",
+          "startsAtLocal",
+          "endsAtLocal",
+          "effectiveFrom",
+          "effectiveUntil",
+          "slotsPerWeek",
+          "upcomingBookedCount"
+        ]
+      },
+      "AvailabilityBlockInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "weekday": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 7,
+            "description": "ISO weekday, Monday = 1"
+          },
+          "startsAtLocal": {
+            "type": "string",
+            "example": "09:00",
+            "description": "Bolivia wall clock, 15-minute grid"
+          },
+          "endsAtLocal": {
+            "type": "string",
+            "example": "13:00",
+            "description": "Bolivia wall clock, 15-minute grid"
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date",
+            "description": "First Bolivia date the block applies; today or later"
+          }
+        },
+        "required": [
+          "branchId",
+          "weekday",
+          "startsAtLocal",
+          "endsAtLocal",
+          "effectiveFrom"
+        ]
+      },
+      "AvailabilityBlockReplacementDto": {
+        "type": "object",
+        "properties": {
+          "ended": {
+            "$ref": "#/components/schemas/AvailabilityBlockDto"
+          },
+          "replacement": {
+            "$ref": "#/components/schemas/AvailabilityBlockDto"
+          },
+          "withdrawnSlots": {
+            "type": "number"
+          },
+          "keptEvaluations": {
+            "type": "number",
+            "description": "Booked Evaluations that keep their slots"
+          }
+        },
+        "required": [
+          "ended",
+          "replacement",
+          "withdrawnSlots",
+          "keptEvaluations"
+        ]
+      },
+      "AvailabilityBlockEndInputDto": {
+        "type": "object",
+        "properties": {
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date",
+            "description": "First Bolivia date without the block; today or later"
+          }
+        },
+        "required": [
+          "effectiveFrom"
+        ]
+      },
+      "AvailabilityBlockEndDto": {
+        "type": "object",
+        "properties": {
+          "block": {
+            "$ref": "#/components/schemas/AvailabilityBlockDto"
+          },
+          "withdrawnSlots": {
+            "type": "number"
+          },
+          "keptEvaluations": {
+            "type": "number",
+            "description": "Booked Evaluations that keep their slots"
+          }
+        },
+        "required": [
+          "block",
+          "withdrawnSlots",
+          "keptEvaluations"
         ]
       },
       "CreatePendingUploadDto": {
