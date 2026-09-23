@@ -8,6 +8,8 @@ import {
   StaffRole,
   SubscriptionState,
 } from '../generated/prisma/enums';
+import { plannedSlots } from '../booking/evaluations/evaluation-rules';
+import { boliviaDate } from '../time/bolivia-time';
 import { deterministicId } from './deterministic-id';
 import type {
   DevelopmentFixtures,
@@ -32,7 +34,16 @@ export type DevelopmentFixtureSummary = {
   subscriptions: number;
   payments: number;
   referrals: number;
+  availabilityBlocks: number;
 };
+
+const minutesOf = (clock: string): number => {
+  const [hours, minutes] = clock.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+const timeValue = (clock: string): Date =>
+  new Date(Date.UTC(1970, 0, 1, 0, minutesOf(clock)));
 
 const upsertAccount = async (
   transaction: Prisma.TransactionClient,
@@ -226,12 +237,57 @@ export const applyDevelopmentFixtures = async (
         });
       }
 
+      // Blocks are immutable once published, so a re-application keeps the
+      // original effective date and only fills the slot horizon.
+      for (const block of fixtures.availabilityBlocks) {
+        const existing = await transaction.availabilityBlock.findUnique({
+          where: { id: block.id },
+          select: { effectiveFrom: true, effectiveUntil: true },
+        });
+        if (!existing) {
+          await transaction.availabilityBlock.create({
+            data: {
+              id: block.id,
+              nutritionistStaffMemberId: block.nutritionistStaffMemberId,
+              branchId: block.branchId,
+              weekday: block.weekday,
+              startsAtLocal: timeValue(block.startsAtLocal),
+              endsAtLocal: timeValue(block.endsAtLocal),
+              effectiveFrom: block.effectiveFrom,
+              createdByAccountId: block.createdByAccountId,
+              createdAt: now,
+            },
+          });
+        }
+        const slots = plannedSlots(
+          {
+            weekday: block.weekday,
+            startMinutes: minutesOf(block.startsAtLocal),
+            endMinutes: minutesOf(block.endsAtLocal),
+            effectiveFrom: existing?.effectiveFrom ?? block.effectiveFrom,
+            effectiveUntil: existing?.effectiveUntil ?? null,
+          },
+          { today: boliviaDate(now), now },
+        );
+        await transaction.evaluationSlot.createMany({
+          data: slots.map((slot) => ({
+            availabilityBlockId: block.id,
+            nutritionistStaffMemberId: block.nutritionistStaffMemberId,
+            branchId: block.branchId,
+            ...slot,
+            createdAt: now,
+          })),
+          skipDuplicates: true,
+        });
+      }
+
       return {
         accounts: fixtures.staffMembers.length + fixtures.clients.length,
         sessions: fixtures.sessions.length,
         subscriptions: fixtures.subscriptions.length,
         payments: fixtures.payments.length,
         referrals: fixtures.referrals.length,
+        availabilityBlocks: fixtures.availabilityBlocks.length,
       };
     },
     { maxWait: 15_000, timeout: 60_000 },

@@ -101,6 +101,16 @@ export type DevelopmentFixtures = {
     awardedAt: Date | null;
     createdAt: Date;
   }[];
+  availabilityBlocks: {
+    id: string;
+    nutritionistStaffMemberId: string;
+    branchId: string;
+    weekday: number;
+    startsAtLocal: string;
+    endsAtLocal: string;
+    effectiveFrom: Date;
+    createdByAccountId: string;
+  }[];
   creditLedgerEntries: {
     id: string;
     clientId: string;
@@ -441,6 +451,44 @@ const referralDefinitions: readonly ReferralDefinition[] = [
   { referrer: 'sofia', referred: 'mariana', registeredDaysAgo: 5 },
 ];
 
+type AvailabilityBlockDefinition = {
+  key: string;
+  nutritionist: (typeof staffDefinitions)[number]['key'];
+  branch: (typeof branchDefinitions)[number]['key'];
+  weekday: number;
+  startsAtLocal: string;
+  endsAtLocal: string;
+};
+
+// Gabriela's weekly consultation hours from the Nutritionist designs
+// (S16: Monday 9:00–13:00, Saturday 9:00–12:00) plus a Thursday afternoon.
+const availabilityBlockDefinitions: readonly AvailabilityBlockDefinition[] = [
+  {
+    key: 'monday-morning',
+    nutritionist: 'gabriela',
+    branch: 'centro',
+    weekday: 1,
+    startsAtLocal: '09:00',
+    endsAtLocal: '13:00',
+  },
+  {
+    key: 'thursday-afternoon',
+    nutritionist: 'gabriela',
+    branch: 'centro',
+    weekday: 4,
+    startsAtLocal: '15:00',
+    endsAtLocal: '18:00',
+  },
+  {
+    key: 'saturday-morning',
+    nutritionist: 'gabriela',
+    branch: 'centro',
+    weekday: 6,
+    startsAtLocal: '09:00',
+    endsAtLocal: '12:00',
+  },
+];
+
 export const buildDevelopmentFixtures = (input: {
   today: Date;
 }): DevelopmentFixtures => {
@@ -555,12 +603,13 @@ export const buildDevelopmentFixtures = (input: {
       };
     });
 
-  const payments: DevelopmentFixtures['payments'] =
-    cashPaymentDefinitions.map((definition) => {
+  const payments: DevelopmentFixtures['payments'] = cashPaymentDefinitions.map(
+    (definition) => {
       const plan = planOf(definition.plan);
       const subscription = subscriptions.find(
         (candidate) =>
-          candidate.paymentId === paymentIdOf(definition.client, definition.plan),
+          candidate.paymentId ===
+          paymentIdOf(definition.client, definition.plan),
       );
       if (!subscription) {
         throw new Error(
@@ -587,7 +636,8 @@ export const buildDevelopmentFixtures = (input: {
         decidedByAccountId: collectedBy,
         decidedAt: subscription.activatedAt,
       };
-    });
+    },
+  );
 
   const referrals: DevelopmentFixtures['referrals'] = referralDefinitions.map(
     (definition) => {
@@ -678,5 +728,26 @@ export const buildDevelopmentFixtures = (input: {
     payments,
     referrals,
     creditLedgerEntries,
+    availabilityBlocks: availabilityBlockDefinitions.map((definition) => {
+      const nutritionist = staffDefinitions.find(
+        (member) => member.key === definition.nutritionist,
+      );
+      if (!nutritionist) {
+        throw new Error(`Unknown Nutritionist ${definition.nutritionist}`);
+      }
+
+      return {
+        id: deterministicId(
+          `availability-block:${definition.nutritionist}:${definition.key}`,
+        ),
+        nutritionistStaffMemberId: staffId(definition.nutritionist),
+        branchId: branchId(definition.branch),
+        weekday: definition.weekday,
+        startsAtLocal: definition.startsAtLocal,
+        endsAtLocal: definition.endsAtLocal,
+        effectiveFrom: input.today,
+        createdByAccountId: accountIdOf(definition.nutritionist),
+      };
+    }),
   };
 };
