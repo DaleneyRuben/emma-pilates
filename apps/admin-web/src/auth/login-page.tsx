@@ -1,5 +1,6 @@
 import type { LoginNotice, LoginSearch } from "./auth-search";
 import { AuthLayout } from "./auth-layout";
+import { LoginForm } from "./login-form";
 
 const noticeText: Record<LoginNotice, string> = {
   "session-ended": "Tu sesión terminó. Vuelve a iniciar sesión.",
@@ -20,6 +21,7 @@ export function LoginPage({ search }: { search: LoginSearch }) {
           {noticeText[search.notice]}
         </p>
       )}
+      <LoginForm redirect={search.redirect} />
     </AuthLayout>
   );
 }

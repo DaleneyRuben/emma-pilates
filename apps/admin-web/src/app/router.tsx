@@ -10,6 +10,7 @@ import {
 import type { SessionExpiry } from "../api/session-expiry";
 import { loginSearchSchema } from "../auth/auth-search";
 import { LoginPage } from "../auth/login-page";
+import { RecoverPasswordPage } from "../auth/recover-password-page";
 import { listSearchSchema } from "../components/table/pagination";
 import { NotFoundPage } from "../pages/not-found-page";
 import { PlaceholderPage } from "../pages/placeholder-page";
@@ -45,6 +46,12 @@ const loginRoute = createRoute({
   component: function LoginRoute() {
     return <LoginPage search={loginRoute.useSearch()} />;
   },
+});
+
+const recoverPasswordRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "/recuperar-contrasena",
+  component: RecoverPasswordPage,
 });
 
 // Every sidebar page sits behind the session probe; a signed-out visitor
@@ -86,6 +93,7 @@ const placeholderRoutes = navigationItems.map((item) =>
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
+  recoverPasswordRoute,
   authenticatedRoute.addChildren(placeholderRoutes),
 ]);
 

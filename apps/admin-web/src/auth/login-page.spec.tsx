@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, waitFor } from "@testing-library/react";
 import { http } from "msw";
 import {
   apiUrl,
@@ -121,14 +121,13 @@ describe("AW01 Login", () => {
         timeout: 2000,
       }),
     ).toBeInTheDocument();
-    await screen.findByRole(
-      "button",
-      { name: "Iniciar sesión" },
+    await waitFor(
+      () =>
+        expect(
+          screen.getByRole("button", { name: "Iniciar sesión" }),
+        ).toBeEnabled(),
       { timeout: 3000 },
     );
-    await expect(
-      screen.findByRole("button", { name: "Iniciar sesión" }),
-    ).resolves.toBeEnabled();
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
