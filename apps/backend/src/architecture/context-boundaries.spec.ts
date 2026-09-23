@@ -5,8 +5,17 @@ const sourceRoot = resolve(process.cwd(), 'src');
 
 // Bounded contexts own their models and commands; they may only reach each
 // other through the edges listed here.
-const contexts = ['booking', 'notifications', 'system-identity', 'uploads'];
+const contexts = [
+  'back-office',
+  'booking',
+  'notifications',
+  'system-identity',
+  'uploads',
+];
 const allowedContextEdges: Record<string, string[]> = {
+  // Back Office reads Branches and Staff Members through its own read-only
+  // queries (ADR-0011) and imports no other context.
+  'back-office': [],
   // Booking records notifications and streams receipt objects through the
   // uploads storage port.
   booking: ['notifications', 'uploads'],
