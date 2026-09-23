@@ -404,6 +404,7 @@ export const createPrismaEvaluationCommands = (
     }
 
     const result = await work();
+    const createdAt = dependencies.now();
     await transaction.idempotencyRecord.create({
       data: {
         accountId: record.accountId,
@@ -412,8 +413,9 @@ export const createPrismaEvaluationCommands = (
         requestHash,
         responseStatus: 201,
         responseBody: result,
+        createdAt,
         expiresAt: new Date(
-          dependencies.now().getTime() + idempotencyRetentionMilliseconds,
+          createdAt.getTime() + idempotencyRetentionMilliseconds,
         ),
       },
     });
