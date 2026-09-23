@@ -69,26 +69,26 @@ const present = <Value>(value: Value | null): value is Value => value !== null;
 export const createAssistantClientRepository = (
   prisma: PrismaClient,
 ): AssistantClientRepository => ({
-  searchClients: ({ query, limit }) =>
-    prisma.client
-      .findMany({
-        where: {
-          account: { isNot: null },
-          OR: [
-            { name: { contains: query, mode: 'insensitive' } },
-            { phone: { contains: query, mode: 'insensitive' } },
-            {
-              account: {
-                is: { email: { contains: query, mode: 'insensitive' } },
-              },
-            },
-          ],
-        },
-        orderBy: [{ name: 'asc' }, { id: 'asc' }],
-        take: limit,
-        select: clientSelect,
-      })
-      .then((rows) => rows.map(toSummary).filter(present)),
+  // STAFF-004: names and emails match without accents or case through
+  // booking.search_text; LIKE wildcards in the query are matched literally.
+  searchClients: async ({ query, limit }) => {
+    const pattern = `%${query.replace(/[\\%_]/g, (character) => `\\${character}`)}%`;
+    const matches = await prisma.$queryRaw<{ id: string }[]>`
+      SELECT c.id
+      FROM booking.clients c
+      JOIN system.accounts a ON a.client_id = c.id
+      WHERE booking.search_text(c.name) LIKE booking.search_text(${pattern})
+         OR booking.search_text(a.email) LIKE booking.search_text(${pattern})
+         OR c.phone ILIKE ${pattern}
+      ORDER BY c.name, c.id
+      LIMIT ${limit}`;
+    const rows = await prisma.client.findMany({
+      where: { id: { in: matches.map(({ id }) => id) } },
+      orderBy: [{ name: 'asc' }, { id: 'asc' }],
+      select: clientSelect,
+    });
+    return rows.map(toSummary).filter(present);
+  },
   findClient: (clientId) =>
     prisma.client
       .findUnique({ where: { id: clientId }, select: clientSelect })
