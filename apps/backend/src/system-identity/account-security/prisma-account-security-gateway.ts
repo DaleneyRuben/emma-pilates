@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import type { PgBoss } from 'pg-boss';
@@ -177,7 +178,7 @@ export class PrismaAccountSecurityGateway
         },
         data: { invalidatedAt: input.completedAt },
       });
-      await transaction.account.update({
+      const account = await transaction.account.update({
         where: { id: token.accountId },
         data: {
           passwordHash: input.passwordHash,
@@ -185,6 +186,24 @@ export class PrismaAccountSecurityGateway
           emailVerifiedAt: input.completedAt,
           activatedAt: input.completedAt,
           pendingExpiresAt: null,
+        },
+        select: { clientId: true },
+      });
+      const auditRecordId = randomUUID();
+      await transaction.auditRecord.create({
+        data: {
+          id: auditRecordId,
+          actionCode: 'account.activated',
+          outcome: AuditOutcome.SUCCEEDED,
+          actorKind: AuditActorKind.ACCOUNT,
+          actorAccountId: token.accountId,
+          targetType: 'account',
+          targetId: token.accountId,
+          correlationId: auditRecordId,
+          metadata: {
+            domainIdentity: account.clientId === null ? 'staff' : 'client',
+          },
+          occurredAt: input.completedAt,
         },
       });
     });
