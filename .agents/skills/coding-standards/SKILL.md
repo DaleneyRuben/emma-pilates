@@ -54,6 +54,13 @@ Use the narrowest meaningful test level:
 - Write comments only when the reason, invariant, or tradeoff is non-obvious. Do not narrate what the code already states.
 - Keep secrets, provider SDK types, Prisma types, NestJS types, and transport DTOs out of domain models.
 
+### File size and reuse
+
+- **A source file holds at most 400 lines of code.** This applies to every hand-written `.ts` and `.tsx` file, tests included; generated output (`packages/api-contracts/src/generated`, the Prisma client, `design/`) and migrations are exempt. Split by responsibility (one adapter's read side and write side, one controller per resource, one spec file per behavior group), never by arbitrary line count.
+- Several files written before this rule are larger (the Prisma payment, evaluation, and booking command adapters, the development fixtures, the administration controller, the mobile authentication flow). Do not grow them: when a change touches one, put the new behavior in its own module and, where the change already forces it, move the part you are editing out with it. Do not refactor them wholesale in an unrelated commit.
+- **Before implementing anything new, read what already exists.** Search the affected context and the shared packages (`mobile-core`, `api-contracts`, `src/database`, `src/time`, `src/http`) for the same rule, helper, query, component, or copy, and decide explicitly whether to reuse it, extract it into a shared module and reuse it, or write something new because the cases genuinely differ. Record that decision in the backlog evidence when it is not obvious from the diff.
+- Extract shared logic at the moment the second use appears, into the narrowest home that both users may depend on under the monorepo boundaries below. Do not extract for a use that does not exist yet.
+
 ### Functions and classes
 
 - Prefer plain functions for stateless calculations, parsing, validation,
