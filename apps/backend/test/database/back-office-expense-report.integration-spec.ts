@@ -20,6 +20,7 @@ describe('Prisma Back Office expense report', () => {
   const administrator = () => world.principalOf('paola.mendoza@example.com');
   const centro = branchIdOf('centro');
   const equipetrol = branchIdOf('equipetrol');
+  const categoryIds = { repair: '', cleaning: '' };
 
   beforeAll(async () => {
     world = await startEvaluationTestWorld();
@@ -36,6 +37,8 @@ describe('Prisma Back Office expense report', () => {
       { name: 'Limpieza' },
       admin,
     );
+    categoryIds.repair = repair.id;
+    categoryIds.cleaning = cleaning.id;
     for (const [branchId, expenseCategoryId, amountCentavos, incurredOn] of [
       [centro, repair.id, 45_000, '2026-09-15'],
       [centro, cleaning.id, 5_000, '2026-09-30'],
@@ -89,12 +92,12 @@ describe('Prisma Back Office expense report', () => {
       salaryPaymentsCentavos: 350_000,
       byCategory: [
         {
-          expenseCategoryId: expect.any(String),
+          expenseCategoryId: categoryIds.repair,
           expenseCategoryName: 'Reparación',
           totalCentavos: 75_000,
         },
         {
-          expenseCategoryId: expect.any(String),
+          expenseCategoryId: categoryIds.cleaning,
           expenseCategoryName: 'Limpieza',
           totalCentavos: 12_000,
         },
