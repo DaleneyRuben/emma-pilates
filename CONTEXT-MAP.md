@@ -11,7 +11,7 @@
 - **Back Office → Booking & Membership**: `Supply` is scoped to a `Branch`; `Branch` is owned and defined by the Booking & Membership context.
 - **Back Office → Booking & Membership**: `Salary Payment` references a `Staff Member`; `Staff Member` is owned and defined by the Booking & Membership context.
 - **Back Office → Booking & Membership**: `Expense` is scoped to a `Branch`, same as `Supply`.
-- **Back Office → Booking & Membership**: total income/expense reports sum confirmed `Payment` Money Amounts (income, owned by Booking & Membership) against `Salary Payment` and `Expense` (both owned by Back Office). Cash income is attributable to its collection `Branch`; transfer and Credit-only records are studio-wide and appear only in the all-Branches report, not a single-Branch result.
+- **Back Office → Booking & Membership**: total income/expense reports sum confirmed `Payment` Money Amounts (income, owned by Booking & Membership) against `Salary Payment` and `Expense` (both owned by Back Office). Cash income is attributable to its collection `Branch`; transfer and Credit-only records are studio-wide and appear only in the all-Branches report, not a single-Branch result. On the expense side, `Expense` is attributable to its `Branch`, while `Salary Payment` is studio-wide and likewise appears only in the all-Branches report.
 - **System Identity ↔ Booking & Membership**: System Identity owns `Account` and authentication state; each Account links to exactly one `Client` or `Staff Member`, which remain owned by Booking & Membership and supply the current Role and Branch scope used for authorization.
 
 ## Shared language
