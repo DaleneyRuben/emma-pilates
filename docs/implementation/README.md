@@ -46,9 +46,11 @@ shared authentication and UI infrastructure lives in `mobile-core`.
 The approved 15-table System Identity,
 Client/Staff/Branch, and image-asset foundation is implemented in the first
 business migration with disposable PostgreSQL integration coverage. The Client
-app contains the complete first Client authentication journey; authenticated
-Client and Staff destinations and the admin application still contain starter
-screens.
+app contains the complete first Client authentication journey. The admin web
+has its foundation (`WEB-001`): design tokens, shadcn/Radix primitives, typed
+routes for every sidebar entry, the generated-client fetcher and QueryClient,
+form and table primitives, and the responsive shell with the Branch selector;
+every admin page is still a placeholder until its `WEB-00x` item.
 
 The complete first-release data model and relationship diagram are in
 [`full-release-schema-proposal.md`](./full-release-schema-proposal.md). The
