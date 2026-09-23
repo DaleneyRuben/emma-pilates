@@ -187,6 +187,38 @@ describe('development fixtures', () => {
     }
   });
 
+  it("publishes Gabriela's weekly Availability Blocks at Centro from today", () => {
+    const gabriela = fixtures.staffMembers.find(
+      (member) => member.email === 'gabriela.flores@example.com',
+    );
+    const centro = fixtures.branches.find((branch) => branch.name === 'Centro');
+
+    expect(fixtures.availabilityBlocks).toEqual([
+      expect.objectContaining({
+        weekday: 1,
+        startsAtLocal: '09:00',
+        endsAtLocal: '13:00',
+      }),
+      expect.objectContaining({
+        weekday: 4,
+        startsAtLocal: '15:00',
+        endsAtLocal: '18:00',
+      }),
+      expect.objectContaining({
+        weekday: 6,
+        startsAtLocal: '09:00',
+        endsAtLocal: '12:00',
+      }),
+    ]);
+    for (const block of fixtures.availabilityBlocks) {
+      expect(block).toMatchObject({
+        nutritionistStaffMemberId: gabriela?.id,
+        branchId: centro?.id,
+        effectiveFrom: today,
+      });
+    }
+  });
+
   it("backs Valeria's Subscription with a confirmed cash Payment", () => {
     const valeria = clientByEmail(fixtures, 'valeria@example.com');
     const [subscription] = subscriptionsOf(fixtures, 'valeria@example.com');

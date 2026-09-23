@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createCatalogRepository } from '../../src/booking/catalog/prisma-catalog-repository';
+import { createPrismaEvaluationCommands } from '../../src/booking/evaluations/prisma-evaluation-commands';
 import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
 import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
@@ -111,6 +112,48 @@ describe('development fixtures', () => {
         { referredName: 'Valeria Q.', state: 'awarded', awardCentavos: 6000 },
       ],
     });
+  });
+
+  it("publishes Gabriela's Availability Blocks with their 30-day slots once", async () => {
+    const account = await prisma.account.findUniqueOrThrow({
+      where: { email: 'gabriela.flores@example.com' },
+      select: {
+        id: true,
+        staffMember: {
+          select: {
+            id: true,
+            branchAssignments: { select: { branchId: true } },
+          },
+        },
+      },
+    });
+    const gabriela: AuthenticatedPrincipal = {
+      accountId: account.id,
+      authenticationSessionId: randomUUID(),
+      identity: {
+        kind: 'staff',
+        staffMemberId: account.staffMember!.id,
+        role: 'nutritionist',
+        branchIds: account.staffMember!.branchAssignments.map(
+          ({ branchId }) => branchId,
+        ),
+      },
+    };
+    const slotCount = await prisma.evaluationSlot.count();
+
+    await applyDevelopmentFixtures(prisma, { fixtures, passwordHash });
+
+    await expect(prisma.evaluationSlot.count()).resolves.toBe(slotCount);
+    expect(slotCount).toBeGreaterThan(0);
+    await expect(
+      createPrismaEvaluationCommands(prisma, {
+        now: () => new Date(),
+      }).listAvailabilityBlocks(gabriela),
+    ).resolves.toMatchObject([
+      { weekday: 1, startsAtLocal: '09:00', slotsPerWeek: 5 },
+      { weekday: 4, startsAtLocal: '15:00', slotsPerWeek: 4 },
+      { weekday: 6, startsAtLocal: '09:00', slotsPerWeek: 4 },
+    ]);
   });
 
   it('creates active Client Accounts that authenticate with the shared password', async () => {
