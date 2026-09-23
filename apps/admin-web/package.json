@@ -71,7 +71,7 @@
       "<rootDir>/src/**/*.spec.ts?(x)"
     ],
     "transform": {
-      "^.+\\.(t|j)sx?$": [
+      "^.+\\.(mjs|cjs|[tj]sx?)$": [
         "@swc/jest",
         {
           "jsc": {
@@ -89,7 +89,7 @@
       ]
     },
     "transformIgnorePatterns": [
-      "/node_modules/.pnpm/(?!@pilates)"
+      "/node_modules/.pnpm/(?!(rettime|until-async|@open-draft\\+deferred-promise)@)"
     ],
     "moduleNameMapper": {
       "\\.css$": "<rootDir>/test/style-stub.cjs"
