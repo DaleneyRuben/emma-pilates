@@ -169,6 +169,8 @@ export function BrowseSessionsScreen({
         horizontal
         contentContainerStyle={styles.chips}
         showsHorizontalScrollIndicator={false}
+        style={styles.strip}
+        testID="assistant-day-strip"
       >
         {dates.map((date) => {
           const { weekday, day } = dayChipLabel(date);
@@ -196,6 +198,8 @@ export function BrowseSessionsScreen({
         horizontal
         contentContainerStyle={styles.chips}
         showsHorizontalScrollIndicator={false}
+        style={styles.strip}
+        testID="assistant-class-type-strip"
       >
         <Chip
           label="Todas"
@@ -318,6 +322,8 @@ const styles = StyleSheet.create({
   },
   list: { paddingBottom: spacing.xxl },
   screen: { gap: spacing.md },
+  // Horizontal strips would otherwise stretch into spare tablet height.
+  strip: { flexGrow: 0 },
   tag: {
     backgroundColor: colors.primaryTint,
     borderRadius: radii.pill,
