@@ -7,9 +7,9 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10) | The Evaluation screens (MOB-016), the Promotions carousel, and push notifications are not built yet |
-| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | The Nutritionist destination is still a placeholder (its APIs are ready, see Test 7) |
-| Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The Client and Staff Evaluation screens are built in MOB-016; reminders need the worker and real time to pass |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10) | The Promotions carousel and push notifications are not built yet; Evaluations are reached from Perfil (Test 15) |
+| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); Promotions and receipt images wait for image delivery |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
@@ -1194,6 +1194,41 @@ Every refusal changes nothing. Drop the throwaway database afterwards with
 `dropdb pilates_test_bootstrap`. Completing activation needs the link from the
 queued email, which the local capture does not expose to testers yet.
 
+## Test 15: book an Evaluation and manage the Nutritionist's availability
+
+Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
+
+**In the Client app** as `lucia@example.com`:
+
+1. Open **Perfil → Evaluación nutricional**. Only days with an open turno
+   appear; each turno is 45 minutes and disappears 3 hours before it starts.
+   With more than one Branch, each turno names its Branch.
+2. Tap a time, check the summary on **Confirmar evaluación** ("Es gratuita —
+   no usa clases de tu plan."), and tap **Confirmar**. You land on **Mis
+   evaluaciones** with "Evaluación confirmada".
+3. Tap **Cancelar** and confirm: the sheet says the turno is freed and the
+   month becomes available again. Inside 3 hours of the start the card shows
+   "Ya no se puede cancelar" instead.
+4. Book one again and open **Evaluación nutricional**: days in that month
+   disappear. When no unused month has open turnos, the screen shows "Ya usaste
+   tu evaluación de este mes." A Client without an active plan sees "Necesitas
+   un plan activo…" with **Ver planes**.
+
+**In the Staff app** as `gabriela.flores@example.com`:
+
+1. **Mi agenda** groups upcoming Evaluations by day ("Hoy", "Mañana") with
+   "Primera evaluación" or "Seguimiento". Tap a card, then **Cancelar
+   evaluación**, and confirm: the Client is notified and the turno is freed.
+2. **Mi disponibilidad** lists the weekly blocks from Monday to Sunday with
+   their turnos and bookings, and "Desde…"/"Hasta…" when a block starts later
+   or ends.
+3. **+ Nuevo horario**: pick a day, a start and end on the 15-minute grid, and
+   the date it starts ("A partir del", today by default). A Nutritionist with
+   two Branches also picks the Branch. An overlapping block is refused with "Se
+   superpone con otro de tus horarios."
+4. Tap a block to edit it ("Aplicar cambios desde") or **Eliminar horario**.
+   When it already has bookings, a sheet confirms that those Evaluations stay.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1208,8 +1243,6 @@ The following are not ready for manual product testing:
   mobile-link domain and native association files are configured;
 - Promotions on Client Home or push notifications (the in-app inbox works, see
   Test 9; buying a Plan works, see Test 10);
-- the Nutritionist agenda, Mi disponibilidad, and the Client Evaluation
-  screens in the apps (their APIs work, see Test 7; the screens are MOB-016);
 - editing a Session Schedule (ADM-001);
 - creating, reassigning, and deactivating Staff Members (IDN-007);
 - Promotions, image variants, and Back Office records (UPL-002, BKO-001);
