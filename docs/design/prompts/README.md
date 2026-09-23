@@ -154,7 +154,7 @@ Each of these was sent as the next message in the existing design session for th
 | [44](./followups/44-my-evaluations-two-upcoming-and-cancel-window.md) | Allows two upcoming cards on `15`, says a cancellation frees the month, and replaces Cancelar inside 3 h (NUT-001 D8, D9, D12) | 🕓 pending |
 | [45](./followups/45-nutritionist-agenda-cancel-evaluation.md) | Adds «Cancelar evaluación» on `S15`'s selected card with an `S14`-style sheet; amends 26's «Sin detalle» note (NUT-001 D14) | 🕓 pending |
 | [46](./followups/46-evaluation-cancellation-notices.md) | Adds the studio-cancelled Evaluation notice to `19` and the Client-cancelled notice to `S20` | 🕓 pending |
-| [47](./followups/47-home-referral-shortcut-credit.md) | Replaces `02`'s «Invita y gana clases» with «Invita y gana crédito» and the Evaluation shortcut's «Agenda tu primera cita» with «Agenda tu cita del mes» | 🕓 pending |
+| [47](./followups/47-home-referral-shortcut-credit.md) | Replaces `02`'s «Invita y gana clases» with «Invita amigas y gana crédito» and the Evaluation shortcut's «Agenda tu primera cita» with «Agenda tu cita del mes» | 🕓 pending |
 
 ## Status
 

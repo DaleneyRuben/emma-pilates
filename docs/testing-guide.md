@@ -1290,7 +1290,7 @@ In the Client app as `lucia@example.com`:
 1. **Inicio** shows three quick actions: **Reservar una clase**, **Evaluación
    nutricional** ("Próxima: …" when one is booked, otherwise "Agenda tu cita
    del mes"; it opens Mis evaluaciones or the availability), and **Mis
-   referidos** ("N amigas invitadas" or "Invita y gana crédito").
+   referidos** ("N amigas invitadas" or "Invita amigas y gana crédito").
 2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with dates such as
    "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
    termine."; while expiring, an amber banner; once expired, "Último plan",

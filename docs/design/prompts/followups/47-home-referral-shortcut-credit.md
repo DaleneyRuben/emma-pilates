@@ -11,7 +11,7 @@ Client's first Payment is confirmed; it never grants classes
 ([`booking/CONTEXT.md`](../../../../booking/CONTEXT.md), *Referral*, *Credit*;
 `16` and `17` already say Credit).
 
-Change that line to **"Invita y gana crédito"**. The built app shows it whenever
+Change that line to **"Invita amigas y gana crédito"**, the wording [39](./39-align-booking-membership-schema.md) §4 already set. The built app shows it whenever
 the Client has not invited anyone yet, in both frames; once someone signed up
 with their code it reads "N amigas invitadas", as the active frame already
 shows. The Evaluation shortcut likewise reads "Próxima: 2 de septiembre" when
