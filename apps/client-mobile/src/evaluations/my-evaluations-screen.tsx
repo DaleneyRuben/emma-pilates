@@ -257,6 +257,7 @@ export function MyEvaluationsScreen({
 const styles = StyleSheet.create({
   badge: {
     alignItems: "center",
+    alignSelf: "flex-start",
     backgroundColor: colors.primaryTint,
     borderRadius: radii.control,
     justifyContent: "center",
