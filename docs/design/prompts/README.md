@@ -149,6 +149,7 @@ Each of these was sent as the next message in the existing design session for th
 | [39](./followups/39-align-booking-membership-schema.md) | Adds weekly Session Schedule controls, Class Type descriptions, Promotion publication, and corrects contradictory Booking & Membership sample copy | 🕓 pending |
 | [40](./followups/40-cancellation-window-wording.md) | Corrects checklist 30: same-day Reschedule applies inside the Cancellation Window; outside it, use free Cancel plus a new Booking | 🕓 pending |
 | [41](./followups/41-availability-form-effective-date-and-branch.md) | Adds `S17`'s «A partir del» date, a Branch picker for multi-Branch Nutritionists, and the «ya reservadas se mantienen» confirmation (NUT-001 D3, D6) | 🕓 pending |
+| [42](./followups/42-availability-list-dates-and-branch.md) | Shows «Desde» / «Hasta» dates and the Branch on `S16`'s block cards (NUT-001 D3, D6) | 🕓 pending |
 
 ## Status
 
