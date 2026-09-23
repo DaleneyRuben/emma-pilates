@@ -265,7 +265,7 @@ Readable identifiers stand in for UUIDs; amounts are centavos.
 
 ## Test plan
 
-- **Rejection cases**: the review test's 32 expected failures (run on a
+- **Rejection cases**: the review test's 31 expected failures (run on a
   disposable database during this review), promoted to a
   `back-office-schema.integration-spec.ts` fixture in BKO-002, as NUT-002 did.
 - **Concurrency on real PostgreSQL**: two Withdrawals that together exceed

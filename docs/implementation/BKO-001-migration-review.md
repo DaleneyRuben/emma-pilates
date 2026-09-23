@@ -17,7 +17,7 @@ the [NUT-002](./NUT-002-migration-review.md) and
 - [Database-only protections](./sql/back-office-constraints.sql): checks,
   partial and expression unique indexes, the stock triggers, immutability
   guards, and the provisional Q1 delete guards.
-- [Rejection cases](./sql/back-office-review-test.sql): 32 expected failures
+- [Rejection cases](./sql/back-office-review-test.sql): 31 expected failures
   and the valid transitions between them, including a stock reconciliation
   check, inside one rolled-back transaction.
 
@@ -117,7 +117,7 @@ On disposable databases (both dropped afterwards):
   the first's row lock, then failed `supplies_values_check`; the Supply ended
   with 4 units and one Withdrawal row.
 - `pilates_test_bko001_review` (empty): `psql -f back-office-review-test.sql`
-  ran the foundation migration, the generated SQL, the protections, and all 32
+  ran the foundation migration, the generated SQL, the protections, and all 31
   expected failures, ending with "Back Office review checks passed; all
   changes rolled back."
 
