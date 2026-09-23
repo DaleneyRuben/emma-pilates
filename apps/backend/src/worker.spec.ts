@@ -19,6 +19,14 @@ const occurrenceJobs = () => ({
   startedSessionWaitlists: {
     execute: jest.fn().mockResolvedValue({ closed: 0 }),
   },
+  retentionSweeps: {
+    execute: jest.fn().mockResolvedValue({
+      idempotencyRecords: 0,
+      authenticationSessions: 0,
+      throttleEvents: 0,
+      notifications: 0,
+    }),
+  },
 });
 
 describe('worker entrypoint', () => {
@@ -394,6 +402,72 @@ describe('worker entrypoint', () => {
     await stopWorker();
     await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
     expect(sessionSchedules.execute).toHaveBeenCalledTimes(3);
+  });
+
+  it('runs the retention sweeps at start and hourly with a sanitized failure signal', async () => {
+    jest.useFakeTimers();
+    const boss: WorkerBoss = {
+      isInstalled: jest.fn().mockResolvedValue(true),
+      schemaVersion: jest.fn().mockResolvedValue(38),
+      start: jest.fn().mockResolvedValue(undefined),
+      work: jest.fn().mockResolvedValue('worker-id'),
+      getQueueStats: jest.fn().mockResolvedValue([]),
+      stop: jest.fn().mockResolvedValue(undefined),
+    };
+    const counts = {
+      idempotencyRecords: 3,
+      authenticationSessions: 1,
+      throttleEvents: 0,
+      notifications: 2,
+    };
+    const retentionSweeps = {
+      execute: jest
+        .fn()
+        .mockResolvedValueOnce(counts)
+        .mockRejectedValueOnce(new Error('sensitive retention failure'))
+        .mockResolvedValue(counts),
+    };
+    const emit = jest.fn();
+
+    const stopWorker = await startWorker({
+      boss,
+      authenticationEmail: {
+        stateReader: { find: jest.fn() },
+        decryptor: { decrypt: jest.fn() },
+        renderer: { render: jest.fn() },
+        delivery: { deliver: jest.fn() },
+      },
+      finalizeUpload: { process: jest.fn() },
+      pendingAccountCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      imageUploadCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
+      },
+      ...occurrenceJobs(),
+      retentionSweeps,
+      serviceVersion: '1.2.3',
+      emit,
+    });
+
+    expect(retentionSweeps.execute).toHaveBeenCalledTimes(1);
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    expect(retentionSweeps.execute).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledWith({
+      event: 'retention_sweep_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(JSON.stringify(emit.mock.calls)).not.toContain('sensitive');
+
+    await stopWorker();
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    expect(retentionSweeps.execute).toHaveBeenCalledTimes(2);
   });
 
   it('checks empty Sessions and closes started Waitlists at start and every minute with sanitized failure signals', async () => {
