@@ -1,0 +1,105 @@
+enum EvaluationSlotState {
+  PUBLISHED @map("published")
+  WITHDRAWN @map("withdrawn")
+
+  @@schema("booking")
+}
+
+enum EvaluationState {
+  BOOKED    @map("booked")
+  CANCELLED @map("cancelled")
+
+  @@schema("booking")
+}
+
+enum EvaluationCancellationCause {
+  CLIENT_REQUEST  @map("client_request")
+  STAFF_CANCELLED @map("staff_cancelled")
+
+  @@schema("booking")
+}
+
+model AvailabilityBlock {
+  id                        String           @id @default(uuid()) @db.Uuid
+  nutritionistStaffMemberId String           @map("nutritionist_staff_member_id") @db.Uuid
+  branchId                  String           @map("branch_id") @db.Uuid
+  weekday                   Int              @db.SmallInt
+  startsAtLocal             DateTime         @map("starts_at_local") @db.Time(0)
+  endsAtLocal               DateTime         @map("ends_at_local") @db.Time(0)
+  effectiveFrom             DateTime         @map("effective_from") @db.Date
+  effectiveUntil            DateTime?        @map("effective_until") @db.Date
+  createdByAccountId        String           @map("created_by_account_id") @db.Uuid
+  endedByAccountId          String?          @map("ended_by_account_id") @db.Uuid
+  endedAt                   DateTime?        @map("ended_at") @db.Timestamptz(3)
+  createdAt                 DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                 DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  nutritionist              StaffMember      @relation(fields: [nutritionistStaffMemberId], references: [id], onDelete: Restrict)
+  branch                    Branch           @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  createdByAccount          Account          @relation("AvailabilityBlockCreatedBy", fields: [createdByAccountId], references: [id], onDelete: Restrict)
+  endedByAccount            Account?         @relation("AvailabilityBlockEndedBy", fields: [endedByAccountId], references: [id], onDelete: Restrict)
+  slots                     EvaluationSlot[]
+
+  @@unique([id, nutritionistStaffMemberId, branchId])
+  @@index([nutritionistStaffMemberId, weekday, startsAtLocal])
+  @@index([effectiveUntil])
+  @@index([branchId])
+  @@index([createdByAccountId])
+  @@index([endedByAccountId])
+  @@map("availability_blocks")
+  @@schema("booking")
+}
+
+model EvaluationSlot {
+  id                        String              @id @default(uuid()) @db.Uuid
+  availabilityBlockId       String              @map("availability_block_id") @db.Uuid
+  nutritionistStaffMemberId String              @map("nutritionist_staff_member_id") @db.Uuid
+  branchId                  String              @map("branch_id") @db.Uuid
+  startsAt                  DateTime            @map("starts_at") @db.Timestamptz(3)
+  endsAt                    DateTime            @map("ends_at") @db.Timestamptz(3)
+  localMonth                DateTime            @map("local_month") @db.Date
+  state                     EvaluationSlotState @default(PUBLISHED)
+  withdrawnAt               DateTime?           @map("withdrawn_at") @db.Timestamptz(3)
+  createdAt                 DateTime            @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                 DateTime            @updatedAt @map("updated_at") @db.Timestamptz(3)
+  block                     AvailabilityBlock   @relation(fields: [availabilityBlockId, nutritionistStaffMemberId, branchId], references: [id, nutritionistStaffMemberId, branchId], onDelete: Restrict, map: "evaluation_slots_block_fkey")
+  nutritionist              StaffMember         @relation(fields: [nutritionistStaffMemberId], references: [id], onDelete: Restrict, map: "evaluation_slots_nutritionist_fkey")
+  branch                    Branch              @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  evaluations               Evaluation[]
+
+  @@unique([availabilityBlockId, startsAt])
+  @@unique([id, localMonth])
+  @@index([nutritionistStaffMemberId, startsAt])
+  @@index([branchId, startsAt])
+  @@map("evaluation_slots")
+  @@schema("booking")
+}
+
+model Evaluation {
+  id                     String                       @id @default(uuid()) @db.Uuid
+  clientId               String                       @map("client_id") @db.Uuid
+  evaluationSlotId       String                       @map("evaluation_slot_id") @db.Uuid
+  eligibilityMonth       DateTime                     @map("eligibility_month") @db.Date
+  subscriptionId         String                       @map("subscription_id") @db.Uuid
+  state                  EvaluationState              @default(BOOKED)
+  createdByAccountId     String                       @map("created_by_account_id") @db.Uuid
+  cancelledAt            DateTime?                    @map("cancelled_at") @db.Timestamptz(3)
+  cancelledByAccountId   String?                      @map("cancelled_by_account_id") @db.Uuid
+  cancellationCause      EvaluationCancellationCause? @map("cancellation_cause")
+  dayReminderRecordedAt  DateTime?                    @map("day_reminder_recorded_at") @db.Timestamptz(3)
+  hourReminderRecordedAt DateTime?                    @map("hour_reminder_recorded_at") @db.Timestamptz(3)
+  createdAt              DateTime                     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime                     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  client                 Client                       @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  slot                   EvaluationSlot               @relation(fields: [evaluationSlotId, eligibilityMonth], references: [id, localMonth], onDelete: Restrict, map: "evaluations_slot_month_fkey")
+  subscription           Subscription                 @relation(fields: [subscriptionId, clientId], references: [id, clientId], onDelete: Restrict, map: "evaluations_subscription_client_fkey")
+  createdByAccount       Account                      @relation("EvaluationCreatedBy", fields: [createdByAccountId], references: [id], onDelete: Restrict)
+  cancelledByAccount     Account?                     @relation("EvaluationCancelledBy", fields: [cancelledByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([clientId, state])
+  @@index([evaluationSlotId])
+  @@index([subscriptionId])
+  @@index([createdByAccountId])
+  @@index([cancelledByAccountId])
+  @@map("evaluations")
+  @@schema("booking")
+}
