@@ -7,6 +7,7 @@ import { PlaceholderAuthenticationEmailRenderer } from './jobs/authentication-em
 import { PrismaAuthenticationEmailStateReader } from './jobs/authentication-email/prisma-authentication-email-state-reader';
 import { createPgBoss } from './jobs/pg-boss-runtime';
 import { createWorkerLog } from './jobs/worker-log';
+import { createPrismaEvaluationCommands } from './booking/evaluations/prisma-evaluation-commands';
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
@@ -61,6 +62,8 @@ async function bootstrap(): Promise<void> {
     Buffer.from(environment.AUTHENTICATION_LINK_ENCRYPTION_KEY, 'base64'),
   );
 
+  const evaluations = createPrismaEvaluationCommands(prisma, { now });
+
   const stopWorker = await startWorker({
     boss,
     authenticationEmail: {
@@ -82,6 +85,10 @@ async function bootstrap(): Promise<void> {
       now,
       environment.REFERRAL_REWARD_CENTAVOS,
     ),
+    evaluationSlots: { execute: () => evaluations.materializeAvailability() },
+    evaluationReminders: {
+      execute: () => evaluations.sendDueEvaluationReminders(),
+    },
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit: createWorkerLog({
       environment: environment.NODE_ENV,

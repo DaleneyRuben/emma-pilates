@@ -20,6 +20,8 @@ const pendingAccountCleanupIntervalMs = 60 * 60 * 1_000;
 const imageUploadCleanupIntervalMs = 60 * 60 * 1_000;
 const subscriptionReminderIntervalMs = 60 * 60 * 1_000;
 const purchaseIntentExpiryIntervalMs = 5 * 60 * 1_000;
+const evaluationSlotIntervalMs = 60 * 60 * 1_000;
+const evaluationReminderIntervalMs = 60 * 1_000;
 
 type QueueStatsSnapshot = {
   readyCount: number;
@@ -52,6 +54,12 @@ type WorkerDependencies = {
   };
   purchaseIntentExpiry: {
     execute(): Promise<{ expired: number }>;
+  };
+  evaluationSlots: {
+    execute(): Promise<{ blocks: number; created: number; skipped: number }>;
+  };
+  evaluationReminders: {
+    execute(): Promise<{ sent: number }>;
   };
   serviceVersion: string;
   emit(record: unknown): void;
@@ -109,6 +117,32 @@ export const startWorker = async (
     });
   }, purchaseIntentExpiryIntervalMs);
 
+  // The horizon moves only at Bolivia midnight and block commands materialize
+  // synchronously, so an hourly pass is enough (ADR-0059); reminders are swept
+  // every minute so each is at most a minute late (ADR-0058).
+  const runEvaluationSlots = () =>
+    dependencies.evaluationSlots.execute().catch(() => {
+      dependencies.emit({
+        event: 'evaluation_slot_materialization_failed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+    });
+  const runEvaluationReminders = () =>
+    dependencies.evaluationReminders.execute().catch(() => {
+      dependencies.emit({
+        event: 'evaluation_reminders_failed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+    });
+  await runEvaluationSlots();
+  const evaluationSlotTimer = setInterval(() => {
+    void runEvaluationSlots();
+  }, evaluationSlotIntervalMs);
+  await runEvaluationReminders();
+  const evaluationReminderTimer = setInterval(() => {
+    void runEvaluationReminders();
+  }, evaluationReminderIntervalMs);
+
   const getQueueCounts = async (queue: string) => {
     const snapshots = await dependencies.boss.getQueueStats(queue, {
       force: true,
@@ -135,6 +169,8 @@ export const startWorker = async (
     clearInterval(imageUploadCleanupTimer);
     clearInterval(subscriptionReminderTimer);
     clearInterval(purchaseIntentExpiryTimer);
+    clearInterval(evaluationSlotTimer);
+    clearInterval(evaluationReminderTimer);
     stopHeartbeat();
     await dependencies.boss.stop({ graceful: true });
   };
