@@ -37,6 +37,26 @@ export const authenticationSessionLifetimes: Record<
   },
 };
 
+export const authenticationSessionTimes = (
+  surface: AuthenticationSurface,
+  now: Date,
+): Pick<
+  NewAuthenticationSession,
+  | 'createdAt'
+  | 'lastMeaningfulActivityAt'
+  | 'idleExpiresAt'
+  | 'absoluteExpiresAt'
+> => {
+  const lifetime = authenticationSessionLifetimes[surface];
+
+  return {
+    createdAt: now,
+    lastMeaningfulActivityAt: now,
+    idleExpiresAt: new Date(now.getTime() + lifetime.idleMilliseconds),
+    absoluteExpiresAt: new Date(now.getTime() + lifetime.absoluteMilliseconds),
+  };
+};
+
 export const newAuthenticationSession = (
   input: {
     id: string;
@@ -45,17 +65,10 @@ export const newAuthenticationSession = (
     credentialDigest: Uint8Array;
   },
   now: Date,
-): NewAuthenticationSession => {
-  const lifetime = authenticationSessionLifetimes[input.surface];
-
-  return {
-    ...input,
-    createdAt: now,
-    lastMeaningfulActivityAt: now,
-    idleExpiresAt: new Date(now.getTime() + lifetime.idleMilliseconds),
-    absoluteExpiresAt: new Date(now.getTime() + lifetime.absoluteMilliseconds),
-  };
-};
+): NewAuthenticationSession => ({
+  ...input,
+  ...authenticationSessionTimes(input.surface, now),
+});
 
 export const createAuthenticationSession = async (
   accountId: string,

@@ -1,4 +1,11 @@
-import type { NewAuthenticationSession } from '../authentication/create-authentication-session';
+import {
+  type AuthenticationSurface,
+  authenticationSessionTimes,
+  type NewAuthenticationSession,
+} from '../authentication/create-authentication-session';
+
+/** Who may receive the replacement session a completed recovery opens. */
+export type RecoverySessionEligibility = 'any' | 'administrator';
 
 type RecoveryToken = {
   id: string;
@@ -29,8 +36,9 @@ export type PasswordRecoveryGateway = {
     passwordHash: string;
     completedAt: Date;
     authenticationSession: Omit<NewAuthenticationSession, 'accountId'>;
+    sessionEligibility: RecoverySessionEligibility;
     auditRecordId: string;
-  }): Promise<void>;
+  }): Promise<{ sessionOpened: boolean }>;
 };
 
 type PasswordRecoveryDependencies = {
@@ -50,7 +58,6 @@ type PasswordRecoveryDependencies = {
 };
 
 const minuteMilliseconds = 60 * 1_000;
-const dayMilliseconds = 24 * 60 * minuteMilliseconds;
 
 export const requestPasswordRecovery = async (
   command: { email: string },
@@ -81,9 +88,10 @@ export const requestPasswordRecovery = async (
 export const completePasswordRecovery = async (
   command: { token: string; password: string },
   dependencies: PasswordRecoveryDependencies,
+  surface: AuthenticationSurface = 'mobile',
 ): Promise<
   | { status: 'invalid' | 'expired' }
-  | { status: 'recovered'; credential: string }
+  | { status: 'recovered'; credential?: string }
 > => {
   const completedAt = dependencies.now();
   const tokenDigest = dependencies.digestToken(command.token);
@@ -98,23 +106,27 @@ export const completePasswordRecovery = async (
 
   const passwordHash = await dependencies.hashPassword(command.password);
   const credential = dependencies.issueSessionCredential();
-  const authenticationSession: Omit<NewAuthenticationSession, 'accountId'> = {
+  const authenticationSession = {
     id: dependencies.newSessionId(),
-    surface: 'mobile',
+    surface,
     credentialDigest: credential.digest,
-    createdAt: completedAt,
-    lastMeaningfulActivityAt: completedAt,
-    idleExpiresAt: new Date(completedAt.getTime() + 30 * dayMilliseconds),
-    absoluteExpiresAt: new Date(completedAt.getTime() + 90 * dayMilliseconds),
+    ...authenticationSessionTimes(surface, completedAt),
   };
 
-  await dependencies.gateway.completeRecovery({
+  // ADR-0030 opens one replacement session where the reset completed; the
+  // admin web may hold one only for an Administrator (ADR-0053).
+  const { sessionOpened } = await dependencies.gateway.completeRecovery({
     tokenDigest,
     passwordHash,
     completedAt,
     authenticationSession,
+    sessionEligibility: surface === 'admin_web' ? 'administrator' : 'any',
     auditRecordId: dependencies.newAuditRecordId(),
   });
+
+  if (!sessionOpened) {
+    return { status: 'recovered' };
+  }
 
   return { status: 'recovered', credential: credential.secret };
 };

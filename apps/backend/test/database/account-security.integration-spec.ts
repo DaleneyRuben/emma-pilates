@@ -180,6 +180,7 @@ describe('Account security persistence', () => {
         idleExpiresAt: new Date('2026-09-30T18:00:00.000Z'),
         absoluteExpiresAt: new Date('2026-11-29T18:00:00.000Z'),
       },
+      sessionEligibility: 'any',
       auditRecordId: randomUUID(),
     });
 

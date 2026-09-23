@@ -10,6 +10,7 @@ import {
   AuthenticationThrottleEventKind,
   AuthenticationThrottlePurpose,
   AuthenticationTokenPurpose,
+  StaffRole,
 } from '../../generated/prisma/enums';
 import { scheduleAuthenticationEmail } from '../../jobs/authentication-email/schedule-authentication-email';
 import type { AuthenticationLinkGateway } from './authentication-links';
@@ -268,7 +269,7 @@ export class PrismaAccountSecurityGateway
 
   completeRecovery(
     input: Parameters<PasswordRecoveryGateway['completeRecovery']>[0],
-  ): Promise<void> {
+  ): ReturnType<PasswordRecoveryGateway['completeRecovery']> {
     return this.prisma.$transaction(async (transaction) => {
       const token = await findToken(transaction, input.tokenDigest);
 
@@ -299,16 +300,32 @@ export class PrismaAccountSecurityGateway
             AuthenticationSessionRevocationReason.PASSWORD_RECOVERED,
         },
       });
-      await transaction.authenticationSession.create({
-        data: {
-          ...input.authenticationSession,
-          accountId: token.accountId,
-          surface: AuthenticationSessionSurface.MOBILE,
-          credentialDigest: toPrismaBytes(
-            input.authenticationSession.credentialDigest,
-          ),
-        },
-      });
+      const staffMember =
+        token.account.staffMemberId === null
+          ? null
+          : await transaction.staffMember.findUnique({
+              where: { id: token.account.staffMemberId },
+              select: { role: true },
+            });
+      const sessionOpened =
+        input.sessionEligibility === 'any' ||
+        staffMember?.role === StaffRole.ADMINISTRATOR;
+
+      if (sessionOpened) {
+        await transaction.authenticationSession.create({
+          data: {
+            ...input.authenticationSession,
+            accountId: token.accountId,
+            surface:
+              input.authenticationSession.surface === 'admin_web'
+                ? AuthenticationSessionSurface.ADMIN_WEB
+                : AuthenticationSessionSurface.MOBILE,
+            credentialDigest: toPrismaBytes(
+              input.authenticationSession.credentialDigest,
+            ),
+          },
+        });
+      }
       await transaction.auditRecord.create({
         data: {
           id: input.auditRecordId,
@@ -322,6 +339,8 @@ export class PrismaAccountSecurityGateway
           occurredAt: input.completedAt,
         },
       });
+
+      return { sessionOpened };
     });
   }
 }
