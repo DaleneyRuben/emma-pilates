@@ -8,6 +8,7 @@
 export interface SessionAvailabilityDto {
   id: string;
   branchId: string;
+  branchName: string;
   classTypeId: string;
   trainerStaffMemberId: string;
   classTypeName: string;

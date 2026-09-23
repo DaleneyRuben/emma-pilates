@@ -71,6 +71,7 @@ export * from "./evaluationSlotDto";
 export * from "./finalizedUploadDto";
 export * from "./finalizedUploadDtoState";
 export * from "./inviteClientDto";
+export * from "./listAdministratorSessionsParams";
 export * from "./listEvaluationSlotsParams";
 export * from "./listEvaluationsParams";
 export * from "./listEvaluationsScope";

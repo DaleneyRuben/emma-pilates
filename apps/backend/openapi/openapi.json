@@ -2228,6 +2228,61 @@
         ]
       }
     },
+    "/api/v1/administrator/sessions": {
+      "get": {
+        "operationId": "listAdministratorSessions",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionAvailabilityDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessions"
+        ]
+      }
+    },
     "/api/v1/administrator/sessions/{sessionId}/cancel": {
       "post": {
         "operationId": "cancelSession",
@@ -3849,6 +3904,9 @@
             "type": "string",
             "format": "uuid"
           },
+          "branchName": {
+            "type": "string"
+          },
           "classTypeId": {
             "type": "string",
             "format": "uuid"
@@ -3891,6 +3949,7 @@
         "required": [
           "id",
           "branchId",
+          "branchName",
           "classTypeId",
           "trainerStaffMemberId",
           "classTypeName",
