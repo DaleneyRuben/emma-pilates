@@ -1369,6 +1369,50 @@ Roles get `403 administration_access_denied`.
    `GET reports/income?from=…&until=…&branchId=…` (income by month and method;
    with a Branch only its cash counts).
 
+## Test 22: run the Back Office as the Administrator (API)
+
+The admin web is not built yet, so use Swagger or curl as
+`paola.mendoza@example.com` (Test 3 shows how to log in and authorize). Every
+route below lives under `/api/v1/administrator/`; other Roles get
+`403 back_office_access_denied`. The four `POST`s that record a Withdrawal,
+Restock, Salary Payment, or Expense need an `Idempotency-Key` header with a new
+UUID; sending the same key and body again returns the first result without
+recording twice, and the same key with a different body answers
+`409 idempotency_key_reused`.
+
+1. **Supplies** (Insumos): `POST supplies` with a Branch, `name`,
+   `initialQuantity`, and `lowStockThreshold` creates one; `GET
+   supplies?branchId=…` lists that Branch's active Supplies with `lowStock`
+   set when the quantity is at or below the threshold. `PUT supplies/{id}`
+   changes only the name and threshold; the stock never changes by editing.
+   A second active Supply with the same name at that Branch answers
+   `409 supply_name_taken`. `POST supplies/{id}/archive` hides it from the
+   list and blocks further movements (`409 supply_archived`).
+2. **Withdrawals and Restocks**: `POST supplies/{id}/withdrawals` with
+   `{"quantity": 3}` takes units out and returns the new `quantityOnHand`;
+   asking for more than is on hand answers `409 insufficient_stock` and
+   changes nothing. `POST supplies/{id}/restocks` puts units back in.
+   `GET withdrawals?branchId=…&month=2026-09` lists the month's Withdrawals,
+   newest first, with the units per Supply in `totals` (the consumption
+   report).
+3. **Payroll** (Nómina): `POST salary-payments` with `staffMemberId`,
+   `amountCentavos` (Bs 3 500 is `350000`), and `paidOn` (a Bolivia date, not
+   in the future, otherwise `400 date_in_future`). `PUT salary-payments/{id}`
+   corrects it; `GET salary-payments?staffMemberId=…&from=…&to=…` lists them.
+4. **Expenses** (Gastos): `POST expense-categories` with a `name`; `DELETE
+   expense-categories/{id}` works only while no Expense uses it
+   (`409 expense_category_in_use`). `POST expenses` with a Branch, category,
+   `amountCentavos`, and `incurredOn`; `PUT expenses/{id}` corrects the
+   category, amount, or date (never the Branch); `GET expenses?branchId=…`
+   lists them.
+5. **Report**: `GET reports/expenses?from=…&until=…` (the same instants as
+   `reports/income`) totals Expenses by category and by month plus every
+   Salary Payment. Add `&branchId=…` and only that Branch's Expenses count:
+   Salary Payments are studio-wide and appear only in the all-Branches view.
+
+Recording or correcting a Salary Payment or Expense writes an audit record
+(`salary_payment.*`, `expense.*`).
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1386,7 +1430,8 @@ The following are not ready for manual product testing:
 - editing a Session Schedule (ADM-001);
 - creating, reassigning, and deactivating Staff Members in a screen (the
   API works, see Test 17; the admin screens are WEB-004);
-- Promotions, image variants, and Back Office records (UPL-002, BKO-001);
+- Promotions and image variants (UPL-002);
+- Back Office screens (the API works, see Test 22; the screens are WEB-007);
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
