@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Open the admin shell in a browser: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23) | Every section is still a placeholder; login (WEB-002) and the real screens (WEB-003 onward) are not built, so this is a shell test, not a product test |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23) | Every section is still a placeholder until WEB-003 onward; valid activation and recovery links still cannot be read from the local email capture |
 
 ## Before you begin
 
@@ -781,8 +781,14 @@ without exposing a real credential.
 pnpm --filter @pilates/admin-web test
 ```
 
-These Jest and Testing Library tests render the admin shell against an
-in-memory router: every sidebar entry opens its placeholder page, the current
+These Jest and Testing Library tests render the whole admin web against an
+in-memory router. Login shows one neutral rejection, counts down the server's
+`Retry-After`, and returns to the page you wanted; the startup session read
+restores a signed-in browser; a later `authentication_required` returns to
+Login once; recovery requests stay neutral; the create-password page inspects
+the link first and handles current, expired, used, and invalid links for both
+activation and recovery; and the user menu changes the password and logs out
+on desktop and narrow widths. Every sidebar entry opens its placeholder page, the current
 section is marked, the Branch selector switches Branches and explains the
 studio-wide pages, the narrow-browser drawer and bottom sheet work, unknown
 paths land on "Página no encontrada", and list pages normalize `?page=` and
@@ -1441,9 +1447,9 @@ pnpm dev:admin
 
 Open [http://localhost:5173](http://localhost:5173) in any browser (the tab is
 titled "Emma · Administración" and loads Lora and Work Sans from Google Fonts).
-You do not need the backend for this test: `/api/v1` is proxied to
-`http://127.0.0.1:3100` like the Vercel origin will do, but no placeholder page
-calls it yet.
+Every page now needs a signed-in Administrator, so start the backend
+(Test 2) and log in first as Test 24 describes; `/api/v1` is proxied to
+`http://127.0.0.1:3100` like the Vercel origin will do.
 
 1. **Sidebar.** On a desktop-width window the left sidebar shows **Horario**,
    then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
@@ -1471,9 +1477,74 @@ calls it yet.
    such as `/catalogo/planes?page=abc&pageSize=500`, is accepted and treated
    as page 1 of 20.
 
-The account cell on the right shows only a placeholder avatar and
-"Administradora": the user menu, password change, and logout arrive with the
-login work (WEB-002). Press `Ctrl+C` in the Terminal to stop the server.
+The account cell on the right shows the signed-in Administrator; Test 24
+walks through its menu. Press `Ctrl+C` in the Terminal to stop the server.
+
+## Test 24: log in to the admin web
+
+The admin web keeps its Authentication Session in a browser cookie that page
+scripts cannot read, and only an Administrator may sign in. Use a browser on
+your computer (any modern one; Safari may refuse the local `Secure` cookie on
+`http://localhost`, so prefer Chrome or Firefox for this test).
+
+Start the backend against the local simulator database and load the fixtures
+(Test 2 and Test 5 A), then start the admin web in a second Terminal:
+
+```sh
+DATABASE_URL="postgresql://$USER@localhost:5432/pilates_dev_sim" pnpm --filter @pilates/backend db:fixtures
+DATABASE_URL="postgresql://$USER@localhost:5432/pilates_dev_sim" pnpm dev:backend
+pnpm dev:admin
+```
+
+1. **Signed out.** Open
+   [http://localhost:5173/catalogo/planes](http://localhost:5173/catalogo/planes).
+   You land on the Login card (Emma, the tagline, **Correo electrónico**,
+   **Contraseña**, **Iniciar sesión**, **¿Olvidaste tu contraseña?**) with no
+   sidebar, and the address remembers `redirect=/catalogo/planes…`.
+2. **Neutral rejection.** Log in as `camila.rojas@example.com` with the fixture
+   password `emma-local-2026`. She is an Assistant, so the card says "El correo
+   o la contraseña no son correctos.", exactly as for a wrong password or an
+   unknown email, and keeps what you typed.
+3. **Log in.** Log in as `paola.mendoza@example.com` / `emma-local-2026`. You
+   return to **Planes**. Reload the page: you stay signed in (the session is
+   restored at startup). In the browser's developer tools (Application →
+   Cookies) the `__Host-emma-admin-session` cookie is HttpOnly, Secure,
+   SameSite Lax, has no Domain (host-only), and expires in 12 hours;
+   `__Host-emma-admin-client` is the random browser identifier used only for
+   throttling.
+4. **User menu.** Click **Paola Mendoza** in the top bar: her name, email,
+   "Administración", **Cambiar contraseña**, and **Cerrar sesión** (in red
+   text). **Cambiar contraseña** opens the 408 px side panel ("Tu sesión
+   seguirá abierta en este navegador."). **Guardar contraseña** stays disabled
+   until all three fields are filled and the two new ones match; a wrong
+   current password is marked on its field. If you do change it, every other
+   session of the Account (the Staff app, for example) is signed out, and you
+   must use the new password next time; run the fixtures command again to
+   restore `emma-local-2026`.
+5. **Log out.** Open the menu, choose **Cerrar sesión**: it first asks
+   "¿Cerrar sesión?" with **Cancelar**. Confirm, and you are back on Login;
+   the session cookie is gone and going back to a page asks you to log in.
+6. **Throttling.** On Login, submit a made-up email such as
+   `nobody.admin-login@example.com` with any password six times. The seventh
+   try shows "Demasiados intentos. Intenta de nuevo en un momento." with a
+   countdown from the server (0:30 at first) and a disabled button.
+7. **Recovery.** **¿Olvidaste tu contraseña?** opens **Recuperar contraseña**.
+   Any email gives the same "Revisa tu correo" state ("El enlace vence en 30
+   minutos.") whether or not it belongs to an Account.
+8. **Links.** Open
+   [http://localhost:5173/crear-contrasena?token=not-a-real-link-secret](http://localhost:5173/crear-contrasena?token=not-a-real-link-secret):
+   "Este enlace no es válido". Valid activation and recovery links still cannot
+   be read from the local email capture (it lives inside the worker process
+   with no inbox), so the current, expired, and used states and a successful
+   activation or reset are covered by the automated tests only.
+9. **Narrow browser.** At a phone width the top bar keeps only the avatar, the
+   menu opens from the bottom, and **Cambiar contraseña** fills the screen.
+
+A request that changes something with the session cookie from any other site
+is refused with `403 untrusted_origin`; you can see it with curl after logging
+in with the same command-line cookie jar (`curl -c jar -H "Origin:
+http://localhost:5173" …` to log in, then `curl -b jar -X DELETE -H "Origin:
+https://attacker.example" http://localhost:5173/api/v1/admin-web/authentication-sessions/current`).
 
 ## What you cannot test yet
 
@@ -1494,8 +1565,8 @@ The following are not ready for manual product testing:
   API works, see Test 17; the admin screens are WEB-004);
 - Promotions and image variants (UPL-002);
 - Back Office screens (the API works, see Test 22; the screens are WEB-007);
-- any Pilates admin-web workflow beyond the shell of Test 23: there is no
-  login yet and every section is a placeholder;
+- any Pilates admin-web workflow beyond logging in and the shell (Tests 23
+  and 24): every section is a placeholder;
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
 
