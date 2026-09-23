@@ -20,6 +20,7 @@ const pendingAccountCleanupIntervalMs = 60 * 60 * 1_000;
 const imageUploadCleanupIntervalMs = 60 * 60 * 1_000;
 const subscriptionReminderIntervalMs = 60 * 60 * 1_000;
 const purchaseIntentExpiryIntervalMs = 5 * 60 * 1_000;
+const sessionScheduleIntervalMs = 60 * 60 * 1_000;
 const evaluationSlotIntervalMs = 60 * 60 * 1_000;
 const evaluationReminderIntervalMs = 60 * 1_000;
 
@@ -54,6 +55,9 @@ type WorkerDependencies = {
   };
   purchaseIntentExpiry: {
     execute(): Promise<{ expired: number }>;
+  };
+  sessionSchedules: {
+    execute(): Promise<{ schedules: number; created: number; skipped: number }>;
   };
   evaluationSlots: {
     execute(): Promise<{ blocks: number; created: number; skipped: number }>;
@@ -117,6 +121,20 @@ export const startWorker = async (
     });
   }, purchaseIntentExpiryIntervalMs);
 
+  // The Session horizon moves only at Bolivia midnight, so an hourly pass
+  // keeps it filled (ADR-0059).
+  const runSessionSchedules = () =>
+    dependencies.sessionSchedules.execute().catch(() => {
+      dependencies.emit({
+        event: 'session_materialization_failed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+    });
+  await runSessionSchedules();
+  const sessionScheduleTimer = setInterval(() => {
+    void runSessionSchedules();
+  }, sessionScheduleIntervalMs);
+
   // The horizon moves only at Bolivia midnight and block commands materialize
   // synchronously, so an hourly pass is enough (ADR-0059); reminders are swept
   // every minute so each is at most a minute late (ADR-0058).
@@ -169,6 +187,7 @@ export const startWorker = async (
     clearInterval(imageUploadCleanupTimer);
     clearInterval(subscriptionReminderTimer);
     clearInterval(purchaseIntentExpiryTimer);
+    clearInterval(sessionScheduleTimer);
     clearInterval(evaluationSlotTimer);
     clearInterval(evaluationReminderTimer);
     stopHeartbeat();
