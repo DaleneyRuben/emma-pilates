@@ -57,6 +57,8 @@ Back Office money records follow BKO-001 D17: Salary Payments and Expenses are a
 | --- | --- |
 | Login success, failure, and throttling | Throttle events already record the security signal; a success audit per sign-in would be high-volume routine activity. |
 | Logout of the current Authentication Session | The Account ends its own sign-in; the session row keeps `revoked_at` and the reason. |
+| Admin-web browser Login and logout (WEB-002) | Same rules as mobile: the session row records `surface = admin_web`, and a rejected non-Administrator counts as an ordinary failed attempt in the throttle events. Password change and recovery from the browser write the same `account.password_changed` / `account.password_recovered` records. |
+| Admin-web request refused for an untrusted origin (`403 untrusted_origin`) | Nothing changes, and no Account is identified before the refusal; the request log keeps the status and correlation id. |
 | Client registration and email verification | Routine self-service; the Account row records the timestamps. |
 | Session Schedule create, replace, end (cancelling unbooked Sessions as `schedule_changed`) | The schedule rows keep their effective range and the cancelled Sessions record the actor; no booked class changes. |
 | Client Booking, cancellation, Reschedule, Waitlist join/leave | Routine Client activity (ADR-0055); `created_by`/`cancelled_by`/`rescheduled_by` Account columns keep who acted, including an Assistant acting for a Client. |
