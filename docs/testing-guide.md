@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Open the Vite starter page and verify that the development server works                                                         | No Pilates admin features have been built yet, so this is not a product test                                                                                  |
+| Admin web                    | Open the admin shell in a browser: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23) | Every section is still a placeholder; login (WEB-002) and the real screens (WEB-003 onward) are not built, so this is a shell test, not a product test |
 
 ## Before you begin
 
@@ -39,7 +39,7 @@ The local services use these default ports:
 | Backend API and Swagger |       `3100` |
 | Client Expo server      |       `8081` |
 | Staff Expo server       |       `8082` |
-| Admin web starter       |       `5173` |
+| Admin web               |       `5173` |
 | PostgreSQL              |       `5432` |
 
 These defaults avoid the `8080`, `3000`, `3005`, and `3015` ports used by the
@@ -775,6 +775,23 @@ Pilates development or release build. Run the mobile automated tests above for
 the protected-session opt-in, locked, unlock, invalidation, and logout behavior
 without exposing a real credential.
 
+### Admin web automated tests
+
+```sh
+pnpm --filter @pilates/admin-web test
+```
+
+These Jest and Testing Library tests render the admin shell against an
+in-memory router: every sidebar entry opens its placeholder page, the current
+section is marked, the Branch selector switches Branches and explains the
+studio-wide pages, the narrow-browser drawer and bottom sheet work, unknown
+paths land on "Página no encontrada", and list pages normalize `?page=` and
+`?pageSize=`. Mock Service Worker answers the generated API client so the
+same-origin fetcher, the RFC 9457 problem normalizer, and the retry policy
+are checked without a backend. The table and form foundations are covered
+too. `pnpm --filter @pilates/admin-web lint`, `typecheck`, `build`, and
+`format:check` are the remaining quality checks for that app.
+
 ### Backend HTTP end-to-end tests
 
 ```sh
@@ -1413,6 +1430,51 @@ recording twice, and the same key with a different body answers
 Recording or correcting a Salary Payment or Expense writes an audit record
 (`salary_payment.*`, `expense.*`).
 
+## Test 23: open the admin web shell in a browser
+
+The admin web is a website, not one of the mobile apps. Start its development
+server:
+
+```sh
+pnpm dev:admin
+```
+
+Open [http://localhost:5173](http://localhost:5173) in any browser (the tab is
+titled "Emma · Administración" and loads Lora and Work Sans from Google Fonts).
+You do not need the backend for this test: `/api/v1` is proxied to
+`http://127.0.0.1:3100` like the Vercel origin will do, but no placeholder page
+calls it yet.
+
+1. **Sidebar.** On a desktop-width window the left sidebar shows **Horario**,
+   then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
+   (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
+   Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
+   Referidos, Créditos). There is no "Descuentos". Clicking an entry opens a
+   page with that title, "Esta sección aún no está disponible.", and the
+   design screen it will implement (for example "Pantalla AW04"); the entry is
+   highlighted in the sidebar and the address changes (`/catalogo/planes`).
+2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
+   popover lists Centro, Equipetrol, and Urubó with their addresses, marks the
+   current one with a check, and ends with **Gestionar sucursales** (opens
+   Sucursales). Choosing Urubó closes the popover, the cell reads **Sucursal
+   Urubó**, and you stay on the same page. Esc or a click outside closes it.
+   On **Pagos**, **Clientes**, **Nómina**, **Referidos**, or **Créditos** the
+   popover first says "Esta página no se filtra por sucursal — …" and still
+   lets you switch for the next page. These three Branches are placeholders
+   until WEB-003 reads them from the API.
+3. **Narrow browser.** Make the window narrower than 1024 px (or open the
+   address on a phone). The sidebar disappears behind the **Abrir menú**
+   button, which opens a drawer with the same sections that closes after you
+   pick one, and the Branch selector opens as a sheet from the bottom.
+4. **Unknown address.** Open `http://localhost:5173/no-existe`: "Página no
+   encontrada" with **Volver al horario**. A list address with a bad page,
+   such as `/catalogo/planes?page=abc&pageSize=500`, is accepted and treated
+   as page 1 of 20.
+
+The account cell on the right shows only a placeholder avatar and
+"Administradora": the user menu, password change, and logout arrive with the
+login work (WEB-002). Press `Ctrl+C` in the Terminal to stop the server.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1432,7 +1494,8 @@ The following are not ready for manual product testing:
   API works, see Test 17; the admin screens are WEB-004);
 - Promotions and image variants (UPL-002);
 - Back Office screens (the API works, see Test 22; the screens are WEB-007);
-- any Pilates admin-web workflow;
+- any Pilates admin-web workflow beyond the shell of Test 23: there is no
+  login yet and every section is a placeholder;
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
 
