@@ -1,18 +1,9 @@
-import { createContext, useMemo, useState, type ReactNode } from "react";
-
-export type Branch = {
-  id: string;
-  name: string;
-  address: string;
-};
-
-export type BranchSelection = {
-  branches: readonly Branch[];
-  selectedBranch: Branch | undefined;
-  selectBranch: (branchId: string) => void;
-};
-
-export const BranchContext = createContext<BranchSelection | null>(null);
+import { useMemo, useState, type ReactNode } from "react";
+import {
+  BranchContext,
+  type Branch,
+  type BranchSelection,
+} from "./branch-context";
 
 /**
  * The selected Branch is the one piece of low-frequency, application-wide

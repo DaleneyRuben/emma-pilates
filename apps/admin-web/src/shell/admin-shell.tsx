@@ -1,5 +1,6 @@
 import { Outlet } from "@tanstack/react-router";
-import { BranchProvider, type Branch } from "./branch/branch-context";
+import type { Branch } from "./branch/branch-context";
+import { BranchProvider } from "./branch/branch-provider";
 import { SidebarNav } from "./sidebar-nav";
 import { TopBar } from "./top-bar";
 import { useIsNarrowViewport } from "./use-media-query";
