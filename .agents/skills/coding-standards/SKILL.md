@@ -108,9 +108,19 @@ Use the narrowest meaningful test level:
 
 Never edit files under `design/`. Read and follow [`design-workflow`](../design-workflow/SKILL.md) for any design-related task.
 
+## Surface verification
+
+Automated tests prove behavior; they do not prove that a screen looks and works the way the design and the person using it expect. Before marking any item done, exercise the change on its real surface:
+
+- **Mobile** (`apps/client-mobile`, `apps/staff-mobile`, `packages/mobile-core`): run the affected journey in the iOS Simulator on an **iPhone and an iPad**, with the API on a disposable or development database, following the fixture Accounts and steps in `docs/testing-guide.md`. Use Maestro flows where they exist and add one for a new critical journey. The iPad run matters even for phone-first screens: the Assistant works on a tablet and layouts must adapt, not just scale.
+- **Admin web** (`apps/admin-web`): open the change in a **real browser** against the Vite dev server (`pnpm dev:admin`), at the 1440 px desktop reference and at a 420 px narrow width, and walk the affected pages, dialogs, and forms. Browser automation with screenshots counts; Jest with jsdom, a build, or a curl smoke does not, because none of them renders the styles.
+- **Backend-only** changes still need the API journey exercised end to end (curl or Swagger against `pilates_dev_sim`, as the testing guide describes), and if the change alters what a screen shows, the surface check above too.
+
+Compare what you see with the governing design prompt and the design system, fix discrepancies before marking done, and record in the backlog evidence which device or browser and width you verified on, what you did, and what you saw. Report plainly when a surface check could not be run (no Simulator, no browser access) instead of implying it happened.
+
 ## Completion and commits
 
-Before calling a change complete, run the narrowest relevant tests plus configured lint, formatting, type checking, schema, and contract validation for the affected files. Report anything that could not be run.
+Before calling a change complete, run the narrowest relevant tests plus configured lint, formatting, type checking, schema, and contract validation for the affected files, and the surface verification above. Report anything that could not be run.
 
 Create an atomic commit after each meaningful implementation checkpoint once its relevant tests are green. Do not batch unrelated work into a later commit.
 
