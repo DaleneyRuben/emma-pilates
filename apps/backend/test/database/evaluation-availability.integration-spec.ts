@@ -1,5 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { createPrismaEvaluationCommands } from '../../src/booking/evaluations/prisma-evaluation-commands';
+import {
+  createPrismaEvaluationCommands,
+  endNutritionistAvailability,
+} from '../../src/booking/evaluations/prisma-evaluation-commands';
 import {
   branchIdOf,
   codeOf,
@@ -344,5 +347,38 @@ describe('Prisma evaluation availability commands', () => {
     await expect(commands().materializeAvailability()).resolves.toMatchObject({
       created: 0,
     });
+  });
+
+  it('ends a Nutritionist’s blocks from today when a Branch assignment or Role changes (D15)', async () => {
+    const carla = await world.principalOf('carla@example.com');
+    const paola = await world.principalOf('paola.mendoza@example.com');
+    const end = (branchId?: string) =>
+      world.prisma.$transaction((transaction) =>
+        endNutritionistAvailability(transaction, {
+          staffMemberId:
+            carla.identity.kind === 'staff' ? carla.identity.staffMemberId : '',
+          branchId,
+          actorAccountId: paola.accountId,
+          now: clock,
+        }),
+      );
+
+    await expect(end(branchIdOf('equipetrol'))).resolves.toEqual({
+      endedBlocks: 1,
+      withdrawnSlots: 20,
+      keptEvaluations: 0,
+    });
+    // Lucía's September 28 Evaluation keeps its slot on the original block.
+    await expect(end()).resolves.toEqual({
+      endedBlocks: 1,
+      withdrawnSlots: 4,
+      keptEvaluations: 1,
+    });
+    await expect(end()).resolves.toEqual({
+      endedBlocks: 0,
+      withdrawnSlots: 0,
+      keptEvaluations: 0,
+    });
+    await expect(commands().listAvailabilityBlocks(carla)).resolves.toEqual([]);
   });
 });
