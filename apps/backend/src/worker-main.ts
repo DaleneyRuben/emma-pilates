@@ -10,6 +10,7 @@ import { createWorkerLog } from './jobs/worker-log';
 import { createPrismaEvaluationCommands } from './booking/evaluations/prisma-evaluation-commands';
 import { createPrismaSessionMaterializer } from './booking/sessions/prisma-session-materializer';
 import { createPrismaSessionStartChecks } from './booking/sessions/prisma-session-start-checks';
+import { createPrismaRetentionSweeps } from './system-identity/retention/prisma-retention-sweeps';
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
@@ -102,6 +103,7 @@ async function bootstrap(): Promise<void> {
     startedSessionWaitlists: {
       execute: () => sessionStartChecks.closeStartedWaitlists(),
     },
+    retentionSweeps: createPrismaRetentionSweeps(prisma, { now }),
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit: createWorkerLog({
       environment: environment.NODE_ENV,
