@@ -157,6 +157,7 @@ Each of these was sent as the next message in the existing design session for th
 | [47](./followups/47-home-referral-shortcut-credit.md) | Replaces `02`'s «Invita y gana clases» with «Invita amigas y gana crédito» and the Evaluation shortcut's «Agenda tu primera cita» with «Agenda tu cita del mes» | 🕓 pending |
 | [48](./followups/48-insumos-record-restock.md) | Adds «Registrar reposición» to `AW08` and its `AW10`-style panel, amending 30 §6 to four header actions (BKO-001 D5) | 🕓 pending |
 | [49](./followups/49-supply-form-archive.md) | Adds «Archivar insumo» with a confirmation to `AW09`'s edit frame (BKO-001 D9) | 🕓 pending |
+| [50](./followups/50-record-withdrawal-stock-limit.md) | Adds the «Máximo» helper and the insufficient-stock error to `AW10` (BKO-001 D4) | 🕓 pending |
 
 ## Status
 
