@@ -7,27 +7,10 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "../components/ui/sheet";
+import { AccountCell } from "./account/account-cell";
 import { BranchSelector } from "./branch/branch-selector";
 import { SidebarNav } from "./sidebar-nav";
 import { useIsNarrowViewport } from "./use-media-query";
-
-function AccountCell() {
-  // WEB-002 replaces this with the signed-in Administrator and the AW33 menu.
-  return (
-    <div
-      className="flex items-center gap-2 pl-2 text-nota text-texto"
-      title="El menú de usuario llega con el inicio de sesión."
-    >
-      <span
-        aria-hidden="true"
-        className="inline-flex size-[26px] items-center justify-center rounded-full bg-rosa-empolvado font-serif text-[12px] text-blanco"
-      >
-        A
-      </span>
-      <span className="max-lg:sr-only">Administradora</span>
-    </div>
-  );
-}
 
 function MenuDrawer() {
   const [open, setOpen] = useState(false);

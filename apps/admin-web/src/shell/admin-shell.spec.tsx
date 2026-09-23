@@ -84,7 +84,11 @@ describe("admin shell", () => {
       expect(
         within(topBar).getByRole("button", { name: "Sucursal Centro" }),
       ).toHaveAttribute("aria-expanded", "false");
-      expect(within(topBar).getByText("Administradora")).toBeInTheDocument();
+      expect(
+        await within(topBar).findByRole("button", {
+          name: "Tu cuenta: Paola Mendoza",
+        }),
+      ).toBeInTheDocument();
     });
 
     it("switches the Branch from the selector without leaving the page or asking to confirm", async () => {
