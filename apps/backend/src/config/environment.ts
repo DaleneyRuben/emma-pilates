@@ -9,11 +9,38 @@ const localTransferInstructions = {
   TRANSFER_ACCOUNT_NUMBER: '0000000000',
   TRANSFER_QR_IMAGE_PATH: '.data/transfer-qr.png',
 } as const;
+const localAdminWebOrigin = 'http://localhost:5173';
+
+// ADR-0084: exact scheme, host, and port only; a wildcard, path, or bare
+// host is never a trusted credentialed origin.
+const isExactOrigin = (value: string): boolean => {
+  try {
+    const url = new URL(value);
+    return (
+      !value.includes('*') &&
+      (url.protocol === 'https:' || url.protocol === 'http:') &&
+      url.origin === value
+    );
+  } catch {
+    return false;
+  }
+};
+
+const trustedOriginsSchema = z
+  .string()
+  .default(localAdminWebOrigin)
+  .transform((value) => value.split(',').map((origin) => origin.trim()))
+  .refine(
+    (origins) => origins.length > 0 && origins.every(isExactOrigin),
+    'ADMIN_WEB_TRUSTED_ORIGINS must list exact http(s) origins separated by commas',
+  );
+
 // Bs 60; any other reward needs separate product approval (PAY-001).
 const approvedReferralRewardCentavos = 6000;
 
 const environmentSchema = z
   .object({
+    ADMIN_WEB_TRUSTED_ORIGINS: trustedOriginsSchema,
     AUTHENTICATION_EMAIL_DIGEST_KEY: z
       .string()
       .min(32)
@@ -84,6 +111,19 @@ const environmentSchema = z
         string,
       ][]),
     ];
+
+    const origins = environment.ADMIN_WEB_TRUSTED_ORIGINS;
+    if (
+      origins.includes(localAdminWebOrigin) ||
+      origins.some((origin) => !origin.startsWith('https://'))
+    ) {
+      context.addIssue({
+        code: 'custom',
+        message:
+          'ADMIN_WEB_TRUSTED_ORIGINS must list explicit https origins in production',
+        path: ['ADMIN_WEB_TRUSTED_ORIGINS'],
+      });
+    }
 
     localDefaults.forEach(([name, localDefault]) => {
       if (environment[name] === localDefault) {
