@@ -20,10 +20,12 @@ import {
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { useStartSession } from "../session/use-start-session";
-import { formatWait, useCountdown } from "./use-countdown";
+import { emailField } from "./auth-fields";
+import { ThrottledNotice } from "./throttled-notice";
+import { useCountdown } from "./use-countdown";
 
 const loginSchema = z.object({
-  email: z.email("Escribe un correo electrónico válido."),
+  email: emailField,
   password: z.string().min(1, "Escribe tu contraseña."),
 });
 
@@ -104,14 +106,7 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
             </FormItem>
           )}
         />
-        {throttled ? (
-          <p role="alert" className="text-nota text-error-texto">
-            Demasiados intentos. Intenta de nuevo en un momento.{" "}
-            <span className="tabular">
-              Podrás intentarlo en {formatWait(waitSeconds)}.
-            </span>
-          </p>
-        ) : null}
+        {throttled ? <ThrottledNotice seconds={waitSeconds} /> : null}
         {!throttled && failure === "rejected" ? (
           <p role="alert" className="text-nota text-error-texto">
             El correo o la contraseña no son correctos.
