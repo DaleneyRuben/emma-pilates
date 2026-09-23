@@ -6,6 +6,7 @@ export type AccountCredentials = {
   emailVerifiedAt: Date | null;
   activatedAt: Date | null;
   disabledAt: Date | null;
+  staffRole: 'TRAINER' | 'NUTRITIONIST' | 'ASSISTANT' | 'ADMINISTRATOR' | null;
 };
 
 type AuthenticateCredentialsDependencies = {
@@ -17,6 +18,7 @@ type AuthenticateCredentialsDependencies = {
 export const authenticateCredentials = async (
   command: { email: string; password: string },
   dependencies: AuthenticateCredentialsDependencies,
+  canOpenSession: (account: AccountCredentials) => boolean = () => true,
 ): Promise<{ accountId: string }> => {
   const account = await dependencies.findAccountByEmail(
     command.email.trim().toLowerCase(),
@@ -30,7 +32,8 @@ export const authenticateCredentials = async (
     account.passwordHash !== null &&
     account.emailVerifiedAt !== null &&
     account.activatedAt !== null &&
-    account.disabledAt === null;
+    account.disabledAt === null &&
+    canOpenSession(account);
 
   if (!passwordMatches || !accountCanAuthenticate) {
     throw new AuthenticationFailedError();

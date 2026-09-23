@@ -23,16 +23,30 @@ export class PrismaAuthenticationGateway {
   constructor(private readonly prisma: PrismaClient) {}
 
   findAccountByEmail(email: string): Promise<AccountCredentials | null> {
-    return this.prisma.account.findUnique({
-      where: { email },
-      select: {
-        id: true,
-        passwordHash: true,
-        emailVerifiedAt: true,
-        activatedAt: true,
-        disabledAt: true,
-      },
-    });
+    return this.prisma.account
+      .findUnique({
+        where: { email },
+        select: {
+          id: true,
+          passwordHash: true,
+          emailVerifiedAt: true,
+          activatedAt: true,
+          disabledAt: true,
+          staffMember: { select: { role: true } },
+        },
+      })
+      .then((account) =>
+        account === null
+          ? null
+          : {
+              id: account.id,
+              passwordHash: account.passwordHash,
+              emailVerifiedAt: account.emailVerifiedAt,
+              activatedAt: account.activatedAt,
+              disabledAt: account.disabledAt,
+              staffRole: account.staffMember?.role ?? null,
+            },
+      );
   }
 
   async readThrottleEvents(input: ThrottleDigests & { now: Date }): Promise<{
@@ -127,7 +141,10 @@ export class PrismaAuthenticationGateway {
         data: {
           id: input.session.id,
           accountId: input.session.accountId,
-          surface: AuthenticationSessionSurface.MOBILE,
+          surface:
+            input.session.surface === 'admin_web'
+              ? AuthenticationSessionSurface.ADMIN_WEB
+              : AuthenticationSessionSurface.MOBILE,
           credentialDigest,
           createdAt: input.session.createdAt,
           lastMeaningfulActivityAt: input.session.lastMeaningfulActivityAt,

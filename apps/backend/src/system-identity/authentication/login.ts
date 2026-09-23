@@ -4,6 +4,7 @@ import {
   AuthenticationFailedError,
 } from './authenticate-credentials';
 import {
+  type AuthenticationSurface,
   createAuthenticationSession,
   type NewAuthenticationSession,
 } from './create-authentication-session';
@@ -20,7 +21,15 @@ export type LoginCommand = {
   password: string;
   clientIdentifier: string | null;
   networkAddress: string;
+  surface?: AuthenticationSurface;
 };
+
+// ADR-0053/ADR-0084: only an Administrator may open an admin-web session;
+// everyone else receives the same neutral failure after the same work.
+const canOpenSessionOn =
+  (surface: AuthenticationSurface) =>
+  (account: AccountCredentials): boolean =>
+    surface !== 'admin_web' || account.staffRole === 'ADMINISTRATOR';
 
 type LoginThrottleDigests = {
   loginLaneDigest: Uint8Array;
@@ -87,10 +96,15 @@ export const login = async (
     throw new LoginThrottledError(throttle.retryAfterSeconds);
   }
 
+  const surface = command.surface ?? 'mobile';
   let accountId: string;
 
   try {
-    ({ accountId } = await authenticateCredentials(command, dependencies));
+    ({ accountId } = await authenticateCredentials(
+      command,
+      dependencies,
+      canOpenSessionOn(surface),
+    ));
   } catch (error) {
     if (!(error instanceof AuthenticationFailedError)) {
       throw error;
@@ -104,7 +118,7 @@ export const login = async (
     throw error;
   }
 
-  return createAuthenticationSession(accountId, 'mobile', {
+  return createAuthenticationSession(accountId, surface, {
     issueCredential: () => dependencies.issueCredential(),
     newId: () => dependencies.newId(),
     now: () => now,
