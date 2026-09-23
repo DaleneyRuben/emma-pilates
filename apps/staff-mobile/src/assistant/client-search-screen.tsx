@@ -11,6 +11,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import {
+  Keyboard,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -68,10 +69,16 @@ export function ClientSearchScreen() {
   const clients = results.data?.status === 200 ? results.data.data : [];
   const workspace = useAssistantWorkspace();
   const selectedId = workspace.split ? workspace.panel?.clientId : undefined;
-  const open = (clientId: string) =>
-    workspace.split
-      ? workspace.show({ view: "overview", clientId })
-      : navigation.navigate("ClientOverview", { clientId });
+  const open = (clientId: string) => {
+    if (!workspace.split) {
+      navigation.navigate("ClientOverview", { clientId });
+      return;
+    }
+    // The search field stays beside the panel, so a keyboard left open would
+    // swallow the panel's first tap.
+    Keyboard.dismiss();
+    workspace.show({ view: "overview", clientId });
+  };
 
   const search = (
     <>
