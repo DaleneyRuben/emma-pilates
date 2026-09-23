@@ -147,6 +147,7 @@ export class PrismaAuthenticationGateway {
         select: {
           id: true,
           accountId: true,
+          surface: true,
           createdAt: true,
           idleExpiresAt: true,
           absoluteExpiresAt: true,
@@ -172,6 +173,10 @@ export class PrismaAuthenticationGateway {
           : {
               id: session.id,
               accountId: session.accountId,
+              surface:
+                session.surface === AuthenticationSessionSurface.ADMIN_WEB
+                  ? 'admin_web'
+                  : 'mobile',
               createdAt: session.createdAt,
               idleExpiresAt: session.idleExpiresAt,
               absoluteExpiresAt: session.absoluteExpiresAt,

@@ -1,3 +1,8 @@
+import {
+  authenticationSessionLifetimes,
+  type AuthenticationSurface,
+} from './create-authentication-session';
+
 export class AuthenticationRequiredError extends Error {}
 
 type StaffRole = 'TRAINER' | 'NUTRITIONIST' | 'ASSISTANT' | 'ADMINISTRATOR';
@@ -5,6 +10,7 @@ type StaffRole = 'TRAINER' | 'NUTRITIONIST' | 'ASSISTANT' | 'ADMINISTRATOR';
 export type AuthenticationSessionPrincipalRecord = {
   id: string;
   accountId: string;
+  surface: AuthenticationSurface;
   createdAt: Date;
   idleExpiresAt: Date;
   absoluteExpiresAt: Date;
@@ -44,12 +50,11 @@ type ResolveAuthenticatedPrincipalDependencies = {
   now(): Date;
 };
 
-const dayMilliseconds = 24 * 60 * 60 * 1_000;
-
 export const resolveAuthenticatedPrincipal = async (
   credential: string,
   meaningfulActivity: boolean,
   dependencies: ResolveAuthenticatedPrincipalDependencies,
+  surface: AuthenticationSurface = 'mobile',
 ): Promise<AuthenticatedPrincipal> => {
   const now = dependencies.now();
   const session = await dependencies.findSessionByCredentialDigest(
@@ -58,6 +63,7 @@ export const resolveAuthenticatedPrincipal = async (
 
   if (
     session === null ||
+    session.surface !== surface ||
     session.revokedAt !== null ||
     session.accountDisabledAt !== null ||
     session.idleExpiresAt <= now ||
@@ -72,7 +78,8 @@ export const resolveAuthenticatedPrincipal = async (
       activityAt: now,
       idleExpiresAt: new Date(
         Math.min(
-          now.getTime() + 30 * dayMilliseconds,
+          now.getTime() +
+            authenticationSessionLifetimes[surface].idleMilliseconds,
           session.absoluteExpiresAt.getTime(),
         ),
       ),
