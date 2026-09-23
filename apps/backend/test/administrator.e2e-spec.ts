@@ -8,6 +8,7 @@ import { BookingAccessDeniedError } from '../src/booking/commands/create-booking
 import {
   AdministratorPaymentsController,
   AdministratorSessionsController,
+  administratorSessionSearch,
   cancelSessionCommand,
   receiptObjectStorage,
 } from '../src/booking/payments/administrator.controller';
@@ -41,7 +42,12 @@ const payment = {
 describe('administrator payments and sessions (e2e)', () => {
   let app: INestApplication<App>;
   const resolvePrincipal =
-    jest.fn<(credential: string, meaningfulActivity: boolean) => Promise<AuthenticatedPrincipal>>();
+    jest.fn<
+      (
+        credential: string,
+        meaningfulActivity: boolean,
+      ) => Promise<AuthenticatedPrincipal>
+    >();
   const commands = {
     listPendingPayments: jest.fn<() => Promise<unknown>>(),
     readPaymentReview: jest.fn<() => Promise<unknown>>(),
@@ -51,12 +57,18 @@ describe('administrator payments and sessions (e2e)', () => {
   };
   const storage = { get: jest.fn<() => Promise<Buffer>>() };
   const cancelSession = jest.fn<() => Promise<unknown>>();
+  const searchSessions = jest.fn<() => Promise<unknown>>();
 
   beforeEach(async () => {
     resolvePrincipal.mockResolvedValue({
       accountId: 'admin-account',
       authenticationSessionId: 'session',
-      identity: { kind: 'staff', staffMemberId: 'admin', role: 'administrator', branchIds: [] },
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'admin',
+        role: 'administrator',
+        branchIds: [],
+      },
     });
     commands.listPendingPayments.mockResolvedValue([
       {
@@ -73,19 +85,50 @@ describe('administrator payments and sessions (e2e)', () => {
       clientName: 'Sofía Guzmán',
       receipt: { imageAssetId: 'asset-1', mediaType: 'image/jpeg' },
     });
-    commands.readReceiptObject.mockResolvedValue({ objectKey: 'pending/x', mediaType: 'image/jpeg' });
-    commands.confirmTransfer.mockResolvedValue({ ...payment, state: 'confirmed' });
-    commands.rejectTransfer.mockResolvedValue({ ...payment, state: 'rejected', rejectionReason: 'Monto' });
+    commands.readReceiptObject.mockResolvedValue({
+      objectKey: 'pending/x',
+      mediaType: 'image/jpeg',
+    });
+    commands.confirmTransfer.mockResolvedValue({
+      ...payment,
+      state: 'confirmed',
+    });
+    commands.rejectTransfer.mockResolvedValue({
+      ...payment,
+      state: 'rejected',
+      rejectionReason: 'Monto',
+    });
     storage.get.mockResolvedValue(Buffer.from('jpeg-bytes'));
     cancelSession.mockResolvedValue({ affectedBookings: 6 });
+    searchSessions.mockResolvedValue([
+      {
+        id: sessionId,
+        branchId: '11111111-1111-4111-8111-111111111111',
+        branchName: 'Urubó',
+        classTypeId: '22222222-2222-4222-8222-222222222222',
+        trainerStaffMemberId: '33333333-3333-4333-8333-333333333333',
+        classTypeName: 'Reformer Pilates',
+        trainerName: 'Emma Vargas',
+        startsAt: new Date('2026-09-23T22:30:00.000Z'),
+        endsAt: new Date('2026-09-23T23:20:00.000Z'),
+        capacity: 8,
+        bookedCount: 6,
+        availableSeats: 2,
+        waitlistCount: 0,
+      },
+    ]);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      controllers: [AdministratorPaymentsController, AdministratorSessionsController],
+      controllers: [
+        AdministratorPaymentsController,
+        AdministratorSessionsController,
+      ],
       providers: [
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
         { provide: paymentCommands, useValue: commands },
         { provide: receiptObjectStorage, useValue: storage },
         { provide: cancelSessionCommand, useValue: cancelSession },
+        { provide: administratorSessionSearch, useValue: searchSessions },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
@@ -108,7 +151,11 @@ describe('administrator payments and sessions (e2e)', () => {
       .expect('Cache-Control', 'no-store')
       .expect(({ body }) => {
         expect(body).toEqual([
-          expect.objectContaining({ id: paymentId, clientName: 'Sofía Guzmán', receiptAvailable: true }),
+          expect.objectContaining({
+            id: paymentId,
+            clientName: 'Sofía Guzmán',
+            receiptAvailable: true,
+          }),
         ]);
       });
     await request(app.getHttpServer())
@@ -153,7 +200,9 @@ describe('administrator payments and sessions (e2e)', () => {
       .set('authorization', bearer)
       .send({ reason: '' })
       .expect(400)
-      .expect(({ body }) => expect(body).toMatchObject({ code: 'invalid_request' }));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'invalid_request' }),
+      );
 
     commands.confirmTransfer.mockRejectedValue(
       new PaymentRuleError('payment_confirmation_conflict', 'already rejected'),
@@ -163,7 +212,9 @@ describe('administrator payments and sessions (e2e)', () => {
       .set('authorization', bearer)
       .expect('Content-Type', /application\/problem\+json/)
       .expect(409)
-      .expect(({ body }) => expect(body).toMatchObject({ code: 'payment_confirmation_conflict' }));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'payment_confirmation_conflict' }),
+      );
   });
 
   it('cancels a Session and maps denial and rule conflicts', async () => {
@@ -178,14 +229,18 @@ describe('administrator payments and sessions (e2e)', () => {
       .post(`/api/v1/administrator/sessions/${sessionId}/cancel`)
       .set('authorization', bearer)
       .expect(409)
-      .expect(({ body }) => expect(body).toMatchObject({ code: 'session_has_no_bookings' }));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'session_has_no_bookings' }),
+      );
 
     cancelSession.mockRejectedValue(new BookingAccessDeniedError());
     await request(app.getHttpServer())
       .post(`/api/v1/administrator/sessions/${sessionId}/cancel`)
       .set('authorization', bearer)
       .expect(403)
-      .expect(({ body }) => expect(body).toMatchObject({ code: 'booking_access_denied' }));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'booking_access_denied' }),
+      );
   });
 
   it('requires authentication on every administrator route', async () => {
@@ -202,5 +257,40 @@ describe('administrator payments and sessions (e2e)', () => {
     await request(app.getHttpServer())
       .post(`/api/v1/administrator/sessions/${sessionId}/cancel`)
       .expect(401);
+  });
+
+  it('searches Sessions across every Branch for the Administrator', async () => {
+    await request(app.getHttpServer())
+      .get(
+        '/api/v1/administrator/sessions?from=2026-09-23T04:00:00.000Z&until=2026-09-24T04:00:00.000Z',
+      )
+      .set('authorization', bearer)
+      .expect(200)
+      .expect('Cache-Control', 'no-store')
+      .expect(({ body }) => {
+        expect(body).toEqual([
+          expect.objectContaining({ id: sessionId, branchName: 'Urubó' }),
+        ]);
+      });
+    expect(searchSessions).toHaveBeenCalledWith(
+      {
+        from: new Date('2026-09-23T04:00:00.000Z'),
+        until: new Date('2026-09-24T04:00:00.000Z'),
+        limit: 50,
+      },
+      expect.objectContaining({ accountId: 'admin-account' }),
+    );
+
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/sessions?from=bad')
+      .set('authorization', bearer)
+      .expect(400);
+    searchSessions.mockRejectedValueOnce(new BookingAccessDeniedError());
+    await request(app.getHttpServer())
+      .get(
+        '/api/v1/administrator/sessions?from=2026-09-23T04:00:00.000Z&until=2026-09-24T04:00:00.000Z',
+      )
+      .set('authorization', bearer)
+      .expect(403);
   });
 });
