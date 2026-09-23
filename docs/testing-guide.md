@@ -8,7 +8,8 @@ you are starting with no project knowledge.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, Plans, Plan detail, Mi plan, Perfil, and Editar perfil with the fixture Accounts | Class browsing and bookings are still placeholders; paying for a Plan from the app is not available yet |
-| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11) | The Nutritionist destination is still a placeholder |
+| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11) | The Nutritionist destination is still a placeholder (its APIs are ready, see Test 7) |
+| Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The Client and Staff Evaluation screens are built in MOB-016; reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, and active Client and Staff Accounts with one command                            | Promotions and receipt images are not included until image delivery is specified                                                              |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
@@ -652,6 +653,51 @@ for a just-invited Client works before activation; from then on the invitation
 cannot be cancelled (`409 invitation_has_activity`) and the 30-day cleanup keeps
 the Client.
 
+### Nutritionist Evaluations through Swagger (NUT-002)
+
+The fixtures give `gabriela.flores@example.com` (Nutritionist, Centro) three
+weekly Availability Blocks — Monday 09:00–13:00, Thursday 15:00–18:00, and
+Saturday 09:00–12:00 — from the day you first load them, already cut into
+45-minute slots for the next 30 Bolivia days. Log in as Gabriela and as
+`lucia@example.com` and authorize each credential in turn. Commands marked
+with a key need an `idempotency-key` header with a fresh UUID.
+
+| Who | Endpoint | What you should see |
+| --- | --- | --- |
+| Client | `GET /api/v1/evaluation-slots?from=&to=&branchId=` | Bookable slots grouped by Bolivia `date`, each with Branch, Nutritionist, and `durationMinutes: 45`, plus `months` marking each month `available` or `used` |
+| Client | `GET /api/v1/evaluation-slots/{slotId}` | One slot with `bookable` |
+| Client | 🔑 `POST /api/v1/evaluation-slots/{slotId}/evaluations` | `201 booked` with `cancellableUntil` (start − 3 h); Gabriela's inbox gets "Nueva evaluación agendada: …" and Lucía keeps all her classes |
+| Client | `GET /api/v1/evaluations?scope=upcoming` / `scope=past` | Booked Evaluations (past ones newest first, `cursor` pages); cancelled ones are not listed |
+| Client | `DELETE /api/v1/evaluations/{evaluationId}` | `204`; the slot and the month are free again and Gabriela is told |
+| Nutritionist | `GET /api/v1/nutritionist/evaluations` | Her upcoming booked Evaluations with the Client's name and `kind` `first` or `follow_up` |
+| Nutritionist | `DELETE /api/v1/nutritionist/evaluations/{evaluationId}` | `204` at any time before the start; the Client gets "El estudio canceló tu evaluación…" and an `evaluation.cancelled_by_staff` audit row is written |
+| Nutritionist | `GET /api/v1/nutritionist/availability-blocks` | Current and scheduled blocks by weekday with `effectiveFrom`, `effectiveUntil`, `slotsPerWeek`, and `upcomingBookedCount` |
+| Nutritionist | 🔑 `POST /api/v1/nutritionist/availability-blocks` | `201` with the new block; its slots exist immediately |
+| Nutritionist | 🔑 `POST …/availability-blocks/{blockId}/replacement` | The ended block, its replacement from the chosen date, and how many unbooked slots were withdrawn and booked Evaluations kept |
+| Nutritionist | `POST …/availability-blocks/{blockId}/end` `{ "effectiveFrom" }` | The block ends from that date; booked Evaluations keep their slots |
+
+Rules you can check: a second Evaluation in the same Bolivia month answers
+`409 evaluation_month_used` (a slot at 20:15 on the last day of a month still
+counts for that month); a slot starting within 3 hours is not listed and
+answers `409 evaluation_booking_closed`; a taken or withdrawn slot answers `409
+evaluation_slot_unavailable`; `valeria@example.com` (Plan ends before the slot)
+and `mariana@example.com` (no Plan) get `409 no_eligible_subscription`;
+cancelling within 3 hours of the start answers `409
+evaluation_cancellation_window_closed`. Block times must sit on the 15-minute
+grid and hold at least one 45-minute slot (`400
+availability_block_invalid_range`), start today or later (`400
+availability_block_effective_date_past`), be at a Branch assigned to the
+Nutritionist (`403 branch_not_assigned`), and never overlap her other blocks,
+even at another Branch (`409 availability_block_overlap`). Clients, Trainers,
+and Assistants get `403 booking_access_denied` on the Nutritionist routes, and
+staff get it on the Client routes.
+
+With the worker running (`pnpm --filter @pilates/backend start:worker`), slots
+are extended every hour as the 30-day horizon moves, and each booked
+Evaluation gets "Recordatorio: tu evaluación nutricional es mañana…" 24 hours
+before (only if it was booked earlier than that) and "…es en una hora…" one
+hour before, each at most a minute late.
+
 ## Test 8: run the automated checks
 
 You do not need to understand the test code to run it. A successful Jest run
@@ -1064,9 +1110,8 @@ The following are not ready for manual product testing:
   mobile-link domain and native association files are configured;
 - Promotions on Client Home or push notifications (the in-app inbox works, see
   Test 9; buying a Plan works, see Test 10);
-- authenticated Assistant or Nutritionist journeys beyond Perfil and the inbox
-  (the Administrator payment review and Session cancellation work, see Test
-  10);
+- the Nutritionist agenda, Mi disponibilidad, and the Client Evaluation
+  screens in the apps (their APIs work, see Test 7; the screens are MOB-016);
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, or production deployment; and
 - Maestro release-journey tests.
