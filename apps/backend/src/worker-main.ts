@@ -6,6 +6,7 @@ import { LocalEmailCapture } from './jobs/authentication-email/local-email-captu
 import { PlaceholderAuthenticationEmailRenderer } from './jobs/authentication-email/placeholder-authentication-email-renderer';
 import { PrismaAuthenticationEmailStateReader } from './jobs/authentication-email/prisma-authentication-email-state-reader';
 import { createPgBoss } from './jobs/pg-boss-runtime';
+import { createWorkerLog } from './jobs/worker-log';
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
@@ -82,7 +83,10 @@ async function bootstrap(): Promise<void> {
       environment.REFERRAL_REWARD_CENTAVOS,
     ),
     serviceVersion: process.env.npm_package_version ?? 'local',
-    emit: (record) => console.log(JSON.stringify(record)),
+    emit: createWorkerLog({
+      environment: environment.NODE_ENV,
+      release: environment.RELEASE_ID,
+    }),
   });
 
   const shutdown = async () => {
