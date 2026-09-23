@@ -34,6 +34,9 @@ beyond what the table below names.
 | `staff_member.role_changed` | Booking & Membership | An Administrator changes a Staff Member's Role | Administrator | `account` | — | `previousRole`, `role` |
 | `staff_member.branches_changed` | Booking & Membership | An Administrator assigns or removes Branches | Administrator | `account` | — | `added`, `removed` |
 | `staff_member.deactivated` | Booking & Membership | An Administrator deactivates a Staff Member (Account disabled, sessions revoked) | Administrator | `account` | — | `role` |
+| `plan.created` | Booking & Membership | An Administrator creates a Plan | Administrator | `plan` | — | `priceCentavos` |
+| `plan.updated` | Booking & Membership | An Administrator edits a Plan | Administrator | `plan` | — | `previousPriceCentavos`, `priceCentavos` |
+| `plan.visibility_changed` | Booking & Membership | An Administrator hides or shows a Plan | Administrator | `plan` | — | `visible` |
 | `payment.transfer_confirmed` | Booking & Membership | An Administrator confirms a transfer Payment | Administrator | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.transfer_rejected` | Booking & Membership | An Administrator rejects a transfer Payment | Administrator | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.cash_confirmed` | Booking & Membership | An Assistant or Administrator records a cash Payment | Staff Account and Role | `payment` | Collection Branch | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
