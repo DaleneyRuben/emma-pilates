@@ -56,7 +56,9 @@ describe('environment configuration', () => {
         DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
         NODE_ENV: 'production',
         AUTHENTICATION_EMAIL_DIGEST_KEY: 'x'.repeat(32),
-        AUTHENTICATION_LINK_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString('base64'),
+        AUTHENTICATION_LINK_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString(
+          'base64',
+        ),
         AUTHENTICATION_LINK_ENCRYPTION_KEY_ID: 'prod-v1',
       }),
     ).toThrow('TRANSFER_BENEFICIARY_NAME');
@@ -79,5 +81,75 @@ describe('environment configuration', () => {
     });
 
     expect(environment.UPLOADS_LOCAL_STORAGE_ROOT).toBe('.data/uploads');
+  });
+
+  describe('admin-web trusted origins', () => {
+    const base = {
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+    };
+    const production = {
+      ...base,
+      NODE_ENV: 'production',
+      AUTHENTICATION_EMAIL_DIGEST_KEY: 'x'.repeat(32),
+      AUTHENTICATION_LINK_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString(
+        'base64',
+      ),
+      AUTHENTICATION_LINK_ENCRYPTION_KEY_ID: 'prod-v1',
+      TRANSFER_BENEFICIARY_NAME: 'Studio',
+      TRANSFER_BANK_NAME: 'Bank',
+      TRANSFER_ACCOUNT_NUMBER: '123',
+      TRANSFER_QR_IMAGE_PATH: '/qr.png',
+    };
+
+    it('trusts the local Vite origin by default outside production', () => {
+      expect(validateEnvironment(base).ADMIN_WEB_TRUSTED_ORIGINS).toEqual([
+        'http://localhost:5173',
+      ]);
+    });
+
+    it('reads a comma-separated list of exact origins', () => {
+      expect(
+        validateEnvironment({
+          ...base,
+          ADMIN_WEB_TRUSTED_ORIGINS:
+            ' https://admin.emmapilates.bo , https://preview-123.vercel.app ',
+        }).ADMIN_WEB_TRUSTED_ORIGINS,
+      ).toEqual([
+        'https://admin.emmapilates.bo',
+        'https://preview-123.vercel.app',
+      ]);
+    });
+
+    it.each([
+      'https://*.vercel.app',
+      '*',
+      'https://admin.emmapilates.bo/',
+      'https://admin.emmapilates.bo/path',
+      'admin.emmapilates.bo',
+      '',
+    ])('rejects %p as a trusted origin', (value) => {
+      expect(() =>
+        validateEnvironment({ ...base, ADMIN_WEB_TRUSTED_ORIGINS: value }),
+      ).toThrow('ADMIN_WEB_TRUSTED_ORIGINS');
+    });
+
+    it('requires explicit HTTPS origins in production', () => {
+      expect(() => validateEnvironment(production)).toThrow(
+        'ADMIN_WEB_TRUSTED_ORIGINS',
+      );
+      expect(() =>
+        validateEnvironment({
+          ...production,
+          ADMIN_WEB_TRUSTED_ORIGINS: 'http://admin.emmapilates.bo',
+        }),
+      ).toThrow('ADMIN_WEB_TRUSTED_ORIGINS');
+      expect(
+        validateEnvironment({
+          ...production,
+          ADMIN_WEB_TRUSTED_ORIGINS: 'https://admin.emmapilates.bo',
+        }).ADMIN_WEB_TRUSTED_ORIGINS,
+      ).toEqual(['https://admin.emmapilates.bo']);
+    });
   });
 });
