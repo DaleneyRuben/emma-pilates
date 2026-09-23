@@ -27,6 +27,8 @@ export * from "./adminSessionDto";
 export * from "./adminSessionDtoState";
 export * from "./adminSessionScheduleDto";
 export * from "./adminSupplyDto";
+export * from "./adminWebPasswordRecoveryResultDto";
+export * from "./adminWebPasswordRecoveryResultDtoStatus";
 export * from "./assistantCashPaymentDto";
 export * from "./assistantClientBookingDto";
 export * from "./assistantClientBookingDtoKind";

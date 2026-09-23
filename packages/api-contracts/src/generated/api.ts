@@ -36,6 +36,7 @@ import type {
   AdminSessionDto,
   AdminSessionScheduleDto,
   AdminSupplyDto,
+  AdminWebPasswordRecoveryResultDto,
   AssistantCashPaymentDto,
   AssistantClientBookingDto,
   AssistantClientDto,
@@ -1194,6 +1195,580 @@ export const useChangeCurrentAccountPassword = <
 > => {
   return useMutation(
     getChangeCurrentAccountPasswordMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type createAdminWebAuthenticationSessionResponse201 = {
+  data: CurrentAuthenticationPrincipalDto;
+  status: 201;
+};
+
+export type createAdminWebAuthenticationSessionResponseSuccess =
+  createAdminWebAuthenticationSessionResponse201 & {
+    headers: Headers;
+  };
+export type createAdminWebAuthenticationSessionResponse =
+  createAdminWebAuthenticationSessionResponseSuccess;
+
+export const getCreateAdminWebAuthenticationSessionUrl = () => {
+  return `/api/v1/admin-web/authentication-sessions`;
+};
+
+export const createAdminWebAuthenticationSession = async (
+  createAuthenticationSessionDto: CreateAuthenticationSessionDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createAdminWebAuthenticationSessionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getCreateAdminWebAuthenticationSessionUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(createAuthenticationSessionDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createAdminWebAuthenticationSessionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createAdminWebAuthenticationSessionResponse;
+};
+
+export const getCreateAdminWebAuthenticationSessionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createAdminWebAuthenticationSession>>,
+    TError,
+    CreateAdminWebAuthenticationSessionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createAdminWebAuthenticationSession>>,
+  TError,
+  CreateAdminWebAuthenticationSessionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createAdminWebAuthenticationSession"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createAdminWebAuthenticationSession>>,
+    CreateAdminWebAuthenticationSessionMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createAdminWebAuthenticationSession(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateAdminWebAuthenticationSessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createAdminWebAuthenticationSession>>
+>;
+export type CreateAdminWebAuthenticationSessionMutationBody =
+  CreateAuthenticationSessionDto;
+export type CreateAdminWebAuthenticationSessionMutationError = unknown;
+export type CreateAdminWebAuthenticationSessionMutationVariables = {
+  data: CreateAuthenticationSessionDto;
+};
+
+export const useCreateAdminWebAuthenticationSession = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createAdminWebAuthenticationSession>>,
+      TError,
+      CreateAdminWebAuthenticationSessionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createAdminWebAuthenticationSession>>,
+  TError,
+  CreateAdminWebAuthenticationSessionMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreateAdminWebAuthenticationSessionMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getCurrentAdminWebAuthenticationSessionResponse200 = {
+  data: CurrentAuthenticationPrincipalDto;
+  status: 200;
+};
+
+export type getCurrentAdminWebAuthenticationSessionResponseSuccess =
+  getCurrentAdminWebAuthenticationSessionResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentAdminWebAuthenticationSessionResponse =
+  getCurrentAdminWebAuthenticationSessionResponseSuccess;
+
+export const getGetCurrentAdminWebAuthenticationSessionUrl = () => {
+  return `/api/v1/admin-web/authentication-sessions/current`;
+};
+
+export const getCurrentAdminWebAuthenticationSession = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentAdminWebAuthenticationSessionResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetCurrentAdminWebAuthenticationSessionUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentAdminWebAuthenticationSessionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentAdminWebAuthenticationSessionResponse;
+};
+
+export const getGetCurrentAdminWebAuthenticationSessionQueryKey = () => {
+  return [`/api/v1/admin-web/authentication-sessions/current`] as const;
+};
+
+export const getGetCurrentAdminWebAuthenticationSessionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetCurrentAdminWebAuthenticationSessionQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>
+  > = ({ signal }) =>
+    getCurrentAdminWebAuthenticationSession(
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentAdminWebAuthenticationSessionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>
+>;
+export type GetCurrentAdminWebAuthenticationSessionQueryError = unknown;
+
+export function useGetCurrentAdminWebAuthenticationSession<
+  TData = Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentAdminWebAuthenticationSession<
+  TData = Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentAdminWebAuthenticationSession<
+  TData = Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentAdminWebAuthenticationSession<
+  TData = Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAdminWebAuthenticationSession>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetCurrentAdminWebAuthenticationSessionQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type logoutAdminWebAuthenticationSessionResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type logoutAdminWebAuthenticationSessionResponseSuccess =
+  logoutAdminWebAuthenticationSessionResponse204 & {
+    headers: Headers;
+  };
+export type logoutAdminWebAuthenticationSessionResponse =
+  logoutAdminWebAuthenticationSessionResponseSuccess;
+
+export const getLogoutAdminWebAuthenticationSessionUrl = () => {
+  return `/api/v1/admin-web/authentication-sessions/current`;
+};
+
+export const logoutAdminWebAuthenticationSession = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<logoutAdminWebAuthenticationSessionResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getLogoutAdminWebAuthenticationSessionUrl(),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: logoutAdminWebAuthenticationSessionResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as logoutAdminWebAuthenticationSessionResponse;
+};
+
+export const getLogoutAdminWebAuthenticationSessionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof logoutAdminWebAuthenticationSession>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof logoutAdminWebAuthenticationSession>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["logoutAdminWebAuthenticationSession"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof logoutAdminWebAuthenticationSession>>,
+    void
+  > = () => {
+    return logoutAdminWebAuthenticationSession(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LogoutAdminWebAuthenticationSessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof logoutAdminWebAuthenticationSession>>
+>;
+
+export type LogoutAdminWebAuthenticationSessionMutationError = unknown;
+
+export const useLogoutAdminWebAuthenticationSession = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof logoutAdminWebAuthenticationSession>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof logoutAdminWebAuthenticationSession>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(
+    getLogoutAdminWebAuthenticationSessionMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type completeAdminWebPasswordRecoveryResponse200 = {
+  data: AdminWebPasswordRecoveryResultDto;
+  status: 200;
+};
+
+export type completeAdminWebPasswordRecoveryResponseSuccess =
+  completeAdminWebPasswordRecoveryResponse200 & {
+    headers: Headers;
+  };
+export type completeAdminWebPasswordRecoveryResponse =
+  completeAdminWebPasswordRecoveryResponseSuccess;
+
+export const getCompleteAdminWebPasswordRecoveryUrl = () => {
+  return `/api/v1/admin-web/password-recoveries`;
+};
+
+export const completeAdminWebPasswordRecovery = async (
+  completePasswordRecoveryDto: CompletePasswordRecoveryDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<completeAdminWebPasswordRecoveryResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getCompleteAdminWebPasswordRecoveryUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(completePasswordRecoveryDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: completeAdminWebPasswordRecoveryResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as completeAdminWebPasswordRecoveryResponse;
+};
+
+export const getCompleteAdminWebPasswordRecoveryMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof completeAdminWebPasswordRecovery>>,
+    TError,
+    CompleteAdminWebPasswordRecoveryMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof completeAdminWebPasswordRecovery>>,
+  TError,
+  CompleteAdminWebPasswordRecoveryMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["completeAdminWebPasswordRecovery"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof completeAdminWebPasswordRecovery>>,
+    CompleteAdminWebPasswordRecoveryMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return completeAdminWebPasswordRecovery(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CompleteAdminWebPasswordRecoveryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof completeAdminWebPasswordRecovery>>
+>;
+export type CompleteAdminWebPasswordRecoveryMutationBody =
+  CompletePasswordRecoveryDto;
+export type CompleteAdminWebPasswordRecoveryMutationError = unknown;
+export type CompleteAdminWebPasswordRecoveryMutationVariables = {
+  data: CompletePasswordRecoveryDto;
+};
+
+export const useCompleteAdminWebPasswordRecovery = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof completeAdminWebPasswordRecovery>>,
+      TError,
+      CompleteAdminWebPasswordRecoveryMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof completeAdminWebPasswordRecovery>>,
+  TError,
+  CompleteAdminWebPasswordRecoveryMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCompleteAdminWebPasswordRecoveryMutationOptions(options),
     queryClient,
   );
 };

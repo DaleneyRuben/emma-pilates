@@ -204,6 +204,115 @@
         ]
       }
     },
+    "/api/v1/admin-web/authentication-sessions": {
+      "post": {
+        "operationId": "createAdminWebAuthenticationSession",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAuthenticationSessionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentAuthenticationPrincipalDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "AdminWebSession"
+        ]
+      }
+    },
+    "/api/v1/admin-web/authentication-sessions/current": {
+      "get": {
+        "operationId": "getCurrentAdminWebAuthenticationSession",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentAuthenticationPrincipalDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "adminWebSession": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdminWebSession"
+        ]
+      },
+      "delete": {
+        "operationId": "logoutAdminWebAuthenticationSession",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "adminWebSession": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdminWebSession"
+        ]
+      }
+    },
+    "/api/v1/admin-web/password-recoveries": {
+      "post": {
+        "operationId": "completeAdminWebPasswordRecovery",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompletePasswordRecoveryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminWebPasswordRecoveryResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "AdminWebSession"
+        ]
+      }
+    },
     "/api/v1/assistant/client-invitations": {
       "post": {
         "operationId": "inviteClient",
@@ -5108,6 +5217,11 @@
         "scheme": "bearer",
         "bearerFormat": "opaque",
         "type": "http"
+      },
+      "adminWebSession": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "__Host-emma-admin-session"
       }
     },
     "schemas": {
@@ -5300,6 +5414,127 @@
           "newPassword"
         ]
       },
+      "ClientAuthenticationIdentityDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "client"
+            ]
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "kind",
+          "clientId"
+        ]
+      },
+      "StaffAuthenticationIdentityDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "staff"
+            ]
+          },
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "trainer",
+              "nutritionist",
+              "assistant",
+              "administrator"
+            ]
+          },
+          "branchIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "staffMemberId",
+          "role",
+          "branchIds"
+        ]
+      },
+      "CreateAuthenticationSessionDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "CurrentAuthenticationPrincipalDto": {
+        "type": "object",
+        "properties": {
+          "accountId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "identity": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ClientAuthenticationIdentityDto"
+              },
+              {
+                "$ref": "#/components/schemas/StaffAuthenticationIdentityDto"
+              }
+            ],
+            "discriminator": {
+              "propertyName": "kind"
+            }
+          }
+        },
+        "required": [
+          "accountId",
+          "identity"
+        ]
+      },
+      "AdminWebPasswordRecoveryResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "recovered",
+              "expired",
+              "invalid"
+            ]
+          },
+          "signedIn": {
+            "type": "boolean",
+            "description": "True when the recovery opened a browser session (Administrators only); the credential travels only in the HttpOnly cookie"
+          }
+        },
+        "required": [
+          "status",
+          "signedIn"
+        ]
+      },
       "InviteClientDto": {
         "type": "object",
         "properties": {
@@ -5405,80 +5640,6 @@
           "email"
         ]
       },
-      "ClientAuthenticationIdentityDto": {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "type": "string",
-            "enum": [
-              "client"
-            ]
-          },
-          "clientId": {
-            "type": "string",
-            "format": "uuid"
-          }
-        },
-        "required": [
-          "kind",
-          "clientId"
-        ]
-      },
-      "StaffAuthenticationIdentityDto": {
-        "type": "object",
-        "properties": {
-          "kind": {
-            "type": "string",
-            "enum": [
-              "staff"
-            ]
-          },
-          "staffMemberId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "role": {
-            "type": "string",
-            "enum": [
-              "trainer",
-              "nutritionist",
-              "assistant",
-              "administrator"
-            ]
-          },
-          "branchIds": {
-            "type": "array",
-            "items": {
-              "type": "string",
-              "format": "uuid"
-            }
-          }
-        },
-        "required": [
-          "kind",
-          "staffMemberId",
-          "role",
-          "branchIds"
-        ]
-      },
-      "CreateAuthenticationSessionDto": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email"
-          },
-          "password": {
-            "type": "string",
-            "format": "password",
-            "minLength": 1
-          }
-        },
-        "required": [
-          "email",
-          "password"
-        ]
-      },
       "AuthenticationSessionCredentialDto": {
         "type": "object",
         "properties": {
@@ -5489,32 +5650,6 @@
         },
         "required": [
           "credential"
-        ]
-      },
-      "CurrentAuthenticationPrincipalDto": {
-        "type": "object",
-        "properties": {
-          "accountId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "identity": {
-            "oneOf": [
-              {
-                "$ref": "#/components/schemas/ClientAuthenticationIdentityDto"
-              },
-              {
-                "$ref": "#/components/schemas/StaffAuthenticationIdentityDto"
-              }
-            ],
-            "discriminator": {
-              "propertyName": "kind"
-            }
-          }
-        },
-        "required": [
-          "accountId",
-          "identity"
         ]
       },
       "VerifyClientEmailDto": {
