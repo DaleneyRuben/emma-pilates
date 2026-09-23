@@ -26,8 +26,11 @@ export type PurchaseEligibility = {
 
 // A Subscription is effective while it is paid through today and still has
 // classes to use or future booked Sessions; otherwise the purchase expires it.
-const isEffective = (
-  subscription: ActiveSubscriptionFacts,
+export const isSubscriptionEffective = (
+  subscription: Pick<
+    ActiveSubscriptionFacts,
+    'endsOn' | 'remainingClassAllowance' | 'futureBookedCount'
+  >,
   today: Date,
 ): boolean =>
   subscription.endsOn.getTime() >= today.getTime() &&
@@ -62,7 +65,7 @@ export const evaluatePurchaseEligibility = (
   if (context.activeSubscription === null) {
     return { subscriptionIdToExpire: null };
   }
-  if (isEffective(context.activeSubscription, context.today)) {
+  if (isSubscriptionEffective(context.activeSubscription, context.today)) {
     throw new PaymentRuleError(
       'subscription_not_expired',
       'The current Subscription is still active',
