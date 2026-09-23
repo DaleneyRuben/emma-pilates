@@ -22,7 +22,7 @@ describe("admin session guard", () => {
     expect(await heading("Iniciar sesión")).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/iniciar-sesion");
     expect(router.state.location.search).toEqual({
-      redirect: "/catalogo/planes?page=2",
+      redirect: "/catalogo/planes?page=2&pageSize=20",
     });
     expect(
       screen.queryByRole("navigation", { name: "Secciones" }),
@@ -51,6 +51,7 @@ describe("admin session guard", () => {
     server.use(...signedInHandlers());
     const { router, queryClient } = renderAdmin("/back-office/gastos");
     await heading("Gastos");
+    server.use(...signedOutHandlers());
 
     const ended = () =>
       Promise.reject(
@@ -66,7 +67,7 @@ describe("admin session guard", () => {
       screen.getByText("Tu sesión terminó. Vuelve a iniciar sesión."),
     ).toBeInTheDocument();
     expect(router.state.location.search).toEqual({
-      redirect: "/back-office/gastos",
+      redirect: "/back-office/gastos?page=1&pageSize=20",
       notice: "session-ended",
     });
     expect(router.history.length).toBe(2);
