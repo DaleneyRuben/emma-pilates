@@ -473,3 +473,43 @@ export const deactivateStaffMember = async (
     return reread(transaction, member.id);
   });
 };
+
+export type StaffDirectoryQuery = {
+  page: number;
+  pageSize: number;
+  role?: StaffRoleName;
+  branchId?: string;
+  status?: StaffStatus;
+};
+
+export type StaffDirectoryPage = {
+  items: StaffMemberRecord[];
+  page: number;
+  pageSize: number;
+  totalItems: number;
+};
+
+export interface StaffDirectory {
+  list: (query: StaffDirectoryQuery) => Promise<StaffDirectoryPage>;
+  read: (staffMemberId: string) => Promise<StaffMemberRecord | null>;
+}
+
+export const listStaffMembers = async (
+  query: StaffDirectoryQuery,
+  principal: AuthenticatedPrincipal,
+  directory: StaffDirectory,
+): Promise<StaffDirectoryPage> => {
+  requireAdministrator(principal);
+  return directory.list(query);
+};
+
+export const readStaffMember = async (
+  command: { staffMemberId: string },
+  principal: AuthenticatedPrincipal,
+  directory: StaffDirectory,
+): Promise<StaffMemberRecord> => {
+  requireAdministrator(principal);
+  const member = await directory.read(command.staffMemberId);
+  if (member === null) throw new StaffManagementError('staff_member_not_found');
+  return member;
+};

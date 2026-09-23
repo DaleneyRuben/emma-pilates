@@ -15,6 +15,7 @@ import {
 import { boliviaDate } from '../../time/bolivia-time';
 import { endNutritionistAvailability } from '../evaluations/prisma-evaluation-commands';
 import type {
+  StaffDirectory,
   StaffManagementTransaction,
   StaffManagementUnitOfWork,
   StaffMemberRecord,
@@ -256,24 +257,11 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
   }
 }
 
-export type StaffDirectoryQuery = {
-  page: number;
-  pageSize: number;
-  role?: StaffRoleName;
-  branchId?: string;
-  status?: StaffStatus;
-};
-
-export type StaffDirectoryPage = {
-  items: StaffMemberRecord[];
-  page: number;
-  pageSize: number;
-  totalItems: number;
-};
-
 // Administrator reads for the admin-web staff table (ADR-0061 page-and-offset).
-export const createPrismaStaffDirectory = (prisma: PrismaClient) => ({
-  list: async (query: StaffDirectoryQuery): Promise<StaffDirectoryPage> => {
+export const createPrismaStaffDirectory = (
+  prisma: PrismaClient,
+): StaffDirectory => ({
+  list: async (query) => {
     const where: Prisma.StaffMemberWhereInput = {
       account:
         query.status === undefined
@@ -301,7 +289,7 @@ export const createPrismaStaffDirectory = (prisma: PrismaClient) => ({
       totalItems,
     };
   },
-  read: async (staffMemberId: string): Promise<StaffMemberRecord | null> => {
+  read: async (staffMemberId) => {
     const row = await prisma.staffMember.findUnique({
       where: { id: staffMemberId },
       select: staffSelect,
