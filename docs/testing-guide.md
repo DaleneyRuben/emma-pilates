@@ -8,7 +8,7 @@ you are starting with no project knowledge.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, Plans, Plan detail, Mi plan, Perfil, and Editar perfil with the fixture Accounts | Class browsing and bookings are still placeholders; paying for a Plan from the app is not available yet |
-| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10) | Assistant and Nutritionist destinations are still placeholders; the Assistant APIs can be exercised through Swagger (Test 7) |
+| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11) | The Nutritionist destination is still a placeholder |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, and active Client and Staff Accounts with one command                            | Promotions and receipt images are not included until image delivery is specified                                                              |
 | Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
@@ -927,6 +927,98 @@ When the available Credit covers the whole price, **Continuar al pago**
 activates the Plan immediately (`POST /api/v1/credit-purchases`) and lands on
 "¡Pago confirmado!" without a QR. The fixtures cannot reach this (Bs 60 is
 below the cheapest Plan), so the automated purchase-flow spec covers it.
+
+## Test 11: act for a Client as the Assistant in the Staff app
+
+Start the Staff app (Test 1B) with the backend and worker running (Test 2 and
+the worker command from Test 5) and log in as `camila.rojas@example.com`
+(Assistant assigned to Centro). The Assistant root is **Buscar cliente**.
+
+### A. Find a Client and read her overview
+
+Type at least two characters in **Buscar por nombre, teléfono o correo**
+("luc", "7001", or "lucia@"). Each result shows the name, phone, and email; a
+still-pending Client carries a **Pendiente** tag. With no match the screen
+reads "No se encontró ningún cliente." and keeps **+ Nuevo cliente** as the
+next step. Tap Lucía: the overview shows her Plan card ("Paquete de 8 clases",
+"N clases restantes", "Vence el …", **Activa**), her next reservation, the
+**Reservar clase** and **Registrar pago en efectivo** actions, **Ver
+reservas** (only while a Plan is active), and the **Historial** card with her
+last two classes and **Ver historial completo**. A Client without a Plan reads
+"Sin plan activo" with **Reservar clase** disabled.
+
+### B. Bookings, cancellation, and history
+
+**Ver reservas** opens **Reservas de la clienta** under the banner "Viendo
+reservas de: Lucía Fernández". Cards mirror the Client app: **Cancelar** for a
+reservation outside the 2 h 30 window, **No cancelable** plus **Reprogramar**
+inside it, **En lista de espera** plus **Salir de la lista de espera**. Items
+at a Branch you are not assigned to keep their action disabled with "Solo en
+tus sucursales". Cancelling asks "¿Cancelar esta reserva de Lucía Fernández?"
+first. With nothing upcoming the screen reads "Esta clienta no tiene reservas
+próximas." and offers **Reservar una clase**. **Ver historial completo** lists
+attended classes by month ("Septiembre 2026") under "Viendo historial de: …".
+
+### C. Book a class for her
+
+**Reservar clase** opens **Reservar una clase** with the banner "Reservando
+para: Lucía Fernández", the Branch row, the seven day chips, and the Class Type
+chips. Tap a Session: the detail shows Trainer, Branch, date, time, duration,
+and "X de Y cupos disponibles". **Reservar** books it for the Client and lands
+on **Reservas de la clienta** with the "Reserva confirmada" notice. A full
+class offers **Unirme a la lista de espera** ("Clase llena. Se avisará al
+cliente si se libera un cupo."); a Client without classes left sees **Reservar**
+disabled, "El cliente no tiene clases disponibles en su plan.", and
+**Registrar pago**. After booking, **Volver** goes straight back to her
+overview, not to the Session you just booked. Rescheduling works the same
+way.
+
+### D. Take a cash Payment
+
+Open `mariana@example.com` (no Plan) and tap **Registrar pago en efectivo**.
+**Elige un plan** shows "Registrando pago para: Mariana Peña", the Credit line
+when the Client has any ("Este cliente tiene Bs 60 de crédito disponible."),
+and the four Plans with the cash amount after Credit (the original price
+crossed out). Tap one: **Confirmar pago en efectivo** breaks down **Precio del
+plan**, **Crédito aplicado**, and **Monto a cobrar en efectivo**; when you are
+assigned to several Branches a chip row asks where you received the cash.
+**Confirmar pago recibido** activates the Plan at once and shows
+"¡Pago registrado!" with the Plan, its classes, and "Válido hasta el …";
+**Volver al cliente** returns to the overview, now **Activa**, and **Volver**
+from there goes back to **Buscar cliente**. A Client with an active Plan
+answers "El cliente ya tiene un plan activo."
+
+### E. Invite a new Client and manage the invitation
+
+From **Buscar cliente** tap **+ Nuevo cliente**. Fill **Nombre**, **Correo
+electrónico**, and optionally **Teléfono (opcional)**; the form explains
+"Enviaremos un enlace de activación al correo. Vence en 7 días." **Crear
+cuenta** creates the pending Client, queues the activation email (the worker
+delivers it to the local capture), and opens her overview with the card
+**Cuenta pendiente de activación**: the email, "El enlace de activación vence
+el …", the 30-day removal note, **Cambiar correo**, **Reenviar enlace**, and
+**Cancelar invitación** (confirmed with "¿Cancelar la invitación de …?", then
+back to **Buscar cliente**). A second send within a minute answers "Ya
+enviamos un correo a esa dirección hace poco…". An email already in use
+answers "Este correo ya pertenece a otra cuenta."; a pending self-registration
+explains that verification is pending and offers **Ver cliente**. Once the
+pending Client has a Payment or Booking, **Cancelar invitación** disappears
+and the account stays pending until she activates it.
+
+### F. Tablet layout
+
+Open the same Metro URL in an iPad Simulator (for example iPad Pro 11-inch)
+with Expo Go installed. **Buscar cliente** becomes a split view: the search
+and results sit in a left column and the right panel reads "Selecciona un
+cliente para ver sus detalles". Tapping a result highlights it and shows her
+overview in the right panel without navigating away; **Ver reservas** and
+**Ver historial completo** also open in that panel, with **Volver** returning
+to the overview. **Reservar clase**, **Registrar pago en efectivo**, and
+**+ Nuevo cliente** open full-screen: the classes and the Plans show as a
+two-column grid, and the Session detail, the cash confirmation, and the new
+Client form sit in a centered card. Finishing a booking, a cash Payment, or a
+new Client returns to the split with that Client in the panel. Cancelling an
+invitation clears the panel.
 
 ## What you cannot test yet
 
