@@ -47,6 +47,7 @@ model StaffMember {
   sessions            Session[]
   availabilityBlocks  AvailabilityBlock[]
   evaluationSlots     EvaluationSlot[]
+  salaryPayments      SalaryPayment[]
 
   @@map("staff_members")
   @@schema("booking")
@@ -66,6 +67,8 @@ model Branch {
   cashPayments     Payment[]
   availabilityBlocks AvailabilityBlock[]
   evaluationSlots  EvaluationSlot[]
+  supplies         Supply[]
+  expenses         Expense[]
 
   @@map("branches")
   @@schema("booking")

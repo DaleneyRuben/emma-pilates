@@ -184,6 +184,11 @@ model Account {
   endedAvailabilityBlocks   AvailabilityBlock[]     @relation("AvailabilityBlockEndedBy")
   createdEvaluations        Evaluation[]            @relation("EvaluationCreatedBy")
   cancelledEvaluations      Evaluation[]            @relation("EvaluationCancelledBy")
+  createdSupplies           Supply[]                @relation("SupplyCreatedBy")
+  recordedWithdrawals       Withdrawal[]            @relation("WithdrawalRecordedBy")
+  recordedSupplyRestocks    SupplyRestock[]         @relation("SupplyRestockRecordedBy")
+  recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
+  recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
 
   @@map("accounts")
   @@schema("system")
