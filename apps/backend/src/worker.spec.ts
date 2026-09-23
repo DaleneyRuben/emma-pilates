@@ -1,6 +1,15 @@
 import { WORKER_HEARTBEAT_INTERVAL_MS } from './jobs/worker-heartbeat';
 import { startWorker, type WorkerBoss } from './worker';
 
+const evaluationJobs = () => ({
+  evaluationSlots: {
+    execute: jest.fn().mockResolvedValue({ blocks: 0, created: 0, skipped: 0 }),
+  },
+  evaluationReminders: {
+    execute: jest.fn().mockResolvedValue({ sent: 0 }),
+  },
+});
+
 describe('worker entrypoint', () => {
   afterEach(() => {
     jest.useRealTimers();
@@ -51,6 +60,7 @@ describe('worker entrypoint', () => {
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
+      ...evaluationJobs(),
       serviceVersion: '1.2.3',
       emit,
     });
@@ -111,6 +121,7 @@ describe('worker entrypoint', () => {
       imageUploadCleanup,
       subscriptionReminders,
       purchaseIntentExpiry,
+      ...evaluationJobs(),
       serviceVersion: '1.2.3',
       emit: jest.fn(),
     };
@@ -175,6 +186,7 @@ describe('worker entrypoint', () => {
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
+      ...evaluationJobs(),
       serviceVersion: '1.2.3',
       emit,
     });
@@ -231,6 +243,7 @@ describe('worker entrypoint', () => {
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
+      ...evaluationJobs(),
       serviceVersion: '1.2.3',
       emit,
     });
@@ -287,6 +300,7 @@ describe('worker entrypoint', () => {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
       imageUploadCleanup,
+      ...evaluationJobs(),
       serviceVersion: '1.2.3',
       emit,
     });
@@ -302,5 +316,83 @@ describe('worker entrypoint', () => {
     );
 
     await stopWorker();
+  });
+
+  it('materializes Evaluation slots at start and hourly and sweeps Evaluation reminders every minute', async () => {
+    jest.useFakeTimers();
+    const boss: WorkerBoss = {
+      isInstalled: jest.fn().mockResolvedValue(true),
+      schemaVersion: jest.fn().mockResolvedValue(38),
+      start: jest.fn().mockResolvedValue(undefined),
+      work: jest.fn().mockResolvedValue('worker-id'),
+      getQueueStats: jest.fn().mockResolvedValue([]),
+      stop: jest.fn().mockResolvedValue(undefined),
+    };
+    const evaluationSlots = {
+      execute: jest
+        .fn()
+        .mockResolvedValueOnce({ blocks: 1, created: 5, skipped: 0 })
+        .mockRejectedValueOnce(new Error('sensitive slot failure'))
+        .mockResolvedValue({ blocks: 1, created: 0, skipped: 0 }),
+    };
+    const evaluationReminders = {
+      execute: jest
+        .fn()
+        .mockResolvedValueOnce({ sent: 0 })
+        .mockRejectedValueOnce(new Error('sensitive reminder failure'))
+        .mockResolvedValue({ sent: 1 }),
+    };
+    const emit = jest.fn();
+
+    const stopWorker = await startWorker({
+      boss,
+      authenticationEmail: {
+        stateReader: { find: jest.fn() },
+        decryptor: { decrypt: jest.fn() },
+        renderer: { render: jest.fn() },
+        delivery: { deliver: jest.fn() },
+      },
+      finalizeUpload: { process: jest.fn() },
+      pendingAccountCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      imageUploadCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
+      },
+      evaluationSlots,
+      evaluationReminders,
+      serviceVersion: '1.2.3',
+      emit,
+    });
+
+    expect(evaluationSlots.execute).toHaveBeenCalledTimes(1);
+    expect(evaluationReminders.execute).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(60 * 1_000);
+    expect(evaluationReminders.execute).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledWith({
+      event: 'evaluation_reminders_failed',
+      serviceVersion: '1.2.3',
+    });
+
+    await jest.advanceTimersByTimeAsync(59 * 60 * 1_000);
+    expect(evaluationReminders.execute).toHaveBeenCalledTimes(61);
+    expect(evaluationSlots.execute).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledWith({
+      event: 'evaluation_slot_materialization_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(JSON.stringify(emit.mock.calls)).not.toContain('sensitive');
+
+    await stopWorker();
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    expect(evaluationSlots.execute).toHaveBeenCalledTimes(2);
+    expect(evaluationReminders.execute).toHaveBeenCalledTimes(61);
   });
 });
