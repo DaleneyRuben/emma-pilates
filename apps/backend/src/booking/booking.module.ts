@@ -74,6 +74,16 @@ import {
   type TransferInstructions,
 } from './payments/payments.controller';
 import { createPrismaPaymentCommands } from './payments/prisma-payment-commands';
+import {
+  ClientEvaluationsController,
+  evaluationCommands,
+  EvaluationSlotsController,
+} from './evaluations/evaluations.controller';
+import {
+  NutritionistAvailabilityBlocksController,
+  NutritionistEvaluationsController,
+} from './evaluations/nutritionist.controller';
+import { createPrismaEvaluationCommands } from './evaluations/prisma-evaluation-commands';
 import { loadStaffProfile } from './staff/staff-profile';
 import {
   StaffProfileController,
@@ -121,6 +131,10 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     AdministratorPaymentsController,
     AdministratorSessionsController,
     AssistantClientsController,
+    EvaluationSlotsController,
+    ClientEvaluationsController,
+    NutritionistEvaluationsController,
+    NutritionistAvailabilityBlocksController,
   ],
   providers: [
     {
@@ -476,6 +490,12 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
         accountNumber: config.getOrThrow('TRANSFER_ACCOUNT_NUMBER'),
         qrImagePath: config.getOrThrow('TRANSFER_QR_IMAGE_PATH'),
       }),
+    },
+    {
+      provide: evaluationCommands,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) =>
+        createPrismaEvaluationCommands(prisma, { now: () => new Date() }),
     },
     {
       provide: BookingRuntimeCleanup,
