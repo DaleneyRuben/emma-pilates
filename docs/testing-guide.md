@@ -727,6 +727,12 @@ This currently covers backend domain behavior, security helpers, registration
 rules, job behavior, and worker building blocks. It does not run the separate
 backend end-to-end or database integration suites.
 
+It also runs the architecture checks, including the audit catalog check: every
+audit action code the backend writes must be listed in
+[`docs/security/audit-event-catalog.md`](./security/audit-event-catalog.md),
+and every listed code must be written somewhere. If you add or rename an
+audited action, update that catalog in the same change or this test fails.
+
 ### Mobile automated tests
 
 ```sh
