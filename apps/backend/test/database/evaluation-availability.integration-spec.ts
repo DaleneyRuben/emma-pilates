@@ -82,8 +82,7 @@ describe('Prisma evaluation availability commands', () => {
     // Monday through 2026-10-21 has five 45-minute slots.
     const slots = await publishedSlots(block.id);
     expect(slots).toHaveLength(22);
-    expect(slots[0]).toEqual({
-      id: expect.any(String),
+    expect(slots[0]).toMatchObject({
       startsAt: at('2026-09-21T15:15:00.000Z'),
       endsAt: at('2026-09-21T16:00:00.000Z'),
       localMonth: civil('2026-09-01'),

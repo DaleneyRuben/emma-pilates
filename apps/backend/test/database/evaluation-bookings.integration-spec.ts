@@ -52,7 +52,7 @@ describe('Prisma evaluation booking commands', () => {
       (value) => ({ ok: true as const, value }),
       async (error: unknown) => ({
         ok: false as const,
-        code: await codeOf(Promise.reject(error)),
+        code: await codeOf(Promise.reject(error as Error)),
       }),
     );
 
@@ -353,9 +353,10 @@ describe('Prisma evaluation booking commands', () => {
       commands().listClientEvaluations({ scope: 'upcoming' }, lucia),
     ).resolves.toMatchObject({ items: [{ id: ids.luciaSeptember }] });
 
+    // The freed slot is bookable again, as her October follow-up.
     ids.luciaFollowUp = (
       await commands().bookEvaluation(
-        await slotAt(mondayBlockId, '2026-10-12T13:00:00.000Z'),
+        await slotAt(mondayBlockId, '2026-10-05T13:00:00.000Z'),
         lucia,
         randomUUID(),
       )
