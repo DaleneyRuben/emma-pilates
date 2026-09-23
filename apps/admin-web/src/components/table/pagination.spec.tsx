@@ -2,12 +2,8 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createColumnHelper } from "@tanstack/react-table";
 import { DataTable } from "./data-table";
-import {
-  listSearchSchema,
-  pageCount,
-  pageRangeLabel,
-  TablePagination,
-} from "./pagination";
+import { listSearchSchema, pageCount, pageRangeLabel } from "./pagination";
+import { TablePagination } from "./table-pagination";
 
 describe("listSearchSchema", () => {
   it("defaults to the first page of twenty rows", () => {

@@ -4,6 +4,7 @@ import {
   createRouter,
   type RouterHistory,
 } from "@tanstack/react-router";
+import { listSearchSchema } from "../components/table/pagination";
 import { NotFoundPage } from "../pages/not-found-page";
 import { PlaceholderPage } from "../pages/placeholder-page";
 import { AdminShell } from "../shell/admin-shell";
@@ -23,12 +24,21 @@ const rootRoute = createRootRouteWithContext<AdminRouterContext>()({
   notFoundComponent: NotFoundPage,
 });
 
+// List pages validate their page-and-offset search (ADR-0061) so the URL,
+// not component state, owns pagination (ADR-0042).
 const placeholderRoutes = navigationItems.map((item) =>
-  createRoute({
-    getParentRoute: () => rootRoute,
-    path: item.to,
-    component: () => <PlaceholderPage item={item} />,
-  }),
+  item.list
+    ? createRoute({
+        getParentRoute: () => rootRoute,
+        path: item.to,
+        validateSearch: listSearchSchema,
+        component: () => <PlaceholderPage item={item} />,
+      })
+    : createRoute({
+        getParentRoute: () => rootRoute,
+        path: item.to,
+        component: () => <PlaceholderPage item={item} />,
+      }),
 );
 
 const routeTree = rootRoute.addChildren(placeholderRoutes);

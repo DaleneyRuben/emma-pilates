@@ -32,6 +32,8 @@ export type NavigationItem = {
    * sucursal — …".
    */
   studioWide?: string;
+  /** A dense list page (design system → List pages) with page-and-offset search. */
+  list?: true;
 };
 
 export type NavigationGroup = {
@@ -48,9 +50,15 @@ export const navigationGroups: readonly NavigationGroup[] = [
         label: "Tipos de clase",
         to: "/catalogo/tipos-de-clase",
         screen: "AW06",
+        list: true,
       },
-      { label: "Planes", to: "/catalogo/planes", screen: "AW04" },
-      { label: "Sucursales", to: "/catalogo/sucursales", screen: "AW19" },
+      { label: "Planes", to: "/catalogo/planes", screen: "AW04", list: true },
+      {
+        label: "Sucursales",
+        to: "/catalogo/sucursales",
+        screen: "AW19",
+        list: true,
+      },
     ],
   },
   {
@@ -60,32 +68,52 @@ export const navigationGroups: readonly NavigationGroup[] = [
         label: "Clientes",
         to: "/back-office/clientes",
         screen: "AW21",
+        list: true,
         studioWide: "los clientes son del estudio, no de una sede.",
       },
       {
         label: "Pagos",
         to: "/back-office/pagos",
         screen: "AW28",
+        list: true,
         studioWide: "los pagos son del estudio, no de una sede.",
       },
-      { label: "Insumos", to: "/back-office/insumos", screen: "AW08" },
+      {
+        label: "Insumos",
+        to: "/back-office/insumos",
+        screen: "AW08",
+        list: true,
+      },
       {
         label: "Evaluaciones nutricionales",
         to: "/back-office/evaluaciones-nutricionales",
         screen: "AW25",
+        list: true,
       },
-      { label: "Personal", to: "/back-office/personal", screen: "AW23" },
+      {
+        label: "Personal",
+        to: "/back-office/personal",
+        screen: "AW23",
+        list: true,
+      },
       {
         label: "Nómina",
         to: "/back-office/nomina",
         screen: "AW11",
+        list: true,
         studioWide: "la nómina es del estudio, no de una sede.",
       },
-      { label: "Gastos", to: "/back-office/gastos", screen: "AW13" },
+      {
+        label: "Gastos",
+        to: "/back-office/gastos",
+        screen: "AW13",
+        list: true,
+      },
       {
         label: "Categorías de gasto",
         to: "/back-office/categorias-de-gasto",
         screen: "AW15",
+        list: true,
       },
     ],
   },
@@ -93,17 +121,19 @@ export const navigationGroups: readonly NavigationGroup[] = [
   {
     label: "Promociones",
     items: [
-      { label: "Promociones", to: "/promociones", screen: "AW17" },
+      { label: "Promociones", to: "/promociones", screen: "AW17", list: true },
       {
         label: "Referidos",
         to: "/promociones/referidos",
         screen: "AW26",
+        list: true,
         studioWide: "los referidos son del estudio, no de una sede.",
       },
       {
         label: "Créditos",
         to: "/promociones/creditos",
         screen: "AW27",
+        list: true,
         studioWide: "los créditos son del estudio, no de una sede.",
       },
     ],

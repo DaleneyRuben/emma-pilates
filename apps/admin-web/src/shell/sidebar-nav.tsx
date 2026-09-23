@@ -19,7 +19,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               key={item.to}
               to={item.to}
               onClick={onNavigate}
-              activeOptions={{ exact: true }}
+              activeOptions={{ exact: true, includeSearch: false }}
               className="flex h-9 items-center rounded-control px-3 text-fila-menu text-texto-secundario hover:bg-hover-fila hover:text-texto data-[status=active]:bg-primario-tinte data-[status=active]:font-medium data-[status=active]:text-primario-profundo"
             >
               {item.label}

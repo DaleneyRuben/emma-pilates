@@ -107,14 +107,20 @@ describe("admin routes", () => {
 
     const router = renderAt("/catalogo/planes?page=abc&pageSize=500");
     await screen.findByRole("heading", { level: 1, name: "Planes" });
-    expect(router.state.location.search).toEqual({ page: 1, pageSize: 20 });
+    expect(router.state.matches.at(-1)?.search).toEqual({
+      page: 1,
+      pageSize: 20,
+    });
 
     await router.navigate({
       to: "/back-office/gastos",
       search: { page: 3, pageSize: 50 },
     });
     await screen.findByRole("heading", { level: 1, name: "Gastos" });
-    expect(router.state.location.search).toEqual({ page: 3, pageSize: 50 });
+    expect(router.state.matches.at(-1)?.search).toEqual({
+      page: 3,
+      pageSize: 50,
+    });
     expect(router.state.location.href).toBe(
       "/back-office/gastos?page=3&pageSize=50",
     );
