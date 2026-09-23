@@ -1327,6 +1327,14 @@ To check that the release bundles build, run
 follow the [mobile release runbook](./runbooks/mobile-release.md) and need the
 Expo, Apple, and Google accounts first.
 
+## Test 20: search every Branch as the Administrator
+
+In the Staff app as `paola.mendoza@example.com`, open **Cancelar una clase**,
+tap **Sucursal**, and choose **Todas las sucursales**: the day's Sessions of
+every Branch appear together, each card naming its Trainer and Branch
+("Emma Vargas · Urubó"). The API behind it is
+`GET /api/v1/administrator/sessions?from=…&until=…` (Administrators only).
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
