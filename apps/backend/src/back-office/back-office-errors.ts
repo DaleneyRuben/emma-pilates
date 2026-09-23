@@ -9,6 +9,9 @@ export type BackOfficeErrorCode =
   | 'supply_archived'
   | 'insufficient_stock'
   | 'invalid_back_office_value'
+  | 'date_in_future'
+  | 'staff_member_not_found'
+  | 'salary_payment_not_found'
   | 'idempotency_key_reused';
 
 const statuses: Record<BackOfficeErrorCode, number> = {
@@ -20,6 +23,9 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   supply_archived: 409,
   insufficient_stock: 409,
   invalid_back_office_value: 400,
+  date_in_future: 400,
+  staff_member_not_found: 404,
+  salary_payment_not_found: 404,
   idempotency_key_reused: 409,
 };
 

@@ -44,8 +44,10 @@ beyond what the table below names.
 | `session.cancelled` | Booking & Membership | An Administrator cancels a Session with Bookings (last resort) | Administrator | `session` | Session Branch | `cause`, `cancelledBookings`, `closedWaitlistEntries` |
 | `session.updated` | Booking & Membership | An Administrator edits one Session (Trainer swap, new start, or capacity) | Administrator | `session` | Session Branch | previous and new `trainerStaffMemberId`, `startsAt`, `capacity` (only those changed) |
 | `evaluation.cancelled_by_staff` | Booking & Membership | The Nutritionist or an Administrator cancels a booked Evaluation | Staff Account and Role | `evaluation` | Slot Branch | `cause`, `insideClientWindow` |
+| `salary_payment.recorded` | Back Office | An Administrator records a Salary Payment | Administrator | `salary_payment` | — | `amountCentavos`, `paidOn` |
+| `salary_payment.updated` | Back Office | An Administrator corrects a Salary Payment | Administrator | `salary_payment` | — | previous and new `staffMemberId`, `amountCentavos`, `paidOn` (only those changed) |
 
-Back Office money records are decided in BKO-001.
+Back Office money records follow BKO-001 D17: Salary Payments and Expenses are audited; Supplies, Withdrawals, Restocks, and Expense Categories are not (below).
 
 ## Considered and not audited
 
@@ -62,6 +64,8 @@ Back Office money records are decided in BKO-001.
 | Availability Block create, replace, end | The Nutritionist manages their own schedule; the block row records `created_by`/`ended_by`, and booked Evaluations are never changed by it. |
 | Transfer receipt upload and Purchase Intent creation | Client self-service with no decision; the Payment decision is audited instead. |
 | Credit ledger entries | The ledger itself is append-only and actor-stamped; the Payment audit references the purchase. |
+| Supply create, edit, and archive; Withdrawals and Restocks | Stock rows record their actor and time, move no money, and the database keeps the quantity reconciled with the movements (BKO-001 D4, D17). |
+| Expense Category create and delete | A label with no money of its own; deletion is refused while any Expense uses it (BKO-001 D13). |
 
 ## Retention (provisional)
 
