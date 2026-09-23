@@ -35,7 +35,7 @@ import type { AuthenticatedPrincipal } from '../src/system-identity/authenticati
 export const trustedOrigin = 'http://localhost:5173';
 export const credential = 'c'.repeat(43);
 export const sessionCookie = `__Host-emma-admin-session=${credential}`;
-const administrator: AuthenticatedPrincipal = {
+export const administrator: AuthenticatedPrincipal = {
   accountId: 'account-id',
   authenticationSessionId: 'authentication-session-id',
   identity: {
@@ -46,26 +46,28 @@ const administrator: AuthenticatedPrincipal = {
   },
 };
 
-export const executeLogin =
-  jest.fn<(command: LoginCommand) => Promise<{ credential: string }>>();
-export const resolvePrincipal =
-  jest.fn<
-    (
-      credential: string,
-      meaningfulActivity: boolean,
-      surface?: 'mobile' | 'admin_web',
-    ) => Promise<AuthenticatedPrincipal>
-  >();
-export const executeLogout =
-  jest.fn<(authenticationSessionId: string) => Promise<void>>();
-export const completeRecovery =
-  jest.fn<
-    (command: {
-      token: string;
-      password: string;
-    }) => Promise<{ status: string; credential?: string }>
-  >();
-export const changePassword = jest.fn<(command: unknown) => Promise<void>>();
+type LoginFunction = (command: LoginCommand) => Promise<{ credential: string }>;
+type ResolveFunction = (
+  credential: string,
+  meaningfulActivity: boolean,
+  surface?: 'mobile' | 'admin_web',
+) => Promise<AuthenticatedPrincipal>;
+type LogoutFunction = (authenticationSessionId: string) => Promise<void>;
+type RecoveryFunction = (command: {
+  token: string;
+  password: string;
+}) => Promise<{ status: string; credential?: string }>;
+type ChangePasswordFunction = (command: unknown) => Promise<void>;
+
+export const executeLogin: jest.Mock<LoginFunction> = jest.fn<LoginFunction>();
+export const resolvePrincipal: jest.Mock<ResolveFunction> =
+  jest.fn<ResolveFunction>();
+export const executeLogout: jest.Mock<LogoutFunction> =
+  jest.fn<LogoutFunction>();
+export const completeRecovery: jest.Mock<RecoveryFunction> =
+  jest.fn<RecoveryFunction>();
+export const changePassword: jest.Mock<ChangePasswordFunction> =
+  jest.fn<ChangePasswordFunction>();
 
 @Module({
   controllers: [AdminWebSessionController, AccountSecurityController],

@@ -9,7 +9,6 @@ import {
   Inject,
   Patch,
   Post,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiAcceptedResponse,
@@ -39,7 +38,10 @@ import {
 } from './account-security.dto';
 import { authenticatedPrincipalResolver } from '../authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
-import { AuthenticationRequiredError } from '../authentication/resolve-authenticated-principal';
+import {
+  authenticateBearer,
+  type PrincipalResolver,
+} from '../authentication/bearer-principal';
 
 export const authenticationLinkInspection = Symbol(
   'authenticationLinkInspection',
@@ -69,10 +71,6 @@ type PasswordChangeHandler = (command: {
   currentPassword: string;
   newPassword: string;
 }) => Promise<void>;
-type PrincipalResolver = (
-  credential: string,
-  meaningfulActivity: boolean,
-) => Promise<AuthenticatedPrincipal>;
 
 @Controller({ version: '1' })
 export class AccountSecurityController {
@@ -176,19 +174,9 @@ export class AccountSecurityController {
     }
   }
 
-  private async authenticate(
+  private authenticate(
     authorization: string | undefined,
   ): Promise<AuthenticatedPrincipal> {
-    const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
-    if (match?.[1] === undefined)
-      throw new UnauthorizedException('Authentication is required');
-    try {
-      return await this.resolvePrincipal(match[1], true);
-    } catch (error) {
-      if (error instanceof AuthenticationRequiredError) {
-        throw new UnauthorizedException('Authentication is required');
-      }
-      throw error;
-    }
+    return authenticateBearer(this.resolvePrincipal, authorization);
   }
 }

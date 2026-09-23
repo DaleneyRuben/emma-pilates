@@ -6,7 +6,6 @@ import {
   Get,
   Headers,
   HttpCode,
-  HttpException,
   HttpStatus,
   Inject,
   Post,
@@ -24,7 +23,6 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
-import { AuthenticationFailedError } from './authenticate-credentials';
 import {
   AuthenticationSessionCredentialDto,
   ClientAuthenticationIdentityDto,
@@ -34,7 +32,7 @@ import {
   StaffAuthenticationIdentityDto,
 } from './authentication.dto';
 import type { LoginCommand } from './login';
-import { LoginThrottledError } from './login';
+import { toLoginProblem } from './login-problems';
 import type { AuthenticatedPrincipal } from './resolve-authenticated-principal';
 import { AuthenticationRequiredError } from './resolve-authenticated-principal';
 
@@ -69,12 +67,6 @@ const parseBearerCredential = (authorization: string | undefined): string => {
 
   return match[1];
 };
-
-const authenticationProblem = (
-  status: number,
-  code: string,
-  detail: string,
-): HttpException => new HttpException({ code, detail }, status);
 
 @Controller({ path: 'authentication-sessions', version: '1' })
 @ApiExtraModels(ClientAuthenticationIdentityDto, StaffAuthenticationIdentityDto)
@@ -113,24 +105,7 @@ export class AuthenticationController {
         networkAddress: request.ip ?? request.socket.remoteAddress ?? 'unknown',
       });
     } catch (error) {
-      if (error instanceof AuthenticationFailedError) {
-        throw authenticationProblem(
-          HttpStatus.UNAUTHORIZED,
-          'authentication_failed',
-          'Email or password is incorrect',
-        );
-      }
-
-      if (error instanceof LoginThrottledError) {
-        response.setHeader('Retry-After', String(error.retryAfterSeconds));
-        throw authenticationProblem(
-          HttpStatus.TOO_MANY_REQUESTS,
-          'login_throttled',
-          'Login is temporarily unavailable. Try again later',
-        );
-      }
-
-      throw error;
+      throw toLoginProblem(error, response);
     }
   }
 
