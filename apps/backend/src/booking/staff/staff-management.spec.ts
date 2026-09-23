@@ -4,6 +4,8 @@ import {
   changeStaffRole,
   createStaffMember,
   deactivateStaffMember,
+  listStaffMembers,
+  readStaffMember,
   resendStaffActivation,
   StaffManagementError,
   type StaffManagementTransaction,
@@ -496,5 +498,42 @@ describe('deactivateStaffMember', () => {
       code,
     );
     expect(transaction.disableAccount).not.toHaveBeenCalled();
+  });
+});
+
+describe('staff directory reads', () => {
+  const directory = {
+    list: jest.fn().mockResolvedValue({
+      items: [record()],
+      page: 1,
+      pageSize: 20,
+      totalItems: 1,
+    }),
+    read: jest.fn().mockResolvedValue(record()),
+  };
+
+  it('lists and reads Staff Members for an Administrator', async () => {
+    await expect(
+      listStaffMembers({ page: 1, pageSize: 20 }, administrator, directory),
+    ).resolves.toMatchObject({ totalItems: 1 });
+    await expect(
+      readStaffMember({ staffMemberId: 'staff-1' }, administrator, directory),
+    ).resolves.toMatchObject({ id: 'staff-1' });
+  });
+
+  it('denies other Roles and reports an unknown Staff Member', async () => {
+    await rejectsWith(
+      listStaffMembers(
+        { page: 1, pageSize: 20 },
+        principal('assistant'),
+        directory,
+      ),
+      'staff_access_denied',
+    );
+    directory.read.mockResolvedValueOnce(null);
+    await rejectsWith(
+      readStaffMember({ staffMemberId: 'missing' }, administrator, directory),
+      'staff_member_not_found',
+    );
   });
 });
