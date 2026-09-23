@@ -143,7 +143,11 @@ describe('AdministratorPaymentsController', () => {
 describe('AdministratorSessionsController', () => {
   const resolvePrincipal = jest.fn();
   const cancel = jest.fn();
-  const controller = new AdministratorSessionsController(cancel, resolvePrincipal);
+  const controller = new AdministratorSessionsController(
+    cancel,
+    jest.fn(),
+    resolvePrincipal,
+  );
 
   beforeEach(() => {
     resolvePrincipal.mockResolvedValue(administrator);

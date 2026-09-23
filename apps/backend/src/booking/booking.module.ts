@@ -60,6 +60,8 @@ import {
 import {
   AdministratorPaymentsController,
   AdministratorSessionsController,
+  administratorSessionSearch,
+  type AdministratorSessionSearch,
   cancelSessionCommand,
   receiptObjectStorage,
 } from './payments/administrator.controller';
@@ -91,7 +93,11 @@ import {
   staffProfile,
 } from './staff/staff-profile.controller';
 import { listClassHistory } from './class-history';
-import { listSessionAvailability } from './session-availability';
+import {
+  listSessionAvailability,
+  listSessionsAcrossBranches,
+} from './session-availability';
+import { listAdministratorSessions } from './sessions/administrator-sessions';
 import { listTrainerSchedule } from './trainer-schedule';
 import { loadTrainerSessionRoster } from './trainer-session-roster';
 
@@ -346,6 +352,18 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
             findProfile: (clientId) =>
               createCatalogRepository(prisma).findClientProfile(clientId),
           }),
+    },
+    {
+      provide: administratorSessionSearch,
+      inject: [bookingPrisma],
+      useFactory:
+        (prisma: PrismaClient): AdministratorSessionSearch =>
+        (query, principal) =>
+          listAdministratorSessions(
+            query,
+            principal,
+            listSessionsAcrossBranches(prisma),
+          ),
     },
     {
       provide: staffManagementOperations,

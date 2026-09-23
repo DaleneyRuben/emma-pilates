@@ -12,6 +12,7 @@ import {
   Inject,
   Param,
   Post,
+  Query,
   Res,
   StreamableFile,
 } from '@nestjs/common';
@@ -22,6 +23,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiProduces,
+  ApiQuery,
 } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
@@ -30,7 +32,11 @@ import {
   type PrincipalResolver,
 } from '../../system-identity/authentication/bearer-principal';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { parseUuid } from '../booking.dto';
+import {
+  parseAdministratorSessionQuery,
+  parseUuid,
+  SessionAvailabilityDto,
+} from '../booking.dto';
 import type { SessionCancellationResult } from '../commands/cancel-session';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import {
@@ -46,6 +52,12 @@ import type { PaymentCommands } from './prisma-payment-commands';
 
 export const receiptObjectStorage = Symbol('receiptObjectStorage');
 export const cancelSessionCommand = Symbol('cancelSessionCommand');
+export const administratorSessionSearch = Symbol('administratorSessionSearch');
+
+export type AdministratorSessionSearch = (
+  query: { from: Date; until: Date; limit: number },
+  principal: AuthenticatedPrincipal,
+) => Promise<SessionAvailabilityDto[]>;
 
 // The uploads storage port, narrowed to what receipt viewing needs.
 export type ReceiptObjectStorage = { get(key: string): Promise<Buffer> };
@@ -92,7 +104,9 @@ export class AdministratorPaymentsController {
     @Headers('authorization') authorization: string | undefined,
   ): Promise<PendingPaymentDto[]> {
     const principal = await this.authenticate(authorization);
-    return runPaymentCommand(() => this.commands.listPendingPayments(principal));
+    return runPaymentCommand(() =>
+      this.commands.listPendingPayments(principal),
+    );
   }
 
   @Get(':paymentId')
@@ -191,9 +205,42 @@ export class AdministratorSessionsController {
   constructor(
     @Inject(cancelSessionCommand)
     private readonly cancelSession: CancelSessionHandler,
+    @Inject(administratorSessionSearch)
+    private readonly searchSessions: AdministratorSessionSearch,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
   ) {}
+
+  // API-002: the Administrator's Session search across every Branch.
+  @Get()
+  @ApiOperation({ operationId: 'listAdministratorSessions' })
+  @ApiQuery({ name: 'from', required: true, format: 'date-time' })
+  @ApiQuery({ name: 'until', required: true, format: 'date-time' })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiOkResponse({ type: SessionAvailabilityDto, isArray: true })
+  @Header('Cache-Control', 'no-store')
+  async search(
+    @Headers('authorization') authorization: string | undefined,
+    @Query() query: unknown,
+  ): Promise<SessionAvailabilityDto[]> {
+    const parsed = parseAdministratorSessionQuery(query);
+    if (parsed === null) throw invalidRequest('Invalid Session search');
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
+    try {
+      return await this.searchSessions(parsed, principal);
+    } catch (error) {
+      if (error instanceof BookingAccessDeniedError) {
+        throw new ForbiddenException({
+          code: 'booking_access_denied',
+          detail: 'Booking access is denied',
+        });
+      }
+      throw error;
+    }
+  }
 
   @Post(':sessionId/cancel')
   @HttpCode(HttpStatus.OK)
@@ -220,7 +267,8 @@ export class AdministratorSessionsController {
           detail: 'Booking access is denied',
         });
       }
-      const code = error instanceof Error ? sessionProblems[error.message] : undefined;
+      const code =
+        error instanceof Error ? sessionProblems[error.message] : undefined;
       if (code !== undefined) {
         throw new HttpException(
           { code, detail: (error as Error).message },

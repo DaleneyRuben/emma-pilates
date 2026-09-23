@@ -201,6 +201,28 @@ export const parseAvailabilityQuery = (
   };
 };
 
+const administratorSessionQuerySchema = z
+  .strictObject({
+    from: z.iso.datetime(),
+    until: z.iso.datetime(),
+    limit: z.coerce.number().int().min(1).max(100).default(50),
+  })
+  .refine(({ from, until }) => new Date(from) < new Date(until), {
+    message: 'until must be after from',
+  });
+
+export const parseAdministratorSessionQuery = (
+  value: unknown,
+): { from: Date; until: Date; limit: number } | null => {
+  const result = administratorSessionQuerySchema.safeParse(value);
+  if (!result.success) return null;
+  return {
+    from: new Date(result.data.from),
+    until: new Date(result.data.until),
+    limit: result.data.limit,
+  };
+};
+
 export const parseUuid = (value: unknown): string | null => {
   const result = uuidSchema.safeParse(value);
   return result.success ? result.data : null;
