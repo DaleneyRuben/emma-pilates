@@ -59,6 +59,9 @@ export class SessionAvailabilityDto {
   @ApiProperty({ format: 'uuid' })
   branchId!: string;
 
+  @ApiProperty()
+  branchName!: string;
+
   @ApiProperty({ format: 'uuid' })
   classTypeId!: string;
 
