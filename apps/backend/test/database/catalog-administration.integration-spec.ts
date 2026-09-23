@@ -198,7 +198,7 @@ describe('Prisma catalog administration', () => {
 
     const audits = await world.prisma.auditRecord.findMany({
       where: { targetId: plan.id },
-      orderBy: { occurredAt: 'asc' },
+      orderBy: { actionCode: 'asc' },
       select: { actionCode: true, actorRole: true, targetType: true },
     });
     expect(audits).toEqual([
