@@ -262,6 +262,103 @@ type EvaluationRow = Prisma.EvaluationGetPayload<{
   select: typeof evaluationSelect;
 }>;
 
+// Withdraws the block's future unbooked slots from the end date and counts
+// the booked Evaluations that keep theirs (D6).
+const endBlockFrom = async (
+  transaction: Transaction,
+  block: BlockRow,
+  endsOn: Date,
+  actorAccountId: string,
+  now: Date,
+): Promise<{ withdrawnSlots: number; keptEvaluations: number }> => {
+  await transaction.availabilityBlock.update({
+    where: { id: block.id },
+    data: {
+      effectiveUntil: endsOn,
+      endedAt: now,
+      endedByAccountId: actorAccountId,
+    },
+  });
+  const affected = await transaction.$queryRaw<
+    { id: string; booked: boolean }[]
+  >`
+    SELECT s.id,
+           EXISTS (
+             SELECT 1 FROM booking.evaluations e
+             WHERE e.evaluation_slot_id = s.id AND e.state = 'booked'
+           ) AS booked
+    FROM booking.evaluation_slots s
+    WHERE s.availability_block_id = ${block.id}::uuid
+      AND s.state = 'published'
+      AND s.starts_at >= ${boliviaInstant(endsOn, 0)}::timestamptz
+      AND s.starts_at > ${now}::timestamptz
+    ORDER BY s.starts_at, s.id
+    FOR UPDATE OF s`;
+  const unbooked = affected.filter((slot) => !slot.booked);
+  if (unbooked.length > 0) {
+    await transaction.evaluationSlot.updateMany({
+      where: {
+        id: { in: unbooked.map((slot) => slot.id) },
+        state: EvaluationSlotState.PUBLISHED,
+      },
+      data: { state: EvaluationSlotState.WITHDRAWN, withdrawnAt: now },
+    });
+  }
+  return {
+    withdrawnSlots: unbooked.length,
+    keptEvaluations: affected.length - unbooked.length,
+  };
+};
+
+// D15 port: removing a Branch assignment (branchId) or changing the Role (no
+// branchId) ends the Nutritionist's current and scheduled blocks from today in
+// the caller's transaction. Booked Evaluations keep their slots.
+export const endNutritionistAvailability = async (
+  transaction: Transaction,
+  input: {
+    staffMemberId: string;
+    branchId?: string;
+    actorAccountId: string;
+    now: Date;
+  },
+): Promise<{
+  endedBlocks: number;
+  withdrawnSlots: number;
+  keptEvaluations: number;
+}> => {
+  const today = boliviaDate(input.now);
+  const blocks = await transaction.$queryRaw<{ id: string }[]>`
+    SELECT id FROM booking.availability_blocks
+    WHERE nutritionist_staff_member_id = ${input.staffMemberId}::uuid
+      AND (effective_until IS NULL
+           OR effective_until > greatest(effective_from, ${today}::date))
+    ORDER BY id
+    FOR UPDATE`;
+  const result = { endedBlocks: 0, withdrawnSlots: 0, keptEvaluations: 0 };
+
+  for (const { id } of blocks) {
+    const block = await transaction.availabilityBlock.findUniqueOrThrow({
+      where: { id },
+      select: blockSelect,
+    });
+    if (input.branchId !== undefined && block.branchId !== input.branchId) {
+      continue;
+    }
+    const counts = await endBlockFrom(
+      transaction,
+      block,
+      resolveBlockChangeDate({ block, selectedDate: today, today }),
+      input.actorAccountId,
+      input.now,
+    );
+    result.endedBlocks += 1;
+    result.withdrawnSlots += counts.withdrawnSlots;
+    result.keptEvaluations += counts.keptEvaluations;
+  }
+
+  return result;
+};
+
 export const createPrismaEvaluationCommands = (
   prisma: PrismaClient,
   dependencies: EvaluationCommandsDependencies,
@@ -476,54 +573,6 @@ export const createPrismaEvaluationCommands = (
       throw new BookingAccessDeniedError();
     }
     return block;
-  };
-
-  // Withdraws the block's future unbooked slots from the end date and counts
-  // the booked Evaluations that keep theirs (D6).
-  const endBlockFrom = async (
-    transaction: Transaction,
-    block: BlockRow,
-    endsOn: Date,
-    actorAccountId: string,
-    now: Date,
-  ): Promise<{ withdrawnSlots: number; keptEvaluations: number }> => {
-    await transaction.availabilityBlock.update({
-      where: { id: block.id },
-      data: {
-        effectiveUntil: endsOn,
-        endedAt: now,
-        endedByAccountId: actorAccountId,
-      },
-    });
-    const affected = await transaction.$queryRaw<
-      { id: string; booked: boolean }[]
-    >`
-      SELECT s.id,
-             EXISTS (
-               SELECT 1 FROM booking.evaluations e
-               WHERE e.evaluation_slot_id = s.id AND e.state = 'booked'
-             ) AS booked
-      FROM booking.evaluation_slots s
-      WHERE s.availability_block_id = ${block.id}::uuid
-        AND s.state = 'published'
-        AND s.starts_at >= ${boliviaInstant(endsOn, 0)}::timestamptz
-        AND s.starts_at > ${now}::timestamptz
-      ORDER BY s.starts_at, s.id
-      FOR UPDATE OF s`;
-    const unbooked = affected.filter((slot) => !slot.booked);
-    if (unbooked.length > 0) {
-      await transaction.evaluationSlot.updateMany({
-        where: {
-          id: { in: unbooked.map((slot) => slot.id) },
-          state: EvaluationSlotState.PUBLISHED,
-        },
-        data: { state: EvaluationSlotState.WITHDRAWN, withdrawnAt: now },
-      });
-    }
-    return {
-      withdrawnSlots: unbooked.length,
-      keptEvaluations: affected.length - unbooked.length,
-    };
   };
 
   const blockValues = (input: AvailabilityBlockValues) => {
