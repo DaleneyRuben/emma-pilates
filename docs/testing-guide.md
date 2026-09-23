@@ -1123,6 +1123,9 @@ Client form sit in a centered card. Finishing a booking, a cash Payment, or a
 new Client returns to the split with that Client in the panel. Cancelling an
 invitation clears the panel.
 
+Client search ignores accents and case: "lucia" finds Lucía Fernández and
+"guzman" finds Sofía Guzmán (STAFF-004).
+
 ## Test 12: see the agenda and record attendance as a Trainer
 
 Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
