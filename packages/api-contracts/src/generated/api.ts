@@ -36,6 +36,8 @@ import type {
   AvailabilityBlockReplacementDto,
   BranchDto,
   ChangeCurrentPasswordDto,
+  ChangeStaffBranchesDto,
+  ChangeStaffRoleDto,
   ClassHistoryEntryDto,
   ClassTypeDto,
   ClientEmailVerificationResultDto,
@@ -54,6 +56,7 @@ import type {
   CreateBookingDto,
   CreatePendingUploadDto,
   CreatePurchaseIntentDto,
+  CreateStaffMemberDto,
   CreatedBookingDto,
   CreditDto,
   CurrentAuthenticationPrincipalDto,
@@ -66,6 +69,7 @@ import type {
   ListNotificationsParams,
   ListNutritionistAgendaParams,
   ListSessionAvailabilityParams,
+  ListStaffMembersParams,
   ListTrainerScheduleParams,
   LivenessResponseDto,
   MarkedNotificationsDto,
@@ -93,6 +97,8 @@ import type {
   SessionAvailabilityDto,
   SessionCancellationDto,
   SessionDetailDto,
+  StaffMemberDto,
+  StaffMemberPageDto,
   StaffProfileDto,
   StartClientRegistrationDto,
   TrainerScheduleSessionDto,
@@ -6048,6 +6054,1008 @@ export function useGetCurrentStaffMemberProfile<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type listStaffMembersResponse200 = {
+  data: StaffMemberPageDto;
+  status: 200;
+};
+
+export type listStaffMembersResponseSuccess = listStaffMembersResponse200 & {
+  headers: Headers;
+};
+export type listStaffMembersResponse = listStaffMembersResponseSuccess;
+
+export const getListStaffMembersUrl = (params?: ListStaffMembersParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/staff-members?${stringifiedParams}`
+    : `/api/v1/administrator/staff-members`;
+};
+
+export const listStaffMembers = async (
+  params?: ListStaffMembersParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listStaffMembersResponse> => {
+  const res = await (fetchFn ?? fetch)(getListStaffMembersUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listStaffMembersResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listStaffMembersResponse;
+};
+
+export const getListStaffMembersQueryKey = (
+  params?: ListStaffMembersParams,
+) => {
+  return [
+    `/api/v1/administrator/staff-members`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListStaffMembersQueryOptions = <
+  TData = Awaited<ReturnType<typeof listStaffMembers>>,
+  TError = unknown,
+>(
+  params?: ListStaffMembersParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffMembers>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListStaffMembersQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listStaffMembers>>
+  > = ({ signal }) =>
+    listStaffMembers(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listStaffMembers>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListStaffMembersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listStaffMembers>>
+>;
+export type ListStaffMembersQueryError = unknown;
+
+export function useListStaffMembers<
+  TData = Awaited<ReturnType<typeof listStaffMembers>>,
+  TError = unknown,
+>(
+  params: undefined | ListStaffMembersParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffMembers>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStaffMembers>>,
+          TError,
+          Awaited<ReturnType<typeof listStaffMembers>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListStaffMembers<
+  TData = Awaited<ReturnType<typeof listStaffMembers>>,
+  TError = unknown,
+>(
+  params?: ListStaffMembersParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffMembers>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listStaffMembers>>,
+          TError,
+          Awaited<ReturnType<typeof listStaffMembers>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListStaffMembers<
+  TData = Awaited<ReturnType<typeof listStaffMembers>>,
+  TError = unknown,
+>(
+  params?: ListStaffMembersParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffMembers>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListStaffMembers<
+  TData = Awaited<ReturnType<typeof listStaffMembers>>,
+  TError = unknown,
+>(
+  params?: ListStaffMembersParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listStaffMembers>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListStaffMembersQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createStaffMemberResponse201 = {
+  data: StaffMemberDto;
+  status: 201;
+};
+
+export type createStaffMemberResponseSuccess = createStaffMemberResponse201 & {
+  headers: Headers;
+};
+export type createStaffMemberResponse = createStaffMemberResponseSuccess;
+
+export const getCreateStaffMemberUrl = () => {
+  return `/api/v1/administrator/staff-members`;
+};
+
+export const createStaffMember = async (
+  createStaffMemberDto: CreateStaffMemberDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createStaffMemberResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateStaffMemberUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createStaffMemberDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createStaffMemberResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createStaffMemberResponse;
+};
+
+export const getCreateStaffMemberMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createStaffMember>>,
+    TError,
+    CreateStaffMemberMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createStaffMember>>,
+  TError,
+  CreateStaffMemberMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createStaffMember"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createStaffMember>>,
+    CreateStaffMemberMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createStaffMember(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateStaffMemberMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createStaffMember>>
+>;
+export type CreateStaffMemberMutationBody = CreateStaffMemberDto;
+export type CreateStaffMemberMutationError = unknown;
+export type CreateStaffMemberMutationVariables = { data: CreateStaffMemberDto };
+
+export const useCreateStaffMember = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createStaffMember>>,
+      TError,
+      CreateStaffMemberMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createStaffMember>>,
+  TError,
+  CreateStaffMemberMutationVariables,
+  TContext
+> => {
+  return useMutation(getCreateStaffMemberMutationOptions(options), queryClient);
+};
+
+export type getStaffMemberResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type getStaffMemberResponseSuccess = getStaffMemberResponse200 & {
+  headers: Headers;
+};
+export type getStaffMemberResponse = getStaffMemberResponseSuccess;
+
+export const getGetStaffMemberUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}`;
+};
+
+export const getStaffMember = async (
+  staffMemberId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStaffMemberResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetStaffMemberUrl(staffMemberId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getStaffMemberResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getStaffMemberResponse;
+};
+
+export const getGetStaffMemberQueryKey = (staffMemberId: string) => {
+  return [`/api/v1/administrator/staff-members/${staffMemberId}`] as const;
+};
+
+export const getGetStaffMemberQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStaffMember>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffMember>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetStaffMemberQueryKey(staffMemberId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getStaffMember>>> = ({
+    signal,
+  }) => getStaffMember(staffMemberId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: staffMemberId !== null && staffMemberId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStaffMember>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStaffMemberQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStaffMember>>
+>;
+export type GetStaffMemberQueryError = unknown;
+
+export function useGetStaffMember<
+  TData = Awaited<ReturnType<typeof getStaffMember>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffMember>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffMember>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffMember>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffMember<
+  TData = Awaited<ReturnType<typeof getStaffMember>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffMember>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffMember>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffMember>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffMember<
+  TData = Awaited<ReturnType<typeof getStaffMember>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffMember>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetStaffMember<
+  TData = Awaited<ReturnType<typeof getStaffMember>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getStaffMember>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetStaffMemberQueryOptions(staffMemberId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type resendStaffMemberActivationResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type resendStaffMemberActivationResponseSuccess =
+  resendStaffMemberActivationResponse200 & {
+    headers: Headers;
+  };
+export type resendStaffMemberActivationResponse =
+  resendStaffMemberActivationResponseSuccess;
+
+export const getResendStaffMemberActivationUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/activation-link`;
+};
+
+export const resendStaffMemberActivation = async (
+  staffMemberId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resendStaffMemberActivationResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getResendStaffMemberActivationUrl(staffMemberId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resendStaffMemberActivationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as resendStaffMemberActivationResponse;
+};
+
+export const getResendStaffMemberActivationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resendStaffMemberActivation>>,
+    TError,
+    ResendStaffMemberActivationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resendStaffMemberActivation>>,
+  TError,
+  ResendStaffMemberActivationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["resendStaffMemberActivation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resendStaffMemberActivation>>,
+    ResendStaffMemberActivationMutationVariables
+  > = (props) => {
+    const { staffMemberId } = props ?? {};
+
+    return resendStaffMemberActivation(staffMemberId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResendStaffMemberActivationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resendStaffMemberActivation>>
+>;
+
+export type ResendStaffMemberActivationMutationError = unknown;
+export type ResendStaffMemberActivationMutationVariables = {
+  staffMemberId: string;
+};
+
+export const useResendStaffMemberActivation = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resendStaffMemberActivation>>,
+      TError,
+      ResendStaffMemberActivationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resendStaffMemberActivation>>,
+  TError,
+  ResendStaffMemberActivationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getResendStaffMemberActivationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type changeStaffMemberRoleResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type changeStaffMemberRoleResponseSuccess =
+  changeStaffMemberRoleResponse200 & {
+    headers: Headers;
+  };
+export type changeStaffMemberRoleResponse =
+  changeStaffMemberRoleResponseSuccess;
+
+export const getChangeStaffMemberRoleUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/role`;
+};
+
+export const changeStaffMemberRole = async (
+  staffMemberId: string,
+  changeStaffRoleDto: ChangeStaffRoleDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<changeStaffMemberRoleResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getChangeStaffMemberRoleUrl(staffMemberId),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(changeStaffRoleDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: changeStaffMemberRoleResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as changeStaffMemberRoleResponse;
+};
+
+export const getChangeStaffMemberRoleMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof changeStaffMemberRole>>,
+    TError,
+    ChangeStaffMemberRoleMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof changeStaffMemberRole>>,
+  TError,
+  ChangeStaffMemberRoleMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["changeStaffMemberRole"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof changeStaffMemberRole>>,
+    ChangeStaffMemberRoleMutationVariables
+  > = (props) => {
+    const { staffMemberId, data } = props ?? {};
+
+    return changeStaffMemberRole(staffMemberId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ChangeStaffMemberRoleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof changeStaffMemberRole>>
+>;
+export type ChangeStaffMemberRoleMutationBody = ChangeStaffRoleDto;
+export type ChangeStaffMemberRoleMutationError = unknown;
+export type ChangeStaffMemberRoleMutationVariables = {
+  staffMemberId: string;
+  data: ChangeStaffRoleDto;
+};
+
+export const useChangeStaffMemberRole = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof changeStaffMemberRole>>,
+      TError,
+      ChangeStaffMemberRoleMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof changeStaffMemberRole>>,
+  TError,
+  ChangeStaffMemberRoleMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getChangeStaffMemberRoleMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type changeStaffMemberBranchesResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type changeStaffMemberBranchesResponseSuccess =
+  changeStaffMemberBranchesResponse200 & {
+    headers: Headers;
+  };
+export type changeStaffMemberBranchesResponse =
+  changeStaffMemberBranchesResponseSuccess;
+
+export const getChangeStaffMemberBranchesUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/branches`;
+};
+
+export const changeStaffMemberBranches = async (
+  staffMemberId: string,
+  changeStaffBranchesDto: ChangeStaffBranchesDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<changeStaffMemberBranchesResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getChangeStaffMemberBranchesUrl(staffMemberId),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(changeStaffBranchesDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: changeStaffMemberBranchesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as changeStaffMemberBranchesResponse;
+};
+
+export const getChangeStaffMemberBranchesMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof changeStaffMemberBranches>>,
+    TError,
+    ChangeStaffMemberBranchesMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof changeStaffMemberBranches>>,
+  TError,
+  ChangeStaffMemberBranchesMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["changeStaffMemberBranches"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof changeStaffMemberBranches>>,
+    ChangeStaffMemberBranchesMutationVariables
+  > = (props) => {
+    const { staffMemberId, data } = props ?? {};
+
+    return changeStaffMemberBranches(
+      staffMemberId,
+      data,
+      fetchOptions,
+      fetcherFn,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ChangeStaffMemberBranchesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof changeStaffMemberBranches>>
+>;
+export type ChangeStaffMemberBranchesMutationBody = ChangeStaffBranchesDto;
+export type ChangeStaffMemberBranchesMutationError = unknown;
+export type ChangeStaffMemberBranchesMutationVariables = {
+  staffMemberId: string;
+  data: ChangeStaffBranchesDto;
+};
+
+export const useChangeStaffMemberBranches = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof changeStaffMemberBranches>>,
+      TError,
+      ChangeStaffMemberBranchesMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof changeStaffMemberBranches>>,
+  TError,
+  ChangeStaffMemberBranchesMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getChangeStaffMemberBranchesMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type deactivateStaffMemberResponse200 = {
+  data: StaffMemberDto;
+  status: 200;
+};
+
+export type deactivateStaffMemberResponseSuccess =
+  deactivateStaffMemberResponse200 & {
+    headers: Headers;
+  };
+export type deactivateStaffMemberResponse =
+  deactivateStaffMemberResponseSuccess;
+
+export const getDeactivateStaffMemberUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/deactivation`;
+};
+
+export const deactivateStaffMember = async (
+  staffMemberId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deactivateStaffMemberResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getDeactivateStaffMemberUrl(staffMemberId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deactivateStaffMemberResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deactivateStaffMemberResponse;
+};
+
+export const getDeactivateStaffMemberMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deactivateStaffMember>>,
+    TError,
+    DeactivateStaffMemberMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deactivateStaffMember>>,
+  TError,
+  DeactivateStaffMemberMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["deactivateStaffMember"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deactivateStaffMember>>,
+    DeactivateStaffMemberMutationVariables
+  > = (props) => {
+    const { staffMemberId } = props ?? {};
+
+    return deactivateStaffMember(staffMemberId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeactivateStaffMemberMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deactivateStaffMember>>
+>;
+
+export type DeactivateStaffMemberMutationError = unknown;
+export type DeactivateStaffMemberMutationVariables = { staffMemberId: string };
+
+export const useDeactivateStaffMember = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deactivateStaffMember>>,
+      TError,
+      DeactivateStaffMemberMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deactivateStaffMember>>,
+  TError,
+  DeactivateStaffMemberMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getDeactivateStaffMemberMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type createPurchaseIntentResponse201 = {
   data: PurchaseIntentDto;
