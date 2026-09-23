@@ -74,6 +74,9 @@ Priorities describe product value, not strict technical order:
 | NOT-001   | P0       | Backend             | Implement durable Account notification inbox, unread count, read state, Role filtering, and badge source                                                                                                         | Identity and affected domain events         | Client 19; Staff S20                                        | done   | `fd58ea5`; inbox, unread count, read state, Waitlist promotion notice, and 3-day renewal reminder over the existing tables; automatic zero-booking Session cancellation and its Trainer notice remain BOOK-scope work |
 | NOT-002   | P1       | Backend/mobile      | Add Account device endpoints, Expo Push delivery/receipts, privacy-safe payloads, contextual permission, deep-link routing, and notification sounds                                                              | NOT-001, MOB-005                            | Client 19; Staff S20                                        | blocked | Expo account/device gate                                                                  |
 | MOB-017   | P0       | Mobile              | Complete Client/Staff profile, password change, log-out confirmation, inbox, unread badge, and online-first cache behavior                                                                                       | IDN-005, NOT-001                            | Client 18, 19, 23; Staff S20, S23                           | done | `GET /staff-members/current` (loadStaffProfile + findStaffProfile + e2e); shared `NotificationsScreen` (Sin leer/Anteriores, Marcar leídas, tap marks read), `ChangePasswordScreen`, `confirmLogout`, `initials`; client Perfil rows Notificaciones (unread badge) + Cambiar contraseña + footer; staff Perfil (S23) reached from the "Tu cuenta" avatar on every role root, Rol/Sucursales, "Todas las sucursales" for admin; ADR-0035 persisted cache allowlisted by generated keys (`/api/v1/sessions`, `/api/v1/trainer/sessions`, `/api/v1/bookings`, `/api/v1/clients/current/subscription`) with account-scoped AsyncStorage key + offline banner; Prisma connections pinned to UTC after timestamptz skew found in the simulator; simulator: Maestro client flow (inbox, mark read, mismatch, wrong current password, change + login with new password, logout confirm) and staff flow (avatar → Perfil → inbox → change password → logout confirm) pass. Gaps: tab-bar unread badge not designed (badge lives on the Perfil row); notification tap opens Subscription/Mis reservas only for `subscription`/`booking` destinations; offline banner verified by unit test only (simulator shares Mac network). |
+| BKM-003   | P0       | Backend             | Materialize Sessions from Session Schedules 30 days ahead with an hourly reconciler (reuse the NUT-002 horizon and worker-sweep shape); today Sessions exist only because `db:fixtures` writes them | BKM-002 | Staff S02; Client 03 | ready | Found in the 2026-09-22 audit: no production code writes `booking.sessions`; ADR-0059 |
+| BOOK-004  | P0       | Backend             | Cancel zero-booking Sessions automatically at the 2-hour check (`empty_booking_check_completed_at`, `zero_bookings`) with the Trainer notice, and close open Waitlist Entries as `session_started` when a Session starts | BOOK-003, NOT-001 | Staff S02; Client 05 | ready | Columns and enum values exist since BOOK-001; no job uses them (NOT-001 gap) |
+| MOB-019   | P1       | Client mobile       | Finish Client Home and Mi plan: Promotions carousel, Evaluation and Referral quick actions, refreshed Mi plan (12), and notification taps for `evaluation`, `session`, and payment destinations | MOB-016, UPL-002 | Client 02, 12, 19 | later | Gaps carried from MOB-007, MOB-012, MOB-017 |
 | REL-001   | P1       | Mobile quality      | Add Maestro critical journeys, release-build smoke checks, EAS Build/Submit configuration, and controlled EAS Update policy checks                                                                               | Mobile P0 journeys                          | ADRs 0037–0039                                              | later   | Expo account/store gate                                                                   |
 
 ## Backend hardening queue
@@ -87,9 +90,71 @@ Priorities describe product value, not strict technical order:
 | BE-005  | P1       | Operations           | Add readiness checks, structured logs, correlation IDs, sanitized errors, and non-mutating smoke checks                                               | Stable local API                | done | Readiness `8966526`/`3f6cd5f` (`GET /health/ready`: PostgreSQL probe with a 2 s timeout, every shipped migration applied, fails during graceful shutdown, reports `RELEASE_ID`; 503 `not_ready` names no dependency; contracts `c99d6a7`); structured logs `525c742`/`169cb8c`/`555eee3` (Pino JSON with environment, service, release, `reqId`; `x-request-id` kept when well-formed, else a UUID, echoed on every response; method and path only, never query, headers, or body; `/health/*` not logged); sanitized errors `14971dc`/`613937f` (5xx logged once with an allowlisted `err` of type, code, message, stack; driver `detail`/`meta` never serialized; 4xx not reported as failures); worker `4ddacf6`/`76c9e94` (heartbeat and `*_failed` records as JSON, failures at error level); smoke `d14949c`/`fd2f085` (`pnpm smoke`: GET-only liveness, readiness with `SMOKE_EXPECTED_RELEASE`, OpenAPI, anonymous 401 problem); testing guide `98dbe12`. Verified locally: e2e 16/16 suites, readiness 200 on `pilates_dev_sim` and 503 with an unapplied migration, live JSON logs, `pnpm smoke` exit 0 and 1 on a wrong release. Gaps: Better Stack error reporting and heartbeat monitors wait for the provider account (ADR-0081); worker job-duration and queue-age measurements (ADR-0066) are REL/deployment scope. |
 | BE-006  | P1       | Security             | Complete focused audit-event catalog and retention rules                                                                                              | Sensitive workflows implemented | later   | —                     |
 | BE-007  | P1       | Data governance      | Decide Account closure, personal-data deletion, Evaluation data, audit retention, export requirements, backups, restore drills, and incident recovery | Before real user data           | blocked | Production gate       |
+| IDN-006 | P0       | Backend              | Add the idempotent first-Administrator bootstrap command and its runbook (ADR-0083)                                                                 | IDN-005                         | ready   | Not implemented; required before first production access |
+| IDN-007 | P1       | Backend              | Staff Member creation, activation status, Role change, Branch assignment and removal, and deactivation APIs; Role/assignment changes call `endNutritionistAvailability` (NUT-002 D15) | IDN-005, NUT-002                | later   | Feeds WEB-004; Branch archival (WEB-003) must call the same port |
+| IDN-008 | P1       | Backend/mobile       | Decide and implement email change for active Accounts (re-verification rule), then enable it in Client 22                                          | Product rule                    | blocked | MOB-008 keeps email read-only until the rule exists |
+| BE-008  | P1       | Backend              | Retention sweeps for expired idempotency records (≥ 48 h), expired/revoked Authentication Sessions, old throttle events, and read notifications      | BE-006, BE-007                  | ready   | No cleanup exists for these tables today |
+| EML-001 | P1       | Backend              | Replace `PlaceholderAuthenticationEmailRenderer` with the approved Spanish verification, activation, and recovery email templates                    | DES-001                         | later   | Must land before EXT-001 sends real email |
+| UPL-002 | P1       | Backend              | Generate image variants (ADR-0073 sizes and quality) for receipts, profile photos, and Promotions; add Promotion delivery and management APIs        | UPL-001, ADR-0073 sizes         | blocked | Needs the variant sizes from an approved design; receipts use the original meanwhile |
+| LNK-001 | P1       | Mobile/hosting       | Configure the mobile-link domain, `apple-app-site-association`, `assetlinks.json`, and associated domains / intent filters for both apps          | Domain, EXT-003, REL-001        | blocked | Domain and hosting gate; custom schemes work locally |
+| STAFF-004 | P2     | Backend              | Accent-insensitive Assistant Client search with `unaccent` (migration)                                                                             | STAFF-003                       | later   | Gap from STAFF-003/MOB-015 |
+| API-002 | P2       | Backend              | Cross-Branch Session search for Administrators ("Todas las sucursales")                                                                         | STAFF-001                       | later   | Gap from MOB-013 (`GET /sessions` is per Branch) |
+| ADM-001 | P2       | Backend              | Admin-web APIs: schedule, Session, Trainer swap, Plan, Class Type, and Branch management (WEB-003); Evaluation, Referral, and Credit lists plus the admin Evaluation cancel route (WEB-008); report read models (WEB-009) | BKM-003, NUT-002, PAY-002        | later   | Only the mobile Administrator APIs exist (STAFF-001) |
+| BKO-001 | P2       | Backend design       | Propose the Back Office schema for Supplies, Withdrawals, Salary Payments, Expenses, and Expense Categories                                         | Back Office glossary            | later   | No Back Office code or schema exists; WEB-007 depends on it |
+| BKO-002 | P2       | Backend              | Implement the approved Back Office persistence and APIs                                                                                            | BKO-001 approval                | later   | — |
 | EXT-001 | P1       | Provider integration | Connect and verify SendPulse only after local authentication email flows work                                                                         | IDN-003, IDN-005                | later   | Provider account gate |
 | EXT-002 | P1       | Provider integration | Connect and verify Cloudflare R2 only after local receipt upload/finalization works                                                                   | UPL-001                         | later   | Provider account gate |
 | EXT-003 | P1       | Delivery             | Configure GitHub Actions, disposable PostgreSQL, shared development, and production deployment environments                                           | Stable critical local journeys  | later   | Hosting account gate  |
+
+## External accounts and provider gates
+
+Work that needs an account, credential, domain, or real business data the
+user must provide. Local stand-ins keep development moving; none of them may
+reach production.
+
+| Account or input | Needed for | Backlog items | What must be set up | Local stand-in today |
+| --- | --- | --- | --- | --- |
+| Expo / EAS account | Push tokens, EAS Build, Submit, and Updates | NOT-002, REL-001 | Organization, project IDs for both apps, push credentials, update channels | Expo Go and dev clients; in-app inbox only |
+| Apple Developer Program | iOS builds, TestFlight, APNs, Universal Links | REL-001, NOT-002, LNK-001 | Team, bundle IDs `com.emmapilates.client` and `com.emmapilates.staff`, APNs key, associated domains | iOS Simulator |
+| Google Play Console + Firebase (FCM) | Android builds, store release, push | REL-001, NOT-002, LNK-001 | App entries, signing key, FCM server credentials, `assetlinks.json` fingerprint | Android not verified yet |
+| SendPulse | Real authentication email | EXT-001, EML-001 | Sender domain with SPF, DKIM, DMARC; API credentials; bounce/complaint webhook | `LocalEmailCapture` in the worker |
+| Cloudflare R2 | Receipt, profile, and Promotion image storage | EXT-002, UPL-002 | Private and public buckets, scoped keys, public custom domain for Promotions | `LocalObjectStorage` under `.data/uploads` |
+| Northflank + Aiven PostgreSQL | Production API, worker, migrations, database | EXT-003 | Services, secrets store, backups, staged migration job | Local API, worker, and PostgreSQL |
+| Render + Neon | Shared development API and database for previews | EXT-003 | Services and development secrets | `pilates_dev_sim` locally |
+| Vercel | Admin-web previews and production | EXT-003, WEB-010 | Project, protected previews, `/api/v1` proxy | Vite dev server |
+| GitHub Actions | CI and deployments | EXT-003, BE-003 | Workflows, disposable PostgreSQL, deployment-only credentials | Local test runs |
+| Better Stack | Error reporting, uptime, and heartbeat alerts | BE-005 gap, EXT-003 | Sources, monitors, email alerts | JSON logs on stdout |
+| Domain and DNS | API host, admin host, mobile-link domain, email sending domain | LNK-001, EXT-001, EXT-003 | Registered domain and records | `localhost` and custom URL schemes |
+| Studio business data | Transfer instructions and QR shown to Clients | Production config | Real `TRANSFER_BENEFICIARY_NAME`, `TRANSFER_BANK_NAME`, `TRANSFER_ACCOUNT_NUMBER`, QR image | Placeholder values in `.env.example` |
+| Production secrets | Link encryption and email digests | EXT-003 | Fresh `AUTHENTICATION_EMAIL_DIGEST_KEY`, `AUTHENTICATION_LINK_ENCRYPTION_KEY(_ID)` with a rotation plan, `RELEASE_ID` per deploy | Development-only keys |
+
+## Pending design exports
+
+Design changes go through `docs/design/prompts/` (never `design/`). These are
+written but not yet applied by the external design session, or still to write:
+
+| Follow-up | Affects | Needed by | Status |
+| --- | --- | --- | --- |
+| 33–38 (email-only authentication, verification, activation, recovery, throttling) | Client 01/20/21; Staff S01/S05/S18/S19; AW01/AW24/AW30/AW32 | DES-001, EML-001, WEB-002 | 🕓 pending export |
+| 39 (weekly Session Schedule controls, Class Type descriptions, Promotion publication) | Admin web schedule and Promotions | ADM-001, WEB-003, WEB-006, UPL-002 | 🕓 pending export |
+| 40 (Cancellation Window wording) | Invariants checklist | Mobile copy review | 🕓 pending export |
+| Six NUT-001 follow-ups (S15 cancel, S16/S17 dates and Branch picker, Client 13/15 copy, 19/S20 notices) | Client 13–15, 19; Staff S15–S17, S20 | MOB-016 | not written yet |
+| Image variant sizes and quality (ADR-0073) | Receipts, profile photos, Promotions | UPL-002 | not specified by any approved screen |
+| Tab-bar unread badge | Client and Staff navigation | MOB-017 gap | not designed |
+
+## Production readiness checklist
+
+Nothing reaches real users until each line is done:
+
+- [ ] Sessions materialize without fixtures (BKM-003) and empty Sessions cancel themselves (BOOK-004).
+- [ ] First Administrator bootstrap command and runbook (IDN-006).
+- [ ] Real email templates and SendPulse delivery (EML-001, EXT-001); R2 storage and image variants (EXT-002, UPL-002).
+- [ ] Push delivery and store builds (NOT-002, REL-001) with Universal/App Links (LNK-001).
+- [ ] Hosting, CI, secrets, staged migrations, and monitoring (EXT-003, BE-005 gaps, BE-003).
+- [ ] Data governance: Account closure, personal-data and Evaluation retention, audit retention, backups, restore drills, incident runbooks (BE-006, BE-007, BE-008).
+- [ ] Staff management and admin web for studio operation (IDN-007, ADM-001, BKO-001/002, WEB-001–WEB-010).
+- [ ] Real transfer instructions and production secrets configured (see the gate table above).
+- [ ] The two local-only test failures pass in CI (`app.e2e-spec.ts` needs a PostgreSQL role for the app module; `pg-boss-runtime.spec.ts` needs `--experimental-vm-modules`).
 
 ## Admin-web queue
 
