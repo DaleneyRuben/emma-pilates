@@ -26,6 +26,7 @@ model Client {
   creditLedgerEntries CreditLedgerEntry[]
   referralsMade       Referral[]      @relation("ReferralReferrer")
   referralReceived    Referral?       @relation("ReferralReferred")
+  evaluations         Evaluation[]
 
   @@map("clients")
   @@schema("booking")
@@ -44,6 +45,8 @@ model StaffMember {
   branchAssignments   StaffBranchAssignment[]
   schedules           SessionSchedule[]
   sessions            Session[]
+  availabilityBlocks  AvailabilityBlock[]
+  evaluationSlots     EvaluationSlot[]
 
   @@map("staff_members")
   @@schema("booking")
@@ -61,6 +64,8 @@ model Branch {
   schedules        SessionSchedule[]
   sessions         Session[]
   cashPayments     Payment[]
+  availabilityBlocks AvailabilityBlock[]
+  evaluationSlots  EvaluationSlot[]
 
   @@map("branches")
   @@schema("booking")

@@ -134,6 +134,7 @@ model Subscription {
   plan                    Plan              @relation(fields: [planId], references: [id], onDelete: Restrict)
   payment                 Payment?          @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   bookings                Booking[]
+  evaluations             Evaluation[]
 
   @@unique([id, clientId])
   @@index([clientId, startsOn])

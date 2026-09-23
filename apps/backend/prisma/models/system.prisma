@@ -180,6 +180,10 @@ model Account {
   submittedPayments         Payment[]               @relation("PaymentSubmittedBy")
   decidedPayments           Payment[]               @relation("PaymentDecidedBy")
   creditLedgerEntries       CreditLedgerEntry[]     @relation("CreditLedgerActor")
+  createdAvailabilityBlocks AvailabilityBlock[]     @relation("AvailabilityBlockCreatedBy")
+  endedAvailabilityBlocks   AvailabilityBlock[]     @relation("AvailabilityBlockEndedBy")
+  createdEvaluations        Evaluation[]            @relation("EvaluationCreatedBy")
+  cancelledEvaluations      Evaluation[]            @relation("EvaluationCancelledBy")
 
   @@map("accounts")
   @@schema("system")
