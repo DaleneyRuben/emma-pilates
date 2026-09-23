@@ -159,6 +159,7 @@ Each of these was sent as the next message in the existing design session for th
 | [49](./followups/49-supply-form-archive.md) | Adds «Archivar insumo» with a confirmation to `AW09`'s edit frame (BKO-001 D9) | 🕓 pending |
 | [50](./followups/50-record-withdrawal-stock-limit.md) | Adds the «Máximo» helper and the insufficient-stock error to `AW10` (BKO-001 D4) | 🕓 pending |
 | [51](./followups/51-report-salary-all-branches.md) | Shows «Nómina» only in `AW16`'s «Todas las sucursales» view, with a single-Branch frame and caption (BKO-001 Q3) | 🕓 pending |
+| [52](./followups/52-admin-user-menu-role-label.md) | Labels the Role «Administración» (as `S23` does) instead of «Administradora» in `AW33`, and uses Hover de fila for its rows (WEB-002) | 🕓 pending |
 
 ## Status
 
