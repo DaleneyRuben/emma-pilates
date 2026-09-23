@@ -22,6 +22,30 @@
         ]
       }
     },
+    "/health/ready": {
+      "get": {
+        "operationId": "ReadinessController_getReadiness",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadinessResponseDto"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Not ready for traffic"
+          }
+        },
+        "tags": [
+          "Readiness"
+        ]
+      }
+    },
     "/api/v1/authentication-links/inspection": {
       "post": {
         "operationId": "inspectAuthenticationLink",
@@ -2478,6 +2502,25 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "ReadinessResponseDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ready"
+            ]
+          },
+          "release": {
+            "type": "string",
+            "description": "Release identifier of the serving build"
+          }
+        },
+        "required": [
+          "status",
+          "release"
         ]
       },
       "AuthenticationLinkTokenDto": {

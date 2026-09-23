@@ -71,6 +71,7 @@ import type {
   PlanDto,
   PlanQuotesDto,
   PurchaseIntentDto,
+  ReadinessResponseDto,
   RecordCashPaymentDto,
   ReferralsDto,
   RejectPaymentDto,
@@ -284,6 +285,204 @@ export function useHealthControllerGetLiveness<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getHealthControllerGetLivenessQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type readinessControllerGetReadinessResponse200 = {
+  data: ReadinessResponseDto;
+  status: 200;
+};
+
+export type readinessControllerGetReadinessResponse503 = {
+  data: void;
+  status: 503;
+};
+
+export type readinessControllerGetReadinessResponseSuccess =
+  readinessControllerGetReadinessResponse200 & {
+    headers: Headers;
+  };
+export type readinessControllerGetReadinessResponseError =
+  readinessControllerGetReadinessResponse503 & {
+    headers: Headers;
+  };
+
+export type readinessControllerGetReadinessResponse =
+  | readinessControllerGetReadinessResponseSuccess
+  | readinessControllerGetReadinessResponseError;
+
+export const getReadinessControllerGetReadinessUrl = () => {
+  return `/health/ready`;
+};
+
+export const readinessControllerGetReadiness = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<readinessControllerGetReadinessResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getReadinessControllerGetReadinessUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: readinessControllerGetReadinessResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as readinessControllerGetReadinessResponse;
+};
+
+export const getReadinessControllerGetReadinessQueryKey = () => {
+  return [`/health/ready`] as const;
+};
+
+export const getReadinessControllerGetReadinessQueryOptions = <
+  TData = Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+  TError = void,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getReadinessControllerGetReadinessQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof readinessControllerGetReadiness>>
+  > = ({ signal }) =>
+    readinessControllerGetReadiness({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ReadinessControllerGetReadinessQueryResult = NonNullable<
+  Awaited<ReturnType<typeof readinessControllerGetReadiness>>
+>;
+export type ReadinessControllerGetReadinessQueryError = void;
+
+export function useReadinessControllerGetReadiness<
+  TData = Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+  TError = void,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+          TError,
+          Awaited<ReturnType<typeof readinessControllerGetReadiness>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReadinessControllerGetReadiness<
+  TData = Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+          TError,
+          Awaited<ReturnType<typeof readinessControllerGetReadiness>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReadinessControllerGetReadiness<
+  TData = Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useReadinessControllerGetReadiness<
+  TData = Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+  TError = void,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof readinessControllerGetReadiness>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getReadinessControllerGetReadinessQueryOptions(options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
