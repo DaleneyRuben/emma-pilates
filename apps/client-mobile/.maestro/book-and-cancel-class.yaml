@@ -1,0 +1,51 @@
+# Critical journey: browse Sessions, book one, see it in Mis reservas, cancel it.
+appId: ${APP_ID}
+env:
+  EMAIL: sofia@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      text: "Reservar, tab.*"
+    timeout: 30000
+- tapOn:
+    text: "Reservar, tab.*"
+- extendedWaitUntil:
+    visible:
+      text: "Sucursal: .*"
+    timeout: 20000
+- runFlow:
+    when:
+      notVisible:
+        text: ".*Pilates \\d\\d:\\d\\d.*"
+    commands:
+      - tapOn:
+          text: "\\w{3} \\d{1,2}"
+          index: 1
+- extendedWaitUntil:
+    visible:
+      text: ".*Pilates \\d\\d:\\d\\d.*"
+    timeout: 15000
+- tapOn:
+    text: ".*Pilates \\d\\d:\\d\\d.*"
+    index: 0
+- extendedWaitUntil:
+    visible: "Reservar"
+    timeout: 15000
+- tapOn:
+    text: "Reservar"
+    index: 0
+- extendedWaitUntil:
+    visible: "Reserva confirmada"
+    timeout: 15000
+- takeScreenshot: client-booking-confirmed
+- tapOn:
+    text: "Cancelar"
+    index: 0
+- extendedWaitUntil:
+    visible: "¿Cancelar esta reserva?"
+    timeout: 10000
+- tapOn: "Sí, cancelar reserva"
+- extendedWaitUntil:
+    notVisible: "¿Cancelar esta reserva?"
+    timeout: 10000

@@ -1,0 +1,65 @@
+# Critical journey: Home shortcuts, Mi plan, and notification destinations.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      text: "Evaluación nutricional: .*"
+    timeout: 30000
+- assertVisible:
+    text: "Mis referidos: .*"
+- takeScreenshot: client-home-1-inicio
+- tapOn:
+    text: "Mis referidos: .*"
+- extendedWaitUntil:
+    visible: "Tus invitaciones|Mis referidos"
+    timeout: 15000
+- takeScreenshot: client-home-2-referidos
+- tapOn: "Volver"
+- extendedWaitUntil:
+    visible: "Ver detalle"
+    timeout: 10000
+- tapOn: "Ver detalle"
+- extendedWaitUntil:
+    visible: "Suscripción actual"
+    timeout: 10000
+- assertVisible: "Podrás comprar un plan nuevo cuando este termine."
+- takeScreenshot: client-home-3-miplan
+- tapOn: "Volver"
+- tapOn:
+    text: "Evaluación nutricional: .*"
+- extendedWaitUntil:
+    visible: "Días disponibles|Mis evaluaciones"
+    timeout: 15000
+- takeScreenshot: client-home-4-evaluacion
+- tapOn:
+    text: "Perfil, tab.*"
+- extendedWaitUntil:
+    visible: "Cerrar sesión"
+    timeout: 15000
+- tapOn:
+    text: "Notificaciones.*"
+- extendedWaitUntil:
+    visible:
+      text: ".*canceló tu evaluación nutricional.*"
+    timeout: 15000
+- takeScreenshot: client-home-5-inbox
+- tapOn:
+    text: ".*canceló tu evaluación nutricional.*"
+- extendedWaitUntil:
+    visible: "Mis evaluaciones"
+    timeout: 10000
+- takeScreenshot: client-home-6-mis-evaluaciones
+- tapOn: "Volver"
+- extendedWaitUntil:
+    visible:
+      text: ".*Tu clase de .* fue cancelada.*"
+    timeout: 10000
+- tapOn:
+    text: ".*Tu clase de .* fue cancelada.*"
+- extendedWaitUntil:
+    visible: "Ver historial"
+    timeout: 10000
+- takeScreenshot: client-home-7-mis-reservas

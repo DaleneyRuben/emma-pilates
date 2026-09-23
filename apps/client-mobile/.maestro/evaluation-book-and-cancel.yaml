@@ -1,0 +1,56 @@
+# Critical journey: book an Evaluation from Perfil, see it confirmed, cancel it.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      text: "Perfil, tab.*"
+    timeout: 30000
+- tapOn:
+    text: "Perfil, tab.*"
+- extendedWaitUntil:
+    visible: "Evaluación nutricional"
+    timeout: 15000
+- assertVisible: "Mis evaluaciones"
+- takeScreenshot: client-evaluation-1-perfil
+- tapOn: "Evaluación nutricional"
+- extendedWaitUntil:
+    visible: "Días disponibles"
+    timeout: 15000
+- assertVisible: "Nutricionista · sesiones de 45 min"
+- assertVisible: "Puedes reservar hasta 3 horas antes."
+- takeScreenshot: client-evaluation-2-disponibilidad
+- tapOn:
+    text: "Turno .*"
+    index: 0
+- extendedWaitUntil:
+    visible: "Es gratuita — no usa clases de tu plan."
+    timeout: 10000
+- assertVisible: "Te avisaremos un día antes y una hora antes de tu cita."
+- takeScreenshot: client-evaluation-3-confirmar
+- tapOn: "Confirmar"
+- extendedWaitUntil:
+    visible: "Evaluación confirmada"
+    timeout: 15000
+- assertVisible: "Puedes cancelar hasta 3 horas antes."
+- takeScreenshot: client-evaluation-4-confirmada
+- tapOn: "Cancelar"
+- extendedWaitUntil:
+    visible: "¿Cancelar esta evaluación?"
+    timeout: 10000
+- assertVisible: "Podrás reservar otra evaluación para este mes."
+- takeScreenshot: client-evaluation-5-cancelar
+- tapOn: "Sí, cancelar evaluación"
+- extendedWaitUntil:
+    visible: "No tienes evaluaciones próximas."
+    timeout: 15000
+- takeScreenshot: client-evaluation-6-vacio
+- extendedWaitUntil:
+    notVisible: "¿Cancelar esta evaluación?"
+    timeout: 10000
+- tapOn: "Reservar evaluación"
+- extendedWaitUntil:
+    visible: "Días disponibles"
+    timeout: 15000

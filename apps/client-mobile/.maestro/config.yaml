@@ -1,0 +1,7 @@
+# Run from apps/client-mobile with the app served and fixtures freshly applied:
+#   maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8083 \
+#     -e PASSWORD=emma-local-2026 .maestro
+flows:
+  - "*.yaml"
+executionOrder:
+  continueOnFailure: false
