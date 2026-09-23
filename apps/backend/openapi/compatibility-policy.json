@@ -33,6 +33,23 @@
     "cancelAdminEvaluation",
     "listAdminReferrals",
     "listAdminCredits",
-    "getIncomeReport"
+    "getIncomeReport",
+    "listAdminSupplies",
+    "createSupply",
+    "updateSupply",
+    "archiveSupply",
+    "recordWithdrawal",
+    "recordRestock",
+    "listAdminWithdrawals",
+    "listAdminSalaryPayments",
+    "recordSalaryPayment",
+    "updateSalaryPayment",
+    "listAdminExpenseCategories",
+    "createExpenseCategory",
+    "deleteExpenseCategory",
+    "listAdminExpenses",
+    "recordExpense",
+    "updateExpense",
+    "getExpenseReport"
   ]
 }
