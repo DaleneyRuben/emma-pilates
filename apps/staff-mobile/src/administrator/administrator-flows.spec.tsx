@@ -349,4 +349,47 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.getByText("No hay clases con estos filtros.")).toBeOnTheScreen();
     });
   });
+
+  it("searches every Branch at once and names the Branch on each Session", async () => {
+    const screen = await openPendingPayments({
+      ...administratorRoutes(() => []),
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+        () => jsonResponse([session]),
+      "/api/v1/administrator/sessions": () =>
+        jsonResponse([
+          { ...session, branchName: "Centro" },
+          {
+            ...session,
+            id: "session-2",
+            branchId: "branch-urubo",
+            branchName: "Urubó",
+            classTypeName: "Mat Pilates",
+          },
+        ]),
+    });
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Cancelar una clase" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Sucursal: Centro" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Todas las sucursales" }));
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /^Mat Pilates \d.* · Urubó$/ }),
+      ).toBeOnTheScreen();
+    });
+    expect(screen.getByRole("button", { name: "Sucursal: Todas las sucursales" })).toBeOnTheScreen();
+    expect(screen.getByText("2 clases")).toBeOnTheScreen();
+
+    await fireEvent.press(screen.getByRole("button", { name: /^Mat Pilates \d.* · Urubó$/ }));
+    await waitFor(() => {
+      expect(screen.getByLabelText("Cancelar sesión")).toBeOnTheScreen();
+    });
+    expect(screen.getByText(/Urubó/)).toBeOnTheScreen();
+  });
 });
