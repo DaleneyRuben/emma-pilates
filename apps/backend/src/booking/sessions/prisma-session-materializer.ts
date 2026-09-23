@@ -1,4 +1,8 @@
-import { StaffRole, type PrismaClient } from '../../generated/prisma/client';
+import {
+  StaffRole,
+  type Prisma,
+  type PrismaClient,
+} from '../../generated/prisma/client';
 import { boliviaDate } from '../../time/bolivia-time';
 import { materializationHorizon } from '../materialization-horizon';
 import { plannedSessions } from './session-materialization';
@@ -11,6 +15,57 @@ export type SessionMaterialization = {
 
 const minutesOf = (wallClock: Date): number =>
   wallClock.getUTCHours() * 60 + wallClock.getUTCMinutes();
+
+export type MaterializableSchedule = {
+  id: string;
+  branchId: string;
+  classTypeId: string;
+  trainerStaffMemberId: string;
+  weekday: number;
+  startsAtLocal: Date;
+  capacity: number;
+  effectiveFrom: Date;
+  effectiveUntil: Date | null;
+  classType: { durationMinutes: number };
+};
+
+// Inserts one schedule's missing occurrences across the horizon. ON CONFLICT
+// DO NOTHING without a target: the unique schedule/occurrence index makes
+// reruns and concurrent runs no-ops, and the Branch and Trainer exclusion
+// constraints skip an occurrence that would overlap a scheduled Session.
+export const materializeSchedule = async (
+  client: PrismaClient | Prisma.TransactionClient,
+  schedule: MaterializableSchedule,
+  clock: { today: Date; now: Date },
+): Promise<{ created: number; skipped: number }> => {
+  const planned = plannedSessions(
+    {
+      weekday: schedule.weekday,
+      startMinutes: minutesOf(schedule.startsAtLocal),
+      durationMinutes: schedule.classType.durationMinutes,
+      effectiveFrom: schedule.effectiveFrom,
+      effectiveUntil: schedule.effectiveUntil,
+    },
+    clock,
+  );
+  if (planned.length === 0) return { created: 0, skipped: 0 };
+
+  const { count } = await client.session.createMany({
+    data: planned.map((session) => ({
+      sessionScheduleId: schedule.id,
+      branchId: schedule.branchId,
+      classTypeId: schedule.classTypeId,
+      trainerStaffMemberId: schedule.trainerStaffMemberId,
+      startsAt: session.startsAt,
+      occurrenceStartsAt: session.startsAt,
+      endsAt: session.endsAt,
+      capacity: schedule.capacity,
+      createdAt: clock.now,
+    })),
+    skipDuplicates: true,
+  });
+  return { created: count, skipped: planned.length - count };
+};
 
 export const createPrismaSessionMaterializer = (
   prisma: PrismaClient,
@@ -59,37 +114,12 @@ export const createPrismaSessionMaterializer = (
     let skipped = 0;
 
     for (const schedule of schedules) {
-      const planned = plannedSessions(
-        {
-          weekday: schedule.weekday,
-          startMinutes: minutesOf(schedule.startsAtLocal),
-          durationMinutes: schedule.classType.durationMinutes,
-          effectiveFrom: schedule.effectiveFrom,
-          effectiveUntil: schedule.effectiveUntil,
-        },
-        { today, now },
-      );
-      if (planned.length === 0) continue;
-
-      // ON CONFLICT DO NOTHING without a target: the unique schedule/start
-      // index makes reruns and concurrent runs no-ops, and the Branch and
-      // Trainer exclusion constraints skip an occurrence that would overlap a
-      // scheduled Session.
-      const { count } = await prisma.session.createMany({
-        data: planned.map((session) => ({
-          sessionScheduleId: schedule.id,
-          branchId: schedule.branchId,
-          classTypeId: schedule.classTypeId,
-          trainerStaffMemberId: schedule.trainerStaffMemberId,
-          startsAt: session.startsAt,
-          endsAt: session.endsAt,
-          capacity: schedule.capacity,
-          createdAt: now,
-        })),
-        skipDuplicates: true,
+      const result = await materializeSchedule(prisma, schedule, {
+        today,
+        now,
       });
-      created += count;
-      skipped += planned.length - count;
+      created += result.created;
+      skipped += result.skipped;
     }
 
     return { schedules: schedules.length, created, skipped };
