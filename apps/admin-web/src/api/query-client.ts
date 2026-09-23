@@ -1,5 +1,6 @@
-import { QueryClient } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
 import { isApiError } from "./problem";
+import type { SessionExpiry } from "./session-expiry";
 
 const maxRetries = 1;
 
@@ -18,8 +19,19 @@ export function shouldRetryQuery(
   return true;
 }
 
-export function createAdminQueryClient(): QueryClient {
+export function createAdminQueryClient(
+  options: { sessionExpiry?: SessionExpiry } = {},
+): QueryClient {
+  const { sessionExpiry } = options;
+
   return new QueryClient({
+    queryCache: new QueryCache({
+      onError: (error, query) => sessionExpiry?.report(error, query.meta),
+    }),
+    mutationCache: new MutationCache({
+      onError: (error, _variables, _context, mutation) =>
+        sessionExpiry?.report(error, mutation.meta),
+    }),
     defaultOptions: {
       queries: {
         retry: shouldRetryQuery,
