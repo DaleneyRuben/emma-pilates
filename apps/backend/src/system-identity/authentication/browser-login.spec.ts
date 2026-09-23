@@ -44,15 +44,21 @@ describe('admin-web Login', () => {
     await expect(login(command, dependencies)).resolves.toEqual({
       credential: 'opaque-session-credential',
     });
-    expect(dependencies.completeLogin).toHaveBeenCalledWith(
-      expect.objectContaining({
-        session: expect.objectContaining({
-          surface: 'admin_web',
-          idleExpiresAt: new Date('2026-08-31T12:30:00.000Z'),
-          absoluteExpiresAt: new Date('2026-09-01T00:00:00.000Z'),
-        }),
-      }),
-    );
+    expect(dependencies.completeLogin).toHaveBeenCalledWith({
+      loginLaneDigest: Buffer.from(
+        'digest:login-lane:paola@example.com\u0000client:browser-client-identifier\u0000network:127.0.0.1',
+      ),
+      session: {
+        id: 'authentication-session-id',
+        accountId: 'account-id',
+        surface: 'admin_web',
+        credentialDigest: Buffer.from('credential-digest'),
+        createdAt: now,
+        lastMeaningfulActivityAt: now,
+        idleExpiresAt: new Date('2026-08-31T12:30:00.000Z'),
+        absoluteExpiresAt: new Date('2026-09-01T00:00:00.000Z'),
+      },
+    });
   });
 
   it.each([
@@ -82,10 +88,20 @@ describe('admin-web Login', () => {
 
     await login({ ...command, surface: 'mobile' }, dependencies);
 
-    expect(dependencies.completeLogin).toHaveBeenCalledWith(
-      expect.objectContaining({
-        session: expect.objectContaining({ surface: 'mobile' }),
-      }),
-    );
+    expect(dependencies.completeLogin).toHaveBeenCalledWith({
+      loginLaneDigest: Buffer.from(
+        'digest:login-lane:paola@example.com\u0000client:browser-client-identifier\u0000network:127.0.0.1',
+      ),
+      session: {
+        id: 'authentication-session-id',
+        accountId: 'account-id',
+        surface: 'mobile',
+        credentialDigest: Buffer.from('credential-digest'),
+        createdAt: now,
+        lastMeaningfulActivityAt: now,
+        idleExpiresAt: new Date('2026-09-30T12:00:00.000Z'),
+        absoluteExpiresAt: new Date('2026-11-29T12:00:00.000Z'),
+      },
+    });
   });
 });
