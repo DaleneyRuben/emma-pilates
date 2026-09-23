@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useMemo, useState, type ReactNode } from "react";
 
 export type Branch = {
   id: string;
@@ -12,13 +6,13 @@ export type Branch = {
   address: string;
 };
 
-type BranchSelection = {
+export type BranchSelection = {
   branches: readonly Branch[];
   selectedBranch: Branch | undefined;
   selectBranch: (branchId: string) => void;
 };
 
-const BranchContext = createContext<BranchSelection | null>(null);
+export const BranchContext = createContext<BranchSelection | null>(null);
 
 /**
  * The selected Branch is the one piece of low-frequency, application-wide
@@ -56,12 +50,4 @@ export function BranchProvider({
   return (
     <BranchContext.Provider value={value}>{children}</BranchContext.Provider>
   );
-}
-
-export function useBranchSelection(): BranchSelection {
-  const selection = useContext(BranchContext);
-  if (selection === null) {
-    throw new Error("useBranchSelection needs a BranchProvider above it");
-  }
-  return selection;
 }

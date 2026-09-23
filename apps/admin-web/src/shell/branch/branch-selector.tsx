@@ -10,7 +10,8 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from "../../components/ui/sheet";
 import { cn } from "../../lib/cn";
 import { useIsNarrowViewport } from "../use-media-query";
-import { useBranchSelection, type Branch } from "./branch-context";
+import type { Branch } from "./branch-context";
+import { useBranchSelection } from "./use-branch-selection";
 
 // AW34: the shell's Branch cell. One Branch always; "Todas las sucursales"
 // exists only inside the report's own selector (AW16).
