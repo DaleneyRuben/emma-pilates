@@ -1165,6 +1165,35 @@ Book a Session in the Client app first and it stays scheduled through the
 check. The worker logs only a sanitized `empty_session_check_failed` or
 `started_waitlist_closure_failed` event if a sweep fails.
 
+## Test 14: bootstrap the first Administrator on an empty database
+
+The bootstrap command creates the very first Administrator of a new
+environment (see the
+[runbook](./runbooks/first-administrator-bootstrap.md)). Try it on a throwaway
+database so your fixture data stays intact:
+
+```sh
+createdb pilates_test_bootstrap
+cd apps/backend
+export DATABASE_URL=postgresql://$USER@localhost:5432/pilates_test_bootstrap
+pnpm exec prisma migrate deploy
+BOOTSTRAP_ADMINISTRATOR_EMAIL=duena@example.com \
+BOOTSTRAP_ADMINISTRATOR_NAME="Dueña del estudio" pnpm admin:bootstrap
+```
+
+It prints `administrator_bootstrap_completed` with `status: created`. Then:
+
+1. Run the same command again within a minute: `email_throttled`. After a
+   minute it prints `status: activation_resent` (a fresh Activation Link).
+2. Run it with a different email: `bootstrap_pending_for_another_email`.
+3. Run it against the fixture database
+   (`DATABASE_URL=…/pilates_dev_sim`): `administrator_already_active`, because
+   `paola.mendoza@example.com` is already an active Administrator.
+
+Every refusal changes nothing. Drop the throwaway database afterwards with
+`dropdb pilates_test_bootstrap`. Completing activation needs the link from the
+queued email, which the local capture does not expose to testers yet.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1182,8 +1211,7 @@ The following are not ready for manual product testing:
 - the Nutritionist agenda, Mi disponibilidad, and the Client Evaluation
   screens in the apps (their APIs work, see Test 7; the screens are MOB-016);
 - editing a Session Schedule (ADM-001);
-- creating the first Administrator with the bootstrap command (IDN-006) or
-  creating, reassigning, and deactivating Staff Members (IDN-007);
+- creating, reassigning, and deactivating Staff Members (IDN-007);
 - Promotions, image variants, and Back Office records (UPL-002, BKO-001);
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, or production deployment; and
