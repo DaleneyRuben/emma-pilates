@@ -60,8 +60,8 @@ describe("Client Subscription detail", () => {
     expect(screen.getByText("Activa")).toBeOnTheScreen();
     expect(screen.getByText("5 de 12 clases")).toBeOnTheScreen();
     expect(screen.getByText("Te quedan 5 clases por usar")).toBeOnTheScreen();
-    expect(screen.getByText("25 de agosto")).toBeOnTheScreen();
-    expect(screen.getByText("24 de septiembre")).toBeOnTheScreen();
+    expect(screen.getByText("25 de agosto de 2026")).toBeOnTheScreen();
+    expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
     expect(
       screen.queryByRole("button", { name: "Comprar un plan" }),
     ).not.toBeOnTheScreen();

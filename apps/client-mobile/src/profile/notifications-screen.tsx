@@ -6,7 +6,7 @@ import { useClientFetcher } from "../client-fetcher";
 type NotificationsNavigation = {
   goBack: () => void;
   navigate: (
-    screen: "Subscription" | "Bookings" | "PaymentStatus",
+    screen: "Subscription" | "Bookings" | "PaymentStatus" | "MyEvaluations",
     params?: { screen: "MyBookings" },
   ) => void;
 };
@@ -23,7 +23,13 @@ export function ClientNotificationsScreen() {
       onOpen={(notification) => {
         if (notification.destinationType === "subscription") {
           navigation.navigate("Subscription");
-        } else if (notification.destinationType === "booking") {
+        } else if (notification.destinationType === "evaluation") {
+          navigation.navigate("MyEvaluations");
+        } else if (
+          notification.destinationType === "booking" ||
+          // A cancelled Session has no detail to open; its Bookings do.
+          notification.destinationType === "session"
+        ) {
           navigation.navigate("Bookings", { screen: "MyBookings" });
         } else if (notification.destinationType === "payment") {
           navigation.navigate("PaymentStatus");

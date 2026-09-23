@@ -17,6 +17,7 @@ import { useClientFetcher } from "../client-fetcher";
 import {
   describeAllowance,
   formatCivilDate,
+  formatCivilDateWithYear,
   subscriptionBadge,
 } from "../home/home-format";
 import { BackLink } from "@pilates/mobile-core";
@@ -36,9 +37,10 @@ const badgeColors = {
 } as const;
 
 function allowanceMessage(remaining: number, expired: boolean): string {
-  if (expired) return "Podrás comprar un plan nuevo cuando este termine.";
-  if (remaining === 0) return "Sin clases disponibles";
-  return `Te quedan ${remaining} clases por usar`;
+  if (expired || remaining === 0) return "Sin clases disponibles";
+  return remaining === 1
+    ? "Te queda 1 clase por usar"
+    : `Te quedan ${remaining} clases por usar`;
 }
 
 export function SubscriptionScreen() {
@@ -107,12 +109,15 @@ export function SubscriptionScreen() {
             <Text style={styles.warningText}>
               {`Tu plan vence el ${formatCivilDate(subscription.endsOn)}.`}
             </Text>
+            <BodyText style={styles.warningNote}>
+              Podrás comprar uno nuevo apenas termine.
+            </BodyText>
           </View>
         ) : null}
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <BodyText style={styles.cardLabel}>
-              {expired ? "Último plan" : "Tu plan"}
+              {expired ? "Último plan" : "Suscripción actual"}
             </BodyText>
             <View style={[styles.badge, { backgroundColor: badge.background }]}>
               <Text style={[styles.badgeText, { color: badge.text }]}>
@@ -153,21 +158,32 @@ export function SubscriptionScreen() {
           <View style={styles.dateRow}>
             <BodyText style={styles.dateLabel}>Inicio</BodyText>
             <Text style={styles.dateValue}>
-              {formatCivilDate(subscription.startsOn)}
+              {formatCivilDateWithYear(subscription.startsOn)}
             </Text>
           </View>
           <View style={styles.dateRow}>
-            <BodyText style={styles.dateLabel}>Pagado hasta</BodyText>
-            <Text style={styles.dateValue}>
-              {formatCivilDate(subscription.endsOn)}
+            <BodyText style={styles.dateLabel}>
+              {expired ? "Venció el" : "Pagado hasta"}
+            </BodyText>
+            <Text style={[styles.dateValue, expired && styles.expiredDate]}>
+              {formatCivilDateWithYear(subscription.endsOn)}
             </Text>
           </View>
         </View>
         {expired ? (
-          <PrimaryButton
-            label="Comprar un plan"
-            onPress={() => navigation.navigate("Plans")}
-          />
+          <View style={styles.purchase}>
+            <PrimaryButton
+              label="Comprar un plan"
+              onPress={() => navigation.navigate("Plans")}
+            />
+            <BodyText style={styles.note}>
+              Elige el paquete que mejor te acomode.
+            </BodyText>
+          </View>
+        ) : status === "active" ? (
+          <BodyText style={styles.note}>
+            Podrás comprar un plan nuevo cuando este termine.
+          </BodyText>
         ) : null}
       </ScrollView>
     </Screen>
@@ -197,6 +213,10 @@ const styles = StyleSheet.create({
   dateLabel: { color: colors.textMuted },
   dateRow: { flexDirection: "row", justifyContent: "space-between" },
   dateValue: { color: colors.text, fontSize: typography.body },
+  expiredDate: { color: colors.errorText },
+  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
+  purchase: { gap: spacing.sm },
+  warningNote: { color: colors.warningText, fontSize: typography.note },
   dates: {
     backgroundColor: colors.surface,
     borderRadius: radii.card,
@@ -221,6 +241,7 @@ const styles = StyleSheet.create({
   warning: {
     backgroundColor: "rgba(201,154,78,0.16)",
     borderRadius: radii.card,
+    gap: spacing.xs,
     padding: spacing.lg,
   },
   warningText: { color: colors.warningText, fontSize: typography.body },

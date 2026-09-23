@@ -42,9 +42,18 @@ const planScreens = {
   Subscription: SubscriptionScreen,
 };
 
+// Evaluation and Referral screens open from Home's quick actions and Perfil.
+const shortcutScreens = {
+  EvaluationAvailability: EvaluationAvailabilityScreen,
+  BookEvaluation: BookEvaluationScreen,
+  MyEvaluations: MyEvaluationsScreen,
+  Referrals: ReferralsScreen,
+  Credit: CreditScreen,
+};
+
 const HomeStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },
-  screens: { Home: HomeScreen, ...planScreens },
+  screens: { Home: HomeScreen, ...planScreens, ...shortcutScreens },
 });
 
 const BookingsStack = createNativeStackNavigator({
@@ -72,11 +81,7 @@ const ProfileStack = createNativeStackNavigator({
     EditProfile: EditProfileScreen,
     Notifications: ClientNotificationsScreen,
     ChangePassword: ClientChangePasswordScreen,
-    Referrals: ReferralsScreen,
-    Credit: CreditScreen,
-    EvaluationAvailability: EvaluationAvailabilityScreen,
-    BookEvaluation: BookEvaluationScreen,
-    MyEvaluations: MyEvaluationsScreen,
+    ...shortcutScreens,
     ...planScreens,
   },
 });

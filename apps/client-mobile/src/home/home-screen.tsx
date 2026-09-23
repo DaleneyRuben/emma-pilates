@@ -1,6 +1,8 @@
 import {
   useGetCurrentClientProfile,
+  useGetCurrentClientReferrals,
   useGetCurrentClientSubscription,
+  useListEvaluations,
   type ClientSubscriptionDto,
 } from "@pilates/api-contracts";
 import {
@@ -21,13 +23,23 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import {
   describeAllowance,
+  evaluationShortcut,
   firstName,
   formatCivilDate,
+  referralShortcut,
   subscriptionBadge,
 } from "./home-format";
 
 type HomeNavigation = {
-  navigate: (screen: "Booking" | "Plans" | "Subscription") => void;
+  navigate: (
+    screen:
+      | "Booking"
+      | "Plans"
+      | "Subscription"
+      | "EvaluationAvailability"
+      | "MyEvaluations"
+      | "Referrals",
+  ) => void;
 };
 
 const badgeStyles = {
@@ -110,19 +122,21 @@ function PurchaseCard({ onPurchase }: { onPurchase: () => void }) {
 }
 
 function QuickAction({
-  disabled,
+  disabled = false,
   label,
   note,
   onPress,
+  summary,
 }: {
-  disabled: boolean;
+  disabled?: boolean;
   label: string;
   note?: string;
   onPress: () => void;
+  summary?: string;
 }) {
   return (
     <Pressable
-      accessibilityLabel={label}
+      accessibilityLabel={summary === undefined ? label : `${label}: ${summary}`}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
       disabled={disabled}
@@ -135,6 +149,9 @@ function QuickAction({
       {disabled && note !== undefined ? (
         <BodyText style={styles.actionNote}>{note}</BodyText>
       ) : null}
+      {summary !== undefined ? (
+        <BodyText style={styles.actionNote}>{summary}</BodyText>
+      ) : null}
     </Pressable>
   );
 }
@@ -145,6 +162,8 @@ export function HomeScreen() {
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const profile = useGetCurrentClientProfile(queryOptions);
   const subscription = useGetCurrentClientSubscription(queryOptions);
+  const evaluations = useListEvaluations({ scope: "upcoming" }, queryOptions);
+  const referrals = useGetCurrentClientReferrals(queryOptions);
 
   const retry = () => {
     void Promise.all([profile.refetch(), subscription.refetch()]);
@@ -176,6 +195,10 @@ export function HomeScreen() {
   }
 
   const view = subscription.data.data;
+  const nextEvaluation =
+    evaluations.data?.status === 200 ? evaluations.data.data.items[0] : undefined;
+  const referralCount =
+    referrals.data?.status === 200 ? referrals.data.data.referrals.length : undefined;
   const hasActivePlan =
     (view.status === "active" || view.status === "expiring_soon") &&
     view.subscription !== null &&
@@ -200,6 +223,20 @@ export function HomeScreen() {
             label="Reservar una clase"
             note="Necesitas un plan activo para reservar"
             onPress={() => navigation.navigate("Booking")}
+          />
+          <QuickAction
+            label="Evaluación nutricional"
+            onPress={() =>
+              navigation.navigate(
+                nextEvaluation === undefined ? "EvaluationAvailability" : "MyEvaluations",
+              )
+            }
+            summary={evaluationShortcut(nextEvaluation?.startsAt)}
+          />
+          <QuickAction
+            label="Mis referidos"
+            onPress={() => navigation.navigate("Referrals")}
+            summary={referralShortcut(referralCount)}
           />
         </View>
       </ScrollView>
