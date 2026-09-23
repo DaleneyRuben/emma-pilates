@@ -56,5 +56,43 @@
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.57.1",
     "vite": "^8.2.2"
+  },
+  "jest": {
+    "testEnvironment": "<rootDir>/jest.environment.cjs",
+    "testEnvironmentOptions": {
+      "customExportConditions": [
+        ""
+      ]
+    },
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
+    ],
+    "testMatch": [
+      "<rootDir>/src/**/*.spec.ts?(x)"
+    ],
+    "transform": {
+      "^.+\\.(t|j)sx?$": [
+        "@swc/jest",
+        {
+          "jsc": {
+            "parser": {
+              "syntax": "typescript",
+              "tsx": true
+            },
+            "transform": {
+              "react": {
+                "runtime": "automatic"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "transformIgnorePatterns": [
+      "/node_modules/.pnpm/(?!@pilates)"
+    ],
+    "moduleNameMapper": {
+      "\\.css$": "<rootDir>/test/style-stub.cjs"
+    }
   }
 }
