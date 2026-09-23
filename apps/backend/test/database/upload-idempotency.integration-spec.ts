@@ -139,4 +139,53 @@ describe('Finalize upload idempotency', () => {
       ),
     ).rejects.toThrow('Idempotency Key was reused with a different request');
   });
+
+  it('writes the idempotency record from the injected clock even when it lies far in the past', async () => {
+    const pastNow = new Date('2026-09-01T12:00:00.000Z');
+    const account = await createAccount();
+    const bytes = await receiptBytes();
+    const commands = createPrismaUploadCommands(
+      prisma,
+      storage,
+      () => pastNow,
+      boss,
+    );
+    const intent = await commands.createPendingUpload({
+      ownerAccountId: account.id,
+      purpose: 'transfer_receipt',
+      mediaType: 'image/jpeg',
+      byteSize: bytes.byteLength,
+      checksum: createHash('sha256').update(bytes).digest(),
+    });
+    await storage.put(intent.pendingObjectKey, bytes);
+    const finalizeUploadIdempotent = createFinalizeUploadIdempotent(
+      prisma,
+      storage,
+      () => pastNow,
+      boss,
+    );
+    const idempotencyKey = randomUUID();
+
+    await finalizeUploadIdempotent(
+      { imageAssetId: intent.id },
+      account.id,
+      idempotencyKey,
+    );
+
+    await expect(
+      prisma.idempotencyRecord.findUniqueOrThrow({
+        where: {
+          accountId_command_idempotencyKey: {
+            accountId: account.id,
+            command: 'finalize_upload',
+            idempotencyKey,
+          },
+        },
+        select: { createdAt: true, expiresAt: true },
+      }),
+    ).resolves.toEqual({
+      createdAt: pastNow,
+      expiresAt: new Date('2026-09-02T12:00:00.000Z'),
+    });
+  });
 });
