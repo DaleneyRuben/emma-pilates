@@ -86,6 +86,25 @@ describe('development fixtures', () => {
     expect(stored.state).toBe('CANCELLED');
   });
 
+  it('keeps a Session the worker already materialized at a fixture start instead of failing', async () => {
+    const session = fixtures.sessions[1];
+    const materializedId = randomUUID();
+    await prisma.session.delete({ where: { id: session.id } });
+    await prisma.session.create({ data: { ...session, id: materializedId } });
+
+    await applyDevelopmentFixtures(prisma, { fixtures, passwordHash });
+
+    await expect(
+      prisma.session.findMany({
+        where: {
+          sessionScheduleId: session.sessionScheduleId,
+          startsAt: session.startsAt,
+        },
+        select: { id: true },
+      }),
+    ).resolves.toEqual([{ id: materializedId }]);
+  });
+
   it('lets Sofía read Bs 60 of referral credit and both referrals through the payment reads', async () => {
     const account = await prisma.account.findUniqueOrThrow({
       where: { email: 'sofia@example.com' },
