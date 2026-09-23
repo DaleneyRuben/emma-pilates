@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
+import { BackOfficeModule } from './back-office/back-office.module';
 import { HealthModule } from './health/health.module';
 import { ProblemDetailsFilter } from './http/problem-details.filter';
 import { BookingModule } from './booking/booking.module';
@@ -12,6 +13,7 @@ import { UploadsModule } from './uploads/uploads.module';
     HealthModule,
     SystemIdentityModule,
     BookingModule,
+    BackOfficeModule,
     UploadsModule,
     NotificationsModule,
   ],
