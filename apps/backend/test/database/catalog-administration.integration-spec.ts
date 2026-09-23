@@ -97,6 +97,7 @@ describe('Prisma catalog administration', () => {
         endsAtLocal: new Date('1970-01-01T10:30:00.000Z'),
         effectiveFrom: new Date('2026-09-21T00:00:00.000Z'),
         createdByAccountId: (await administrator()).accountId,
+        createdAt: new Date('2026-09-20T12:00:00.000Z'),
       },
     });
 
