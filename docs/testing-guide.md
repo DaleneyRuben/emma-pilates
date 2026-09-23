@@ -1299,6 +1299,34 @@ In the Client app as `lucia@example.com`:
 In the Staff app, a Trainer's "Tu clase … se canceló" notice and a
 Nutritionist's Evaluation notices open **Mi agenda**.
 
+## Test 19: run the mobile critical journeys and the release smoke check
+
+With fixtures freshly applied (Test 5A), the backend running, and both apps
+served (client Metro on any free port, staff on 8082), run the committed Maestro
+journeys from each app folder:
+
+```sh
+cd apps/client-mobile
+maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8081 \
+  -e PASSWORD=emma-local-2026 .maestro
+cd ../staff-mobile
+maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8082 \
+  -e PASSWORD=emma-local-2026 .maestro
+```
+
+The Client suite books and cancels a class, walks Home, Mi plan, and the
+notification destinations, and books and cancels an Evaluation. The Staff suite
+covers the Administrator's pending payments, the Trainer's agenda and inbox,
+the Assistant's Client search, and the Nutritionist's availability. Each flow
+changes the development database, so re-apply fixtures before running again.
+
+To check that the release bundles build, run
+`EXPO_PUBLIC_API_URL=https://api.example.com pnpm --filter @pilates/client-mobile release:smoke`
+(and the same for `@pilates/staff-mobile`). It prints
+`mobile_release_smoke_passed` with both bundle sizes. Store builds and updates
+follow the [mobile release runbook](./runbooks/mobile-release.md) and need the
+Expo, Apple, and Google accounts first.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1318,8 +1346,8 @@ The following are not ready for manual product testing:
   API works, see Test 17; the admin screens are WEB-004);
 - Promotions, image variants, and Back Office records (UPL-002, BKO-001);
 - any Pilates admin-web workflow;
-- real SendPulse email, Expo push notifications, or production deployment; and
-- Maestro release-journey tests.
+- real SendPulse email, Expo push notifications, store builds, or production
+  deployment.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
