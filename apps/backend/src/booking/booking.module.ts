@@ -86,7 +86,10 @@ import {
   NutritionistAvailabilityBlocksController,
   NutritionistEvaluationsController,
 } from './evaluations/nutritionist.controller';
-import { createPrismaEvaluationCommands } from './evaluations/prisma-evaluation-commands';
+import {
+  createPrismaEvaluationCommands,
+  type EvaluationCommands,
+} from './evaluations/prisma-evaluation-commands';
 import { loadStaffProfile } from './staff/staff-profile';
 import {
   StaffProfileController,
@@ -124,6 +127,15 @@ import {
   type StaffAccountRuntime,
 } from '../system-identity/staff-accounts/staff-accounts';
 
+import {
+  administrationControllers,
+  administrationOperations,
+  type AdministrationOperations,
+} from './administration/administration.controller';
+import { createPrismaCatalogAdministration } from './administration/prisma-catalog-administration';
+import { createPrismaOversight } from './administration/prisma-oversight';
+import { createPrismaScheduleAdministration } from './administration/prisma-schedule-administration';
+
 const bookingPrisma = Symbol('bookingPrisma');
 
 class BookingRuntimeCleanup implements OnApplicationShutdown {
@@ -153,6 +165,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     WaitlistEntriesController,
     StaffProfileController,
     AdministratorStaffMembersController,
+    ...administrationControllers,
     PurchaseIntentsController,
     CreditPurchasesController,
     ClientPaymentsController,
@@ -575,6 +588,23 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
       inject: [bookingPrisma],
       useFactory: (prisma: PrismaClient) =>
         createPrismaEvaluationCommands(prisma, { now: () => new Date() }),
+    },
+    {
+      provide: administrationOperations,
+      inject: [bookingPrisma, evaluationCommands],
+      useFactory: (
+        prisma: PrismaClient,
+        evaluations: EvaluationCommands,
+      ): AdministrationOperations => {
+        const now = () => new Date();
+        return {
+          catalog: createPrismaCatalogAdministration(prisma, { now }),
+          schedules: createPrismaScheduleAdministration(prisma, { now }),
+          oversight: createPrismaOversight(prisma, { now }),
+          cancelEvaluation: (evaluationId, principal) =>
+            evaluations.cancelEvaluationAsStaff(evaluationId, principal),
+        };
+      },
     },
     {
       provide: BookingRuntimeCleanup,
