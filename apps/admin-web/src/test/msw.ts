@@ -12,7 +12,7 @@ export function useMockServer(): void {
 export const apiUrl = (path: string): string =>
   `${window.location.origin}${path}`;
 
-export function jsonResponse(body: JsonBodyType, status = 200): HttpResponse {
+export function jsonResponse(body: JsonBodyType, status = 200): Response {
   return HttpResponse.json(body, { status });
 }
 
@@ -20,7 +20,7 @@ export function problemResponse(
   status: number,
   code: string,
   extra: { detail?: string; headers?: Record<string, string> } = {},
-): HttpResponse {
+): Response {
   return HttpResponse.json(
     {
       type: "about:blank",
