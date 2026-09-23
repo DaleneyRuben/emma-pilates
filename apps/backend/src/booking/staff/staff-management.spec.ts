@@ -1,0 +1,500 @@
+import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import {
+  changeStaffBranches,
+  changeStaffRole,
+  createStaffMember,
+  deactivateStaffMember,
+  resendStaffActivation,
+  StaffManagementError,
+  type StaffManagementTransaction,
+  type StaffMemberRecord,
+} from './staff-management';
+
+const now = new Date('2026-09-23T15:00:00.000Z');
+const day = 24 * 60 * 60 * 1_000;
+
+const principal = (
+  role:
+    | 'administrator'
+    | 'assistant'
+    | 'trainer'
+    | 'nutritionist' = 'administrator',
+  staffMemberId = 'admin-staff',
+): AuthenticatedPrincipal => ({
+  accountId: 'admin-account',
+  authenticationSessionId: 'session',
+  identity: { kind: 'staff', staffMemberId, role, branchIds: [] },
+});
+const administrator = principal();
+
+const record = (
+  overrides: Partial<StaffMemberRecord> = {},
+): StaffMemberRecord => ({
+  id: 'staff-1',
+  accountId: 'account-1',
+  name: 'Daniela Ortiz',
+  email: 'daniela@example.com',
+  phone: null,
+  role: 'trainer',
+  branchIds: ['centro', 'urubo'],
+  status: 'active',
+  activationExpiresAt: null,
+  ...overrides,
+});
+
+const createTransaction = (
+  overrides: Partial<jest.Mocked<StaffManagementTransaction>> = {},
+): jest.Mocked<StaffManagementTransaction> => ({
+  findAccountByEmail: jest.fn().mockResolvedValue(null),
+  findStaffMember: jest.fn().mockResolvedValue(record()),
+  findUsableBranchIds: jest
+    .fn()
+    .mockImplementation((ids: string[]) =>
+      Promise.resolve(ids.filter((id) => id !== 'archived')),
+    ),
+  countActiveAdministrators: jest.fn().mockResolvedValue(2),
+  countTrainerCommitments: jest.fn().mockResolvedValue(0),
+  canIssueActivationEmail: jest.fn().mockResolvedValue(true),
+  createPendingStaffMember: jest.fn().mockResolvedValue(undefined),
+  reissueActivation: jest.fn().mockResolvedValue(undefined),
+  setRole: jest.fn().mockResolvedValue(undefined),
+  replaceBranches: jest.fn().mockResolvedValue(undefined),
+  endNutritionistAvailability: jest.fn().mockResolvedValue(undefined),
+  disableAccount: jest.fn().mockResolvedValue(undefined),
+  recordAudit: jest.fn().mockResolvedValue(undefined),
+  ...overrides,
+});
+
+let ids = 0;
+const dependencies = (transaction: StaffManagementTransaction) => ({
+  unitOfWork: {
+    execute: <Result>(
+      work: (tx: StaffManagementTransaction) => Promise<Result>,
+    ) => work(transaction),
+  },
+  now: () => now,
+  newId: () => `id-${(ids += 1)}`,
+});
+
+const rejectsWith = async (promise: Promise<unknown>, code: string) => {
+  await expect(promise).rejects.toBeInstanceOf(StaffManagementError);
+  await expect(promise).rejects.toMatchObject({ code });
+};
+
+beforeEach(() => {
+  ids = 0;
+});
+
+describe('createStaffMember', () => {
+  const command = {
+    name: '  Andrea Suárez ',
+    email: ' Andrea@Example.com ',
+    phone: '+591 70000001',
+    role: 'trainer' as const,
+    branchIds: ['centro'],
+  };
+
+  it('creates a pending Staff Member with its Branches, activation link, and audit', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest.fn().mockResolvedValue(
+        record({
+          id: 'id-2',
+          accountId: 'id-1',
+          name: 'Andrea Suárez',
+          email: 'andrea@example.com',
+          status: 'pending',
+          branchIds: ['centro'],
+        }),
+      ),
+    });
+
+    const created = await createStaffMember(
+      command,
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.createPendingStaffMember).toHaveBeenCalledWith({
+      accountId: 'id-1',
+      staffMemberId: 'id-2',
+      name: 'Andrea Suárez',
+      email: 'andrea@example.com',
+      phone: '+591 70000001',
+      role: 'trainer',
+      branchIds: ['centro'],
+      pendingExpiresAt: new Date(now.getTime() + 30 * day),
+      activationExpiresAt: new Date(now.getTime() + 7 * day),
+    });
+    expect(transaction.recordAudit).toHaveBeenCalledWith({
+      actionCode: 'staff_member.created',
+      actorAccountId: 'admin-account',
+      targetAccountId: 'id-1',
+      correlationId: 'id-3',
+      metadata: { role: 'trainer', branchIds: ['centro'] },
+      occurredAt: now,
+    });
+    expect(created).toMatchObject({ id: 'id-2', status: 'pending' });
+  });
+
+  it('creates an Administrator without Branch rows', async () => {
+    const transaction = createTransaction();
+
+    await createStaffMember(
+      { ...command, role: 'administrator', branchIds: ['centro'] },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.createPendingStaffMember).toHaveBeenCalledWith(
+      expect.objectContaining({ role: 'administrator', branchIds: [] }),
+    );
+  });
+
+  it.each([
+    [
+      'a non-Administrator',
+      { principal: principal('assistant') },
+      'staff_access_denied',
+    ],
+    ['an email already in use', { account: { id: 'other' } }, 'email_in_use'],
+    ['no Branch for a Trainer', { branchIds: [] }, 'invalid_branch_assignment'],
+    [
+      'an archived or unknown Branch',
+      { branchIds: ['archived'] },
+      'invalid_branch_assignment',
+    ],
+    ['a throttled recipient', { throttled: true }, 'email_throttled'],
+  ])('refuses %s without changes', async (_label, setup, code) => {
+    const transaction = createTransaction({
+      findAccountByEmail: jest
+        .fn()
+        .mockResolvedValue('account' in setup ? setup.account : null),
+      canIssueActivationEmail: jest
+        .fn()
+        .mockResolvedValue(!('throttled' in setup)),
+    });
+
+    await rejectsWith(
+      createStaffMember(
+        {
+          ...command,
+          branchIds: 'branchIds' in setup ? setup.branchIds : ['centro'],
+        },
+        'principal' in setup ? setup.principal : administrator,
+        dependencies(transaction),
+      ),
+      code,
+    );
+    expect(transaction.createPendingStaffMember).not.toHaveBeenCalled();
+    expect(transaction.recordAudit).not.toHaveBeenCalled();
+  });
+});
+
+describe('resendStaffActivation', () => {
+  it('reissues the activation link of a pending Staff Member', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValue(record({ status: 'pending' })),
+    });
+
+    await resendStaffActivation(
+      { staffMemberId: 'staff-1' },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.reissueActivation).toHaveBeenCalledWith({
+      accountId: 'account-1',
+      email: 'daniela@example.com',
+      pendingExpiresAt: new Date(now.getTime() + 30 * day),
+      activationExpiresAt: new Date(now.getTime() + 7 * day),
+    });
+    expect(transaction.recordAudit).toHaveBeenCalledWith(
+      expect.objectContaining({ actionCode: 'staff_member.activation_resent' }),
+    );
+  });
+
+  it('refuses when the Staff Member already activated', async () => {
+    await rejectsWith(
+      resendStaffActivation(
+        { staffMemberId: 'staff-1' },
+        administrator,
+        dependencies(createTransaction()),
+      ),
+      'staff_member_not_pending',
+    );
+  });
+});
+
+describe('changeStaffRole', () => {
+  it('ends a Nutritionist’s availability when the Role changes', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValue(record({ role: 'nutritionist' })),
+    });
+
+    await changeStaffRole(
+      { staffMemberId: 'staff-1', role: 'assistant' },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.endNutritionistAvailability).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      actorAccountId: 'admin-account',
+      now,
+    });
+    expect(transaction.setRole).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      role: 'assistant',
+    });
+    expect(transaction.recordAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actionCode: 'staff_member.role_changed',
+        metadata: { previousRole: 'nutritionist', role: 'assistant' },
+      }),
+    );
+  });
+
+  it('clears Branch rows when promoting to Administrator and requires Branches when demoting one', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValue(record({ role: 'assistant' })),
+    });
+    await changeStaffRole(
+      { staffMemberId: 'staff-1', role: 'administrator' },
+      administrator,
+      dependencies(transaction),
+    );
+    expect(transaction.replaceBranches).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      branchIds: [],
+    });
+
+    const demoting = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValue(record({ role: 'administrator', branchIds: [] })),
+    });
+    await rejectsWith(
+      changeStaffRole(
+        { staffMemberId: 'staff-1', role: 'trainer' },
+        administrator,
+        dependencies(demoting),
+      ),
+      'invalid_branch_assignment',
+    );
+    await changeStaffRole(
+      { staffMemberId: 'staff-1', role: 'trainer', branchIds: ['centro'] },
+      administrator,
+      dependencies(demoting),
+    );
+    expect(demoting.replaceBranches).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      branchIds: ['centro'],
+    });
+  });
+
+  it.each([
+    [
+      'a Trainer with upcoming Sessions',
+      { trainerCommitments: 2 },
+      'trainer_has_upcoming_sessions',
+    ],
+    [
+      'the last active Administrator',
+      { role: 'administrator' as const, admins: 1 },
+      'last_administrator',
+    ],
+    ['their own Role', { self: true }, 'own_staff_member'],
+    [
+      'a deactivated Staff Member',
+      { status: 'deactivated' as const },
+      'staff_member_deactivated',
+    ],
+  ])('refuses to change %s', async (_label, setup, code) => {
+    const transaction = createTransaction({
+      findStaffMember: jest.fn().mockResolvedValue(
+        record({
+          role: 'role' in setup ? setup.role : 'trainer',
+          status: 'status' in setup ? setup.status : 'active',
+          branchIds: 'role' in setup ? [] : ['centro'],
+        }),
+      ),
+      countTrainerCommitments: jest
+        .fn()
+        .mockResolvedValue(
+          'trainerCommitments' in setup ? setup.trainerCommitments : 0,
+        ),
+      countActiveAdministrators: jest
+        .fn()
+        .mockResolvedValue('admins' in setup ? setup.admins : 2),
+    });
+
+    await rejectsWith(
+      changeStaffRole(
+        { staffMemberId: 'staff-1', role: 'assistant', branchIds: ['centro'] },
+        'self' in setup ? principal('administrator', 'staff-1') : administrator,
+        dependencies(transaction),
+      ),
+      code,
+    );
+    expect(transaction.setRole).not.toHaveBeenCalled();
+    expect(transaction.endNutritionistAvailability).not.toHaveBeenCalled();
+  });
+});
+
+describe('changeStaffBranches', () => {
+  it('ends a Nutritionist’s blocks only at removed Branches', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValue(
+          record({ role: 'nutritionist', branchIds: ['centro', 'urubo'] }),
+        ),
+    });
+
+    await changeStaffBranches(
+      { staffMemberId: 'staff-1', branchIds: ['centro', 'equipetrol'] },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.endNutritionistAvailability).toHaveBeenCalledTimes(1);
+    expect(transaction.endNutritionistAvailability).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      branchId: 'urubo',
+      actorAccountId: 'admin-account',
+      now,
+    });
+    expect(transaction.replaceBranches).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      branchIds: ['centro', 'equipetrol'],
+    });
+    expect(transaction.recordAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actionCode: 'staff_member.branches_changed',
+        metadata: { added: ['equipetrol'], removed: ['urubo'] },
+      }),
+    );
+  });
+
+  it('refuses to remove a Branch where the Trainer still leads upcoming Sessions', async () => {
+    const transaction = createTransaction({
+      countTrainerCommitments: jest.fn().mockResolvedValue(1),
+    });
+
+    await rejectsWith(
+      changeStaffBranches(
+        { staffMemberId: 'staff-1', branchIds: ['centro'] },
+        administrator,
+        dependencies(transaction),
+      ),
+      'trainer_has_upcoming_sessions',
+    );
+    expect(transaction.countTrainerCommitments).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      branchIds: ['urubo'],
+      now,
+    });
+    expect(transaction.replaceBranches).not.toHaveBeenCalled();
+  });
+
+  it('refuses Branch changes for an Administrator', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValue(record({ role: 'administrator', branchIds: [] })),
+    });
+
+    await rejectsWith(
+      changeStaffBranches(
+        { staffMemberId: 'staff-1', branchIds: ['centro'] },
+        administrator,
+        dependencies(transaction),
+      ),
+      'invalid_branch_assignment',
+    );
+  });
+});
+
+describe('deactivateStaffMember', () => {
+  it('disables the Account, ends a Nutritionist’s availability, and audits', async () => {
+    const transaction = createTransaction({
+      findStaffMember: jest
+        .fn()
+        .mockResolvedValue(record({ role: 'nutritionist' })),
+    });
+
+    await deactivateStaffMember(
+      { staffMemberId: 'staff-1' },
+      administrator,
+      dependencies(transaction),
+    );
+
+    expect(transaction.endNutritionistAvailability).toHaveBeenCalledWith({
+      staffMemberId: 'staff-1',
+      actorAccountId: 'admin-account',
+      now,
+    });
+    expect(transaction.disableAccount).toHaveBeenCalledWith({
+      accountId: 'account-1',
+      now,
+    });
+    expect(transaction.recordAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actionCode: 'staff_member.deactivated',
+        targetAccountId: 'account-1',
+      }),
+    );
+  });
+
+  it.each([
+    [
+      'a Trainer with upcoming Sessions',
+      { trainerCommitments: 1 },
+      'trainer_has_upcoming_sessions',
+    ],
+    [
+      'the last active Administrator',
+      { role: 'administrator' as const, admins: 1 },
+      'last_administrator',
+    ],
+    ['themselves', { self: true }, 'own_staff_member'],
+    [
+      'an already deactivated Staff Member',
+      { status: 'deactivated' as const },
+      'staff_member_deactivated',
+    ],
+  ])('refuses to deactivate %s', async (_label, setup, code) => {
+    const transaction = createTransaction({
+      findStaffMember: jest.fn().mockResolvedValue(
+        record({
+          role: 'role' in setup ? setup.role : 'trainer',
+          status: 'status' in setup ? setup.status : 'active',
+        }),
+      ),
+      countTrainerCommitments: jest
+        .fn()
+        .mockResolvedValue(
+          'trainerCommitments' in setup ? setup.trainerCommitments : 0,
+        ),
+      countActiveAdministrators: jest
+        .fn()
+        .mockResolvedValue('admins' in setup ? setup.admins : 2),
+    });
+
+    await rejectsWith(
+      deactivateStaffMember(
+        { staffMemberId: 'staff-1' },
+        'self' in setup ? principal('administrator', 'staff-1') : administrator,
+        dependencies(transaction),
+      ),
+      code,
+    );
+    expect(transaction.disableAccount).not.toHaveBeenCalled();
+  });
+});
