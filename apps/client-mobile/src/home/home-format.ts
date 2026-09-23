@@ -49,7 +49,7 @@ export function evaluationShortcut(nextStartsAt: string | undefined): string {
 
 // The reward is Credit (Bs 60), not classes (PAY-001).
 export function referralShortcut(count: number | undefined): string {
-  if (count === undefined || count === 0) return "Invita y gana crédito";
+  if (count === undefined || count === 0) return "Invita amigas y gana crédito";
   return count === 1 ? "1 amiga invitada" : `${count} amigas invitadas`;
 }
 
