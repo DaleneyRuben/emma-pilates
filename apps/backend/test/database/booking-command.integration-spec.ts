@@ -544,6 +544,53 @@ describe('Booking commands', () => {
       }),
     ).resolves.toBe(1);
   });
+
+  it('writes the idempotency records from the injected clock even when it lies far in the past', async () => {
+    const pastNow = new Date('2026-09-01T12:00:00.000Z');
+    const fixture = await createFixture(prisma, { capacity: 1 });
+    const commands = new PrismaBookingCommands(prisma, () => pastNow);
+    const bookingKey = randomUUID();
+    const waitlistKey = randomUUID();
+
+    await commands.createIdempotent(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: fixture.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: fixture.clientId },
+      },
+      bookingKey,
+    );
+    const waitingClient = await createClientWithSubscription(prisma);
+    await commands.joinWaitlistIdempotent(
+      { sessionId: fixture.sessionId },
+      {
+        accountId: waitingClient.accountId,
+        authenticationSessionId: randomUUID(),
+        identity: { kind: 'client', clientId: waitingClient.clientId },
+      },
+      waitlistKey,
+    );
+
+    await expect(
+      prisma.idempotencyRecord.findMany({
+        where: { idempotencyKey: { in: [bookingKey, waitlistKey] } },
+        select: { command: true, createdAt: true, expiresAt: true },
+        orderBy: { command: 'asc' },
+      }),
+    ).resolves.toEqual([
+      {
+        command: 'create_booking',
+        createdAt: pastNow,
+        expiresAt: new Date('2026-09-02T12:00:00.000Z'),
+      },
+      {
+        command: 'join_waitlist',
+        createdAt: pastNow,
+        expiresAt: new Date('2026-09-02T12:00:00.000Z'),
+      },
+    ]);
+  });
 });
 
 const createFixture = async (
