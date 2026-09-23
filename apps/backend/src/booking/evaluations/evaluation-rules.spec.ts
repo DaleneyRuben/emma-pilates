@@ -4,7 +4,6 @@ import {
   cancellableUntil,
   dueReminders,
   isEvaluationBookable,
-  materializationHorizon,
   plannedSlots,
   resolveBlockChangeDate,
   slotsPerWeek,
@@ -97,13 +96,6 @@ describe('Availability Block values', () => {
 });
 
 describe('slot materialization', () => {
-  it('covers Bolivia dates from today through today + 30', () => {
-    expect(materializationHorizon(civil('2026-09-22'))).toEqual({
-      from: civil('2026-09-22'),
-      through: civil('2026-10-22'),
-    });
-  });
-
   it('cuts every matching weekday of the horizon into 45-minute instants with their Bolivia month', () => {
     const slots = plannedSlots(mondayMorning, {
       today: civil('2026-09-22'),

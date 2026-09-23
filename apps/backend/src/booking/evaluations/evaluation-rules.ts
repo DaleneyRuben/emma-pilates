@@ -4,12 +4,12 @@ import {
   boliviaMonth,
   isoWeekday,
 } from '../../time/bolivia-time';
+import { materializationHorizon } from '../materialization-horizon';
 import { EvaluationRuleError } from './evaluation-errors';
 
 // D1/D2: one global 45-minute slot, cut back-to-back from a start on the
-// 15-minute grid. D7: materialized for Bolivia dates today .. today + 30.
+// 15-minute grid. D7: materialized over the shared ADR-0059 horizon.
 export const evaluationSlotMinutes = 45;
-export const evaluationHorizonDays = 30;
 const gridMinutes = 15;
 const minuteMilliseconds = 60 * 1_000;
 const hourMilliseconds = 60 * minuteMilliseconds;
@@ -53,13 +53,6 @@ export const slotsPerWeek = (times: BlockTimes): number =>
     0,
     Math.floor((times.endMinutes - times.startMinutes) / evaluationSlotMinutes),
   );
-
-export const materializationHorizon = (
-  today: Date,
-): { from: Date; through: Date } => ({
-  from: today,
-  through: addCivilDays(today, evaluationHorizonDays),
-});
 
 // ADR-0059: every matching Bolivia date of the horizon inside the block's
 // [effectiveFrom, effectiveUntil) range, skipping occurrences already started.

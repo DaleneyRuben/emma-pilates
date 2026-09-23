@@ -40,12 +40,12 @@ import {
   dueReminders,
   evaluationSlotMinutes,
   isEvaluationBookable,
-  materializationHorizon,
   plannedSlots,
   resolveBlockChangeDate,
   slotsPerWeek,
   type BlockDefinition,
 } from './evaluation-rules';
+import { materializationHorizon } from '../materialization-horizon';
 
 type Transaction = Prisma.TransactionClient;
 type Database = PrismaClient | Transaction;
