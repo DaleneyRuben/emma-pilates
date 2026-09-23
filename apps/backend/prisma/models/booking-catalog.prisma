@@ -8,6 +8,7 @@ enum SessionState {
 enum SessionCancellationCause {
   ZERO_BOOKINGS         @map("zero_bookings")
   NO_SUBSTITUTE_TRAINER @map("no_substitute_trainer")
+  SCHEDULE_CHANGED      @map("schedule_changed")
 
   @@schema("booking")
 }
@@ -86,6 +87,8 @@ model Session {
   classTypeId                  String                    @map("class_type_id") @db.Uuid
   trainerStaffMemberId         String                    @map("trainer_staff_member_id") @db.Uuid
   startsAt                     DateTime                  @map("starts_at") @db.Timestamptz(3)
+  // The schedule occurrence a generated Session stands for; never moves (ADM-001).
+  occurrenceStartsAt           DateTime?                 @map("occurrence_starts_at") @db.Timestamptz(3)
   endsAt                       DateTime                  @map("ends_at") @db.Timestamptz(3)
   capacity                     Int                       @db.SmallInt
   state                        SessionState              @default(SCHEDULED)
@@ -105,7 +108,7 @@ model Session {
   bookings                     Booking[]
   waitlistEntries              WaitlistEntry[]
 
-  @@unique([sessionScheduleId, startsAt])
+  @@unique([sessionScheduleId, occurrenceStartsAt])
   @@index([branchId, startsAt, id])
   @@index([trainerStaffMemberId, startsAt])
   @@index([classTypeId])

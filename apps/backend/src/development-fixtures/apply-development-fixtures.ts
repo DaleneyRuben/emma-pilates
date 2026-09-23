@@ -173,9 +173,9 @@ export const applyDevelopmentFixtures = async (
         // under its own id; that occurrence is the same Session, so keep it.
         const occupant = await transaction.session.findUnique({
           where: {
-            sessionScheduleId_startsAt: {
+            sessionScheduleId_occurrenceStartsAt: {
               sessionScheduleId: session.sessionScheduleId,
-              startsAt: session.startsAt,
+              occurrenceStartsAt: session.startsAt,
             },
           },
           select: { id: true },
@@ -185,8 +185,12 @@ export const applyDevelopmentFixtures = async (
         // cancellations belong to the running system and are kept.
         await transaction.session.upsert({
           where: { id: session.id },
-          create: session,
-          update: { startsAt: session.startsAt, endsAt: session.endsAt },
+          create: { ...session, occurrenceStartsAt: session.startsAt },
+          update: {
+            startsAt: session.startsAt,
+            endsAt: session.endsAt,
+            occurrenceStartsAt: session.startsAt,
+          },
         });
       }
 
