@@ -733,6 +733,13 @@ audit action code the backend writes must be listed in
 and every listed code must be written somewhere. If you add or rename an
 audited action, update that catalog in the same change or this test fails.
 
+The unit suite also checks mobile contract compatibility (ADR-0016): the
+committed `apps/backend/openapi/openapi.json` must not remove or change
+anything the previous mobile release relies on, compared with
+`apps/backend/openapi/mobile-baseline.json`. Run it alone with
+`pnpm check:api-compat`; [the OpenAPI README](../apps/backend/openapi/README.md)
+explains the rules and when to move the baseline.
+
 ### Mobile automated tests
 
 ```sh
