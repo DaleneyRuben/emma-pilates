@@ -23,6 +23,7 @@ const purchaseIntentExpiryIntervalMs = 5 * 60 * 1_000;
 const sessionScheduleIntervalMs = 60 * 60 * 1_000;
 const evaluationSlotIntervalMs = 60 * 60 * 1_000;
 const evaluationReminderIntervalMs = 60 * 1_000;
+const sessionStartCheckIntervalMs = 60 * 1_000;
 
 type QueueStatsSnapshot = {
   readyCount: number;
@@ -64,6 +65,12 @@ type WorkerDependencies = {
   };
   evaluationReminders: {
     execute(): Promise<{ sent: number }>;
+  };
+  emptySessionChecks: {
+    execute(): Promise<{ checked: number; cancelled: number }>;
+  };
+  startedSessionWaitlists: {
+    execute(): Promise<{ closed: number }>;
   };
   serviceVersion: string;
   emit(record: unknown): void;
@@ -161,6 +168,30 @@ export const startWorker = async (
     void runEvaluationReminders();
   }, evaluationReminderIntervalMs);
 
+  // The one-time empty check and the Session-start Waitlist closure are each
+  // swept every minute, so neither is more than a minute late (ADR-0058). The
+  // check runs first so one the worker missed settles before its Session's
+  // Waitlist closes.
+  const runEmptySessionChecks = () =>
+    dependencies.emptySessionChecks.execute().catch(() => {
+      dependencies.emit({
+        event: 'empty_session_check_failed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+    });
+  const runStartedSessionWaitlists = () =>
+    dependencies.startedSessionWaitlists.execute().catch(() => {
+      dependencies.emit({
+        event: 'started_waitlist_closure_failed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+    });
+  await runEmptySessionChecks();
+  await runStartedSessionWaitlists();
+  const sessionStartCheckTimer = setInterval(() => {
+    void runEmptySessionChecks().then(runStartedSessionWaitlists);
+  }, sessionStartCheckIntervalMs);
+
   const getQueueCounts = async (queue: string) => {
     const snapshots = await dependencies.boss.getQueueStats(queue, {
       force: true,
@@ -190,6 +221,7 @@ export const startWorker = async (
     clearInterval(sessionScheduleTimer);
     clearInterval(evaluationSlotTimer);
     clearInterval(evaluationReminderTimer);
+    clearInterval(sessionStartCheckTimer);
     stopHeartbeat();
     await dependencies.boss.stop({ graceful: true });
   };

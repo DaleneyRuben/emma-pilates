@@ -9,6 +9,7 @@ import { createPgBoss } from './jobs/pg-boss-runtime';
 import { createWorkerLog } from './jobs/worker-log';
 import { createPrismaEvaluationCommands } from './booking/evaluations/prisma-evaluation-commands';
 import { createPrismaSessionMaterializer } from './booking/sessions/prisma-session-materializer';
+import { createPrismaSessionStartChecks } from './booking/sessions/prisma-session-start-checks';
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
@@ -65,6 +66,7 @@ async function bootstrap(): Promise<void> {
 
   const evaluations = createPrismaEvaluationCommands(prisma, { now });
   const sessionMaterializer = createPrismaSessionMaterializer(prisma, { now });
+  const sessionStartChecks = createPrismaSessionStartChecks(prisma, { now });
 
   const stopWorker = await startWorker({
     boss,
@@ -93,6 +95,12 @@ async function bootstrap(): Promise<void> {
     evaluationSlots: { execute: () => evaluations.materializeAvailability() },
     evaluationReminders: {
       execute: () => evaluations.sendDueEvaluationReminders(),
+    },
+    emptySessionChecks: {
+      execute: () => sessionStartChecks.checkEmptySessions(),
+    },
+    startedSessionWaitlists: {
+      execute: () => sessionStartChecks.closeStartedWaitlists(),
     },
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit: createWorkerLog({
