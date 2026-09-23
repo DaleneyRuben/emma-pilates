@@ -4,11 +4,23 @@ type RetryOptions = {
 
 const maxAttempts = 5;
 
-const isWriteConflict = (error: unknown): boolean =>
-  typeof error === 'object' &&
-  error !== null &&
-  'code' in error &&
-  error.code === 'P2034';
+type PrismaFailure = {
+  code?: unknown;
+  meta?: { driverAdapterError?: { cause?: { originalCode?: unknown } } };
+};
+
+// A raw query (such as a FOR UPDATE lock) reports a serialization failure as
+// P2010 carrying the PostgreSQL 40001 code instead of P2034.
+const isWriteConflict = (error: unknown): boolean => {
+  if (typeof error !== 'object' || error === null) return false;
+  const failure = error as PrismaFailure;
+
+  return (
+    failure.code === 'P2034' ||
+    (failure.code === 'P2010' &&
+      failure.meta?.driverAdapterError?.cause?.originalCode === '40001')
+  );
+};
 
 const wait = (milliseconds: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, milliseconds));
