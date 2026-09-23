@@ -72,9 +72,7 @@ describe('admin-web Login', () => {
         'stored-password-hash',
         'submitted password',
       );
-      expect(dependencies.recordFailedCredentialCheck).toHaveBeenCalledTimes(
-        1,
-      );
+      expect(dependencies.recordFailedCredentialCheck).toHaveBeenCalledTimes(1);
       expect(dependencies.completeLogin).not.toHaveBeenCalled();
     },
   );
