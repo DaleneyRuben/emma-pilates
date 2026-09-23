@@ -24,6 +24,7 @@ const sessionScheduleIntervalMs = 60 * 60 * 1_000;
 const evaluationSlotIntervalMs = 60 * 60 * 1_000;
 const evaluationReminderIntervalMs = 60 * 1_000;
 const sessionStartCheckIntervalMs = 60 * 1_000;
+const retentionSweepIntervalMs = 60 * 60 * 1_000;
 
 type QueueStatsSnapshot = {
   readyCount: number;
@@ -71,6 +72,14 @@ type WorkerDependencies = {
   };
   startedSessionWaitlists: {
     execute(): Promise<{ closed: number }>;
+  };
+  retentionSweeps: {
+    execute(): Promise<{
+      idempotencyRecords: number;
+      authenticationSessions: number;
+      throttleEvents: number;
+      notifications: number;
+    }>;
   };
   serviceVersion: string;
   emit(record: unknown): void;
@@ -192,6 +201,20 @@ export const startWorker = async (
     void runEmptySessionChecks().then(runStartedSessionWaitlists);
   }, sessionStartCheckIntervalMs);
 
+  // Housekeeping for rows past their provisional retention (BE-008); hourly
+  // keeps each batch small.
+  const runRetentionSweeps = () =>
+    dependencies.retentionSweeps.execute().catch(() => {
+      dependencies.emit({
+        event: 'retention_sweep_failed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+    });
+  await runRetentionSweeps();
+  const retentionSweepTimer = setInterval(() => {
+    void runRetentionSweeps();
+  }, retentionSweepIntervalMs);
+
   const getQueueCounts = async (queue: string) => {
     const snapshots = await dependencies.boss.getQueueStats(queue, {
       force: true,
@@ -222,6 +245,7 @@ export const startWorker = async (
     clearInterval(evaluationSlotTimer);
     clearInterval(evaluationReminderTimer);
     clearInterval(sessionStartCheckTimer);
+    clearInterval(retentionSweepTimer);
     stopHeartbeat();
     await dependencies.boss.stop({ graceful: true });
   };
