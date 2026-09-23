@@ -6,6 +6,7 @@
   "scripts": {
     "build": "pnpm -r --if-present build",
     "check:api": "pnpm generate:api && git diff --exit-code -- apps/backend/openapi/openapi.json packages/api-contracts/src/generated && test -z \"$(git ls-files --others --exclude-standard -- apps/backend/openapi packages/api-contracts/src/generated)\"",
+    "check:api-compat": "pnpm --filter @pilates/backend exec jest src/openapi/mobile-compatibility",
     "dev:admin": "pnpm --filter @pilates/admin-web dev",
     "dev:backend": "pnpm --filter @pilates/backend start:dev",
     "dev:client-mobile": "pnpm --filter @pilates/client-mobile start",
