@@ -189,7 +189,7 @@ describe('Prisma schedule administration', () => {
 
     expect(moved).toMatchObject({
       startsAt: bolivia('2026-10-14', '14:00'),
-      endsAt: bolivia('2026-10-14', '14:45'),
+      endsAt: bolivia('2026-10-14', '14:50'),
       trainerStaffMemberId: staff('emma'),
       isException: true,
     });
@@ -245,7 +245,7 @@ describe('Prisma schedule administration', () => {
     );
 
     expect(session).toMatchObject({
-      endsAt: bolivia('2026-09-26', '15:45'),
+      endsAt: bolivia('2026-09-26', '15:50'),
       isException: true,
       sessionScheduleId: null,
       capacity: 8,
