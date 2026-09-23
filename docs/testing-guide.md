@@ -1338,6 +1338,37 @@ every Branch appear together, each card naming its Trainer and Branch
 ("Emma Vargas · Urubó"). The API behind it is
 `GET /api/v1/administrator/sessions?from=…&until=…` (Administrators only).
 
+## Test 21: manage the catalog, schedules, and reports as the Administrator (API)
+
+The admin web is not built yet, so try these through Swagger or curl as
+`paola.mendoza@example.com` (Test 3 shows how to log in and authorize). Other
+Roles get `403 administration_access_denied`.
+
+1. **Catalog**: `GET`/`POST /api/v1/administrator/branches`, `PUT …/{id}`,
+   and `POST …/{id}/archive`; the same for `class-types`. A Branch or Class
+   Type that still has upcoming Sessions or schedules cannot be archived
+   (`409 branch_in_use`, `409 class_type_in_use`). Plans are created and
+   edited under `plans`, and `PUT plans/{id}/visibility` with
+   `{"visible": false}` hides one from the Client catalog.
+2. **Weekly schedules**: `POST /api/v1/administrator/session-schedules` with a
+   Branch, Class Type, Trainer, weekday (1–7), `startsAtLocal` ("16:00"),
+   capacity, and `effectiveFrom` (a Bolivia date) creates the schedule and
+   reports how many Sessions it created. `POST …/{id}/replacement` changes the
+   time, Trainer, or capacity from an effective date: unbooked future Sessions
+   move or change, booked ones stay, and the worker does not recreate the old
+   start. `POST …/{id}/end` stops it from a date. A reassigned Trainer gets a
+   notice such as "Se te asignó una clase: Mat Pilates, sábado 26 de
+   septiembre, 16:00.".
+3. **Single Sessions**: `POST /api/v1/administrator/sessions` adds a one-off
+   Session; `PATCH …/{id}` changes its start, Trainer, or capacity. Overlaps
+   answer `409 session_overlap`, and capacity below the booked count answers
+   `409 capacity_below_bookings`.
+4. **Oversight**: `GET evaluations?from=…&until=…`, `DELETE evaluations/{id}`
+   (cancels it for the Client), `GET referrals?query=sofia`, `GET credits`
+   (Clients with available Credit and the studio total), and
+   `GET reports/income?from=…&until=…&branchId=…` (income by month and method;
+   with a Branch only its cash counts).
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
