@@ -22,6 +22,14 @@ import type {
 
 import type {
   AccountActivationResultDto,
+  AdminBranchDto,
+  AdminClassTypeDto,
+  AdminCreditPageDto,
+  AdminEvaluationPageDto,
+  AdminPlanDto,
+  AdminReferralPageDto,
+  AdminSessionDto,
+  AdminSessionScheduleDto,
   AssistantCashPaymentDto,
   AssistantClientBookingDto,
   AssistantClientDto,
@@ -35,11 +43,13 @@ import type {
   AvailabilityBlockInputDto,
   AvailabilityBlockReplacementDto,
   BranchDto,
+  BranchInputDto,
   ChangeCurrentPasswordDto,
   ChangeStaffBranchesDto,
   ChangeStaffRoleDto,
   ClassHistoryEntryDto,
   ClassTypeDto,
+  ClassTypeInputDto,
   ClientEmailVerificationResultDto,
   ClientEvaluationDto,
   ClientEvaluationPageDto,
@@ -63,13 +73,19 @@ import type {
   EvaluationAvailabilityDto,
   EvaluationSlotDto,
   FinalizedUploadDto,
+  GetIncomeReportParams,
+  IncomeReportDto,
   InviteClientDto,
+  ListAdminCreditsParams,
+  ListAdminEvaluationsParams,
+  ListAdminReferralsParams,
   ListAdministratorSessionsParams,
   ListEvaluationSlotsParams,
   ListEvaluationsParams,
   ListNotificationsParams,
   ListNutritionistAgendaParams,
   ListSessionAvailabilityParams,
+  ListSessionSchedulesParams,
   ListStaffMembersParams,
   ListTrainerScheduleParams,
   LivenessResponseDto,
@@ -87,7 +103,9 @@ import type {
   PendingUploadDto,
   PendingVerificationResendDto,
   PlanDto,
+  PlanInputDto,
   PlanQuotesDto,
+  PlanVisibilityDto,
   PurchaseIntentDto,
   ReadinessResponseDto,
   RecordCashPaymentDto,
@@ -97,7 +115,14 @@ import type {
   SearchAssistantClientsParams,
   SessionAvailabilityDto,
   SessionCancellationDto,
+  SessionChangeDto,
   SessionDetailDto,
+  SessionInputDto,
+  SessionScheduleCreationDto,
+  SessionScheduleEndDto,
+  SessionScheduleEndInputDto,
+  SessionScheduleInputDto,
+  SessionScheduleReplacementDto,
   StaffMemberDto,
   StaffMemberPageDto,
   StaffProfileDto,
@@ -7058,6 +7083,3571 @@ export const useDeactivateStaffMember = <TError = unknown, TContext = unknown>(
   );
 };
 
+export type listAdminBranchesResponse200 = {
+  data: AdminBranchDto[];
+  status: 200;
+};
+
+export type listAdminBranchesResponseSuccess = listAdminBranchesResponse200 & {
+  headers: Headers;
+};
+export type listAdminBranchesResponse = listAdminBranchesResponseSuccess;
+
+export const getListAdminBranchesUrl = () => {
+  return `/api/v1/administrator/branches`;
+};
+
+export const listAdminBranches = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminBranchesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminBranchesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminBranchesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminBranchesResponse;
+};
+
+export const getListAdminBranchesQueryKey = () => {
+  return [`/api/v1/administrator/branches`] as const;
+};
+
+export const getListAdminBranchesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminBranches>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listAdminBranches>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListAdminBranchesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminBranches>>
+  > = ({ signal }) => listAdminBranches({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminBranches>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminBranchesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminBranches>>
+>;
+export type ListAdminBranchesQueryError = unknown;
+
+export function useListAdminBranches<
+  TData = Awaited<ReturnType<typeof listAdminBranches>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminBranches>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminBranches>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminBranches>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminBranches<
+  TData = Awaited<ReturnType<typeof listAdminBranches>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminBranches>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminBranches>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminBranches>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminBranches<
+  TData = Awaited<ReturnType<typeof listAdminBranches>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminBranches>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminBranches<
+  TData = Awaited<ReturnType<typeof listAdminBranches>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminBranches>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminBranchesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createBranchResponse201 = {
+  data: AdminBranchDto;
+  status: 201;
+};
+
+export type createBranchResponseSuccess = createBranchResponse201 & {
+  headers: Headers;
+};
+export type createBranchResponse = createBranchResponseSuccess;
+
+export const getCreateBranchUrl = () => {
+  return `/api/v1/administrator/branches`;
+};
+
+export const createBranch = async (
+  branchInputDto: BranchInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createBranchResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateBranchUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(branchInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createBranchResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createBranchResponse;
+};
+
+export const getCreateBranchMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createBranch>>,
+    TError,
+    CreateBranchMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createBranch>>,
+  TError,
+  CreateBranchMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createBranch"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createBranch>>,
+    CreateBranchMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createBranch(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateBranchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createBranch>>
+>;
+export type CreateBranchMutationBody = BranchInputDto;
+export type CreateBranchMutationError = unknown;
+export type CreateBranchMutationVariables = { data: BranchInputDto };
+
+export const useCreateBranch = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createBranch>>,
+      TError,
+      CreateBranchMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createBranch>>,
+  TError,
+  CreateBranchMutationVariables,
+  TContext
+> => {
+  return useMutation(getCreateBranchMutationOptions(options), queryClient);
+};
+
+export type updateBranchResponse200 = {
+  data: AdminBranchDto;
+  status: 200;
+};
+
+export type updateBranchResponseSuccess = updateBranchResponse200 & {
+  headers: Headers;
+};
+export type updateBranchResponse = updateBranchResponseSuccess;
+
+export const getUpdateBranchUrl = (branchId: string) => {
+  return `/api/v1/administrator/branches/${branchId}`;
+};
+
+export const updateBranch = async (
+  branchId: string,
+  branchInputDto: BranchInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateBranchResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateBranchUrl(branchId), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(branchInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateBranchResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateBranchResponse;
+};
+
+export const getUpdateBranchMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateBranch>>,
+    TError,
+    UpdateBranchMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateBranch>>,
+  TError,
+  UpdateBranchMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateBranch"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateBranch>>,
+    UpdateBranchMutationVariables
+  > = (props) => {
+    const { branchId, data } = props ?? {};
+
+    return updateBranch(branchId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateBranchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateBranch>>
+>;
+export type UpdateBranchMutationBody = BranchInputDto;
+export type UpdateBranchMutationError = unknown;
+export type UpdateBranchMutationVariables = {
+  branchId: string;
+  data: BranchInputDto;
+};
+
+export const useUpdateBranch = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateBranch>>,
+      TError,
+      UpdateBranchMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateBranch>>,
+  TError,
+  UpdateBranchMutationVariables,
+  TContext
+> => {
+  return useMutation(getUpdateBranchMutationOptions(options), queryClient);
+};
+
+export type archiveBranchResponse200 = {
+  data: AdminBranchDto;
+  status: 200;
+};
+
+export type archiveBranchResponseSuccess = archiveBranchResponse200 & {
+  headers: Headers;
+};
+export type archiveBranchResponse = archiveBranchResponseSuccess;
+
+export const getArchiveBranchUrl = (branchId: string) => {
+  return `/api/v1/administrator/branches/${branchId}/archive`;
+};
+
+export const archiveBranch = async (
+  branchId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<archiveBranchResponse> => {
+  const res = await (fetchFn ?? fetch)(getArchiveBranchUrl(branchId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: archiveBranchResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as archiveBranchResponse;
+};
+
+export const getArchiveBranchMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof archiveBranch>>,
+    TError,
+    ArchiveBranchMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof archiveBranch>>,
+  TError,
+  ArchiveBranchMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["archiveBranch"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof archiveBranch>>,
+    ArchiveBranchMutationVariables
+  > = (props) => {
+    const { branchId } = props ?? {};
+
+    return archiveBranch(branchId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ArchiveBranchMutationResult = NonNullable<
+  Awaited<ReturnType<typeof archiveBranch>>
+>;
+
+export type ArchiveBranchMutationError = unknown;
+export type ArchiveBranchMutationVariables = { branchId: string };
+
+export const useArchiveBranch = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof archiveBranch>>,
+      TError,
+      ArchiveBranchMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof archiveBranch>>,
+  TError,
+  ArchiveBranchMutationVariables,
+  TContext
+> => {
+  return useMutation(getArchiveBranchMutationOptions(options), queryClient);
+};
+
+export type listAdminClassTypesResponse200 = {
+  data: AdminClassTypeDto[];
+  status: 200;
+};
+
+export type listAdminClassTypesResponseSuccess =
+  listAdminClassTypesResponse200 & {
+    headers: Headers;
+  };
+export type listAdminClassTypesResponse = listAdminClassTypesResponseSuccess;
+
+export const getListAdminClassTypesUrl = () => {
+  return `/api/v1/administrator/class-types`;
+};
+
+export const listAdminClassTypes = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminClassTypesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminClassTypesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminClassTypesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminClassTypesResponse;
+};
+
+export const getListAdminClassTypesQueryKey = () => {
+  return [`/api/v1/administrator/class-types`] as const;
+};
+
+export const getListAdminClassTypesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminClassTypes>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listAdminClassTypes>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListAdminClassTypesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminClassTypes>>
+  > = ({ signal }) =>
+    listAdminClassTypes({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminClassTypes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminClassTypesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminClassTypes>>
+>;
+export type ListAdminClassTypesQueryError = unknown;
+
+export function useListAdminClassTypes<
+  TData = Awaited<ReturnType<typeof listAdminClassTypes>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClassTypes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminClassTypes>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminClassTypes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminClassTypes<
+  TData = Awaited<ReturnType<typeof listAdminClassTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClassTypes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminClassTypes>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminClassTypes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminClassTypes<
+  TData = Awaited<ReturnType<typeof listAdminClassTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClassTypes>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminClassTypes<
+  TData = Awaited<ReturnType<typeof listAdminClassTypes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClassTypes>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminClassTypesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createClassTypeResponse201 = {
+  data: AdminClassTypeDto;
+  status: 201;
+};
+
+export type createClassTypeResponseSuccess = createClassTypeResponse201 & {
+  headers: Headers;
+};
+export type createClassTypeResponse = createClassTypeResponseSuccess;
+
+export const getCreateClassTypeUrl = () => {
+  return `/api/v1/administrator/class-types`;
+};
+
+export const createClassType = async (
+  classTypeInputDto: ClassTypeInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createClassTypeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateClassTypeUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(classTypeInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createClassTypeResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createClassTypeResponse;
+};
+
+export const getCreateClassTypeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createClassType>>,
+    TError,
+    CreateClassTypeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createClassType>>,
+  TError,
+  CreateClassTypeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createClassType"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createClassType>>,
+    CreateClassTypeMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createClassType(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateClassTypeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createClassType>>
+>;
+export type CreateClassTypeMutationBody = ClassTypeInputDto;
+export type CreateClassTypeMutationError = unknown;
+export type CreateClassTypeMutationVariables = { data: ClassTypeInputDto };
+
+export const useCreateClassType = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createClassType>>,
+      TError,
+      CreateClassTypeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createClassType>>,
+  TError,
+  CreateClassTypeMutationVariables,
+  TContext
+> => {
+  return useMutation(getCreateClassTypeMutationOptions(options), queryClient);
+};
+
+export type updateClassTypeResponse200 = {
+  data: AdminClassTypeDto;
+  status: 200;
+};
+
+export type updateClassTypeResponseSuccess = updateClassTypeResponse200 & {
+  headers: Headers;
+};
+export type updateClassTypeResponse = updateClassTypeResponseSuccess;
+
+export const getUpdateClassTypeUrl = (classTypeId: string) => {
+  return `/api/v1/administrator/class-types/${classTypeId}`;
+};
+
+export const updateClassType = async (
+  classTypeId: string,
+  classTypeInputDto: ClassTypeInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateClassTypeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateClassTypeUrl(classTypeId), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(classTypeInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateClassTypeResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateClassTypeResponse;
+};
+
+export const getUpdateClassTypeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateClassType>>,
+    TError,
+    UpdateClassTypeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateClassType>>,
+  TError,
+  UpdateClassTypeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateClassType"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateClassType>>,
+    UpdateClassTypeMutationVariables
+  > = (props) => {
+    const { classTypeId, data } = props ?? {};
+
+    return updateClassType(classTypeId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateClassTypeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateClassType>>
+>;
+export type UpdateClassTypeMutationBody = ClassTypeInputDto;
+export type UpdateClassTypeMutationError = unknown;
+export type UpdateClassTypeMutationVariables = {
+  classTypeId: string;
+  data: ClassTypeInputDto;
+};
+
+export const useUpdateClassType = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateClassType>>,
+      TError,
+      UpdateClassTypeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateClassType>>,
+  TError,
+  UpdateClassTypeMutationVariables,
+  TContext
+> => {
+  return useMutation(getUpdateClassTypeMutationOptions(options), queryClient);
+};
+
+export type archiveClassTypeResponse200 = {
+  data: AdminClassTypeDto;
+  status: 200;
+};
+
+export type archiveClassTypeResponseSuccess = archiveClassTypeResponse200 & {
+  headers: Headers;
+};
+export type archiveClassTypeResponse = archiveClassTypeResponseSuccess;
+
+export const getArchiveClassTypeUrl = (classTypeId: string) => {
+  return `/api/v1/administrator/class-types/${classTypeId}/archive`;
+};
+
+export const archiveClassType = async (
+  classTypeId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<archiveClassTypeResponse> => {
+  const res = await (fetchFn ?? fetch)(getArchiveClassTypeUrl(classTypeId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: archiveClassTypeResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as archiveClassTypeResponse;
+};
+
+export const getArchiveClassTypeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof archiveClassType>>,
+    TError,
+    ArchiveClassTypeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof archiveClassType>>,
+  TError,
+  ArchiveClassTypeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["archiveClassType"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof archiveClassType>>,
+    ArchiveClassTypeMutationVariables
+  > = (props) => {
+    const { classTypeId } = props ?? {};
+
+    return archiveClassType(classTypeId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ArchiveClassTypeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof archiveClassType>>
+>;
+
+export type ArchiveClassTypeMutationError = unknown;
+export type ArchiveClassTypeMutationVariables = { classTypeId: string };
+
+export const useArchiveClassType = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof archiveClassType>>,
+      TError,
+      ArchiveClassTypeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof archiveClassType>>,
+  TError,
+  ArchiveClassTypeMutationVariables,
+  TContext
+> => {
+  return useMutation(getArchiveClassTypeMutationOptions(options), queryClient);
+};
+
+export type listAdminPlansResponse200 = {
+  data: AdminPlanDto[];
+  status: 200;
+};
+
+export type listAdminPlansResponseSuccess = listAdminPlansResponse200 & {
+  headers: Headers;
+};
+export type listAdminPlansResponse = listAdminPlansResponseSuccess;
+
+export const getListAdminPlansUrl = () => {
+  return `/api/v1/administrator/plans`;
+};
+
+export const listAdminPlans = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminPlansResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminPlansUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminPlansResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminPlansResponse;
+};
+
+export const getListAdminPlansQueryKey = () => {
+  return [`/api/v1/administrator/plans`] as const;
+};
+
+export const getListAdminPlansQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminPlans>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof listAdminPlans>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListAdminPlansQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listAdminPlans>>> = ({
+    signal,
+  }) => listAdminPlans({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminPlans>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminPlansQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminPlans>>
+>;
+export type ListAdminPlansQueryError = unknown;
+
+export function useListAdminPlans<
+  TData = Awaited<ReturnType<typeof listAdminPlans>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listAdminPlans>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminPlans>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminPlans>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminPlans<
+  TData = Awaited<ReturnType<typeof listAdminPlans>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listAdminPlans>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminPlans>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminPlans>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminPlans<
+  TData = Awaited<ReturnType<typeof listAdminPlans>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listAdminPlans>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminPlans<
+  TData = Awaited<ReturnType<typeof listAdminPlans>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listAdminPlans>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminPlansQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createPlanResponse201 = {
+  data: AdminPlanDto;
+  status: 201;
+};
+
+export type createPlanResponseSuccess = createPlanResponse201 & {
+  headers: Headers;
+};
+export type createPlanResponse = createPlanResponseSuccess;
+
+export const getCreatePlanUrl = () => {
+  return `/api/v1/administrator/plans`;
+};
+
+export const createPlan = async (
+  planInputDto: PlanInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createPlanResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreatePlanUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(planInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createPlanResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createPlanResponse;
+};
+
+export const getCreatePlanMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createPlan>>,
+    TError,
+    CreatePlanMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createPlan>>,
+  TError,
+  CreatePlanMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createPlan"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createPlan>>,
+    CreatePlanMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createPlan(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreatePlanMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createPlan>>
+>;
+export type CreatePlanMutationBody = PlanInputDto;
+export type CreatePlanMutationError = unknown;
+export type CreatePlanMutationVariables = { data: PlanInputDto };
+
+export const useCreatePlan = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createPlan>>,
+      TError,
+      CreatePlanMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createPlan>>,
+  TError,
+  CreatePlanMutationVariables,
+  TContext
+> => {
+  return useMutation(getCreatePlanMutationOptions(options), queryClient);
+};
+
+export type updatePlanResponse200 = {
+  data: AdminPlanDto;
+  status: 200;
+};
+
+export type updatePlanResponseSuccess = updatePlanResponse200 & {
+  headers: Headers;
+};
+export type updatePlanResponse = updatePlanResponseSuccess;
+
+export const getUpdatePlanUrl = (planId: string) => {
+  return `/api/v1/administrator/plans/${planId}`;
+};
+
+export const updatePlan = async (
+  planId: string,
+  planInputDto: PlanInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updatePlanResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdatePlanUrl(planId), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(planInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updatePlanResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updatePlanResponse;
+};
+
+export const getUpdatePlanMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updatePlan>>,
+    TError,
+    UpdatePlanMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updatePlan>>,
+  TError,
+  UpdatePlanMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updatePlan"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updatePlan>>,
+    UpdatePlanMutationVariables
+  > = (props) => {
+    const { planId, data } = props ?? {};
+
+    return updatePlan(planId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdatePlanMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updatePlan>>
+>;
+export type UpdatePlanMutationBody = PlanInputDto;
+export type UpdatePlanMutationError = unknown;
+export type UpdatePlanMutationVariables = {
+  planId: string;
+  data: PlanInputDto;
+};
+
+export const useUpdatePlan = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updatePlan>>,
+      TError,
+      UpdatePlanMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updatePlan>>,
+  TError,
+  UpdatePlanMutationVariables,
+  TContext
+> => {
+  return useMutation(getUpdatePlanMutationOptions(options), queryClient);
+};
+
+export type setPlanVisibilityResponse200 = {
+  data: AdminPlanDto;
+  status: 200;
+};
+
+export type setPlanVisibilityResponseSuccess = setPlanVisibilityResponse200 & {
+  headers: Headers;
+};
+export type setPlanVisibilityResponse = setPlanVisibilityResponseSuccess;
+
+export const getSetPlanVisibilityUrl = (planId: string) => {
+  return `/api/v1/administrator/plans/${planId}/visibility`;
+};
+
+export const setPlanVisibility = async (
+  planId: string,
+  planVisibilityDto: PlanVisibilityDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setPlanVisibilityResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getSetPlanVisibilityUrl(planId), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(planVisibilityDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setPlanVisibilityResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setPlanVisibilityResponse;
+};
+
+export const getSetPlanVisibilityMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setPlanVisibility>>,
+    TError,
+    SetPlanVisibilityMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setPlanVisibility>>,
+  TError,
+  SetPlanVisibilityMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["setPlanVisibility"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setPlanVisibility>>,
+    SetPlanVisibilityMutationVariables
+  > = (props) => {
+    const { planId, data } = props ?? {};
+
+    return setPlanVisibility(planId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetPlanVisibilityMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setPlanVisibility>>
+>;
+export type SetPlanVisibilityMutationBody = PlanVisibilityDto;
+export type SetPlanVisibilityMutationError = unknown;
+export type SetPlanVisibilityMutationVariables = {
+  planId: string;
+  data: PlanVisibilityDto;
+};
+
+export const useSetPlanVisibility = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setPlanVisibility>>,
+      TError,
+      SetPlanVisibilityMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setPlanVisibility>>,
+  TError,
+  SetPlanVisibilityMutationVariables,
+  TContext
+> => {
+  return useMutation(getSetPlanVisibilityMutationOptions(options), queryClient);
+};
+
+export type listSessionSchedulesResponse200 = {
+  data: AdminSessionScheduleDto[];
+  status: 200;
+};
+
+export type listSessionSchedulesResponseSuccess =
+  listSessionSchedulesResponse200 & {
+    headers: Headers;
+  };
+export type listSessionSchedulesResponse = listSessionSchedulesResponseSuccess;
+
+export const getListSessionSchedulesUrl = (
+  params?: ListSessionSchedulesParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/session-schedules?${stringifiedParams}`
+    : `/api/v1/administrator/session-schedules`;
+};
+
+export const listSessionSchedules = async (
+  params?: ListSessionSchedulesParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listSessionSchedulesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListSessionSchedulesUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listSessionSchedulesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listSessionSchedulesResponse;
+};
+
+export const getListSessionSchedulesQueryKey = (
+  params?: ListSessionSchedulesParams,
+) => {
+  return [
+    `/api/v1/administrator/session-schedules`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListSessionSchedulesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listSessionSchedules>>,
+  TError = unknown,
+>(
+  params?: ListSessionSchedulesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionSchedules>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListSessionSchedulesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listSessionSchedules>>
+  > = ({ signal }) =>
+    listSessionSchedules(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listSessionSchedules>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListSessionSchedulesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listSessionSchedules>>
+>;
+export type ListSessionSchedulesQueryError = unknown;
+
+export function useListSessionSchedules<
+  TData = Awaited<ReturnType<typeof listSessionSchedules>>,
+  TError = unknown,
+>(
+  params: undefined | ListSessionSchedulesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionSchedules>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSessionSchedules>>,
+          TError,
+          Awaited<ReturnType<typeof listSessionSchedules>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListSessionSchedules<
+  TData = Awaited<ReturnType<typeof listSessionSchedules>>,
+  TError = unknown,
+>(
+  params?: ListSessionSchedulesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionSchedules>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listSessionSchedules>>,
+          TError,
+          Awaited<ReturnType<typeof listSessionSchedules>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListSessionSchedules<
+  TData = Awaited<ReturnType<typeof listSessionSchedules>>,
+  TError = unknown,
+>(
+  params?: ListSessionSchedulesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionSchedules>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListSessionSchedules<
+  TData = Awaited<ReturnType<typeof listSessionSchedules>>,
+  TError = unknown,
+>(
+  params?: ListSessionSchedulesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listSessionSchedules>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListSessionSchedulesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createSessionScheduleResponse201 = {
+  data: SessionScheduleCreationDto;
+  status: 201;
+};
+
+export type createSessionScheduleResponseSuccess =
+  createSessionScheduleResponse201 & {
+    headers: Headers;
+  };
+export type createSessionScheduleResponse =
+  createSessionScheduleResponseSuccess;
+
+export const getCreateSessionScheduleUrl = () => {
+  return `/api/v1/administrator/session-schedules`;
+};
+
+export const createSessionSchedule = async (
+  sessionScheduleInputDto: SessionScheduleInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createSessionScheduleResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateSessionScheduleUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(sessionScheduleInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createSessionScheduleResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createSessionScheduleResponse;
+};
+
+export const getCreateSessionScheduleMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSessionSchedule>>,
+    TError,
+    CreateSessionScheduleMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSessionSchedule>>,
+  TError,
+  CreateSessionScheduleMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createSessionSchedule"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSessionSchedule>>,
+    CreateSessionScheduleMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createSessionSchedule(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateSessionScheduleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createSessionSchedule>>
+>;
+export type CreateSessionScheduleMutationBody = SessionScheduleInputDto;
+export type CreateSessionScheduleMutationError = unknown;
+export type CreateSessionScheduleMutationVariables = {
+  data: SessionScheduleInputDto;
+};
+
+export const useCreateSessionSchedule = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createSessionSchedule>>,
+      TError,
+      CreateSessionScheduleMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createSessionSchedule>>,
+  TError,
+  CreateSessionScheduleMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreateSessionScheduleMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type replaceSessionScheduleResponse201 = {
+  data: SessionScheduleReplacementDto;
+  status: 201;
+};
+
+export type replaceSessionScheduleResponseSuccess =
+  replaceSessionScheduleResponse201 & {
+    headers: Headers;
+  };
+export type replaceSessionScheduleResponse =
+  replaceSessionScheduleResponseSuccess;
+
+export const getReplaceSessionScheduleUrl = (scheduleId: string) => {
+  return `/api/v1/administrator/session-schedules/${scheduleId}/replacement`;
+};
+
+export const replaceSessionSchedule = async (
+  scheduleId: string,
+  sessionScheduleInputDto: SessionScheduleInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<replaceSessionScheduleResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getReplaceSessionScheduleUrl(scheduleId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(sessionScheduleInputDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: replaceSessionScheduleResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as replaceSessionScheduleResponse;
+};
+
+export const getReplaceSessionScheduleMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof replaceSessionSchedule>>,
+    TError,
+    ReplaceSessionScheduleMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof replaceSessionSchedule>>,
+  TError,
+  ReplaceSessionScheduleMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["replaceSessionSchedule"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof replaceSessionSchedule>>,
+    ReplaceSessionScheduleMutationVariables
+  > = (props) => {
+    const { scheduleId, data } = props ?? {};
+
+    return replaceSessionSchedule(scheduleId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ReplaceSessionScheduleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof replaceSessionSchedule>>
+>;
+export type ReplaceSessionScheduleMutationBody = SessionScheduleInputDto;
+export type ReplaceSessionScheduleMutationError = unknown;
+export type ReplaceSessionScheduleMutationVariables = {
+  scheduleId: string;
+  data: SessionScheduleInputDto;
+};
+
+export const useReplaceSessionSchedule = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof replaceSessionSchedule>>,
+      TError,
+      ReplaceSessionScheduleMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof replaceSessionSchedule>>,
+  TError,
+  ReplaceSessionScheduleMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getReplaceSessionScheduleMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type endSessionScheduleResponse200 = {
+  data: SessionScheduleEndDto;
+  status: 200;
+};
+
+export type endSessionScheduleResponseSuccess =
+  endSessionScheduleResponse200 & {
+    headers: Headers;
+  };
+export type endSessionScheduleResponse = endSessionScheduleResponseSuccess;
+
+export const getEndSessionScheduleUrl = (scheduleId: string) => {
+  return `/api/v1/administrator/session-schedules/${scheduleId}/end`;
+};
+
+export const endSessionSchedule = async (
+  scheduleId: string,
+  sessionScheduleEndInputDto: SessionScheduleEndInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<endSessionScheduleResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getEndSessionScheduleUrl(scheduleId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(sessionScheduleEndInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: endSessionScheduleResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as endSessionScheduleResponse;
+};
+
+export const getEndSessionScheduleMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof endSessionSchedule>>,
+    TError,
+    EndSessionScheduleMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof endSessionSchedule>>,
+  TError,
+  EndSessionScheduleMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["endSessionSchedule"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof endSessionSchedule>>,
+    EndSessionScheduleMutationVariables
+  > = (props) => {
+    const { scheduleId, data } = props ?? {};
+
+    return endSessionSchedule(scheduleId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type EndSessionScheduleMutationResult = NonNullable<
+  Awaited<ReturnType<typeof endSessionSchedule>>
+>;
+export type EndSessionScheduleMutationBody = SessionScheduleEndInputDto;
+export type EndSessionScheduleMutationError = unknown;
+export type EndSessionScheduleMutationVariables = {
+  scheduleId: string;
+  data: SessionScheduleEndInputDto;
+};
+
+export const useEndSessionSchedule = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof endSessionSchedule>>,
+      TError,
+      EndSessionScheduleMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof endSessionSchedule>>,
+  TError,
+  EndSessionScheduleMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getEndSessionScheduleMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type createOneOffSessionResponse201 = {
+  data: AdminSessionDto;
+  status: 201;
+};
+
+export type createOneOffSessionResponseSuccess =
+  createOneOffSessionResponse201 & {
+    headers: Headers;
+  };
+export type createOneOffSessionResponse = createOneOffSessionResponseSuccess;
+
+export const getCreateOneOffSessionUrl = () => {
+  return `/api/v1/administrator/sessions`;
+};
+
+export const createOneOffSession = async (
+  sessionInputDto: SessionInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createOneOffSessionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateOneOffSessionUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(sessionInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createOneOffSessionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createOneOffSessionResponse;
+};
+
+export const getCreateOneOffSessionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createOneOffSession>>,
+    TError,
+    CreateOneOffSessionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createOneOffSession>>,
+  TError,
+  CreateOneOffSessionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createOneOffSession"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createOneOffSession>>,
+    CreateOneOffSessionMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createOneOffSession(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateOneOffSessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createOneOffSession>>
+>;
+export type CreateOneOffSessionMutationBody = SessionInputDto;
+export type CreateOneOffSessionMutationError = unknown;
+export type CreateOneOffSessionMutationVariables = { data: SessionInputDto };
+
+export const useCreateOneOffSession = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createOneOffSession>>,
+      TError,
+      CreateOneOffSessionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createOneOffSession>>,
+  TError,
+  CreateOneOffSessionMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreateOneOffSessionMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type listAdministratorSessionsResponse200 = {
+  data: SessionAvailabilityDto[];
+  status: 200;
+};
+
+export type listAdministratorSessionsResponseSuccess =
+  listAdministratorSessionsResponse200 & {
+    headers: Headers;
+  };
+export type listAdministratorSessionsResponse =
+  listAdministratorSessionsResponseSuccess;
+
+export const getListAdministratorSessionsUrl = (
+  params: ListAdministratorSessionsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/sessions?${stringifiedParams}`
+    : `/api/v1/administrator/sessions`;
+};
+
+export const listAdministratorSessions = async (
+  params: ListAdministratorSessionsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdministratorSessionsResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getListAdministratorSessionsUrl(params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdministratorSessionsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdministratorSessionsResponse;
+};
+
+export const getListAdministratorSessionsQueryKey = (
+  params?: ListAdministratorSessionsParams,
+) => {
+  return [
+    `/api/v1/administrator/sessions`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdministratorSessionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
+  TError = unknown,
+>(
+  params: ListAdministratorSessionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdministratorSessions>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdministratorSessionsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdministratorSessions>>
+  > = ({ signal }) =>
+    listAdministratorSessions(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdministratorSessions>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdministratorSessionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdministratorSessions>>
+>;
+export type ListAdministratorSessionsQueryError = unknown;
+
+export function useListAdministratorSessions<
+  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
+  TError = unknown,
+>(
+  params: ListAdministratorSessionsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdministratorSessions>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdministratorSessions>>,
+          TError,
+          Awaited<ReturnType<typeof listAdministratorSessions>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdministratorSessions<
+  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
+  TError = unknown,
+>(
+  params: ListAdministratorSessionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdministratorSessions>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdministratorSessions>>,
+          TError,
+          Awaited<ReturnType<typeof listAdministratorSessions>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdministratorSessions<
+  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
+  TError = unknown,
+>(
+  params: ListAdministratorSessionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdministratorSessions>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdministratorSessions<
+  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
+  TError = unknown,
+>(
+  params: ListAdministratorSessionsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdministratorSessions>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdministratorSessionsQueryOptions(
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type updateSessionResponse200 = {
+  data: AdminSessionDto;
+  status: 200;
+};
+
+export type updateSessionResponseSuccess = updateSessionResponse200 & {
+  headers: Headers;
+};
+export type updateSessionResponse = updateSessionResponseSuccess;
+
+export const getUpdateSessionUrl = (sessionId: string) => {
+  return `/api/v1/administrator/sessions/${sessionId}`;
+};
+
+export const updateSession = async (
+  sessionId: string,
+  sessionChangeDto: SessionChangeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateSessionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateSessionUrl(sessionId), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(sessionChangeDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateSessionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateSessionResponse;
+};
+
+export const getUpdateSessionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSession>>,
+    TError,
+    UpdateSessionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateSession>>,
+  TError,
+  UpdateSessionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateSession"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateSession>>,
+    UpdateSessionMutationVariables
+  > = (props) => {
+    const { sessionId, data } = props ?? {};
+
+    return updateSession(sessionId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateSessionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateSession>>
+>;
+export type UpdateSessionMutationBody = SessionChangeDto;
+export type UpdateSessionMutationError = unknown;
+export type UpdateSessionMutationVariables = {
+  sessionId: string;
+  data: SessionChangeDto;
+};
+
+export const useUpdateSession = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateSession>>,
+      TError,
+      UpdateSessionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateSession>>,
+  TError,
+  UpdateSessionMutationVariables,
+  TContext
+> => {
+  return useMutation(getUpdateSessionMutationOptions(options), queryClient);
+};
+
+export type listAdminEvaluationsResponse200 = {
+  data: AdminEvaluationPageDto;
+  status: 200;
+};
+
+export type listAdminEvaluationsResponseSuccess =
+  listAdminEvaluationsResponse200 & {
+    headers: Headers;
+  };
+export type listAdminEvaluationsResponse = listAdminEvaluationsResponseSuccess;
+
+export const getListAdminEvaluationsUrl = (
+  params: ListAdminEvaluationsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/evaluations?${stringifiedParams}`
+    : `/api/v1/administrator/evaluations`;
+};
+
+export const listAdminEvaluations = async (
+  params: ListAdminEvaluationsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminEvaluationsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminEvaluationsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminEvaluationsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminEvaluationsResponse;
+};
+
+export const getListAdminEvaluationsQueryKey = (
+  params?: ListAdminEvaluationsParams,
+) => {
+  return [
+    `/api/v1/administrator/evaluations`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminEvaluationsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
+  TError = unknown,
+>(
+  params: ListAdminEvaluationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminEvaluations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminEvaluationsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminEvaluations>>
+  > = ({ signal }) =>
+    listAdminEvaluations(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminEvaluations>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminEvaluationsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminEvaluations>>
+>;
+export type ListAdminEvaluationsQueryError = unknown;
+
+export function useListAdminEvaluations<
+  TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
+  TError = unknown,
+>(
+  params: ListAdminEvaluationsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminEvaluations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminEvaluations>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminEvaluations>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminEvaluations<
+  TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
+  TError = unknown,
+>(
+  params: ListAdminEvaluationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminEvaluations>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminEvaluations>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminEvaluations>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminEvaluations<
+  TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
+  TError = unknown,
+>(
+  params: ListAdminEvaluationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminEvaluations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminEvaluations<
+  TData = Awaited<ReturnType<typeof listAdminEvaluations>>,
+  TError = unknown,
+>(
+  params: ListAdminEvaluationsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminEvaluations>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminEvaluationsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type cancelAdminEvaluationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type cancelAdminEvaluationResponseSuccess =
+  cancelAdminEvaluationResponse204 & {
+    headers: Headers;
+  };
+export type cancelAdminEvaluationResponse =
+  cancelAdminEvaluationResponseSuccess;
+
+export const getCancelAdminEvaluationUrl = (evaluationId: string) => {
+  return `/api/v1/administrator/evaluations/${evaluationId}`;
+};
+
+export const cancelAdminEvaluation = async (
+  evaluationId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelAdminEvaluationResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getCancelAdminEvaluationUrl(evaluationId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelAdminEvaluationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as cancelAdminEvaluationResponse;
+};
+
+export const getCancelAdminEvaluationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelAdminEvaluation>>,
+    TError,
+    CancelAdminEvaluationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelAdminEvaluation>>,
+  TError,
+  CancelAdminEvaluationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["cancelAdminEvaluation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cancelAdminEvaluation>>,
+    CancelAdminEvaluationMutationVariables
+  > = (props) => {
+    const { evaluationId } = props ?? {};
+
+    return cancelAdminEvaluation(evaluationId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelAdminEvaluationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cancelAdminEvaluation>>
+>;
+
+export type CancelAdminEvaluationMutationError = unknown;
+export type CancelAdminEvaluationMutationVariables = { evaluationId: string };
+
+export const useCancelAdminEvaluation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelAdminEvaluation>>,
+      TError,
+      CancelAdminEvaluationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelAdminEvaluation>>,
+  TError,
+  CancelAdminEvaluationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCancelAdminEvaluationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type listAdminReferralsResponse200 = {
+  data: AdminReferralPageDto;
+  status: 200;
+};
+
+export type listAdminReferralsResponseSuccess =
+  listAdminReferralsResponse200 & {
+    headers: Headers;
+  };
+export type listAdminReferralsResponse = listAdminReferralsResponseSuccess;
+
+export const getListAdminReferralsUrl = (params?: ListAdminReferralsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/referrals?${stringifiedParams}`
+    : `/api/v1/administrator/referrals`;
+};
+
+export const listAdminReferrals = async (
+  params?: ListAdminReferralsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminReferralsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminReferralsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminReferralsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminReferralsResponse;
+};
+
+export const getListAdminReferralsQueryKey = (
+  params?: ListAdminReferralsParams,
+) => {
+  return [
+    `/api/v1/administrator/referrals`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminReferralsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminReferrals>>,
+  TError = unknown,
+>(
+  params?: ListAdminReferralsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminReferrals>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminReferralsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminReferrals>>
+  > = ({ signal }) =>
+    listAdminReferrals(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminReferrals>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminReferralsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminReferrals>>
+>;
+export type ListAdminReferralsQueryError = unknown;
+
+export function useListAdminReferrals<
+  TData = Awaited<ReturnType<typeof listAdminReferrals>>,
+  TError = unknown,
+>(
+  params: undefined | ListAdminReferralsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminReferrals>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminReferrals>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminReferrals>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminReferrals<
+  TData = Awaited<ReturnType<typeof listAdminReferrals>>,
+  TError = unknown,
+>(
+  params?: ListAdminReferralsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminReferrals>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminReferrals>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminReferrals>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminReferrals<
+  TData = Awaited<ReturnType<typeof listAdminReferrals>>,
+  TError = unknown,
+>(
+  params?: ListAdminReferralsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminReferrals>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminReferrals<
+  TData = Awaited<ReturnType<typeof listAdminReferrals>>,
+  TError = unknown,
+>(
+  params?: ListAdminReferralsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminReferrals>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminReferralsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listAdminCreditsResponse200 = {
+  data: AdminCreditPageDto;
+  status: 200;
+};
+
+export type listAdminCreditsResponseSuccess = listAdminCreditsResponse200 & {
+  headers: Headers;
+};
+export type listAdminCreditsResponse = listAdminCreditsResponseSuccess;
+
+export const getListAdminCreditsUrl = (params?: ListAdminCreditsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/credits?${stringifiedParams}`
+    : `/api/v1/administrator/credits`;
+};
+
+export const listAdminCredits = async (
+  params?: ListAdminCreditsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminCreditsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminCreditsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminCreditsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminCreditsResponse;
+};
+
+export const getListAdminCreditsQueryKey = (
+  params?: ListAdminCreditsParams,
+) => {
+  return [
+    `/api/v1/administrator/credits`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminCreditsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminCredits>>,
+  TError = unknown,
+>(
+  params?: ListAdminCreditsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCredits>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminCreditsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminCredits>>
+  > = ({ signal }) =>
+    listAdminCredits(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminCredits>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminCreditsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminCredits>>
+>;
+export type ListAdminCreditsQueryError = unknown;
+
+export function useListAdminCredits<
+  TData = Awaited<ReturnType<typeof listAdminCredits>>,
+  TError = unknown,
+>(
+  params: undefined | ListAdminCreditsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCredits>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminCredits>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminCredits>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminCredits<
+  TData = Awaited<ReturnType<typeof listAdminCredits>>,
+  TError = unknown,
+>(
+  params?: ListAdminCreditsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCredits>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminCredits>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminCredits>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminCredits<
+  TData = Awaited<ReturnType<typeof listAdminCredits>>,
+  TError = unknown,
+>(
+  params?: ListAdminCreditsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCredits>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminCredits<
+  TData = Awaited<ReturnType<typeof listAdminCredits>>,
+  TError = unknown,
+>(
+  params?: ListAdminCreditsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCredits>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminCreditsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getIncomeReportResponse200 = {
+  data: IncomeReportDto;
+  status: 200;
+};
+
+export type getIncomeReportResponseSuccess = getIncomeReportResponse200 & {
+  headers: Headers;
+};
+export type getIncomeReportResponse = getIncomeReportResponseSuccess;
+
+export const getGetIncomeReportUrl = (params: GetIncomeReportParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/reports/income?${stringifiedParams}`
+    : `/api/v1/administrator/reports/income`;
+};
+
+export const getIncomeReport = async (
+  params: GetIncomeReportParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getIncomeReportResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetIncomeReportUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getIncomeReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getIncomeReportResponse;
+};
+
+export const getGetIncomeReportQueryKey = (params?: GetIncomeReportParams) => {
+  return [
+    `/api/v1/administrator/reports/income`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetIncomeReportQueryOptions = <
+  TData = Awaited<ReturnType<typeof getIncomeReport>>,
+  TError = unknown,
+>(
+  params: GetIncomeReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getIncomeReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetIncomeReportQueryKey(params);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getIncomeReport>>> = ({
+    signal,
+  }) => getIncomeReport(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getIncomeReport>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetIncomeReportQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getIncomeReport>>
+>;
+export type GetIncomeReportQueryError = unknown;
+
+export function useGetIncomeReport<
+  TData = Awaited<ReturnType<typeof getIncomeReport>>,
+  TError = unknown,
+>(
+  params: GetIncomeReportParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getIncomeReport>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIncomeReport>>,
+          TError,
+          Awaited<ReturnType<typeof getIncomeReport>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetIncomeReport<
+  TData = Awaited<ReturnType<typeof getIncomeReport>>,
+  TError = unknown,
+>(
+  params: GetIncomeReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getIncomeReport>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getIncomeReport>>,
+          TError,
+          Awaited<ReturnType<typeof getIncomeReport>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetIncomeReport<
+  TData = Awaited<ReturnType<typeof getIncomeReport>>,
+  TError = unknown,
+>(
+  params: GetIncomeReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getIncomeReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetIncomeReport<
+  TData = Awaited<ReturnType<typeof getIncomeReport>>,
+  TError = unknown,
+>(
+  params: GetIncomeReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getIncomeReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetIncomeReportQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
 export type createPurchaseIntentResponse201 = {
   data: PurchaseIntentDto;
   status: 201;
@@ -9479,223 +13069,6 @@ export const useRejectPayment = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(getRejectPaymentMutationOptions(options), queryClient);
 };
-
-export type listAdministratorSessionsResponse200 = {
-  data: SessionAvailabilityDto[];
-  status: 200;
-};
-
-export type listAdministratorSessionsResponseSuccess =
-  listAdministratorSessionsResponse200 & {
-    headers: Headers;
-  };
-export type listAdministratorSessionsResponse =
-  listAdministratorSessionsResponseSuccess;
-
-export const getListAdministratorSessionsUrl = (
-  params: ListAdministratorSessionsParams,
-) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? "null" : String(value));
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0
-    ? `/api/v1/administrator/sessions?${stringifiedParams}`
-    : `/api/v1/administrator/sessions`;
-};
-
-export const listAdministratorSessions = async (
-  params: ListAdministratorSessionsParams,
-  options?: RequestInit,
-  fetchFn?: typeof globalThis.fetch,
-): Promise<listAdministratorSessionsResponse> => {
-  const res = await (fetchFn ?? fetch)(
-    getListAdministratorSessionsUrl(params),
-    {
-      ...options,
-      method: "GET",
-    },
-  );
-
-  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
-
-  const data: listAdministratorSessionsResponse["data"] = body
-    ? JSON.parse(body)
-    : {};
-  return {
-    data,
-    status: res.status,
-    headers: res.headers,
-  } as listAdministratorSessionsResponse;
-};
-
-export const getListAdministratorSessionsQueryKey = (
-  params?: ListAdministratorSessionsParams,
-) => {
-  return [
-    `/api/v1/administrator/sessions`,
-    ...(params ? [params] : []),
-  ] as const;
-};
-
-export const getListAdministratorSessionsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
-  TError = unknown,
->(
-  params: ListAdministratorSessionsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdministratorSessions>>,
-        TError,
-        TData
-      >
-    >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-) => {
-  const {
-    query: queryOptions,
-    fetch: fetchOptions,
-    fetcher: fetcherFn,
-  } = options ?? {};
-
-  const queryKey =
-    queryOptions?.queryKey ?? getListAdministratorSessionsQueryKey(params);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listAdministratorSessions>>
-  > = ({ signal }) =>
-    listAdministratorSessions(params, { signal, ...fetchOptions }, fetcherFn);
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof listAdministratorSessions>>,
-    TError,
-    TData
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-};
-
-export type ListAdministratorSessionsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listAdministratorSessions>>
->;
-export type ListAdministratorSessionsQueryError = unknown;
-
-export function useListAdministratorSessions<
-  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
-  TError = unknown,
->(
-  params: ListAdministratorSessionsParams,
-  options: {
-    query: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdministratorSessions>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listAdministratorSessions>>,
-          TError,
-          Awaited<ReturnType<typeof listAdministratorSessions>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-  queryClient?: QueryClient,
-): DefinedUseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListAdministratorSessions<
-  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
-  TError = unknown,
->(
-  params: ListAdministratorSessionsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdministratorSessions>>,
-        TError,
-        TData
-      >
-    > &
-      Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof listAdministratorSessions>>,
-          TError,
-          Awaited<ReturnType<typeof listAdministratorSessions>>
-        >,
-        "initialData"
-      >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-export function useListAdministratorSessions<
-  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
-  TError = unknown,
->(
-  params: ListAdministratorSessionsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdministratorSessions>>,
-        TError,
-        TData
-      >
-    >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-};
-
-export function useListAdministratorSessions<
-  TData = Awaited<ReturnType<typeof listAdministratorSessions>>,
-  TError = unknown,
->(
-  params: ListAdministratorSessionsParams,
-  options?: {
-    query?: Partial<
-      UseQueryOptions<
-        Awaited<ReturnType<typeof listAdministratorSessions>>,
-        TError,
-        TData
-      >
-    >;
-    fetch?: RequestInit;
-    fetcher?: typeof globalThis.fetch;
-  },
-  queryClient?: QueryClient,
-): UseQueryResult<TData, TError> & {
-  queryKey: DataTag<QueryKey, TData, TError>;
-} {
-  const queryOptions = getListAdministratorSessionsQueryOptions(
-    params,
-    options,
-  );
-
-  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
-    TData,
-    TError
-  > & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
 
 export type cancelSessionResponse200 = {
   data: SessionCancellationDto;

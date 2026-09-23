@@ -1668,6 +1668,1018 @@
         ]
       }
     },
+    "/api/v1/administrator/branches": {
+      "get": {
+        "operationId": "listAdminBranches",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminBranchDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorBranches"
+        ]
+      },
+      "post": {
+        "operationId": "createBranch",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBranchDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorBranches"
+        ]
+      }
+    },
+    "/api/v1/administrator/branches/{branchId}": {
+      "put": {
+        "operationId": "updateBranch",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BranchInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBranchDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorBranches"
+        ]
+      }
+    },
+    "/api/v1/administrator/branches/{branchId}/archive": {
+      "post": {
+        "operationId": "archiveBranch",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminBranchDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorBranches"
+        ]
+      }
+    },
+    "/api/v1/administrator/class-types": {
+      "get": {
+        "operationId": "listAdminClassTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminClassTypeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClassTypes"
+        ]
+      },
+      "post": {
+        "operationId": "createClassType",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClassTypeInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClassTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClassTypes"
+        ]
+      }
+    },
+    "/api/v1/administrator/class-types/{classTypeId}": {
+      "put": {
+        "operationId": "updateClassType",
+        "parameters": [
+          {
+            "name": "classTypeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClassTypeInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClassTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClassTypes"
+        ]
+      }
+    },
+    "/api/v1/administrator/class-types/{classTypeId}/archive": {
+      "post": {
+        "operationId": "archiveClassType",
+        "parameters": [
+          {
+            "name": "classTypeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClassTypeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClassTypes"
+        ]
+      }
+    },
+    "/api/v1/administrator/plans": {
+      "get": {
+        "operationId": "listAdminPlans",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminPlanDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPlans"
+        ]
+      },
+      "post": {
+        "operationId": "createPlan",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPlanDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPlans"
+        ]
+      }
+    },
+    "/api/v1/administrator/plans/{planId}": {
+      "put": {
+        "operationId": "updatePlan",
+        "parameters": [
+          {
+            "name": "planId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPlanDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPlans"
+        ]
+      }
+    },
+    "/api/v1/administrator/plans/{planId}/visibility": {
+      "put": {
+        "operationId": "setPlanVisibility",
+        "parameters": [
+          {
+            "name": "planId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanVisibilityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPlanDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPlans"
+        ]
+      }
+    },
+    "/api/v1/administrator/session-schedules": {
+      "get": {
+        "operationId": "listSessionSchedules",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminSessionScheduleDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessionSchedules"
+        ]
+      },
+      "post": {
+        "operationId": "createSessionSchedule",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionScheduleInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionScheduleCreationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessionSchedules"
+        ]
+      }
+    },
+    "/api/v1/administrator/session-schedules/{scheduleId}/replacement": {
+      "post": {
+        "operationId": "replaceSessionSchedule",
+        "parameters": [
+          {
+            "name": "scheduleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionScheduleInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionScheduleReplacementDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessionSchedules"
+        ]
+      }
+    },
+    "/api/v1/administrator/session-schedules/{scheduleId}/end": {
+      "post": {
+        "operationId": "endSessionSchedule",
+        "parameters": [
+          {
+            "name": "scheduleId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionScheduleEndInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionScheduleEndDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessionSchedules"
+        ]
+      }
+    },
+    "/api/v1/administrator/sessions": {
+      "post": {
+        "operationId": "createOneOffSession",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSessionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessionEdits"
+        ]
+      },
+      "get": {
+        "operationId": "listAdministratorSessions",
+        "parameters": [
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionAvailabilityDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessions"
+        ]
+      }
+    },
+    "/api/v1/administrator/sessions/{sessionId}": {
+      "patch": {
+        "operationId": "updateSession",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSessionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSessionEdits"
+        ]
+      }
+    },
+    "/api/v1/administrator/evaluations": {
+      "get": {
+        "operationId": "listAdminEvaluations",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "nutritionistStaffMemberId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminEvaluationPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorOversight"
+        ]
+      }
+    },
+    "/api/v1/administrator/evaluations/{evaluationId}": {
+      "delete": {
+        "operationId": "cancelAdminEvaluation",
+        "parameters": [
+          {
+            "name": "evaluationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorOversight"
+        ]
+      }
+    },
+    "/api/v1/administrator/referrals": {
+      "get": {
+        "operationId": "listAdminReferrals",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminReferralPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorOversight"
+        ]
+      }
+    },
+    "/api/v1/administrator/credits": {
+      "get": {
+        "operationId": "listAdminCredits",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "query",
+            "required": false,
+            "in": "query",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminCreditPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorOversight"
+        ]
+      }
+    },
+    "/api/v1/administrator/reports/income": {
+      "get": {
+        "operationId": "getIncomeReport",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IncomeReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorOversight"
+        ]
+      }
+    },
     "/api/v1/purchase-intents": {
       "post": {
         "operationId": "createPurchaseIntent",
@@ -2225,61 +3237,6 @@
         "summary": "",
         "tags": [
           "AdministratorPayments"
-        ]
-      }
-    },
-    "/api/v1/administrator/sessions": {
-      "get": {
-        "operationId": "listAdministratorSessions",
-        "parameters": [
-          {
-            "name": "limit",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "until",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "format": "date-time"
-            }
-          },
-          {
-            "name": "from",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "format": "date-time"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/SessionAvailabilityDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": [
-          "AdministratorSessions"
         ]
       }
     },
@@ -4653,6 +5610,779 @@
         },
         "required": [
           "branchIds"
+        ]
+      },
+      "AdminBranchDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "address",
+          "archivedAt"
+        ]
+      },
+      "BranchInputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "address": {
+            "type": "string",
+            "maxLength": 160
+          }
+        },
+        "required": [
+          "name",
+          "address"
+        ]
+      },
+      "AdminClassTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "number"
+          },
+          "defaultCapacity": {
+            "type": "number"
+          },
+          "equipmentNeeds": {
+            "type": "string",
+            "nullable": true
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "description",
+          "durationMinutes",
+          "defaultCapacity",
+          "equipmentNeeds",
+          "archivedAt"
+        ]
+      },
+      "ClassTypeInputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 280
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 5,
+            "maximum": 240
+          },
+          "defaultCapacity": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "equipmentNeeds": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "name",
+          "description",
+          "durationMinutes",
+          "defaultCapacity"
+        ]
+      },
+      "AdminPlanDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "durationMonths": {
+            "type": "number",
+            "enum": [
+              1,
+              3,
+              6,
+              12
+            ]
+          },
+          "classAllowance": {
+            "type": "number"
+          },
+          "priceCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "displayOrder": {
+            "type": "number"
+          },
+          "hiddenAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "durationMonths",
+          "classAllowance",
+          "priceCentavos",
+          "displayOrder",
+          "hiddenAt"
+        ]
+      },
+      "PlanInputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "durationMonths": {
+            "type": "number",
+            "enum": [
+              1,
+              3,
+              6,
+              12
+            ]
+          },
+          "classAllowance": {
+            "type": "number",
+            "minimum": 1
+          },
+          "priceCentavos": {
+            "type": "number",
+            "minimum": 1,
+            "description": "BOB centavos"
+          },
+          "displayOrder": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "name",
+          "durationMonths",
+          "classAllowance",
+          "priceCentavos",
+          "displayOrder"
+        ]
+      },
+      "PlanVisibilityDto": {
+        "type": "object",
+        "properties": {
+          "visible": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "visible"
+        ]
+      },
+      "AdminSessionScheduleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trainerStaffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "weekday": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 7,
+            "description": "ISO weekday, Monday = 1"
+          },
+          "startsAtLocal": {
+            "type": "string",
+            "example": "09:00",
+            "description": "Bolivia wall clock"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          },
+          "effectiveUntil": {
+            "type": "string",
+            "format": "date",
+            "nullable": true,
+            "description": "Exclusive end"
+          },
+          "classTypeName": {
+            "type": "string"
+          },
+          "durationMinutes": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "classTypeId",
+          "trainerStaffMemberId",
+          "weekday",
+          "startsAtLocal",
+          "capacity",
+          "effectiveFrom",
+          "effectiveUntil",
+          "classTypeName",
+          "durationMinutes"
+        ]
+      },
+      "SessionScheduleInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trainerStaffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "weekday": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 7
+          },
+          "startsAtLocal": {
+            "type": "string",
+            "example": "09:00"
+          },
+          "capacity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date",
+            "description": "Vigente desde, today or later"
+          }
+        },
+        "required": [
+          "branchId",
+          "classTypeId",
+          "trainerStaffMemberId",
+          "weekday",
+          "startsAtLocal",
+          "capacity",
+          "effectiveFrom"
+        ]
+      },
+      "SessionScheduleCreationDto": {
+        "type": "object",
+        "properties": {
+          "schedule": {
+            "$ref": "#/components/schemas/AdminSessionScheduleDto"
+          },
+          "created": {
+            "type": "number"
+          },
+          "skipped": {
+            "type": "number",
+            "description": "Occurrences skipped for overlapping a scheduled Session"
+          }
+        },
+        "required": [
+          "schedule",
+          "created",
+          "skipped"
+        ]
+      },
+      "SessionScheduleReplacementDto": {
+        "type": "object",
+        "properties": {
+          "ended": {
+            "$ref": "#/components/schemas/AdminSessionScheduleDto"
+          },
+          "replacement": {
+            "$ref": "#/components/schemas/AdminSessionScheduleDto"
+          },
+          "cancelledSessions": {
+            "type": "number"
+          },
+          "keptSessions": {
+            "type": "number",
+            "description": "Booked or exception Sessions left unchanged"
+          },
+          "created": {
+            "type": "number"
+          },
+          "skipped": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "ended",
+          "replacement",
+          "cancelledSessions",
+          "keptSessions",
+          "created",
+          "skipped"
+        ]
+      },
+      "SessionScheduleEndInputDto": {
+        "type": "object",
+        "properties": {
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "effectiveFrom"
+        ]
+      },
+      "SessionScheduleEndDto": {
+        "type": "object",
+        "properties": {
+          "schedule": {
+            "$ref": "#/components/schemas/AdminSessionScheduleDto"
+          },
+          "cancelledSessions": {
+            "type": "number"
+          },
+          "keptSessions": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "schedule",
+          "cancelledSessions",
+          "keptSessions"
+        ]
+      },
+      "SessionInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trainerStaffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "capacity": {
+            "type": "number",
+            "description": "Defaults to the Class Type capacity"
+          }
+        },
+        "required": [
+          "branchId",
+          "classTypeId",
+          "trainerStaffMemberId",
+          "startsAt"
+        ]
+      },
+      "AdminSessionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sessionScheduleId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trainerStaffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "scheduled",
+              "cancelled"
+            ]
+          },
+          "isException": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "sessionScheduleId",
+          "branchId",
+          "classTypeId",
+          "trainerStaffMemberId",
+          "startsAt",
+          "endsAt",
+          "capacity",
+          "state",
+          "isException"
+        ]
+      },
+      "SessionChangeDto": {
+        "type": "object",
+        "properties": {
+          "trainerStaffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startsAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "capacity": {
+            "type": "number"
+          }
+        }
+      },
+      "AdminEvaluationDto": {
+        "type": "object",
+        "properties": {
+          "evaluationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "nutritionistStaffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "nutritionistName": {
+            "type": "string"
+          },
+          "branchName": {
+            "type": "string"
+          },
+          "startsAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "endsAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evaluationId",
+          "clientName",
+          "nutritionistStaffMemberId",
+          "nutritionistName",
+          "branchName",
+          "startsAt",
+          "endsAt"
+        ]
+      },
+      "AdminEvaluationPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminEvaluationDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ]
+      },
+      "AdminReferralDto": {
+        "type": "object",
+        "properties": {
+          "referralId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "referrerName": {
+            "type": "string"
+          },
+          "referredName": {
+            "type": "string"
+          },
+          "registeredAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "awardedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "awarded"
+            ]
+          }
+        },
+        "required": [
+          "referralId",
+          "referrerName",
+          "referredName",
+          "registeredAt",
+          "awardedAt",
+          "state"
+        ]
+      },
+      "AdminReferralPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminReferralDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ]
+      },
+      "AdminCreditBalanceDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "availableCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "lastMovementAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientId",
+          "clientName",
+          "availableCentavos",
+          "lastMovementAt"
+        ]
+      },
+      "AdminCreditPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminCreditBalanceDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          },
+          "outstandingCentavos": {
+            "type": "number",
+            "description": "Studio-wide available Credit, BOB centavos"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "outstandingCentavos"
+        ]
+      },
+      "IncomeByMethodDto": {
+        "type": "object",
+        "properties": {
+          "cash": {
+            "type": "number"
+          },
+          "transfer": {
+            "type": "number"
+          },
+          "credit_only": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "cash",
+          "transfer",
+          "credit_only"
+        ]
+      },
+      "IncomeMonthDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "description": "First day of the Bolivia month"
+          },
+          "totalCentavos": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "totalCentavos"
+        ]
+      },
+      "IncomeReportDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "until": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "totalCentavos": {
+            "type": "number",
+            "description": "Confirmed Payments, BOB centavos"
+          },
+          "byMethod": {
+            "$ref": "#/components/schemas/IncomeByMethodDto"
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IncomeMonthDto"
+            }
+          },
+          "generatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "until",
+          "branchId",
+          "totalCentavos",
+          "byMethod",
+          "months",
+          "generatedAt"
         ]
       },
       "CreatePurchaseIntentDto": {
