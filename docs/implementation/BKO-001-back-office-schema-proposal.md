@@ -1,12 +1,10 @@
 # BKO-001 — Back Office schema proposal
 
-Status: **proposed 2026-09-23, awaiting the user's review.** The engineering
-and product decisions D1–D20 below were taken under the blanket
-backlog-decision approval. The money and data-governance rules that are the
-user's call are recorded as [open questions](#open-questions) Q1–Q4 with a
-provisional answer each. BKO-002 must not create the migration until the user
-approves this proposal and answers or accepts those provisional answers. The
-exact Prisma models and SQL are in the
+Status: **approved 2026-09-23 as proposed.** The user approved this proposal
+and the migration review package as they stand, which accepts decisions
+D1–D20, the new Restock movement, and the provisional answers to
+[open questions](#open-questions) Q1–Q4. BKO-002 may create the migration and
+the implementation. The exact Prisma models and SQL are in the
 [BKO-001 migration review package](./BKO-001-migration-review.md).
 
 This refines the five "Proposed" `back_office` rows of the

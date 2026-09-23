@@ -1,12 +1,11 @@
 # BKO-001 — Back Office migration review
 
-Status: **proposed 2026-09-23, awaiting the user's review** together with the
+Status: **approved 2026-09-23 as proposed**, together with the
 [BKO-001 proposal](./BKO-001-back-office-schema-proposal.md) (decisions
-D1–D20, open questions Q1–Q4). This package turns the proposal into the exact
-Prisma models and migration SQL BKO-002 would add, in the format of the
-[NUT-002](./NUT-002-migration-review.md) and
-[ADM-001](./ADM-001-migration-review.md) packages. It does not create,
-modify, or apply a migration.
+D1–D20 and the provisional answers to Q1–Q4). This package turns the proposal
+into the exact Prisma models and migration SQL BKO-002 adds, in the format of
+the [NUT-002](./NUT-002-migration-review.md) and
+[ADM-001](./ADM-001-migration-review.md) packages.
 
 ## Reviewed artifacts
 
