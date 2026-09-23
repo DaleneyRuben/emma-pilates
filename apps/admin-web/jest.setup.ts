@@ -17,3 +17,16 @@ if (typeof window.matchMedia !== "function") {
     }),
   });
 }
+
+// Radix measures triggers with ResizeObserver, which jsdom does not ship.
+if (typeof window.ResizeObserver !== "function") {
+  class ResizeObserverStub {
+    observe(): void {}
+    unobserve(): void {}
+    disconnect(): void {}
+  }
+  Object.defineProperty(window, "ResizeObserver", {
+    writable: true,
+    value: ResizeObserverStub,
+  });
+}
