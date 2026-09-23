@@ -1248,6 +1248,31 @@ read notification for a fixture Account in `pilates_dev_sim` (for example
 gone a few seconds later. The worker logs only a sanitized
 `retention_sweep_failed` event if a sweep fails.
 
+## Test 17: manage Staff Members as the Administrator (API)
+
+The admin web is not built yet, so try these through Swagger or curl as
+`paola.mendoza@example.com` (Test 3 shows how to log in and authorize):
+
+1. `GET /api/v1/administrator/staff-members` lists every Staff Member with
+   `page`, `pageSize` (up to 100), and optional `role`, `branchId`, and
+   `status` (`pending`, `active`, `deactivated`) filters.
+2. `POST /api/v1/administrator/staff-members` with a name, email, Role, and
+   Branches creates a pending Staff Member and queues the Activation Link
+   email. An Administrator is created without Branches (they hold every
+   Branch); every other Role needs at least one active Branch.
+3. `POST …/{id}/activation-link` sends a new link while the person is still
+   pending (at most one per minute per email).
+4. `PUT …/{id}/role` and `PUT …/{id}/branches` change the Role or the
+   Branches. A Nutritionist's Availability Blocks end from today when her Role
+   changes or she loses a Branch (booked Evaluations stay). A Trainer who still
+   leads upcoming Sessions or Session Schedules cannot lose that Branch, change
+   Role, or be deactivated (`409 trainer_has_upcoming_sessions`).
+5. `POST …/{id}/deactivation` disables the Account and signs it out
+   everywhere.
+
+You cannot change or deactivate yourself (`409 own_staff_member`) or remove the
+last active Administrator (`409 last_administrator`). Other Roles get `403`.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1263,7 +1288,8 @@ The following are not ready for manual product testing:
 - Promotions on Client Home or push notifications (the in-app inbox works, see
   Test 9; buying a Plan works, see Test 10);
 - editing a Session Schedule (ADM-001);
-- creating, reassigning, and deactivating Staff Members (IDN-007);
+- creating, reassigning, and deactivating Staff Members in a screen (the
+  API works, see Test 17; the admin screens are WEB-004);
 - Promotions, image variants, and Back Office records (UPL-002, BKO-001);
 - any Pilates admin-web workflow;
 - real SendPulse email, Expo push notifications, or production deployment; and
