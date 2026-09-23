@@ -153,6 +153,7 @@ Each of these was sent as the next message in the existing design session for th
 | [43](./followups/43-evaluation-availability-months-and-branch.md) | Makes `13`'s monthly rule per appointment month, shows the Branch per turno, closes turnos 3 h before start, and adds the no-plan state (NUT-001 D8, D11) | 🕓 pending |
 | [44](./followups/44-my-evaluations-two-upcoming-and-cancel-window.md) | Allows two upcoming cards on `15`, says a cancellation frees the month, and replaces Cancelar inside 3 h (NUT-001 D8, D9, D12) | 🕓 pending |
 | [45](./followups/45-nutritionist-agenda-cancel-evaluation.md) | Adds «Cancelar evaluación» on `S15`'s selected card with an `S14`-style sheet; amends 26's «Sin detalle» note (NUT-001 D14) | 🕓 pending |
+| [46](./followups/46-evaluation-cancellation-notices.md) | Adds the studio-cancelled Evaluation notice to `19` and the Client-cancelled notice to `S20` | 🕓 pending |
 
 ## Status
 
