@@ -1235,6 +1235,19 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
 4. Tap a block to edit it ("Aplicar cambios desde") or **Eliminar horario**.
    When it already has bookings, a sheet confirms that those Evaluations stay.
 
+## Test 16: watch the worker's retention sweeps
+
+When the worker starts, and then every hour, it deletes housekeeping rows that
+have outlived their provisional retention (BE-008): idempotency records past
+their own expiry and at least 48 hours old, Authentication Sessions 90 days
+after they were revoked or expired, throttle events 30 days after they
+stopped counting, and notifications 180 days after they were read. Unread
+notifications and audit records are never deleted. To see it, insert an old
+read notification for a fixture Account in `pilates_dev_sim` (for example
+`read_at = now() - interval '200 days'`), start the worker, and the row is
+gone a few seconds later. The worker logs only a sanitized
+`retention_sweep_failed` event if a sweep fails.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
