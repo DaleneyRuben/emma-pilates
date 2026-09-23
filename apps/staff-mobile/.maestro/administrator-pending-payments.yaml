@@ -21,3 +21,15 @@ env:
     visible:
       text: "Sucursal: .*"
     timeout: 20000
+- tapOn:
+    text: "Sucursal: .*"
+- tapOn: "Todas las sucursales"
+- extendedWaitUntil:
+    visible:
+      text: "Sucursal: Todas las sucursales"
+    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      text: ".* · (Centro|Equipetrol|Urubó)|No hay clases con estos filtros."
+    timeout: 15000
+- takeScreenshot: staff-admin-every-branch
