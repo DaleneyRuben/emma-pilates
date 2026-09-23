@@ -314,6 +314,7 @@ export function createFinalizeUploadIdempotent(
             state: stateFromPrisma[asset.state],
           };
 
+          const createdAt = now();
           await transaction.idempotencyRecord.create({
             data: {
               accountId: ownerAccountId,
@@ -322,8 +323,9 @@ export function createFinalizeUploadIdempotent(
               requestHash,
               responseStatus: 202,
               responseBody: response,
+              createdAt,
               expiresAt: new Date(
-                now().getTime() + finalizeUploadIdempotencyRetentionMs,
+                createdAt.getTime() + finalizeUploadIdempotencyRetentionMs,
               ),
             },
           });
