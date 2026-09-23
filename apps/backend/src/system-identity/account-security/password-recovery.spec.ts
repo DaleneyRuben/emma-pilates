@@ -74,7 +74,7 @@ describe('password recovery', () => {
 
   it('replaces the password, revokes all sessions, and returns one replacement session', async () => {
     gateway.inspectRecoveryLink.mockResolvedValue('current');
-    gateway.completeRecovery.mockResolvedValue(undefined);
+    gateway.completeRecovery.mockResolvedValue({ sessionOpened: true });
 
     await expect(
       completePasswordRecovery(
@@ -92,8 +92,49 @@ describe('password recovery', () => {
       tokenDigest: Buffer.from('recovery-digest'),
       authenticationSession: {
         id: 'authentication-session-id',
+        surface: 'mobile',
         credentialDigest: Buffer.from('session-digest'),
       },
+      sessionEligibility: 'any',
+    });
+  });
+
+  describe('from the admin web', () => {
+    it('opens the replacement browser session with the Administrator lifetimes', async () => {
+      gateway.inspectRecoveryLink.mockResolvedValue('current');
+      gateway.completeRecovery.mockResolvedValue({ sessionOpened: true });
+
+      await expect(
+        completePasswordRecovery(
+          { token: 'recovery-secret', password: 'new secure password' },
+          dependencies,
+          'admin_web',
+        ),
+      ).resolves.toEqual({
+        status: 'recovered',
+        credential: 'session-credential',
+      });
+      expect(gateway.completeRecovery.mock.calls[0]?.[0]).toMatchObject({
+        authenticationSession: {
+          surface: 'admin_web',
+          idleExpiresAt: new Date('2026-08-31T18:30:00.000Z'),
+          absoluteExpiresAt: new Date('2026-09-01T06:00:00.000Z'),
+        },
+        sessionEligibility: 'administrator',
+      });
+    });
+
+    it('replaces the password but opens no browser session for an Account that is not an Administrator', async () => {
+      gateway.inspectRecoveryLink.mockResolvedValue('current');
+      gateway.completeRecovery.mockResolvedValue({ sessionOpened: false });
+
+      await expect(
+        completePasswordRecovery(
+          { token: 'recovery-secret', password: 'new secure password' },
+          dependencies,
+          'admin_web',
+        ),
+      ).resolves.toEqual({ status: 'recovered' });
     });
   });
 });
