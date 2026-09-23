@@ -4002,6 +4002,819 @@
         ]
       }
     },
+    "/api/v1/administrator/supplies": {
+      "get": {
+        "operationId": "listAdminSupplies",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminSupplyDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSupplies"
+        ]
+      },
+      "post": {
+        "operationId": "createSupply",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplyInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSupplyDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSupplies"
+        ]
+      }
+    },
+    "/api/v1/administrator/supplies/{supplyId}": {
+      "put": {
+        "operationId": "updateSupply",
+        "parameters": [
+          {
+            "name": "supplyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplyChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSupplyDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSupplies"
+        ]
+      }
+    },
+    "/api/v1/administrator/supplies/{supplyId}/archive": {
+      "post": {
+        "operationId": "archiveSupply",
+        "parameters": [
+          {
+            "name": "supplyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSupplyDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSupplies"
+        ]
+      }
+    },
+    "/api/v1/administrator/supplies/{supplyId}/withdrawals": {
+      "post": {
+        "operationId": "recordWithdrawal",
+        "parameters": [
+          {
+            "name": "supplyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplyMovementInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplyMovementDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSupplies"
+        ]
+      }
+    },
+    "/api/v1/administrator/supplies/{supplyId}/restocks": {
+      "post": {
+        "operationId": "recordRestock",
+        "parameters": [
+          {
+            "name": "supplyId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupplyMovementInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SupplyMovementDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSupplies"
+        ]
+      }
+    },
+    "/api/v1/administrator/withdrawals": {
+      "get": {
+        "operationId": "listAdminWithdrawals",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "supplyId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-09"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WithdrawalPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorWithdrawals"
+        ]
+      }
+    },
+    "/api/v1/administrator/salary-payments": {
+      "get": {
+        "operationId": "listAdminSalaryPayments",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date"
+            }
+          },
+          {
+            "name": "staffMemberId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSalaryPaymentPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSalaryPayments"
+        ]
+      },
+      "post": {
+        "operationId": "recordSalaryPayment",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalaryPaymentInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSalaryPaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSalaryPayments"
+        ]
+      }
+    },
+    "/api/v1/administrator/salary-payments/{salaryPaymentId}": {
+      "put": {
+        "operationId": "updateSalaryPayment",
+        "parameters": [
+          {
+            "name": "salaryPaymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SalaryPaymentInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSalaryPaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorSalaryPayments"
+        ]
+      }
+    },
+    "/api/v1/administrator/expense-categories": {
+      "get": {
+        "operationId": "listAdminExpenseCategories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminExpenseCategoryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenseCategories"
+        ]
+      },
+      "post": {
+        "operationId": "createExpenseCategory",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseCategoryInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminExpenseCategoryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenseCategories"
+        ]
+      }
+    },
+    "/api/v1/administrator/expense-categories/{expenseCategoryId}": {
+      "delete": {
+        "operationId": "deleteExpenseCategory",
+        "parameters": [
+          {
+            "name": "expenseCategoryId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenseCategories"
+        ]
+      }
+    },
+    "/api/v1/administrator/expenses": {
+      "get": {
+        "operationId": "listAdminExpenses",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "to",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date"
+            }
+          },
+          {
+            "name": "from",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "date"
+            }
+          },
+          {
+            "name": "expenseCategoryId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminExpensePageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenses"
+        ]
+      },
+      "post": {
+        "operationId": "recordExpense",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminExpenseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenses"
+        ]
+      }
+    },
+    "/api/v1/administrator/expenses/{expenseId}": {
+      "put": {
+        "operationId": "updateExpense",
+        "parameters": [
+          {
+            "name": "expenseId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpenseChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminExpenseDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenses"
+        ]
+      }
+    },
+    "/api/v1/administrator/reports/expenses": {
+      "get": {
+        "operationId": "getExpenseReport",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExpenseReportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorExpenseReport"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -7576,6 +8389,550 @@
           "block",
           "withdrawnSlots",
           "keptEvaluations"
+        ]
+      },
+      "AdminSupplyDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "quantityOnHand": {
+            "type": "number",
+            "description": "Whole units"
+          },
+          "lowStockThreshold": {
+            "type": "number"
+          },
+          "lowStock": {
+            "type": "boolean",
+            "description": "Quantity at or below the threshold"
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "name",
+          "quantityOnHand",
+          "lowStockThreshold",
+          "lowStock",
+          "archivedAt"
+        ]
+      },
+      "SupplyInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "initialQuantity": {
+            "type": "number",
+            "minimum": 0
+          },
+          "lowStockThreshold": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "branchId",
+          "name",
+          "initialQuantity",
+          "lowStockThreshold"
+        ]
+      },
+      "SupplyChangeDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "lowStockThreshold": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "name",
+          "lowStockThreshold"
+        ]
+      },
+      "SupplyMovementInputDto": {
+        "type": "object",
+        "properties": {
+          "quantity": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Whole units"
+          }
+        },
+        "required": [
+          "quantity"
+        ]
+      },
+      "SupplyMovementDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "supplyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "recordedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "quantityOnHand": {
+            "type": "number",
+            "description": "Stock after this movement"
+          }
+        },
+        "required": [
+          "id",
+          "supplyId",
+          "quantity",
+          "recordedAt",
+          "quantityOnHand"
+        ]
+      },
+      "WithdrawalDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "supplyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "supplyName": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "recordedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "supplyId",
+          "supplyName",
+          "quantity",
+          "recordedAt"
+        ]
+      },
+      "WithdrawalTotalDto": {
+        "type": "object",
+        "properties": {
+          "supplyId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "supplyName": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number",
+            "description": "Units withdrawn in the month"
+          }
+        },
+        "required": [
+          "supplyId",
+          "supplyName",
+          "quantity"
+        ]
+      },
+      "WithdrawalPageDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-09",
+            "description": "Bolivia month"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WithdrawalDto"
+            }
+          },
+          "totals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WithdrawalTotalDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "items",
+          "totals",
+          "page",
+          "pageSize",
+          "totalItems"
+        ]
+      },
+      "AdminSalaryPaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffMemberName": {
+            "type": "string"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "paidOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil date"
+          }
+        },
+        "required": [
+          "id",
+          "staffMemberId",
+          "staffMemberName",
+          "amountCentavos",
+          "paidOn"
+        ]
+      },
+      "AdminSalaryPaymentPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminSalaryPaymentDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ]
+      },
+      "SalaryPaymentInputDto": {
+        "type": "object",
+        "properties": {
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "minimum": 1,
+            "description": "BOB centavos"
+          },
+          "paidOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Today or earlier in Bolivia"
+          }
+        },
+        "required": [
+          "staffMemberId",
+          "amountCentavos",
+          "paidOn"
+        ]
+      },
+      "AdminExpenseCategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "inUse": {
+            "type": "boolean",
+            "description": "Referenced by an Expense, so not deletable"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "inUse"
+        ]
+      },
+      "ExpenseCategoryInputDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 60
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "AdminExpenseDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expenseCategoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expenseCategoryName": {
+            "type": "string"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "incurredOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil date"
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "expenseCategoryId",
+          "expenseCategoryName",
+          "amountCentavos",
+          "incurredOn"
+        ]
+      },
+      "AdminExpensePageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminExpenseDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ]
+      },
+      "ExpenseInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expenseCategoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "minimum": 1,
+            "description": "BOB centavos"
+          },
+          "incurredOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Today or earlier in Bolivia"
+          }
+        },
+        "required": [
+          "branchId",
+          "expenseCategoryId",
+          "amountCentavos",
+          "incurredOn"
+        ]
+      },
+      "ExpenseChangeDto": {
+        "type": "object",
+        "properties": {
+          "expenseCategoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "minimum": 1,
+            "description": "BOB centavos"
+          },
+          "incurredOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Today or earlier in Bolivia"
+          }
+        },
+        "required": [
+          "expenseCategoryId",
+          "amountCentavos",
+          "incurredOn"
+        ]
+      },
+      "ExpenseCategoryTotalDto": {
+        "type": "object",
+        "properties": {
+          "expenseCategoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expenseCategoryName": {
+            "type": "string"
+          },
+          "totalCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          }
+        },
+        "required": [
+          "expenseCategoryId",
+          "expenseCategoryName",
+          "totalCentavos"
+        ]
+      },
+      "ExpenseMonthDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "description": "First day of the Bolivia month"
+          },
+          "totalCentavos": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "totalCentavos"
+        ]
+      },
+      "ExpenseReportDto": {
+        "type": "object",
+        "properties": {
+          "from": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "until": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "totalCentavos": {
+            "type": "number",
+            "description": "Expenses plus Salary Payments, BOB centavos"
+          },
+          "expensesCentavos": {
+            "type": "number"
+          },
+          "salaryPaymentsCentavos": {
+            "type": "number",
+            "description": "Studio-wide; always 0 when a Branch is selected"
+          },
+          "byCategory": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpenseCategoryTotalDto"
+            }
+          },
+          "months": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExpenseMonthDto"
+            }
+          },
+          "generatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "until",
+          "branchId",
+          "totalCentavos",
+          "expensesCentavos",
+          "salaryPaymentsCentavos",
+          "byCategory",
+          "months",
+          "generatedAt"
         ]
       },
       "CreatePendingUploadDto": {

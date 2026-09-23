@@ -26,10 +26,16 @@ import type {
   AdminClassTypeDto,
   AdminCreditPageDto,
   AdminEvaluationPageDto,
+  AdminExpenseCategoryDto,
+  AdminExpenseDto,
+  AdminExpensePageDto,
   AdminPlanDto,
   AdminReferralPageDto,
+  AdminSalaryPaymentDto,
+  AdminSalaryPaymentPageDto,
   AdminSessionDto,
   AdminSessionScheduleDto,
+  AdminSupplyDto,
   AssistantCashPaymentDto,
   AssistantClientBookingDto,
   AssistantClientDto,
@@ -72,13 +78,22 @@ import type {
   CurrentAuthenticationPrincipalDto,
   EvaluationAvailabilityDto,
   EvaluationSlotDto,
+  ExpenseCategoryInputDto,
+  ExpenseChangeDto,
+  ExpenseInputDto,
+  ExpenseReportDto,
   FinalizedUploadDto,
+  GetExpenseReportParams,
   GetIncomeReportParams,
   IncomeReportDto,
   InviteClientDto,
   ListAdminCreditsParams,
   ListAdminEvaluationsParams,
+  ListAdminExpensesParams,
   ListAdminReferralsParams,
+  ListAdminSalaryPaymentsParams,
+  ListAdminSuppliesParams,
+  ListAdminWithdrawalsParams,
   ListAdministratorSessionsParams,
   ListEvaluationSlotsParams,
   ListEvaluationsParams,
@@ -112,6 +127,7 @@ import type {
   ReferralsDto,
   RejectPaymentDto,
   RequestPasswordRecoveryDto,
+  SalaryPaymentInputDto,
   SearchAssistantClientsParams,
   SessionAvailabilityDto,
   SessionCancellationDto,
@@ -127,6 +143,10 @@ import type {
   StaffMemberPageDto,
   StaffProfileDto,
   StartClientRegistrationDto,
+  SupplyChangeDto,
+  SupplyInputDto,
+  SupplyMovementDto,
+  SupplyMovementInputDto,
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
   TransferInstructionsDto,
@@ -135,6 +155,7 @@ import type {
   UpdateClientProfileDto,
   UploadStatusDto,
   VerifyClientEmailDto,
+  WithdrawalPageDto,
 } from "./models";
 
 const withQueryKey = <T extends object, K>(
@@ -16059,6 +16080,2556 @@ export const useEndAvailabilityBlock = <TError = unknown, TContext = unknown>(
     queryClient,
   );
 };
+
+export type listAdminSuppliesResponse200 = {
+  data: AdminSupplyDto[];
+  status: 200;
+};
+
+export type listAdminSuppliesResponseSuccess = listAdminSuppliesResponse200 & {
+  headers: Headers;
+};
+export type listAdminSuppliesResponse = listAdminSuppliesResponseSuccess;
+
+export const getListAdminSuppliesUrl = (params: ListAdminSuppliesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/supplies?${stringifiedParams}`
+    : `/api/v1/administrator/supplies`;
+};
+
+export const listAdminSupplies = async (
+  params: ListAdminSuppliesParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminSuppliesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminSuppliesUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminSuppliesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminSuppliesResponse;
+};
+
+export const getListAdminSuppliesQueryKey = (
+  params?: ListAdminSuppliesParams,
+) => {
+  return [
+    `/api/v1/administrator/supplies`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminSuppliesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminSupplies>>,
+  TError = unknown,
+>(
+  params: ListAdminSuppliesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSupplies>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminSuppliesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminSupplies>>
+  > = ({ signal }) =>
+    listAdminSupplies(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminSupplies>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminSuppliesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminSupplies>>
+>;
+export type ListAdminSuppliesQueryError = unknown;
+
+export function useListAdminSupplies<
+  TData = Awaited<ReturnType<typeof listAdminSupplies>>,
+  TError = unknown,
+>(
+  params: ListAdminSuppliesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSupplies>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminSupplies>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminSupplies>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminSupplies<
+  TData = Awaited<ReturnType<typeof listAdminSupplies>>,
+  TError = unknown,
+>(
+  params: ListAdminSuppliesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSupplies>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminSupplies>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminSupplies>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminSupplies<
+  TData = Awaited<ReturnType<typeof listAdminSupplies>>,
+  TError = unknown,
+>(
+  params: ListAdminSuppliesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSupplies>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminSupplies<
+  TData = Awaited<ReturnType<typeof listAdminSupplies>>,
+  TError = unknown,
+>(
+  params: ListAdminSuppliesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSupplies>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminSuppliesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createSupplyResponse201 = {
+  data: AdminSupplyDto;
+  status: 201;
+};
+
+export type createSupplyResponseSuccess = createSupplyResponse201 & {
+  headers: Headers;
+};
+export type createSupplyResponse = createSupplyResponseSuccess;
+
+export const getCreateSupplyUrl = () => {
+  return `/api/v1/administrator/supplies`;
+};
+
+export const createSupply = async (
+  supplyInputDto: SupplyInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createSupplyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateSupplyUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(supplyInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createSupplyResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createSupplyResponse;
+};
+
+export const getCreateSupplyMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSupply>>,
+    TError,
+    CreateSupplyMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSupply>>,
+  TError,
+  CreateSupplyMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createSupply"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSupply>>,
+    CreateSupplyMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createSupply(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateSupplyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createSupply>>
+>;
+export type CreateSupplyMutationBody = SupplyInputDto;
+export type CreateSupplyMutationError = unknown;
+export type CreateSupplyMutationVariables = { data: SupplyInputDto };
+
+export const useCreateSupply = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createSupply>>,
+      TError,
+      CreateSupplyMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createSupply>>,
+  TError,
+  CreateSupplyMutationVariables,
+  TContext
+> => {
+  return useMutation(getCreateSupplyMutationOptions(options), queryClient);
+};
+
+export type updateSupplyResponse200 = {
+  data: AdminSupplyDto;
+  status: 200;
+};
+
+export type updateSupplyResponseSuccess = updateSupplyResponse200 & {
+  headers: Headers;
+};
+export type updateSupplyResponse = updateSupplyResponseSuccess;
+
+export const getUpdateSupplyUrl = (supplyId: string) => {
+  return `/api/v1/administrator/supplies/${supplyId}`;
+};
+
+export const updateSupply = async (
+  supplyId: string,
+  supplyChangeDto: SupplyChangeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateSupplyResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateSupplyUrl(supplyId), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(supplyChangeDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateSupplyResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateSupplyResponse;
+};
+
+export const getUpdateSupplyMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSupply>>,
+    TError,
+    UpdateSupplyMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateSupply>>,
+  TError,
+  UpdateSupplyMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateSupply"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateSupply>>,
+    UpdateSupplyMutationVariables
+  > = (props) => {
+    const { supplyId, data } = props ?? {};
+
+    return updateSupply(supplyId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateSupplyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateSupply>>
+>;
+export type UpdateSupplyMutationBody = SupplyChangeDto;
+export type UpdateSupplyMutationError = unknown;
+export type UpdateSupplyMutationVariables = {
+  supplyId: string;
+  data: SupplyChangeDto;
+};
+
+export const useUpdateSupply = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateSupply>>,
+      TError,
+      UpdateSupplyMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateSupply>>,
+  TError,
+  UpdateSupplyMutationVariables,
+  TContext
+> => {
+  return useMutation(getUpdateSupplyMutationOptions(options), queryClient);
+};
+
+export type archiveSupplyResponse200 = {
+  data: AdminSupplyDto;
+  status: 200;
+};
+
+export type archiveSupplyResponseSuccess = archiveSupplyResponse200 & {
+  headers: Headers;
+};
+export type archiveSupplyResponse = archiveSupplyResponseSuccess;
+
+export const getArchiveSupplyUrl = (supplyId: string) => {
+  return `/api/v1/administrator/supplies/${supplyId}/archive`;
+};
+
+export const archiveSupply = async (
+  supplyId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<archiveSupplyResponse> => {
+  const res = await (fetchFn ?? fetch)(getArchiveSupplyUrl(supplyId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: archiveSupplyResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as archiveSupplyResponse;
+};
+
+export const getArchiveSupplyMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof archiveSupply>>,
+    TError,
+    ArchiveSupplyMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof archiveSupply>>,
+  TError,
+  ArchiveSupplyMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["archiveSupply"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof archiveSupply>>,
+    ArchiveSupplyMutationVariables
+  > = (props) => {
+    const { supplyId } = props ?? {};
+
+    return archiveSupply(supplyId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ArchiveSupplyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof archiveSupply>>
+>;
+
+export type ArchiveSupplyMutationError = unknown;
+export type ArchiveSupplyMutationVariables = { supplyId: string };
+
+export const useArchiveSupply = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof archiveSupply>>,
+      TError,
+      ArchiveSupplyMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof archiveSupply>>,
+  TError,
+  ArchiveSupplyMutationVariables,
+  TContext
+> => {
+  return useMutation(getArchiveSupplyMutationOptions(options), queryClient);
+};
+
+export type recordWithdrawalResponse201 = {
+  data: SupplyMovementDto;
+  status: 201;
+};
+
+export type recordWithdrawalResponseSuccess = recordWithdrawalResponse201 & {
+  headers: Headers;
+};
+export type recordWithdrawalResponse = recordWithdrawalResponseSuccess;
+
+export const getRecordWithdrawalUrl = (supplyId: string) => {
+  return `/api/v1/administrator/supplies/${supplyId}/withdrawals`;
+};
+
+export const recordWithdrawal = async (
+  supplyId: string,
+  supplyMovementInputDto: SupplyMovementInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recordWithdrawalResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRecordWithdrawalUrl(supplyId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(supplyMovementInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordWithdrawalResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordWithdrawalResponse;
+};
+
+export const getRecordWithdrawalMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recordWithdrawal>>,
+    TError,
+    RecordWithdrawalMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recordWithdrawal>>,
+  TError,
+  RecordWithdrawalMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recordWithdrawal"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recordWithdrawal>>,
+    RecordWithdrawalMutationVariables
+  > = (props) => {
+    const { supplyId, data } = props ?? {};
+
+    return recordWithdrawal(supplyId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecordWithdrawalMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recordWithdrawal>>
+>;
+export type RecordWithdrawalMutationBody = SupplyMovementInputDto;
+export type RecordWithdrawalMutationError = unknown;
+export type RecordWithdrawalMutationVariables = {
+  supplyId: string;
+  data: SupplyMovementInputDto;
+};
+
+export const useRecordWithdrawal = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recordWithdrawal>>,
+      TError,
+      RecordWithdrawalMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recordWithdrawal>>,
+  TError,
+  RecordWithdrawalMutationVariables,
+  TContext
+> => {
+  return useMutation(getRecordWithdrawalMutationOptions(options), queryClient);
+};
+
+export type recordRestockResponse201 = {
+  data: SupplyMovementDto;
+  status: 201;
+};
+
+export type recordRestockResponseSuccess = recordRestockResponse201 & {
+  headers: Headers;
+};
+export type recordRestockResponse = recordRestockResponseSuccess;
+
+export const getRecordRestockUrl = (supplyId: string) => {
+  return `/api/v1/administrator/supplies/${supplyId}/restocks`;
+};
+
+export const recordRestock = async (
+  supplyId: string,
+  supplyMovementInputDto: SupplyMovementInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recordRestockResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRecordRestockUrl(supplyId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(supplyMovementInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordRestockResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordRestockResponse;
+};
+
+export const getRecordRestockMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recordRestock>>,
+    TError,
+    RecordRestockMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recordRestock>>,
+  TError,
+  RecordRestockMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recordRestock"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recordRestock>>,
+    RecordRestockMutationVariables
+  > = (props) => {
+    const { supplyId, data } = props ?? {};
+
+    return recordRestock(supplyId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecordRestockMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recordRestock>>
+>;
+export type RecordRestockMutationBody = SupplyMovementInputDto;
+export type RecordRestockMutationError = unknown;
+export type RecordRestockMutationVariables = {
+  supplyId: string;
+  data: SupplyMovementInputDto;
+};
+
+export const useRecordRestock = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recordRestock>>,
+      TError,
+      RecordRestockMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recordRestock>>,
+  TError,
+  RecordRestockMutationVariables,
+  TContext
+> => {
+  return useMutation(getRecordRestockMutationOptions(options), queryClient);
+};
+
+export type listAdminWithdrawalsResponse200 = {
+  data: WithdrawalPageDto;
+  status: 200;
+};
+
+export type listAdminWithdrawalsResponseSuccess =
+  listAdminWithdrawalsResponse200 & {
+    headers: Headers;
+  };
+export type listAdminWithdrawalsResponse = listAdminWithdrawalsResponseSuccess;
+
+export const getListAdminWithdrawalsUrl = (
+  params: ListAdminWithdrawalsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/withdrawals?${stringifiedParams}`
+    : `/api/v1/administrator/withdrawals`;
+};
+
+export const listAdminWithdrawals = async (
+  params: ListAdminWithdrawalsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminWithdrawalsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminWithdrawalsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminWithdrawalsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminWithdrawalsResponse;
+};
+
+export const getListAdminWithdrawalsQueryKey = (
+  params?: ListAdminWithdrawalsParams,
+) => {
+  return [
+    `/api/v1/administrator/withdrawals`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminWithdrawalsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminWithdrawals>>,
+  TError = unknown,
+>(
+  params: ListAdminWithdrawalsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminWithdrawals>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminWithdrawalsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminWithdrawals>>
+  > = ({ signal }) =>
+    listAdminWithdrawals(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminWithdrawals>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminWithdrawalsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminWithdrawals>>
+>;
+export type ListAdminWithdrawalsQueryError = unknown;
+
+export function useListAdminWithdrawals<
+  TData = Awaited<ReturnType<typeof listAdminWithdrawals>>,
+  TError = unknown,
+>(
+  params: ListAdminWithdrawalsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminWithdrawals>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminWithdrawals>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminWithdrawals>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminWithdrawals<
+  TData = Awaited<ReturnType<typeof listAdminWithdrawals>>,
+  TError = unknown,
+>(
+  params: ListAdminWithdrawalsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminWithdrawals>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminWithdrawals>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminWithdrawals>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminWithdrawals<
+  TData = Awaited<ReturnType<typeof listAdminWithdrawals>>,
+  TError = unknown,
+>(
+  params: ListAdminWithdrawalsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminWithdrawals>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminWithdrawals<
+  TData = Awaited<ReturnType<typeof listAdminWithdrawals>>,
+  TError = unknown,
+>(
+  params: ListAdminWithdrawalsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminWithdrawals>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminWithdrawalsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listAdminSalaryPaymentsResponse200 = {
+  data: AdminSalaryPaymentPageDto;
+  status: 200;
+};
+
+export type listAdminSalaryPaymentsResponseSuccess =
+  listAdminSalaryPaymentsResponse200 & {
+    headers: Headers;
+  };
+export type listAdminSalaryPaymentsResponse =
+  listAdminSalaryPaymentsResponseSuccess;
+
+export const getListAdminSalaryPaymentsUrl = (
+  params?: ListAdminSalaryPaymentsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/salary-payments?${stringifiedParams}`
+    : `/api/v1/administrator/salary-payments`;
+};
+
+export const listAdminSalaryPayments = async (
+  params?: ListAdminSalaryPaymentsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminSalaryPaymentsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminSalaryPaymentsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminSalaryPaymentsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminSalaryPaymentsResponse;
+};
+
+export const getListAdminSalaryPaymentsQueryKey = (
+  params?: ListAdminSalaryPaymentsParams,
+) => {
+  return [
+    `/api/v1/administrator/salary-payments`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminSalaryPaymentsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+  TError = unknown,
+>(
+  params?: ListAdminSalaryPaymentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminSalaryPaymentsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminSalaryPayments>>
+  > = ({ signal }) =>
+    listAdminSalaryPayments(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminSalaryPaymentsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminSalaryPayments>>
+>;
+export type ListAdminSalaryPaymentsQueryError = unknown;
+
+export function useListAdminSalaryPayments<
+  TData = Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+  TError = unknown,
+>(
+  params: undefined | ListAdminSalaryPaymentsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminSalaryPayments>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminSalaryPayments<
+  TData = Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+  TError = unknown,
+>(
+  params?: ListAdminSalaryPaymentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminSalaryPayments>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminSalaryPayments<
+  TData = Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+  TError = unknown,
+>(
+  params?: ListAdminSalaryPaymentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminSalaryPayments<
+  TData = Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+  TError = unknown,
+>(
+  params?: ListAdminSalaryPaymentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminSalaryPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminSalaryPaymentsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type recordSalaryPaymentResponse201 = {
+  data: AdminSalaryPaymentDto;
+  status: 201;
+};
+
+export type recordSalaryPaymentResponseSuccess =
+  recordSalaryPaymentResponse201 & {
+    headers: Headers;
+  };
+export type recordSalaryPaymentResponse = recordSalaryPaymentResponseSuccess;
+
+export const getRecordSalaryPaymentUrl = () => {
+  return `/api/v1/administrator/salary-payments`;
+};
+
+export const recordSalaryPayment = async (
+  salaryPaymentInputDto: SalaryPaymentInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recordSalaryPaymentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRecordSalaryPaymentUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(salaryPaymentInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordSalaryPaymentResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordSalaryPaymentResponse;
+};
+
+export const getRecordSalaryPaymentMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recordSalaryPayment>>,
+    TError,
+    RecordSalaryPaymentMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recordSalaryPayment>>,
+  TError,
+  RecordSalaryPaymentMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recordSalaryPayment"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recordSalaryPayment>>,
+    RecordSalaryPaymentMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return recordSalaryPayment(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecordSalaryPaymentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recordSalaryPayment>>
+>;
+export type RecordSalaryPaymentMutationBody = SalaryPaymentInputDto;
+export type RecordSalaryPaymentMutationError = unknown;
+export type RecordSalaryPaymentMutationVariables = {
+  data: SalaryPaymentInputDto;
+};
+
+export const useRecordSalaryPayment = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recordSalaryPayment>>,
+      TError,
+      RecordSalaryPaymentMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recordSalaryPayment>>,
+  TError,
+  RecordSalaryPaymentMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRecordSalaryPaymentMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type updateSalaryPaymentResponse200 = {
+  data: AdminSalaryPaymentDto;
+  status: 200;
+};
+
+export type updateSalaryPaymentResponseSuccess =
+  updateSalaryPaymentResponse200 & {
+    headers: Headers;
+  };
+export type updateSalaryPaymentResponse = updateSalaryPaymentResponseSuccess;
+
+export const getUpdateSalaryPaymentUrl = (salaryPaymentId: string) => {
+  return `/api/v1/administrator/salary-payments/${salaryPaymentId}`;
+};
+
+export const updateSalaryPayment = async (
+  salaryPaymentId: string,
+  salaryPaymentInputDto: SalaryPaymentInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateSalaryPaymentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getUpdateSalaryPaymentUrl(salaryPaymentId),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(salaryPaymentInputDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateSalaryPaymentResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateSalaryPaymentResponse;
+};
+
+export const getUpdateSalaryPaymentMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateSalaryPayment>>,
+    TError,
+    UpdateSalaryPaymentMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateSalaryPayment>>,
+  TError,
+  UpdateSalaryPaymentMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateSalaryPayment"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateSalaryPayment>>,
+    UpdateSalaryPaymentMutationVariables
+  > = (props) => {
+    const { salaryPaymentId, data } = props ?? {};
+
+    return updateSalaryPayment(salaryPaymentId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateSalaryPaymentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateSalaryPayment>>
+>;
+export type UpdateSalaryPaymentMutationBody = SalaryPaymentInputDto;
+export type UpdateSalaryPaymentMutationError = unknown;
+export type UpdateSalaryPaymentMutationVariables = {
+  salaryPaymentId: string;
+  data: SalaryPaymentInputDto;
+};
+
+export const useUpdateSalaryPayment = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateSalaryPayment>>,
+      TError,
+      UpdateSalaryPaymentMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateSalaryPayment>>,
+  TError,
+  UpdateSalaryPaymentMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getUpdateSalaryPaymentMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type listAdminExpenseCategoriesResponse200 = {
+  data: AdminExpenseCategoryDto[];
+  status: 200;
+};
+
+export type listAdminExpenseCategoriesResponseSuccess =
+  listAdminExpenseCategoriesResponse200 & {
+    headers: Headers;
+  };
+export type listAdminExpenseCategoriesResponse =
+  listAdminExpenseCategoriesResponseSuccess;
+
+export const getListAdminExpenseCategoriesUrl = () => {
+  return `/api/v1/administrator/expense-categories`;
+};
+
+export const listAdminExpenseCategories = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminExpenseCategoriesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminExpenseCategoriesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminExpenseCategoriesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminExpenseCategoriesResponse;
+};
+
+export const getListAdminExpenseCategoriesQueryKey = () => {
+  return [`/api/v1/administrator/expense-categories`] as const;
+};
+
+export const getListAdminExpenseCategoriesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminExpenseCategoriesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminExpenseCategories>>
+  > = ({ signal }) =>
+    listAdminExpenseCategories({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminExpenseCategoriesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminExpenseCategories>>
+>;
+export type ListAdminExpenseCategoriesQueryError = unknown;
+
+export function useListAdminExpenseCategories<
+  TData = Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminExpenseCategories>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminExpenseCategories<
+  TData = Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminExpenseCategories>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminExpenseCategories<
+  TData = Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminExpenseCategories<
+  TData = Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenseCategories>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminExpenseCategoriesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createExpenseCategoryResponse201 = {
+  data: AdminExpenseCategoryDto;
+  status: 201;
+};
+
+export type createExpenseCategoryResponseSuccess =
+  createExpenseCategoryResponse201 & {
+    headers: Headers;
+  };
+export type createExpenseCategoryResponse =
+  createExpenseCategoryResponseSuccess;
+
+export const getCreateExpenseCategoryUrl = () => {
+  return `/api/v1/administrator/expense-categories`;
+};
+
+export const createExpenseCategory = async (
+  expenseCategoryInputDto: ExpenseCategoryInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createExpenseCategoryResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateExpenseCategoryUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(expenseCategoryInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createExpenseCategoryResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createExpenseCategoryResponse;
+};
+
+export const getCreateExpenseCategoryMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createExpenseCategory>>,
+    TError,
+    CreateExpenseCategoryMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createExpenseCategory>>,
+  TError,
+  CreateExpenseCategoryMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createExpenseCategory"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createExpenseCategory>>,
+    CreateExpenseCategoryMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createExpenseCategory(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateExpenseCategoryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createExpenseCategory>>
+>;
+export type CreateExpenseCategoryMutationBody = ExpenseCategoryInputDto;
+export type CreateExpenseCategoryMutationError = unknown;
+export type CreateExpenseCategoryMutationVariables = {
+  data: ExpenseCategoryInputDto;
+};
+
+export const useCreateExpenseCategory = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createExpenseCategory>>,
+      TError,
+      CreateExpenseCategoryMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createExpenseCategory>>,
+  TError,
+  CreateExpenseCategoryMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreateExpenseCategoryMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type deleteExpenseCategoryResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteExpenseCategoryResponseSuccess =
+  deleteExpenseCategoryResponse204 & {
+    headers: Headers;
+  };
+export type deleteExpenseCategoryResponse =
+  deleteExpenseCategoryResponseSuccess;
+
+export const getDeleteExpenseCategoryUrl = (expenseCategoryId: string) => {
+  return `/api/v1/administrator/expense-categories/${expenseCategoryId}`;
+};
+
+export const deleteExpenseCategory = async (
+  expenseCategoryId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deleteExpenseCategoryResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getDeleteExpenseCategoryUrl(expenseCategoryId),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteExpenseCategoryResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteExpenseCategoryResponse;
+};
+
+export const getDeleteExpenseCategoryMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deleteExpenseCategory>>,
+    TError,
+    DeleteExpenseCategoryMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deleteExpenseCategory>>,
+  TError,
+  DeleteExpenseCategoryMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["deleteExpenseCategory"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deleteExpenseCategory>>,
+    DeleteExpenseCategoryMutationVariables
+  > = (props) => {
+    const { expenseCategoryId } = props ?? {};
+
+    return deleteExpenseCategory(expenseCategoryId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeleteExpenseCategoryMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deleteExpenseCategory>>
+>;
+
+export type DeleteExpenseCategoryMutationError = unknown;
+export type DeleteExpenseCategoryMutationVariables = {
+  expenseCategoryId: string;
+};
+
+export const useDeleteExpenseCategory = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deleteExpenseCategory>>,
+      TError,
+      DeleteExpenseCategoryMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deleteExpenseCategory>>,
+  TError,
+  DeleteExpenseCategoryMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getDeleteExpenseCategoryMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type listAdminExpensesResponse200 = {
+  data: AdminExpensePageDto;
+  status: 200;
+};
+
+export type listAdminExpensesResponseSuccess = listAdminExpensesResponse200 & {
+  headers: Headers;
+};
+export type listAdminExpensesResponse = listAdminExpensesResponseSuccess;
+
+export const getListAdminExpensesUrl = (params: ListAdminExpensesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/expenses?${stringifiedParams}`
+    : `/api/v1/administrator/expenses`;
+};
+
+export const listAdminExpenses = async (
+  params: ListAdminExpensesParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminExpensesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminExpensesUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminExpensesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminExpensesResponse;
+};
+
+export const getListAdminExpensesQueryKey = (
+  params?: ListAdminExpensesParams,
+) => {
+  return [
+    `/api/v1/administrator/expenses`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminExpensesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminExpenses>>,
+  TError = unknown,
+>(
+  params: ListAdminExpensesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenses>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminExpensesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminExpenses>>
+  > = ({ signal }) =>
+    listAdminExpenses(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminExpenses>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminExpensesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminExpenses>>
+>;
+export type ListAdminExpensesQueryError = unknown;
+
+export function useListAdminExpenses<
+  TData = Awaited<ReturnType<typeof listAdminExpenses>>,
+  TError = unknown,
+>(
+  params: ListAdminExpensesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenses>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminExpenses>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminExpenses>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminExpenses<
+  TData = Awaited<ReturnType<typeof listAdminExpenses>>,
+  TError = unknown,
+>(
+  params: ListAdminExpensesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenses>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminExpenses>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminExpenses>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminExpenses<
+  TData = Awaited<ReturnType<typeof listAdminExpenses>>,
+  TError = unknown,
+>(
+  params: ListAdminExpensesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenses>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminExpenses<
+  TData = Awaited<ReturnType<typeof listAdminExpenses>>,
+  TError = unknown,
+>(
+  params: ListAdminExpensesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminExpenses>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminExpensesQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type recordExpenseResponse201 = {
+  data: AdminExpenseDto;
+  status: 201;
+};
+
+export type recordExpenseResponseSuccess = recordExpenseResponse201 & {
+  headers: Headers;
+};
+export type recordExpenseResponse = recordExpenseResponseSuccess;
+
+export const getRecordExpenseUrl = () => {
+  return `/api/v1/administrator/expenses`;
+};
+
+export const recordExpense = async (
+  expenseInputDto: ExpenseInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recordExpenseResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRecordExpenseUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(expenseInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordExpenseResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordExpenseResponse;
+};
+
+export const getRecordExpenseMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recordExpense>>,
+    TError,
+    RecordExpenseMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recordExpense>>,
+  TError,
+  RecordExpenseMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recordExpense"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recordExpense>>,
+    RecordExpenseMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return recordExpense(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecordExpenseMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recordExpense>>
+>;
+export type RecordExpenseMutationBody = ExpenseInputDto;
+export type RecordExpenseMutationError = unknown;
+export type RecordExpenseMutationVariables = { data: ExpenseInputDto };
+
+export const useRecordExpense = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recordExpense>>,
+      TError,
+      RecordExpenseMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recordExpense>>,
+  TError,
+  RecordExpenseMutationVariables,
+  TContext
+> => {
+  return useMutation(getRecordExpenseMutationOptions(options), queryClient);
+};
+
+export type updateExpenseResponse200 = {
+  data: AdminExpenseDto;
+  status: 200;
+};
+
+export type updateExpenseResponseSuccess = updateExpenseResponse200 & {
+  headers: Headers;
+};
+export type updateExpenseResponse = updateExpenseResponseSuccess;
+
+export const getUpdateExpenseUrl = (expenseId: string) => {
+  return `/api/v1/administrator/expenses/${expenseId}`;
+};
+
+export const updateExpense = async (
+  expenseId: string,
+  expenseChangeDto: ExpenseChangeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateExpenseResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdateExpenseUrl(expenseId), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(expenseChangeDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateExpenseResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateExpenseResponse;
+};
+
+export const getUpdateExpenseMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateExpense>>,
+    TError,
+    UpdateExpenseMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateExpense>>,
+  TError,
+  UpdateExpenseMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateExpense"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateExpense>>,
+    UpdateExpenseMutationVariables
+  > = (props) => {
+    const { expenseId, data } = props ?? {};
+
+    return updateExpense(expenseId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateExpenseMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateExpense>>
+>;
+export type UpdateExpenseMutationBody = ExpenseChangeDto;
+export type UpdateExpenseMutationError = unknown;
+export type UpdateExpenseMutationVariables = {
+  expenseId: string;
+  data: ExpenseChangeDto;
+};
+
+export const useUpdateExpense = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateExpense>>,
+      TError,
+      UpdateExpenseMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateExpense>>,
+  TError,
+  UpdateExpenseMutationVariables,
+  TContext
+> => {
+  return useMutation(getUpdateExpenseMutationOptions(options), queryClient);
+};
+
+export type getExpenseReportResponse200 = {
+  data: ExpenseReportDto;
+  status: 200;
+};
+
+export type getExpenseReportResponseSuccess = getExpenseReportResponse200 & {
+  headers: Headers;
+};
+export type getExpenseReportResponse = getExpenseReportResponseSuccess;
+
+export const getGetExpenseReportUrl = (params: GetExpenseReportParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/reports/expenses?${stringifiedParams}`
+    : `/api/v1/administrator/reports/expenses`;
+};
+
+export const getExpenseReport = async (
+  params: GetExpenseReportParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getExpenseReportResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetExpenseReportUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getExpenseReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getExpenseReportResponse;
+};
+
+export const getGetExpenseReportQueryKey = (
+  params?: GetExpenseReportParams,
+) => {
+  return [
+    `/api/v1/administrator/reports/expenses`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetExpenseReportQueryOptions = <
+  TData = Awaited<ReturnType<typeof getExpenseReport>>,
+  TError = unknown,
+>(
+  params: GetExpenseReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExpenseReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetExpenseReportQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getExpenseReport>>
+  > = ({ signal }) =>
+    getExpenseReport(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getExpenseReport>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetExpenseReportQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getExpenseReport>>
+>;
+export type GetExpenseReportQueryError = unknown;
+
+export function useGetExpenseReport<
+  TData = Awaited<ReturnType<typeof getExpenseReport>>,
+  TError = unknown,
+>(
+  params: GetExpenseReportParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExpenseReport>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getExpenseReport>>,
+          TError,
+          Awaited<ReturnType<typeof getExpenseReport>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetExpenseReport<
+  TData = Awaited<ReturnType<typeof getExpenseReport>>,
+  TError = unknown,
+>(
+  params: GetExpenseReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExpenseReport>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getExpenseReport>>,
+          TError,
+          Awaited<ReturnType<typeof getExpenseReport>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetExpenseReport<
+  TData = Awaited<ReturnType<typeof getExpenseReport>>,
+  TError = unknown,
+>(
+  params: GetExpenseReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExpenseReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetExpenseReport<
+  TData = Awaited<ReturnType<typeof getExpenseReport>>,
+  TError = unknown,
+>(
+  params: GetExpenseReportParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getExpenseReport>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetExpenseReportQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export type createPendingUploadResponse201 = {
   data: PendingUploadDto;
