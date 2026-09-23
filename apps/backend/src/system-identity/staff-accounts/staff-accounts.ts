@@ -22,6 +22,16 @@ export type StaffAccountDependencies = {
   newId: () => string;
 };
 
+// Nest token for the runtime pieces the System Identity module shares with
+// the staff-management composition: pg-boss, the email digest, the link
+// cipher, and the token issuer.
+export const staffAccountRuntime = Symbol('staffAccountRuntime');
+
+export type StaffAccountRuntime = Omit<
+  StaffAccountDependencies,
+  'now' | 'newId'
+>;
+
 export const createStaffAccountOperations = (
   transaction: Prisma.TransactionClient,
   dependencies: StaffAccountDependencies,

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { Module, OnApplicationShutdown } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Environment } from '../config/environment';
@@ -94,6 +95,29 @@ import { listSessionAvailability } from './session-availability';
 import { listTrainerSchedule } from './trainer-schedule';
 import { loadTrainerSessionRoster } from './trainer-session-roster';
 
+import {
+  changeStaffBranches,
+  changeStaffRole,
+  createStaffMember,
+  deactivateStaffMember,
+  listStaffMembers,
+  readStaffMember,
+  resendStaffActivation,
+} from './staff/staff-management';
+import {
+  AdministratorStaffMembersController,
+  staffManagementOperations,
+  type StaffManagementOperations,
+} from './staff/staff-management.controller';
+import {
+  createPrismaStaffDirectory,
+  PrismaStaffManagementUnitOfWork,
+} from './staff/prisma-staff-management';
+import {
+  staffAccountRuntime,
+  type StaffAccountRuntime,
+} from '../system-identity/staff-accounts/staff-accounts';
+
 const bookingPrisma = Symbol('bookingPrisma');
 
 class BookingRuntimeCleanup implements OnApplicationShutdown {
@@ -122,6 +146,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     ClientBookingsController,
     WaitlistEntriesController,
     StaffProfileController,
+    AdministratorStaffMembersController,
     PurchaseIntentsController,
     CreditPurchasesController,
     ClientPaymentsController,
@@ -321,6 +346,42 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
             findProfile: (clientId) =>
               createCatalogRepository(prisma).findClientProfile(clientId),
           }),
+    },
+    {
+      provide: staffManagementOperations,
+      inject: [bookingPrisma, staffAccountRuntime],
+      useFactory: (
+        prisma: PrismaClient,
+        runtime: StaffAccountRuntime,
+      ): StaffManagementOperations => {
+        const now = () => new Date();
+        const dependencies = {
+          unitOfWork: new PrismaStaffManagementUnitOfWork({
+            prisma,
+            ...runtime,
+            now,
+          }),
+          now,
+          newId: randomUUID,
+        };
+        const directory = createPrismaStaffDirectory(prisma);
+        return {
+          list: (query, principal) =>
+            listStaffMembers(query, principal, directory),
+          read: (command, principal) =>
+            readStaffMember(command, principal, directory),
+          create: (command, principal) =>
+            createStaffMember(command, principal, dependencies),
+          resendActivation: (command, principal) =>
+            resendStaffActivation(command, principal, dependencies),
+          changeRole: (command, principal) =>
+            changeStaffRole(command, principal, dependencies),
+          changeBranches: (command, principal) =>
+            changeStaffBranches(command, principal, dependencies),
+          deactivate: (command, principal) =>
+            deactivateStaffMember(command, principal, dependencies),
+        };
+      },
     },
     {
       provide: staffProfile,

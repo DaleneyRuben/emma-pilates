@@ -60,6 +60,10 @@ import { argon2PasswordHasher } from './security/argon2-password-hasher';
 import { dummyPasswordHash } from './security/argon2-password-hasher';
 import { AuthenticationLinkCipher } from './security/authentication-link-cipher';
 import { authenticationTokens } from './security/authentication-token-service';
+import {
+  staffAccountRuntime,
+  type StaffAccountRuntime,
+} from './staff-accounts/staff-accounts';
 
 const registrationGateway = Symbol('registrationGateway');
 const registrationPgBoss = Symbol('registrationPgBoss');
@@ -427,12 +431,32 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         }),
     },
     {
+      provide: staffAccountRuntime,
+      inject: [registrationPgBoss, ConfigService, AuthenticationLinkCipher],
+      useFactory: (
+        boss: PgBoss,
+        config: ConfigService<Environment, true>,
+        linkCipher: AuthenticationLinkCipher,
+      ): StaffAccountRuntime => ({
+        boss,
+        digestEmail: (email) =>
+          createHmac(
+            'sha256',
+            config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
+          )
+            .update(email)
+            .digest(),
+        linkCipher,
+        tokenIssuer: authenticationTokens,
+      }),
+    },
+    {
       provide: SystemIdentityRuntimeCleanup,
       inject: [systemIdentityPrisma, registrationPgBoss],
       useFactory: (prisma: PrismaClient, boss: PgBoss) =>
         new SystemIdentityRuntimeCleanup(prisma, boss),
     },
   ],
-  exports: [authenticatedPrincipalResolver],
+  exports: [authenticatedPrincipalResolver, staffAccountRuntime],
 })
 export class SystemIdentityModule {}
