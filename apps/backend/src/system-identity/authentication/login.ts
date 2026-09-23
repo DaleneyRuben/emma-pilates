@@ -4,9 +4,9 @@ import {
   AuthenticationFailedError,
 } from './authenticate-credentials';
 import {
-  createMobileAuthenticationSession,
-  type NewMobileAuthenticationSession,
-} from './create-mobile-authentication-session';
+  createAuthenticationSession,
+  type NewAuthenticationSession,
+} from './create-authentication-session';
 import { getLoginThrottle } from './login-throttle-policy';
 
 export class LoginThrottledError extends Error {
@@ -43,7 +43,7 @@ type LoginDependencies = {
   ): Promise<void>;
   completeLogin(input: {
     loginLaneDigest: Uint8Array;
-    session: NewMobileAuthenticationSession;
+    session: NewAuthenticationSession;
   }): Promise<void>;
   issueCredential(): { secret: string; digest: Uint8Array };
   newId(): string;
@@ -104,7 +104,7 @@ export const login = async (
     throw error;
   }
 
-  return createMobileAuthenticationSession(accountId, {
+  return createAuthenticationSession(accountId, 'mobile', {
     issueCredential: () => dependencies.issueCredential(),
     newId: () => dependencies.newId(),
     now: () => now,

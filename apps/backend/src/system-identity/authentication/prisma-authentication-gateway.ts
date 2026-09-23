@@ -7,7 +7,7 @@ import {
   AuthenticationThrottlePurpose,
 } from '../../generated/prisma/enums';
 import type { AccountCredentials } from './authenticate-credentials';
-import type { NewMobileAuthenticationSession } from './create-mobile-authentication-session';
+import type { NewAuthenticationSession } from './create-authentication-session';
 import {
   AuthenticationRequiredError,
   type AuthenticationSessionPrincipalRecord,
@@ -110,7 +110,7 @@ export class PrismaAuthenticationGateway {
 
   async completeLogin(input: {
     loginLaneDigest: Uint8Array;
-    session: NewMobileAuthenticationSession;
+    session: NewAuthenticationSession;
   }): Promise<void> {
     const credentialDigest = toPrismaBytes(input.session.credentialDigest);
 

@@ -1,4 +1,4 @@
-import type { NewMobileAuthenticationSession } from '../authentication/create-mobile-authentication-session';
+import type { NewAuthenticationSession } from '../authentication/create-authentication-session';
 
 type RecoveryToken = {
   id: string;
@@ -28,7 +28,7 @@ export type PasswordRecoveryGateway = {
     tokenDigest: Uint8Array;
     passwordHash: string;
     completedAt: Date;
-    authenticationSession: Omit<NewMobileAuthenticationSession, 'accountId'>;
+    authenticationSession: Omit<NewAuthenticationSession, 'accountId'>;
     auditRecordId: string;
   }): Promise<void>;
 };
@@ -98,10 +98,7 @@ export const completePasswordRecovery = async (
 
   const passwordHash = await dependencies.hashPassword(command.password);
   const credential = dependencies.issueSessionCredential();
-  const authenticationSession: Omit<
-    NewMobileAuthenticationSession,
-    'accountId'
-  > = {
+  const authenticationSession: Omit<NewAuthenticationSession, 'accountId'> = {
     id: dependencies.newSessionId(),
     surface: 'mobile',
     credentialDigest: credential.digest,
