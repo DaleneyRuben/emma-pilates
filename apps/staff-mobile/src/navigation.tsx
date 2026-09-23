@@ -40,6 +40,9 @@ import { ClientSearchScreen } from "./assistant/client-search-screen";
 import { ConfirmCashPaymentScreen } from "./assistant/confirm-cash-payment-screen";
 import { NewClientScreen } from "./assistant/new-client-screen";
 import { SelectPlanScreen } from "./assistant/select-plan-screen";
+import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-form-screen";
+import { AvailabilityScreen } from "./nutritionist/availability-screen";
+import { NutritionistAgendaScreen } from "./nutritionist/nutritionist-agenda-screen";
 import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
@@ -86,14 +89,6 @@ function formatTimeRange(startsAt: string, endsAt: string): string {
     timeZone: "America/La_Paz",
   });
   return `${formatter.format(new Date(startsAt))}–${formatter.format(new Date(endsAt))}`;
-}
-
-function NavigationPlaceholder({ title }: { title: string }) {
-  return (
-    <Screen>
-      <RootHeader label={title} title={title} />
-    </Screen>
-  );
 }
 
 function TrainerAgendaScreen() {
@@ -344,10 +339,6 @@ function TrainerRosterScreen({
   );
 }
 
-function NutritionistAgendaScreen() {
-  return <NavigationPlaceholder title="Mi agenda" />;
-}
-
 const accountScreens = {
   Profile: StaffProfileScreen,
   Notifications: StaffNotificationsScreen,
@@ -390,7 +381,12 @@ const AdministratorStack = createNativeStackNavigator({
 });
 const NutritionistStack = createNativeStackNavigator({
   screenOptions: { headerShown: false },
-  screens: { Agenda: NutritionistAgendaScreen, ...accountScreens },
+  screens: {
+    Agenda: NutritionistAgendaScreen,
+    Availability: AvailabilityScreen,
+    AvailabilityBlockForm: AvailabilityBlockFormScreen,
+    ...accountScreens,
+  },
 });
 const roleNavigation: Record<
   StaffRole,
