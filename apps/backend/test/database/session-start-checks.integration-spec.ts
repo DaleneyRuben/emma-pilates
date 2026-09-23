@@ -151,19 +151,19 @@ describe('Prisma Session start checks', () => {
       closureReason: 'SESSION_CANCELLED',
       closedByAccountId: null,
     });
-    await expect(trainerNotices()).resolves.toEqual([
-      expect.objectContaining({
-        category: 'BOOKING_SCHEDULE',
-        title: 'Clase cancelada',
-        message: expect.stringMatching(
-          new RegExp(
-            `^Tu clase de ${classType.name} .+ se canceló: no tuvo reservas\\.$`,
-          ),
-        ),
-        destinationType: 'trainer_schedule',
-        destinationId: null,
-      }),
-    ]);
+    const [trainerNotice, ...otherTrainerNotices] = await trainerNotices();
+    expect(otherTrainerNotices).toEqual([]);
+    expect(trainerNotice).toMatchObject({
+      category: 'BOOKING_SCHEDULE',
+      title: 'Clase cancelada',
+      destinationType: 'trainer_schedule',
+      destinationId: null,
+    });
+    expect(trainerNotice.message).toMatch(
+      new RegExp(
+        `^Tu clase de ${classType.name} .+ se canceló: no tuvo reservas\\.$`,
+      ),
+    );
     await expect(
       prisma.notification.findMany({
         where: { accountId: valeria.accountId, type: 'session_cancelled' },
