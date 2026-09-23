@@ -400,6 +400,10 @@ Session that would overlap another at the same Branch or for the same Trainer,
 and ignores schedules at an archived Branch, for an archived Class Type, or
 whose Trainer is not assigned to that Branch.
 
+The running worker also cancels, once and for good, every fixture Session that
+still has no Bookings two hours before it starts, and tells its Trainer. Book
+a class first if you want to keep it for a manual test (Test 13).
+
 These fixtures exist only for your local `emma_pilates` database. Never load
 them into a shared-development or production database.
 
@@ -1128,6 +1132,39 @@ The same data is available through Swagger as `GET
 /api/v1/trainer/sessions/{sessionId}/roster`, and `POST
 /api/v1/sessions/{sessionId}/attendance`; other Roles get `403`.
 
+## Test 13: watch the worker cancel an empty Session and close a Waitlist
+
+Load the fixtures (Test 5A), start the backend, and start the worker with
+`pnpm --filter @pilates/backend start:worker`. The worker checks every minute
+(and once when it starts) for:
+
+- **Sessions starting within two hours.** A Session with no Bookings at that
+  moment is cancelled with cause `zero_bookings` and no actor, its open
+  Waitlist Entries close as `session_cancelled`, and its Trainer receives
+  "Tu clase de Mat Pilates de hoy 07:00 se canceló: no tuvo reservas." (the
+  Class Type and time vary) in the inbox, which opens their agenda. A waitlisted
+  Client receives "La clase de … a la que estabas en lista de espera fue
+  cancelada." A Session with at least one Booking stays scheduled. Either way
+  the check is recorded in `empty_booking_check_completed_at` and never runs
+  again for that Session, even if its Bookings later drop to zero. A Session
+  that drops to zero before the check stays bookable until then.
+- **Sessions that have started.** Their remaining open Waitlist Entries close
+  as `session_started`, without a notification.
+
+To see it without waiting for a real class, pick today's Session that starts
+in the next two hours with no Bookings (or wait until one does), keep the
+worker running for a minute, then:
+
+1. Log in to the Staff app as that Session's Trainer (usually
+   `emma.vargas@example.com`) and open the inbox from Perfil: the
+   cancellation notice is there.
+2. In the Client app as `lucia@example.com`, the Session no longer appears in
+   the class list, and `GET /api/v1/sessions/{sessionId}` returns `404`.
+
+Book a Session in the Client app first and it stays scheduled through the
+check. The worker logs only a sanitized `empty_session_check_failed` or
+`started_waitlist_closure_failed` event if a sweep fails.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1144,9 +1181,7 @@ The following are not ready for manual product testing:
   Test 9; buying a Plan works, see Test 10);
 - the Nutritionist agenda, Mi disponibilidad, and the Client Evaluation
   screens in the apps (their APIs work, see Test 7; the screens are MOB-016);
-- automatic cancellation of Sessions with no Bookings two hours before and
-  Waitlists closing when a Session starts (BOOK-004), or editing a Session
-  Schedule (ADM-001);
+- editing a Session Schedule (ADM-001);
 - creating the first Administrator with the bootstrap command (IDN-006) or
   creating, reassigning, and deactivating Staff Members (IDN-007);
 - Promotions, image variants, and Back Office records (UPL-002, BKO-001);
