@@ -4,12 +4,12 @@ import type { NavigationItem } from "../app/navigation";
 export function PlaceholderPage({ item }: { item: NavigationItem }) {
   return (
     <article className="flex flex-col gap-4">
-      <header className="flex flex-wrap items-baseline justify-between gap-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-3">
         <h1 className="text-titulo-pagina text-texto">{item.label}</h1>
         <span className="text-ayuda text-texto-muy-tenue tabular">
           Pantalla {item.screen}
         </span>
-      </header>
+      </div>
       <section className="rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center">
         <p className="text-cuerpo text-texto-secundario">
           Esta sección aún no está disponible.

@@ -30,3 +30,7 @@ if (typeof window.ResizeObserver !== "function") {
     value: ResizeObserverStub,
   });
 }
+
+// The router restores scroll positions through window.scrollTo, which jsdom
+// reports as not implemented.
+Object.defineProperty(window, "scrollTo", { writable: true, value: () => {} });
