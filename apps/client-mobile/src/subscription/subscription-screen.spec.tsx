@@ -82,3 +82,57 @@ describe("Client Subscription detail", () => {
     expect(screen.getByText("Sin clases disponibles")).toBeOnTheScreen();
   });
 });
+
+describe("Refreshed Mi plan (Client 12)", () => {
+  afterEach(() => {
+    cleanup();
+    clearMobileQueryCache();
+  });
+
+  it("labels the current Subscription and says a new Plan waits for it to end", async () => {
+    const screen = await openSubscription(subscription("active", 5));
+
+    expect(screen.getByText("Suscripción actual")).toBeOnTheScreen();
+    expect(screen.getByText("25 de agosto de 2026")).toBeOnTheScreen();
+    expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Podrás comprar un plan nuevo cuando este termine."),
+    ).toBeOnTheScreen();
+  });
+
+  it("adds the informational renewal line while expiring soon", async () => {
+    const screen = await openSubscription(subscription("expiring_soon", 2));
+
+    expect(
+      screen.getByText("Podrás comprar uno nuevo apenas termine."),
+    ).toBeOnTheScreen();
+    expect(
+      screen.queryByRole("button", { name: "Comprar un plan" }),
+    ).not.toBeOnTheScreen();
+  });
+
+  it("shows the last Plan as expired with its end date and the only purchase action", async () => {
+    const fetcher = routeFetcher({
+      "/api/v1/clients/current": () => jsonResponse(profile),
+      "/api/v1/clients/current/subscription": () =>
+        jsonResponse(subscription("expired", 3)),
+    });
+    const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /Perfil, tab/ })).toBeOnTheScreen();
+    });
+    fireEvent.press(screen.getByRole("button", { name: /Perfil, tab/ }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: /^Mi plan/ })).toBeOnTheScreen();
+    });
+    fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
+    await waitFor(() => {
+      expect(screen.getByText("Último plan")).toBeOnTheScreen();
+    });
+
+    expect(screen.getByText("Venció el")).toBeOnTheScreen();
+    expect(screen.getByText("Sin clases disponibles")).toBeOnTheScreen();
+    expect(screen.getByText("Elige el paquete que mejor te acomode.")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
+  });
+});
