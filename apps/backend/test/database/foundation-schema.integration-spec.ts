@@ -20,12 +20,18 @@ describe('foundation migration', () => {
     const result = await context.pool.query<{ table_name: string }>(`
       SELECT table_schema || '.' || table_name AS table_name
       FROM information_schema.tables
-      WHERE table_schema IN ('booking', 'system')
+      WHERE table_schema IN ('back_office', 'booking', 'system')
         AND table_type = 'BASE TABLE'
       ORDER BY table_schema, table_name
     `);
 
     expect(result.rows.map(({ table_name: tableName }) => tableName)).toEqual([
+      'back_office.expense_categories',
+      'back_office.expenses',
+      'back_office.salary_payments',
+      'back_office.supplies',
+      'back_office.supply_restocks',
+      'back_office.withdrawals',
       'booking.attendance_records',
       'booking.availability_blocks',
       'booking.bookings',
