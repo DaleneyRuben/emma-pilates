@@ -8,6 +8,7 @@ describe('resolveAuthenticatedPrincipal', () => {
   const activeSession = {
     id: 'authentication-session-id',
     accountId: 'account-id',
+    surface: 'mobile' as const,
     createdAt: new Date('2026-08-30T12:00:00.000Z'),
     idleExpiresAt: new Date('2026-09-30T12:00:00.000Z'),
     absoluteExpiresAt: new Date('2026-11-28T12:00:00.000Z'),
@@ -120,6 +121,104 @@ describe('resolveAuthenticatedPrincipal', () => {
       authenticationSessionId: 'authentication-session-id',
       activityAt: now,
       idleExpiresAt: absoluteExpiresAt,
+    });
+  });
+
+  describe('admin-web Authentication Sessions', () => {
+    const adminWebSession = {
+      ...activeSession,
+      surface: 'admin_web' as const,
+      clientId: null,
+      staffMember: {
+        id: 'staff-member-id',
+        role: 'ADMINISTRATOR',
+        branchIds: [],
+      },
+      idleExpiresAt: new Date('2026-08-31T12:20:00.000Z'),
+      absoluteExpiresAt: new Date('2026-08-31T20:00:00.000Z'),
+    };
+
+    it('extends meaningful browser activity by 30 minutes', async () => {
+      const recordMeaningfulActivity = jest.fn().mockResolvedValue(undefined);
+
+      await expect(
+        resolveAuthenticatedPrincipal(
+          'opaque-credential',
+          true,
+          {
+            digestCredential: () => Buffer.from('credential-digest'),
+            findSessionByCredentialDigest: jest
+              .fn()
+              .mockResolvedValue(adminWebSession),
+            recordMeaningfulActivity,
+            now: () => now,
+          },
+          'admin_web',
+        ),
+      ).resolves.toEqual({
+        accountId: 'account-id',
+        authenticationSessionId: 'authentication-session-id',
+        identity: {
+          kind: 'staff',
+          staffMemberId: 'staff-member-id',
+          role: 'administrator',
+          branchIds: [],
+        },
+      });
+      expect(recordMeaningfulActivity).toHaveBeenCalledWith({
+        authenticationSessionId: 'authentication-session-id',
+        activityAt: now,
+        idleExpiresAt: new Date('2026-08-31T12:30:00.000Z'),
+      });
+    });
+
+    it('never extends browser activity past the 12-hour absolute expiry', async () => {
+      const recordMeaningfulActivity = jest.fn().mockResolvedValue(undefined);
+      const absoluteExpiresAt = new Date('2026-08-31T12:10:00.000Z');
+
+      await resolveAuthenticatedPrincipal(
+        'opaque-credential',
+        true,
+        {
+          digestCredential: () => Buffer.from('credential-digest'),
+          findSessionByCredentialDigest: jest
+            .fn()
+            .mockResolvedValue({ ...adminWebSession, absoluteExpiresAt }),
+          recordMeaningfulActivity,
+          now: () => now,
+        },
+        'admin_web',
+      );
+
+      expect(recordMeaningfulActivity).toHaveBeenCalledWith(
+        expect.objectContaining({ idleExpiresAt: absoluteExpiresAt }),
+      );
+    });
+
+    it.each([
+      ['a mobile session presented by the browser', activeSession, 'admin_web'],
+      [
+        'a browser session presented as a bearer credential',
+        adminWebSession,
+        'mobile',
+      ],
+    ] as const)('rejects %s', async (_label, session, surface) => {
+      const recordMeaningfulActivity = jest.fn();
+
+      await expect(
+        resolveAuthenticatedPrincipal(
+          'opaque-credential',
+          true,
+          {
+            digestCredential: () => Buffer.from('credential-digest'),
+            findSessionByCredentialDigest: jest.fn().mockResolvedValue(session),
+            recordMeaningfulActivity,
+            now: () => now,
+          },
+          surface,
+        ),
+      ).rejects.toBeInstanceOf(AuthenticationRequiredError);
+      expect(recordMeaningfulActivity).not.toHaveBeenCalled();
     });
   });
 });
