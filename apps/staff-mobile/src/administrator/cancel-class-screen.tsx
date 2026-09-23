@@ -1,6 +1,7 @@
 import {
   useListBranches,
   useListClassTypes,
+  useListAdministratorSessions,
   useListSessionAvailability,
   type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
@@ -66,6 +67,8 @@ function seatsTag(session: SessionAvailabilityDto): string {
   return describeCount(session.availableSeats, "cupo", "cupos");
 }
 
+const everyBranch = "every-branch";
+
 export function CancelClassScreen() {
   const navigation = useNavigation<CancelClassNavigation>();
   const fetcher = useStaffFetcher();
@@ -79,17 +82,28 @@ export function CancelClassScreen() {
   const branches = useListBranches({ fetcher });
   const classTypes = useListClassTypes({ fetcher });
   const branchList = branches.data?.status === 200 ? branches.data.data : [];
+  const allBranches = selectedBranchId === everyBranch;
   const branch =
     branchList.find((candidate) => candidate.id === selectedBranchId) ??
     branchList[0];
   const { from, until } = civilDateRange(selectedDate);
-  const sessions = useListSessionAvailability(
+  const branchSessions = useListSessionAvailability(
     { branchId: branch?.id ?? "", from, until, limit: 100 },
     {
       fetcher,
-      query: { enabled: branch !== undefined, refetchOnMount: "always" },
+      query: {
+        enabled: branch !== undefined && !allBranches,
+        refetchOnMount: "always",
+      },
     },
   );
+  // API-002: an Administrator acts on every Branch, so one search spans them.
+  const everySession = useListAdministratorSessions(
+    { from, until, limit: 100 },
+    { fetcher, query: { enabled: allBranches, refetchOnMount: "always" } },
+  );
+  const sessions = allBranches ? everySession : branchSessions;
+  const branchLabel = allBranches ? "Todas las sucursales" : (branch?.name ?? "");
 
   const header = (
     <>
@@ -132,18 +146,26 @@ export function CancelClassScreen() {
     <Screen style={styles.screen}>
       {header}
       <Pressable
-        accessibilityLabel={`Sucursal: ${branch.name}`}
+        accessibilityLabel={`Sucursal: ${branchLabel}`}
         accessibilityRole="button"
         onPress={() => setChoosingBranch((current) => !current)}
         style={styles.branchRow}
       >
         <BodyText style={styles.branchLabel}>Sucursal:</BodyText>
-        <Text style={styles.branchName}>{branch.name}</Text>
+        <Text style={styles.branchName}>{branchLabel}</Text>
         <Text style={styles.chevron}>{choosingBranch ? "▴" : "▾"}</Text>
       </Pressable>
       {choosingBranch ? (
         <View style={styles.branchList}>
           <BodyText>Elige una sucursal</BodyText>
+          <Chip
+            label="Todas las sucursales"
+            onPress={() => {
+              setSelectedBranchId(everyBranch);
+              setChoosingBranch(false);
+            }}
+            selected={allBranches}
+          />
           {branchList.map((candidate) => (
             <Chip
               key={candidate.id}
@@ -152,7 +174,7 @@ export function CancelClassScreen() {
                 setSelectedBranchId(candidate.id);
                 setChoosingBranch(false);
               }}
-              selected={candidate.id === branch.id}
+              selected={!allBranches && candidate.id === branch.id}
             />
           ))}
         </View>
@@ -227,12 +249,15 @@ export function CancelClassScreen() {
             const full = session.availableSeats === 0;
             return (
               <Pressable
-                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
+                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}${allBranches ? ` · ${session.branchName}` : ""}`}
                 accessibilityRole="button"
                 key={session.id}
                 onPress={() =>
                   navigation.navigate("CancelSession", {
-                    session: { ...session, branchName: branch.name },
+                    session: {
+                      ...session,
+                      branchName: allBranches ? session.branchName : branch.name,
+                    },
                   })
                 }
                 style={styles.card}
@@ -242,7 +267,11 @@ export function CancelClassScreen() {
                     {formatTimeRange(session.startsAt, session.endsAt)}
                   </Text>
                   <Text style={styles.cardTitle}>{session.classTypeName}</Text>
-                  <Text style={styles.trainer}>{session.trainerName}</Text>
+                  <Text style={styles.trainer}>
+                    {allBranches
+                      ? `${session.trainerName} · ${session.branchName}`
+                      : session.trainerName}
+                  </Text>
                   <BodyText>
                     {describeCount(session.bookedCount, "reserva", "reservas")}
                   </BodyText>
