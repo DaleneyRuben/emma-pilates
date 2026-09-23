@@ -10,7 +10,7 @@ you are starting with no project knowledge.
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10) | The Evaluation screens (MOB-016), the Promotions carousel, and push notifications are not built yet |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | The Nutritionist destination is still a placeholder (its APIs are ready, see Test 7) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The Client and Staff Evaluation screens are built in MOB-016; reminders need the worker and real time to pass |
-| Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions only move forward when you re-run the command (no Session reconciler yet, BKM-003); Promotions and receipt images wait for image delivery |
+| Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); Promotions and receipt images wait for image delivery |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
 | Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The captured verification email does not have a beginner-facing inbox yet                                                                                     |
@@ -391,9 +391,14 @@ Evaluation slots, and these active Accounts. Every fixture Account uses the pass
 | `paola.mendoza@example.com`  | Administrator | Covers every Branch                           |
 | `gabriela.flores@example.com`| Nutritionist  | Assigned to Centro                            |
 
-The 30-day window starts on the day you run the command. Nothing extends
-Sessions afterwards yet (BKM-003), so re-run the command every few days; the
-worker extends Evaluation slots by itself every hour.
+The 30-day window starts on the day you run the command. With the worker
+running (`pnpm --filter @pilates/backend start:worker`), it fills every Session
+Schedule and Availability Block up to 30 days ahead when it starts and again
+every hour, so you no longer need to re-run the command to keep classes ahead.
+It only adds Sessions: it never moves, reopens, or deletes one, skips a
+Session that would overlap another at the same Branch or for the same Trainer,
+and ignores schedules at an archived Branch, for an archived Class Type, or
+whose Trainer is not assigned to that Branch.
 
 These fixtures exist only for your local `emma_pilates` database. Never load
 them into a shared-development or production database.
@@ -1139,9 +1144,9 @@ The following are not ready for manual product testing:
   Test 9; buying a Plan works, see Test 10);
 - the Nutritionist agenda, Mi disponibilidad, and the Client Evaluation
   screens in the apps (their APIs work, see Test 7; the screens are MOB-016);
-- Sessions beyond the fixtures' 30-day window, automatic cancellation of
-  Sessions with no Bookings two hours before, and Waitlists closing when a
-  Session starts (BKM-003, BOOK-004);
+- automatic cancellation of Sessions with no Bookings two hours before and
+  Waitlists closing when a Session starts (BOOK-004), or editing a Session
+  Schedule (ADM-001);
 - creating the first Administrator with the bootstrap command (IDN-006) or
   creating, reassigning, and deactivating Staff Members (IDN-007);
 - Promotions, image variants, and Back Office records (UPL-002, BKO-001);
