@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
-import { HealthController } from './health/health.controller';
+import { HealthModule } from './health/health.module';
 import { ProblemDetailsFilter } from './http/problem-details.filter';
 import { BookingModule } from './booking/booking.module';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -9,12 +9,12 @@ import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
+    HealthModule,
     SystemIdentityModule,
     BookingModule,
     UploadsModule,
     NotificationsModule,
   ],
-  controllers: [HealthController],
   providers: [
     {
       provide: APP_FILTER,

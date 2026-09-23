@@ -40,6 +40,8 @@ const environmentSchema = z
       .enum(['development', 'test', 'production'])
       .default('development'),
     PORT: z.coerce.number().int().positive().max(65_535).default(3100),
+    // Release identifier reported by readiness and logs (ADR-0080/0081).
+    RELEASE_ID: z.string().min(1).default('local'),
     REFERRAL_REWARD_CENTAVOS: z.coerce
       .number()
       .refine(
