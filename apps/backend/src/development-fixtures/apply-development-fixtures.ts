@@ -169,6 +169,18 @@ export const applyDevelopmentFixtures = async (
       }
 
       for (const session of fixtures.sessions) {
+        // The worker's reconciler may already hold this schedule and start
+        // under its own id; that occurrence is the same Session, so keep it.
+        const occupant = await transaction.session.findUnique({
+          where: {
+            sessionScheduleId_startsAt: {
+              sessionScheduleId: session.sessionScheduleId,
+              startsAt: session.startsAt,
+            },
+          },
+          select: { id: true },
+        });
+        if (occupant !== null && occupant.id !== session.id) continue;
         // Scheduled times follow the schedule; state, capacity, and
         // cancellations belong to the running system and are kept.
         await transaction.session.upsert({
