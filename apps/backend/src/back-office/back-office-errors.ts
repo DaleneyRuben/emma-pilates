@@ -12,6 +12,10 @@ export type BackOfficeErrorCode =
   | 'date_in_future'
   | 'staff_member_not_found'
   | 'salary_payment_not_found'
+  | 'expense_not_found'
+  | 'expense_category_not_found'
+  | 'expense_category_name_taken'
+  | 'expense_category_in_use'
   | 'idempotency_key_reused';
 
 const statuses: Record<BackOfficeErrorCode, number> = {
@@ -26,6 +30,10 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   date_in_future: 400,
   staff_member_not_found: 404,
   salary_payment_not_found: 404,
+  expense_not_found: 404,
+  expense_category_not_found: 404,
+  expense_category_name_taken: 409,
+  expense_category_in_use: 409,
   idempotency_key_reused: 409,
 };
 
