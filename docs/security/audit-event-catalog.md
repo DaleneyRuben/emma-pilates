@@ -29,6 +29,11 @@ beyond what the table below names.
 | `client_invitation.cancelled` | System Identity | A pending invitation without activity is removed | Staff Account and Role | `account` | — | `email` (the removed Account no longer exists) |
 | `administrator_bootstrap.created` | System Identity | The bootstrap command creates the first, pending Administrator | `bootstrap` | `account` | — | — |
 | `administrator_bootstrap.activation_resent` | System Identity | The bootstrap command reissues the pending Administrator's link | `bootstrap` | `account` | — | — |
+| `staff_member.created` | Booking & Membership | An Administrator creates a Staff Member with a pending Account | Administrator | `account` | — | `role`, `branchIds` |
+| `staff_member.activation_resent` | Booking & Membership | An Administrator reissues a pending Staff Member's Activation Link | Administrator | `account` | — | — |
+| `staff_member.role_changed` | Booking & Membership | An Administrator changes a Staff Member's Role | Administrator | `account` | — | `previousRole`, `role` |
+| `staff_member.branches_changed` | Booking & Membership | An Administrator assigns or removes Branches | Administrator | `account` | — | `added`, `removed` |
+| `staff_member.deactivated` | Booking & Membership | An Administrator deactivates a Staff Member (Account disabled, sessions revoked) | Administrator | `account` | — | `role` |
 | `payment.transfer_confirmed` | Booking & Membership | An Administrator confirms a transfer Payment | Administrator | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.transfer_rejected` | Booking & Membership | An Administrator rejects a transfer Payment | Administrator | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.cash_confirmed` | Booking & Membership | An Assistant or Administrator records a cash Payment | Staff Account and Role | `payment` | Collection Branch | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
@@ -36,9 +41,7 @@ beyond what the table below names.
 | `session.cancelled` | Booking & Membership | An Administrator cancels a Session with Bookings (last resort) | Administrator | `session` | Session Branch | `cause`, `cancelledBookings`, `closedWaitlistEntries` |
 | `evaluation.cancelled_by_staff` | Booking & Membership | The Nutritionist or an Administrator cancels a booked Evaluation | Staff Account and Role | `evaluation` | Slot Branch | `cause`, `insideClientWindow` |
 
-Staff-management codes (Staff Member creation, Role change, Branch assignment
-and removal, activation status, deactivation) are added by IDN-007 when those
-commands exist; Back Office money records are decided in BKO-001.
+Back Office money records are decided in BKO-001.
 
 ## Considered and not audited
 
