@@ -137,7 +137,7 @@ describe('booking catalog concurrent writes', () => {
       [randomUUID(), ...references],
       [randomUUID(), ...references],
       '23505',
-      'sessions_session_schedule_id_starts_at_key',
+      'sessions_session_schedule_id_occurrence_starts_at_key',
     );
     expect(
       await prisma.session.count({ where: { sessionScheduleId: scheduleId } }),
