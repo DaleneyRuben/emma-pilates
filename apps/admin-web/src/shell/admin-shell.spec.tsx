@@ -1,7 +1,7 @@
-import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
-import { render, screen, within } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { createAdminRouter } from "../app/router";
+import { screen, within } from "@testing-library/react";
+import { server, useMockServer } from "../test/msw";
+import { renderAdmin } from "../test/render-admin";
+import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
 import type { Branch } from "./branch/branch-context";
 
@@ -11,14 +11,10 @@ const branches: Branch[] = [
   { id: "urubo", name: "Urubó", address: "Condominio Los Tajibos" },
 ];
 
-const renderShell = (path = "/") => {
-  const router = createAdminRouter({
-    history: createMemoryHistory({ initialEntries: [path] }),
-    branches,
-  });
-  render(<RouterProvider router={router} />);
-  return { router, user: userEvent.setup() };
-};
+const renderShell = (path = "/") => renderAdmin(path, { branches });
+
+useMockServer();
+beforeEach(() => server.use(...signedInHandlers()));
 
 const heading = (name: string) =>
   screen.findByRole("heading", { level: 1, name });

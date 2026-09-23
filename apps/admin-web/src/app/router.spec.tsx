@@ -1,15 +1,10 @@
-import { createMemoryHistory, RouterProvider } from "@tanstack/react-router";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
+import { server, useMockServer } from "../test/msw";
+import { renderAdmin } from "../test/render-admin";
+import { signedInHandlers } from "../test/session-handlers";
 import { navigationGroups, navigationItems } from "./navigation";
-import { createAdminRouter } from "./router";
 
-const renderAt = (path: string) => {
-  const router = createAdminRouter({
-    history: createMemoryHistory({ initialEntries: [path] }),
-  });
-  render(<RouterProvider router={router} />);
-  return router;
-};
+const renderAt = (path: string) => renderAdmin(path).router;
 
 describe("admin navigation", () => {
   it("lists the sidebar exactly as the invariants checklist orders it, without Descuentos", () => {
@@ -75,6 +70,9 @@ describe("admin navigation", () => {
 });
 
 describe("admin routes", () => {
+  useMockServer();
+  beforeEach(() => server.use(...signedInHandlers()));
+
   it.each(navigationItems.map((item) => [item.to, item.label] as const))(
     "renders a placeholder page for %s",
     async (path, label) => {
