@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
-import { Dimensions } from "react-native";
+import { Dimensions, Keyboard } from "react-native";
 
 import { jsonResponse } from "../test-support";
 import {
@@ -72,7 +72,12 @@ describe("Assistant flows on a tablet", () => {
   });
 
   it("shows the Client overview, Bookings, and history beside the search instead of navigating away", async () => {
+    const dismissKeyboard = jest.spyOn(Keyboard, "dismiss");
     const screen = await selectLucia(assistantRoutes());
+
+    // The panel stays beside a focused search field, so selecting a Client
+    // dismisses the keyboard; otherwise the panel's first tap only closes it.
+    expect(dismissKeyboard).toHaveBeenCalled();
 
     expect(screen.getByPlaceholderText(searchField)).toBeOnTheScreen();
     expect(screen.queryByText(emptyPanel)).toBeNull();
