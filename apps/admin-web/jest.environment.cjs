@@ -21,9 +21,16 @@ const nodeGlobals = [
   "structuredClone",
 ];
 
+// Node's fetch rejects jsdom's AbortSignal, and TanStack Query passes one to
+// every query, so the abort pair must come from Node as well.
+const replacedGlobals = ["AbortController", "AbortSignal"];
+
 class AdminWebTestEnvironment extends TestEnvironment {
   constructor(config, context) {
     super(config, context);
+    for (const name of replacedGlobals) {
+      this.global[name] = globalThis[name];
+    }
     for (const name of nodeGlobals) {
       if (this.global[name] === undefined && globalThis[name] !== undefined) {
         this.global[name] = globalThis[name];
