@@ -286,4 +286,42 @@ describe('Prisma payment commands', () => {
       }),
     ).resolves.toBe(1);
   });
+
+  it('writes the idempotency record from the injected clock even when it lies far in the past', async () => {
+    const pastNow = new Date('2026-09-01T15:00:00.000Z');
+    const account = await prisma.account.create({
+      data: {
+        email: 'past-clock@example.com',
+        client: { create: { name: 'Pasada', referralCode: 'PASADA' } },
+      },
+      select: { id: true, clientId: true },
+    });
+    const principal: AuthenticatedPrincipal = {
+      accountId: account.id,
+      authenticationSessionId: randomUUID(),
+      identity: { kind: 'client', clientId: account.clientId! },
+    };
+    const key = randomUUID();
+
+    await createPrismaPaymentCommands(prisma, {
+      now: () => pastNow,
+      referralRewardCentavos: 6000,
+    }).createPurchaseIntent({ planId: plan.id }, principal, key);
+
+    await expect(
+      prisma.idempotencyRecord.findUniqueOrThrow({
+        where: {
+          accountId_command_idempotencyKey: {
+            accountId: account.id,
+            command: 'create_purchase_intent',
+            idempotencyKey: key,
+          },
+        },
+        select: { createdAt: true, expiresAt: true },
+      }),
+    ).resolves.toEqual({
+      createdAt: pastNow,
+      expiresAt: new Date('2026-09-04T15:00:00.000Z'),
+    });
+  });
 });
