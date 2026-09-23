@@ -33,7 +33,9 @@ type ProfileNavigation = {
       | "Notifications"
       | "ChangePassword"
       | "Referrals"
-      | "Credit",
+      | "Credit"
+      | "EvaluationAvailability"
+      | "MyEvaluations",
   ) => void;
 };
 
@@ -139,6 +141,14 @@ export function ProfileScreen() {
                 ? undefined
                 : subscriptionBadge(status)
             }
+          />
+          <MenuRow
+            label="Evaluación nutricional"
+            onPress={() => navigation.navigate("EvaluationAvailability")}
+          />
+          <MenuRow
+            label="Mis evaluaciones"
+            onPress={() => navigation.navigate("MyEvaluations")}
           />
           <MenuRow
             label="Mis referidos"

@@ -13,6 +13,9 @@ import { ClassHistoryScreen } from "./booking/class-history-screen";
 import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientFetcherContext } from "./client-fetcher";
+import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
+import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
+import { MyEvaluationsScreen } from "./evaluations/my-evaluations-screen";
 import { HomeScreen } from "./home/home-screen";
 import { CreditScreen } from "./payments/credit-screen";
 import { PaymentScreen } from "./payments/payment-screen";
@@ -71,6 +74,9 @@ const ProfileStack = createNativeStackNavigator({
     ChangePassword: ClientChangePasswordScreen,
     Referrals: ReferralsScreen,
     Credit: CreditScreen,
+    EvaluationAvailability: EvaluationAvailabilityScreen,
+    BookEvaluation: BookEvaluationScreen,
+    MyEvaluations: MyEvaluationsScreen,
     ...planScreens,
   },
 });
