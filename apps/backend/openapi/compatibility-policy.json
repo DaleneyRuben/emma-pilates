@@ -4,6 +4,10 @@
     "release": "pre-release: the contract committed on 2026-09-23 (no mobile release published yet)"
   },
   "adminWebOnlyOperationIds": [
+    "createAdminWebAuthenticationSession",
+    "getCurrentAdminWebAuthenticationSession",
+    "logoutAdminWebAuthenticationSession",
+    "completeAdminWebPasswordRecovery",
     "listStaffMembers",
     "createStaffMember",
     "getStaffMember",
