@@ -8,6 +8,7 @@ import {
   type BackOfficeActor,
 } from '../back-office-errors';
 import { civilText, recordBackOfficeAudit } from '../prisma-audit';
+import { requireActiveBranch } from '../booking-references';
 import { runIdempotent } from '../prisma-idempotency';
 
 type Transaction = Prisma.TransactionClient;
@@ -64,21 +65,6 @@ export const createPrismaExpenses = (
     }
     if (input.incurredOn > boliviaDate(dependencies.now())) {
       throw new BackOfficeError('date_in_future');
-    }
-  };
-
-  // Read-only dependency on booking.branches (ADR-0011).
-  const requireActiveBranch = async (
-    transaction: Transaction,
-    branchId: string,
-  ) => {
-    const branch = await transaction.branch.findUnique({
-      where: { id: branchId },
-      select: { archivedAt: true },
-    });
-    if (branch === null) throw new BackOfficeError('branch_not_found');
-    if (branch.archivedAt !== null) {
-      throw new BackOfficeError('branch_archived');
     }
   };
 

@@ -6,6 +6,7 @@ import {
   databaseCause,
   requireAdministrator,
 } from '../back-office-errors';
+import { requireActiveBranch } from '../booking-references';
 import { runIdempotent } from '../prisma-idempotency';
 
 type Transaction = Prisma.TransactionClient;
@@ -82,22 +83,6 @@ export const createPrismaSupplies = (
   prisma: PrismaClient,
   dependencies: { now: () => Date },
 ) => {
-  // Read-only dependency on booking.branches (ADR-0011): Back Office checks the
-  // Branch exists and is active but never writes it.
-  const requireActiveBranch = async (
-    database: Transaction | PrismaClient,
-    branchId: string,
-  ) => {
-    const branch = await database.branch.findUnique({
-      where: { id: branchId },
-      select: { archivedAt: true },
-    });
-    if (branch === null) throw new BackOfficeError('branch_not_found');
-    if (branch.archivedAt !== null) {
-      throw new BackOfficeError('branch_archived');
-    }
-  };
-
   const findSupply = async (
     database: Transaction | PrismaClient,
     supplyId: string,
