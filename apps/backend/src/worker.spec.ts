@@ -1,7 +1,12 @@
 import { WORKER_HEARTBEAT_INTERVAL_MS } from './jobs/worker-heartbeat';
 import { startWorker, type WorkerBoss } from './worker';
 
-const evaluationJobs = () => ({
+const occurrenceJobs = () => ({
+  sessionSchedules: {
+    execute: jest
+      .fn()
+      .mockResolvedValue({ schedules: 0, created: 0, skipped: 0 }),
+  },
   evaluationSlots: {
     execute: jest.fn().mockResolvedValue({ blocks: 0, created: 0, skipped: 0 }),
   },
@@ -60,7 +65,7 @@ describe('worker entrypoint', () => {
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
-      ...evaluationJobs(),
+      ...occurrenceJobs(),
       serviceVersion: '1.2.3',
       emit,
     });
@@ -121,7 +126,7 @@ describe('worker entrypoint', () => {
       imageUploadCleanup,
       subscriptionReminders,
       purchaseIntentExpiry,
-      ...evaluationJobs(),
+      ...occurrenceJobs(),
       serviceVersion: '1.2.3',
       emit: jest.fn(),
     };
@@ -186,7 +191,7 @@ describe('worker entrypoint', () => {
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
-      ...evaluationJobs(),
+      ...occurrenceJobs(),
       serviceVersion: '1.2.3',
       emit,
     });
@@ -243,7 +248,7 @@ describe('worker entrypoint', () => {
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
-      ...evaluationJobs(),
+      ...occurrenceJobs(),
       serviceVersion: '1.2.3',
       emit,
     });
@@ -300,7 +305,7 @@ describe('worker entrypoint', () => {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
       imageUploadCleanup,
-      ...evaluationJobs(),
+      ...occurrenceJobs(),
       serviceVersion: '1.2.3',
       emit,
     });
@@ -316,6 +321,73 @@ describe('worker entrypoint', () => {
     );
 
     await stopWorker();
+  });
+
+  it('materializes Sessions at start and hourly with a sanitized failure signal', async () => {
+    jest.useFakeTimers();
+    const boss: WorkerBoss = {
+      isInstalled: jest.fn().mockResolvedValue(true),
+      schemaVersion: jest.fn().mockResolvedValue(38),
+      start: jest.fn().mockResolvedValue(undefined),
+      work: jest.fn().mockResolvedValue('worker-id'),
+      getQueueStats: jest.fn().mockResolvedValue([]),
+      stop: jest.fn().mockResolvedValue(undefined),
+    };
+    const sessionSchedules = {
+      execute: jest
+        .fn()
+        .mockResolvedValueOnce({ schedules: 9, created: 40, skipped: 0 })
+        .mockRejectedValueOnce(new Error('sensitive session failure'))
+        .mockResolvedValue({ schedules: 9, created: 0, skipped: 40 }),
+    };
+    const emit = jest.fn();
+
+    const stopWorker = await startWorker({
+      boss,
+      authenticationEmail: {
+        stateReader: { find: jest.fn() },
+        decryptor: { decrypt: jest.fn() },
+        renderer: { render: jest.fn() },
+        delivery: { deliver: jest.fn() },
+      },
+      finalizeUpload: { process: jest.fn() },
+      pendingAccountCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      imageUploadCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
+      },
+      ...occurrenceJobs(),
+      sessionSchedules,
+      serviceVersion: '1.2.3',
+      emit,
+    });
+
+    expect(sessionSchedules.execute).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(59 * 60 * 1_000);
+    expect(sessionSchedules.execute).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(60 * 1_000);
+    expect(sessionSchedules.execute).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledWith({
+      event: 'session_materialization_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(JSON.stringify(emit.mock.calls)).not.toContain('sensitive');
+
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    expect(sessionSchedules.execute).toHaveBeenCalledTimes(3);
+
+    await stopWorker();
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    expect(sessionSchedules.execute).toHaveBeenCalledTimes(3);
   });
 
   it('materializes Evaluation slots at start and hourly and sweeps Evaluation reminders every minute', async () => {
@@ -365,6 +437,7 @@ describe('worker entrypoint', () => {
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
+      sessionSchedules: occurrenceJobs().sessionSchedules,
       evaluationSlots,
       evaluationReminders,
       serviceVersion: '1.2.3',
