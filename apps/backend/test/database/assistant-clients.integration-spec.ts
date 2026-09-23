@@ -80,6 +80,29 @@ describe('Assistant Client repository', () => {
     ).resolves.toEqual([expect.objectContaining({ id: sofia.id })]);
   });
 
+  it('ignores accents on names and emails, and treats LIKE wildcards literally', async () => {
+    await expect(
+      repository().searchClients({ query: 'lucia fer', limit: 20 }),
+    ).resolves.toEqual([expect.objectContaining({ id: lucia.id })]);
+    await expect(
+      repository().searchClients({ query: 'GUZMAN', limit: 20 }),
+    ).resolves.toEqual([expect.objectContaining({ id: sofia.id })]);
+    await prisma.account.update({
+      where: { clientId: valeria.id },
+      data: { email: 'valeria.quiróga@example.com' },
+    });
+    await expect(
+      repository().searchClients({ query: 'quiroga@', limit: 20 }),
+    ).resolves.toEqual([expect.objectContaining({ id: valeria.id })]);
+    await prisma.account.update({
+      where: { clientId: valeria.id },
+      data: { email: 'valeria@example.com' },
+    });
+    await expect(
+      repository().searchClients({ query: '%_', limit: 20 }),
+    ).resolves.toEqual([]);
+  });
+
   it('orders matches by name and honours the limit', async () => {
     const all = await repository().searchClients({
       query: 'example.com',
