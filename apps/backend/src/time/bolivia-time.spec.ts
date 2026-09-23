@@ -22,9 +22,9 @@ describe('Bolivia civil date', () => {
 
 describe('Bolivia wall-clock instants', () => {
   it('converts a Bolivia date and minute of day through the tz database', () => {
-    expect(boliviaInstant(new Date('2026-09-28T00:00:00.000Z'), 9 * 60)).toEqual(
-      new Date('2026-09-28T13:00:00.000Z'),
-    );
+    expect(
+      boliviaInstant(new Date('2026-09-28T00:00:00.000Z'), 9 * 60),
+    ).toEqual(new Date('2026-09-28T13:00:00.000Z'));
     expect(
       boliviaInstant(new Date('2026-09-30T00:00:00.000Z'), 23 * 60 + 15),
     ).toEqual(new Date('2026-10-01T03:15:00.000Z'));

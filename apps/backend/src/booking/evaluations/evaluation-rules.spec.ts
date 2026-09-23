@@ -48,12 +48,36 @@ describe('Availability Block values', () => {
   });
 
   it.each([
-    { weekday: 0, startMinutes: minutes('09:00'), endMinutes: minutes('10:00') },
-    { weekday: 8, startMinutes: minutes('09:00'), endMinutes: minutes('10:00') },
-    { weekday: 1, startMinutes: minutes('10:00'), endMinutes: minutes('09:00') },
-    { weekday: 1, startMinutes: minutes('09:00'), endMinutes: minutes('09:30') },
-    { weekday: 1, startMinutes: minutes('09:10'), endMinutes: minutes('10:00') },
-    { weekday: 1, startMinutes: minutes('09:00'), endMinutes: minutes('10:05') },
+    {
+      weekday: 0,
+      startMinutes: minutes('09:00'),
+      endMinutes: minutes('10:00'),
+    },
+    {
+      weekday: 8,
+      startMinutes: minutes('09:00'),
+      endMinutes: minutes('10:00'),
+    },
+    {
+      weekday: 1,
+      startMinutes: minutes('10:00'),
+      endMinutes: minutes('09:00'),
+    },
+    {
+      weekday: 1,
+      startMinutes: minutes('09:00'),
+      endMinutes: minutes('09:30'),
+    },
+    {
+      weekday: 1,
+      startMinutes: minutes('09:10'),
+      endMinutes: minutes('10:00'),
+    },
+    {
+      weekday: 1,
+      startMinutes: minutes('09:00'),
+      endMinutes: minutes('10:05'),
+    },
     { weekday: 1, startMinutes: minutes('09:00'), endMinutes: 24 * 60 },
   ])('rejects %o as an invalid range', (values) => {
     expect(codeOf(() => assertBlockValues(values))).toBe(
@@ -64,7 +88,10 @@ describe('Availability Block values', () => {
   it('counts back-to-back 45-minute slots and drops a shorter remainder', () => {
     expect(slotsPerWeek(mondayMorning)).toBe(5);
     expect(
-      slotsPerWeek({ startMinutes: minutes('09:00'), endMinutes: minutes('12:00') }),
+      slotsPerWeek({
+        startMinutes: minutes('09:00'),
+        endMinutes: minutes('12:00'),
+      }),
     ).toBe(4);
   });
 });
@@ -222,8 +249,12 @@ describe('Evaluation reminders', () => {
 
   it('sends the day reminder from 24 hours before until the hour reminder is due', () => {
     expect(dueReminders(booked, at('2026-09-27T12:59:59.999Z'))).toEqual([]);
-    expect(dueReminders(booked, at('2026-09-27T13:00:00.000Z'))).toEqual(['day']);
-    expect(dueReminders(booked, at('2026-09-28T11:59:59.999Z'))).toEqual(['day']);
+    expect(dueReminders(booked, at('2026-09-27T13:00:00.000Z'))).toEqual([
+      'day',
+    ]);
+    expect(dueReminders(booked, at('2026-09-28T11:59:59.999Z'))).toEqual([
+      'day',
+    ]);
   });
 
   it('supersedes an overdue day reminder with the hour reminder until the start', () => {
