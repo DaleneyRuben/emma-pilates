@@ -1,0 +1,28 @@
+# Critical journey: the Trainer sees Mi agenda and reaches the inbox and Perfil.
+appId: ${APP_ID}
+env:
+  EMAIL: emma.vargas@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Tu cuenta"
+    timeout: 30000
+- swipe:
+    start: "88%,10%"
+    end: "12%,88%"
+- extendedWaitUntil:
+    visible:
+      text: "No tienes clases este día.|.*Pilates"
+    timeout: 15000
+- takeScreenshot: staff-trainer-agenda
+- tapOn: "Tu cuenta"
+- extendedWaitUntil:
+    visible:
+      text: "Notificaciones.*"
+    timeout: 15000
+- tapOn:
+    text: "Notificaciones.*"
+- extendedWaitUntil:
+    visible:
+      text: "Sin leer|Anteriores|No tienes notificaciones."
+    timeout: 15000

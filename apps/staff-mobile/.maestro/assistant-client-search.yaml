@@ -1,0 +1,26 @@
+# Critical journey: the Assistant finds a Client and opens her overview.
+appId: ${APP_ID}
+env:
+  EMAIL: camila.rojas@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Tu cuenta"
+    timeout: 30000
+- swipe:
+    start: "88%,10%"
+    end: "12%,88%"
+- tapOn: "Buscar por nombre, teléfono o correo"
+- inputText: "Lucía"
+- extendedWaitUntil:
+    visible:
+      text: ".*Lucía Fernández.*"
+    timeout: 15000
+- tapOn:
+    text: ".*Lucía Fernández.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      text: "Historial.*|Reservas.*"
+    timeout: 15000
+- takeScreenshot: staff-assistant-overview

@@ -1,0 +1,48 @@
+# Critical journey: the Nutritionist publishes a weekly block and removes it.
+appId: ${APP_ID}
+env:
+  EMAIL: gabriela.flores@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Mi disponibilidad"
+    timeout: 30000
+- swipe:
+    start: "88%,10%"
+    end: "12%,88%"
+- takeScreenshot: staff-nutritionist-agenda
+- tapOn: "Mi disponibilidad"
+- extendedWaitUntil:
+    visible: "Nuevo horario"
+    timeout: 15000
+- tapOn:
+    text: "Nuevo horario"
+    index: 0
+- extendedWaitUntil:
+    visible: "A partir del"
+    timeout: 10000
+- tapOn: "Viernes"
+- tapOn: "Hora de inicio: Elegir"
+- tapOn: "10:00"
+- tapOn: "Hora de fin: Elegir"
+- tapOn: "11:30"
+- assertVisible: "2 turnos de 45 min"
+- tapOn: "Guardar"
+- extendedWaitUntil:
+    visible: "Editar horario Viernes, 10:00 – 11:30"
+    timeout: 15000
+- tapOn: "Editar horario Viernes, 10:00 – 11:30"
+- extendedWaitUntil:
+    visible: "Aplicar cambios desde"
+    timeout: 10000
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- tapOn: "Eliminar horario"
+- extendedWaitUntil:
+    visible: "¿Quitar este horario?"
+    timeout: 5000
+- tapOn: "Quitar horario"
+- extendedWaitUntil:
+    visible: "Horarios semanales"
+    timeout: 10000

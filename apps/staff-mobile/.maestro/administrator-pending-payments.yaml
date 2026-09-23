@@ -1,0 +1,23 @@
+# Critical journey: the Administrator lands on Pagos pendientes and opens the
+# Session cancellation search without changing anything.
+appId: ${APP_ID}
+env:
+  EMAIL: paola.mendoza@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Pagos pendientes"
+    timeout: 30000
+- swipe:
+    start: "88%,10%"
+    end: "12%,88%"
+- extendedWaitUntil:
+    visible:
+      text: "Por confirmar|No hay pagos pendientes."
+    timeout: 20000
+- takeScreenshot: staff-admin-payments
+- tapOn: "Cancelar una clase"
+- extendedWaitUntil:
+    visible:
+      text: "Sucursal: .*"
+    timeout: 20000
