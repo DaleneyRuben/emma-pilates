@@ -42,6 +42,7 @@ beyond what the table below names.
 | `payment.cash_confirmed` | Booking & Membership | An Assistant or Administrator records a cash Payment | Staff Account and Role | `payment` | Collection Branch | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `payment.credit_only_confirmed` | Booking & Membership | A Client completes a purchase entirely with Credit | Client Account | `payment` | — | `method`, `priorState`, `newState`, `amountDueCentavos`, `creditAppliedCentavos` |
 | `session.cancelled` | Booking & Membership | An Administrator cancels a Session with Bookings (last resort) | Administrator | `session` | Session Branch | `cause`, `cancelledBookings`, `closedWaitlistEntries` |
+| `session.updated` | Booking & Membership | An Administrator edits one Session (Trainer swap, new start, or capacity) | Administrator | `session` | Session Branch | previous and new `trainerStaffMemberId`, `startsAt`, `capacity` (only those changed) |
 | `evaluation.cancelled_by_staff` | Booking & Membership | The Nutritionist or an Administrator cancels a booked Evaluation | Staff Account and Role | `evaluation` | Slot Branch | `cause`, `insideClientWindow` |
 
 Back Office money records are decided in BKO-001.
@@ -53,6 +54,7 @@ Back Office money records are decided in BKO-001.
 | Login success, failure, and throttling | Throttle events already record the security signal; a success audit per sign-in would be high-volume routine activity. |
 | Logout of the current Authentication Session | The Account ends its own sign-in; the session row keeps `revoked_at` and the reason. |
 | Client registration and email verification | Routine self-service; the Account row records the timestamps. |
+| Session Schedule create, replace, end (cancelling unbooked Sessions as `schedule_changed`) | The schedule rows keep their effective range and the cancelled Sessions record the actor; no booked class changes. |
 | Client Booking, cancellation, Reschedule, Waitlist join/leave | Routine Client activity (ADR-0055); `created_by`/`cancelled_by`/`rescheduled_by` Account columns keep who acted, including an Assistant acting for a Client. |
 | Trainer Attendance | A reporting record with `recorded_by` and no money or access effect. |
 | Automatic empty-Session cancellation, Waitlist closure, Purchase Intent expiry | System sweeps with no human actor; the rows record cause and time (BOOK-001, BOOK-004, PAY-002). |
