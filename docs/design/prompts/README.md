@@ -151,6 +151,7 @@ Each of these was sent as the next message in the existing design session for th
 | [41](./followups/41-availability-form-effective-date-and-branch.md) | Adds `S17`'s «A partir del» date, a Branch picker for multi-Branch Nutritionists, and the «ya reservadas se mantienen» confirmation (NUT-001 D3, D6) | 🕓 pending |
 | [42](./followups/42-availability-list-dates-and-branch.md) | Shows «Desde» / «Hasta» dates and the Branch on `S16`'s block cards (NUT-001 D3, D6) | 🕓 pending |
 | [43](./followups/43-evaluation-availability-months-and-branch.md) | Makes `13`'s monthly rule per appointment month, shows the Branch per turno, closes turnos 3 h before start, and adds the no-plan state (NUT-001 D8, D11) | 🕓 pending |
+| [44](./followups/44-my-evaluations-two-upcoming-and-cancel-window.md) | Allows two upcoming cards on `15`, says a cancellation frees the month, and replaces Cancelar inside 3 h (NUT-001 D8, D9, D12) | 🕓 pending |
 
 ## Status
 
