@@ -13,6 +13,12 @@ const occurrenceJobs = () => ({
   evaluationReminders: {
     execute: jest.fn().mockResolvedValue({ sent: 0 }),
   },
+  emptySessionChecks: {
+    execute: jest.fn().mockResolvedValue({ checked: 0, cancelled: 0 }),
+  },
+  startedSessionWaitlists: {
+    execute: jest.fn().mockResolvedValue({ closed: 0 }),
+  },
 });
 
 describe('worker entrypoint', () => {
@@ -390,6 +396,98 @@ describe('worker entrypoint', () => {
     expect(sessionSchedules.execute).toHaveBeenCalledTimes(3);
   });
 
+  it('checks empty Sessions and closes started Waitlists at start and every minute with sanitized failure signals', async () => {
+    jest.useFakeTimers();
+    const boss: WorkerBoss = {
+      isInstalled: jest.fn().mockResolvedValue(true),
+      schemaVersion: jest.fn().mockResolvedValue(38),
+      start: jest.fn().mockResolvedValue(undefined),
+      work: jest.fn().mockResolvedValue('worker-id'),
+      getQueueStats: jest.fn().mockResolvedValue([]),
+      stop: jest.fn().mockResolvedValue(undefined),
+    };
+    const order: string[] = [];
+    const emptySessionChecks = {
+      execute: jest
+        .fn()
+        .mockImplementationOnce(() => {
+          order.push('empty-check');
+          return Promise.resolve({ checked: 1, cancelled: 1 });
+        })
+        .mockRejectedValueOnce(new Error('sensitive empty check failure'))
+        .mockResolvedValue({ checked: 0, cancelled: 0 }),
+    };
+    const startedSessionWaitlists = {
+      execute: jest
+        .fn()
+        .mockImplementationOnce(() => {
+          order.push('waitlist-closure');
+          return Promise.resolve({ closed: 2 });
+        })
+        .mockRejectedValueOnce(new Error('sensitive waitlist failure'))
+        .mockResolvedValue({ closed: 0 }),
+    };
+    const emit = jest.fn();
+
+    const stopWorker = await startWorker({
+      boss,
+      authenticationEmail: {
+        stateReader: { find: jest.fn() },
+        decryptor: { decrypt: jest.fn() },
+        renderer: { render: jest.fn() },
+        delivery: { deliver: jest.fn() },
+      },
+      finalizeUpload: { process: jest.fn() },
+      pendingAccountCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      imageUploadCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
+      },
+      ...occurrenceJobs(),
+      emptySessionChecks,
+      startedSessionWaitlists,
+      serviceVersion: '1.2.3',
+      emit,
+    });
+
+    // A check missed while the worker was down runs before the Waitlist of a
+    // Session that has since started is closed.
+    expect(order).toEqual(['empty-check', 'waitlist-closure']);
+
+    await jest.advanceTimersByTimeAsync(59 * 1_000);
+    expect(emptySessionChecks.execute).toHaveBeenCalledTimes(1);
+    expect(startedSessionWaitlists.execute).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(1_000);
+    expect(emptySessionChecks.execute).toHaveBeenCalledTimes(2);
+    expect(startedSessionWaitlists.execute).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledWith({
+      event: 'empty_session_check_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(emit).toHaveBeenCalledWith({
+      event: 'started_waitlist_closure_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(JSON.stringify(emit.mock.calls)).not.toContain('sensitive');
+
+    await jest.advanceTimersByTimeAsync(60 * 1_000);
+    expect(emptySessionChecks.execute).toHaveBeenCalledTimes(3);
+    expect(startedSessionWaitlists.execute).toHaveBeenCalledTimes(3);
+
+    await stopWorker();
+    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
+    expect(emptySessionChecks.execute).toHaveBeenCalledTimes(3);
+    expect(startedSessionWaitlists.execute).toHaveBeenCalledTimes(3);
+  });
+
   it('materializes Evaluation slots at start and hourly and sweeps Evaluation reminders every minute', async () => {
     jest.useFakeTimers();
     const boss: WorkerBoss = {
@@ -437,7 +535,7 @@ describe('worker entrypoint', () => {
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
-      sessionSchedules: occurrenceJobs().sessionSchedules,
+      ...occurrenceJobs(),
       evaluationSlots,
       evaluationReminders,
       serviceVersion: '1.2.3',
