@@ -10,7 +10,7 @@ you are starting with no project knowledge.
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, Plans, Plan detail, Mi plan, Perfil, and Editar perfil with the fixture Accounts | Class browsing and bookings are still placeholders; paying for a Plan from the app is not available yet |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11) | The Nutritionist destination is still a placeholder |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, and active Client and Staff Accounts with one command                            | Promotions and receipt images are not included until image delivery is specified                                                              |
-| Backend health               | Confirm that the API is running                                                                                                 | This checks only that the HTTP process is alive, not the database or worker                                                                                   |
+| Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
 | Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The captured verification email does not have a beginner-facing inbox yet                                                                                     |
 | Pending registration actions | Correct the email, request another verification email, or cancel using the continuation returned by registration                | Resend deliberately gives the same neutral response whether it sends or suppresses an email                                                                   |
@@ -196,6 +196,36 @@ The health check should show:
 ```json
 { "status": "ok" }
 ```
+
+The readiness check at
+[http://localhost:3100/health/ready](http://localhost:3100/health/ready)
+answers `{ "status": "ready", "release": "local" }` once PostgreSQL is
+reachable and every migration in `apps/backend/prisma/migrations` has been
+applied. If you pull new code without running `pnpm db:migrate:dev`, it answers
+503 with the problem code `not_ready` and names no dependency. Set `RELEASE_ID`
+before starting the API to see a different release.
+
+With the API running, the smoke check reads the same endpoints plus the
+OpenAPI document and confirms that a protected route rejects anonymous callers.
+It never books, pays, or changes anything:
+
+```sh
+cd apps/backend
+SMOKE_EXPECTED_RELEASE=local pnpm smoke
+```
+
+It prints one JSON report and exits with status 1 when any check fails; a wrong
+`SMOKE_EXPECTED_RELEASE` makes the readiness check fail with "serving release
+local, expected …".
+
+The API terminal now prints one JSON line per request with `environment`,
+`service`, `release`, `reqId`, the method, and the path (never the query
+string, headers, or body). Every response carries the same identifier in its
+`x-request-id` header; send your own `x-request-id` (8 to 128 letters, digits,
+`.`, `_`, `:`, or `-`) and it is kept. An unexpected failure answers the generic
+"An unexpected error occurred" problem and logs one error line with that
+`reqId` and only the error type, code, message, and stack. The worker prints
+its heartbeat and failure records the same way with `service` set to `worker`.
 
 Swagger is the easiest way to test the backend without learning command-line
 HTTP tools:
