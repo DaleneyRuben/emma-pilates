@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10) | The Promotions carousel and push notifications are not built yet; Evaluations are reached from Perfil (Test 15) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10) | The Promotions carousel and push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); Promotions and receipt images wait for image delivery |
@@ -1279,6 +1279,25 @@ The admin web is not built yet, so try these through Swagger or curl as
 
 You cannot change or deactivate yourself (`409 own_staff_member`) or remove the
 last active Administrator (`409 last_administrator`). Other Roles get `403`.
+
+## Test 18: Home shortcuts, Mi plan, and notification taps
+
+In the Client app as `lucia@example.com`:
+
+1. **Inicio** shows three quick actions: **Reservar una clase**, **Evaluación
+   nutricional** ("Próxima: …" when one is booked, otherwise "Agenda tu cita
+   del mes"; it opens Mis evaluaciones or the availability), and **Mis
+   referidos** ("N amigas invitadas" or "Invita y gana crédito").
+2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with dates such as
+   "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
+   termine."; while expiring, an amber banner; once expired, "Último plan",
+   "Venció el …", and **Comprar un plan**.
+3. In **Perfil → Notificaciones**, tapping an Evaluation notice opens Mis
+   evaluaciones, a class-cancelled notice opens Mis reservas, a payment notice
+   opens the payment status, and a Plan notice opens Mi plan.
+
+In the Staff app, a Trainer's "Tu clase … se canceló" notice and a
+Nutritionist's Evaluation notices open **Mi agenda**.
 
 ## What you cannot test yet
 
