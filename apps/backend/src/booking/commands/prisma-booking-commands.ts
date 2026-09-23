@@ -127,6 +127,7 @@ export class PrismaBookingCommands {
 
             throw error;
           }
+          const createdAt = this.now();
           await transaction.idempotencyRecord.create({
             data: {
               accountId: principal.accountId,
@@ -135,7 +136,8 @@ export class PrismaBookingCommands {
               requestHash,
               responseStatus: 201,
               responseBody: created,
-              expiresAt: new Date(this.now().getTime() + 24 * 60 * 60 * 1_000),
+              createdAt,
+              expiresAt: new Date(createdAt.getTime() + 24 * 60 * 60 * 1_000),
             },
           });
 
@@ -389,6 +391,7 @@ export class PrismaBookingCommands {
             command,
             principal,
           );
+          const createdAt = this.now();
           await transaction.idempotencyRecord.create({
             data: {
               accountId: principal.accountId,
@@ -397,7 +400,8 @@ export class PrismaBookingCommands {
               requestHash,
               responseStatus: 201,
               responseBody: result,
-              expiresAt: new Date(this.now().getTime() + 24 * 60 * 60 * 1_000),
+              createdAt,
+              expiresAt: new Date(createdAt.getTime() + 24 * 60 * 60 * 1_000),
             },
           });
 
