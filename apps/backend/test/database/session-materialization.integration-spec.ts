@@ -173,7 +173,7 @@ describe('Prisma Session materialization', () => {
           branch: 'centro',
           classType: 'mat',
           trainer: 'emma',
-          effectiveFrom: civil('2026-10-23'),
+          effectiveFrom: civil('2026-12-01'),
         },
       ],
     ] as const) {
