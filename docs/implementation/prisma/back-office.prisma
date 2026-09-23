@@ -1,0 +1,106 @@
+// Review-only Prisma models for BKO-001. BKO-002 commits this file as
+// apps/backend/prisma/models/back-office.prisma after approval, together with
+// the reverse relations listed in BKO-001-migration-review.md.
+
+model Supply {
+  id                 String          @id @default(uuid()) @db.Uuid
+  branchId           String          @map("branch_id") @db.Uuid
+  name               String
+  initialQuantity    Int             @map("initial_quantity")
+  quantityOnHand     Int             @map("quantity_on_hand")
+  lowStockThreshold  Int             @map("low_stock_threshold")
+  createdByAccountId String          @map("created_by_account_id") @db.Uuid
+  createdAt          DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+  archivedAt         DateTime?       @map("archived_at") @db.Timestamptz(3)
+  branch             Branch          @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  createdByAccount   Account         @relation("SupplyCreatedBy", fields: [createdByAccountId], references: [id], onDelete: Restrict)
+  withdrawals        Withdrawal[]
+  restocks           SupplyRestock[]
+
+  @@index([branchId])
+  @@index([createdByAccountId])
+  @@map("supplies")
+  @@schema("back_office")
+}
+
+model Withdrawal {
+  id                  String   @id @default(uuid()) @db.Uuid
+  supplyId            String   @map("supply_id") @db.Uuid
+  quantity            Int
+  recordedByAccountId String   @map("recorded_by_account_id") @db.Uuid
+  recordedAt          DateTime @default(now()) @map("recorded_at") @db.Timestamptz(3)
+  supply              Supply   @relation(fields: [supplyId], references: [id], onDelete: Restrict)
+  recordedByAccount   Account  @relation("WithdrawalRecordedBy", fields: [recordedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([supplyId, recordedAt])
+  @@index([recordedAt])
+  @@index([recordedByAccountId])
+  @@map("withdrawals")
+  @@schema("back_office")
+}
+
+model SupplyRestock {
+  id                  String   @id @default(uuid()) @db.Uuid
+  supplyId            String   @map("supply_id") @db.Uuid
+  quantity            Int
+  recordedByAccountId String   @map("recorded_by_account_id") @db.Uuid
+  recordedAt          DateTime @default(now()) @map("recorded_at") @db.Timestamptz(3)
+  supply              Supply   @relation(fields: [supplyId], references: [id], onDelete: Restrict)
+  recordedByAccount   Account  @relation("SupplyRestockRecordedBy", fields: [recordedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([supplyId, recordedAt])
+  @@index([recordedByAccountId])
+  @@map("supply_restocks")
+  @@schema("back_office")
+}
+
+model SalaryPayment {
+  id                  String      @id @default(uuid()) @db.Uuid
+  staffMemberId       String      @map("staff_member_id") @db.Uuid
+  amountCentavos      Int         @map("amount_centavos")
+  paidOn              DateTime    @map("paid_on") @db.Date
+  recordedByAccountId String      @map("recorded_by_account_id") @db.Uuid
+  createdAt           DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  staffMember         StaffMember @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
+  recordedByAccount   Account     @relation("SalaryPaymentRecordedBy", fields: [recordedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([paidOn])
+  @@index([staffMemberId, paidOn])
+  @@index([recordedByAccountId])
+  @@map("salary_payments")
+  @@schema("back_office")
+}
+
+model ExpenseCategory {
+  id        String    @id @default(uuid()) @db.Uuid
+  name      String
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  expenses  Expense[]
+
+  @@map("expense_categories")
+  @@schema("back_office")
+}
+
+model Expense {
+  id                  String          @id @default(uuid()) @db.Uuid
+  branchId            String          @map("branch_id") @db.Uuid
+  expenseCategoryId   String          @map("expense_category_id") @db.Uuid
+  amountCentavos      Int             @map("amount_centavos")
+  incurredOn          DateTime        @map("incurred_on") @db.Date
+  recordedByAccountId String          @map("recorded_by_account_id") @db.Uuid
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+  branch              Branch          @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  expenseCategory     ExpenseCategory @relation(fields: [expenseCategoryId], references: [id], onDelete: Restrict)
+  recordedByAccount   Account         @relation("ExpenseRecordedBy", fields: [recordedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([branchId, incurredOn])
+  @@index([incurredOn])
+  @@index([expenseCategoryId])
+  @@index([recordedByAccountId])
+  @@map("expenses")
+  @@schema("back_office")
+}
