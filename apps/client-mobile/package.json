@@ -36,7 +36,8 @@
     "ios": "expo start --ios --port 8081",
     "test": "jest",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "release:smoke": "node ../../scripts/mobile-release-smoke.mjs"
   },
   "jest": {
     "preset": "jest-expo",
