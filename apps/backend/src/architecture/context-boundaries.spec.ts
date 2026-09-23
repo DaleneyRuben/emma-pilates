@@ -22,6 +22,10 @@ const sharedContextSlices = [
   // Registration attributes the referrer inside its own transaction through
   // this Booking-owned slice (PAY-001 decision d).
   'booking/payments/referral-attribution',
+  // Staff management creates, reissues, and disables the Staff Member's
+  // Account inside its own transaction through this System Identity slice
+  // (IDN-007).
+  'system-identity/staff-accounts',
 ];
 // Shared kernel folders may depend on each other but never on a context.
 const sharedKernel = [
