@@ -1,111 +1,146 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+/*
+ * Emma Pilates design tokens (docs/design/design-system.md). The palette is
+ * closed: every color the admin web paints comes from this list. Spacing uses
+ * Tailwind's 4px scale, which already covers the 2–40px design steps
+ * (2 = 0.5, 6 = 1.5, 10 = 2.5, 14 = 3.5, 18 = 4.5, 26 = 6.5).
+ */
+@theme {
+  --color-*: initial;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --color-arena: #f2ece5;
+  --color-superficie: #faf7f2;
+  --color-blanco: #ffffff;
+  --color-superficie-sutil: #fdfaf6;
+  --color-hover-fila: #fdf7f2;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --color-primario: #b78380;
+  --color-primario-hover: #a87370;
+  --color-primario-presionado: #9c6764;
+  --color-primario-tinte: #efe0dc;
+  --color-primario-profundo: #8a5d59;
+  --color-rosa-empolvado: #d8bdb8;
+  --color-tinte-suave: #f6edeb;
+  --color-tinte-suave-calido: #f7eee9;
+
+  --color-texto: #4a4a4a;
+  --color-texto-secundario: #6e6663;
+  --color-texto-tenue: #8a807c;
+  --color-texto-muy-tenue: #a79e9a;
+
+  --color-borde-fuerte: #d8c9bb;
+  --color-borde: #e4d8cc;
+  --color-divisor: #f2ebe2;
+
+  --color-exito: #7c9473;
+  --color-exito-texto: #5f7457;
+  --color-advertencia: #c99a4e;
+  --color-advertencia-texto: #9a7434;
+  --color-error: #b25d4b;
+  --color-error-texto: #94493a;
+  --color-deshabilitado: #e7dcd8;
+  --color-deshabilitado-texto: #b3a9a5;
+
+  --color-scrim: rgba(74, 58, 48, 0.22);
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --font-serif: "Lora", ui-serif, Georgia, serif;
+  --font-sans: "Work Sans", ui-sans-serif, system-ui, sans-serif;
+
+  --text-display: 44px;
+  --text-display--line-height: 1.1;
+  --text-display--letter-spacing: -0.01em;
+  --text-titulo-1: 30px;
+  --text-titulo-1--line-height: 1.2;
+  --text-titulo-2: 22px;
+  --text-titulo-2--line-height: 1.3;
+  --text-precio: 26px;
+  --text-precio--line-height: 1.2;
+  --text-cuerpo-grande: 17px;
+  --text-cuerpo-grande--line-height: 1.65;
+  --text-cuerpo: 15px;
+  --text-cuerpo--line-height: 1.6;
+  --text-etiqueta: 12px;
+  --text-etiqueta--line-height: 1.2;
+  --text-etiqueta--letter-spacing: 0.16em;
+  --text-nota: 13px;
+  --text-nota--line-height: 1.5;
+
+  /* Admin web runs one step tighter. */
+  --text-titulo-pagina: 27px;
+  --text-titulo-pagina--line-height: 1.2;
+  --text-titulo-panel: 22px;
+  --text-titulo-panel--line-height: 1.3;
+  --text-celda: 14px;
+  --text-celda--line-height: 1.45;
+  --text-cabecera-tabla: 10.5px;
+  --text-cabecera-tabla--line-height: 1.2;
+  --text-cabecera-tabla--letter-spacing: 0.14em;
+  --text-etiqueta-campo: 10.5px;
+  --text-etiqueta-campo--line-height: 1.2;
+  --text-etiqueta-campo--letter-spacing: 0.14em;
+  --text-ayuda: 11.5px;
+  --text-ayuda--line-height: 1.4;
+  --text-fila-menu: 13.5px;
+  --text-fila-menu--line-height: 1.4;
+
+  --radius-control: 8px;
+  --radius-tarjeta: 12px;
+  --radius-panel: 10px;
+  --radius-marco: 16px;
+
+  --shadow-boton: 0 2px 6px rgba(183, 131, 128, 0.22);
+  --shadow-tarjeta-hover: 0 6px 16px rgba(74, 58, 48, 0.1);
+  --shadow-panel: -14px 0 34px rgba(74, 58, 48, 0.14);
+  --shadow-arrastre: 0 16px 32px rgba(74, 58, 48, 0.2);
+  --shadow-popover: 0 12px 28px rgba(74, 58, 48, 0.14);
+  --shadow-foco: 0 0 0 3px rgba(183, 131, 128, 0.15);
+}
+
+@layer base {
+  html {
+    background-color: var(--color-arena);
+    color: var(--color-texto);
+    font-family: var(--font-sans);
+    font-size: var(--text-cuerpo);
+    line-height: var(--text-cuerpo--line-height);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100svh;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    margin: 0;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+  }
+
+  :focus-visible {
+    outline: none;
+    border-color: var(--color-primario);
+    box-shadow: var(--shadow-foco);
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
-}
-
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
-}
-
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+@utility tabular {
+  font-variant-numeric: tabular-nums;
 }
