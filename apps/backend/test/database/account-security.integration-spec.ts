@@ -135,6 +135,19 @@ describe('Account security persistence', () => {
     await expect(
       prisma.authenticationSession.count({ where: { accountId } }),
     ).resolves.toBe(0);
+    await expect(
+      prisma.auditRecord.findMany({ where: { targetId: accountId } }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        actionCode: 'account.activated',
+        outcome: 'SUCCEEDED',
+        actorKind: 'ACCOUNT',
+        actorAccountId: accountId,
+        targetType: 'account',
+        metadata: { domainIdentity: 'client' },
+        occurredAt: completedAt,
+      }),
+    ]);
   });
 
   it('recovers a password while revoking old sessions and creating one replacement', async () => {
