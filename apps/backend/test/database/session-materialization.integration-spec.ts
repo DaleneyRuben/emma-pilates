@@ -230,12 +230,10 @@ describe('Prisma Session materialization', () => {
   });
 
   it('reruns as a no-op and never recreates or reopens a cancelled occurrence', async () => {
-    await prisma.session.update({
+    await prisma.session.updateMany({
       where: {
-        sessionScheduleId_startsAt: {
-          sessionScheduleId: idOf('schedule:monday-reformer'),
-          startsAt: at('2026-10-05T11:00:00.000Z'),
-        },
+        sessionScheduleId: idOf('schedule:monday-reformer'),
+        startsAt: at('2026-10-05T11:00:00.000Z'),
       },
       data: {
         state: 'CANCELLED',
@@ -256,6 +254,27 @@ describe('Prisma Session materialization', () => {
       startsAt: at('2026-10-05T11:00:00.000Z'),
       state: 'CANCELLED',
     });
+  });
+
+  it('never recreates the original start of an occurrence that was moved', async () => {
+    await prisma.session.updateMany({
+      where: {
+        sessionScheduleId: idOf('schedule:monday-reformer'),
+        startsAt: at('2026-10-12T11:00:00.000Z'),
+      },
+      data: {
+        startsAt: at('2026-10-12T13:00:00.000Z'),
+        endsAt: at('2026-10-12T13:50:00.000Z'),
+        isException: true,
+      },
+    });
+
+    await materializer().materializeSessions();
+
+    await expect(startsOf('monday-reformer')).resolves.not.toContain(
+      '2026-10-12T11:00:00.000Z',
+    );
+    await expect(sessionsOf('monday-reformer')).resolves.toHaveLength(4);
   });
 
   it('extends the horizon as Bolivia days pass without touching started or existing Sessions', async () => {
