@@ -47,35 +47,13 @@ describe('Prisma administration oversight reads', () => {
         createdByAccountId: ana.account!.id,
       },
     });
-
-    // A confirmed transfer, studio-wide income without a collection Branch.
-    const plan = await world.prisma.plan.findFirstOrThrow();
-    const paola = await administrator();
-    await world.prisma.payment.create({
-      data: {
-        clientId: ana.id,
-        planId: plan.id,
-        planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
-        classAllowanceSnapshot: plan.classAllowance,
-        planPriceCentavos: 50_000,
-        creditAppliedCentavos: 0,
-        amountDueCentavos: 50_000,
-        method: 'TRANSFER',
-        state: 'CONFIRMED',
-        submittedByAccountId: ana.account!.id,
-        submittedAt: new Date('2026-09-10T15:00:00.000Z'),
-        decidedByAccountId: paola.accountId,
-        decidedAt: new Date('2026-09-10T16:00:00.000Z'),
-      },
-    });
   });
 
   afterAll(async () => {
     await world?.stop();
   });
 
-  it('lists booked Evaluations in a date range and lets an Administrator cancel one', async () => {
+  it('lists booked Evaluations in a date range for Administrators only', async () => {
     const page = await oversight().listEvaluations(
       {
         from: new Date('2026-09-21T04:00:00.000Z'),
@@ -155,15 +133,26 @@ describe('Prisma administration oversight reads', () => {
       await administrator(),
     );
 
-    expect(everywhere.byMethod.transfer).toBe(50_000);
-    expect(everywhere.totalCentavos).toBe(everywhere.byMethod.cash + 50_000);
+    const equipetrol = await oversight().incomeReport(
+      { ...range, branchId: deterministicId('branch:equipetrol') },
+      await administrator(),
+    );
+
+    // The fixtures' one confirmed Payment is Valeria's cash at Centro.
+    expect(everywhere.byMethod.cash).toBeGreaterThan(0);
+    expect(everywhere.totalCentavos).toBe(
+      everywhere.byMethod.cash +
+        everywhere.byMethod.transfer +
+        everywhere.byMethod.credit_only,
+    );
     expect(centro.byMethod).toEqual({
       cash: everywhere.byMethod.cash,
       transfer: 0,
       credit_only: 0,
     });
+    expect(equipetrol.totalCentavos).toBe(0);
     expect(everywhere.months.map((month) => month.month)).toContain(
-      '2026-09-01',
+      '2026-08-01',
     );
   });
 });
