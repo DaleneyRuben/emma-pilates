@@ -183,6 +183,7 @@ export function CancelClassScreen() {
         horizontal
         contentContainerStyle={styles.chips}
         showsHorizontalScrollIndicator={false}
+        style={styles.strip}
       >
         {dates.map((date) => {
           const { weekday, day } = dayChipLabel(date);
@@ -210,6 +211,7 @@ export function CancelClassScreen() {
         horizontal
         contentContainerStyle={styles.chips}
         showsHorizontalScrollIndicator={false}
+        style={styles.strip}
       >
         <Chip
           label="Todas"
@@ -291,6 +293,8 @@ export function CancelClassScreen() {
 }
 
 const styles = StyleSheet.create({
+  // Horizontal strips keep their natural height when the list below is long.
+  strip: { flexGrow: 0, flexShrink: 0 },
   branchLabel: { color: colors.textMuted },
   branchList: { gap: spacing.sm },
   branchName: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
