@@ -125,3 +125,17 @@ export function formatCivilMoment(instant: string): string {
   const parts = boliviaParts(instant);
   return `${formatCivilDate(parts.date)} · ${parts.time}`;
 }
+
+/** The Bolivia month `YYYY-MM` an instant falls in. */
+export const boliviaMonth = (now: Date = new Date()): string =>
+  boliviaParts(now).date.slice(0, 7);
+
+export function addMonths(month: string, count: number): string {
+  const index = Number(month.slice(0, 4)) * 12 + Number(month.slice(5, 7)) - 1;
+  const next = index + count;
+  return `${Math.floor(next / 12)}-${String((next % 12) + 1).padStart(2, "0")}`;
+}
+
+/** "agosto de 2026", as AW31 names the month. */
+export const formatMonth = (month: string): string =>
+  `${months[Number(month.slice(5, 7)) - 1] ?? ""} de ${month.slice(0, 4)}`;
