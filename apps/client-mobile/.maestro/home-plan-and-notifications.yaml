@@ -1,16 +1,38 @@
-# Critical journey: Home shortcuts, Mi plan, and notification destinations.
+# Critical journey: the Promotions carousel, Home shortcuts, Mi plan, and
+# notification destinations. Needs the two Promotions of Test 33 published
+# (or pass -e PROMOTION_1=... -e PROMOTION_2=... with the headlines on screen).
 appId: ${APP_ID}
 env:
   EMAIL: lucia@example.com
+  PROMOTION_1: "Nueva sala de Reformer en Urubó"
+  PROMOTION_2: "Clases de Barre los sábados"
 ---
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
+    visible: ${PROMOTION_1}
+    timeout: 30000
+- assertVisible: "Novedades del estudio"
+- assertVisible: "Promoción 1 de 2"
+- takeScreenshot: client-home-1-inicio
+- swipe:
+    start: "80%,25%"
+    end: "10%,25%"
+- extendedWaitUntil:
+    visible: ${PROMOTION_2}
+    timeout: 10000
+- assertVisible: "Promoción 2 de 2"
+- takeScreenshot: client-home-1b-promocion-2
+# The carousel takes the top of the phone screen; the quick actions sit below.
+- swipe:
+    start: "50%,75%"
+    end: "50%,25%"
+- extendedWaitUntil:
     visible:
       text: "Evaluación nutricional: .*"
-    timeout: 30000
+    timeout: 10000
 - assertVisible:
     text: "Mis referidos: .*"
-- takeScreenshot: client-home-1-inicio
+- takeScreenshot: client-home-1c-accesos
 - tapOn:
     text: "Mis referidos: .*"
 - extendedWaitUntil:
