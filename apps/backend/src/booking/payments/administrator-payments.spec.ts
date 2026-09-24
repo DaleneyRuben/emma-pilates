@@ -87,7 +87,9 @@ describe('Administrator Payment list', () => {
           principal,
           { ledger: payments },
         ),
-      ).rejects.toEqual(new AdministrationError('administration_access_denied'));
+      ).rejects.toEqual(
+        new AdministrationError('administration_access_denied'),
+      );
       expect(payments.list).not.toHaveBeenCalled();
     },
   );
