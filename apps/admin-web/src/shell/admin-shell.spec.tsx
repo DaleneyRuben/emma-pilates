@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import { activeBranchesHandler, branchesPath } from "../test/booking-handlers";
 import { apiUrl, problemResponse, server, useMockServer } from "../test/msw";
@@ -237,6 +237,32 @@ describe("admin shell", () => {
           "No pudimos cargar las sucursales. Inténtalo de nuevo.",
         ),
       ).toBeInTheDocument();
+    });
+
+    it("shows no count beside Pagos or Insumos when either read fails", async () => {
+      server.use(
+        http.get(apiUrl("/api/v1/administrator/payments"), () =>
+          problemResponse(500, "unexpected_error"),
+        ),
+        http.get(apiUrl("/api/v1/administrator/supplies"), () =>
+          problemResponse(500, "unexpected_error"),
+        ),
+      );
+      renderShell("/");
+      await heading("Horario");
+
+      const sidebar = screen.getByRole("navigation", { name: "Secciones" });
+      // The retry policy gives a 5xx one more try before the badge gives up.
+      await waitFor(
+        () => expect(screen.queryByRole("status")).not.toBeInTheDocument(),
+        { timeout: 5_000 },
+      );
+      expect(
+        within(sidebar).getByRole("link", { name: "Pagos" }),
+      ).toHaveTextContent(/^Pagos$/);
+      expect(
+        within(sidebar).getByRole("link", { name: "Insumos" }),
+      ).toHaveTextContent(/^Insumos$/);
     });
 
     it("links to the Sucursales page from the selector", async () => {
