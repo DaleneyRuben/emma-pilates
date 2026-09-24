@@ -148,9 +148,11 @@ function BranchWithdrawals({
         />
       ) : (
         <>
-          <p className="text-nota text-texto-secundario">
-            {summary(query.data.totalItems, month, supplyName)}
-          </p>
+          {query.data.totalItems === 0 ? null : (
+            <p className="text-nota text-texto-secundario">
+              {summary(query.data.totalItems, month, supplyName)}
+            </p>
+          )}
           <DataTable
             columns={withdrawalColumns}
             rows={query.data.items}
