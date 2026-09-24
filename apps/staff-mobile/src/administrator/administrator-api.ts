@@ -5,7 +5,7 @@ import {
   type PaymentReviewDto,
   type SessionCancellationDto,
 } from "@pilates/api-contracts";
-import { encodeBase64 } from "@pilates/mobile-core";
+import { loadPrivateImage } from "@pilates/mobile-core";
 
 export type AdministratorApi = {
   cancelSession: (sessionId: string) => Promise<SessionCancellationDto>;
@@ -34,15 +34,8 @@ export function createAdministratorApi(
       requireSuccessfulResponse(response);
       return response.data as PaymentReviewDto;
     },
-    // The receipt is a private, authenticated image: it is fetched through the
-    // API fetcher and rendered inline as a data URI.
-    async loadReceipt(receiptUrl) {
-      const response = await fetcher(receiptUrl);
-      if (!response.ok) return null;
-      const bytes = new Uint8Array(await response.arrayBuffer());
-      const type = response.headers.get("Content-Type") ?? "image/jpeg";
-      return `data:${type};base64,${encodeBase64(bytes)}`;
-    },
+    // The receipt is a private, authenticated image (mobile-core loader).
+    loadReceipt: (receiptUrl) => loadPrivateImage(fetcher, receiptUrl),
     async rejectPayment(paymentId, reason) {
       const response = await rejectPayment(
         paymentId,
