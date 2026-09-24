@@ -135,7 +135,9 @@ describe('administrator Client endpoints (e2e)', () => {
       .get(`/api/v1/administrator/clients${search}`)
       .set('authorization', bearer)
       .expect(400)
-      .expect(({ body }) => expect(body.code).toBe('invalid_request'));
+      .expect(({ body }: { body: { code?: string } }) =>
+        expect(body.code).toBe('invalid_request'),
+      );
     expect(operations.list).not.toHaveBeenCalled();
   });
 
@@ -173,7 +175,9 @@ describe('administrator Client endpoints (e2e)', () => {
       .get(`/api/v1/administrator/clients/${clientId}`)
       .set('authorization', bearer)
       .expect(404)
-      .expect(({ body }) => expect(body.code).toBe('client_not_found'));
+      .expect(({ body }: { body: { code?: string } }) =>
+        expect(body.code).toBe('client_not_found'),
+      );
 
     operations.list.mockRejectedValueOnce(
       new AdministrationError('administration_access_denied'),
@@ -182,7 +186,7 @@ describe('administrator Client endpoints (e2e)', () => {
       .get('/api/v1/administrator/clients')
       .set('authorization', bearer)
       .expect(403)
-      .expect(({ body }) =>
+      .expect(({ body }: { body: { code?: string } }) =>
         expect(body.code).toBe('administration_access_denied'),
       );
 
@@ -190,7 +194,9 @@ describe('administrator Client endpoints (e2e)', () => {
       .get('/api/v1/administrator/clients/not-a-uuid')
       .set('authorization', bearer)
       .expect(400)
-      .expect(({ body }) => expect(body.code).toBe('invalid_request'));
+      .expect(({ body }: { body: { code?: string } }) =>
+        expect(body.code).toBe('invalid_request'),
+      );
 
     await request(app.getHttpServer())
       .get('/api/v1/administrator/clients')
