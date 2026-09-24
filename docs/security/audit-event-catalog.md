@@ -73,6 +73,7 @@ Back Office money records follow BKO-001 D17: Salary Payments and Expenses are a
 | Expense Category create and delete | A label with no money of its own; deletion is refused while any Expense uses it (BKO-001 D13). |
 | Admin-web Back Office lists, forms, and the Insumos low-stock count (WEB-007) | Ordinary reads (ADR-0055); recording or correcting a Salary Payment or Expense from the browser writes the same `salary_payment.*` / `expense.*` records in the same transaction, and stock movements and categories stay unaudited as above. |
 | Admin-web Evaluation, Referral, and Credit lists (WEB-008) | Ordinary read-only oversight reads (ADR-0055); AW25–AW27 change nothing. The Administrator Evaluation cancel is not on the admin web (AW25 is read-only, invariant 10); where it is used, it keeps writing `evaluation.cancelled_by_staff`. |
+| Admin-web income and expense report (WEB-009) | An ordinary read of two existing aggregates (ADR-0055); AW16 changes nothing and shows no personal data beyond totals, and the Payments, Expenses, and Salary Payments it sums keep their own audit records. |
 
 ## Retention (provisional)
 
