@@ -167,6 +167,7 @@ Each of these was sent as the next message in the existing design session for th
 | [57](./followups/57-oversight-list-controls.md) | `AW25` follows the Branch selector with Horario's week stepper, «Primera evaluación» / «Seguimiento», and one card per Evaluation at 420 px; `AW26`'s studio counts and no-results state; `AW27`'s four Credit movements, the total shown only without a search, and its empty states (WEB-008) | 🕓 pending |
 | [58](./followups/58-report-controls.md) | `AW16`'s own Desde/Hasta and Sucursal controls (archived Branches included), the top-bar note, amounts with centavos and a signed net, the lines under each figure per scope, every month on a rounded scale with a legend and a hover popover, the empty state, «Nómina» first in the category table, and the new «Totales por mes» table (WEB-009) | 🕓 pending |
 | [59](./followups/59-admin-review-design-findings.md) | Design findings of the 2026-09-24 admin review: the two quiet text tones and the focus ring on solid buttons fail contrast, «Pendiente» versus the glossary (open question), «sortable columns», `AW23`'s name search, checklist 30 §5's Reporte, «Entrenador» beside feminine copy, the single-Branch caption in 51 versus 58, 49's dialog buttons, `AW22`'s deactivated Account, and the 32 px figure (WEB-011) | 🕓 pending |
+| [60](./followups/60-image-crops-and-formats.md) | Client `22` previews the centre-cropped circular profile photo; `AW18` previews the 16:9 centre crop, accepts WEBP, and shows the too-small message (UPL-002) | 🕓 pending |
 
 ## Status
 
