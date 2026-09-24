@@ -1,61 +1,37 @@
-import { createRoute } from "@tanstack/react-router";
-import { EvaluationsPage } from "../oversight/evaluations/evaluations-page";
+import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 import { evaluationSearchSchema } from "../oversight/evaluations/evaluation-search";
-import { CreditsPage } from "../oversight/credits/credits-page";
 import { nameSearchSchema } from "../oversight/oversight-search";
-import { ReferralsPage } from "../oversight/referrals/referrals-page";
 import { authenticatedRoute } from "./root-routes";
 
-// The read-only oversight lists (WEB-008): AW25–AW27.
+// The read-only oversight lists (WEB-008): AW25–AW27, one chunk each.
 const evaluationsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/evaluaciones-nutricionales",
   validateSearch: evaluationSearchSchema,
-  component: function EvaluationsRoute() {
-    const navigate = evaluationsRoute.useNavigate();
-    return (
-      <EvaluationsPage
-        search={evaluationsRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
+  component: lazyRouteComponent(
+    () => import("../oversight/evaluations/evaluations-route"),
+    "EvaluationsRoute",
+  ),
 });
 
 const referralsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/promociones/referidos",
   validateSearch: nameSearchSchema,
-  component: function ReferralsRoute() {
-    const navigate = referralsRoute.useNavigate();
-    return (
-      <ReferralsPage
-        search={referralsRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
+  component: lazyRouteComponent(
+    () => import("../oversight/referrals/referrals-route"),
+    "ReferralsRoute",
+  ),
 });
 
 const creditsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/promociones/creditos",
   validateSearch: nameSearchSchema,
-  component: function CreditsRoute() {
-    const navigate = creditsRoute.useNavigate();
-    return (
-      <CreditsPage
-        search={creditsRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
+  component: lazyRouteComponent(
+    () => import("../oversight/credits/credits-route"),
+    "CreditsRoute",
+  ),
 });
 
 export const oversightRoutes = [evaluationsRoute, referralsRoute, creditsRoute];

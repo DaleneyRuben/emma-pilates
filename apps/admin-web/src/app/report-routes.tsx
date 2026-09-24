@@ -1,5 +1,4 @@
-import { createRoute } from "@tanstack/react-router";
-import { ReportPage } from "../report/report-page";
+import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 import { reportSearchSchema } from "../report/report-search";
 import { authenticatedRoute } from "./root-routes";
 
@@ -8,17 +7,10 @@ const reportRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/reporte",
   validateSearch: reportSearchSchema,
-  component: function ReportRoute() {
-    const navigate = reportRoute.useNavigate();
-    return (
-      <ReportPage
-        search={reportRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
+  component: lazyRouteComponent(
+    () => import("../report/report-route"),
+    "ReportRoute",
+  ),
 });
 
 export const reportRoutes = [reportRoute];

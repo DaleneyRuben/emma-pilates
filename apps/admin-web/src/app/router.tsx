@@ -2,19 +2,16 @@ import type { QueryClient } from "@tanstack/react-query";
 import {
   createRoute,
   createRouter,
+  lazyRouteComponent,
   type RouterHistory,
 } from "@tanstack/react-router";
 import type { SessionExpiry } from "../api/session-expiry";
-import { BranchesPage } from "../catalog/branches/branches-page";
-import { ClassTypesPage } from "../catalog/class-types/class-types-page";
 import {
   catalogStatusSearchSchema,
   planSearchSchema,
 } from "../catalog/catalog-search";
-import { PlansPage } from "../catalog/plans/plans-page";
 import { listSearchSchema } from "../components/table/pagination";
 import { PlaceholderPage } from "../pages/placeholder-page";
-import { SchedulePage } from "../schedule/schedule-page";
 import { scheduleSearchSchema } from "../schedule/schedule-search";
 import { backOfficeRoutes } from "./back-office-routes";
 import { navigationItems } from "./navigation";
@@ -24,70 +21,46 @@ import { authenticatedRoute, publicRoutes, rootRoute } from "./root-routes";
 
 // List pages validate their page-and-offset search and allowlisted filters
 // (ADR-0061/0062) so the URL, not component state, owns them (ADR-0042).
+// Every page is its own chunk (ADR-0023 route-level code splitting): the
+// entry keeps the session guard, the shell, and the sign-in pages.
 const scheduleRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/",
   validateSearch: scheduleSearchSchema,
-  component: function ScheduleRoute() {
-    const navigate = scheduleRoute.useNavigate();
-    return (
-      <SchedulePage
-        search={scheduleRoute.useSearch()}
-        onWeekChange={(week) => void navigate({ search: { week } })}
-      />
-    );
-  },
+  component: lazyRouteComponent(
+    () => import("../schedule/schedule-route"),
+    "ScheduleRoute",
+  ),
 });
 
 const branchesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/catalogo/sucursales",
   validateSearch: catalogStatusSearchSchema,
-  component: function BranchesRoute() {
-    const navigate = branchesRoute.useNavigate();
-    return (
-      <BranchesPage
-        search={branchesRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
+  component: lazyRouteComponent(
+    () => import("../catalog/branches/branches-route"),
+    "BranchesRoute",
+  ),
 });
 
 const classTypesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/catalogo/tipos-de-clase",
   validateSearch: catalogStatusSearchSchema,
-  component: function ClassTypesRoute() {
-    const navigate = classTypesRoute.useNavigate();
-    return (
-      <ClassTypesPage
-        search={classTypesRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
+  component: lazyRouteComponent(
+    () => import("../catalog/class-types/class-types-route"),
+    "ClassTypesRoute",
+  ),
 });
 
 const plansRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/catalogo/planes",
   validateSearch: planSearchSchema,
-  component: function PlansRoute() {
-    const navigate = plansRoute.useNavigate();
-    return (
-      <PlansPage
-        search={plansRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
+  component: lazyRouteComponent(
+    () => import("../catalog/plans/plans-route"),
+    "PlansRoute",
+  ),
 });
 
 const pageRoutes = [
