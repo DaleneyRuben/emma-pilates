@@ -93,7 +93,9 @@ describe('client profile photo (e2e)', () => {
       .set('authorization', bearer)
       .send({ imageAssetId: 'not-a-uuid' })
       .expect(400)
-      .expect(({ body }) => expect(body).toMatchObject({ code: 'invalid_request' }));
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'invalid_request' }),
+      );
     expect(operations.set).not.toHaveBeenCalled();
 
     operations.set.mockRejectedValueOnce(
