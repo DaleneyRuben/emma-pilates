@@ -94,6 +94,7 @@ export function PaymentDecision({
   const { mutation, afterConflict } = useDecision(review, clientId);
   const [confirming, setConfirming] = useState(false);
   const [rejecting, setRejecting] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const form = useForm<RejectionInput, unknown, RejectionOutput>({
     resolver: zodResolver(rejectionSchema),
@@ -150,6 +151,8 @@ export function PaymentDecision({
                   <FormControl>
                     <Textarea
                       placeholder="Ej. el monto no coincide con la transferencia recibida."
+                      // The buttons are gone; the reason is the next step.
+                      autoFocus
                       {...field}
                     />
                   </FormControl>
@@ -175,6 +178,7 @@ export function PaymentDecision({
                 onClick={() => {
                   form.reset();
                   setRejecting(false);
+                  setCancelled(true);
                 }}
               >
                 Cancelar
@@ -195,6 +199,8 @@ export function PaymentDecision({
             variant="destructive"
             size="lg"
             disabled={mutation.isPending}
+            // Back from the reason, focus returns to the button it left.
+            autoFocus={cancelled}
             onClick={() => {
               setFailure(null);
               setRejecting(true);
