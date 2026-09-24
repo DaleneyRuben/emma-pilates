@@ -1,11 +1,10 @@
 import type { StaffMemberDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { branchTableQueryOptions } from "../../catalog/branches/branch-queries";
+import { everyBranchesQueryOptions } from "../../catalog/branches/branch-queries";
 import { SidePanelBody } from "../../components/panel/side-panel";
+import { namesById } from "../../lib/named";
 import type { StaffRole } from "../people-search";
 import { branchNames, roleLabels } from "./staff-format";
-
-const allBranches = { status: "all", page: 1, pageSize: 100 } as const;
 
 // The contact a Staff Member was invited with; no command edits it yet.
 export function StaffContact({ member }: { member: StaffMemberDto }) {
@@ -42,10 +41,8 @@ export function StaffReadOnly({
   member: StaffMemberDto;
   note: string;
 }) {
-  const branches = useQuery(branchTableQueryOptions(allBranches));
-  const names = new Map(
-    (branches.data?.items ?? []).map((branch) => [branch.id, branch.name]),
-  );
+  const branches = useQuery(everyBranchesQueryOptions());
+  const names = namesById(branches.data ?? []);
   const facts = [
     ["Rol", roleLabels[member.role as StaffRole]],
     ["Sucursales asignadas", branchNames(member, names)],

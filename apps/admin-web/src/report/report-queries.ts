@@ -3,16 +3,15 @@ import {
   getGetExpenseReportQueryKey,
   getGetIncomeReportQueryKey,
   getIncomeReport,
-  getListAdminBranchesQueryKey,
-  listAdminBranches,
   type AdminBranchDto,
-  type AdminBranchPageDto,
   type ExpenseReportDto,
   type IncomeReportDto,
 } from "@pilates/api-contracts";
 import { queryOptions } from "@tanstack/react-query";
 import { adminFetch } from "../api/fetcher";
+import { everyBranchesQueryOptions } from "../catalog/branches/branch-queries";
 import { addDays, boliviaInstant } from "../lib/bolivia-time";
+import { archivedLast } from "../lib/named";
 import type { ReportRange } from "./report-search";
 
 /**
@@ -58,20 +57,8 @@ export const expenseReportQueryOptions = (
 
 // Every Branch, archived ones last: their past income and Expenses still
 // count in a report over their months.
-const everyBranchParams = { status: "all", pageSize: 100 } as const;
-
 export const reportBranchesQueryOptions = () =>
   queryOptions({
-    queryKey: getListAdminBranchesQueryKey(everyBranchParams),
-    queryFn: async ({ signal }) =>
-      (
-        (await listAdminBranches(everyBranchParams, { signal }, adminFetch))
-          .data as AdminBranchPageDto
-      ).items,
-    select: (branches: AdminBranchDto[]) =>
-      [...branches].sort(
-        (a, b) =>
-          Number(a.archivedAt !== null) - Number(b.archivedAt !== null) ||
-          a.name.localeCompare(b.name, "es"),
-      ),
+    ...everyBranchesQueryOptions(),
+    select: (branches: AdminBranchDto[]) => [...branches].sort(archivedLast),
   });

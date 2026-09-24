@@ -20,6 +20,7 @@ import {
   formatCivilMoment,
   formatMonth,
 } from "../../lib/bolivia-time";
+import { archivedLast, namesById } from "../../lib/named";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
 import { unitsLabel } from "./supply-format";
@@ -60,17 +61,11 @@ const withdrawalColumns = [
 // Active Supplies by name, then the archived ones, whose Withdrawals stay.
 const supplyOptions = (supplies: AdminSupplyDto[]) => [
   { value: "all", label: "Todos" },
-  ...[...supplies]
-    .sort(
-      (a, b) =>
-        Number(a.archivedAt !== null) - Number(b.archivedAt !== null) ||
-        a.name.localeCompare(b.name, "es"),
-    )
-    .map((supply) => ({
-      value: supply.id,
-      label:
-        supply.archivedAt === null ? supply.name : `${supply.name} (archivado)`,
-    })),
+  ...[...supplies].sort(archivedLast).map((supply) => ({
+    value: supply.id,
+    label:
+      supply.archivedAt === null ? supply.name : `${supply.name} (archivado)`,
+  })),
 ];
 
 const summary = (count: number, month: string, supplyName?: string) =>
@@ -104,9 +99,10 @@ function BranchWithdrawals({
     withdrawalHistoryQueryOptions(branch.id, month, search),
   );
   const supplies = useQuery(everySupplyQueryOptions(branch.id));
-  const supplyName = supplies.data?.items.find(
-    (supply) => supply.id === search.supplyId,
-  )?.name;
+  const supplyName =
+    search.supplyId === undefined
+      ? undefined
+      : namesById(supplies.data?.items ?? []).get(search.supplyId);
   useKnownOption(search.supplyId, supplies.data?.items, () =>
     onSearchChange({ supplyId: undefined, page: 1 }),
   );

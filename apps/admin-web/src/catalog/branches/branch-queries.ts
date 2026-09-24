@@ -32,6 +32,20 @@ export const branchTableQueryOptions = (search: CatalogStatusSearch) => {
   });
 };
 
+// Every Branch, archived ones too, in one page of the maximum: an old
+// assignment (Personal) or a past report (Reporte) still needs its name.
+const everyBranchParams = { status: "all", page: 1, pageSize: 100 } as const;
+
+export const everyBranchesQueryOptions = () =>
+  queryOptions({
+    queryKey: getListAdminBranchesQueryKey(everyBranchParams),
+    queryFn: async ({ signal }) =>
+      (
+        (await listAdminBranches(everyBranchParams, { signal }, adminFetch))
+          .data as AdminBranchPageDto
+      ).items,
+  });
+
 type BranchChange =
   | { kind: "create"; input: BranchInputDto }
   | { kind: "update"; branchId: string; input: BranchInputDto }

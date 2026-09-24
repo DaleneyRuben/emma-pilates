@@ -2,12 +2,13 @@ import type { StaffMemberDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 import { useMemo } from "react";
-import { branchTableQueryOptions } from "../../catalog/branches/branch-queries";
+import { everyBranchesQueryOptions } from "../../catalog/branches/branch-queries";
 import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { ListFilter } from "../../components/table/list-filter";
 import { pageRangeLabel } from "../../components/table/pagination";
 import { StatusPill } from "../../components/ui/status-pill";
+import { namesById } from "../../lib/named";
 import { staffRoles, type StaffRole, type StaffSearch } from "../people-search";
 import { branchNames, roleLabels, statusPills } from "./staff-format";
 import { StaffPanelForm } from "./staff-panel";
@@ -17,9 +18,6 @@ const roleOptions: { value: StaffSearch["role"]; label: string }[] = [
   { value: "all", label: "Todos" },
   ...staffRoles.map((role) => ({ value: role, label: roleLabels[role] })),
 ];
-
-// Every Branch, archived ones too, so an old assignment still has a name.
-const allBranches = { status: "all", page: 1, pageSize: 100 } as const;
 
 const columns = createColumnHelper<StaffMemberDto>();
 
@@ -84,14 +82,8 @@ export function StaffPage({
   onSearchChange: SearchChange<StaffSearch>;
 }) {
   const query = useQuery(staffTableQueryOptions(search));
-  const branches = useQuery(branchTableQueryOptions(allBranches));
-  const names = useMemo(
-    () =>
-      new Map(
-        (branches.data?.items ?? []).map((branch) => [branch.id, branch.name]),
-      ),
-    [branches.data],
-  );
+  const branches = useQuery(everyBranchesQueryOptions());
+  const names = useMemo(() => namesById(branches.data ?? []), [branches.data]);
 
   return (
     <CatalogPage
