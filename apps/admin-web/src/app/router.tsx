@@ -15,7 +15,11 @@ import { LoginPage } from "../auth/login-page";
 import { RecoverPasswordPage } from "../auth/recover-password-page";
 import { BranchesPage } from "../catalog/branches/branches-page";
 import { ClassTypesPage } from "../catalog/class-types/class-types-page";
-import { catalogStatusSearchSchema } from "../catalog/catalog-search";
+import {
+  catalogStatusSearchSchema,
+  planSearchSchema,
+} from "../catalog/catalog-search";
+import { PlansPage } from "../catalog/plans/plans-page";
 import { listSearchSchema } from "../components/table/pagination";
 import { NotFoundPage } from "../pages/not-found-page";
 import { PlaceholderPage } from "../pages/placeholder-page";
@@ -123,7 +127,24 @@ const classTypesRoute = createRoute({
   },
 });
 
-const pageRoutes = [branchesRoute, classTypesRoute];
+const plansRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/catalogo/planes",
+  validateSearch: planSearchSchema,
+  component: function PlansRoute() {
+    const navigate = plansRoute.useNavigate();
+    return (
+      <PlansPage
+        search={plansRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
+const pageRoutes = [branchesRoute, classTypesRoute, plansRoute];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)
   .map((item) =>

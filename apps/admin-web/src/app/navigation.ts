@@ -55,7 +55,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         built: true,
       },
-      { label: "Planes", to: "/catalogo/planes", screen: "AW04", list: true },
+      {
+        label: "Planes",
+        to: "/catalogo/planes",
+        screen: "AW04",
+        list: true,
+        built: true,
+      },
       {
         label: "Sucursales",
         to: "/catalogo/sucursales",
