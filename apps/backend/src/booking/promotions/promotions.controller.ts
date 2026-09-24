@@ -34,6 +34,7 @@ import {
   idempotencyHeader,
   requireIdempotencyKey,
 } from '../../http/idempotency-key';
+import { streamImage } from '../../http/stream-image';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
 import {
   authenticateBearer,
@@ -117,18 +118,6 @@ const toPromotionDto = (view: ActivePromotionView): PromotionDto => ({
     })),
   },
 });
-
-const streamImage = (
-  response: Response,
-  bytes: Buffer,
-  mediaType: string,
-  cacheControl: string,
-): StreamableFile => {
-  response.setHeader('Content-Type', mediaType);
-  response.setHeader('Cache-Control', cacheControl);
-  response.setHeader('X-Content-Type-Options', 'nosniff');
-  return new StreamableFile(bytes);
-};
 
 // Administrator-only Promotion management for the admin web (AW17, AW18,
 // follow-up 39; ADR-0054). Nothing here is cached (ADR-0063).

@@ -29,6 +29,13 @@ export const clientSubscriptionStatuses: [
   ...ClientSubscriptionStatus[],
 ] = ['active', 'expiring_soon', 'expired', 'none'];
 
+// The attached photo's asset id lets a client fetch the photo again when it
+// changes; the bytes come from `GET /clients/current/photo` (MOB-020).
+export class ClientPhotoDto {
+  @ApiProperty({ format: 'uuid' })
+  imageAssetId!: string;
+}
+
 export class ClientProfileDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -44,7 +51,24 @@ export class ClientProfileDto {
 
   @ApiProperty()
   referralCode!: string;
+
+  @ApiPropertyOptional({ type: ClientPhotoDto, nullable: true })
+  photo!: ClientPhotoDto | null;
 }
+
+export class SetClientPhotoDto {
+  @ApiProperty({ format: 'uuid' })
+  imageAssetId!: string;
+}
+
+const setClientPhotoSchema = z.strictObject({ imageAssetId: z.uuid() });
+
+export const parseSetClientPhoto = (
+  value: unknown,
+): SetClientPhotoDto | null => {
+  const result = setClientPhotoSchema.safeParse(value);
+  return result.success ? result.data : null;
+};
 
 export class ClientSubscriptionSummaryDto {
   @ApiProperty({ format: 'uuid' })

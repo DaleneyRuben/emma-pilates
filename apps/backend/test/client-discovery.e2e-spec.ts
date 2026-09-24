@@ -66,6 +66,7 @@ describe('client discovery (e2e)', () => {
               email: 'lucia@example.com',
               phone: '+591 70011001',
               referralCode: 'REF-LUCIA',
+              photo: null,
             }),
         },
         {
@@ -77,6 +78,7 @@ describe('client discovery (e2e)', () => {
               email: 'lucia@example.com',
               phone: command.phone,
               referralCode: 'REF-LUCIA',
+              photo: null,
             }),
         },
         {
@@ -158,6 +160,7 @@ describe('client discovery (e2e)', () => {
         email: 'lucia@example.com',
         phone: '+591 70011001',
         referralCode: 'REF-LUCIA',
+        photo: null,
       });
   });
 
@@ -173,6 +176,7 @@ describe('client discovery (e2e)', () => {
         email: 'lucia@example.com',
         phone: null,
         referralCode: 'REF-LUCIA',
+        photo: null,
       });
     await request(app.getHttpServer())
       .patch('/api/v1/clients/current')
