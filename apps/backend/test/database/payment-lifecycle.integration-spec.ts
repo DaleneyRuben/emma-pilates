@@ -3,6 +3,7 @@ import { PrismaClient } from '../../src/generated/prisma/client';
 import { BookingAccessDeniedError } from '../../src/booking/commands/create-booking';
 import { PaymentRuleError } from '../../src/booking/payments/payment-errors';
 import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
+import { createPrismaReceiptRead } from '../../src/booking/payments/prisma-receipt-read';
 import { createPrismaAdapter } from '../../src/database/prisma-adapter';
 import { toPrismaBytes } from '../../src/database/prisma-bytes';
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
@@ -440,7 +441,10 @@ describe('Prisma payment lifecycle', () => {
       codeOf(commands().readPaymentReview({ paymentId: randomUUID() }, admin)),
     ).resolves.toBe('payment_not_found');
     await expect(
-      commands().readReceiptObject({ paymentId: older.id }, admin),
+      createPrismaReceiptRead(prisma).readReceiptObject(
+        { paymentId: older.id, variant: 'readable' },
+        admin,
+      ),
     ).resolves.toMatchObject({ mediaType: 'image/jpeg', objectKey: expect.stringContaining('pending/') });
   });
 

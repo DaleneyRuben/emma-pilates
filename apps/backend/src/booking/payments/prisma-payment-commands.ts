@@ -70,7 +70,11 @@ export type PaymentView = {
 
 export type CreditActivityEntry = {
   id: string;
-  kind: 'referral_award' | 'payment_reservation' | 'payment_spend' | 'payment_release';
+  kind:
+    | 'referral_award'
+    | 'payment_reservation'
+    | 'payment_spend'
+    | 'payment_release';
   amountCentavos: number;
   occurredAt: Date;
 };
@@ -132,12 +136,11 @@ const receiptRetentionAfterFinalizationMilliseconds = 45 * dayMilliseconds;
 const receiptRetentionAfterDecisionMilliseconds = 7 * dayMilliseconds;
 const rejectionReasonMaxLength = 300;
 
-const intentStates: Record<PurchaseIntentState, PurchaseIntentView['state']> =
-  {
-    [PurchaseIntentState.OPEN]: 'open',
-    [PurchaseIntentState.SUBMITTED]: 'submitted',
-    [PurchaseIntentState.EXPIRED]: 'expired',
-  };
+const intentStates: Record<PurchaseIntentState, PurchaseIntentView['state']> = {
+  [PurchaseIntentState.OPEN]: 'open',
+  [PurchaseIntentState.SUBMITTED]: 'submitted',
+  [PurchaseIntentState.EXPIRED]: 'expired',
+};
 const paymentMethods: Record<PaymentMethod, PaymentView['method']> = {
   [PaymentMethod.TRANSFER]: 'transfer',
   [PaymentMethod.CASH]: 'cash',
@@ -184,7 +187,9 @@ const paymentSelect = {
   subscription: { select: { id: true } },
 } as const;
 
-type IntentRow = Prisma.PurchaseIntentGetPayload<{ select: typeof intentSelect }>;
+type IntentRow = Prisma.PurchaseIntentGetPayload<{
+  select: typeof intentSelect;
+}>;
 type PaymentRow = Prisma.PaymentGetPayload<{ select: typeof paymentSelect }>;
 
 const toIntentView = (row: IntentRow): PurchaseIntentView => ({
@@ -249,10 +254,7 @@ const rule = (code: PaymentRuleError['code'], message: string) =>
 
 const normalizeRejectionReason = (reason: string): string => {
   const normalized = reason.trim();
-  if (
-    normalized.length === 0 ||
-    normalized.length > rejectionReasonMaxLength
-  ) {
+  if (normalized.length === 0 || normalized.length > rejectionReasonMaxLength) {
     throw new Error('Rejection reason is required');
   }
   return normalized;
@@ -321,9 +323,7 @@ export function createPrismaPaymentCommands(
     });
 
     if (existing !== null) {
-      if (
-        !Buffer.from(existing.requestHash).equals(Buffer.from(requestHash))
-      ) {
+      if (!Buffer.from(existing.requestHash).equals(Buffer.from(requestHash))) {
         throw rule(
           'idempotency_key_reused',
           'Idempotency Key was reused with a different request',
@@ -433,7 +433,9 @@ export function createPrismaPaymentCommands(
         where: {
           clientId: input.clientId,
           state: PaymentState.PENDING,
-          ...(input.ignorePaymentId ? { id: { not: input.ignorePaymentId } } : {}),
+          ...(input.ignorePaymentId
+            ? { id: { not: input.ignorePaymentId } }
+            : {}),
         },
         select: { id: true },
       }),
@@ -494,7 +496,10 @@ export function createPrismaPaymentCommands(
       where: { purchaseIntentId: input.purchaseIntentId },
       select: { id: true, clientId: true, amountCentavos: true, state: true },
     });
-    if (reservation === null || reservation.state !== CreditReservationState.RESERVED) {
+    if (
+      reservation === null ||
+      reservation.state !== CreditReservationState.RESERVED
+    ) {
       return;
     }
     await transaction.creditReservation.update({
@@ -654,7 +659,12 @@ export function createPrismaPaymentCommands(
 
   const notifyPaymentConfirmed = async (
     transaction: Transaction,
-    input: { clientId: string; paymentId: string; subscriptionId: string; now: Date },
+    input: {
+      clientId: string;
+      paymentId: string;
+      subscriptionId: string;
+      now: Date;
+    },
   ): Promise<void> => {
     const client = await transaction.client.findUniqueOrThrow({
       where: { id: input.clientId },
@@ -722,12 +732,16 @@ export function createPrismaPaymentCommands(
       planId: input.planId,
     });
     const credit = await readLedgerSummary(transaction, input.clientId);
-    if (input.requireFullCredit && credit.availableCentavos < plan.priceCentavos) {
+    if (
+      input.requireFullCredit &&
+      credit.availableCentavos < plan.priceCentavos
+    ) {
       throw rule('credit_insufficient', 'Credit does not cover the Plan price');
     }
     const applied = Math.min(credit.availableCentavos, plan.priceCentavos);
     const amountDue = plan.priceCentavos - applied;
-    const method = amountDue === 0 ? PaymentMethod.CREDIT_ONLY : PaymentMethod.CASH;
+    const method =
+      amountDue === 0 ? PaymentMethod.CREDIT_ONLY : PaymentMethod.CASH;
 
     const payment = await transaction.payment.create({
       data: {
@@ -741,7 +755,8 @@ export function createPrismaPaymentCommands(
         amountDueCentavos: amountDue,
         method,
         state: PaymentState.CONFIRMED,
-        collectedAtBranchId: method === PaymentMethod.CASH ? input.branchId : null,
+        collectedAtBranchId:
+          method === PaymentMethod.CASH ? input.branchId : null,
         submittedByAccountId: input.principal.accountId,
         submittedAt: now,
         decidedByAccountId: input.principal.accountId,
@@ -878,7 +893,9 @@ export function createPrismaPaymentCommands(
       }),
     );
 
-  const readIntentView = async (intentId: string): Promise<PurchaseIntentView> =>
+  const readIntentView = async (
+    intentId: string,
+  ): Promise<PurchaseIntentView> =>
     toIntentView(
       await prisma.purchaseIntent.findUniqueOrThrow({
         where: { id: intentId },
@@ -1002,7 +1019,12 @@ export function createPrismaPaymentCommands(
           );
           const asset = await transaction.imageAsset.findUnique({
             where: { id: command.imageAssetId },
-            select: { id: true, ownerAccountId: true, purpose: true, state: true },
+            select: {
+              id: true,
+              ownerAccountId: true,
+              purpose: true,
+              state: true,
+            },
           });
           if (
             asset === null ||
@@ -1223,7 +1245,10 @@ export function createPrismaPaymentCommands(
 
       const now = dependencies.now();
       const referral = await transaction.referral.findFirst({
-        where: { referredClientId: payment.clientId, state: ReferralState.PENDING },
+        where: {
+          referredClientId: payment.clientId,
+          state: ReferralState.PENDING,
+        },
         select: { referrerClientId: true },
       });
       await lockClients(transaction, [
@@ -1231,13 +1256,20 @@ export function createPrismaPaymentCommands(
         ...(referral ? [referral.referrerClientId] : []),
       ]);
 
-      const active = await loadActiveSubscription(transaction, payment.clientId, now);
+      const active = await loadActiveSubscription(
+        transaction,
+        payment.clientId,
+        now,
+      );
       if (active !== null) {
         const eligibility = (() => {
           try {
             return evaluatePurchaseEligibility({
               today: boliviaDate(now),
-              plan: { hiddenAt: null, priceCentavos: payment.planPriceCentavos },
+              plan: {
+                hiddenAt: null,
+                priceCentavos: payment.planPriceCentavos,
+              },
               activeSubscription: active,
               openPurchaseIntentId: null,
               pendingPaymentId: null,
@@ -1250,7 +1282,11 @@ export function createPrismaPaymentCommands(
           }
         })();
         if (eligibility.subscriptionIdToExpire !== null) {
-          await expireSubscription(transaction, eligibility.subscriptionIdToExpire, now);
+          await expireSubscription(
+            transaction,
+            eligibility.subscriptionIdToExpire,
+            now,
+          );
         }
       }
 
@@ -1266,7 +1302,10 @@ export function createPrismaPaymentCommands(
         purchaseIntentId: payment.purchaseIntentId!,
         outcome: 'spent',
         now,
-        actor: { kind: CreditLedgerActorKind.ACCOUNT, accountId: principal.accountId },
+        actor: {
+          kind: CreditLedgerActorKind.ACCOUNT,
+          accountId: principal.accountId,
+        },
         correlationId: payment.id,
       });
       const subscriptionId = await activateSubscription(
@@ -1344,7 +1383,10 @@ export function createPrismaPaymentCommands(
         purchaseIntentId: payment.purchaseIntentId!,
         outcome: 'released',
         now,
-        actor: { kind: CreditLedgerActorKind.ACCOUNT, accountId: principal.accountId },
+        actor: {
+          kind: CreditLedgerActorKind.ACCOUNT,
+          accountId: principal.accountId,
+        },
         correlationId: payment.id,
       });
       await recordPaymentAudit(transaction, {
@@ -1474,20 +1516,22 @@ export function createPrismaPaymentCommands(
     };
   };
 
+  // The receipt bytes themselves are read by `prisma-receipt-read.ts`.
   const receiptSelect = {
     id: true,
-    pendingObjectKey: true,
     deletedAt: true,
     declaredMediaType: true,
     verifiedMediaType: true,
   } as const;
-  type ReceiptRow = Prisma.ImageAssetGetPayload<{ select: typeof receiptSelect }>;
+  type ReceiptRow = Prisma.ImageAssetGetPayload<{
+    select: typeof receiptSelect;
+  }>;
   const receiptOf = (asset: ReceiptRow | null | undefined) =>
     asset && asset.deletedAt === null
       ? {
           imageAssetId: asset.id,
-          objectKey: asset.pendingObjectKey,
-          mediaType: mediaTypes[asset.verifiedMediaType ?? asset.declaredMediaType],
+          mediaType:
+            mediaTypes[asset.verifiedMediaType ?? asset.declaredMediaType],
         }
       : null;
 
@@ -1504,7 +1548,9 @@ export function createPrismaPaymentCommands(
         amountDueCentavos: true,
         submittedAt: true,
         client: { select: { name: true } },
-        purchaseIntent: { select: { receiptImageAsset: { select: receiptSelect } } },
+        purchaseIntent: {
+          select: { receiptImageAsset: { select: receiptSelect } },
+        },
       },
     });
     return rows.map((row) => ({
@@ -1513,7 +1559,8 @@ export function createPrismaPaymentCommands(
       planName: row.planNameSnapshot,
       amountDueCentavos: row.amountDueCentavos,
       submittedAt: row.submittedAt,
-      receiptAvailable: receiptOf(row.purchaseIntent?.receiptImageAsset) !== null,
+      receiptAvailable:
+        receiptOf(row.purchaseIntent?.receiptImageAsset) !== null,
     }));
   };
 
@@ -1523,7 +1570,9 @@ export function createPrismaPaymentCommands(
       select: {
         ...paymentSelect,
         client: { select: { name: true } },
-        purchaseIntent: { select: { receiptImageAsset: { select: receiptSelect } } },
+        purchaseIntent: {
+          select: { receiptImageAsset: { select: receiptSelect } },
+        },
       },
     });
     if (row === null) throw rule('payment_not_found', 'Payment not found');
@@ -1543,22 +1592,11 @@ export function createPrismaPaymentCommands(
       receipt:
         receipt === null
           ? null
-          : { imageAssetId: receipt.imageAssetId, mediaType: receipt.mediaType },
+          : {
+              imageAssetId: receipt.imageAssetId,
+              mediaType: receipt.mediaType,
+            },
     };
-  };
-
-  // Only an Administrator reviewing the Payment may read its receipt object.
-  const readReceiptObject = async (
-    command: { paymentId: string },
-    principal: AuthenticatedPrincipal,
-  ): Promise<{ objectKey: string; mediaType: string }> => {
-    requireAdministrator(principal);
-    const row = await loadReview(command.paymentId);
-    const receipt = receiptOf(row.purchaseIntent?.receiptImageAsset);
-    if (receipt === null) {
-      throw rule('payment_receipt_not_ready', 'Receipt is no longer available');
-    }
-    return { objectKey: receipt.objectKey, mediaType: receipt.mediaType };
   };
 
   return {
@@ -1566,7 +1604,6 @@ export function createPrismaPaymentCommands(
     attachReceipt,
     listPendingPayments,
     readPaymentReview,
-    readReceiptObject,
     submitTransfer,
     expirePurchaseIntents,
     confirmTransfer,
