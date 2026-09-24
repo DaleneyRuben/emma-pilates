@@ -72,6 +72,20 @@ const pageRoutes = [
   ...oversightRoutes,
   ...reportRoutes,
 ];
+/**
+ * Loads every page chunk now instead of on its first visit: the specs that
+ * render the whole app would otherwise pay each chunk's first load inside
+ * their first lookup, and a browser may want the pages warm after Login.
+ */
+export const preloadAdminPages = (): Promise<unknown> =>
+  Promise.all(
+    pageRoutes.map((route) => {
+      const component = route.options.component as
+        { preload?: () => Promise<void> } | undefined;
+      return component?.preload?.();
+    }),
+  );
+
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)
   .map((item) =>
