@@ -10,6 +10,8 @@ import {
 } from "@tanstack/react-router";
 import type { SessionExpiry } from "../api/session-expiry";
 import { loginSearchSchema } from "../auth/auth-search";
+import { SuppliesPage } from "../back-office/supplies/supplies-page";
+import { WithdrawalsPage } from "../back-office/supplies/withdrawals-page";
 import { CreatePasswordPage } from "../auth/create-password-page";
 import { LoginPage } from "../auth/login-page";
 import { RecoverPasswordPage } from "../auth/recover-password-page";
@@ -217,6 +219,30 @@ const paymentsRoute = createRoute({
   },
 });
 
+const suppliesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/insumos",
+  validateSearch: listSearchSchema,
+  component: function SuppliesRoute() {
+    const navigate = suppliesRoute.useNavigate();
+    return (
+      <SuppliesPage
+        search={suppliesRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
+// AW31 is a view of Insumos, not a sidebar entry of its own.
+const withdrawalsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/insumos/retiros",
+  component: WithdrawalsPage,
+});
+
 const pageRoutes = [
   scheduleRoute,
   branchesRoute,
@@ -224,6 +250,8 @@ const pageRoutes = [
   plansRoute,
   clientsRoute,
   paymentsRoute,
+  suppliesRoute,
+  withdrawalsRoute,
   staffRoute,
 ];
 const placeholderRoutes = navigationItems

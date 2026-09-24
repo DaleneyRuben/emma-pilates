@@ -38,13 +38,26 @@ type CatalogPageProps<Row extends { id: string }> = {
     row: Row | undefined,
     done: (notice?: string) => void,
   ) => ReactNode;
+  /** More outlined header actions, each with its own panel (AW08). */
+  panelActions?: readonly PanelAction[];
+  /** Quiet text links after the actions (AW08's withdrawal history). */
+  links?: ReactNode;
 };
 
-type PanelState<Row> = { open: false } | { open: true; row?: Row };
+export type PanelAction = {
+  label: string;
+  render: (done: (notice?: string) => void) => ReactNode;
+};
+
+type PanelState<Row> =
+  | { kind: "closed" }
+  | { kind: "record"; row?: Row }
+  | { kind: "action"; action: PanelAction };
 
 /**
  * The list convention (design system → List pages): title and a "+ Nuevo …"
- * primary action (absent on read-only lists), one allowlisted filter, a
+ * primary action (absent on read-only lists), optionally more actions with
+ * their own panels and quiet links, one allowlisted filter, a
  * dense page-and-offset table whose rows open the record in the side panel.
  * The catalog pages and the People pages (WEB-004) share it.
  */
@@ -65,14 +78,18 @@ export function CatalogPage<Row extends { id: string }>({
   query,
   columns,
   renderForm,
+  panelActions = [],
+  links,
 }: CatalogPageProps<Row>) {
-  const [panel, setPanel] = useState<PanelState<Row>>({ open: false });
+  const [panel, setPanel] = useState<PanelState<Row>>({ kind: "closed" });
   const [notice, setNotice] = useState<string | null>(null);
-  const open = (row?: Row) => {
+  const show = (next: PanelState<Row>) => {
     setNotice(null);
-    setPanel({ open: true, row });
+    setPanel(next);
   };
-  const close = () => setPanel({ open: false });
+  const open = (row?: Row) => show({ kind: "record", row });
+  const close = () => setPanel({ kind: "closed" });
+  const forbidden = isForbidden(query.error);
   const done = (message?: string) => {
     close();
     setNotice(message ?? null);
@@ -84,11 +101,28 @@ export function CatalogPage<Row extends { id: string }>({
         title={title}
         subtitle={subtitle}
         actions={
-          createLabel === undefined || isForbidden(query.error) ? undefined : (
-            <Button onClick={() => open()}>
-              <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
-              {createLabel}
-            </Button>
+          forbidden ||
+          (createLabel === undefined &&
+            panelActions.length === 0 &&
+            links === undefined) ? undefined : (
+            <>
+              {createLabel === undefined ? null : (
+                <Button onClick={() => open()}>
+                  <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
+                  {createLabel}
+                </Button>
+              )}
+              {panelActions.map((action) => (
+                <Button
+                  key={action.label}
+                  variant="secondary"
+                  onClick={() => show({ kind: "action", action })}
+                >
+                  {action.label}
+                </Button>
+              ))}
+              {links}
+            </>
           )
         }
       />
@@ -120,26 +154,32 @@ export function CatalogPage<Row extends { id: string }>({
         />
       )}
       <SidePanel
-        open={panel.open}
+        open={panel.kind !== "closed"}
         onOpenChange={(next) => {
           if (!next) close();
         }}
         title={
-          !panel.open || panel.row === undefined
-            ? panelTitles.create
-            : typeof panelTitles.edit === "string"
-              ? panelTitles.edit
-              : panelTitles.edit(panel.row)
+          panel.kind === "action"
+            ? panel.action.label
+            : panel.kind === "closed" || panel.row === undefined
+              ? panelTitles.create
+              : typeof panelTitles.edit === "string"
+                ? panelTitles.edit
+                : panelTitles.edit(panel.row)
         }
         description={
-          panel.open && panel.row !== undefined
+          panel.kind === "record" && panel.row !== undefined
             ? panelDescription?.(panel.row)
             : undefined
         }
       >
-        {panel.open ? (
+        {panel.kind === "record" ? (
           <div key={panel.row?.id ?? "new"} className="flex flex-1 flex-col">
             {renderForm(panel.row, done)}
+          </div>
+        ) : panel.kind === "action" ? (
+          <div key={panel.action.label} className="flex flex-1 flex-col">
+            {panel.action.render(done)}
           </div>
         ) : null}
       </SidePanel>

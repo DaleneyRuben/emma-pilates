@@ -36,8 +36,14 @@ export type NavigationItem = {
   list?: true;
   /** Its WEB item has replaced the placeholder with the real page. */
   built?: true;
-  /** A count beside the link (design system → Back Office: Pagos badge). */
-  badge?: "pendingPayments";
+  /**
+   * A count beside the link (design system → Back Office): the transfers
+   * waiting in Pagos, or the selected Branch's low-stock Supplies in the
+   * warning tint beside Insumos.
+   */
+  badge?: "pendingPayments" | "lowStock";
+  /** Its sub-pages keep it marked (AW31 is a view of Insumos). */
+  subPages?: true;
 };
 
 export type NavigationGroup = {
@@ -98,6 +104,9 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/insumos",
         screen: "AW08",
         list: true,
+        built: true,
+        badge: "lowStock",
+        subPages: true,
       },
       {
         label: "Evaluaciones nutricionales",
