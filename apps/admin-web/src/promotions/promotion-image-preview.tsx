@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { cn } from "../lib/cn";
 
 const carouselRatio = 16 / 9;
 const previewHeight = 240;
@@ -54,22 +55,22 @@ export function PromotionImagePreview({
           {crop === "sides" ? (
             <>
               <span
-                className={`${bandClass} inset-y-0 left-0`}
+                className={cn(bandClass, "inset-y-0 left-0")}
                 style={{ width: band }}
               />
               <span
-                className={`${bandClass} inset-y-0 right-0`}
+                className={cn(bandClass, "inset-y-0 right-0")}
                 style={{ width: band }}
               />
             </>
           ) : crop === "ends" ? (
             <>
               <span
-                className={`${bandClass} inset-x-0 top-0`}
+                className={cn(bandClass, "inset-x-0 top-0")}
                 style={{ height: band }}
               />
               <span
-                className={`${bandClass} inset-x-0 bottom-0`}
+                className={cn(bandClass, "inset-x-0 bottom-0")}
                 style={{ height: band }}
               />
             </>
