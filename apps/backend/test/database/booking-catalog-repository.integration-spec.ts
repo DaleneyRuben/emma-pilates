@@ -264,6 +264,8 @@ describe('Booking catalog repository', () => {
           declaredMediaType: ImageMediaType.JPEG,
           declaredByteSize: 100,
           declaredChecksum: Buffer.alloc(32, 'test'),
+          // Stamped explicitly: the upload must still be alive when created.
+          createdAt: new Date('2026-10-01T14:00:00.000Z'),
           expiresAt: new Date('2026-10-01'),
         },
       });
