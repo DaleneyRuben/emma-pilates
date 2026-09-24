@@ -55,7 +55,8 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
     ),
   );
   const height = (centavos: number) => `${(centavos / topCentavos) * 100}%`;
-  const shown = months.find((month) => month.month === active);
+  const shownIndex = months.findIndex((month) => month.month === active);
+  const shown = months[shownIndex];
 
   return (
     <figure
@@ -136,7 +137,12 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
           {shown === undefined ? null : (
             <div
               role="tooltip"
-              className="pointer-events-none absolute top-0 left-1/2 z-10 flex -translate-x-1/2 flex-col gap-0.5 rounded-control border border-borde bg-blanco px-3 py-2 text-nota text-texto shadow-popover tabular"
+              // Above the hovered month, kept inside the plot at the edges.
+              style={{
+                left: `${((shownIndex + 0.5) / months.length) * 100}%`,
+                transform: `translateX(-${((shownIndex + 0.5) / months.length) * 100}%)`,
+              }}
+              className="pointer-events-none absolute top-0 z-10 flex flex-col gap-0.5 rounded-control border border-borde bg-blanco px-3 py-2 text-nota text-texto shadow-popover tabular"
             >
               <span className="font-medium">{formatMonth(shown.month)}</span>
               <span className="flex items-center gap-1.5">
