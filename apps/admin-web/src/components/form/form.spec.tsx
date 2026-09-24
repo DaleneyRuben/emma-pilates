@@ -75,9 +75,10 @@ describe("form primitives", () => {
     const name = screen.getByRole("textbox", { name: "Nombre" });
     expect(name).toHaveAttribute("aria-invalid", "false");
     expect(name).toHaveAccessibleDescription("Como aparece en el selector.");
+    // A field without helper text points at nothing until it has an error.
     expect(
       screen.getByRole("textbox", { name: "Dirección" }),
-    ).toBeInTheDocument();
+    ).not.toHaveAttribute("aria-describedby");
   });
 
   it("shows the Zod message under the field, marks it invalid, and keeps the typed values", async () => {
