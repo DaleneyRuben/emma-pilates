@@ -34,6 +34,8 @@ export type NavigationItem = {
   studioWide?: string;
   /** A dense list page (design system → List pages) with page-and-offset search. */
   list?: true;
+  /** Its WEB item has replaced the placeholder with the real page. */
+  built?: true;
 };
 
 export type NavigationGroup = {
@@ -58,6 +60,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/catalogo/sucursales",
         screen: "AW19",
         list: true,
+        built: true,
       },
     ],
   },

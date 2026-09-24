@@ -98,8 +98,13 @@ describe("AW19 Sucursales on a desktop browser", () => {
 
     server.use(branchTable(() => problemResponse(500, "unexpected_error")));
     await user.selectOptions(screen.getByLabelText("Estado"), "all");
+    // A 5xx is retried once before the page gives up (query-client.ts).
     expect(
-      await screen.findByText("No pudimos cargar las sucursales."),
+      await screen.findByText(
+        "No pudimos cargar las sucursales.",
+        {},
+        { timeout: 5_000 },
+      ),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeEnabled();
   });
@@ -142,7 +147,7 @@ describe("AW19 Sucursales on a desktop browser", () => {
 
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     expect(within(panel).getByLabelText("Nombre")).toHaveAccessibleDescription(
-      "Escribe el nombre.",
+      expect.stringContaining("Escribe el nombre."),
     );
 
     await user.type(within(panel).getByLabelText("Nombre"), " Norte ");

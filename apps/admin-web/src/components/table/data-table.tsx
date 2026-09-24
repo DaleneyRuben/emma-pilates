@@ -22,6 +22,8 @@ type DataTableProps<Row> = {
   rows: Row[];
   rowId: (row: Row) => string;
   emptyMessage?: string;
+  /** The whole row opens the record (design system → Table convention). */
+  onRowClick?: (row: Row) => void;
   pagination: PageWindow & { onPageChange: (page: number) => void };
 };
 
@@ -36,6 +38,7 @@ export function DataTable<Row>({
   rows,
   rowId,
   emptyMessage = "No hay registros.",
+  onRowClick,
   pagination,
 }: DataTableProps<Row>) {
   // TanStack Table hands back functions the React Compiler cannot memoize;
@@ -77,7 +80,17 @@ export function DataTable<Row>({
         {rows.length === 0 ? null : (
           <TableBody>
             {table.getRowModel().rows.map((row) => (
-              <TableRow key={row.id}>
+              <TableRow
+                key={row.id}
+                onClick={
+                  onRowClick === undefined
+                    ? undefined
+                    : () => onRowClick(row.original)
+                }
+                className={
+                  onRowClick === undefined ? undefined : "cursor-pointer"
+                }
+              >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}

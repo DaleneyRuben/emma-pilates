@@ -73,19 +73,20 @@ describe("admin routes", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it.each(navigationItems.map((item) => [item.to, item.label] as const))(
-    "renders a placeholder page for %s",
-    async (path, label) => {
-      renderAt(path);
+  it.each(
+    navigationItems
+      .filter((item) => item.built !== true)
+      .map((item) => [item.to, item.label] as const),
+  )("renders a placeholder page for %s", async (path, label) => {
+    renderAt(path);
 
-      expect(
-        await screen.findByRole("heading", { level: 1, name: label }),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText("Esta sección aún no está disponible."),
-      ).toBeInTheDocument();
-    },
-  );
+    expect(
+      await screen.findByRole("heading", { level: 1, name: label }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText("Esta sección aún no está disponible."),
+    ).toBeInTheDocument();
+  });
 
   it("opens the schedule at the root path", async () => {
     renderAt("/");

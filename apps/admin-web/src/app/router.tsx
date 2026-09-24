@@ -13,6 +13,8 @@ import { loginSearchSchema } from "../auth/auth-search";
 import { CreatePasswordPage } from "../auth/create-password-page";
 import { LoginPage } from "../auth/login-page";
 import { RecoverPasswordPage } from "../auth/recover-password-page";
+import { BranchesPage } from "../catalog/branches/branches-page";
+import { catalogStatusSearchSchema } from "../catalog/catalog-search";
 import { listSearchSchema } from "../components/table/pagination";
 import { NotFoundPage } from "../pages/not-found-page";
 import { PlaceholderPage } from "../pages/placeholder-page";
@@ -84,28 +86,48 @@ const authenticatedRoute = createRoute({
   component: AdminShell,
 });
 
-// List pages validate their page-and-offset search (ADR-0061) so the URL,
-// not component state, owns pagination (ADR-0042).
-const placeholderRoutes = navigationItems.map((item) =>
-  item.list
-    ? createRoute({
-        getParentRoute: () => authenticatedRoute,
-        path: item.to,
-        validateSearch: listSearchSchema,
-        component: () => <PlaceholderPage item={item} />,
-      })
-    : createRoute({
-        getParentRoute: () => authenticatedRoute,
-        path: item.to,
-        component: () => <PlaceholderPage item={item} />,
-      }),
-);
+// List pages validate their page-and-offset search and allowlisted filters
+// (ADR-0061/0062) so the URL, not component state, owns them (ADR-0042).
+const branchesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/catalogo/sucursales",
+  validateSearch: catalogStatusSearchSchema,
+  component: function BranchesRoute() {
+    const navigate = branchesRoute.useNavigate();
+    return (
+      <BranchesPage
+        search={branchesRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
+const pageRoutes = [branchesRoute];
+const placeholderRoutes = navigationItems
+  .filter((item) => item.built !== true)
+  .map((item) =>
+    item.list
+      ? createRoute({
+          getParentRoute: () => authenticatedRoute,
+          path: item.to,
+          validateSearch: listSearchSchema,
+          component: () => <PlaceholderPage item={item} />,
+        })
+      : createRoute({
+          getParentRoute: () => authenticatedRoute,
+          path: item.to,
+          component: () => <PlaceholderPage item={item} />,
+        }),
+  );
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
   recoverPasswordRoute,
   createPasswordRoute,
-  authenticatedRoute.addChildren(placeholderRoutes),
+  authenticatedRoute.addChildren([...pageRoutes, ...placeholderRoutes]),
 ]);
 
 export function createAdminRouter(options: {
