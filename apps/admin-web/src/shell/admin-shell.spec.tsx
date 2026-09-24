@@ -88,6 +88,52 @@ describe("admin shell", () => {
       ).toBeInTheDocument();
     });
 
+    it("titles the document after the page and moves focus to the content on navigation, behind a skip link", async () => {
+      const { user } = renderShell("/");
+      await heading("Horario");
+      expect(document.title).toBe("Horario · Emma");
+      const skip = screen.getByRole("link", { name: "Saltar al contenido" });
+      expect(skip).toHaveAttribute("href", "#contenido");
+      expect(screen.getByRole("main")).toHaveAttribute("id", "contenido");
+
+      await user.click(screen.getByRole("link", { name: "Gastos" }));
+      await heading("Gastos");
+
+      expect(document.title).toBe("Gastos · Emma");
+      await waitFor(() => expect(screen.getByRole("main")).toHaveFocus());
+    });
+
+    it("moves through the Branch options with the arrow keys and chooses with Enter", async () => {
+      const { user } = renderShell("/");
+      await heading("Horario");
+
+      await user.click(
+        await screen.findByRole("button", { name: "Sucursal Centro" }),
+      );
+      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
+      const options = within(popover).getAllByRole("option");
+      // Roving tabindex: the selected Branch is the one Tab reaches.
+      expect(options.map((option) => option.tabIndex)).toEqual([0, -1, -1]);
+      await waitFor(() => expect(options[0]).toHaveFocus());
+
+      await user.keyboard("{ArrowDown}");
+      expect(options[1]).toHaveFocus();
+      await user.keyboard("{ArrowDown}{ArrowDown}");
+      expect(options[0]).toHaveFocus();
+      await user.keyboard("{End}");
+      expect(options[2]).toHaveFocus();
+      await user.keyboard("{ArrowUp}");
+      expect(options[1]).toHaveFocus();
+      await user.keyboard("{Enter}");
+
+      expect(
+        screen.queryByRole("dialog", { name: "Sucursal" }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole("button", { name: "Sucursal Equipetrol" }),
+      ).toBeInTheDocument();
+    });
+
     it("paints the main area in Superficie, as the handoff draws it", async () => {
       renderShell("/");
       await heading("Horario");
@@ -319,7 +365,7 @@ describe("admin shell", () => {
       ).not.toBeInTheDocument();
     });
 
-    it("opens the Branch selector as a bottom sheet with the same rows", async () => {
+    it("opens the Branch selector as a bottom sheet with the same rows and a title", async () => {
       const { user } = renderShell("/");
       await heading("Horario");
 
@@ -329,6 +375,10 @@ describe("admin shell", () => {
 
       const sheet = await screen.findByRole("dialog", { name: "Sucursal" });
       expect(sheet).toHaveAttribute("data-side", "bottom");
+      // The sheet's label is its title, a heading like every other sheet's.
+      expect(
+        within(sheet).getByRole("heading", { name: "Sucursal" }),
+      ).toBeInTheDocument();
       await user.click(
         within(sheet).getByRole("option", { name: /Equipetrol/ }),
       );
