@@ -14,6 +14,7 @@ import {
   type StaffMemberPageDto,
 } from "@pilates/api-contracts";
 import { keepPreviousData, queryOptions } from "@tanstack/react-query";
+import { isBranchScopedKey } from "../api/branch-scoped-key";
 import { adminFetch } from "../api/fetcher";
 import { addDays, boliviaInstant } from "../lib/bolivia-time";
 
@@ -44,11 +45,8 @@ export const weekSessionsQueryOptions = (branchId: string, monday: string) => {
   });
 };
 
-export const isBranchSessionsKey =
-  (branchId: string) =>
-  ({ queryKey }: { queryKey: readonly unknown[] }): boolean =>
-    queryKey[0] === getListAdministratorSessionsQueryKey()[0] &&
-    (queryKey[1] as { branchId?: string } | undefined)?.branchId === branchId;
+export const isBranchSessionsKey = (branchId: string) =>
+  isBranchScopedKey(getListAdministratorSessionsQueryKey()[0], branchId);
 
 export const branchSchedulesQueryOptions = (branchId: string) =>
   queryOptions({
