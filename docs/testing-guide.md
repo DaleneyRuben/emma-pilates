@@ -1455,10 +1455,11 @@ Every page now needs a signed-in Administrator, so start the backend
    then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
    Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
-   Referidos, Créditos). There is no "Descuentos". Clicking an entry opens a
-   page with that title, "Esta sección aún no está disponible.", and the
-   design screen it will implement (for example "Pantalla AW04"); the entry is
-   highlighted in the sidebar and the address changes (`/catalogo/planes`).
+   Referidos, Créditos). There is no "Descuentos". Horario and the Catálogo
+   pages are real (Test 25); every other entry opens a page with that title,
+   "Esta sección aún no está disponible.", and the design screen it will
+   implement (for example "Pantalla AW08"); the entry is highlighted in the
+   sidebar and the address changes (`/back-office/insumos`).
 2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
    popover lists Centro, Equipetrol, and Urubó with their addresses, marks the
    current one with a check, and ends with **Gestionar sucursales** (opens
@@ -1466,16 +1467,16 @@ Every page now needs a signed-in Administrator, so start the backend
    Urubó**, and you stay on the same page. Esc or a click outside closes it.
    On **Pagos**, **Clientes**, **Nómina**, **Referidos**, or **Créditos** the
    popover first says "Esta página no se filtra por sucursal — …" and still
-   lets you switch for the next page. These three Branches are placeholders
-   until WEB-003 reads them from the API.
+   lets you switch for the next page. The Branches are the active ones the
+   API returns (Test 25); archived Branches never appear here.
 3. **Narrow browser.** Make the window narrower than 1024 px (or open the
    address on a phone). The sidebar disappears behind the **Abrir menú**
    button, which opens a drawer with the same sections that closes after you
    pick one, and the Branch selector opens as a sheet from the bottom.
 4. **Unknown address.** Open `http://localhost:5173/no-existe`: "Página no
    encontrada" with **Volver al horario**. A list address with a bad page,
-   such as `/catalogo/planes?page=abc&pageSize=500`, is accepted and treated
-   as page 1 of 20.
+   such as `/back-office/insumos?page=abc&pageSize=500`, is accepted and
+   treated as page 1 of 20.
 
 The account cell on the right shows the signed-in Administrator; Test 24
 walks through its menu. Press `Ctrl+C` in the Terminal to stop the server.
@@ -1546,6 +1547,60 @@ in with the same command-line cookie jar (`curl -c jar -H "Origin:
 http://localhost:5173" …` to log in, then `curl -b jar -X DELETE -H "Origin:
 https://attacker.example" http://localhost:5173/api/v1/admin-web/authentication-sessions/current`).
 
+## Test 25: run the schedule and the catalog in the admin web
+
+Start the backend on `pilates_dev_sim` after loading the fixtures and start
+the admin web, exactly as Test 24 describes, and log in as
+`paola.mendoza@example.com` / `emma-local-2026`. Every time and date below is
+Bolivia time, whatever time zone your computer uses.
+
+1. **Horario.** The landing page shows the selected Branch's week: seven day
+   columns, a time axis, and one block per Session with the Class Type, the
+   start and end time, the Trainer, and the booked seats ("0/12"); a full
+   Session reads "Llena · 3 en espera". The subtitle counts the week's
+   Sessions ("Sucursal Centro · sala única · 10 sesiones esta semana"). The
+   arrows and **Hoy** move between weeks and the address remembers the week
+   (`/?week=2026-09-28`). Choosing another Branch in the top bar redraws the
+   grid for it without leaving the page.
+2. **Nueva sesión.** **+ Nueva sesión** opens the 408 px side panel. **Una sola
+   vez** asks for Tipo de clase, Entrenador (only Trainers assigned to the
+   Branch), Fecha, Hora, and Capacidad (filled from the Class Type). **Cada
+   semana** swaps Fecha for **Día de la semana** and **Vigente desde** and
+   creates the weekly schedule; the page then says how many Sessions it
+   created for the next 30 days. **Guardar** with empty fields marks each one;
+   a Session that overlaps another says "Se cruza con otra sesión…".
+3. **Editar sesión.** Click a block. The panel names the day, time, and
+   "N de M lugares reservados" (plus "N en lista de espera"). A Session a
+   weekly schedule generated offers **Solo esta sesión** (change its Trainer,
+   date, time, or capacity; capacity cannot go below the booked seats) or
+   **Esta y las futuras** (change the weekly schedule from a **Vigente desde**
+   date: unbooked Sessions move, booked ones stay, and the page says how many
+   of each). **Terminar la serie** stops the schedule from a date after asking.
+4. **Cancelar sesión.** Only a Session with Bookings offers it (an empty one
+   says it cancels itself 2 hours before). The confirmation says every
+   Booking is refunded even inside the 2 h 30 window and that the waitlist is
+   notified; afterwards the Session disappears from the grid and the page
+   says "Sesión cancelada: N reservas reembolsadas y avisos enviados.". To try
+   it, book a Session first as a Client (Test 10 or the Staff app, Test 11).
+5. **Sucursales, Tipos de clase, Planes.** Each is a dense table with
+   pagination and one filter in the address (`?status=archived`,
+   `?visibility=hidden`). **+ Nueva …** and a row open the side panel. Plans
+   show prices as `Bs 1.050,00`, last 1, 3, 6, or 12 months, and always carry
+   a class count; **Ocultar en la app** hides one from the Client catalog.
+   A Class Type needs a description, and a taken name is marked on its field.
+   **Archivar sucursal** / **Archivar tipo de clase** ask first; Centro is
+   refused ("No puedes archivarla: tiene sesiones programadas…") because it
+   has upcoming Sessions.
+6. **Narrow browser.** At a phone width the week becomes day tabs with one
+   day's Sessions, tables become one card per row, and every panel fills the
+   screen.
+
+Browsers show the date and time pickers in the format of their own language,
+so an English Chrome shows `09/29/2026` and `09:00 AM`; the values sent and
+shown elsewhere stay Bolivia dates and 24-hour times. The changes you make stay
+in `pilates_dev_sim`; run the fixtures command again to restore the fixture
+Accounts and catalog (it does not remove Sessions or schedules you created).
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1560,13 +1615,12 @@ The following are not ready for manual product testing:
   mobile-link domain and native association files are configured;
 - Promotions on Client Home or push notifications (the in-app inbox works, see
   Test 9; buying a Plan works, see Test 10);
-- editing a Session Schedule (ADM-001);
 - creating, reassigning, and deactivating Staff Members in a screen (the
   API works, see Test 17; the admin screens are WEB-004);
 - Promotions and image variants (UPL-002);
 - Back Office screens (the API works, see Test 22; the screens are WEB-007);
-- any Pilates admin-web workflow beyond logging in and the shell (Tests 23
-  and 24): every section is a placeholder;
+- any admin-web section beyond logging in, Horario, and the Catálogo pages
+  (Tests 23 to 25): the other sections are placeholders;
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
 
