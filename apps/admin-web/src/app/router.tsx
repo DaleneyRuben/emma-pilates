@@ -10,6 +10,7 @@ import {
 } from "@tanstack/react-router";
 import type { SessionExpiry } from "../api/session-expiry";
 import { loginSearchSchema } from "../auth/auth-search";
+import { ExpenseCategoriesPage } from "../back-office/expenses/categories-page";
 import { ExpensesPage } from "../back-office/expenses/expenses-page";
 import { expenseSearchSchema } from "../back-office/expenses/expense-search";
 import { PayrollPage } from "../back-office/payroll/payroll-page";
@@ -293,6 +294,14 @@ const expensesRoute = createRoute({
   },
 });
 
+// AW15 lists every label on one page, so it keeps only the list search.
+const expenseCategoriesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/categorias-de-gasto",
+  validateSearch: listSearchSchema,
+  component: ExpenseCategoriesPage,
+});
+
 const pageRoutes = [
   scheduleRoute,
   branchesRoute,
@@ -305,6 +314,7 @@ const pageRoutes = [
   staffRoute,
   payrollRoute,
   expensesRoute,
+  expenseCategoriesRoute,
 ];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)

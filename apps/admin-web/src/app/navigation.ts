@@ -141,6 +141,8 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/categorias-de-gasto",
         screen: "AW15",
         list: true,
+        built: true,
+        studioWide: "las categorías de gasto son del estudio, no de una sede.",
       },
     ],
   },
