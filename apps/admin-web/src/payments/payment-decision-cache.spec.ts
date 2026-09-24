@@ -1,5 +1,6 @@
 import {
   getGetAdminClientQueryKey,
+  getGetIncomeReportQueryKey,
   getGetPaymentReviewQueryKey,
   getListAdminClientsQueryKey,
   getListAdminCreditsQueryKey,
@@ -40,6 +41,15 @@ const keys = {
     query: "sofia",
   }),
   credits: getListAdminCreditsQueryKey({ page: 1, pageSize: 20 }),
+  studioIncome: getGetIncomeReportQueryKey({
+    from: "2026-08-01T04:00:00.000Z",
+    until: "2026-10-01T04:00:00.000Z",
+  }),
+  branchIncome: getGetIncomeReportQueryKey({
+    from: "2026-08-01T04:00:00.000Z",
+    until: "2026-10-01T04:00:00.000Z",
+    branchId: "0b6f6f2e-1d38-5a52-9d44-7a0cf0a1c001",
+  }),
   evaluations: getListAdminEvaluationsQueryKey({
     from: "2026-09-21T04:00:00.000Z",
     until: "2026-09-28T04:00:00.000Z",
@@ -72,7 +82,8 @@ describe("the cache after a Payment decision", () => {
 
     // The Plan starts (the directory and her detail show it), a first
     // Payment can award Credit to whoever referred her (Referidos, Créditos),
-    // and her reserved Credit is spent.
+    // her reserved Credit is spent, and a transfer counts as income only in
+    // the all-Branches report (CONTEXT-MAP).
     expect(invalidated(queryClient)).toEqual(
       [
         "badge",
@@ -84,6 +95,7 @@ describe("the cache after a Payment decision", () => {
         "referrer",
         "review",
         "searchedReferrals",
+        "studioIncome",
       ].sort(),
     );
   });
@@ -124,6 +136,7 @@ describe("the cache after a Payment decision", () => {
         "referrer",
         "review",
         "searchedReferrals",
+        "studioIncome",
       ].sort(),
     );
   });
