@@ -1,26 +1,10 @@
 import type { QueryClient } from "@tanstack/react-query";
-import { z } from "zod";
 import {
-  createRootRouteWithContext,
   createRoute,
   createRouter,
-  Outlet,
-  redirect,
   type RouterHistory,
 } from "@tanstack/react-router";
 import type { SessionExpiry } from "../api/session-expiry";
-import { loginSearchSchema } from "../auth/auth-search";
-import { ExpenseCategoriesPage } from "../back-office/expenses/categories-page";
-import { ExpensesPage } from "../back-office/expenses/expenses-page";
-import { expenseSearchSchema } from "../back-office/expenses/expense-search";
-import { PayrollPage } from "../back-office/payroll/payroll-page";
-import { payrollSearchSchema } from "../back-office/payroll/payroll-search";
-import { SuppliesPage } from "../back-office/supplies/supplies-page";
-import { withdrawalSearchSchema } from "../back-office/supplies/supply-search";
-import { WithdrawalsPage } from "../back-office/supplies/withdrawals-page";
-import { CreatePasswordPage } from "../auth/create-password-page";
-import { LoginPage } from "../auth/login-page";
-import { RecoverPasswordPage } from "../auth/recover-password-page";
 import { BranchesPage } from "../catalog/branches/branches-page";
 import { ClassTypesPage } from "../catalog/class-types/class-types-page";
 import {
@@ -29,82 +13,12 @@ import {
 } from "../catalog/catalog-search";
 import { PlansPage } from "../catalog/plans/plans-page";
 import { listSearchSchema } from "../components/table/pagination";
-import { NotFoundPage } from "../pages/not-found-page";
-import { ClientsPage } from "../people/clients/clients-page";
-import { clientSearchSchema, staffSearchSchema } from "../people/people-search";
-import { StaffPage } from "../people/staff/staff-page";
 import { PlaceholderPage } from "../pages/placeholder-page";
-import { PaymentsPage } from "../payments/payments-page";
-import { paymentSearchSchema } from "../payments/payment-search";
-import { StartupErrorPage } from "../pages/startup-error-page";
 import { SchedulePage } from "../schedule/schedule-page";
 import { scheduleSearchSchema } from "../schedule/schedule-search";
-import { readSignedInSession } from "../session/session-queries";
-import { AdminShell } from "../shell/admin-shell";
+import { backOfficeRoutes } from "./back-office-routes";
 import { navigationItems } from "./navigation";
-
-export type AdminRouterContext = {
-  queryClient: QueryClient;
-  sessionExpiry: SessionExpiry;
-};
-
-const rootRoute = createRootRouteWithContext<AdminRouterContext>()({
-  component: Outlet,
-  notFoundComponent: NotFoundPage,
-});
-
-// AW01: a signed-in Administrator has nothing to do on Login.
-const loginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/iniciar-sesion",
-  validateSearch: loginSearchSchema,
-  beforeLoad: async ({ context }) => {
-    if ((await readSignedInSession(context.queryClient)) !== null) {
-      throw redirect({ to: "/" });
-    }
-  },
-  errorComponent: StartupErrorPage,
-  component: function LoginRoute() {
-    return <LoginPage search={loginRoute.useSearch()} />;
-  },
-});
-
-const recoverPasswordRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/recuperar-contrasena",
-  component: RecoverPasswordPage,
-});
-
-// AW32: the one page every emailed Activation or Password-Recovery Link
-// opens; the inspected purpose, not the address, picks the variant.
-const createPasswordRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/crear-contrasena",
-  validateSearch: z.object({
-    token: z.string().min(1).optional().catch(undefined),
-  }),
-  component: function CreatePasswordRoute() {
-    const { token } = createPasswordRoute.useSearch();
-    return <CreatePasswordPage key={token} token={token} />;
-  },
-});
-
-// Every sidebar page sits behind the session probe; a signed-out visitor
-// goes to Login and comes back to the exact address afterwards.
-const authenticatedRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  id: "authenticated",
-  beforeLoad: async ({ context, location }) => {
-    if ((await readSignedInSession(context.queryClient)) === null) {
-      throw redirect({
-        to: "/iniciar-sesion",
-        search: { redirect: location.href },
-      });
-    }
-  },
-  errorComponent: StartupErrorPage,
-  component: AdminShell,
-});
+import { authenticatedRoute, publicRoutes, rootRoute } from "./root-routes";
 
 // List pages validate their page-and-offset search and allowlisted filters
 // (ADR-0061/0062) so the URL, not component state, owns them (ADR-0042).
@@ -174,147 +88,12 @@ const plansRoute = createRoute({
   },
 });
 
-const clientsRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/back-office/clientes",
-  validateSearch: clientSearchSchema,
-  component: function ClientsRoute() {
-    const navigate = clientsRoute.useNavigate();
-    return (
-      <ClientsPage
-        search={clientsRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
-});
-
-const staffRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/back-office/personal",
-  validateSearch: staffSearchSchema,
-  component: function StaffRoute() {
-    const navigate = staffRoute.useNavigate();
-    return (
-      <StaffPage
-        search={staffRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
-});
-
-const paymentsRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/back-office/pagos",
-  validateSearch: paymentSearchSchema,
-  component: function PaymentsRoute() {
-    const navigate = paymentsRoute.useNavigate();
-    return (
-      <PaymentsPage
-        search={paymentsRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
-});
-
-const suppliesRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/back-office/insumos",
-  validateSearch: listSearchSchema,
-  component: function SuppliesRoute() {
-    const navigate = suppliesRoute.useNavigate();
-    return (
-      <SuppliesPage
-        search={suppliesRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
-});
-
-// AW31 is a view of Insumos, not a sidebar entry of its own.
-const withdrawalsRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/back-office/insumos/retiros",
-  validateSearch: withdrawalSearchSchema,
-  component: function WithdrawalsRoute() {
-    const navigate = withdrawalsRoute.useNavigate();
-    return (
-      <WithdrawalsPage
-        search={withdrawalsRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
-});
-
-const payrollRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/back-office/nomina",
-  validateSearch: payrollSearchSchema,
-  component: function PayrollRoute() {
-    const navigate = payrollRoute.useNavigate();
-    return (
-      <PayrollPage
-        search={payrollRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
-});
-
-const expensesRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/back-office/gastos",
-  validateSearch: expenseSearchSchema,
-  component: function ExpensesRoute() {
-    const navigate = expensesRoute.useNavigate();
-    return (
-      <ExpensesPage
-        search={expensesRoute.useSearch()}
-        onSearchChange={(change) =>
-          void navigate({ search: (previous) => ({ ...previous, ...change }) })
-        }
-      />
-    );
-  },
-});
-
-// AW15 lists every label on one page, so it keeps only the list search.
-const expenseCategoriesRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: "/back-office/categorias-de-gasto",
-  validateSearch: listSearchSchema,
-  component: ExpenseCategoriesPage,
-});
-
 const pageRoutes = [
   scheduleRoute,
   branchesRoute,
   classTypesRoute,
   plansRoute,
-  clientsRoute,
-  paymentsRoute,
-  suppliesRoute,
-  withdrawalsRoute,
-  staffRoute,
-  payrollRoute,
-  expensesRoute,
-  expenseCategoriesRoute,
+  ...backOfficeRoutes,
 ];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)
@@ -334,9 +113,7 @@ const placeholderRoutes = navigationItems
   );
 
 const routeTree = rootRoute.addChildren([
-  loginRoute,
-  recoverPasswordRoute,
-  createPasswordRoute,
+  ...publicRoutes,
   authenticatedRoute.addChildren([...pageRoutes, ...placeholderRoutes]),
 ]);
 
