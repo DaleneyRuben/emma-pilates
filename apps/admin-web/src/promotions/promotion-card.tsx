@@ -111,7 +111,7 @@ export function PromotionCard({
             event.stopPropagation();
             onOpen();
           }}
-          className="truncate rounded-control text-left text-celda font-medium text-texto hover:text-primario focus-visible:shadow-foco"
+          className="truncate rounded-control text-left text-celda font-medium text-texto hover:text-primario focus-visible:shadow-foco max-md:line-clamp-2 max-md:whitespace-normal"
         >
           {promotion.headline}
         </button>
