@@ -238,6 +238,53 @@ describe("AW25 Evaluaciones nutricionales on a desktop browser", () => {
     expect(staffReads.at(-1)?.get("branchId")).toBe(equipetrol.id);
   });
 
+  it("drops a Nutritionist filter the new Branch does not know when the selector changes", async () => {
+    // Lorena works at Centro only; Equipetrol's list must not stay filtered
+    // by her after the switch.
+    server.use(
+      evaluationTable(() => jsonResponse(evaluationPage([]))),
+      http.get(apiUrl(staffMembersPath), ({ request }) => {
+        const params = new URL(request.url).searchParams;
+        staffReads.push(params);
+        return jsonResponse({
+          ...staffPage(
+            params.get("branchId") === equipetrol.id ? [] : [veronica, lorena],
+          ),
+          pageSize: 100,
+        });
+      }),
+    );
+    const { router, user } = renderAdmin(
+      `${september21}&nutritionistStaffMemberId=${lorena.id}`,
+    );
+    await waitFor(() =>
+      expect(
+        screen.getByRole("combobox", { name: "Nutricionista" }),
+      ).toHaveValue(lorena.id),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
+    await user.click(
+      within(await screen.findByRole("dialog", { name: "Sucursal" })).getByRole(
+        "option",
+        { name: /Equipetrol/ },
+      ),
+    );
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({
+        week: "2026-09-21",
+        page: 1,
+        pageSize: 20,
+      }),
+    );
+    expect(screen.getByRole("combobox", { name: "Nutricionista" })).toHaveValue(
+      "all",
+    );
+    expect(reads.at(-1)?.get("branchId")).toBe(equipetrol.id);
+    expect(reads.at(-1)?.has("nutritionistStaffMemberId")).toBe(false);
+  });
+
   it("offers a retry when the list cannot load", async () => {
     server.use(
       evaluationTable(() => problemResponse(500, "unexpected_error")),

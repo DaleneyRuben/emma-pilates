@@ -1,9 +1,13 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import {
+  alcohol,
   detergent,
   everySupplyHandler,
   paper,
+  suppliesPath,
+  supplyPage,
+  supplyRow,
   wax,
   withdrawalPage,
   withdrawalRow,
@@ -156,6 +160,51 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
       pageSize: 20,
     });
     expect(wax.archivedAt).not.toBeNull();
+  });
+
+  it("drops a Supply filter the new Branch does not know when the selector changes", async () => {
+    // Equipetrol never had Detergente; its history must not stay filtered
+    // by a Centro Supply the address remembers.
+    server.use(
+      http.get(apiUrl(suppliesPath), ({ request }) => {
+        const params = new URL(request.url).searchParams;
+        if (params.get("status") !== "all") return undefined;
+        return jsonResponse(
+          supplyPage(
+            params.get("branchId") === equipetrol.id
+              ? [supplyRow("09", "Toallas", { branchId: equipetrol.id })]
+              : [alcohol, detergent, paper, wax],
+            { pageSize: 100 },
+          ),
+        );
+      }),
+      history(() => jsonResponse(september)),
+    );
+    const { router, user } = renderAdmin(
+      `/back-office/insumos/retiros?month=2026-09&supplyId=${detergent.id}`,
+    );
+    await waitFor(() =>
+      expect(screen.getByLabelText("Insumo")).toHaveValue(detergent.id),
+    );
+
+    await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
+    await user.click(
+      within(await screen.findByRole("dialog", { name: "Sucursal" })).getByRole(
+        "option",
+        { name: /Equipetrol/ },
+      ),
+    );
+
+    await waitFor(() =>
+      expect(router.state.location.search).toEqual({
+        month: "2026-09",
+        page: 1,
+        pageSize: 20,
+      }),
+    );
+    expect(screen.getByLabelText("Insumo")).toHaveValue("all");
+    expect(reads.at(-1)?.get("branchId")).toBe(equipetrol.id);
+    expect(reads.at(-1)?.has("supplyId")).toBe(false);
   });
 
   it("reads the Branch the selector names", async () => {
