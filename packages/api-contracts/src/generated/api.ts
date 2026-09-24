@@ -26,6 +26,8 @@ import type {
   AdminBranchPageDto,
   AdminClassTypeDto,
   AdminClassTypePageDto,
+  AdminClientDetailDto,
+  AdminClientPageDto,
   AdminCreditPageDto,
   AdminEvaluationPageDto,
   AdminExpenseCategoryDto,
@@ -94,6 +96,7 @@ import type {
   InviteClientDto,
   ListAdminBranchesParams,
   ListAdminClassTypesParams,
+  ListAdminClientsParams,
   ListAdminCreditsParams,
   ListAdminEvaluationsParams,
   ListAdminExpensesParams,
@@ -15019,6 +15022,383 @@ export const useRecordAssistantCashPayment = <
     queryClient,
   );
 };
+
+export type listAdminClientsResponse200 = {
+  data: AdminClientPageDto;
+  status: 200;
+};
+
+export type listAdminClientsResponseSuccess = listAdminClientsResponse200 & {
+  headers: Headers;
+};
+export type listAdminClientsResponse = listAdminClientsResponseSuccess;
+
+export const getListAdminClientsUrl = (params?: ListAdminClientsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/clients?${stringifiedParams}`
+    : `/api/v1/administrator/clients`;
+};
+
+export const listAdminClients = async (
+  params?: ListAdminClientsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminClientsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminClientsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminClientsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminClientsResponse;
+};
+
+export const getListAdminClientsQueryKey = (
+  params?: ListAdminClientsParams,
+) => {
+  return [
+    `/api/v1/administrator/clients`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminClientsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminClients>>,
+  TError = unknown,
+>(
+  params?: ListAdminClientsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClients>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminClientsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminClients>>
+  > = ({ signal }) =>
+    listAdminClients(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminClients>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminClientsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminClients>>
+>;
+export type ListAdminClientsQueryError = unknown;
+
+export function useListAdminClients<
+  TData = Awaited<ReturnType<typeof listAdminClients>>,
+  TError = unknown,
+>(
+  params: undefined | ListAdminClientsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClients>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminClients>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminClients>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminClients<
+  TData = Awaited<ReturnType<typeof listAdminClients>>,
+  TError = unknown,
+>(
+  params?: ListAdminClientsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClients>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminClients>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminClients>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminClients<
+  TData = Awaited<ReturnType<typeof listAdminClients>>,
+  TError = unknown,
+>(
+  params?: ListAdminClientsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClients>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminClients<
+  TData = Awaited<ReturnType<typeof listAdminClients>>,
+  TError = unknown,
+>(
+  params?: ListAdminClientsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminClients>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminClientsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getAdminClientResponse200 = {
+  data: AdminClientDetailDto;
+  status: 200;
+};
+
+export type getAdminClientResponseSuccess = getAdminClientResponse200 & {
+  headers: Headers;
+};
+export type getAdminClientResponse = getAdminClientResponseSuccess;
+
+export const getGetAdminClientUrl = (clientId: string) => {
+  return `/api/v1/administrator/clients/${clientId}`;
+};
+
+export const getAdminClient = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAdminClientResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetAdminClientUrl(clientId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAdminClientResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getAdminClientResponse;
+};
+
+export const getGetAdminClientQueryKey = (clientId: string) => {
+  return [`/api/v1/administrator/clients/${clientId}`] as const;
+};
+
+export const getGetAdminClientQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAdminClient>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdminClient>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetAdminClientQueryKey(clientId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdminClient>>> = ({
+    signal,
+  }) => getAdminClient(clientId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: clientId !== null && clientId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAdminClient>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAdminClientQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAdminClient>>
+>;
+export type GetAdminClientQueryError = unknown;
+
+export function useGetAdminClient<
+  TData = Awaited<ReturnType<typeof getAdminClient>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdminClient>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminClient>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminClient>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdminClient<
+  TData = Awaited<ReturnType<typeof getAdminClient>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdminClient>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminClient>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminClient>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdminClient<
+  TData = Awaited<ReturnType<typeof getAdminClient>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdminClient>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetAdminClient<
+  TData = Awaited<ReturnType<typeof getAdminClient>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof getAdminClient>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetAdminClientQueryOptions(clientId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export type listEvaluationSlotsResponse200 = {
   data: EvaluationAvailabilityDto;

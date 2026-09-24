@@ -3723,6 +3723,94 @@
         ]
       }
     },
+    "/api/v1/administrator/clients": {
+      "get": {
+        "operationId": "listAdminClients",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Name, email, or phone fragment, accents and case ignored",
+            "schema": {}
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClientPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClients"
+        ]
+      }
+    },
+    "/api/v1/administrator/clients/{clientId}": {
+      "get": {
+        "operationId": "getAdminClient",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClientDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClients"
+        ]
+      }
+    },
     "/api/v1/evaluation-slots": {
       "get": {
         "operationId": "listEvaluationSlots",
@@ -8327,6 +8415,161 @@
         },
         "required": [
           "payment"
+        ]
+      },
+      "AdminClientDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "active",
+              "pending",
+              "disabled"
+            ]
+          },
+          "planName": {
+            "type": "string",
+            "nullable": true,
+            "description": "The active Subscription’s Plan name, if any"
+          },
+          "subscriptionStatus": {
+            "type": "string",
+            "enum": [
+              "active",
+              "expired",
+              "none"
+            ],
+            "description": "`expired` when the Client had a Plan before, `none` if never"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "accountStatus",
+          "planName",
+          "subscriptionStatus"
+        ]
+      },
+      "AdminClientPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminClientDto"
+            }
+          },
+          "page": {
+            "type": "number",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalItems": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clients matching the search"
+          },
+          "studioClientCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Every Client of the studio, whatever the search"
+          },
+          "activePlanClientCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Clients of the studio with an active Subscription today"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "studioClientCount",
+          "activePlanClientCount"
+        ]
+      },
+      "AdminClientDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "accountStatus": {
+            "type": "string",
+            "enum": [
+              "active",
+              "pending",
+              "disabled"
+            ],
+            "description": "`pending` while an invitation or verification is open"
+          },
+          "clientSince": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia date of creation"
+          },
+          "subscription": {
+            "$ref": "#/components/schemas/ClientSubscriptionDto"
+          },
+          "creditAvailableCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Available Credit in BOB centavos"
+          },
+          "referralCode": {
+            "type": "string"
+          },
+          "referredClientCount": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "accountStatus",
+          "clientSince",
+          "subscription",
+          "creditAvailableCentavos",
+          "referralCode",
+          "referredClientCount"
         ]
       },
       "EvaluationSlotDto": {
