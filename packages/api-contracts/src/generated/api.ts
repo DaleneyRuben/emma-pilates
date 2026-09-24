@@ -36,6 +36,7 @@ import type {
   AdminPaymentPageDto,
   AdminPlanDto,
   AdminPlanPageDto,
+  AdminPromotionDto,
   AdminReferralPageDto,
   AdminSalaryPaymentDto,
   AdminSalaryPaymentPageDto,
@@ -92,8 +93,10 @@ import type {
   ExpenseInputDto,
   ExpenseReportDto,
   FinalizedUploadDto,
+  GetAdminPromotionImageParams,
   GetExpenseReportParams,
   GetIncomeReportParams,
+  GetPaymentReceiptParams,
   IncomeReportDto,
   InviteClientDto,
   ListAdminBranchesParams,
@@ -135,6 +138,9 @@ import type {
   PlanInputDto,
   PlanQuotesDto,
   PlanVisibilityDto,
+  PromotionDto,
+  PromotionInputDto,
+  PromotionOrderDto,
   PurchaseIntentDto,
   ReadinessResponseDto,
   RecordCashPaymentDto,
@@ -13344,19 +13350,38 @@ export type getPaymentReceiptResponseSuccess = (
 };
 export type getPaymentReceiptResponse = getPaymentReceiptResponseSuccess;
 
-export const getGetPaymentReceiptUrl = (paymentId: string) => {
-  return `/api/v1/administrator/payments/${paymentId}/receipt`;
+export const getGetPaymentReceiptUrl = (
+  paymentId: string,
+  params?: GetPaymentReceiptParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/payments/${paymentId}/receipt?${stringifiedParams}`
+    : `/api/v1/administrator/payments/${paymentId}/receipt`;
 };
 
 export const getPaymentReceipt = async (
   paymentId: string,
+  params?: GetPaymentReceiptParams,
   options?: RequestInit,
   fetchFn?: typeof globalThis.fetch,
 ): Promise<getPaymentReceiptResponse> => {
-  const res = await (fetchFn ?? fetch)(getGetPaymentReceiptUrl(paymentId), {
-    ...options,
-    method: "GET",
-  });
+  const res = await (fetchFn ?? fetch)(
+    getGetPaymentReceiptUrl(paymentId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
   const data: getPaymentReceiptResponse["data"] =
@@ -13368,8 +13393,14 @@ export const getPaymentReceipt = async (
   } as getPaymentReceiptResponse;
 };
 
-export const getGetPaymentReceiptQueryKey = (paymentId: string) => {
-  return [`/api/v1/administrator/payments/${paymentId}/receipt`] as const;
+export const getGetPaymentReceiptQueryKey = (
+  paymentId: string,
+  params?: GetPaymentReceiptParams,
+) => {
+  return [
+    `/api/v1/administrator/payments/${paymentId}/receipt`,
+    ...(params ? [params] : []),
+  ] as const;
 };
 
 export const getGetPaymentReceiptQueryOptions = <
@@ -13377,6 +13408,7 @@ export const getGetPaymentReceiptQueryOptions = <
   TError = unknown,
 >(
   paymentId: string,
+  params?: GetPaymentReceiptParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -13396,12 +13428,17 @@ export const getGetPaymentReceiptQueryOptions = <
   } = options ?? {};
 
   const queryKey =
-    queryOptions?.queryKey ?? getGetPaymentReceiptQueryKey(paymentId);
+    queryOptions?.queryKey ?? getGetPaymentReceiptQueryKey(paymentId, params);
 
   const queryFn: QueryFunction<
     Awaited<ReturnType<typeof getPaymentReceipt>>
   > = ({ signal }) =>
-    getPaymentReceipt(paymentId, { signal, ...fetchOptions }, fetcherFn);
+    getPaymentReceipt(
+      paymentId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
 
   return {
     queryKey,
@@ -13425,6 +13462,7 @@ export function useGetPaymentReceipt<
   TError = unknown,
 >(
   paymentId: string,
+  params: undefined | GetPaymentReceiptParams,
   options: {
     query: Partial<
       UseQueryOptions<
@@ -13453,6 +13491,7 @@ export function useGetPaymentReceipt<
   TError = unknown,
 >(
   paymentId: string,
+  params?: GetPaymentReceiptParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -13481,6 +13520,7 @@ export function useGetPaymentReceipt<
   TError = unknown,
 >(
   paymentId: string,
+  params?: GetPaymentReceiptParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -13502,6 +13542,7 @@ export function useGetPaymentReceipt<
   TError = unknown,
 >(
   paymentId: string,
+  params?: GetPaymentReceiptParams,
   options?: {
     query?: Partial<
       UseQueryOptions<
@@ -13517,7 +13558,11 @@ export function useGetPaymentReceipt<
 ): UseQueryResult<TData, TError> & {
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
-  const queryOptions = getGetPaymentReceiptQueryOptions(paymentId, options);
+  const queryOptions = getGetPaymentReceiptQueryOptions(
+    paymentId,
+    params,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
@@ -15599,6 +15644,1496 @@ export function useListAdminPayments<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getListAdminPaymentsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listAdminPromotionsResponse200 = {
+  data: AdminPromotionDto[];
+  status: 200;
+};
+
+export type listAdminPromotionsResponseSuccess =
+  listAdminPromotionsResponse200 & {
+    headers: Headers;
+  };
+export type listAdminPromotionsResponse = listAdminPromotionsResponseSuccess;
+
+export const getListAdminPromotionsUrl = () => {
+  return `/api/v1/administrator/promotions`;
+};
+
+export const listAdminPromotions = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminPromotionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminPromotionsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminPromotionsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminPromotionsResponse;
+};
+
+export const getListAdminPromotionsQueryKey = () => {
+  return [`/api/v1/administrator/promotions`] as const;
+};
+
+export const getListAdminPromotionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminPromotions>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listAdminPromotions>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListAdminPromotionsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminPromotions>>
+  > = ({ signal }) =>
+    listAdminPromotions({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminPromotions>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminPromotionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminPromotions>>
+>;
+export type ListAdminPromotionsQueryError = unknown;
+
+export function useListAdminPromotions<
+  TData = Awaited<ReturnType<typeof listAdminPromotions>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPromotions>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminPromotions>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminPromotions>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminPromotions<
+  TData = Awaited<ReturnType<typeof listAdminPromotions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPromotions>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminPromotions>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminPromotions>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminPromotions<
+  TData = Awaited<ReturnType<typeof listAdminPromotions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPromotions>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminPromotions<
+  TData = Awaited<ReturnType<typeof listAdminPromotions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPromotions>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminPromotionsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type createPromotionResponse201 = {
+  data: AdminPromotionDto;
+  status: 201;
+};
+
+export type createPromotionResponseSuccess = createPromotionResponse201 & {
+  headers: Headers;
+};
+export type createPromotionResponse = createPromotionResponseSuccess;
+
+export const getCreatePromotionUrl = () => {
+  return `/api/v1/administrator/promotions`;
+};
+
+export const createPromotion = async (
+  promotionInputDto: PromotionInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createPromotionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreatePromotionUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(promotionInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createPromotionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createPromotionResponse;
+};
+
+export const getCreatePromotionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createPromotion>>,
+    TError,
+    CreatePromotionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createPromotion>>,
+  TError,
+  CreatePromotionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createPromotion"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createPromotion>>,
+    CreatePromotionMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createPromotion(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreatePromotionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createPromotion>>
+>;
+export type CreatePromotionMutationBody = PromotionInputDto;
+export type CreatePromotionMutationError = unknown;
+export type CreatePromotionMutationVariables = { data: PromotionInputDto };
+
+export const useCreatePromotion = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createPromotion>>,
+      TError,
+      CreatePromotionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createPromotion>>,
+  TError,
+  CreatePromotionMutationVariables,
+  TContext
+> => {
+  return useMutation(getCreatePromotionMutationOptions(options), queryClient);
+};
+
+export type reorderPromotionsResponse200 = {
+  data: AdminPromotionDto[];
+  status: 200;
+};
+
+export type reorderPromotionsResponseSuccess = reorderPromotionsResponse200 & {
+  headers: Headers;
+};
+export type reorderPromotionsResponse = reorderPromotionsResponseSuccess;
+
+export const getReorderPromotionsUrl = () => {
+  return `/api/v1/administrator/promotions/order`;
+};
+
+export const reorderPromotions = async (
+  promotionOrderDto: PromotionOrderDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<reorderPromotionsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getReorderPromotionsUrl(), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(promotionOrderDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: reorderPromotionsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as reorderPromotionsResponse;
+};
+
+export const getReorderPromotionsMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof reorderPromotions>>,
+    TError,
+    ReorderPromotionsMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof reorderPromotions>>,
+  TError,
+  ReorderPromotionsMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["reorderPromotions"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof reorderPromotions>>,
+    ReorderPromotionsMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return reorderPromotions(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ReorderPromotionsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof reorderPromotions>>
+>;
+export type ReorderPromotionsMutationBody = PromotionOrderDto;
+export type ReorderPromotionsMutationError = unknown;
+export type ReorderPromotionsMutationVariables = { data: PromotionOrderDto };
+
+export const useReorderPromotions = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof reorderPromotions>>,
+      TError,
+      ReorderPromotionsMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof reorderPromotions>>,
+  TError,
+  ReorderPromotionsMutationVariables,
+  TContext
+> => {
+  return useMutation(getReorderPromotionsMutationOptions(options), queryClient);
+};
+
+export type updatePromotionResponse200 = {
+  data: AdminPromotionDto;
+  status: 200;
+};
+
+export type updatePromotionResponseSuccess = updatePromotionResponse200 & {
+  headers: Headers;
+};
+export type updatePromotionResponse = updatePromotionResponseSuccess;
+
+export const getUpdatePromotionUrl = (promotionId: string) => {
+  return `/api/v1/administrator/promotions/${promotionId}`;
+};
+
+export const updatePromotion = async (
+  promotionId: string,
+  promotionInputDto: PromotionInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updatePromotionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getUpdatePromotionUrl(promotionId), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(promotionInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updatePromotionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updatePromotionResponse;
+};
+
+export const getUpdatePromotionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updatePromotion>>,
+    TError,
+    UpdatePromotionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updatePromotion>>,
+  TError,
+  UpdatePromotionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updatePromotion"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updatePromotion>>,
+    UpdatePromotionMutationVariables
+  > = (props) => {
+    const { promotionId, data } = props ?? {};
+
+    return updatePromotion(promotionId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdatePromotionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updatePromotion>>
+>;
+export type UpdatePromotionMutationBody = PromotionInputDto;
+export type UpdatePromotionMutationError = unknown;
+export type UpdatePromotionMutationVariables = {
+  promotionId: string;
+  data: PromotionInputDto;
+};
+
+export const useUpdatePromotion = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updatePromotion>>,
+      TError,
+      UpdatePromotionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updatePromotion>>,
+  TError,
+  UpdatePromotionMutationVariables,
+  TContext
+> => {
+  return useMutation(getUpdatePromotionMutationOptions(options), queryClient);
+};
+
+export type deletePromotionResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deletePromotionResponseSuccess = deletePromotionResponse204 & {
+  headers: Headers;
+};
+export type deletePromotionResponse = deletePromotionResponseSuccess;
+
+export const getDeletePromotionUrl = (promotionId: string) => {
+  return `/api/v1/administrator/promotions/${promotionId}`;
+};
+
+export const deletePromotion = async (
+  promotionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deletePromotionResponse> => {
+  const res = await (fetchFn ?? fetch)(getDeletePromotionUrl(promotionId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deletePromotionResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deletePromotionResponse;
+};
+
+export const getDeletePromotionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deletePromotion>>,
+    TError,
+    DeletePromotionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deletePromotion>>,
+  TError,
+  DeletePromotionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["deletePromotion"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deletePromotion>>,
+    DeletePromotionMutationVariables
+  > = (props) => {
+    const { promotionId } = props ?? {};
+
+    return deletePromotion(promotionId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeletePromotionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deletePromotion>>
+>;
+
+export type DeletePromotionMutationError = unknown;
+export type DeletePromotionMutationVariables = { promotionId: string };
+
+export const useDeletePromotion = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deletePromotion>>,
+      TError,
+      DeletePromotionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deletePromotion>>,
+  TError,
+  DeletePromotionMutationVariables,
+  TContext
+> => {
+  return useMutation(getDeletePromotionMutationOptions(options), queryClient);
+};
+
+export type publishPromotionResponse200 = {
+  data: AdminPromotionDto;
+  status: 200;
+};
+
+export type publishPromotionResponseSuccess = publishPromotionResponse200 & {
+  headers: Headers;
+};
+export type publishPromotionResponse = publishPromotionResponseSuccess;
+
+export const getPublishPromotionUrl = (promotionId: string) => {
+  return `/api/v1/administrator/promotions/${promotionId}/publish`;
+};
+
+export const publishPromotion = async (
+  promotionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<publishPromotionResponse> => {
+  const res = await (fetchFn ?? fetch)(getPublishPromotionUrl(promotionId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: publishPromotionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as publishPromotionResponse;
+};
+
+export const getPublishPromotionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof publishPromotion>>,
+    TError,
+    PublishPromotionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof publishPromotion>>,
+  TError,
+  PublishPromotionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["publishPromotion"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof publishPromotion>>,
+    PublishPromotionMutationVariables
+  > = (props) => {
+    const { promotionId } = props ?? {};
+
+    return publishPromotion(promotionId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type PublishPromotionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof publishPromotion>>
+>;
+
+export type PublishPromotionMutationError = unknown;
+export type PublishPromotionMutationVariables = { promotionId: string };
+
+export const usePublishPromotion = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof publishPromotion>>,
+      TError,
+      PublishPromotionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof publishPromotion>>,
+  TError,
+  PublishPromotionMutationVariables,
+  TContext
+> => {
+  return useMutation(getPublishPromotionMutationOptions(options), queryClient);
+};
+
+export type unpublishPromotionResponse200 = {
+  data: AdminPromotionDto;
+  status: 200;
+};
+
+export type unpublishPromotionResponseSuccess =
+  unpublishPromotionResponse200 & {
+    headers: Headers;
+  };
+export type unpublishPromotionResponse = unpublishPromotionResponseSuccess;
+
+export const getUnpublishPromotionUrl = (promotionId: string) => {
+  return `/api/v1/administrator/promotions/${promotionId}/unpublish`;
+};
+
+export const unpublishPromotion = async (
+  promotionId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<unpublishPromotionResponse> => {
+  const res = await (fetchFn ?? fetch)(getUnpublishPromotionUrl(promotionId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: unpublishPromotionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as unpublishPromotionResponse;
+};
+
+export const getUnpublishPromotionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof unpublishPromotion>>,
+    TError,
+    UnpublishPromotionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof unpublishPromotion>>,
+  TError,
+  UnpublishPromotionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["unpublishPromotion"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof unpublishPromotion>>,
+    UnpublishPromotionMutationVariables
+  > = (props) => {
+    const { promotionId } = props ?? {};
+
+    return unpublishPromotion(promotionId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UnpublishPromotionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof unpublishPromotion>>
+>;
+
+export type UnpublishPromotionMutationError = unknown;
+export type UnpublishPromotionMutationVariables = { promotionId: string };
+
+export const useUnpublishPromotion = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof unpublishPromotion>>,
+      TError,
+      UnpublishPromotionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof unpublishPromotion>>,
+  TError,
+  UnpublishPromotionMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getUnpublishPromotionMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getAdminPromotionImageResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getAdminPromotionImageResponseSuccess =
+  getAdminPromotionImageResponse200 & {
+    headers: Headers;
+  };
+export type getAdminPromotionImageResponse =
+  getAdminPromotionImageResponseSuccess;
+
+export const getGetAdminPromotionImageUrl = (
+  promotionId: string,
+  params: GetAdminPromotionImageParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/promotions/${promotionId}/image?${stringifiedParams}`
+    : `/api/v1/administrator/promotions/${promotionId}/image`;
+};
+
+export const getAdminPromotionImage = async (
+  promotionId: string,
+  params: GetAdminPromotionImageParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getAdminPromotionImageResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetAdminPromotionImageUrl(promotionId, params),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getAdminPromotionImageResponse["data"] =
+    body as getAdminPromotionImageResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getAdminPromotionImageResponse;
+};
+
+export const getGetAdminPromotionImageQueryKey = (
+  promotionId: string,
+  params?: GetAdminPromotionImageParams,
+) => {
+  return [
+    `/api/v1/administrator/promotions/${promotionId}/image`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetAdminPromotionImageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getAdminPromotionImage>>,
+  TError = unknown,
+>(
+  promotionId: string,
+  params: GetAdminPromotionImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminPromotionImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetAdminPromotionImageQueryKey(promotionId, params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getAdminPromotionImage>>
+  > = ({ signal }) =>
+    getAdminPromotionImage(
+      promotionId,
+      params,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: promotionId !== null && promotionId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getAdminPromotionImage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetAdminPromotionImageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getAdminPromotionImage>>
+>;
+export type GetAdminPromotionImageQueryError = unknown;
+
+export function useGetAdminPromotionImage<
+  TData = Awaited<ReturnType<typeof getAdminPromotionImage>>,
+  TError = unknown,
+>(
+  promotionId: string,
+  params: GetAdminPromotionImageParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminPromotionImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminPromotionImage>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminPromotionImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdminPromotionImage<
+  TData = Awaited<ReturnType<typeof getAdminPromotionImage>>,
+  TError = unknown,
+>(
+  promotionId: string,
+  params: GetAdminPromotionImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminPromotionImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getAdminPromotionImage>>,
+          TError,
+          Awaited<ReturnType<typeof getAdminPromotionImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetAdminPromotionImage<
+  TData = Awaited<ReturnType<typeof getAdminPromotionImage>>,
+  TError = unknown,
+>(
+  promotionId: string,
+  params: GetAdminPromotionImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminPromotionImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetAdminPromotionImage<
+  TData = Awaited<ReturnType<typeof getAdminPromotionImage>>,
+  TError = unknown,
+>(
+  promotionId: string,
+  params: GetAdminPromotionImageParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getAdminPromotionImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetAdminPromotionImageQueryOptions(
+    promotionId,
+    params,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listPromotionsResponse200 = {
+  data: PromotionDto[];
+  status: 200;
+};
+
+export type listPromotionsResponseSuccess = listPromotionsResponse200 & {
+  headers: Headers;
+};
+export type listPromotionsResponse = listPromotionsResponseSuccess;
+
+export const getListPromotionsUrl = () => {
+  return `/api/v1/promotions`;
+};
+
+export const listPromotions = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listPromotionsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListPromotionsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listPromotionsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listPromotionsResponse;
+};
+
+export const getListPromotionsQueryKey = () => {
+  return [`/api/v1/promotions`] as const;
+};
+
+export const getListPromotionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listPromotions>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof listPromotions>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListPromotionsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listPromotions>>> = ({
+    signal,
+  }) => listPromotions({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listPromotions>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListPromotionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listPromotions>>
+>;
+export type ListPromotionsQueryError = unknown;
+
+export function useListPromotions<
+  TData = Awaited<ReturnType<typeof listPromotions>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listPromotions>>, TError, TData>
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPromotions>>,
+          TError,
+          Awaited<ReturnType<typeof listPromotions>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListPromotions<
+  TData = Awaited<ReturnType<typeof listPromotions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listPromotions>>, TError, TData>
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listPromotions>>,
+          TError,
+          Awaited<ReturnType<typeof listPromotions>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListPromotions<
+  TData = Awaited<ReturnType<typeof listPromotions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listPromotions>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListPromotions<
+  TData = Awaited<ReturnType<typeof listPromotions>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<Awaited<ReturnType<typeof listPromotions>>, TError, TData>
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListPromotionsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getPromotionImageResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getPromotionImageResponseSuccess = getPromotionImageResponse200 & {
+  headers: Headers;
+};
+export type getPromotionImageResponse = getPromotionImageResponseSuccess;
+
+export const getGetPromotionImageUrl = (
+  imageAssetId: string,
+  kind: "promotion_480" | "promotion_960" | "promotion_1440",
+  deliveryVersion: string,
+) => {
+  return `/api/v1/promotion-images/${imageAssetId}/${kind}/${deliveryVersion}`;
+};
+
+export const getPromotionImage = async (
+  imageAssetId: string,
+  kind: "promotion_480" | "promotion_960" | "promotion_1440",
+  deliveryVersion: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getPromotionImageResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetPromotionImageUrl(imageAssetId, kind, deliveryVersion),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getPromotionImageResponse["data"] =
+    body as getPromotionImageResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getPromotionImageResponse;
+};
+
+export const getGetPromotionImageQueryKey = (
+  imageAssetId: string,
+  kind: "promotion_480" | "promotion_960" | "promotion_1440",
+  deliveryVersion: string,
+) => {
+  return [
+    `/api/v1/promotion-images/${imageAssetId}/${kind}/${deliveryVersion}`,
+  ] as const;
+};
+
+export const getGetPromotionImageQueryOptions = <
+  TData = Awaited<ReturnType<typeof getPromotionImage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  kind: "promotion_480" | "promotion_960" | "promotion_1440",
+  deliveryVersion: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPromotionImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetPromotionImageQueryKey(imageAssetId, kind, deliveryVersion);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getPromotionImage>>
+  > = ({ signal }) =>
+    getPromotionImage(
+      imageAssetId,
+      kind,
+      deliveryVersion,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled:
+      imageAssetId !== null &&
+      imageAssetId !== undefined &&
+      kind !== null &&
+      kind !== undefined &&
+      deliveryVersion !== null &&
+      deliveryVersion !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getPromotionImage>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetPromotionImageQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getPromotionImage>>
+>;
+export type GetPromotionImageQueryError = unknown;
+
+export function useGetPromotionImage<
+  TData = Awaited<ReturnType<typeof getPromotionImage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  kind: "promotion_480" | "promotion_960" | "promotion_1440",
+  deliveryVersion: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPromotionImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPromotionImage>>,
+          TError,
+          Awaited<ReturnType<typeof getPromotionImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetPromotionImage<
+  TData = Awaited<ReturnType<typeof getPromotionImage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  kind: "promotion_480" | "promotion_960" | "promotion_1440",
+  deliveryVersion: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPromotionImage>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPromotionImage>>,
+          TError,
+          Awaited<ReturnType<typeof getPromotionImage>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetPromotionImage<
+  TData = Awaited<ReturnType<typeof getPromotionImage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  kind: "promotion_480" | "promotion_960" | "promotion_1440",
+  deliveryVersion: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPromotionImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetPromotionImage<
+  TData = Awaited<ReturnType<typeof getPromotionImage>>,
+  TError = unknown,
+>(
+  imageAssetId: string,
+  kind: "promotion_480" | "promotion_960" | "promotion_1440",
+  deliveryVersion: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getPromotionImage>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetPromotionImageQueryOptions(
+    imageAssetId,
+    kind,
+    deliveryVersion,
+    options,
+  );
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

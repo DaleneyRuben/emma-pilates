@@ -57,6 +57,14 @@
     "listAdminExpenses",
     "recordExpense",
     "updateExpense",
-    "getExpenseReport"
+    "getExpenseReport",
+    "listAdminPromotions",
+    "createPromotion",
+    "reorderPromotions",
+    "updatePromotion",
+    "publishPromotion",
+    "unpublishPromotion",
+    "deletePromotion",
+    "getAdminPromotionImage"
   ]
 }

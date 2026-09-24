@@ -3325,6 +3325,18 @@
               "format": "uuid",
               "type": "string"
             }
+          },
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "readable",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -3882,6 +3894,406 @@
         "summary": "",
         "tags": [
           "AdministratorPaymentList"
+        ]
+      }
+    },
+    "/api/v1/administrator/promotions": {
+      "get": {
+        "operationId": "listAdminPromotions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminPromotionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotions"
+        ]
+      },
+      "post": {
+        "operationId": "createPromotion",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotionInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPromotionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotions"
+        ]
+      }
+    },
+    "/api/v1/administrator/promotions/order": {
+      "put": {
+        "operationId": "reorderPromotions",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotionOrderDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminPromotionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotions"
+        ]
+      }
+    },
+    "/api/v1/administrator/promotions/{promotionId}": {
+      "put": {
+        "operationId": "updatePromotion",
+        "parameters": [
+          {
+            "name": "promotionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PromotionInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPromotionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotions"
+        ]
+      },
+      "delete": {
+        "operationId": "deletePromotion",
+        "parameters": [
+          {
+            "name": "promotionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotions"
+        ]
+      }
+    },
+    "/api/v1/administrator/promotions/{promotionId}/publish": {
+      "post": {
+        "operationId": "publishPromotion",
+        "parameters": [
+          {
+            "name": "promotionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPromotionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotions"
+        ]
+      }
+    },
+    "/api/v1/administrator/promotions/{promotionId}/unpublish": {
+      "post": {
+        "operationId": "unpublishPromotion",
+        "parameters": [
+          {
+            "name": "promotionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPromotionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotions"
+        ]
+      }
+    },
+    "/api/v1/administrator/promotions/{promotionId}/image": {
+      "get": {
+        "operationId": "getAdminPromotionImage",
+        "parameters": [
+          {
+            "name": "promotionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "variant",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "promotion_480",
+                "promotion_960",
+                "promotion_1440"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotions"
+        ]
+      }
+    },
+    "/api/v1/promotions": {
+      "get": {
+        "operationId": "listPromotions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PromotionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Promotions"
+        ]
+      }
+    },
+    "/api/v1/promotion-images/{imageAssetId}/{kind}/{deliveryVersion}": {
+      "get": {
+        "operationId": "getPromotionImage",
+        "parameters": [
+          {
+            "name": "imageAssetId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "kind",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "enum": [
+                "promotion_480",
+                "promotion_960",
+                "promotion_1440"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "deliveryVersion",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/webp": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "PromotionImages"
         ]
       }
     },
@@ -8815,6 +9227,207 @@
           "pageSize",
           "totalItems",
           "pendingCount"
+        ]
+      },
+      "AdminPromotionImageDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "width": {
+            "type": "number",
+            "description": "Source width after finalization"
+          },
+          "height": {
+            "type": "number"
+          },
+          "thumbnailUrl": {
+            "type": "string",
+            "description": "Authenticated route streaming the private 480 px variant for the list"
+          }
+        },
+        "required": [
+          "imageAssetId",
+          "width",
+          "height",
+          "thumbnailUrl"
+        ]
+      },
+      "AdminPromotionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "headline": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "displayStartsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "displayEndsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "displayOrder": {
+            "type": "number"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "scheduled",
+              "active",
+              "ended",
+              "archived"
+            ]
+          },
+          "image": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AdminPromotionImageDto"
+              }
+            ]
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "headline",
+          "description",
+          "displayStartsOn",
+          "displayEndsOn",
+          "displayOrder",
+          "publishedAt",
+          "state",
+          "updatedAt"
+        ]
+      },
+      "PromotionInputDto": {
+        "type": "object",
+        "properties": {
+          "headline": {
+            "type": "string",
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 280
+          },
+          "displayStartsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "displayEndsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true,
+            "description": "A finalized `promotion` upload owned by the Administrator"
+          }
+        },
+        "required": [
+          "headline",
+          "description",
+          "displayStartsOn",
+          "displayEndsOn"
+        ]
+      },
+      "PromotionOrderDto": {
+        "type": "object",
+        "properties": {
+          "promotionIds": {
+            "description": "Every live Promotion, in carousel order",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "promotionIds"
+        ]
+      },
+      "PromotionImageSourceDto": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Public, versioned, immutable image URL"
+          },
+          "mediaType": {
+            "type": "string"
+          },
+          "width": {
+            "type": "number"
+          },
+          "height": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "url",
+          "mediaType",
+          "width",
+          "height"
+        ]
+      },
+      "PromotionImageDto": {
+        "type": "object",
+        "properties": {
+          "sources": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PromotionImageSourceDto"
+            }
+          }
+        },
+        "required": [
+          "sources"
+        ]
+      },
+      "PromotionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "headline": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "image": {
+            "$ref": "#/components/schemas/PromotionImageDto"
+          }
+        },
+        "required": [
+          "id",
+          "headline",
+          "description",
+          "image"
         ]
       },
       "EvaluationSlotDto": {
