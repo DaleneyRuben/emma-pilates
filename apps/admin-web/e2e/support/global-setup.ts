@@ -2,6 +2,7 @@ import { execFileSync, spawn, type ChildProcess } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { resolve } from "node:path";
 import { setTimeout as sleep } from "node:timers/promises";
+import { serverStdio, stopChild } from "./child-process";
 import {
   adminDatabaseUrl,
   apiOrigin,
@@ -49,17 +50,6 @@ const waitFor = async (url: string, what: string): Promise<void> => {
   throw new Error(`${what} did not answer at ${url} within 60 s`);
 };
 
-const stop = async (child: ChildProcess | undefined): Promise<void> => {
-  if (child === undefined || child.exitCode !== null) return;
-  await new Promise<void>((done) => {
-    child.once("exit", () => done());
-    child.kill("SIGTERM");
-    setTimeout(() => {
-      if (child.exitCode === null) child.kill("SIGKILL");
-    }, 5_000).unref();
-  });
-};
-
 export default async function globalSetup(): Promise<() => Promise<void>> {
   if (!databaseName(adminDatabaseUrl).startsWith(disposablePrefix)) {
     throw new Error(
@@ -91,7 +81,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
     api = spawn("node", ["dist/src/main.js"], {
       cwd: backendRoot,
       env: environment,
-      stdio: "ignore",
+      stdio: serverStdio(adminWebRoot, "e2e-backend"),
     });
     web = spawn(
       "node",
@@ -105,24 +95,24 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       {
         cwd: adminWebRoot,
         env: { ...process.env, ADMIN_API_PROXY_TARGET: apiOrigin },
-        stdio: "ignore",
+        stdio: serverStdio(adminWebRoot, "e2e-preview"),
       },
     );
     await waitFor(`${apiOrigin}/health/ready`, "The backend");
     await waitFor(`${webOrigin}/`, "The preview server");
     console.log(
-      `e2e: backend pid ${api.pid} on ${apiOrigin}, preview pid ${web.pid} on ${webOrigin}, database ${name}`,
+      `e2e: backend pid ${api.pid} on ${apiOrigin}, preview pid ${web.pid} on ${webOrigin}, database ${name}; stderr under test-results/ (E2E_DEBUG=1 prints it here)`,
     );
   } catch (error) {
-    await stop(web);
-    await stop(api);
+    await stopChild(web);
+    await stopChild(api);
     dropDatabase();
     throw error;
   }
 
   return async () => {
-    await stop(web);
-    await stop(api);
+    await stopChild(web);
+    await stopChild(api);
     dropDatabase();
   };
 }
