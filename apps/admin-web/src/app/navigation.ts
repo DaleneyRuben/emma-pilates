@@ -44,6 +44,11 @@ export type NavigationItem = {
   badge?: "pendingPayments" | "lowStock";
   /** Its sub-pages keep it marked (AW31 is a view of Insumos). */
   subPages?: true;
+  /**
+   * The page brings its own Branch selector with «Todas las sucursales»
+   * (AW16), so the top bar shows a note instead of the shell's.
+   */
+  ownBranchFilter?: true;
 };
 
 export type NavigationGroup = {
@@ -147,7 +152,17 @@ export const navigationGroups: readonly NavigationGroup[] = [
       },
     ],
   },
-  { items: [{ label: "Reporte", to: "/reporte", screen: "AW16" }] },
+  {
+    items: [
+      {
+        label: "Reporte",
+        to: "/reporte",
+        screen: "AW16",
+        built: true,
+        ownBranchFilter: true,
+      },
+    ],
+  },
   {
     label: "Promociones",
     items: [
