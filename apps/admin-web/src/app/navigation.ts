@@ -194,3 +194,12 @@ export const findNavigationItem = (
   pathname: string,
 ): NavigationItem | undefined =>
   navigationItems.find((item) => item.to === pathname);
+
+/** The entry a page belongs to, its sub-pages (AW31 under Insumos) included. */
+export const navigationItemOf = (
+  pathname: string,
+): NavigationItem | undefined =>
+  findNavigationItem(pathname) ??
+  navigationItems.find(
+    (item) => item.subPages === true && pathname.startsWith(`${item.to}/`),
+  );

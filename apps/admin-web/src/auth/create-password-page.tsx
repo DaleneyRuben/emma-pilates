@@ -9,6 +9,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import { adminFetch } from "../api/fetcher";
+import { useDocumentTitle } from "../app/use-document-title";
 import { buttonVariants } from "../components/ui/button";
 import { currentSessionQueryOptions } from "../session/session-queries";
 import { useStartSession } from "../session/use-start-session";
@@ -78,6 +79,7 @@ function ExpiredLink({ purpose }: { purpose: Purpose }) {
  * session only for an Administrator.
  */
 export function CreatePasswordPage({ token }: { token: string | undefined }) {
+  useDocumentTitle("Crear contraseña");
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const startSession = useStartSession();

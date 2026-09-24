@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { adminFetch } from "../api/fetcher";
+import { useDocumentTitle } from "../app/use-document-title";
 import { isApiError } from "../api/problem";
 import {
   Form,
@@ -50,6 +51,7 @@ function SentState() {
 // AW30: the response stays neutral (ADR-0029); only a broader client or
 // network limit answers with a wait, and that wait comes from the server.
 export function RecoverPasswordPage() {
+  useDocumentTitle("Recuperar contraseña");
   const [sent, setSent] = useState(false);
   const [failed, setFailed] = useState(false);
   const [waitSeconds, startWait] = useCountdown();

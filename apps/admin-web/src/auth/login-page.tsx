@@ -1,3 +1,4 @@
+import { useDocumentTitle } from "../app/use-document-title";
 import type { LoginNotice, LoginSearch } from "./auth-search";
 import { AuthLayout } from "./auth-layout";
 import { LoginForm } from "./login-form";
@@ -10,6 +11,7 @@ const noticeText: Record<LoginNotice, string> = {
 };
 
 export function LoginPage({ search }: { search: LoginSearch }) {
+  useDocumentTitle("Iniciar sesión");
   return (
     <AuthLayout>
       <h1 className="sr-only">Iniciar sesión</h1>
