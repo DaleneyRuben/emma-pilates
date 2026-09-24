@@ -43,6 +43,8 @@
   --color-deshabilitado-texto: #b3a9a5;
 
   --color-scrim: rgba(74, 58, 48, 0.22);
+  /* Follow-up 21: the enlarged receipt, the one overlay above another. */
+  --color-scrim-fuerte: rgba(74, 58, 48, 0.55);
   --color-transparent: transparent;
   --color-current: currentColor;
 
