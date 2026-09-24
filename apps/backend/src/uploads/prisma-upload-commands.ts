@@ -7,6 +7,8 @@ import {
   ImageAssetPurpose,
   ImageAssetState,
   ImageMediaType,
+  ImageVariantKind,
+  ImageVariantVisibility,
 } from '../generated/prisma/enums';
 import { createPendingUpload } from './create-pending-upload';
 import { finalizeUpload } from './finalize-upload';
@@ -14,6 +16,7 @@ import {
   validateImageUploadDeclaration,
   type ImagePurpose,
 } from './image-purpose';
+import { buildImageVariants } from './image-variants';
 import type { LocalObjectStorage } from './local-object-storage';
 import { processFinalizeUploadJob } from './process-finalize-upload-job';
 import { putPendingUploadObject } from './put-pending-upload-object';
@@ -40,6 +43,15 @@ const mediaTypeToPrisma: Record<string, ImageMediaType> = {
   'image/jpeg': ImageMediaType.JPEG,
   'image/png': ImageMediaType.PNG,
   'image/webp': ImageMediaType.WEBP,
+};
+
+const variantKindToPrisma: Record<string, ImageVariantKind> = {
+  thumbnail: ImageVariantKind.THUMBNAIL,
+  display: ImageVariantKind.DISPLAY,
+  readable: ImageVariantKind.READABLE,
+  promotion_480: ImageVariantKind.PROMOTION_480,
+  promotion_960: ImageVariantKind.PROMOTION_960,
+  promotion_1440: ImageVariantKind.PROMOTION_1440,
 };
 
 const mediaTypeFromPrisma: Record<ImageMediaType, VerifiableMediaType> = {
@@ -215,7 +227,12 @@ export function createFinalizeUploadJobCommands(
             maxAxisPixels,
           );
         },
-        markVerified: async ({ imageAssetId, verified }) => {
+        buildVariants: buildImageVariants,
+        storeVariant: (storageKey, bytes) => storage.replace(storageKey, bytes),
+        deleteObject: (objectKey) => storage.delete(objectKey),
+        // A retried job replaces the variant rows it recorded before failing.
+        markVerified: async ({ imageAssetId, verified, variants }) => {
+          await prisma.imageVariant.deleteMany({ where: { imageAssetId } });
           await prisma.imageAsset.update({
             where: { id: imageAssetId },
             data: {
@@ -226,6 +243,17 @@ export function createFinalizeUploadJobCommands(
               verifiedChecksum: Buffer.from(verified.checksum),
               verifiedWidth: verified.width,
               verifiedHeight: verified.height,
+              variants: {
+                create: variants.map((variant) => ({
+                  kind: variantKindToPrisma[variant.kind],
+                  visibility: ImageVariantVisibility.PRIVATE,
+                  storageKey: variant.storageKey,
+                  mediaType: mediaTypeToPrisma[variant.mediaType],
+                  byteSize: variant.byteSize,
+                  width: variant.width,
+                  height: variant.height,
+                })),
+              },
             },
           });
         },

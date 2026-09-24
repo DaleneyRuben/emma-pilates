@@ -23,6 +23,14 @@ export class LocalObjectStorage {
     await writeFile(path, bytes, { flag: 'wx' });
   }
 
+  // Rebuilt variants reuse one key per asset and kind, so a retried job
+  // overwrites its own partial output (ADR-0073); pending uploads never do.
+  async replace(key: string, bytes: Buffer): Promise<void> {
+    const path = resolveKey(this.root, key);
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, bytes);
+  }
+
   async get(key: string): Promise<Buffer> {
     return readFile(resolveKey(this.root, key));
   }
