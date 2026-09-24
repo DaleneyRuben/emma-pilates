@@ -1,5 +1,7 @@
 import {
   getGetExpenseReportQueryKey,
+  getListAdminExpenseCategoriesQueryKey,
+  getListAdminExpensesQueryKey,
   getListAdminSalaryPaymentsQueryKey,
   getListAdminSuppliesQueryKey,
   getListAdminWithdrawalsQueryKey,
@@ -7,6 +9,8 @@ import {
 } from "@pilates/api-contracts";
 import { QueryClient } from "@tanstack/react-query";
 import {
+  refreshAfterCategoryChange,
+  refreshAfterExpense,
   refreshAfterSalaryPayment,
   refreshAfterSupplyChange,
 } from "./back-office-cache";
@@ -137,5 +141,52 @@ describe("the cache after a Salary Payment", () => {
       "payroll",
       "studioReport",
     ]);
+  });
+});
+
+const expenseKeys = {
+  centroExpenses: getListAdminExpensesQueryKey({
+    branchId: centro,
+    page: 1,
+    pageSize: 20,
+  }),
+  centroRepairs: getListAdminExpensesQueryKey({
+    branchId: centro,
+    expenseCategoryId: "8c000000-0000-5000-8000-000000000003",
+    page: 1,
+    pageSize: 20,
+  }),
+  equipetrolExpenses: getListAdminExpensesQueryKey({
+    branchId: equipetrol,
+    page: 1,
+    pageSize: 20,
+  }),
+  categories: getListAdminExpenseCategoriesQueryKey(),
+  studioReport: payrollKeys.studioReport,
+  centroReport: payrollKeys.centroReport,
+  equipetrolReport: getGetExpenseReportQueryKey({
+    ...range,
+    branchId: equipetrol,
+  }),
+  payroll: payrollKeys.payroll,
+} as const;
+
+describe("the cache after an Expense or a category change", () => {
+  it("refreshes the Branch's Expenses, the categories in use, and its reports", async () => {
+    const queryClient = seeded(expenseKeys);
+    await refreshAfterExpense(queryClient, { branchId: centro });
+    expect(invalidated(queryClient, expenseKeys)).toEqual([
+      "categories",
+      "centroExpenses",
+      "centroRepairs",
+      "centroReport",
+      "studioReport",
+    ]);
+  });
+
+  it("refreshes only the category list after adding or deleting a label", async () => {
+    const queryClient = seeded(expenseKeys);
+    await refreshAfterCategoryChange(queryClient);
+    expect(invalidated(queryClient, expenseKeys)).toEqual(["categories"]);
   });
 });
