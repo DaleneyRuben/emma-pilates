@@ -14,6 +14,7 @@ import { DataTable } from "../../components/table/data-table";
 import { ListFilter } from "../../components/table/list-filter";
 import { MonthStepper } from "../../components/table/month-stepper";
 import { countFormat, pageRangeLabel } from "../../components/table/pagination";
+import { useKnownOption } from "../../components/table/use-known-option";
 import {
   boliviaMonth,
   formatCivilMoment,
@@ -106,6 +107,9 @@ function BranchWithdrawals({
   const supplyName = supplies.data?.items.find(
     (supply) => supply.id === search.supplyId,
   )?.name;
+  useKnownOption(search.supplyId, supplies.data?.items, () =>
+    onSearchChange({ supplyId: undefined, page: 1 }),
+  );
 
   return (
     <article className="flex flex-col gap-5">

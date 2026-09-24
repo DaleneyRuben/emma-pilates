@@ -6,6 +6,7 @@ import type { SearchChange } from "../../catalog/catalog-search";
 import { NoBranchPage } from "../../components/page/no-branch-page";
 import { ListFilter } from "../../components/table/list-filter";
 import { countFormat, pageRangeLabel } from "../../components/table/pagination";
+import { useKnownOption } from "../../components/table/use-known-option";
 import { WeekStepper } from "../../components/table/week-stepper";
 import {
   boliviaToday,
@@ -100,6 +101,9 @@ function BranchEvaluations({
     evaluationTableQueryOptions(branch.id, monday, search),
   );
   const nutritionists = useQuery(branchNutritionistsQueryOptions(branch.id));
+  useKnownOption(search.nutritionistStaffMemberId, nutritionists.data, () =>
+    onSearchChange({ nutritionistStaffMemberId: undefined, page: 1 }),
+  );
 
   return (
     <CatalogPage
