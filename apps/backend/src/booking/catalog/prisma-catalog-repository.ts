@@ -36,6 +36,7 @@ const clientProfileSelect = {
   name: true,
   phone: true,
   referralCode: true,
+  profileImageAssetId: true,
   account: { select: { email: true } },
 } as const;
 
@@ -45,6 +46,7 @@ const toClientProfile = (
     name: string;
     phone: string | null;
     referralCode: string;
+    profileImageAssetId: string | null;
     account: { email: string } | null;
   } | null,
 ) =>
@@ -56,6 +58,10 @@ const toClientProfile = (
         email: client.account.email,
         phone: client.phone,
         referralCode: client.referralCode,
+        photo:
+          client.profileImageAssetId === null
+            ? null
+            : { imageAssetId: client.profileImageAssetId },
       };
 
 export function createCatalogRepository(

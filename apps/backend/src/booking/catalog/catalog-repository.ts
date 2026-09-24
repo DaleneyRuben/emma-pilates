@@ -73,6 +73,7 @@ export type ClientProfileRecord = {
   email: string;
   phone: string | null;
   referralCode: string;
+  photo: { imageAssetId: string } | null;
 };
 
 export type SessionDetail = {

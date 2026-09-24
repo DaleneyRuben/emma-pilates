@@ -7,6 +7,8 @@ export type ClientProfile = {
   email: string;
   phone: string | null;
   referralCode: string;
+  // The attached `profile_photo` asset, or null while the initials stand in.
+  photo: { imageAssetId: string } | null;
 };
 
 type LoadClientProfileDependencies = {
