@@ -21,7 +21,8 @@ type CatalogPageProps<Row extends { id: string }> = {
   /** Completes "No pudimos cargar …". */
   what: string;
   emptyMessage: ReactNode;
-  panelTitles: { create: string; edit: string | ((row: Row) => string) };
+  /** Absent on a list with no panel at all (AW25–AW27): rows open nothing. */
+  panelTitles?: { create: string; edit: string | ((row: Row) => string) };
   /** A context line under the panel title (AW29: Client · Plan). */
   panelDescription?: (row: Row) => string;
   /** Rows that open a panel; a settled record is the whole row (AW28). */
@@ -34,7 +35,7 @@ type CatalogPageProps<Row extends { id: string }> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- each accessor column carries its own value type.
   columns: (open: (row: Row) => void) => ColumnDef<Row, any>[];
   /** `done` closes the panel; a message becomes the page notice. */
-  renderForm: (
+  renderForm?: (
     row: Row | undefined,
     done: (notice?: string) => void,
   ) => ReactNode;
@@ -59,7 +60,8 @@ type PanelState<Row> =
  * primary action (absent on read-only lists), optionally more actions with
  * their own panels and quiet links, one allowlisted filter, a
  * dense page-and-offset table whose rows open the record in the side panel.
- * The catalog pages and the People pages (WEB-004) share it.
+ * The catalog pages and the People pages (WEB-004) share it; the oversight
+ * lists (WEB-008) use it without a panel.
  */
 export function CatalogPage<Row extends { id: string }>({
   title,
@@ -142,7 +144,7 @@ export function CatalogPage<Row extends { id: string }>({
           rows={query.data.items}
           rowId={(row) => row.id}
           emptyMessage={emptyMessage}
-          onRowClick={open}
+          onRowClick={renderForm === undefined ? undefined : open}
           canClickRow={canOpen}
           pagination={{
             page: search.page,
@@ -153,36 +155,38 @@ export function CatalogPage<Row extends { id: string }>({
           }}
         />
       )}
-      <SidePanel
-        open={panel.kind !== "closed"}
-        onOpenChange={(next) => {
-          if (!next) close();
-        }}
-        title={
-          panel.kind === "action"
-            ? panel.action.label
-            : panel.kind === "closed" || panel.row === undefined
-              ? panelTitles.create
-              : typeof panelTitles.edit === "string"
-                ? panelTitles.edit
-                : panelTitles.edit(panel.row)
-        }
-        description={
-          panel.kind === "record" && panel.row !== undefined
-            ? panelDescription?.(panel.row)
-            : undefined
-        }
-      >
-        {panel.kind === "record" ? (
-          <div key={panel.row?.id ?? "new"} className="flex flex-1 flex-col">
-            {renderForm(panel.row, done)}
-          </div>
-        ) : panel.kind === "action" ? (
-          <div key={panel.action.label} className="flex flex-1 flex-col">
-            {panel.action.render(done)}
-          </div>
-        ) : null}
-      </SidePanel>
+      {panelTitles === undefined || renderForm === undefined ? null : (
+        <SidePanel
+          open={panel.kind !== "closed"}
+          onOpenChange={(next) => {
+            if (!next) close();
+          }}
+          title={
+            panel.kind === "action"
+              ? panel.action.label
+              : panel.kind === "closed" || panel.row === undefined
+                ? panelTitles.create
+                : typeof panelTitles.edit === "string"
+                  ? panelTitles.edit
+                  : panelTitles.edit(panel.row)
+          }
+          description={
+            panel.kind === "record" && panel.row !== undefined
+              ? panelDescription?.(panel.row)
+              : undefined
+          }
+        >
+          {panel.kind === "record" ? (
+            <div key={panel.row?.id ?? "new"} className="flex flex-1 flex-col">
+              {renderForm(panel.row, done)}
+            </div>
+          ) : panel.kind === "action" ? (
+            <div key={panel.action.label} className="flex flex-1 flex-col">
+              {panel.action.render(done)}
+            </div>
+          ) : null}
+        </SidePanel>
+      )}
     </article>
   );
 }

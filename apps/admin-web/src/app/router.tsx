@@ -18,6 +18,7 @@ import { SchedulePage } from "../schedule/schedule-page";
 import { scheduleSearchSchema } from "../schedule/schedule-search";
 import { backOfficeRoutes } from "./back-office-routes";
 import { navigationItems } from "./navigation";
+import { oversightRoutes } from "./oversight-routes";
 import { authenticatedRoute, publicRoutes, rootRoute } from "./root-routes";
 
 // List pages validate their page-and-offset search and allowlisted filters
@@ -94,6 +95,7 @@ const pageRoutes = [
   classTypesRoute,
   plansRoute,
   ...backOfficeRoutes,
+  ...oversightRoutes,
 ];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)

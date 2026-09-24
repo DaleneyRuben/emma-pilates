@@ -113,6 +113,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/evaluaciones-nutricionales",
         screen: "AW25",
         list: true,
+        built: true,
       },
       {
         label: "Personal",

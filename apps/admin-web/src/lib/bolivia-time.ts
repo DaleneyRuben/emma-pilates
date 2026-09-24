@@ -126,6 +126,15 @@ export function formatCivilMoment(instant: string): string {
   return `${formatCivilDate(parts.date)} · ${parts.time}`;
 }
 
+/** "lun 21/09 · 09:00": a moment inside a week already on screen (AW25). */
+export function formatWeekdayMoment(instant: string): string {
+  const parts = boliviaParts(instant);
+  const weekday = (shortWeekdays[parts.weekday - 1] ?? "").toLocaleLowerCase(
+    "es",
+  );
+  return `${weekday} ${parts.date.slice(8, 10)}/${parts.date.slice(5, 7)} · ${parts.time}`;
+}
+
 /** The Bolivia month `YYYY-MM` an instant falls in. */
 export const boliviaMonth = (now: Date = new Date()): string =>
   boliviaParts(now).date.slice(0, 7);
