@@ -49,8 +49,11 @@ business migration with disposable PostgreSQL integration coverage. The Client
 app contains the complete first Client authentication journey. The admin web
 has its foundation (`WEB-001`): design tokens, shadcn/Radix primitives, typed
 routes for every sidebar entry, the generated-client fetcher and QueryClient,
-form and table primitives, and the responsive shell with the Branch selector;
-every admin page is still a placeholder until its `WEB-00x` item.
+form and table primitives, and the responsive shell with the Branch selector.
+`WEB-002` adds Administrator-only browser sessions in a host-only HttpOnly
+cookie behind exact trusted-origin checks, Login with throttling, recovery,
+the activation/recovery link page, and the user menu with password change and
+logout; every admin page is still a placeholder until its `WEB-00x` item.
 
 The complete first-release data model and relationship diagram are in
 [`full-release-schema-proposal.md`](./full-release-schema-proposal.md). The
