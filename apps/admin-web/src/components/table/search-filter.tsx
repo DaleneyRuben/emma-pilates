@@ -20,14 +20,14 @@ export function SearchFilter({
 }) {
   const [text, setText] = useState(value);
   const [shown, setShown] = useState(value);
+  const [sent, setSent] = useState(value);
   const latest = useRef(onChange);
-  const sent = useRef(value);
 
   // The address caught up with what this field sent: keep whatever was typed
   // meanwhile. Anything else (back button, a link) came from elsewhere: show it.
   if (value !== shown) {
     setShown(value);
-    if (value !== sent.current) setText(value);
+    if (value !== sent) setText(value);
   }
 
   useEffect(() => {
@@ -35,10 +35,11 @@ export function SearchFilter({
   }, [onChange]);
 
   useEffect(() => {
-    if (text.trim() === value) return undefined;
+    const trimmed = text.trim();
+    if (trimmed === value) return undefined;
     const timer = setTimeout(() => {
-      sent.current = text.trim();
-      latest.current(sent.current);
+      setSent(trimmed);
+      latest.current(trimmed);
     }, settleMilliseconds);
     return () => clearTimeout(timer);
   }, [text, value]);
