@@ -35,7 +35,9 @@ export const page = <Item>(
 // The shell's selector reads the active Branches once per session (AW34).
 export const activeBranchesHandler = (branches = [centro, equipetrol, norte]) =>
   http.get(apiUrl(branchesPath), ({ request }) => {
-    const status = new URL(request.url).searchParams.get("status");
-    if (status !== "active") return undefined;
+    const params = new URL(request.url).searchParams;
+    if (params.get("status") !== "active" || params.get("pageSize") !== "100") {
+      return undefined;
+    }
     return jsonResponse(page(branches, { pageSize: 100 }));
   });
