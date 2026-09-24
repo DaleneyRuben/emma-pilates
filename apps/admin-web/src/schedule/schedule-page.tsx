@@ -52,7 +52,10 @@ export function SchedulePage({
       : today >= monday && today < addDays(monday, 7)
         ? today
         : monday;
-  const openSession = (session: Session) => setPanel({ mode: "edit", session });
+  const openSession = (session: Session) => {
+    setNotice(null);
+    setPanel({ mode: "edit", session });
+  };
 
   if (selectedBranch === undefined) {
     return (

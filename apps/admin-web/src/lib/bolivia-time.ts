@@ -115,3 +115,7 @@ export function formatSessionMoment(instant: string): string {
   const { day, month } = dayMonth(parts.date);
   return `${shortWeekdays[parts.weekday - 1]} ${day} ${month.slice(0, 3)} · ${parts.time}`;
 }
+
+/** `dd/mm/aaaa`, the design system's date format. */
+export const formatCivilDate = (date: string): string =>
+  `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
