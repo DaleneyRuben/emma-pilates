@@ -1,6 +1,8 @@
 import type {
   AdminSupplyDto,
   AdminSupplyPageDto,
+  WithdrawalDto,
+  WithdrawalPageDto,
 } from "@pilates/api-contracts";
 import { http } from "msw";
 import { centro } from "./booking-handlers";
@@ -68,3 +70,44 @@ export const branchSuppliesHandler = (
     }
     return jsonResponse(supplyPage(supplies, { pageSize: 100 }));
   });
+
+// A Supply archived since: its Withdrawals stay in AW31 (BKO-001 D9).
+export const wax = supplyRow("04", "Cera", {
+  archivedAt: "2026-09-10T15:00:00.000Z",
+});
+
+/** AW31's Insumo filter: every Supply the Branch ever had. */
+export const everySupplyHandler = (
+  supplies = [alcohol, detergent, paper, wax],
+) =>
+  http.get(apiUrl(suppliesPath), ({ request }) => {
+    const params = new URL(request.url).searchParams;
+    if (params.get("status") !== "all") return undefined;
+    return jsonResponse(supplyPage(supplies, { pageSize: 100 }));
+  });
+
+export const withdrawalRow = (
+  suffix: string,
+  supply: AdminSupplyDto,
+  quantity: number,
+  recordedAt: string,
+): WithdrawalDto => ({
+  id: `6a000000-0000-5000-8000-0000000000${suffix}`,
+  supplyId: supply.id,
+  supplyName: supply.name,
+  quantity,
+  recordedAt,
+});
+
+export const withdrawalPage = (
+  items: WithdrawalDto[],
+  extra: Partial<WithdrawalPageDto> = {},
+): WithdrawalPageDto => ({
+  month: "2026-09",
+  items,
+  totals: [],
+  page: 1,
+  pageSize: 20,
+  totalItems: items.length,
+  ...extra,
+});
