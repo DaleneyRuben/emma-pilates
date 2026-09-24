@@ -22,6 +22,10 @@ type CatalogPageProps<Row extends { id: string }> = {
   what: string;
   emptyMessage: ReactNode;
   panelTitles: { create: string; edit: string | ((row: Row) => string) };
+  /** A context line under the panel title (AW29: Client · Plan). */
+  panelDescription?: (row: Row) => string;
+  /** Rows that open a panel; a settled record is the whole row (AW28). */
+  canOpen?: (row: Row) => boolean;
   filter: ReactNode;
   search: ListSearch;
   onPageChange: (page: number) => void;
@@ -52,6 +56,8 @@ export function CatalogPage<Row extends { id: string }>({
   what,
   emptyMessage,
   panelTitles,
+  panelDescription,
+  canOpen,
   filter,
   search,
   onPageChange,
@@ -103,6 +109,7 @@ export function CatalogPage<Row extends { id: string }>({
           rowId={(row) => row.id}
           emptyMessage={emptyMessage}
           onRowClick={open}
+          canClickRow={canOpen}
           pagination={{
             page: search.page,
             pageSize: search.pageSize,
@@ -123,6 +130,11 @@ export function CatalogPage<Row extends { id: string }>({
             : typeof panelTitles.edit === "string"
               ? panelTitles.edit
               : panelTitles.edit(panel.row)
+        }
+        description={
+          panel.open && panel.row !== undefined
+            ? panelDescription?.(panel.row)
+            : undefined
         }
       >
         {panel.open ? (

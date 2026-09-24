@@ -36,6 +36,8 @@ export type NavigationItem = {
   list?: true;
   /** Its WEB item has replaced the placeholder with the real page. */
   built?: true;
+  /** A count beside the link (design system → Back Office: Pagos badge). */
+  badge?: "pendingPayments";
 };
 
 export type NavigationGroup = {
@@ -87,6 +89,8 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/pagos",
         screen: "AW28",
         list: true,
+        built: true,
+        badge: "pendingPayments",
         studioWide: "los pagos son del estudio, no de una sede.",
       },
       {

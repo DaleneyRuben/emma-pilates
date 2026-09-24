@@ -33,6 +33,8 @@ type DataTableProps<Row> = {
   emptyMessage?: ReactNode;
   /** The whole row opens the record (design system → Table convention). */
   onRowClick?: (row: Row) => void;
+  /** Rows the click opens; the others stay plain (every row by default). */
+  canClickRow?: (row: Row) => boolean;
   pagination: PageWindow & {
     onPageChange: (page: number) => void;
     rangeLabel?: RangeLabel;
@@ -51,6 +53,7 @@ export function DataTable<Row>({
   rowId,
   emptyMessage = "No hay registros.",
   onRowClick,
+  canClickRow = () => true,
   pagination,
 }: DataTableProps<Row>) {
   // TanStack Table hands back functions the React Compiler cannot memoize;
@@ -109,33 +112,36 @@ export function DataTable<Row>({
               </TableCell>
             </TableRow>
           ) : (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                onClick={
-                  onRowClick === undefined
-                    ? undefined
-                    : () => onRowClick(row.original)
-                }
-                className={
-                  onRowClick === undefined ? undefined : "cursor-pointer"
-                }
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell
-                    key={cell.id}
-                    className={
-                      cell.column.columnDef.meta?.align === "right"
-                        ? "md:text-right"
-                        : undefined
-                    }
-                    data-label={headerLabel(cell.column.id)}
-                  >
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
+            table.getRowModel().rows.map((row) => {
+              const clickable =
+                onRowClick !== undefined && canClickRow(row.original);
+              return (
+                <TableRow
+                  key={row.id}
+                  onClick={
+                    clickable ? () => onRowClick(row.original) : undefined
+                  }
+                  className={clickable ? "cursor-pointer" : undefined}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell
+                      key={cell.id}
+                      className={
+                        cell.column.columnDef.meta?.align === "right"
+                          ? "md:text-right"
+                          : undefined
+                      }
+                      data-label={headerLabel(cell.column.id)}
+                    >
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              );
+            })
           )}
         </TableBody>
       </Table>

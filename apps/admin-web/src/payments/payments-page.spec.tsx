@@ -38,7 +38,8 @@ describe("AW28 Pagos on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     reads.length = 0;
-    server.use(...signedInHandlers(), pendingBadgeHandler(6));
+    server.use(...signedInHandlers());
+    server.use(pendingBadgeHandler(6));
   });
 
   it("lists the pending transfers first by default with the studio count", async () => {
@@ -247,7 +248,10 @@ describe("AW28 Pagos on a desktop browser", () => {
 
 describe("AW28 Pagos without pending transfers in the sidebar", () => {
   useMockServer();
-  beforeEach(() => server.use(...signedInHandlers(), pendingBadgeHandler(0)));
+  beforeEach(() => {
+    server.use(...signedInHandlers());
+    server.use(pendingBadgeHandler(0));
+  });
 
   it("shows no badge when nothing waits", async () => {
     server.use(paymentTable(() => jsonResponse(paymentPage([]))));
@@ -261,7 +265,10 @@ describe("AW28 Pagos without pending transfers in the sidebar", () => {
 describe("AW28 Pagos on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
-  beforeEach(() => server.use(...signedInHandlers(), pendingBadgeHandler(6)));
+  beforeEach(() => {
+    server.use(...signedInHandlers());
+    server.use(pendingBadgeHandler(6));
+  });
 
   it("keeps the filters above one labelled card per Payment", async () => {
     server.use(paymentTable(() => jsonResponse(paymentPage([sofiaPayment]))));

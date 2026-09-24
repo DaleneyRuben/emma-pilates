@@ -1,6 +1,7 @@
 import { http } from "msw";
 import { activeBranchesHandler } from "./booking-handlers";
 import { apiUrl, jsonResponse, problemResponse } from "./msw";
+import { pendingBadgeHandler } from "./payment-fixtures";
 
 export const currentSessionPath =
   "/api/v1/admin-web/authentication-sessions/current";
@@ -28,12 +29,14 @@ export const paolaProfile = {
 // The browser holds a valid host-only session cookie (MSW cannot see it;
 // the backend would answer these reads from it). Every shell page also
 // reads the active Branches for the selector, and Horario (the landing page)
-// reads an empty week unless a spec says otherwise.
+// reads an empty week unless a spec says otherwise; the Pagos badge reads no
+// pending transfers.
 export const signedInHandlers = () => [
   http.get(apiUrl(currentSessionPath), () => jsonResponse(paolaPrincipal)),
   http.get(apiUrl(staffProfilePath), () => jsonResponse(paolaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  pendingBadgeHandler(),
 ];
 
 export const signedOutHandlers = () => [

@@ -26,6 +26,8 @@ import { ClientsPage } from "../people/clients/clients-page";
 import { clientSearchSchema, staffSearchSchema } from "../people/people-search";
 import { StaffPage } from "../people/staff/staff-page";
 import { PlaceholderPage } from "../pages/placeholder-page";
+import { PaymentsPage } from "../payments/payments-page";
+import { paymentSearchSchema } from "../payments/payment-search";
 import { StartupErrorPage } from "../pages/startup-error-page";
 import { SchedulePage } from "../schedule/schedule-page";
 import { scheduleSearchSchema } from "../schedule/schedule-search";
@@ -198,12 +200,30 @@ const staffRoute = createRoute({
   },
 });
 
+const paymentsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/pagos",
+  validateSearch: paymentSearchSchema,
+  component: function PaymentsRoute() {
+    const navigate = paymentsRoute.useNavigate();
+    return (
+      <PaymentsPage
+        search={paymentsRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
 const pageRoutes = [
   scheduleRoute,
   branchesRoute,
   classTypesRoute,
   plansRoute,
   clientsRoute,
+  paymentsRoute,
   staffRoute,
 ];
 const placeholderRoutes = navigationItems
