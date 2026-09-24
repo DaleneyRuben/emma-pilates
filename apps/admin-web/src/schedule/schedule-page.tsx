@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
+import { NoBranchPage } from "../components/page/no-branch-page";
 import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
@@ -60,17 +61,12 @@ export function SchedulePage({
 
   if (selectedBranch === undefined) {
     return (
-      <article className="flex flex-col gap-5">
-        <PageHeader title="Horario" />
-        {branchStatus === "pending" ? (
-          <LoadingNotice>Cargando el horario…</LoadingNotice>
-        ) : (
-          <p className="rounded-tarjeta border border-borde bg-blanco px-6 py-10 text-center text-cuerpo text-texto-secundario">
-            Todavía no hay sucursales activas. Crea una en Sucursales para armar
-            su horario.
-          </p>
-        )}
-      </article>
+      <NoBranchPage
+        title="Horario"
+        pending={branchStatus === "pending"}
+        loadingMessage="Cargando el horario…"
+        emptyMessage="Todavía no hay sucursales activas. Crea una en Sucursales para armar su horario."
+      />
     );
   }
 
