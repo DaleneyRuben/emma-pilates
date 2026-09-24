@@ -141,6 +141,12 @@
     border-color: var(--color-primario);
     box-shadow: var(--shadow-foco);
   }
+
+  /* The browser's blue selection paints outside the closed palette. */
+  ::selection {
+    background-color: var(--color-primario-tinte);
+    color: var(--color-primario-profundo);
+  }
 }
 
 @utility tabular {
