@@ -2,7 +2,10 @@ import {
   getGetAdminClientQueryKey,
   getGetPaymentReviewQueryKey,
   getListAdminClientsQueryKey,
+  getListAdminCreditsQueryKey,
+  getListAdminEvaluationsQueryKey,
   getListAdminPaymentsQueryKey,
+  getListAdminReferralsQueryKey,
   getListStaffMembersQueryKey,
 } from "@pilates/api-contracts";
 import { QueryClient } from "@tanstack/react-query";
@@ -30,6 +33,17 @@ const keys = {
   client: getGetAdminClientQueryKey(clientId),
   referrer: getGetAdminClientQueryKey(referrerId),
   staff: getListStaffMembersQueryKey({ page: 1, pageSize: 20 }),
+  referrals: getListAdminReferralsQueryKey({ page: 1, pageSize: 20 }),
+  searchedReferrals: getListAdminReferralsQueryKey({
+    page: 1,
+    pageSize: 20,
+    query: "sofia",
+  }),
+  credits: getListAdminCreditsQueryKey({ page: 1, pageSize: 20 }),
+  evaluations: getListAdminEvaluationsQueryKey({
+    from: "2026-09-21T04:00:00.000Z",
+    until: "2026-09-28T04:00:00.000Z",
+  }),
   branches: ["/api/v1/administrator/branches", { status: "active" }],
 } as const;
 
@@ -56,16 +70,20 @@ describe("the cache after a Payment decision", () => {
       clientId,
     });
 
-    // The Plan starts (the directory and her detail show it) and a first
-    // Payment can award Credit to whoever referred her.
+    // The Plan starts (the directory and her detail show it), a first
+    // Payment can award Credit to whoever referred her (Referidos, Créditos),
+    // and her reserved Credit is spent.
     expect(invalidated(queryClient)).toEqual(
       [
         "badge",
         "client",
         "clientTable",
+        "credits",
         "pendingTable",
+        "referrals",
         "referrer",
         "review",
+        "searchedReferrals",
       ].sort(),
     );
   });
@@ -79,9 +97,10 @@ describe("the cache after a Payment decision", () => {
       clientId,
     });
 
-    // Her reserved Credit comes back; nothing else about any Client changes.
+    // Her reserved Credit comes back (Créditos); nothing else about any
+    // Client changes and no Referral is awarded.
     expect(invalidated(queryClient)).toEqual(
-      ["badge", "client", "pendingTable", "review"].sort(),
+      ["badge", "client", "credits", "pendingTable", "review"].sort(),
     );
   });
 
@@ -99,9 +118,12 @@ describe("the cache after a Payment decision", () => {
         "badge",
         "client",
         "clientTable",
+        "credits",
         "pendingTable",
+        "referrals",
         "referrer",
         "review",
+        "searchedReferrals",
       ].sort(),
     );
   });
