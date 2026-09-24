@@ -34,6 +34,19 @@ export class AdminSupplyDto {
   archivedAt!: Date | null;
 }
 
+export class AdminSupplyPageDto {
+  @ApiProperty({ type: AdminSupplyDto, isArray: true })
+  items!: AdminSupplyDto[];
+  @ApiProperty() page!: number;
+  @ApiProperty() pageSize!: number;
+  @ApiProperty() totalItems!: number;
+  @ApiProperty({
+    description:
+      'Active Supplies of the Branch at or below their threshold, on every page',
+  })
+  lowStockCount!: number;
+}
+
 export class SupplyInputDto {
   @ApiProperty({ format: 'uuid' }) branchId!: string;
   @ApiProperty({ maxLength: 80 }) name!: string;
@@ -85,8 +98,16 @@ export class WithdrawalPageDto {
   @ApiProperty() totalItems!: number;
 }
 
+export const supplyStatuses = ['active', 'archived', 'all'] as const;
+
 export const parseSupplyQuery = (value: unknown) =>
-  z.strictObject({ branchId: uuid }).safeParse(value);
+  z
+    .strictObject({
+      branchId: uuid,
+      status: z.enum(supplyStatuses).default('active'),
+      ...paging,
+    })
+    .safeParse(value);
 
 export const parseSupplyInput = (value: unknown) =>
   z

@@ -36,6 +36,7 @@ import {
 } from '../back-office-http';
 import {
   AdminSupplyDto,
+  AdminSupplyPageDto,
   parseMovementInput,
   parseSupplyChange,
   parseSupplyInput,
@@ -44,6 +45,7 @@ import {
   SupplyInputDto,
   SupplyMovementDto,
   SupplyMovementInputDto,
+  supplyStatuses,
 } from '../back-office.dto';
 
 @Controller({ path: 'administrator/supplies', version: '1' })
@@ -59,21 +61,18 @@ export class AdministratorSuppliesController extends BackOfficeController {
   @Get()
   @ApiOperation({ operationId: 'listAdminSupplies' })
   @ApiQuery({ name: 'branchId', required: true, schema: { format: 'uuid' } })
-  @ApiOkResponse({ type: AdminSupplyDto, isArray: true })
+  @ApiQuery({ name: 'status', required: false, enum: supplyStatuses })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiOkResponse({ type: AdminSupplyPageDto })
   @Header('Cache-Control', 'no-store')
   async list(
     @Headers('authorization') authorization: string | undefined,
     @Query() query: unknown,
-  ): Promise<AdminSupplyDto[]> {
+  ): Promise<AdminSupplyPageDto> {
     const input = parsed(parseSupplyQuery(query), 'Invalid Supply filters');
     const principal = await this.authenticate(authorization);
-    const page = await run(() =>
-      this.operations.supplies.listSupplies(
-        { ...input, status: 'active', page: 1, pageSize: 100 },
-        principal,
-      ),
-    );
-    return page.items;
+    return run(() => this.operations.supplies.listSupplies(input, principal));
   }
 
   @Post()
