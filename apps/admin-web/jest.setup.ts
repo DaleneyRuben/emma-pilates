@@ -39,3 +39,32 @@ if (typeof window.ResizeObserver !== "function") {
 // The router restores scroll positions through window.scrollTo, which jsdom
 // reports as not implemented.
 Object.defineProperty(window, "scrollTo", { writable: true, value: () => {} });
+
+// jsdom has no object URLs and its Blob cannot hand back its bytes; the
+// image field previews a chosen file through one and the upload module
+// reads the file's bytes through the other.
+if (typeof URL.createObjectURL !== "function") {
+  let objectUrls = 0;
+  Object.defineProperty(URL, "createObjectURL", {
+    writable: true,
+    value: (blob: Blob): string =>
+      `blob:test/${objectUrls++}/${blob instanceof File ? blob.name : "blob"}`,
+  });
+  Object.defineProperty(URL, "revokeObjectURL", {
+    writable: true,
+    value: () => undefined,
+  });
+}
+if (typeof Blob.prototype.arrayBuffer !== "function") {
+  Object.defineProperty(Blob.prototype, "arrayBuffer", {
+    writable: true,
+    value: function readBytes(this: Blob): Promise<ArrayBuffer> {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as ArrayBuffer);
+        reader.onerror = () => reject(reader.error);
+        reader.readAsArrayBuffer(this);
+      });
+    },
+  });
+}
