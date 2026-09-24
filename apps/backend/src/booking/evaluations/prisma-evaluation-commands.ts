@@ -28,6 +28,7 @@ import {
   EvaluationRuleError,
   type EvaluationRuleCode,
 } from './evaluation-errors';
+import { readEvaluationKinds } from './evaluation-kinds';
 import {
   evaluationBookedNotice,
   evaluationCancelledByStudioNotice,
@@ -1465,14 +1466,10 @@ export const createPrismaEvaluationCommands = (
       },
     });
 
-    // D12: "first" unless the Client has an earlier booked Evaluation.
-    const history = await prisma.evaluation.findMany({
-      where: {
-        state: EvaluationState.BOOKED,
-        clientId: { in: [...new Set(rows.map((row) => row.clientId))] },
-      },
-      select: { clientId: true, slot: { select: { startsAt: true } } },
-    });
+    const kindOf = await readEvaluationKinds(
+      prisma,
+      rows.map((row) => row.clientId),
+    );
 
     return pageOf(
       rows.map((row) => ({
@@ -1483,13 +1480,7 @@ export const createPrismaEvaluationCommands = (
         durationMinutes: evaluationSlotMinutes,
         branchId: row.slot.branchId,
         branchName: row.slot.branch.name,
-        kind: history.some(
-          (earlier) =>
-            earlier.clientId === row.clientId &&
-            earlier.slot.startsAt < row.slot.startsAt,
-        )
-          ? ('follow_up' as const)
-          : ('first' as const),
+        kind: kindOf(row.clientId, row.slot.startsAt),
       })),
       limit,
       (item) => ({ startsAt: item.startsAt, id: item.evaluationId }),
