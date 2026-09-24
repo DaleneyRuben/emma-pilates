@@ -1,7 +1,7 @@
 import { getListStaffMembersQueryKey } from "@pilates/api-contracts";
 import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
-import { centro } from "../../test/booking-handlers";
+import { centro, equipetrol } from "../../test/booking-handlers";
 import {
   apiUrl,
   jsonResponse,
@@ -108,6 +108,41 @@ describe("AW24 Editar miembro", () => {
       await screen.findByText("Guardamos los cambios de Emma Vargas."),
     ).toBeVisible();
     expect(queryClient.getQueryState(trainersKey)?.isInvalidated).toBe(true);
+  });
+
+  it("drops a Branch the chips cannot show (archived since) and saves the visible choice", async () => {
+    // Urubó was archived after Emma was assigned there; the selector and the
+    // chips list active Branches only, and the backend refuses the stale id.
+    const archived = "0b6f6f2e-1d38-5a52-9d44-7a0cf0a1c004";
+    const emmaAtUrubo = { ...emma, branchIds: [centro.id, archived] };
+    server.use(
+      http.get(apiUrl(staffMembersPath), () =>
+        jsonResponse(staffPage([emmaAtUrubo, paolaMember])),
+      ),
+      http.put(
+        apiUrl(`${memberPath(emma.id)}/branches`),
+        record(() => jsonResponse({ ...emma, branchIds: [centro.id] })),
+      ),
+    );
+    const { panel, user } = await openMember("Emma Vargas");
+    expect(
+      within(panel).getByRole("checkbox", { name: "Centro" }),
+    ).toBeChecked();
+
+    await user.click(
+      within(panel).getByRole("checkbox", { name: "Equipetrol" }),
+    );
+    await user.click(within(panel).getByRole("button", { name: "Guardar" }));
+
+    await waitFor(() =>
+      expect(sent).toEqual([
+        {
+          method: "PUT",
+          path: `${memberPath(emma.id)}/branches`,
+          body: { branchIds: [centro.id, equipetrol.id] },
+        },
+      ]),
+    );
   });
 
   it("explains why a Trainer with upcoming Sessions keeps the Branch", async () => {
