@@ -99,6 +99,32 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("offers a retry when the Class Types cannot load", async () => {
+    let failing = true;
+    server.use(
+      classTypeTable(() =>
+        failing
+          ? problemResponse(500, "unexpected_error")
+          : jsonResponse(page([reformer])),
+      ),
+    );
+    const { user } = renderAdmin("/catalogo/tipos-de-clase");
+
+    // A 5xx is retried once before the page gives up (query-client.ts).
+    expect(
+      await screen.findByText(
+        "No pudimos cargar los tipos de clase.",
+        {},
+        { timeout: 5_000 },
+      ),
+    ).toBeInTheDocument();
+    failing = false;
+    await user.click(screen.getByRole("button", { name: "Reintentar" }));
+    expect(
+      await screen.findByRole("cell", { name: /Reformer Pilates/ }),
+    ).toBeVisible();
+  });
+
   it("creates a Class Type with its required description and converts the numbers", async () => {
     let body: unknown;
     server.use(
