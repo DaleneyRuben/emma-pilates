@@ -8,6 +8,7 @@ import { SearchFilter } from "../../components/table/search-filter";
 import { StatusPill } from "../../components/ui/status-pill";
 import type { ClientSearch } from "../people-search";
 import { clientTableQueryOptions } from "./client-queries";
+import { ClientDetailPanel } from "./client-detail-panel";
 
 // Follow-up 28: every phrase that counts people is feminine.
 const clientas = (count: number) =>
@@ -123,7 +124,9 @@ export function ClientsPage({
       }
       query={query}
       columns={clientColumns}
-      renderForm={() => null}
+      renderForm={(client) =>
+        client === undefined ? null : <ClientDetailPanel clientId={client.id} />
+      }
     />
   );
 }
