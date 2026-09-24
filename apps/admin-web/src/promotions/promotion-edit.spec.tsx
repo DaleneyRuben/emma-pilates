@@ -12,6 +12,7 @@ import {
 import {
   horario,
   promotionList,
+  promotionListHandler,
   promotionRow,
   promotionsPath,
 } from "../test/promotion-fixtures";
@@ -272,6 +273,57 @@ describe("AW18 Editar promoción (follow-up 39)", () => {
         "Promoción «Nueva sala de Reformer en Urubó» publicada.",
       ),
     ).toBeVisible();
+  });
+
+  it("shows the replaced image on the card once the list is read again, never the browser's copy of the old one", async () => {
+    let reads = 0;
+    server.use(
+      promotionListHandler(() => {
+        reads += 1;
+        return jsonResponse(
+          reads === 1
+            ? [showing]
+            : [
+                {
+                  ...showing,
+                  image: {
+                    ...showing.image!,
+                    imageAssetId: uploadedAssetId,
+                    width: 1600,
+                    height: 900,
+                  },
+                },
+              ],
+        );
+      }),
+    );
+    const { panel, user } = await openEdit(showing.headline);
+    // The open panel hides the page from assistive technology.
+    const before = within(
+      screen.getByRole("article", { name: showing.headline, hidden: true }),
+    ).getByRole("presentation", { hidden: true });
+    expect(before).toHaveAttribute(
+      "src",
+      expect.stringContaining(showing.image!.imageAssetId),
+    );
+
+    await user.click(
+      within(panel).getByRole("button", { name: "Cambiar imagen" }),
+    );
+    await user.upload(
+      within(panel).getByLabelText("Archivo de imagen"),
+      imageFile("otra.png"),
+    );
+    await within(panel).findByText("otra.png · 1600 × 900");
+    await user.click(within(panel).getByRole("button", { name: "Publicar" }));
+
+    await waitFor(() =>
+      expect(
+        within(
+          screen.getByRole("article", { name: showing.headline }),
+        ).getByRole("presentation"),
+      ).toHaveAttribute("src", expect.stringContaining(uploadedAssetId)),
+    );
   });
 
   it("offers Guardar borrador and Publicar on a draft, Publicar only once it has an image", async () => {
