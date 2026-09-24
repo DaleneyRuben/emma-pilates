@@ -4,6 +4,7 @@ import type { SearchChange } from "../catalog/catalog-search";
 import { PageHeader } from "../components/page/page-header";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { ListFilter } from "../components/table/list-filter";
+import { useKnownOption } from "../components/table/use-known-option";
 import { Input } from "../components/ui/input";
 import { boliviaToday, formatCivilDate } from "../lib/bolivia-time";
 import { MonthChart } from "./month-chart";
@@ -110,6 +111,11 @@ export function ReportPage({
   const branches = useQuery(reportBranchesQueryOptions());
   const branchId = search.branch === "all" ? undefined : search.branch;
   const branch = branches.data?.find((option) => option.id === branchId);
+  // An address naming a Branch the studio does not have falls back to every
+  // Branch, instead of a report headed «Sucursal» with no name.
+  useKnownOption(branchId, branches.data, () =>
+    onSearchChange({ branch: "all" }),
+  );
   const income = useQuery(incomeReportQueryOptions(range, branchId));
   const expenses = useQuery(expenseReportQueryOptions(range, branchId));
   const failed = income.isError ? income : expenses.isError ? expenses : null;

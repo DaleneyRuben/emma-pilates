@@ -6,6 +6,7 @@ import type { SearchChange } from "../../catalog/catalog-search";
 import { NoBranchPage } from "../../components/page/no-branch-page";
 import { ListFilter } from "../../components/table/list-filter";
 import { pageRangeLabel } from "../../components/table/pagination";
+import { useKnownOption } from "../../components/table/use-known-option";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
 import type { Branch } from "../../shell/branch/branch-context";
@@ -57,6 +58,9 @@ function BranchExpenses({
 }) {
   const query = useQuery(expenseTableQueryOptions(branch.id, search));
   const categories = useQuery(expenseCategoriesQueryOptions());
+  useKnownOption(search.expenseCategoryId, categories.data, () =>
+    onSearchChange({ expenseCategoryId: undefined, page: 1 }),
+  );
 
   return (
     <CatalogPage

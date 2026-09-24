@@ -5,6 +5,7 @@ import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { ListFilter } from "../../components/table/list-filter";
 import { pageRangeLabel } from "../../components/table/pagination";
+import { useKnownOption } from "../../components/table/use-known-option";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
 import { staffOptionLabel } from "./payroll-format";
@@ -55,6 +56,9 @@ export function PayrollPage({
 }) {
   const query = useQuery(payrollTableQueryOptions(search));
   const staff = useQuery(payrollStaffQueryOptions());
+  useKnownOption(search.staffMemberId, staff.data, () =>
+    onSearchChange({ staffMemberId: undefined, page: 1 }),
+  );
 
   return (
     <CatalogPage
