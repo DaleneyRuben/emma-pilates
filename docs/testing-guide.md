@@ -1395,8 +1395,9 @@ Roles get `403 administration_access_denied`.
 
 ## Test 22: run the Back Office as the Administrator (API)
 
-The admin web is not built yet, so use Swagger or curl as
-`paola.mendoza@example.com` (Test 3 shows how to log in and authorize). Every
+These are the API calls behind the admin web's Back Office pages (Test 28);
+use Swagger or curl as `paola.mendoza@example.com` (Test 3 shows how to log in
+and authorize). Every
 route below lives under `/api/v1/administrator/`; other Roles get
 `403 back_office_access_denied`. The four `POST`s that record a Withdrawal,
 Restock, Salary Payment, or Expense need an `Idempotency-Key` header with a new
@@ -1406,8 +1407,10 @@ recording twice, and the same key with a different body answers
 
 1. **Supplies** (Insumos): `POST supplies` with a Branch, `name`,
    `initialQuantity`, and `lowStockThreshold` creates one; `GET
-   supplies?branchId=…` lists that Branch's active Supplies with `lowStock`
-   set when the quantity is at or below the threshold. `PUT supplies/{id}`
+   supplies?branchId=…` pages that Branch's active Supplies (`page`,
+   `pageSize`, and `status=active|archived|all`) with `lowStock` set when the
+   quantity is at or below the threshold and the Branch's `lowStockCount` on
+   every page. `PUT supplies/{id}`
    changes only the name and threshold; the stock never changes by editing.
    A second active Supply with the same name at that Branch answers
    `409 supply_name_taken`. `POST supplies/{id}/archive` hides it from the
@@ -1456,17 +1459,19 @@ Every page now needs a signed-in Administrator, so start the backend
    then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
    Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
-   Referidos, Créditos). There is no "Descuentos". Horario and the Catálogo
-   pages are real (Test 25); every other entry opens a page with that title,
+   Referidos, Créditos). There is no "Descuentos". Horario, the Catálogo
+   pages, and the Back Office pages except Evaluaciones nutricionales are
+   real (Tests 25 to 28); every other entry opens a page with that title,
    "Esta sección aún no está disponible.", and the design screen it will
-   implement (for example "Pantalla AW08"); the entry is highlighted in the
-   sidebar and the address changes (`/back-office/insumos`).
+   implement (for example "Pantalla AW25"); the entry is highlighted in the
+   sidebar and the address changes (`/back-office/evaluaciones-nutricionales`).
 2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
    popover lists Centro, Equipetrol, and Urubó with their addresses, marks the
    current one with a check, and ends with **Gestionar sucursales** (opens
    Sucursales). Choosing Urubó closes the popover, the cell reads **Sucursal
    Urubó**, and you stay on the same page. Esc or a click outside closes it.
-   On **Pagos**, **Clientes**, **Nómina**, **Referidos**, or **Créditos** the
+   On **Pagos**, **Clientes**, **Nómina**, **Categorías de gasto**,
+   **Referidos**, or **Créditos** the
    popover first says "Esta página no se filtra por sucursal — …" and still
    lets you switch for the next page. The Branches are the active ones the
    API returns (Test 25); archived Branches never appear here.
@@ -1476,7 +1481,7 @@ Every page now needs a signed-in Administrator, so start the backend
    pick one, and the Branch selector opens as a sheet from the bottom.
 4. **Unknown address.** Open `http://localhost:5173/no-existe`: "Página no
    encontrada" with **Volver al horario**. A list address with a bad page,
-   such as `/back-office/insumos?page=abc&pageSize=500`, is accepted and
+   such as `/promociones/creditos?page=abc&pageSize=500`, is accepted and
    treated as page 1 of 20.
 
 The account cell on the right shows the signed-in Administrator; Test 24
@@ -1709,6 +1714,80 @@ Payments, their Subscriptions, and the Credit ledger are append-only money
 history, so the Payments you make here stay in `pilates_dev_sim`; the fixtures
 command does not remove them.
 
+## Test 28: run the Back Office in the admin web
+
+Start the backend on `pilates_dev_sim` after loading the fixtures and start
+the admin web, exactly as Test 24 describes, and log in as
+`paola.mendoza@example.com` / `emma-local-2026`. The fixtures add no Back
+Office rows; everything below is created from the screens (an earlier walk
+may have left some in `pilates_dev_sim`). Dates are Bolivia dates whatever
+time zone your computer uses; money is written `Bs 1.050,00`.
+
+1. **Insumos.** Back Office → **Insumos** lists the selected Branch's
+   Supplies with **Cantidad en stock** on the right and an amber **Stock
+   bajo** pill when the stock is at or below the Supply's alert threshold.
+   The subtitle counts them ("Sucursal Centro · 1 con stock bajo") and the
+   sidebar shows the same count beside **Insumos** in amber, on every page;
+   choosing another Branch in the top bar changes both. The header has
+   **+ Nuevo insumo**, **Registrar retiro**, **Registrar reposición**, and the
+   **Ver historial de retiros** link, in that order.
+2. **Nuevo insumo.** The side panel asks for **Nombre**, **Cantidad en stock**
+   (typed only now), and **Umbral de alerta**; **Guardar** with empty fields
+   marks each one. A name another active Supply of the Branch already has is
+   refused on its field. Saving says "Insumo «…» creado con N unid.".
+3. **Editar insumo.** Click a Supply: the stock is read-only ("Cambia solo con
+   «Registrar retiro» y «Registrar reposición»."); the name and threshold can
+   change. **Archivar insumo** asks first ("¿Archivar este insumo?") and the
+   Supply leaves Insumos and Registrar retiro; its Withdrawals stay in the
+   history. There is no delete.
+4. **Registrar retiro.** Choose an Insumo (each option shows its stock, "(6
+   unid.)") and a quantity. More than the stock marks the field ("Solo hay 6
+   unid. en stock.") and disables **Registrar**. After recording, the page
+   says "Retiro registrado: quedan N unid. de …" and the table and sidebar
+   count update. If someone else takes units while the panel is open (a
+   second browser, or Test 22's API call), **Registrar** is refused and the
+   panel shows the new stock. A Withdrawal cannot be edited or undone; make up
+   for an over-recorded one with a Reposición.
+5. **Registrar reposición.** The same panel with **Cantidad repuesta** and no
+   maximum; afterwards "Reposición registrada: ahora hay N unid. de …".
+6. **Retiros e insumos consumidos.** **Ver historial de retiros** (the only way
+   in) opens the Branch's Withdrawals for the current month, newest first,
+   with **Insumo**, **Cantidad retirada**, and the date and time; "N retiros
+   en septiembre de 2026." above them and the units per Supply under
+   **Consumo del mes**. The arrows move between months (not past the current
+   one) and **Insumo** filters by one Supply, archived ones included as
+   "(archivado)"; both stay in the address (`?month=2026-08&supplyId=…`). A
+   month without Withdrawals says "Sin retiros en este rango.". **Insumos**
+   stays highlighted in the sidebar and **Volver a Insumos** goes back.
+7. **Nómina.** Back Office → **Nómina** lists every Salary Payment of the
+   studio (the Branch selector says the page is not filtered by Branch), with
+   **Empleado**, **Monto**, and **Fecha**, and an **Empleado** filter.
+   **+ Registrar pago** asks for the Staff Member (a deactivated one is
+   listed as "(cuenta desactivada)" for a final payment), the amount (`3.500`
+   or `3.500,00`), and the date, which cannot be after today. Clicking a row
+   corrects it ("Guardamos la corrección del pago de …"); a payment is never
+   deleted, and each record and correction writes an audit record.
+8. **Gastos.** Back Office → **Gastos** lists the selected Branch's Expenses
+   with a **Categoría** filter. **+ Nuevo gasto** says which Branch it is
+   recorded in ("Se registra en la sucursal Centro."), and **+ Nueva
+   categoría** opens a row to add a category without leaving the form; the
+   new one is chosen at once. A correction changes the category, amount, or
+   date, never the Branch.
+9. **Categorías de gasto.** The studio's categories, the same for every
+   Branch (the selector says the page is not filtered by Branch). A category
+   an Expense uses shows "En uso" and its delete icon is disabled; an unused
+   one is deleted after "¿Eliminar «…»?". The row at the bottom adds one; a
+   name that already exists (ignoring capitals) is refused.
+10. **Narrow browser.** At a phone width every table becomes one card per row
+    (a Supply without the amber pill shows no Estado line), the four Insumos
+    actions wrap under the title, every panel fills the screen, and the
+    drawer keeps the Insumos count.
+
+Supplies, Withdrawals, Restocks, Salary Payments, and Expenses are never
+deleted (Withdrawals and Restocks cannot even be edited), so what you create
+here stays in `pilates_dev_sim`; only an unused category can be deleted. Date
+pickers follow the browser's language, as Test 25 notes.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1724,10 +1803,10 @@ The following are not ready for manual product testing:
 - Promotions on Client Home or push notifications (the in-app inbox works, see
   Test 9; buying a Plan works, see Test 10);
 - Promotions and image variants (UPL-002);
-- Back Office screens (the API works, see Test 22; the screens are WEB-007);
 - any admin-web section beyond logging in, Horario, the Catálogo pages,
-  Clientes, Pagos, and Personal (Tests 23 to 27): the other sections are
-  placeholders;
+  Clientes, Pagos, Personal, and the Back Office pages of Test 28 (Tests 23
+  to 28): Evaluaciones nutricionales, Reporte, Promociones, Referidos, and
+  Créditos are still placeholders;
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
 
