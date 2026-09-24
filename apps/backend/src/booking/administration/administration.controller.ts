@@ -88,7 +88,9 @@ export type AdministrationOperations = {
 const invalidRequest = (detail: string) =>
   new BadRequestException({ code: 'invalid_request', detail });
 
-const run = async <Result>(work: () => Promise<Result>): Promise<Result> => {
+export const run = async <Result>(
+  work: () => Promise<Result>,
+): Promise<Result> => {
   try {
     return await work();
   } catch (error) {
@@ -102,7 +104,7 @@ const run = async <Result>(work: () => Promise<Result>): Promise<Result> => {
   }
 };
 
-const parsed = <Value>(
+export const parsed = <Value>(
   result: { success: true; data: Value } | { success: false },
   detail: string,
 ): Value => {
@@ -183,15 +185,6 @@ export class AdministratorBranchesController extends AdministrationController {
     super(operations, resolver);
   }
 
-  @Get()
-  @ApiOperation({ operationId: 'listAdminBranches' })
-  @ApiOkResponse({ type: AdminBranchDto, isArray: true })
-  @Header('Cache-Control', 'no-store')
-  async list(@Headers('authorization') authorization: string | undefined) {
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.catalog.listBranches(principal));
-  }
-
   @Post()
   @ApiOperation({ operationId: 'createBranch' })
   @ApiBody({ type: BranchInputDto })
@@ -256,15 +249,6 @@ export class AdministratorClassTypesController extends AdministrationController 
     super(operations, resolver);
   }
 
-  @Get()
-  @ApiOperation({ operationId: 'listAdminClassTypes' })
-  @ApiOkResponse({ type: AdminClassTypeDto, isArray: true })
-  @Header('Cache-Control', 'no-store')
-  async list(@Headers('authorization') authorization: string | undefined) {
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.catalog.listClassTypes(principal));
-  }
-
   @Post()
   @ApiOperation({ operationId: 'createClassType' })
   @ApiBody({ type: ClassTypeInputDto })
@@ -327,15 +311,6 @@ export class AdministratorPlansController extends AdministrationController {
     @Inject(authenticatedPrincipalResolver) resolver: PrincipalResolver,
   ) {
     super(operations, resolver);
-  }
-
-  @Get()
-  @ApiOperation({ operationId: 'listAdminPlans' })
-  @ApiOkResponse({ type: AdminPlanDto, isArray: true })
-  @Header('Cache-Control', 'no-store')
-  async list(@Headers('authorization') authorization: string | undefined) {
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.catalog.listPlans(principal));
   }
 
   @Post()

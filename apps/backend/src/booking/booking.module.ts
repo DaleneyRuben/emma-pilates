@@ -132,7 +132,12 @@ import {
   administrationOperations,
   type AdministrationOperations,
 } from './administration/administration.controller';
+import {
+  catalogListControllers,
+  catalogListOperations,
+} from './administration/catalog-lists.controller';
 import { createPrismaCatalogAdministration } from './administration/prisma-catalog-administration';
+import { createPrismaCatalogLists } from './administration/prisma-catalog-lists';
 import { createPrismaOversight } from './administration/prisma-oversight';
 import { createPrismaScheduleAdministration } from './administration/prisma-schedule-administration';
 
@@ -166,6 +171,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     StaffProfileController,
     AdministratorStaffMembersController,
     ...administrationControllers,
+    ...catalogListControllers,
     PurchaseIntentsController,
     CreditPurchasesController,
     ClientPaymentsController,
@@ -605,6 +611,11 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
             evaluations.cancelEvaluationAsStaff(evaluationId, principal),
         };
       },
+    },
+    {
+      provide: catalogListOperations,
+      inject: [bookingPrisma],
+      useFactory: (prisma: PrismaClient) => createPrismaCatalogLists(prisma),
     },
     {
       provide: BookingRuntimeCleanup,

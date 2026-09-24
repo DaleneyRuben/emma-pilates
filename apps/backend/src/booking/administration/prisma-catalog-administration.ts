@@ -133,17 +133,6 @@ export const createPrismaCatalogAdministration = (
   };
 
   return {
-    listBranches: async (principal: AuthenticatedPrincipal) => {
-      requireAdministrator(principal);
-      return prisma.branch.findMany({
-        orderBy: [
-          { archivedAt: { sort: 'asc', nulls: 'first' } },
-          { name: 'asc' },
-        ],
-        select: branchSelect,
-      });
-    },
-
     createBranch: async (
       input: BranchInput,
       principal: AuthenticatedPrincipal,
@@ -232,17 +221,6 @@ export const createPrismaCatalogAdministration = (
       });
     },
 
-    listClassTypes: async (principal: AuthenticatedPrincipal) => {
-      requireAdministrator(principal);
-      return prisma.classType.findMany({
-        orderBy: [
-          { archivedAt: { sort: 'asc', nulls: 'first' } },
-          { name: 'asc' },
-        ],
-        select: classTypeSelect,
-      });
-    },
-
     createClassType: async (
       input: ClassTypeInput,
       principal: AuthenticatedPrincipal,
@@ -319,14 +297,6 @@ export const createPrismaCatalogAdministration = (
           data: { archivedAt: dependencies.now() },
           select: classTypeSelect,
         });
-      });
-    },
-
-    listPlans: async (principal: AuthenticatedPrincipal) => {
-      requireAdministrator(principal);
-      return prisma.plan.findMany({
-        orderBy: [{ displayOrder: 'asc' }, { id: 'asc' }],
-        select: planSelect,
       });
     },
 
