@@ -17,12 +17,10 @@ import { useIsNarrowViewport } from "../shell/use-media-query";
 import { DayList } from "./day-list";
 import { weekSessionLimit, weekSessionsQueryOptions } from "./schedule-queries";
 import type { ScheduleSearch } from "./schedule-search";
+import { SessionPanel, type SessionPanelState } from "./session-panel";
 import { WeekGrid } from "./week-grid";
 
 type Session = AdministratorSessionAvailabilityDto;
-type PanelState =
-  { mode: "closed" } | { mode: "create" } | { mode: "edit"; session: Session };
-
 const sessionCount = (count: number) =>
   count === 1 ? "1 sesión esta semana" : `${count} sesiones esta semana`;
 
@@ -40,7 +38,8 @@ export function SchedulePage({
   const monday = weekStartOf(search.week ?? today);
   const narrow = useIsNarrowViewport();
   const { selectedBranch, status: branchStatus } = useBranchSelection();
-  const [, setPanel] = useState<PanelState>({ mode: "closed" });
+  const [panel, setPanel] = useState<SessionPanelState>({ mode: "closed" });
+  const [notice, setNotice] = useState<string | null>(null);
   const [day, setDay] = useState<string | null>(null);
   const sessions = useQuery({
     ...weekSessionsQueryOptions(selectedBranch?.id ?? "", monday),
@@ -84,7 +83,12 @@ export function SchedulePage({
         }
         actions={
           isForbidden(sessions.error) ? undefined : (
-            <Button onClick={() => setPanel({ mode: "create" })}>
+            <Button
+              onClick={() => {
+                setNotice(null);
+                setPanel({ mode: "create" });
+              }}
+            >
               <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
               Nueva sesión
             </Button>
@@ -119,6 +123,14 @@ export function SchedulePage({
           {formatWeekRange(monday)}
         </p>
       </div>
+      {notice === null ? null : (
+        <p
+          role="status"
+          className="rounded-control border border-exito/40 bg-exito/10 px-3 py-2 text-nota text-exito-texto"
+        >
+          {notice}
+        </p>
+      )}
       {sessions.isPending ? (
         <LoadingNotice>Cargando el horario…</LoadingNotice>
       ) : sessions.isError ? (
@@ -158,6 +170,15 @@ export function SchedulePage({
           )}
         </>
       )}
+      <SessionPanel
+        state={panel}
+        branch={selectedBranch}
+        onClose={() => setPanel({ mode: "closed" })}
+        onDone={(message) => {
+          setPanel({ mode: "closed" });
+          setNotice(message);
+        }}
+      />
     </article>
   );
 }

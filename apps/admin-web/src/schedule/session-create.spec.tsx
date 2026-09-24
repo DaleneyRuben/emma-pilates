@@ -50,7 +50,8 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
   useMockServer();
   beforeEach(() => {
     weekReads = 0;
-    server.use(...signedInHandlers(), ...sessionFormHandlers(), weekHandler());
+    server.use(...signedInHandlers(), ...sessionFormHandlers());
+    server.use(weekHandler());
   });
 
   it("creates a one-off Session at a Bolivia date and time with the Class Type's capacity", async () => {
@@ -235,9 +236,10 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
 describe("AW03 Nueva sesión on a narrow browser", () => {
   useMockServer();
   useNarrowViewport();
-  beforeEach(() =>
-    server.use(...signedInHandlers(), ...sessionFormHandlers(), weekHandler()),
-  );
+  beforeEach(() => {
+    server.use(...signedInHandlers(), ...sessionFormHandlers());
+    server.use(weekHandler());
+  });
 
   it("opens as a full-screen sheet", async () => {
     const { panel } = await openNewSession();
