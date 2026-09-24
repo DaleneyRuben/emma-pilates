@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30) | Promotions are still a placeholder (WEB-006); valid activation and recovery links still cannot be read from the local email capture |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31) | Promotions are still a placeholder (WEB-006); valid activation and recovery links still cannot be read from the local email capture; the Playwright journeys run in Chromium only |
 
 ## Before you begin
 
@@ -796,7 +796,8 @@ paths land on "Página no encontrada", and list pages normalize `?page=` and
 same-origin fetcher, the RFC 9457 problem normalizer, and the retry policy
 are checked without a backend. The table and form foundations are covered
 too. `pnpm --filter @pilates/admin-web lint`, `typecheck`, `build`, and
-`format:check` are the remaining quality checks for that app.
+`format:check` are the remaining quality checks for that app. The Playwright
+journeys through the built app and the real backend are Test 31.
 
 ### Backend HTTP end-to-end tests
 
@@ -1459,6 +1460,24 @@ Every page now needs a signed-in Administrator, so start the backend
 (Test 2) and log in first as Test 24 describes; `/api/v1` is proxied to
 `http://127.0.0.1:3100` like the Vercel origin will do.
 
+To try the built app instead of the development server (what a deployment
+serves), build it and start the preview server on port 4173 with the same
+proxy; the backend must then also trust that origin:
+
+```sh
+pnpm --filter @pilates/admin-web build
+pnpm --filter @pilates/admin-web preview
+```
+
+```sh
+DATABASE_URL="postgresql://$USER@localhost:5432/pilates_dev_sim" ADMIN_WEB_TRUSTED_ORIGINS="http://localhost:5173,http://localhost:4173" pnpm dev:backend
+```
+
+The built app is split by page: the shell, the Login pages, and the session
+check load first, and each page's code arrives the first time you open it
+(or as soon as you point at its sidebar entry). In the browser's developer
+tools (Network) you can see one small `*-route-*.js` file per page.
+
 1. **Sidebar.** On a desktop-width window the left sidebar shows **Horario**,
    then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
@@ -1885,6 +1904,69 @@ dates whatever your computer's time zone.
 
 Date pickers follow the browser's language, as Test 25 notes.
 
+## Test 31: run the admin web's critical journeys with Playwright
+
+These are the end-to-end journeys ADR-0043 asks for: the built admin web
+(`vite preview`) talking to the real backend on a database the suite creates
+for itself, loads the development fixtures into, and drops at the end. They
+cover only what the Jest tests cannot: a real cookie, the real proxy, the real
+backend rules.
+
+You need PostgreSQL running locally with the `pilates_test_fixtures` admin
+database (Test 8 creates it), the `psql` command on your PATH, and the
+Chromium build Playwright caches (`pnpm --filter @pilates/admin-web exec
+playwright install chromium` downloads it once; this project pins
+Playwright 1.61.0, whose Chromium is build 1228). Nothing else may be
+listening on ports 3101 or 4173. Then, from the project root:
+
+```sh
+pnpm test:admin-e2e
+```
+
+The script builds the backend and the admin web, then runs
+`playwright test` in `apps/admin-web`. Its global setup prints the two
+process ids, the ports, and the `pilates_test_*` database name it made, and
+its teardown stops both servers and drops that database. The nine journeys
+take about twenty seconds:
+
+1. **Sessions.** Paola signs in and lands on Horario; the
+   `__Host-emma-admin-session` cookie is HttpOnly, Secure, SameSite Lax, and
+   host-only, and page scripts cannot read it. She logs out from the user
+   menu and the old address asks her to sign in again. A signed-out visit to
+   `/catalogo/planes?page=2` returns there after Login. When the session is
+   ended behind the browser's back, the next click returns to Login with
+   "Tu sesión terminó" and signing in again lands on the page she was on.
+2. **Branch scope.** In Horario, next week shows Centro's Mat Pilates; after
+   choosing Equipetrol in the top bar the grid shows Pilates Prenatal and no
+   Mat Pilates, and the week in the address does not move.
+3. **A filtered table.** Personal narrowed to Entrenador puts
+   `role=trainer` in the address, shows the three Trainers, and keeps both
+   after a reload.
+4. **A mutation.** Gastos starts empty on the fresh database; an Expense of
+   Bs 450,50 is recorded at Centro with the category "Mantenimiento" typed
+   into the form's inline row, the notice and the row appear, and Equipetrol
+   still has no Expenses.
+5. **Authorization.** Camila, an Assistant, gets the same neutral rejection
+   as a wrong password; a state-changing request sent with the session cookie
+   from `https://attacker.example` is refused with `403 untrusted_origin`
+   while the session stays valid.
+6. **Narrow browser.** At 420 px the sidebar is behind **Abrir menú**, the
+   Branch selector opens as a bottom sheet, Personal shows one labelled card
+   per member, and nothing scrolls sideways.
+
+To run one file or watch the browser, use Playwright directly from
+`apps/admin-web`, for example
+`pnpm exec playwright test e2e/session.spec.ts --headed`. A failed journey
+leaves a screenshot and a trace under `apps/admin-web/test-results/`
+(`pnpm exec playwright show-trace <file>` opens it). If a run is killed
+before its teardown, stop the servers it left (`lsof -ti tcp:3101`,
+`lsof -ti tcp:4173`) and drop its database (the name is in the run's first
+line; `psql -l | grep pilates_test_` lists them).
+
+Set `TEST_DATABASE_URL` to another `pilates_test_*` admin database, or
+`E2E_API_PORT` and `E2E_WEB_PORT` to other ports, when the defaults collide
+with something on your machine.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1902,6 +1984,9 @@ The following are not ready for manual product testing:
 - Promotions and image variants (UPL-002);
 - the admin web's Promociones page, still a placeholder (every other page
   works, Tests 23 to 30);
+- the admin web on a real Vercel preview or production origin, so the proxy,
+  cookies, and trusted origins of ADR-0084 are only proven locally (EXT-003);
+- the Playwright journeys in Firefox or WebKit (only Chromium is installed);
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
 
