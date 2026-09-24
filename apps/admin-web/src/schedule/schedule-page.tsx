@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
 import { useState } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
 import { PageHeader } from "../components/page/page-header";
+import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
 import {
@@ -126,14 +127,7 @@ export function SchedulePage({
           {formatWeekRange(monday)}
         </p>
       </div>
-      {notice === null ? null : (
-        <p
-          role="status"
-          className="rounded-control border border-exito/40 bg-exito/10 px-3 py-2 text-nota text-exito-texto"
-        >
-          {notice}
-        </p>
-      )}
+      {notice === null ? null : <PageNotice>{notice}</PageNotice>}
       {sessions.isPending ? (
         <LoadingNotice>Cargando el horario…</LoadingNotice>
       ) : sessions.isError ? (
