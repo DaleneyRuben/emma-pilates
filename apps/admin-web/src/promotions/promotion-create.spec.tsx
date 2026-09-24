@@ -80,8 +80,8 @@ describe("AW18 Nueva promoción (follow-up 39)", () => {
       "", // the panel's close icon
     ]);
     expect(
-      within(panel).getByRole("button", { name: /Sube una imagen/ }),
-    ).toHaveTextContent(
+      within(panel).getByRole("button", { name: "Sube una imagen" }),
+    ).toHaveAccessibleDescription(
       "Arrastra el archivo o haz clic · JPG, PNG o WEBP horizontal, mínimo 1200 × 675 px",
     );
     expect(within(panel).getByLabelText("Título")).toHaveAttribute(

@@ -13,3 +13,7 @@ export const pastCivilDateField = (required: string) =>
       (date) => date <= boliviaToday(),
       "La fecha no puede ser posterior a hoy.",
     );
+
+/** A Bolivia civil date with no bound: a display window may start later. */
+export const civilDateField = (required: string) =>
+  z.string().regex(/^\d{4}-\d{2}-\d{2}$/, required);

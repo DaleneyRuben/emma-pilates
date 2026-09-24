@@ -1,12 +1,20 @@
+import type { AdminPromotionDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
+import { useState } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
 import { PageHeader } from "../components/page/page-header";
+import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
+import { SidePanel } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { PromotionCardList } from "./promotion-card-list";
 import { carouselSubtitle } from "./promotion-format";
+import { PromotionPanelForm } from "./promotion-panel";
 import { promotionListQueryOptions } from "./promotion-queries";
+
+type Panel =
+  { kind: "closed" } | { kind: "open"; promotion?: AdminPromotionDto };
 
 function EmptyCarousel() {
   return (
@@ -28,6 +36,18 @@ function EmptyCarousel() {
 export function PromotionsPage() {
   const query = useQuery(promotionListQueryOptions());
   const forbidden = isForbidden(query.error);
+  const [panel, setPanel] = useState<Panel>({ kind: "closed" });
+  const [notice, setNotice] = useState<string | null>(null);
+  const open = (promotion?: AdminPromotionDto) => {
+    setNotice(null);
+    setPanel({ kind: "open", promotion });
+  };
+  const close = () => setPanel({ kind: "closed" });
+  const editing = panel.kind === "open" ? panel.promotion : undefined;
+  const position =
+    editing === undefined
+      ? 0
+      : (query.data?.findIndex((item) => item.id === editing.id) ?? -1) + 1;
 
   return (
     <article className="flex flex-col gap-5">
@@ -40,13 +60,14 @@ export function PromotionsPage() {
         }
         actions={
           forbidden ? undefined : (
-            <Button>
+            <Button onClick={() => open()}>
               <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
               Nueva promoción
             </Button>
           )
         }
       />
+      {notice === null ? null : <PageNotice>{notice}</PageNotice>}
       {query.isPending ? (
         <LoadingNotice>Cargando promociones…</LoadingNotice>
       ) : query.isError ? (
@@ -58,8 +79,30 @@ export function PromotionsPage() {
       ) : query.data.length === 0 ? (
         <EmptyCarousel />
       ) : (
-        <PromotionCardList promotions={query.data} onOpen={() => undefined} />
+        <PromotionCardList promotions={query.data} onOpen={open} />
       )}
+      <SidePanel
+        open={panel.kind === "open"}
+        onOpenChange={(next) => {
+          if (!next) close();
+        }}
+        title={editing === undefined ? "Nueva promoción" : "Editar promoción"}
+        description={
+          editing === undefined
+            ? "Entrará al final del carrusel"
+            : `Posición ${position} en el carrusel`
+        }
+      >
+        <div key={editing?.id ?? "new"} className="flex flex-1 flex-col">
+          <PromotionPanelForm
+            promotion={editing}
+            onDone={(message) => {
+              close();
+              setNotice(message ?? null);
+            }}
+          />
+        </div>
+      </SidePanel>
     </article>
   );
 }
