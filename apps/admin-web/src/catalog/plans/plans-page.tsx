@@ -41,6 +41,7 @@ const planColumns = (open: (row: AdminPlanDto) => void) => [
   }),
   columns.accessor("priceCentavos", {
     header: "Precio",
+    meta: { align: "right" },
     cell: ({ getValue }) => (
       <span className="font-serif tabular">{formatBolivianos(getValue())}</span>
     ),

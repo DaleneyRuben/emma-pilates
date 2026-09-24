@@ -3,6 +3,7 @@ import {
   getCoreRowModel,
   useReactTable,
   type ColumnDef,
+  type RowData,
 } from "@tanstack/react-table";
 import {
   Table,
@@ -15,6 +16,14 @@ import {
 } from "../ui/table";
 import type { PageWindow } from "./pagination";
 import { TablePagination } from "./table-pagination";
+
+declare module "@tanstack/react-table" {
+  // Money and dates sit on the right (design system → Table convention).
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars -- the interface must keep TanStack's type parameters.
+  interface ColumnMeta<TData extends RowData, TValue> {
+    align?: "right";
+  }
+}
 
 type DataTableProps<Row> = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- TanStack's accessor columns carry their own value type per column.
@@ -65,7 +74,14 @@ export function DataTable<Row>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="hover:bg-transparent">
               {headerGroup.headers.map((header) => (
-                <TableHead key={header.id}>
+                <TableHead
+                  key={header.id}
+                  className={
+                    header.column.columnDef.meta?.align === "right"
+                      ? "text-right"
+                      : undefined
+                  }
+                >
                   {header.isPlaceholder
                     ? null
                     : flexRender(
@@ -94,6 +110,11 @@ export function DataTable<Row>({
                 {row.getVisibleCells().map((cell) => (
                   <TableCell
                     key={cell.id}
+                    className={
+                      cell.column.columnDef.meta?.align === "right"
+                        ? "md:text-right"
+                        : undefined
+                    }
                     data-label={headerLabel(cell.column.id)}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
