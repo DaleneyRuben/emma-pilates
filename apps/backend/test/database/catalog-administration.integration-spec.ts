@@ -1,4 +1,5 @@
 import { createPrismaCatalogAdministration } from '../../src/booking/administration/prisma-catalog-administration';
+import { createPrismaCatalogLists } from '../../src/booking/administration/prisma-catalog-lists';
 import { AdministrationError } from '../../src/booking/administration/administration-errors';
 import { deterministicId } from '../../src/development-fixtures/deterministic-id';
 import {
@@ -52,8 +53,11 @@ describe('Prisma catalog administration', () => {
       name: 'Norte',
       address: 'Av. Banzer 4to anillo',
     });
-    const branches = await catalog().listBranches(await administrator());
-    expect(branches.map((branch) => branch.name)).toContain('Norte');
+    const branches = await createPrismaCatalogLists(world.prisma).listBranches(
+      { status: 'active', page: 1, pageSize: 100 },
+      await administrator(),
+    );
+    expect(branches.items.map((branch) => branch.name)).toContain('Norte');
 
     await expect(
       codeOf(

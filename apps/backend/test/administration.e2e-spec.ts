@@ -57,15 +57,12 @@ describe('administration endpoints (e2e)', () => {
       ) => Promise<AuthenticatedPrincipal>
     >();
   const catalog = {
-    listBranches: operation(),
     createBranch: operation(),
     updateBranch: operation(),
     archiveBranch: operation(),
-    listClassTypes: operation(),
     createClassType: operation(),
     updateClassType: operation(),
     archiveClassType: operation(),
-    listPlans: operation(),
     createPlan: operation(),
     updatePlan: operation(),
     setPlanVisibility: operation(),
@@ -97,7 +94,6 @@ describe('administration endpoints (e2e)', () => {
         branchIds: [],
       },
     });
-    catalog.listBranches.mockResolvedValue([branch]);
     catalog.createBranch.mockResolvedValue(branch);
     catalog.archiveBranch.mockRejectedValue(
       new AdministrationError('branch_in_use'),
@@ -159,16 +155,12 @@ describe('administration endpoints (e2e)', () => {
 
   it('manages Branches with validation and stable conflict codes', async () => {
     await request(app.getHttpServer())
-      .get('/api/v1/administrator/branches')
-      .set('authorization', bearer)
-      .expect(200)
-      .expect('Cache-Control', 'no-store')
-      .expect(({ body }) => expect(body).toEqual([{ ...branch }]));
-    await request(app.getHttpServer())
       .post('/api/v1/administrator/branches')
       .set('authorization', bearer)
       .send({ name: 'Centro', address: 'Calle 1' })
-      .expect(201);
+      .expect(201)
+      .expect('Cache-Control', 'no-store')
+      .expect(({ body }) => expect(body).toEqual({ ...branch }));
     await request(app.getHttpServer())
       .post('/api/v1/administrator/branches')
       .set('authorization', bearer)
@@ -309,12 +301,13 @@ describe('administration endpoints (e2e)', () => {
   });
 
   it('answers 403 when a non-Administrator reaches an operation', async () => {
-    catalog.listBranches.mockRejectedValueOnce(
+    catalog.createBranch.mockRejectedValueOnce(
       new AdministrationError('administration_access_denied'),
     );
     await request(app.getHttpServer())
-      .get('/api/v1/administrator/branches')
+      .post('/api/v1/administrator/branches')
       .set('authorization', bearer)
+      .send({ name: 'Centro', address: 'Calle 1' })
       .expect(403)
       .expect(({ body }) =>
         expect(body.code).toBe('administration_access_denied'),
