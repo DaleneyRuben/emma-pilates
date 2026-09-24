@@ -102,12 +102,14 @@ describe("AW17 Promociones", () => {
   });
 
   it("shows a failed read with a retry that reads again", async () => {
+    // A 4xx is not retried by the query itself (ADR-0021), so the failure
+    // shows and only the button reads again.
     let attempts = 0;
     server.use(
       promotionListHandler(() => {
         attempts += 1;
         return attempts === 1
-          ? problemResponse(503, "unexpected_error")
+          ? problemResponse(404, "not_found")
           : jsonResponse([reformer]);
       }),
     );

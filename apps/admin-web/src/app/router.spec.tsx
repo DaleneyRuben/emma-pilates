@@ -80,19 +80,8 @@ describe("admin routes", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it.each(
-    navigationItems
-      .filter((item) => item.built !== true)
-      .map((item) => [item.to, item.label] as const),
-  )("renders a placeholder page for %s", async (path, label) => {
-    renderAt(path);
-
-    expect(
-      await screen.findByRole("heading", { level: 1, name: label }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText("Esta sección aún no está disponible."),
-    ).toBeInTheDocument();
+  it("has a real page behind every sidebar entry since WEB-006", () => {
+    expect(navigationItems.filter((item) => item.built !== true)).toEqual([]);
   });
 
   it("opens the schedule at the root path", async () => {
@@ -107,27 +96,30 @@ describe("admin routes", () => {
     const listPaths = navigationItems
       .filter((item) => item.list)
       .map((item) => item.to);
-    expect(listPaths).toHaveLength(14);
+    expect(listPaths).toHaveLength(13);
     expect(listPaths).not.toContain("/");
     expect(listPaths).not.toContain("/reporte");
+    // AW17 is the carousel: unpaged cards, not a table (WEB-006).
+    expect(listPaths).not.toContain("/promociones");
 
-    const router = renderAt("/promociones?page=abc&pageSize=500");
-    await screen.findByRole("heading", { level: 1, name: "Promociones" });
+    const router = renderAt("/promociones/referidos?page=abc&pageSize=500");
+    await screen.findByRole("heading", { level: 1, name: "Referidos" });
     expect(router.state.matches.at(-1)?.search).toEqual({
       page: 1,
       pageSize: 20,
     });
 
     await router.navigate({
-      to: "/promociones",
+      to: "/promociones/referidos",
       search: { page: 3, pageSize: 50 },
     });
-    await screen.findByText("Esta sección aún no está disponible.");
     expect(router.state.matches.at(-1)?.search).toEqual({
       page: 3,
       pageSize: 50,
     });
-    expect(router.state.location.href).toBe("/promociones?page=3&pageSize=50");
+    expect(router.state.location.href).toBe(
+      "/promociones/referidos?page=3&pageSize=50",
+    );
   });
 
   it("explains an unknown path and offers the way back to the schedule", async () => {

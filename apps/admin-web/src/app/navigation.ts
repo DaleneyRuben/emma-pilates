@@ -166,7 +166,9 @@ export const navigationGroups: readonly NavigationGroup[] = [
   {
     label: "Promociones",
     items: [
-      { label: "Promociones", to: "/promociones", screen: "AW17", list: true },
+      // AW17 is the one list drawn as cards, unpaged, because its order is
+      // what the page edits.
+      { label: "Promociones", to: "/promociones", screen: "AW17", built: true },
       {
         label: "Referidos",
         to: "/promociones/referidos",

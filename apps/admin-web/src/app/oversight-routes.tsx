@@ -3,7 +3,8 @@ import { evaluationSearchSchema } from "../oversight/evaluations/evaluation-sear
 import { nameSearchSchema } from "../oversight/oversight-search";
 import { authenticatedRoute } from "./root-routes";
 
-// The read-only oversight lists (WEB-008): AW25–AW27, one chunk each.
+// The read-only oversight lists (WEB-008): AW25–AW27, and the Promotions
+// carousel (WEB-006): AW17, one chunk each.
 const evaluationsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/evaluaciones-nutricionales",
@@ -11,6 +12,15 @@ const evaluationsRoute = createRoute({
   component: lazyRouteComponent(
     () => import("../oversight/evaluations/evaluations-route"),
     "EvaluationsRoute",
+  ),
+});
+
+const promotionsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/promociones",
+  component: lazyRouteComponent(
+    () => import("../promotions/promotions-route"),
+    "PromotionsRoute",
   ),
 });
 
@@ -34,4 +44,9 @@ const creditsRoute = createRoute({
   ),
 });
 
-export const oversightRoutes = [evaluationsRoute, referralsRoute, creditsRoute];
+export const oversightRoutes = [
+  evaluationsRoute,
+  promotionsRoute,
+  referralsRoute,
+  creditsRoute,
+];
