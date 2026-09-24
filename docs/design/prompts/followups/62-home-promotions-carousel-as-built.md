@@ -37,6 +37,11 @@ not draw. Make the frames match what ships. Change nothing else.
   greeting directly. Draw the active-plan frame once without the section.
 - Pull to refresh on Inicio re-reads the carousel with the rest of the
   screen.
+- On a 393 × 852 phone the greeting, the card, its dots, and the plan card
+  fill the first screen; the quick actions start below the fold and need one
+  scroll. If the studio would rather keep a quick action above the fold,
+  say so and the card can shrink (the export's 268 px peeking card is the
+  alternative); the app keeps the full-width card until then.
 - On a tablet, the card stops at **720 px** wide and the next card peeks on
   the right; the rest of Inicio keeps its phone-first single column.
 
