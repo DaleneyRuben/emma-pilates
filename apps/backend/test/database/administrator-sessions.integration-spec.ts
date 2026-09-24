@@ -2,7 +2,11 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
 import { buildDevelopmentFixtures } from '../../src/development-fixtures/development-fixtures';
-import { listSessionsAcrossBranches } from '../../src/booking/session-availability';
+import {
+  listSessionAvailability,
+  listSessionsAcrossBranches,
+} from '../../src/booking/session-availability';
+import { deterministicId } from '../../src/development-fixtures/deterministic-id';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -66,5 +70,47 @@ describe('Sessions across every Branch', () => {
         availableSeats: expect.any(Number),
       }),
     );
+  });
+
+  it('narrows to one Branch for the admin week grid and says which Sessions a weekly schedule generated', async () => {
+    const from = new Date();
+    const until = new Date(from.getTime() + 7 * day);
+    const centro = deterministicId('branch:centro');
+    const generated = await prisma.session.findFirstOrThrow({
+      where: {
+        branchId: centro,
+        state: 'SCHEDULED',
+        sessionScheduleId: { not: null },
+        startsAt: { gte: from, lt: until },
+      },
+      orderBy: { startsAt: 'asc' },
+    });
+
+    const sessions = await listSessionsAcrossBranches(prisma)({
+      branchId: centro,
+      from,
+      until,
+      limit: 100,
+    });
+
+    expect(sessions.length).toBeGreaterThan(0);
+    expect(new Set(sessions.map((session) => session.branchId))).toEqual(
+      new Set([centro]),
+    );
+    expect(sessions.find((session) => session.id === generated.id)).toEqual(
+      expect.objectContaining({
+        sessionScheduleId: generated.sessionScheduleId,
+        isException: generated.isException,
+      }),
+    );
+
+    const clientFacing = await listSessionAvailability(prisma)({
+      branchId: centro,
+      from,
+      until,
+      limit: 100,
+    });
+    expect(clientFacing[0]).not.toHaveProperty('sessionScheduleId');
+    expect(clientFacing[0]).not.toHaveProperty('isException');
   });
 });

@@ -22,6 +22,7 @@ import type { AuthenticatedPrincipal } from '../src/system-identity/authenticati
 const bearer = `Bearer ${'a'.repeat(43)}`;
 const paymentId = '44444444-4444-4444-8444-444444444444';
 const sessionId = '55555555-5555-4555-8555-555555555555';
+const branchId = '11111111-1111-4111-8111-111111111111';
 const payment = {
   id: paymentId,
   method: 'transfer',
@@ -282,7 +283,29 @@ describe('administrator payments and sessions (e2e)', () => {
     );
 
     await request(app.getHttpServer())
+      .get(
+        `/api/v1/administrator/sessions?from=2026-09-21T04:00:00.000Z&until=2026-09-28T04:00:00.000Z&limit=100&branchId=${branchId}`,
+      )
+      .set('authorization', bearer)
+      .expect(200);
+    expect(searchSessions).toHaveBeenLastCalledWith(
+      {
+        from: new Date('2026-09-21T04:00:00.000Z'),
+        until: new Date('2026-09-28T04:00:00.000Z'),
+        limit: 100,
+        branchId,
+      },
+      expect.anything(),
+    );
+
+    await request(app.getHttpServer())
       .get('/api/v1/administrator/sessions?from=bad')
+      .set('authorization', bearer)
+      .expect(400);
+    await request(app.getHttpServer())
+      .get(
+        '/api/v1/administrator/sessions?from=2026-09-21T04:00:00.000Z&until=2026-09-28T04:00:00.000Z&branchId=centro',
+      )
       .set('authorization', bearer)
       .expect(400);
     searchSessions.mockRejectedValueOnce(new BookingAccessDeniedError());
