@@ -2,7 +2,9 @@ import {
   getGetAdminClientQueryKey,
   getGetPaymentReviewQueryKey,
   getListAdminClientsQueryKey,
+  getListAdminCreditsQueryKey,
   getListAdminPaymentsQueryKey,
+  getListAdminReferralsQueryKey,
 } from "@pilates/api-contracts";
 import type { QueryClient } from "@tanstack/react-query";
 
@@ -15,8 +17,9 @@ const clientsPath = getListAdminClientsQueryKey()[0];
  * (Pagos and the sidebar count) and the review; a confirmation starts the
  * Client's Plan (the Clientes directory and her detail) and a first Payment
  * may award Credit to her referrer, whom the admin web cannot name, so every
- * Client detail; a rejection releases only her reserved Credit. A decision
- * taken elsewhere (a conflict) may have been either.
+ * Client detail and the Referral and Credit lists; a rejection releases only
+ * her reserved Credit (her detail and the Credit list). A decision taken
+ * elsewhere (a conflict) may have been either.
  */
 export async function refreshAfterDecision(
   queryClient: QueryClient,
@@ -29,6 +32,7 @@ export async function refreshAfterDecision(
     queryClient.invalidateQueries({
       queryKey: getGetPaymentReviewQueryKey(change.paymentId),
     }),
+    queryClient.invalidateQueries({ queryKey: getListAdminCreditsQueryKey() }),
   ];
   if (change.outcome === "rejected") {
     refreshes.push(
@@ -46,6 +50,9 @@ export async function refreshAfterDecision(
         predicate: ({ queryKey }) =>
           typeof queryKey[0] === "string" &&
           queryKey[0].startsWith(`${clientsPath}/`),
+      }),
+      queryClient.invalidateQueries({
+        queryKey: getListAdminReferralsQueryKey(),
       }),
     );
   }
