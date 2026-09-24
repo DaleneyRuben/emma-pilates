@@ -1,173 +1,146 @@
 import { randomUUID } from 'node:crypto';
-import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createPrismaAdministratorPayments } from '../../src/booking/payments/prisma-administrator-payments';
+import { createPrismaPaymentCommands } from '../../src/booking/payments/prisma-payment-commands';
+import { createPrismaAdapter } from '../../src/database/prisma-adapter';
+import { toPrismaBytes } from '../../src/database/prisma-bytes';
+import { applyDevelopmentFixtures } from '../../src/development-fixtures/apply-development-fixtures';
+import { buildDevelopmentFixtures } from '../../src/development-fixtures/development-fixtures';
+import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
 } from './database-test-context';
 
+const today = new Date('2026-09-21T00:00:00.000Z');
 const at = (time: string) => new Date(`2026-09-21T${time}:00.000Z`);
 
+// The development fixtures record only cash Payments, so every transfer
+// below is the whole transfer list; Sofía starts with Bs 60 of Credit.
 describe('Administrator Payment list (PostgreSQL)', () => {
   let context: DatabaseTestContext;
   let prisma: PrismaClient;
-  let planId: string;
-  let branchId: string;
+  let administrator: AuthenticatedPrincipal;
+  const fixtures = buildDevelopmentFixtures({ today });
+  const plan = fixtures.plans.find((p) => p.name === 'Paquete de 8 clases')!;
   const ledger = () => createPrismaAdministratorPayments(prisma);
-  const ids: Record<string, string> = {};
-
-  const createClient = async (name: string) => {
-    const client = await prisma.client.create({
-      data: {
-        name,
-        referralCode: randomUUID(),
-        account: { create: { email: `${randomUUID()}@example.com` } },
-      },
-      select: { id: true, account: { select: { id: true } } },
+  const commands = (clock: Date) =>
+    createPrismaPaymentCommands(prisma, {
+      now: () => clock,
+      referralRewardCentavos: 6000,
     });
-    return { clientId: client.id, accountId: client.account!.id };
+  const paymentIds: Record<string, string> = {};
+
+  const principalOf = async (
+    email: string,
+  ): Promise<AuthenticatedPrincipal> => {
+    const account = await prisma.account.findUniqueOrThrow({
+      where: { email },
+      select: { id: true, clientId: true, staffMember: true },
+    });
+    return {
+      accountId: account.id,
+      authenticationSessionId: randomUUID(),
+      identity:
+        account.staffMember === null
+          ? { kind: 'client', clientId: account.clientId! }
+          : {
+              kind: 'staff',
+              staffMemberId: account.staffMember.id,
+              role: 'administrator',
+              branchIds: [],
+            },
+    };
   };
 
-  const snapshot = (priceCentavos: number, creditCentavos: number) => ({
-    planNameSnapshot: 'Paquete de 8 clases',
-    durationMonthsSnapshot: 1,
-    classAllowanceSnapshot: 8,
-    planPriceCentavos: priceCentavos,
-    amountDueCentavos: priceCentavos - creditCentavos,
-  });
+  const newClient = async (name: string) => {
+    const email = `${randomUUID()}@example.com`;
+    await prisma.account.create({
+      data: {
+        email,
+        activatedAt: at('08:00'),
+        emailVerifiedAt: at('08:00'),
+        client: { create: { name, referralCode: randomUUID().slice(0, 8) } },
+      },
+    });
+    return principalOf(email);
+  };
 
-  const transfer = async (input: {
-    name: string;
-    submittedAt: Date;
-    state: 'PENDING' | 'CONFIRMED' | 'REJECTED';
-    decidedAt?: Date;
-    creditCentavos?: number;
-    receiptDeleted?: boolean;
-  }) => {
-    const { clientId, accountId } = await createClient(input.name);
-    const credit = input.creditCentavos ?? 0;
+  // A Client raises a transfer through the real commands (PAY-002).
+  const submitTransfer = async (
+    principal: AuthenticatedPrincipal,
+    submittedAt: Date,
+  ) => {
+    const openedAt = new Date(submittedAt.getTime() - 30 * 60 * 1_000);
     const receipt = await prisma.imageAsset.create({
       data: {
-        ownerAccountId: accountId,
+        ownerAccountId: principal.accountId,
         purpose: 'TRANSFER_RECEIPT',
         state: 'READY',
-        pendingObjectKey: randomUUID(),
+        pendingObjectKey: `pending/${randomUUID()}`,
         declaredMediaType: 'JPEG',
-        declaredByteSize: 100,
-        declaredChecksum: Buffer.alloc(32, 1),
-        createdAt: at('08:00'),
-        expiresAt: at('23:00'),
-        deletedAt: input.receiptDeleted === true ? at('22:00') : null,
+        declaredByteSize: 1234,
+        declaredChecksum: toPrismaBytes(Buffer.alloc(32, 1)),
+        createdAt: openedAt,
+        expiresAt: new Date(openedAt.getTime() + 15 * 60 * 1_000),
+        finalizedAt: openedAt,
       },
+      select: { id: true },
     });
-    const intent = await prisma.purchaseIntent.create({
-      data: {
-        clientId,
-        planId,
-        ...snapshot(56_000, credit),
-        creditReservedCentavos: credit,
-        receiptImageAssetId: receipt.id,
-        state: 'SUBMITTED',
-        createdByAccountId: accountId,
-        createdAt: at('08:00'),
-        expiresAt: new Date('2026-09-22T08:00:00.000Z'),
-        submittedAt: input.submittedAt,
-      },
-    });
-    const payment = await prisma.payment.create({
-      data: {
-        clientId,
-        planId,
-        purchaseIntentId: intent.id,
-        ...snapshot(56_000, credit),
-        creditAppliedCentavos: credit,
-        method: 'TRANSFER',
-        state: input.state,
-        submittedByAccountId: accountId,
-        submittedAt: input.submittedAt,
-        ...(input.state === 'PENDING'
-          ? {}
-          : { decidedByAccountId: accountId, decidedAt: input.decidedAt }),
-        ...(input.state === 'REJECTED'
-          ? { rejectionReason: 'El monto no coincide.' }
-          : {}),
-      },
-    });
-    ids[input.name] = payment.id;
-    return { clientId, paymentId: payment.id };
-  };
-
-  // Cash and Credit-only Payments are confirmed when recorded (ADR-0006).
-  const settledOnTheSpot = async (
-    name: string,
-    method: 'CASH' | 'CREDIT_ONLY',
-  ) => {
-    const { clientId, accountId } = await createClient(name);
-    const credit = method === 'CASH' ? 0 : 56_000;
-    await prisma.payment.create({
-      data: {
-        clientId,
-        planId,
-        ...snapshot(56_000, credit),
-        creditAppliedCentavos: credit,
-        method,
-        state: 'CONFIRMED',
-        collectedAtBranchId: method === 'CASH' ? branchId : null,
-        submittedByAccountId: accountId,
-        submittedAt: at('11:00'),
-        decidedByAccountId: accountId,
-        decidedAt: at('11:00'),
-      },
-    });
+    const intent = await commands(openedAt).createPurchaseIntent(
+      { planId: plan.id },
+      principal,
+      randomUUID(),
+    );
+    await commands(openedAt).attachReceipt(
+      { purchaseIntentId: intent.id, imageAssetId: receipt.id },
+      principal,
+      randomUUID(),
+    );
+    const payment = await commands(submittedAt).submitTransfer(
+      { purchaseIntentId: intent.id },
+      principal,
+      randomUUID(),
+    );
+    return { paymentId: payment.id, receiptId: receipt.id };
   };
 
   beforeAll(async () => {
     context = await startDatabaseTestContext();
-    prisma = new PrismaClient({ adapter: new PrismaPg(context.pool) });
-    planId = (
-      await prisma.plan.create({
-        data: {
-          name: 'Paquete de 8 clases',
-          durationMonths: 1,
-          classAllowance: 8,
-          priceCentavos: 56_000,
-          displayOrder: 0,
-        },
-      })
-    ).id;
-    branchId = (
-      await prisma.branch.create({
-        data: { name: 'Centro', address: 'Calle Ayacucho 245' },
-      })
-    ).id;
+    prisma = new PrismaClient({
+      adapter: createPrismaAdapter(context.databaseUrl),
+    });
+    await applyDevelopmentFixtures(prisma, {
+      fixtures,
+      passwordHash: 'not-a-real-hash',
+      now: () => at('08:00'),
+    });
+    administrator = await principalOf('paola.mendoza@example.com');
 
-    await transfer({
-      name: 'Sofía Guzmán',
-      submittedAt: at('14:00'),
-      state: 'PENDING',
-      creditCentavos: 6_000,
+    const lucia = await newClient('Lucía Fernández');
+    paymentIds.lucia = (await submitTransfer(lucia, at('13:00'))).paymentId;
+    const sofia = await principalOf('sofia@example.com');
+    paymentIds.sofia = (await submitTransfer(sofia, at('14:00'))).paymentId;
+
+    const valeria = await newClient('Valeria Quiroga');
+    paymentIds.valeria = (await submitTransfer(valeria, at('09:00'))).paymentId;
+    await commands(at('15:00')).confirmTransfer(
+      { paymentId: paymentIds.valeria },
+      administrator,
+    );
+
+    const mariana = await newClient('Mariana Paz');
+    const rejected = await submitTransfer(mariana, at('10:00'));
+    paymentIds.mariana = rejected.paymentId;
+    await commands(at('16:00')).rejectTransfer(
+      { paymentId: rejected.paymentId, reason: 'El monto no coincide.' },
+      administrator,
+    );
+    // The retention sweep later deletes a decided receipt (ADR-0075).
+    await prisma.imageAsset.update({
+      where: { id: rejected.receiptId },
+      data: { deletedAt: at('22:00') },
     });
-    await transfer({
-      name: 'Lucía Fernández',
-      submittedAt: at('13:00'),
-      state: 'PENDING',
-    });
-    await transfer({
-      name: 'Valeria Quiroga',
-      submittedAt: at('09:00'),
-      state: 'CONFIRMED',
-      decidedAt: at('15:00'),
-    });
-    await transfer({
-      name: 'Mariana Paz',
-      submittedAt: at('10:00'),
-      state: 'REJECTED',
-      decidedAt: at('16:00'),
-      receiptDeleted: true,
-    });
-    await settledOnTheSpot('Ana Justiniano', 'CASH');
-    await settledOnTheSpot('Bea Montaño', 'CREDIT_ONLY');
   });
 
   afterAll(async () => {
@@ -184,42 +157,49 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       totalItems: 4,
       pendingCount: 2,
     });
-    expect(page.items.map((item) => item.clientName)).toEqual([
-      'Lucía Fernández',
-      'Sofía Guzmán',
-      'Mariana Paz',
-      'Valeria Quiroga',
+    expect(page.items.map((item) => item.id)).toEqual([
+      paymentIds.lucia,
+      paymentIds.sofia,
+      paymentIds.mariana,
+      paymentIds.valeria,
     ]);
     expect(page.items[1]).toEqual({
-      id: ids['Sofía Guzmán'],
+      id: paymentIds.sofia,
       clientId: expect.any(String),
-      clientName: 'Sofía Guzmán',
+      clientName: expect.stringMatching(/^Sofía/),
       planName: 'Paquete de 8 clases',
-      planPriceCentavos: 56_000,
-      creditAppliedCentavos: 6_000,
-      amountDueCentavos: 50_000,
+      planPriceCentavos: plan.priceCentavos,
+      creditAppliedCentavos: 6000,
+      amountDueCentavos: plan.priceCentavos - 6000,
       state: 'pending',
       submittedAt: at('14:00'),
       decidedAt: null,
       receiptAvailable: true,
     });
     expect(page.items[2]).toMatchObject({
+      clientName: 'Mariana Paz',
       state: 'rejected',
       decidedAt: at('16:00'),
       receiptAvailable: false,
     });
+    expect(page.items[3]).toMatchObject({
+      state: 'confirmed',
+      decidedAt: at('15:00'),
+    });
   });
 
   it.each([
-    ['pending', ['Lucía Fernández', 'Sofía Guzmán']],
-    ['confirmed', ['Valeria Quiroga']],
-    ['rejected', ['Mariana Paz']],
+    ['pending', ['lucia', 'sofia']],
+    ['confirmed', ['valeria']],
+    ['rejected', ['mariana']],
   ] as const)(
     'filters by the %s state and still counts every pending transfer',
     async (status, names) => {
       const page = await ledger().list({ page: 1, pageSize: 20, status });
 
-      expect(page.items.map((item) => item.clientName)).toEqual(names);
+      expect(page.items.map((item) => item.id)).toEqual(
+        names.map((name) => paymentIds[name]),
+      );
       expect(page.totalItems).toBe(names.length);
       expect(page.pendingCount).toBe(2);
     },
@@ -230,10 +210,10 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       page: 1,
       pageSize: 20,
       status: 'all',
-      query: 'GUZMAN',
+      query: 'LUCIA FERNANDEZ',
     });
 
-    expect(page.items.map((item) => item.clientName)).toEqual(['Sofía Guzmán']);
+    expect(page.items.map((item) => item.id)).toEqual([paymentIds.lucia]);
     expect(page).toMatchObject({ totalItems: 1, pendingCount: 2 });
   });
 
@@ -251,7 +231,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
   it('pages after filtering and ordering', async () => {
     const page = await ledger().list({ page: 2, pageSize: 1, status: 'all' });
 
-    expect(page.items.map((item) => item.clientName)).toEqual(['Sofía Guzmán']);
+    expect(page.items.map((item) => item.id)).toEqual([paymentIds.sofia]);
     expect(page).toMatchObject({ page: 2, pageSize: 1, totalItems: 4 });
   });
 });
