@@ -157,6 +157,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/promociones/referidos",
         screen: "AW26",
         list: true,
+        built: true,
         studioWide: "los referidos son del estudio, no de una sede.",
       },
       {
