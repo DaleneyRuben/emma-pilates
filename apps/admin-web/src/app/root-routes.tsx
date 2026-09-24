@@ -63,7 +63,9 @@ const createPasswordRoute = createRoute({
 });
 
 // Every sidebar page sits behind the session probe; a signed-out visitor
-// goes to Login and comes back to the exact address afterwards.
+// goes to Login and comes back to the exact address afterwards. A session
+// the probe finds (Login here, or another tab's) is one whose end must be
+// reported again, so a logout's silence ends here.
 export const authenticatedRoute = createRoute({
   getParentRoute: () => rootRoute,
   id: "authenticated",
@@ -74,6 +76,7 @@ export const authenticatedRoute = createRoute({
         search: { redirect: location.href },
       });
     }
+    context.sessionExpiry.reset();
   },
   errorComponent: StartupErrorPage,
   component: AdminShell,
