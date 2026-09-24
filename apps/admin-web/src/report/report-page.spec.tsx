@@ -162,14 +162,11 @@ describe("AW16 Reporte on a desktop browser", () => {
       target: { value: centro.id },
     });
 
+    // Switching scope shows the loading line, then the new tiles.
     expect(
-      await within(tile("Ingresos")).findByText("Bs 780,00"),
+      await screen.findByText("Pagos en efectivo cobrados en Centro"),
     ).toBeVisible();
-    expect(
-      within(tile("Ingresos")).getByText(
-        "Pagos en efectivo cobrados en Centro",
-      ),
-    ).toBeVisible();
+    expect(within(tile("Ingresos")).getByText("Bs 780,00")).toBeVisible();
     expect(within(tile("Gastos")).getByText("Bs 480,50")).toBeVisible();
     expect(
       within(tile("Gastos")).getByText("Gastos registrados en Centro"),
