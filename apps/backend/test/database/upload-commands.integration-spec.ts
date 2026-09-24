@@ -156,6 +156,32 @@ describe('Prisma upload commands', () => {
       expect(asset.verifiedWidth).toBe(20);
       expect(asset.verifiedHeight).toBe(10);
       expect(asset.failureCode).toBeNull();
+
+      // ADR-0073: the private variants are stored and recorded, and the
+      // temporary original is gone.
+      const variants = await tx.imageVariant.findMany({
+        where: { imageAssetId: intent.id },
+        orderBy: { kind: 'asc' },
+      });
+      expect(variants.map((variant) => variant.kind)).toEqual([
+        'THUMBNAIL',
+        'READABLE',
+      ]);
+      expect(variants.every((v) => v.visibility === 'PRIVATE')).toBe(true);
+      expect(variants.every((v) => v.mediaType === 'JPEG')).toBe(true);
+      expect(variants.every((v) => v.width === 20 && v.height === 10)).toBe(
+        true,
+      );
+      for (const variant of variants) {
+        expect(variant.storageKey).toBe(
+          `private/transfer_receipt/${intent.id}/${variant.kind.toLowerCase()}`,
+        );
+        const stored = await storage.get(variant.storageKey);
+        expect(stored.byteLength).toBe(variant.byteSize);
+        expect((await sharp(stored).metadata()).format).toBe('jpeg');
+        await storage.delete(variant.storageKey);
+      }
+      await expect(storage.get(intent.pendingObjectKey)).rejects.toThrow();
     });
   });
 
