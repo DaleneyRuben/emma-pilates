@@ -1,6 +1,8 @@
 import {
   archiveSupply,
   createSupply,
+  recordRestock,
+  recordWithdrawal,
   getListAdminSuppliesQueryKey,
   listAdminSupplies,
   updateSupply,
@@ -9,6 +11,7 @@ import {
   type ListAdminSuppliesParams,
   type SupplyChangeDto,
   type SupplyInputDto,
+  type SupplyMovementDto,
 } from "@pilates/api-contracts";
 import {
   keepPreviousData,
@@ -17,6 +20,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { adminFetch } from "../../api/fetcher";
+import { idempotencyHeaders } from "../../api/idempotency-key";
 import type { ListSearch } from "../../components/table/pagination";
 import { refreshAfterSupplyChange } from "../back-office-cache";
 
@@ -77,5 +81,38 @@ export function useSupplyChange(branchId: string) {
       (await sendSupplyChange(change)).data as AdminSupplyDto,
     onSuccess: (_supply, change) =>
       refreshAfterSupplyChange(queryClient, { branchId, kind: change.kind }),
+  });
+}
+
+export type SupplyMovement = {
+  kind: "withdrawal" | "restock";
+  supplyId: string;
+  quantity: number;
+  idempotencyKey: string;
+};
+
+// AW10 and follow-up 48: units out or in, each once per Idempotency-Key.
+export function useSupplyMovement(branchId: string) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      kind,
+      supplyId,
+      quantity,
+      idempotencyKey,
+    }: SupplyMovement): Promise<SupplyMovementDto> => {
+      const record = kind === "withdrawal" ? recordWithdrawal : recordRestock;
+      return (
+        await record(
+          supplyId,
+          { quantity },
+          idempotencyHeaders(idempotencyKey),
+          adminFetch,
+        )
+      ).data as SupplyMovementDto;
+    },
+    onSuccess: (_movement, { kind }) =>
+      refreshAfterSupplyChange(queryClient, { branchId, kind }),
   });
 }

@@ -14,6 +14,7 @@ import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
+import { SupplyMovementForm } from "./movement-panel";
 import { SupplyPanelForm } from "./supply-panel";
 import { supplyTableQueryOptions } from "./supply-queries";
 
@@ -99,8 +100,26 @@ function BranchSupplies({
         <SupplyPanelForm branchId={branch.id} supply={supply} onDone={done} />
       )}
       panelActions={[
-        { label: "Registrar retiro", render: () => null },
-        { label: "Registrar reposición", render: () => null },
+        {
+          label: "Registrar retiro",
+          render: (done) => (
+            <SupplyMovementForm
+              branchId={branch.id}
+              kind="withdrawal"
+              onDone={done}
+            />
+          ),
+        },
+        {
+          label: "Registrar reposición",
+          render: (done) => (
+            <SupplyMovementForm
+              branchId={branch.id}
+              kind="restock"
+              onDone={done}
+            />
+          ),
+        },
       ]}
       links={
         <Button asChild variant="link" className="px-2">

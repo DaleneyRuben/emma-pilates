@@ -17,11 +17,11 @@ import {
   SidePanelBody,
   SidePanelFooter,
 } from "../../components/panel/side-panel";
-import { countFormat } from "../../components/table/pagination";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
 import { Input } from "../../components/ui/input";
 import { backOfficeProblem } from "../back-office-problems";
+import { unitsLabel } from "./supply-format";
 import { useSupplyChange } from "./supply-queries";
 
 // The backend's whole-unit range (BKO-001 D3).
@@ -38,9 +38,6 @@ const supplySchema = z.object({
 });
 type SupplyInput = z.input<typeof supplySchema>;
 type SupplyOutput = z.output<typeof supplySchema>;
-
-export const unitsLabel = (quantity: number) =>
-  `${countFormat.format(quantity)} unid.`;
 
 // AW09 with follow-up 49: the stock is typed once, at creation; afterwards
 // only Withdrawals and Restocks move it, and a discontinued Supply is

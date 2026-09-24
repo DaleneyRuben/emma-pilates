@@ -21,11 +21,7 @@ export async function refreshAfterSupplyChange(
   queryClient: QueryClient,
   change: { branchId: string; kind: SupplyChangeKind },
 ): Promise<void> {
-  const refreshes = [
-    queryClient.invalidateQueries({
-      predicate: isBranchScopedKey(suppliesPath, change.branchId),
-    }),
-  ];
+  const refreshes = [refreshBranchSupplies(queryClient, change.branchId)];
   if (change.kind !== "create" && change.kind !== "restock") {
     refreshes.push(
       queryClient.invalidateQueries({
@@ -35,3 +31,12 @@ export async function refreshAfterSupplyChange(
   }
   await Promise.all(refreshes);
 }
+
+/** One Branch's Supply lists, e.g. after its stock changed elsewhere. */
+export const refreshBranchSupplies = (
+  queryClient: QueryClient,
+  branchId: string,
+): Promise<void> =>
+  queryClient.invalidateQueries({
+    predicate: isBranchScopedKey(suppliesPath, branchId),
+  });
