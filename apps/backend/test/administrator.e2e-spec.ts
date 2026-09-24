@@ -11,6 +11,7 @@ import {
   administratorSessionSearch,
   cancelSessionCommand,
   receiptObjectStorage,
+  receiptRead,
 } from '../src/booking/payments/administrator.controller';
 import { PaymentRuleError } from '../src/booking/payments/payment-errors';
 import { paymentCommands } from '../src/booking/payments/payments.controller';
@@ -52,11 +53,12 @@ describe('administrator payments and sessions (e2e)', () => {
   const commands = {
     listPendingPayments: jest.fn<() => Promise<unknown>>(),
     readPaymentReview: jest.fn<() => Promise<unknown>>(),
-    readReceiptObject: jest.fn<() => Promise<unknown>>(),
     confirmTransfer: jest.fn<() => Promise<unknown>>(),
     rejectTransfer: jest.fn<() => Promise<unknown>>(),
   };
   const storage = { get: jest.fn<() => Promise<Buffer>>() };
+  const readReceiptObject =
+    jest.fn<(command: unknown, principal: unknown) => Promise<unknown>>();
   const cancelSession = jest.fn<() => Promise<unknown>>();
   const searchSessions = jest.fn<() => Promise<unknown>>();
 
@@ -86,7 +88,7 @@ describe('administrator payments and sessions (e2e)', () => {
       clientName: 'Sofía Guzmán',
       receipt: { imageAssetId: 'asset-1', mediaType: 'image/jpeg' },
     });
-    commands.readReceiptObject.mockResolvedValue({
+    readReceiptObject.mockResolvedValue({
       objectKey: 'pending/x',
       mediaType: 'image/jpeg',
     });
@@ -128,6 +130,7 @@ describe('administrator payments and sessions (e2e)', () => {
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
         { provide: paymentCommands, useValue: commands },
         { provide: receiptObjectStorage, useValue: storage },
+        { provide: receiptRead, useValue: readReceiptObject },
         { provide: cancelSessionCommand, useValue: cancelSession },
         { provide: administratorSessionSearch, useValue: searchSessions },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
@@ -172,15 +175,39 @@ describe('administrator payments and sessions (e2e)', () => {
       });
   });
 
-  it('streams the receipt privately', async () => {
+  it('streams the readable receipt variant privately, or the thumbnail on request', async () => {
     await request(app.getHttpServer())
       .get(`/api/v1/administrator/payments/${paymentId}/receipt`)
       .set('authorization', bearer)
       .expect(200)
       .expect('Content-Type', /image\/jpeg/)
       .expect('Cache-Control', 'no-store')
+      .expect('X-Content-Type-Options', 'nosniff')
       .expect(({ body }) => {
         expect(Buffer.from(body as Buffer).toString()).toBe('jpeg-bytes');
+      });
+    expect(readReceiptObject).toHaveBeenLastCalledWith(
+      { paymentId, variant: 'readable' },
+      expect.objectContaining({ accountId: 'admin-account' }),
+    );
+
+    await request(app.getHttpServer())
+      .get(`/api/v1/administrator/payments/${paymentId}/receipt`)
+      .query({ variant: 'thumbnail' })
+      .set('authorization', bearer)
+      .expect(200);
+    expect(readReceiptObject).toHaveBeenLastCalledWith(
+      { paymentId, variant: 'thumbnail' },
+      expect.anything(),
+    );
+
+    await request(app.getHttpServer())
+      .get(`/api/v1/administrator/payments/${paymentId}/receipt`)
+      .query({ variant: 'original' })
+      .set('authorization', bearer)
+      .expect(400)
+      .expect(({ body }) => {
+        expect(body).toMatchObject({ code: 'invalid_request' });
       });
   });
 
