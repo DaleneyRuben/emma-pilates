@@ -99,7 +99,9 @@ describe('administration oversight endpoints (e2e)', () => {
         .get(`/api/v1/administrator/evaluations?${range}&${filter}`)
         .set('authorization', bearer)
         .expect(400)
-        .expect(({ body }) => expect(body.code).toBe('invalid_request'));
+        .expect(({ body }: { body: { code: string } }) =>
+          expect(body.code).toBe('invalid_request'),
+        );
     }
     expect(oversight.listEvaluations).not.toHaveBeenCalled();
   });
