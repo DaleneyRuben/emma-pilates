@@ -13,6 +13,10 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/form/form";
+import {
+  bolivianosField,
+  bolivianosText,
+} from "../../components/form/money-field";
 import { wholeNumberField } from "../../components/form/number-field";
 import {
   SidePanelBody,
@@ -21,7 +25,6 @@ import {
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Select } from "../../components/ui/select";
-import { formatBolivianos, parseBolivianos } from "../../lib/money";
 import { durationLabel, planDurations } from "./plan-format";
 import { usePlanChange } from "./plan-queries";
 
@@ -33,12 +36,10 @@ const planSchema = z.object({
     .enum(["1", "3", "6", "12"])
     .transform((months) => Number(months) as PlanInputDto["durationMonths"]),
   classAllowance: wholeNumberField(1, 1000, "Entre 1 y 1.000 clases."),
-  priceCentavos: z
-    .string()
-    .transform((text) => parseBolivianos(text))
-    .pipe(
-      z.number(priceMessage).int().min(1, "El precio debe ser mayor a cero."),
-    ),
+  priceCentavos: bolivianosField({
+    invalid: priceMessage,
+    zero: "El precio debe ser mayor a cero.",
+  }),
   displayOrder: wholeNumberField(0, 1000, "Un número desde 0."),
 });
 
@@ -95,9 +96,7 @@ export function PlanPanelForm({
       ) as PlanInput["durationMonths"],
       classAllowance: plan === undefined ? "" : String(plan.classAllowance),
       priceCentavos:
-        plan === undefined
-          ? ""
-          : formatBolivianos(plan.priceCentavos).replace(/^Bs\s/, ""),
+        plan === undefined ? "" : bolivianosText(plan.priceCentavos),
       displayOrder: plan === undefined ? "" : String(plan.displayOrder),
     },
   });
