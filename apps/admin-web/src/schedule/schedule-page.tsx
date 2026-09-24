@@ -10,6 +10,7 @@ import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
 import { WeekStepper } from "../components/table/week-stepper";
 import { addDays, boliviaToday, weekStartOf } from "../lib/bolivia-time";
+import type { Branch } from "../shell/branch/branch-context";
 import { useBranchSelection } from "../shell/branch/use-branch-selection";
 import { useIsNarrowViewport } from "../shell/use-media-query";
 import { DayList } from "./day-list";
@@ -25,24 +26,22 @@ const sessionCount = (count: number) =>
 // AW02: the selected Branch's week in Bolivia time (ADR-0057). Sessions,
 // not schedules, are drawn: a weekly schedule shows up through the Sessions
 // it has materialized up to 30 days ahead (ADR-0059).
-export function SchedulePage({
+function BranchSchedule({
+  branch,
   search,
   onWeekChange,
 }: {
+  branch: Branch;
   search: ScheduleSearch;
   onWeekChange: (week: string) => void;
 }) {
   const today = boliviaToday();
   const monday = weekStartOf(search.week ?? today);
   const narrow = useIsNarrowViewport();
-  const { selectedBranch, status: branchStatus } = useBranchSelection();
   const [panel, setPanel] = useState<SessionPanelState>({ mode: "closed" });
   const [notice, setNotice] = useState<string | null>(null);
   const [day, setDay] = useState<string | null>(null);
-  const sessions = useQuery({
-    ...weekSessionsQueryOptions(selectedBranch?.id ?? "", monday),
-    enabled: selectedBranch !== undefined,
-  });
+  const sessions = useQuery(weekSessionsQueryOptions(branch.id, monday));
 
   const shownDay =
     day !== null && day >= monday && day < addDays(monday, 7)
@@ -54,18 +53,6 @@ export function SchedulePage({
     setNotice(null);
     setPanel({ mode: "edit", session });
   };
-
-  if (selectedBranch === undefined) {
-    return (
-      <NoBranchPage
-        title="Horario"
-        pending={branchStatus === "pending"}
-        loadingMessage="Cargando el horario…"
-        emptyMessage="Todavía no hay sucursales activas. Crea una en Sucursales para armar su horario."
-      />
-    );
-  }
-
   const count = sessions.data?.length ?? 0;
 
   return (
@@ -74,8 +61,8 @@ export function SchedulePage({
         title="Horario"
         subtitle={
           sessions.isSuccess
-            ? `Sucursal ${selectedBranch.name} · sala única · ${sessionCount(count)}`
-            : `Sucursal ${selectedBranch.name} · sala única`
+            ? `Sucursal ${branch.name} · sala única · ${sessionCount(count)}`
+            : `Sucursal ${branch.name} · sala única`
         }
         actions={
           isForbidden(sessions.error) ? undefined : (
@@ -134,7 +121,7 @@ export function SchedulePage({
       )}
       <SessionPanel
         state={panel}
-        branch={selectedBranch}
+        branch={branch}
         onClose={() => setPanel({ mode: "closed" })}
         onDone={(message) => {
           setPanel({ mode: "closed" });
@@ -142,5 +129,36 @@ export function SchedulePage({
         }}
       />
     </article>
+  );
+}
+
+// The week's placeholder keeps the previous week on screen while the next
+// one loads, so the page is remounted per Branch: a Branch switch starts
+// from its loading line, like every other Branch-scoped page.
+export function SchedulePage({
+  search,
+  onWeekChange,
+}: {
+  search: ScheduleSearch;
+  onWeekChange: (week: string) => void;
+}) {
+  const { selectedBranch, status } = useBranchSelection();
+  if (selectedBranch === undefined) {
+    return (
+      <NoBranchPage
+        title="Horario"
+        pending={status === "pending"}
+        loadingMessage="Cargando el horario…"
+        emptyMessage="Todavía no hay sucursales activas. Crea una en Sucursales para armar su horario."
+      />
+    );
+  }
+  return (
+    <BranchSchedule
+      key={selectedBranch.id}
+      branch={selectedBranch}
+      search={search}
+      onWeekChange={onWeekChange}
+    />
   );
 }
