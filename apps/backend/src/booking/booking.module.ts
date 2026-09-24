@@ -142,6 +142,7 @@ import { createPrismaOversight } from './administration/prisma-oversight';
 import { createPrismaScheduleAdministration } from './administration/prisma-schedule-administration';
 import { adminWebReads } from './admin-web-reads';
 import { receiptReadProvider } from './payments/prisma-receipt-read';
+import { promotionsWiring } from './promotions/promotions-wiring';
 
 const bookingPrisma = Symbol('bookingPrisma');
 
@@ -184,6 +185,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     AdministratorSessionsController,
     AssistantClientsController,
     ...adminWebReads.controllers,
+    ...promotionsWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
     NutritionistEvaluationsController,
@@ -622,6 +624,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     ...adminWebReads.providers(bookingPrisma),
     receiptReadProvider(bookingPrisma),
+    ...promotionsWiring.providers(bookingPrisma),
     {
       provide: BookingRuntimeCleanup,
       inject: [bookingPrisma],

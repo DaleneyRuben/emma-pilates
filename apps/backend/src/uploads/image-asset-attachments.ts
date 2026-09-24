@@ -188,7 +188,7 @@ export const readPublicImageVariant = async (
     kind: ImageVariantKind;
     deliveryVersion: string;
   },
-): Promise<{ storageKey: string; mediaType: string } | null> => {
+): Promise<{ objectKey: string; mediaType: string } | null> => {
   const row = await prisma.imageVariant.findFirst({
     where: {
       imageAssetId: input.imageAssetId,
@@ -202,5 +202,5 @@ export const readPublicImageVariant = async (
   });
   return row === null
     ? null
-    : { storageKey: row.storageKey, mediaType: mediaTypes[row.mediaType] };
+    : { objectKey: row.storageKey, mediaType: mediaTypes[row.mediaType] };
 };
