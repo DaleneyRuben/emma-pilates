@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29) | Promotions and the report are still placeholders (WEB-006, WEB-009); valid activation and recovery links still cannot be read from the local email capture |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30) | Promotions are still a placeholder (WEB-006); valid activation and recovery links still cannot be read from the local email capture |
 
 ## Before you begin
 
@@ -1463,19 +1463,20 @@ Every page now needs a signed-in Administrator, so start the backend
    then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
    Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
-   Referidos, Créditos). There is no "Descuentos". Horario, the Catálogo
-   pages, the Back Office pages, Referidos, and Créditos are real (Tests 25
-   to 29); Reporte and Promociones open a page with that title, "Esta
-   sección aún no está disponible.", and the design screen it will implement
-   (for example "Pantalla AW17"); the entry is highlighted in the sidebar and
+   Referidos, Créditos). There is no "Descuentos". Every entry is a real page
+   (Tests 25 to 30) except Promociones, which opens a page with that title,
+   "Esta sección aún no está disponible.", and the design screen it will
+   implement ("Pantalla AW17"); the entry is highlighted in the sidebar and
    the address changes (`/promociones`).
 2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
    popover lists Centro, Equipetrol, and Urubó with their addresses, marks the
    current one with a check, and ends with **Gestionar sucursales** (opens
    Sucursales). Choosing Urubó closes the popover, the cell reads **Sucursal
    Urubó**, and you stay on the same page. Esc or a click outside closes it.
-   On **Pagos**, **Clientes**, **Nómina**, **Categorías de gasto**,
-   **Referidos**, or **Créditos** the
+   On **Reporte** the cell is replaced by "El reporte usa su propio filtro de
+   sucursal" (the report has its own selector, Test 30). On **Pagos**,
+   **Clientes**, **Nómina**, **Categorías de gasto**, **Referidos**, or
+   **Créditos** the
    popover first says "Esta página no se filtra por sucursal — …" and still
    lets you switch for the next page. The Branches are the active ones the
    API returns (Test 25); archived Branches never appear here.
@@ -1843,6 +1844,47 @@ or Test 10 may have added more). All three pages are read-only: there is no
    the week stepper and the search stay above the cards, and the Créditos
    total stays under them.
 
+## Test 30: read the income and expense report in the admin web
+
+Start the backend and the admin web as Test 24 describes and log in as
+`paola.mendoza@example.com`. The fixtures' confirmed Payments give some
+income; record an Expense in two Branches and a Salary Payment first (Test
+28) so every rule shows. Money is written `Bs 1.050,00`, dates are Bolivia
+dates whatever your computer's time zone.
+
+1. **Opening.** **Reporte** opens on **Todas las sucursales** and the last six
+   months up to today (**Desde** / **Hasta**; the subtitle repeats them). The
+   top bar shows "El reporte usa su propio filtro de sucursal" instead of the
+   Branch cell.
+2. **Three figures.** **Ingresos** (green rule) is every confirmed Payment in
+   the range, with the cash and transfer split under it; **Gastos** (red rule)
+   is payroll plus every Branch's Expenses; **Neto** is the difference, with a
+   minus sign when expenses win ("−Bs 2.690,50").
+3. **Mes por mes.** One pair of bars per month of the range, empty months
+   included, green for income and red for expenses; pointing at a month (or
+   tabbing to it) shows its two figures. **Totales por mes** lists the same
+   numbers exactly, with a total.
+4. **Gastos por categoría.** In Todas las sucursales the first row is
+   **Nómina** ("Viene de Nómina, no de las categorías"), then each Expense
+   Category, then **Total de gastos**.
+5. **One Branch.** Choose Centro in **Sucursal**: income counts only the cash
+   collected at Centro, expenses only Centro's Expenses, the Nómina row is
+   gone, and a line says "La nómina y los ingresos por transferencia se ven
+   solo en «Todas las sucursales»." Archived Branches are listed as
+   "(archivada)" so their history stays readable. The Branch and the range
+   stay in the address (`?branch=…&from=2026-09-01&to=2026-09-24`).
+6. **Range.** Change **Desde** or **Hasta**; a start after the end says "La
+   fecha inicial no puede ser posterior a la final." and keeps the last
+   report. A range with no movement says "Sin ingresos ni gastos en este
+   rango.".
+7. **After a confirmation.** Confirm a pending transfer in **Pagos** (Test
+   27) and come back: Todas las sucursales grows by its amount, a single
+   Branch does not change.
+8. **Narrow browser.** At a phone width the figures stack, the chart keeps
+   its pairs, and both tables become cards.
+
+Date pickers follow the browser's language, as Test 25 notes.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1858,10 +1900,8 @@ The following are not ready for manual product testing:
 - Promotions on Client Home or push notifications (the in-app inbox works, see
   Test 9; buying a Plan works, see Test 10);
 - Promotions and image variants (UPL-002);
-- any admin-web section beyond logging in, Horario, the Catálogo pages,
-  Clientes, Pagos, Personal, the Back Office pages of Test 28, and the
-  read-only lists of Test 29 (Tests 23 to 29): Reporte and Promociones are
-  still placeholders;
+- the admin web's Promociones page, still a placeholder (every other page
+  works, Tests 23 to 30);
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
 
