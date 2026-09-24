@@ -1,5 +1,7 @@
 import {
   getGetExpenseReportQueryKey,
+  getListAdminExpenseCategoriesQueryKey,
+  getListAdminExpensesQueryKey,
   getListAdminSalaryPaymentsQueryKey,
   getListAdminSuppliesQueryKey,
   getListAdminWithdrawalsQueryKey,
@@ -69,3 +71,32 @@ export async function refreshAfterSalaryPayment(
     queryClient.invalidateQueries({ predicate: isExpenseReportKey({}) }),
   ]);
 }
+
+/**
+ * An Expense changes its Branch's Expense pages, that Branch's and the
+ * all-Branches expense report, and whether its category is in use (AW15
+ * enables the delete icon only for an unused one).
+ */
+export async function refreshAfterExpense(
+  queryClient: QueryClient,
+  change: { branchId: string },
+): Promise<void> {
+  await Promise.all([
+    queryClient.invalidateQueries({
+      predicate: isBranchScopedKey(
+        getListAdminExpensesQueryKey()[0],
+        change.branchId,
+      ),
+    }),
+    queryClient.invalidateQueries({ predicate: isExpenseReportKey(change) }),
+    refreshAfterCategoryChange(queryClient),
+  ]);
+}
+
+/** A label added or deleted changes only the category list. */
+export const refreshAfterCategoryChange = (
+  queryClient: QueryClient,
+): Promise<void> =>
+  queryClient.invalidateQueries({
+    queryKey: getListAdminExpenseCategoriesQueryKey(),
+  });

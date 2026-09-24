@@ -134,6 +134,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/gastos",
         screen: "AW13",
         list: true,
+        built: true,
       },
       {
         label: "Categorías de gasto",
