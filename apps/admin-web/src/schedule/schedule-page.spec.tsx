@@ -129,8 +129,8 @@ describe("AW02 Horario on a desktop browser", () => {
   });
 
   it("shows the loading line after a Branch switch, never the previous Branch's grid", async () => {
+    // The first matching handler of one server.use call answers.
     server.use(
-      sessionReads((params) => jsonResponse(weekOf(params))),
       http.get(apiUrl(sessionsPath), async ({ request }) => {
         if (
           new URL(request.url).searchParams.get("branchId") !== equipetrol.id
@@ -140,6 +140,7 @@ describe("AW02 Horario on a desktop browser", () => {
         await delay("infinite");
         return jsonResponse([]);
       }),
+      sessionReads((params) => jsonResponse(weekOf(params))),
     );
     const { user } = renderAdmin(`/?week=${nextMonday}`);
     await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
