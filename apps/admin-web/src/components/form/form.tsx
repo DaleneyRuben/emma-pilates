@@ -25,7 +25,8 @@ export const Form = FormProvider;
 export function FormField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
->(props: ControllerProps<TFieldValues, TName>) {
+  TTransformedValues = TFieldValues,
+>(props: ControllerProps<TFieldValues, TName, TTransformedValues>) {
   return (
     <FormFieldContext.Provider value={{ name: props.name }}>
       <Controller {...props} />
@@ -83,8 +84,17 @@ export function FormControl(props: ComponentProps<typeof Slot.Root>) {
   );
 }
 
-export function FormDescription({ className, ...props }: ComponentProps<"p">) {
+export function FormDescription({
+  className,
+  children,
+  ...props
+}: ComponentProps<"p">) {
   const { formDescriptionId } = useFormField();
+
+  // A field without helper text has nothing to describe it before an error.
+  if (children === undefined || children === null || children === "") {
+    return null;
+  }
 
   return (
     <p
@@ -92,7 +102,9 @@ export function FormDescription({ className, ...props }: ComponentProps<"p">) {
       id={formDescriptionId}
       className={cn("text-ayuda text-texto-tenue", className)}
       {...props}
-    />
+    >
+      {children}
+    </p>
   );
 }
 

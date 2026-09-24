@@ -14,6 +14,7 @@ import { CreatePasswordPage } from "../auth/create-password-page";
 import { LoginPage } from "../auth/login-page";
 import { RecoverPasswordPage } from "../auth/recover-password-page";
 import { BranchesPage } from "../catalog/branches/branches-page";
+import { ClassTypesPage } from "../catalog/class-types/class-types-page";
 import { catalogStatusSearchSchema } from "../catalog/catalog-search";
 import { listSearchSchema } from "../components/table/pagination";
 import { NotFoundPage } from "../pages/not-found-page";
@@ -105,7 +106,24 @@ const branchesRoute = createRoute({
   },
 });
 
-const pageRoutes = [branchesRoute];
+const classTypesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/catalogo/tipos-de-clase",
+  validateSearch: catalogStatusSearchSchema,
+  component: function ClassTypesRoute() {
+    const navigate = classTypesRoute.useNavigate();
+    return (
+      <ClassTypesPage
+        search={classTypesRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
+const pageRoutes = [branchesRoute, classTypesRoute];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)
   .map((item) =>

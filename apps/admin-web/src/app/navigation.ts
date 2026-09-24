@@ -53,6 +53,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/catalogo/tipos-de-clase",
         screen: "AW06",
         list: true,
+        built: true,
       },
       { label: "Planes", to: "/catalogo/planes", screen: "AW04", list: true },
       {
