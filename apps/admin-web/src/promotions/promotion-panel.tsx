@@ -31,6 +31,7 @@ import {
   PromotionImageField,
   type AttachedImage,
 } from "./promotion-image-field";
+import { imageUrlFor } from "./promotion-format";
 import { PromotionPanelFooter } from "./promotion-panel-footer";
 import { promotionFailureMessage } from "./promotion-problems";
 import { usePromotionChange } from "./promotion-queries";
@@ -45,9 +46,12 @@ const attachedImage = (
         width: promotion.image.width,
         height: promotion.image.height,
         // AW18's attached preview reads the 1440 px private variant.
-        previewUrl: getGetAdminPromotionImageUrl(promotion.id, {
-          variant: "promotion_1440",
-        }),
+        previewUrl: imageUrlFor(
+          getGetAdminPromotionImageUrl(promotion.id, {
+            variant: "promotion_1440",
+          }),
+          promotion.image.imageAssetId,
+        ),
         label: "Imagen actual",
       };
 

@@ -3,7 +3,11 @@ import { GripVertical, Image } from "lucide-react";
 import type { KeyboardEvent, PointerEvent, Ref } from "react";
 import { StatusPill } from "../components/ui/status-pill";
 import { cn } from "../lib/cn";
-import { formatDisplayWindow, statePills } from "./promotion-format";
+import {
+  formatDisplayWindow,
+  imageUrlFor,
+  statePills,
+} from "./promotion-format";
 
 export type CardState = {
   dragging: boolean;
@@ -89,7 +93,11 @@ export function PromotionCard({
         </span>
       ) : (
         <img
-          src={promotion.image.thumbnailUrl}
+          key={promotion.image.imageAssetId}
+          src={imageUrlFor(
+            promotion.image.thumbnailUrl,
+            promotion.image.imageAssetId,
+          )}
           alt=""
           width={120}
           height={68}

@@ -52,7 +52,7 @@ describe("AW17 Promociones", () => {
     const first = await card("Nueva sala de Reformer en Urubó");
     expect(within(first).getByRole("presentation")).toHaveAttribute(
       "src",
-      `${promotionsPath}/${reformer.id}/image?variant=promotion_480`,
+      `${promotionsPath}/${reformer.id}/image?variant=promotion_480&asset=${reformer.image?.imageAssetId}`,
     );
     expect(
       within(first).getByText("Del 01/09/2026 al 31/10/2026"),

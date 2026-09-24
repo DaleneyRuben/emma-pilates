@@ -117,7 +117,7 @@ describe("AW18 Editar promoción (follow-up 39)", () => {
       within(panel).getByRole("img", { name: "Vista previa de la imagen" }),
     ).toHaveAttribute(
       "src",
-      `${promotionsPath}/${showing.id}/image?variant=promotion_1440`,
+      `${promotionsPath}/${showing.id}/image?variant=promotion_1440&asset=${showing.image?.imageAssetId}`,
     );
     expect(within(panel).getByText("Imagen actual · 1600 × 900")).toBeVisible();
     expect(

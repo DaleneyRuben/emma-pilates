@@ -24,3 +24,12 @@ export const carouselSubtitle = (count: number): string =>
     : count === 1
       ? "1 promoción en el carrusel"
       : `${countFormat.format(count)} promociones · arrastra para cambiar el orden`;
+
+/**
+ * The private image routes answer `no-store`, but a browser still reuses an
+ * image it already holds for the same URL inside one page; naming the asset
+ * in the URL makes a replaced image a new URL (the route ignores the extra
+ * parameter).
+ */
+export const imageUrlFor = (url: string, imageAssetId: string): string =>
+  `${url}${url.includes("?") ? "&" : "?"}asset=${imageAssetId}`;
