@@ -8,6 +8,7 @@ export type AdministrationErrorCode =
   | 'session_schedule_not_found'
   | 'session_not_found'
   | 'evaluation_not_found'
+  | 'client_not_found'
   | 'branch_in_use'
   | 'class_type_in_use'
   | 'class_type_name_taken'
@@ -27,6 +28,7 @@ const statuses: Record<AdministrationErrorCode, number> = {
   session_schedule_not_found: 404,
   session_not_found: 404,
   evaluation_not_found: 404,
+  client_not_found: 404,
   branch_in_use: 409,
   class_type_in_use: 409,
   class_type_name_taken: 409,
