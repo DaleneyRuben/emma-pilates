@@ -32,6 +32,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.4",
+    "@playwright/test": "1.61.0",
     "@swc/core": "1.16.2",
     "@swc/jest": "0.2.39",
     "@tailwindcss/vite": "4.3.3",
