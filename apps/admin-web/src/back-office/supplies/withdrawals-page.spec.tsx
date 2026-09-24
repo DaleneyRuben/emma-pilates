@@ -66,6 +66,8 @@ describe("AW31 Retiros e insumos consumidos on a desktop browser", () => {
     await heading();
 
     expect(await screen.findByText("Sin retiros en este rango.")).toBeVisible();
+    // The empty state already says it; no "0 retiros en …" line above it.
+    expect(screen.queryByText(/^0 retiros/)).not.toBeInTheDocument();
     expect(
       screen.getByText("Prueba con otro mes o con todos los insumos."),
     ).toBeVisible();
