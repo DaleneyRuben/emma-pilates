@@ -24,6 +24,8 @@ import { listSearchSchema } from "../components/table/pagination";
 import { NotFoundPage } from "../pages/not-found-page";
 import { PlaceholderPage } from "../pages/placeholder-page";
 import { StartupErrorPage } from "../pages/startup-error-page";
+import { SchedulePage } from "../schedule/schedule-page";
+import { scheduleSearchSchema } from "../schedule/schedule-search";
 import { readSignedInSession } from "../session/session-queries";
 import { AdminShell } from "../shell/admin-shell";
 import { navigationItems } from "./navigation";
@@ -93,6 +95,21 @@ const authenticatedRoute = createRoute({
 
 // List pages validate their page-and-offset search and allowlisted filters
 // (ADR-0061/0062) so the URL, not component state, owns them (ADR-0042).
+const scheduleRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/",
+  validateSearch: scheduleSearchSchema,
+  component: function ScheduleRoute() {
+    const navigate = scheduleRoute.useNavigate();
+    return (
+      <SchedulePage
+        search={scheduleRoute.useSearch()}
+        onWeekChange={(week) => void navigate({ search: { week } })}
+      />
+    );
+  },
+});
+
 const branchesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/catalogo/sucursales",
@@ -144,7 +161,7 @@ const plansRoute = createRoute({
   },
 });
 
-const pageRoutes = [branchesRoute, classTypesRoute, plansRoute];
+const pageRoutes = [scheduleRoute, branchesRoute, classTypesRoute, plansRoute];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)
   .map((item) =>

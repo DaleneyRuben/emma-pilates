@@ -44,7 +44,7 @@ export type NavigationGroup = {
 };
 
 export const navigationGroups: readonly NavigationGroup[] = [
-  { items: [{ label: "Horario", to: "/", screen: "AW02" }] },
+  { items: [{ label: "Horario", to: "/", screen: "AW02", built: true }] },
   {
     label: "Catálogo",
     items: [

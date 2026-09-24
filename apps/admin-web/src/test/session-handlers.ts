@@ -27,11 +27,13 @@ export const paolaProfile = {
 
 // The browser holds a valid host-only session cookie (MSW cannot see it;
 // the backend would answer these reads from it). Every shell page also
-// reads the active Branches for the selector.
+// reads the active Branches for the selector, and Horario (the landing page)
+// reads an empty week unless a spec says otherwise.
 export const signedInHandlers = () => [
   http.get(apiUrl(currentSessionPath), () => jsonResponse(paolaPrincipal)),
   http.get(apiUrl(staffProfilePath), () => jsonResponse(paolaProfile)),
   activeBranchesHandler(),
+  http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
 ];
 
 export const signedOutHandlers = () => [

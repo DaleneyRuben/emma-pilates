@@ -1,3 +1,4 @@
+import type { AdminClassTypeDto } from "@pilates/api-contracts";
 import { http } from "msw";
 import {
   addDays,
@@ -17,7 +18,7 @@ export const staffPath = "/api/v1/administrator/staff-members";
 export const nextMonday = addDays(weekStartOf(boliviaToday()), 7);
 export const dayOfNextWeek = (offset: number) => addDays(nextMonday, offset);
 
-export const reformer = {
+export const reformer: AdminClassTypeDto = {
   id: "5d0c7a4e-3b1f-5b7a-8c2d-000000000001",
   name: "Reformer Pilates",
   description: "Fuerza y control en la máquina.",
@@ -26,7 +27,7 @@ export const reformer = {
   equipmentNeeds: "Reformer",
   archivedAt: null,
 };
-export const mat = {
+export const mat: AdminClassTypeDto = {
   id: "5d0c7a4e-3b1f-5b7a-8c2d-000000000002",
   name: "Mat Pilates",
   description: "Clase en colchoneta.",
