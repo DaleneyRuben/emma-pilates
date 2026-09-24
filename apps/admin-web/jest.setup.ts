@@ -1,4 +1,9 @@
 import "@testing-library/jest-dom";
+import { configure } from "@testing-library/dom";
+
+// Every spec renders the whole app; on a cold parallel worker the first
+// render can outlast Testing Library's one-second default lookup.
+configure({ asyncUtilTimeout: 3_000 });
 
 // jsdom has no matchMedia; the shell treats a missing implementation as the
 // desktop layout, and narrow-width tests install their own stub.
