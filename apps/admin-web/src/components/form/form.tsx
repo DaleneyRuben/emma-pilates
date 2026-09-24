@@ -1,5 +1,11 @@
 import { Slot } from "radix-ui";
-import { useId, type ComponentProps, type ReactNode } from "react";
+import {
+  useId,
+  useLayoutEffect,
+  useState,
+  type ComponentProps,
+  type ReactNode,
+} from "react";
 import {
   Controller,
   FormProvider,
@@ -36,9 +42,10 @@ export function FormField<
 
 export function FormItem({ className, ...props }: ComponentProps<"div">) {
   const id = useId();
+  const [hasDescription, setHasDescription] = useState(false);
 
   return (
-    <FormItemContext.Provider value={{ id }}>
+    <FormItemContext.Provider value={{ id, hasDescription, setHasDescription }}>
       <div
         data-slot="form-item"
         className={cn("flex flex-col gap-1.5", className)}
@@ -66,17 +73,26 @@ export function FormLabel({
 }
 
 export function FormControl(props: ComponentProps<typeof Slot.Root>) {
-  const { error, formItemId, formDescriptionId, formMessageId } =
-    useFormField();
+  const {
+    error,
+    hasDescription,
+    formItemId,
+    formDescriptionId,
+    formMessageId,
+  } = useFormField();
+  // Only ids that are on screen: a description when one renders, the
+  // message once there is an error.
+  const describedBy = [
+    hasDescription ? formDescriptionId : undefined,
+    error === undefined ? undefined : formMessageId,
+  ].filter((id) => id !== undefined);
 
   return (
     <Slot.Root
       data-slot="form-control"
       id={formItemId}
       aria-describedby={
-        error === undefined
-          ? formDescriptionId
-          : `${formDescriptionId} ${formMessageId}`
+        describedBy.length === 0 ? undefined : describedBy.join(" ")
       }
       aria-invalid={error !== undefined}
       {...props}
@@ -89,10 +105,17 @@ export function FormDescription({
   children,
   ...props
 }: ComponentProps<"p">) {
-  const { formDescriptionId } = useFormField();
-
+  const { formDescriptionId, setHasDescription } = useFormField();
   // A field without helper text has nothing to describe it before an error.
-  if (children === undefined || children === null || children === "") {
+  const shown = children !== undefined && children !== null && children !== "";
+
+  useLayoutEffect(() => {
+    if (!shown) return undefined;
+    setHasDescription(true);
+    return () => setHasDescription(false);
+  }, [shown, setHasDescription]);
+
+  if (!shown) {
     return null;
   }
 

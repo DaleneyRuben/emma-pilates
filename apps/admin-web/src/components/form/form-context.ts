@@ -15,7 +15,12 @@ export const FormFieldContext = createContext<FormFieldContextValue | null>(
   null,
 );
 
-type FormItemContextValue = { id: string };
+type FormItemContextValue = {
+  id: string;
+  /** Whether a FormDescription is on screen for this item. */
+  hasDescription: boolean;
+  setHasDescription: (shown: boolean) => void;
+};
 
 export const FormItemContext = createContext<FormItemContextValue | null>(null);
 
@@ -30,10 +35,12 @@ export function useFormField() {
   }
 
   const fieldState = getFieldState(fieldContext.name, formState);
-  const { id } = itemContext;
+  const { id, hasDescription, setHasDescription } = itemContext;
 
   return {
     id,
+    hasDescription,
+    setHasDescription,
     name: fieldContext.name,
     formItemId: `${id}-form-item`,
     formDescriptionId: `${id}-form-item-description`,
