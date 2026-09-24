@@ -13,7 +13,7 @@ import {
 
 // Every case runs on an injected clock: the Subscriptions below cover a fixed
 // month, so the Sessions built from the clock must fall inside it.
-const clock = new Date('2026-10-01T14:00:00.000Z'); // 10:00 in Bolivia
+const clock = new Date('2026-09-15T14:00:00.000Z'); // 10:00 in Bolivia
 
 describe('Booking commands', () => {
   let context: DatabaseTestContext;
