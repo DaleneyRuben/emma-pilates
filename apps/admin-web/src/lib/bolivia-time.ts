@@ -119,3 +119,9 @@ export function formatSessionMoment(instant: string): string {
 /** `dd/mm/aaaa`, the design system's date format. */
 export const formatCivilDate = (date: string): string =>
   `${date.slice(8, 10)}/${date.slice(5, 7)}/${date.slice(0, 4)}`;
+
+/** `dd/mm/aaaa · hh:mm` in Bolivia time, e.g. when a Payment was sent. */
+export function formatCivilMoment(instant: string): string {
+  const parts = boliviaParts(instant);
+  return `${formatCivilDate(parts.date)} · ${parts.time}`;
+}
