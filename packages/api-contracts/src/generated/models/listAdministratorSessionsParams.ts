@@ -6,6 +6,7 @@
  */
 
 export type ListAdministratorSessionsParams = {
+  branchId?: unknown;
   limit?: number;
   until: unknown;
   from: unknown;
