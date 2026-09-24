@@ -166,6 +166,26 @@ describe("AW02 Horario on a desktop browser", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("says so when the week reached the backend's cap instead of hiding Sessions", async () => {
+    const crowded = Array.from({ length: 100 }, (_, index) => ({
+      ...weekSessions[0]!,
+      id: `1e000000-0000-5000-8000-0000000${String(index).padStart(5, "0")}`,
+    }));
+    server.use(sessionReads(() => jsonResponse(crowded)));
+    renderAdmin(`/?week=${nextMonday}`);
+
+    expect(
+      await screen.findByText(
+        "Se muestran las primeras 100 sesiones de la semana.",
+      ),
+    ).toBeVisible();
+    expect(
+      screen.getByText(
+        "Sucursal Centro · sala única · 100 sesiones esta semana",
+      ),
+    ).toBeVisible();
+  });
+
   it("starts on the current Bolivia week when the address names none", async () => {
     server.use(sessionReads(() => jsonResponse([])));
     const { router } = renderAdmin("/");
