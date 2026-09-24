@@ -10,6 +10,8 @@ import {
 } from "@tanstack/react-router";
 import type { SessionExpiry } from "../api/session-expiry";
 import { loginSearchSchema } from "../auth/auth-search";
+import { PayrollPage } from "../back-office/payroll/payroll-page";
+import { payrollSearchSchema } from "../back-office/payroll/payroll-search";
 import { SuppliesPage } from "../back-office/supplies/supplies-page";
 import { withdrawalSearchSchema } from "../back-office/supplies/supply-search";
 import { WithdrawalsPage } from "../back-office/supplies/withdrawals-page";
@@ -255,6 +257,23 @@ const withdrawalsRoute = createRoute({
   },
 });
 
+const payrollRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/nomina",
+  validateSearch: payrollSearchSchema,
+  component: function PayrollRoute() {
+    const navigate = payrollRoute.useNavigate();
+    return (
+      <PayrollPage
+        search={payrollRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
 const pageRoutes = [
   scheduleRoute,
   branchesRoute,
@@ -265,6 +284,7 @@ const pageRoutes = [
   suppliesRoute,
   withdrawalsRoute,
   staffRoute,
+  payrollRoute,
 ];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)

@@ -126,6 +126,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/nomina",
         screen: "AW11",
         list: true,
+        built: true,
         studioWide: "la nómina es del estudio, no de una sede.",
       },
       {

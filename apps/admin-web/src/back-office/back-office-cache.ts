@@ -1,4 +1,6 @@
 import {
+  getGetExpenseReportQueryKey,
+  getListAdminSalaryPaymentsQueryKey,
   getListAdminSuppliesQueryKey,
   getListAdminWithdrawalsQueryKey,
 } from "@pilates/api-contracts";
@@ -10,6 +12,17 @@ export type SupplyChangeKind =
 
 const suppliesPath = getListAdminSuppliesQueryKey()[0];
 const withdrawalsPath = getListAdminWithdrawalsQueryKey()[0];
+const expenseReportPath = getGetExpenseReportQueryKey()[0];
+
+// AW16's expense half, for every Branch (no branchId) or only one.
+const isExpenseReportKey =
+  (scope: { branchId?: string }) =>
+  ({ queryKey }: { queryKey: readonly unknown[] }): boolean => {
+    if (queryKey[0] !== expenseReportPath) return false;
+    const branchId = (queryKey[1] as { branchId?: string } | undefined)
+      ?.branchId;
+    return branchId === undefined || branchId === scope.branchId;
+  };
 
 /**
  * ADR-0042: a Supply change refreshes that Branch's Supply lists (the table,
@@ -40,3 +53,19 @@ export const refreshBranchSupplies = (
   queryClient.invalidateQueries({
     predicate: isBranchScopedKey(suppliesPath, branchId),
   });
+
+/**
+ * A Salary Payment changes every payroll page and the all-Branches expense
+ * report only: payroll is studio-wide and never counts in a single Branch's
+ * report (CONTEXT-MAP, BKO-001 Q3).
+ */
+export async function refreshAfterSalaryPayment(
+  queryClient: QueryClient,
+): Promise<void> {
+  await Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: getListAdminSalaryPaymentsQueryKey(),
+    }),
+    queryClient.invalidateQueries({ predicate: isExpenseReportKey({}) }),
+  ]);
+}
