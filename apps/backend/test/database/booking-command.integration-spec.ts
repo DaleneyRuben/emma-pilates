@@ -290,7 +290,7 @@ describe('Booking commands', () => {
   it('reschedules a Booking to a same-day Session without changing allowance', async () => {
     // A fixed clock: the rule is "same Bolivia day", so the target Session
     // three hours later must not depend on when the suite runs.
-    const now = new Date('2026-09-16T01:30:00.000Z');
+    const now = new Date('2026-09-15T14:00:00.000Z'); // 10:00 in Bolivia
     const fixture = await createFixture(prisma, {
       now,
       startsAt: new Date(now.getTime() + 90 * 60 * 1_000),
