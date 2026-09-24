@@ -1,26 +1,64 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Check, ChevronDown, MapPin } from "lucide-react";
-import { useId, useState, type ComponentProps } from "react";
+import {
+  useId,
+  useState,
+  type ComponentProps,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 import { findNavigationItem } from "../../app/navigation";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "../../components/ui/popover";
-import { Sheet, SheetContent, SheetTrigger } from "../../components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetTitle,
+  SheetTrigger,
+} from "../../components/ui/sheet";
 import { cn } from "../../lib/cn";
 import { useIsNarrowViewport } from "../use-media-query";
 import type { Branch } from "./branch-context";
 import { useBranchSelection } from "./use-branch-selection";
 
+// AW34's group label: 10px uppercase, 0.18em, Texto muy tenue.
+const labelClass =
+  "px-4 pt-1 pb-2 font-sans text-[10px] font-medium tracking-[0.18em] text-texto-muy-tenue uppercase";
+
+// A listbox with a roving tabindex: Tab reaches the selected Branch, the
+// arrow keys (and Home/End) move between the options, Enter or Space choose.
+function moveFocus(event: KeyboardEvent<HTMLDivElement>) {
+  const options = Array.from(
+    event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="option"]'),
+  );
+  const current = options.indexOf(document.activeElement as HTMLButtonElement);
+  const last = options.length - 1;
+  const next: Record<string, number> = {
+    ArrowDown: current >= last ? 0 : current + 1,
+    ArrowUp: current <= 0 ? last : current - 1,
+    Home: 0,
+    End: last,
+  };
+  const target = next[event.key];
+  if (target === undefined || options.length === 0) return;
+  event.preventDefault();
+  options[target]?.focus();
+}
+
 // AW34: the shell's Branch cell. One Branch always; "Todas las sucursales"
 // exists only inside the report's own selector (AW16).
 function BranchRows({
+  title,
   labelId,
   studioWideNote,
   onDone,
   rowHeightClass,
 }: {
+  /** The "Sucursal" label: a plain line in the popover, the sheet's title. */
+  title: ReactNode;
   labelId: string;
   studioWideNote: string | undefined;
   onDone: () => void;
@@ -36,12 +74,7 @@ function BranchRows({
 
   return (
     <div className="flex flex-col py-2">
-      <p
-        id={labelId}
-        className="px-4 pt-1 pb-2 text-[10px] font-medium tracking-[0.18em] text-texto-muy-tenue uppercase"
-      >
-        Sucursal
-      </p>
+      {title}
       {studioWideNote === undefined ? null : (
         <p className="mx-2 mb-2 rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
           Esta página no se filtra por sucursal — {studioWideNote}
@@ -59,7 +92,12 @@ function BranchRows({
               : "Todavía no hay sucursales activas."}
         </p>
       ) : null}
-      <div role="listbox" aria-labelledby={labelId} className="flex flex-col">
+      <div
+        role="listbox"
+        aria-labelledby={labelId}
+        onKeyDown={moveFocus}
+        className="flex flex-col"
+      >
         {branches.map((branch) => {
           const selected = branch.id === selectedBranch?.id;
           return (
@@ -68,6 +106,7 @@ function BranchRows({
               type="button"
               role="option"
               aria-selected={selected}
+              tabIndex={selected ? 0 : -1}
               onClick={() => choose(branch)}
               className={cn(
                 "flex items-center justify-between gap-3 px-4 text-left text-fila-menu text-texto hover:bg-hover-fila focus-visible:bg-hover-fila focus-visible:shadow-none",
@@ -181,6 +220,11 @@ export function BranchSelector() {
           className="pb-[env(safe-area-inset-bottom)]"
         >
           <BranchRows
+            title={
+              <SheetTitle id={labelId} className={labelClass}>
+                Sucursal
+              </SheetTitle>
+            }
             labelId={labelId}
             studioWideNote={studioWideNote}
             onDone={close}
@@ -198,6 +242,11 @@ export function BranchSelector() {
       </PopoverTrigger>
       <PopoverContent align="start" aria-labelledby={labelId}>
         <BranchRows
+          title={
+            <p id={labelId} className={labelClass}>
+              Sucursal
+            </p>
+          }
           labelId={labelId}
           studioWideNote={studioWideNote}
           onDone={close}
