@@ -44,6 +44,11 @@ beyond what the table below names.
 | `session.cancelled` | Booking & Membership | An Administrator cancels a Session with Bookings (last resort) | Administrator | `session` | Session Branch | `cause`, `cancelledBookings`, `closedWaitlistEntries` |
 | `session.updated` | Booking & Membership | An Administrator edits one Session (Trainer swap, new start, or capacity) | Administrator | `session` | Session Branch | previous and new `trainerStaffMemberId`, `startsAt`, `capacity` (only those changed) |
 | `evaluation.cancelled_by_staff` | Booking & Membership | The Nutritionist or an Administrator cancels a booked Evaluation | Staff Account and Role | `evaluation` | Slot Branch | `cause`, `insideClientWindow` |
+| `promotion.created` | Booking & Membership | An Administrator saves a new Promotion (a draft, with or without its image) | Administrator | `promotion` | — | `hasImage` |
+| `promotion.updated` | Booking & Membership | An Administrator edits a Promotion's copy, display window, or image (a changed image unpublishes it, follow-up 39) | Administrator | `promotion` | — | `imageChanged`, `unpublished` |
+| `promotion.published` | Booking & Membership | An Administrator publishes a Promotion, exposing its public image copies (ADR-0077) | Administrator | `promotion` | — | `displayStartsOn`, `displayEndsOn` |
+| `promotion.unpublished` | Booking & Membership | An Administrator takes a published Promotion out of the carousel; its public copies are retired | Administrator | `promotion` | — | — |
+| `promotion.archived` | Booking & Membership | An Administrator deletes a Promotion (the row is archived, never removed; its image is released, ADR-0076) | Administrator | `promotion` | — | `wasPublished` |
 | `salary_payment.recorded` | Back Office | An Administrator records a Salary Payment | Administrator | `salary_payment` | — | `amountCentavos`, `paidOn` |
 | `salary_payment.updated` | Back Office | An Administrator corrects a Salary Payment | Administrator | `salary_payment` | — | previous and new `staffMemberId`, `amountCentavos`, `paidOn` (only those changed) |
 | `expense.recorded` | Back Office | An Administrator records a Branch Expense | Administrator | `expense` | Expense Branch | `amountCentavos`, `incurredOn`, `expenseCategoryId` |
@@ -70,6 +75,9 @@ Back Office money records follow BKO-001 D17: Salary Payments and Expenses are a
 | Transfer receipt upload and Purchase Intent creation | Client self-service with no decision; the Payment decision is audited instead. |
 | Credit ledger entries | The ledger itself is append-only and actor-stamped; the Payment audit references the purchase. |
 | Supply create, edit, and archive; Withdrawals and Restocks | Stock rows record their actor and time, move no money, and the database keeps the quantity reconciled with the movements (BKO-001 D4, D17). |
+| Promotion reordering (UPL-002) | Drag ordering is routine, high-churn activity that changes no copy and exposes nothing new; the rows keep `display_order` and `updated_at`. Every other Promotion change (create, edit, publish, unpublish, archive) is audited above because it decides what every Client sees. |
+| Image finalization, variant rebuild, and the retention sweeps (UPL-001, UPL-002) | Worker processing with no human actor; `image_assets` and `image_variants` keep their state, failure code, and deletion timestamps (ADR-0073 to ADR-0077). |
+| Reading a Promotion image (private Administrator route or public versioned route) | Ordinary reads (ADR-0055); the public route serves only what a published Promotion already shows to every Client. |
 | Expense Category create and delete | A label with no money of its own; deletion is refused while any Expense uses it (BKO-001 D13). |
 | Admin-web Back Office lists, forms, and the Insumos low-stock count (WEB-007) | Ordinary reads (ADR-0055); recording or correcting a Salary Payment or Expense from the browser writes the same `salary_payment.*` / `expense.*` records in the same transaction, and stock movements and categories stay unaudited as above. |
 | Admin-web Evaluation, Referral, and Credit lists (WEB-008) | Ordinary read-only oversight reads (ADR-0055); AW25–AW27 change nothing. The Administrator Evaluation cancel is not on the admin web (AW25 is read-only, invariant 10); where it is used, it keeps writing `evaluation.cancelled_by_staff`. |
