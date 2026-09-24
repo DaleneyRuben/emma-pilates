@@ -32,7 +32,9 @@ describe('Administrator receipt read (PostgreSQL)', () => {
     });
   const read = () => createPrismaReceiptRead(prisma);
 
-  const principalOf = async (email: string): Promise<AuthenticatedPrincipal> => {
+  const principalOf = async (
+    email: string,
+  ): Promise<AuthenticatedPrincipal> => {
     const account = await prisma.account.findUniqueOrThrow({
       where: { email },
       select: { id: true, clientId: true, staffMember: true },
@@ -158,7 +160,10 @@ describe('Administrator receipt read (PostgreSQL)', () => {
     const thumbnail = receipt.variants.find((v) => v.kind === 'THUMBNAIL')!;
 
     await expect(
-      read().readReceiptObject({ paymentId, variant: 'readable' }, administrator),
+      read().readReceiptObject(
+        { paymentId, variant: 'readable' },
+        administrator,
+      ),
     ).resolves.toEqual({
       objectKey: readable.storageKey,
       mediaType: 'image/jpeg',
@@ -181,7 +186,10 @@ describe('Administrator receipt read (PostgreSQL)', () => {
     );
 
     await expect(
-      read().readReceiptObject({ paymentId, variant: 'readable' }, administrator),
+      read().readReceiptObject(
+        { paymentId, variant: 'readable' },
+        administrator,
+      ),
     ).resolves.toEqual({
       objectKey: receipt.pendingObjectKey,
       mediaType: 'image/png',
@@ -209,7 +217,10 @@ describe('Administrator receipt read (PostgreSQL)', () => {
       data: { deletedAt: at('14:00'), state: 'DELETED' },
     });
     await expect(
-      read().readReceiptObject({ paymentId, variant: 'readable' }, administrator),
+      read().readReceiptObject(
+        { paymentId, variant: 'readable' },
+        administrator,
+      ),
     ).rejects.toMatchObject({ code: 'payment_receipt_not_ready' });
   });
 });

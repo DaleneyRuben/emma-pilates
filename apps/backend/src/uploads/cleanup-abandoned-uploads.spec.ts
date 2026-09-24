@@ -20,7 +20,9 @@ describe('cleanupAbandonedUploads', () => {
       },
     ];
     const markDueForDeletion = jest.fn().mockResolvedValue(due);
-    const deleteObject = jest.fn().mockResolvedValue(undefined);
+    const deleteObject = jest
+      .fn<Promise<void>, [string]>()
+      .mockResolvedValue(undefined);
     const markDeleted = jest.fn().mockResolvedValue(undefined);
     const markVariantsDeleted = jest.fn().mockResolvedValue(undefined);
 
@@ -49,7 +51,9 @@ describe('cleanupAbandonedUploads', () => {
   // ADR-0076 and ADR-0077: unpublished or replaced variants go on their own,
   // while the asset and its other variants stay.
   it('deletes variants whose deletion was requested without touching their asset', async () => {
-    const deleteObject = jest.fn().mockResolvedValue(undefined);
+    const deleteObject = jest
+      .fn<Promise<void>, [string]>()
+      .mockResolvedValue(undefined);
     const markDeleted = jest.fn();
     const markVariantsDeleted = jest.fn().mockResolvedValue(undefined);
 
