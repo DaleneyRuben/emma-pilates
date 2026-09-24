@@ -1,0 +1,117 @@
+import { ApiProperty } from '@nestjs/swagger';
+import { z } from 'zod';
+import { clientAccountStatuses } from '../assistant/assistant.dto';
+import type { ClientAccountStatus } from '../assistant/assistant-clients';
+import { ClientSubscriptionDto } from '../client/client-discovery.dto';
+import type { DirectorySubscriptionStatus } from './administrator-clients';
+
+export const directorySubscriptionStatuses = [
+  'active',
+  'expired',
+  'none',
+] as const satisfies readonly DirectorySubscriptionStatus[];
+
+export class AdminClientDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty({ format: 'email' })
+  email!: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  phone!: string | null;
+
+  @ApiProperty({ enum: clientAccountStatuses })
+  accountStatus!: ClientAccountStatus;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'The active Subscription’s Plan name, if any',
+  })
+  planName!: string | null;
+
+  @ApiProperty({
+    enum: directorySubscriptionStatuses,
+    description: '`expired` when the Client had a Plan before, `none` if never',
+  })
+  subscriptionStatus!: DirectorySubscriptionStatus;
+}
+
+export class AdminClientPageDto {
+  @ApiProperty({ type: AdminClientDto, isArray: true })
+  items!: AdminClientDto[];
+
+  @ApiProperty({ minimum: 1 })
+  page!: number;
+
+  @ApiProperty({ minimum: 1, maximum: 100 })
+  pageSize!: number;
+
+  @ApiProperty({ minimum: 0, description: 'Clients matching the search' })
+  totalItems!: number;
+
+  @ApiProperty({
+    minimum: 0,
+    description: 'Every Client of the studio, whatever the search',
+  })
+  studioClientCount!: number;
+
+  @ApiProperty({
+    minimum: 0,
+    description: 'Clients of the studio with an active Subscription today',
+  })
+  activePlanClientCount!: number;
+}
+
+export class AdminClientDetailDto {
+  @ApiProperty({ format: 'uuid' })
+  id!: string;
+
+  @ApiProperty()
+  name!: string;
+
+  @ApiProperty({ format: 'email' })
+  email!: string;
+
+  @ApiProperty({ type: String, nullable: true })
+  phone!: string | null;
+
+  @ApiProperty({
+    enum: clientAccountStatuses,
+    description: '`pending` while an invitation or verification is open',
+  })
+  accountStatus!: ClientAccountStatus;
+
+  @ApiProperty({ format: 'date', description: 'Bolivia date of creation' })
+  clientSince!: string;
+
+  @ApiProperty({ type: ClientSubscriptionDto })
+  subscription!: ClientSubscriptionDto;
+
+  @ApiProperty({ minimum: 0, description: 'Available Credit in BOB centavos' })
+  creditAvailableCentavos!: number;
+
+  @ApiProperty()
+  referralCode!: string;
+
+  @ApiProperty({ minimum: 0 })
+  referredClientCount!: number;
+}
+
+// Search is the directory's only filter; unknown parameters are refused
+// (ADR-0062).
+export const parseClientDirectoryQuery = (value: unknown) =>
+  z
+    .strictObject({
+      page: z.coerce.number().int().min(1).default(1),
+      pageSize: z.coerce.number().int().min(1).max(100).default(20),
+      q: z.string().trim().max(100).optional(),
+    })
+    .transform(({ q, ...paging }) =>
+      q === undefined || q === '' ? paging : { ...paging, query: q },
+    )
+    .safeParse(value);
