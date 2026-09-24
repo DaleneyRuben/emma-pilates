@@ -52,7 +52,7 @@ export const startEvaluationTestWorld =
       fixtures,
       passwordHash: 'not-a-real-hash',
       // The slot horizon follows this clock, so it must agree with fixtureNow.
-      now: () => new Date('2026-10-15T15:00:00.000Z'),
+      now: () => fixtureNow,
     });
 
     for (const [key, name, branches] of [
