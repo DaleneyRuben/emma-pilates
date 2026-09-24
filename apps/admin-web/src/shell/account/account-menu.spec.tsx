@@ -151,10 +151,17 @@ describe("AW33 user menu on a desktop browser", () => {
     expect(
       within(menu).getByText("Se descartará cualquier panel sin guardar."),
     ).toBeInTheDocument();
+    // The clicked row is gone: focus lands on the way back, never on body.
+    expect(
+      within(menu).getByRole("button", { name: "Cancelar" }),
+    ).toHaveFocus();
     await user.click(within(menu).getByRole("button", { name: "Cancelar" }));
     expect(
       within(menu).getByRole("button", { name: "Cambiar contraseña" }),
     ).toBeInTheDocument();
+    expect(
+      within(menu).getByRole("button", { name: "Cerrar sesión" }),
+    ).toHaveFocus();
     expect(loggedOut).toBe(false);
 
     await user.click(
