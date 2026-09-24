@@ -11,6 +11,7 @@ import {
 import type { SessionExpiry } from "../api/session-expiry";
 import { loginSearchSchema } from "../auth/auth-search";
 import { SuppliesPage } from "../back-office/supplies/supplies-page";
+import { withdrawalSearchSchema } from "../back-office/supplies/supply-search";
 import { WithdrawalsPage } from "../back-office/supplies/withdrawals-page";
 import { CreatePasswordPage } from "../auth/create-password-page";
 import { LoginPage } from "../auth/login-page";
@@ -240,7 +241,18 @@ const suppliesRoute = createRoute({
 const withdrawalsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/insumos/retiros",
-  component: WithdrawalsPage,
+  validateSearch: withdrawalSearchSchema,
+  component: function WithdrawalsRoute() {
+    const navigate = withdrawalsRoute.useNavigate();
+    return (
+      <WithdrawalsPage
+        search={withdrawalsRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
 });
 
 const pageRoutes = [

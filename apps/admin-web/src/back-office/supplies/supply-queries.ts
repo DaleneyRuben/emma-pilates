@@ -4,14 +4,18 @@ import {
   recordRestock,
   recordWithdrawal,
   getListAdminSuppliesQueryKey,
+  getListAdminWithdrawalsQueryKey,
   listAdminSupplies,
+  listAdminWithdrawals,
   updateSupply,
   type AdminSupplyDto,
   type AdminSupplyPageDto,
   type ListAdminSuppliesParams,
+  type ListAdminWithdrawalsParams,
   type SupplyChangeDto,
   type SupplyInputDto,
   type SupplyMovementDto,
+  type WithdrawalPageDto,
 } from "@pilates/api-contracts";
 import {
   keepPreviousData,
@@ -55,6 +59,31 @@ export const supplyTableQueryOptions = (branchId: string, search: ListSearch) =>
 // sidebar's low-stock count, which the backend counts on every page.
 export const branchSuppliesQueryOptions = (branchId: string) =>
   suppliesOf({ branchId, status: "active", page: 1, pageSize: 100 });
+
+// AW31's Insumo filter: archived Supplies keep their Withdrawals (BKO-001 D9).
+export const everySupplyQueryOptions = (branchId: string) =>
+  suppliesOf({ branchId, status: "all", page: 1, pageSize: 100 });
+
+export const withdrawalHistoryQueryOptions = (
+  branchId: string,
+  month: string,
+  search: ListSearch & { supplyId?: string },
+) => {
+  const params: ListAdminWithdrawalsParams = {
+    branchId,
+    month,
+    page: search.page,
+    pageSize: search.pageSize,
+    ...(search.supplyId === undefined ? {} : { supplyId: search.supplyId }),
+  };
+  return queryOptions({
+    queryKey: getListAdminWithdrawalsQueryKey(params),
+    queryFn: async ({ signal }) =>
+      (await listAdminWithdrawals(params, { signal }, adminFetch))
+        .data as WithdrawalPageDto,
+    placeholderData: keepPreviousData,
+  });
+};
 
 type SupplyChange =
   | { kind: "create"; input: SupplyInputDto }
