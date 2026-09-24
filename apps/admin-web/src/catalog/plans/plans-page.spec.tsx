@@ -110,6 +110,20 @@ describe("AW04 Planes on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
+  it("tells an Administrator who lost access that the page is not theirs", async () => {
+    server.use(
+      planTable(() => problemResponse(403, "administration_access_denied")),
+    );
+    renderAdmin("/catalogo/planes");
+
+    expect(
+      await screen.findByText("No tienes permiso para ver esta sección."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Nuevo plan" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("creates a Plan with a 1, 3, 6, or 12 month duration and the price in centavos", async () => {
     let body: unknown;
     server.use(
