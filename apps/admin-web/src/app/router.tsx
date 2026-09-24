@@ -10,13 +10,11 @@ import {
   catalogStatusSearchSchema,
   planSearchSchema,
 } from "../catalog/catalog-search";
-import { listSearchSchema } from "../components/table/pagination";
-import { PlaceholderPage } from "../pages/placeholder-page";
 import { scheduleSearchSchema } from "../schedule/schedule-search";
 import { backOfficeRoutes } from "./back-office-routes";
-import { navigationItems } from "./navigation";
 import { oversightRoutes } from "./oversight-routes";
 import { reportRoutes } from "./report-routes";
+import { optionalSearch } from "../components/table/pagination";
 import { authenticatedRoute, publicRoutes, rootRoute } from "./root-routes";
 
 // List pages validate their page-and-offset search and allowlisted filters
@@ -26,7 +24,7 @@ import { authenticatedRoute, publicRoutes, rootRoute } from "./root-routes";
 const scheduleRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/",
-  validateSearch: scheduleSearchSchema,
+  validateSearch: optionalSearch(scheduleSearchSchema),
   component: lazyRouteComponent(
     () => import("../schedule/schedule-route"),
     "ScheduleRoute",
@@ -36,7 +34,7 @@ const scheduleRoute = createRoute({
 const branchesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/catalogo/sucursales",
-  validateSearch: catalogStatusSearchSchema,
+  validateSearch: optionalSearch(catalogStatusSearchSchema),
   component: lazyRouteComponent(
     () => import("../catalog/branches/branches-route"),
     "BranchesRoute",
@@ -46,7 +44,7 @@ const branchesRoute = createRoute({
 const classTypesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/catalogo/tipos-de-clase",
-  validateSearch: catalogStatusSearchSchema,
+  validateSearch: optionalSearch(catalogStatusSearchSchema),
   component: lazyRouteComponent(
     () => import("../catalog/class-types/class-types-route"),
     "ClassTypesRoute",
@@ -56,7 +54,7 @@ const classTypesRoute = createRoute({
 const plansRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/catalogo/planes",
-  validateSearch: planSearchSchema,
+  validateSearch: optionalSearch(planSearchSchema),
   component: lazyRouteComponent(
     () => import("../catalog/plans/plans-route"),
     "PlansRoute",
@@ -86,26 +84,9 @@ export const preloadAdminPages = (): Promise<unknown> =>
     }),
   );
 
-const placeholderRoutes = navigationItems
-  .filter((item) => item.built !== true)
-  .map((item) =>
-    item.list
-      ? createRoute({
-          getParentRoute: () => authenticatedRoute,
-          path: item.to,
-          validateSearch: listSearchSchema,
-          component: () => <PlaceholderPage item={item} />,
-        })
-      : createRoute({
-          getParentRoute: () => authenticatedRoute,
-          path: item.to,
-          component: () => <PlaceholderPage item={item} />,
-        }),
-  );
-
 const routeTree = rootRoute.addChildren([
   ...publicRoutes,
-  authenticatedRoute.addChildren([...pageRoutes, ...placeholderRoutes]),
+  authenticatedRoute.addChildren(pageRoutes),
 ]);
 
 export function createAdminRouter(options: {

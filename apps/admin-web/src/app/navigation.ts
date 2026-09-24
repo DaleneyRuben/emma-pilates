@@ -34,8 +34,6 @@ export type NavigationItem = {
   studioWide?: string;
   /** A dense list page (design system → List pages) with page-and-offset search. */
   list?: true;
-  /** Its WEB item has replaced the placeholder with the real page. */
-  built?: true;
   /**
    * A count beside the link (design system → Back Office): the transfers
    * waiting in Pagos, or the selected Branch's low-stock Supplies in the
@@ -57,7 +55,7 @@ export type NavigationGroup = {
 };
 
 export const navigationGroups: readonly NavigationGroup[] = [
-  { items: [{ label: "Horario", to: "/", screen: "AW02", built: true }] },
+  { items: [{ label: "Horario", to: "/", screen: "AW02" }] },
   {
     label: "Catálogo",
     items: [
@@ -66,21 +64,18 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/catalogo/tipos-de-clase",
         screen: "AW06",
         list: true,
-        built: true,
       },
       {
         label: "Planes",
         to: "/catalogo/planes",
         screen: "AW04",
         list: true,
-        built: true,
       },
       {
         label: "Sucursales",
         to: "/catalogo/sucursales",
         screen: "AW19",
         list: true,
-        built: true,
       },
     ],
   },
@@ -92,7 +87,6 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/clientes",
         screen: "AW21",
         list: true,
-        built: true,
         studioWide: "los clientes son del estudio, no de una sede.",
       },
       {
@@ -100,7 +94,6 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/pagos",
         screen: "AW28",
         list: true,
-        built: true,
         badge: "pendingPayments",
         studioWide: "los pagos son del estudio, no de una sede.",
       },
@@ -109,7 +102,6 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/insumos",
         screen: "AW08",
         list: true,
-        built: true,
         badge: "lowStock",
         subPages: true,
       },
@@ -118,21 +110,18 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/evaluaciones-nutricionales",
         screen: "AW25",
         list: true,
-        built: true,
       },
       {
         label: "Personal",
         to: "/back-office/personal",
         screen: "AW23",
         list: true,
-        built: true,
       },
       {
         label: "Nómina",
         to: "/back-office/nomina",
         screen: "AW11",
         list: true,
-        built: true,
         studioWide: "la nómina es del estudio, no de una sede.",
       },
       {
@@ -140,14 +129,12 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/gastos",
         screen: "AW13",
         list: true,
-        built: true,
       },
       {
         label: "Categorías de gasto",
         to: "/back-office/categorias-de-gasto",
         screen: "AW15",
         list: true,
-        built: true,
         studioWide: "las categorías de gasto son del estudio, no de una sede.",
       },
     ],
@@ -158,7 +145,6 @@ export const navigationGroups: readonly NavigationGroup[] = [
         label: "Reporte",
         to: "/reporte",
         screen: "AW16",
-        built: true,
         ownBranchFilter: true,
       },
     ],
@@ -168,13 +154,12 @@ export const navigationGroups: readonly NavigationGroup[] = [
     items: [
       // AW17 is the one list drawn as cards, unpaged, because its order is
       // what the page edits.
-      { label: "Promociones", to: "/promociones", screen: "AW17", built: true },
+      { label: "Promociones", to: "/promociones", screen: "AW17" },
       {
         label: "Referidos",
         to: "/promociones/referidos",
         screen: "AW26",
         list: true,
-        built: true,
         studioWide: "los referidos son del estudio, no de una sede.",
       },
       {
@@ -182,7 +167,6 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/promociones/creditos",
         screen: "AW27",
         list: true,
-        built: true,
         studioWide: "los créditos son del estudio, no de una sede.",
       },
     ],

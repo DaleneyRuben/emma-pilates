@@ -80,10 +80,6 @@ describe("admin routes", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers()));
 
-  it("has a real page behind every sidebar entry since WEB-006", () => {
-    expect(navigationItems.filter((item) => item.built !== true)).toEqual([]);
-  });
-
   it("opens the schedule at the root path", async () => {
     renderAt("/");
 

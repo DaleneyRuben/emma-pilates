@@ -2,7 +2,10 @@ import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 import { expenseSearchSchema } from "../back-office/expenses/expense-search";
 import { payrollSearchSchema } from "../back-office/payroll/payroll-search";
 import { withdrawalSearchSchema } from "../back-office/supplies/supply-search";
-import { listSearchSchema } from "../components/table/pagination";
+import {
+  listSearchSchema,
+  optionalSearch,
+} from "../components/table/pagination";
 import { clientSearchSchema, staffSearchSchema } from "../people/people-search";
 import { paymentSearchSchema } from "../payments/payment-search";
 import { authenticatedRoute } from "./root-routes";
@@ -12,7 +15,7 @@ import { authenticatedRoute } from "./root-routes";
 const clientsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/clientes",
-  validateSearch: clientSearchSchema,
+  validateSearch: optionalSearch(clientSearchSchema),
   component: lazyRouteComponent(
     () => import("../people/clients/clients-route"),
     "ClientsRoute",
@@ -22,7 +25,7 @@ const clientsRoute = createRoute({
 const staffRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/personal",
-  validateSearch: staffSearchSchema,
+  validateSearch: optionalSearch(staffSearchSchema),
   component: lazyRouteComponent(
     () => import("../people/staff/staff-route"),
     "StaffRoute",
@@ -32,7 +35,7 @@ const staffRoute = createRoute({
 const paymentsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/pagos",
-  validateSearch: paymentSearchSchema,
+  validateSearch: optionalSearch(paymentSearchSchema),
   component: lazyRouteComponent(
     () => import("../payments/payments-route"),
     "PaymentsRoute",
@@ -42,7 +45,7 @@ const paymentsRoute = createRoute({
 const suppliesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/insumos",
-  validateSearch: listSearchSchema,
+  validateSearch: optionalSearch(listSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/supplies/supplies-route"),
     "SuppliesRoute",
@@ -53,7 +56,7 @@ const suppliesRoute = createRoute({
 const withdrawalsRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/insumos/retiros",
-  validateSearch: withdrawalSearchSchema,
+  validateSearch: optionalSearch(withdrawalSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/supplies/withdrawals-route"),
     "WithdrawalsRoute",
@@ -63,7 +66,7 @@ const withdrawalsRoute = createRoute({
 const payrollRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/nomina",
-  validateSearch: payrollSearchSchema,
+  validateSearch: optionalSearch(payrollSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/payroll/payroll-route"),
     "PayrollRoute",
@@ -73,7 +76,7 @@ const payrollRoute = createRoute({
 const expensesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/gastos",
-  validateSearch: expenseSearchSchema,
+  validateSearch: optionalSearch(expenseSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/expenses/expenses-route"),
     "ExpensesRoute",
@@ -84,7 +87,7 @@ const expensesRoute = createRoute({
 const expenseCategoriesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/categorias-de-gasto",
-  validateSearch: listSearchSchema,
+  validateSearch: optionalSearch(listSearchSchema),
   component: lazyRouteComponent(
     () => import("../back-office/expenses/categories-page"),
     "ExpenseCategoriesPage",
