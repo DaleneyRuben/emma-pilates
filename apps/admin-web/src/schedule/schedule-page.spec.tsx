@@ -1,5 +1,5 @@
 import { screen, waitFor, within } from "@testing-library/react";
-import { http } from "msw";
+import { delay, http } from "msw";
 import {
   addDays,
   boliviaInstant,
@@ -126,6 +126,39 @@ describe("AW02 Horario on a desktop browser", () => {
     expect(reads.map((params) => params.get("branchId"))).toContain(
       equipetrol.id,
     );
+  });
+
+  it("shows the loading line after a Branch switch, never the previous Branch's grid", async () => {
+    server.use(
+      sessionReads((params) => jsonResponse(weekOf(params))),
+      http.get(apiUrl(sessionsPath), async ({ request }) => {
+        if (
+          new URL(request.url).searchParams.get("branchId") !== equipetrol.id
+        ) {
+          return undefined;
+        }
+        await delay("infinite");
+        return jsonResponse([]);
+      }),
+    );
+    const { user } = renderAdmin(`/?week=${nextMonday}`);
+    await screen.findByRole("button", { name: /Reformer Pilates, 07:00/ });
+
+    await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
+    await user.click(
+      within(await screen.findByRole("dialog", { name: "Sucursal" })).getByRole(
+        "option",
+        { name: /Equipetrol/ },
+      ),
+    );
+
+    expect(await screen.findByText("Cargando el horario…")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /Reformer Pilates, 07:00/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Sucursal Equipetrol · sala única"),
+    ).toBeInTheDocument();
   });
 
   it("shows the loading, failed, and forbidden states of the week", async () => {
