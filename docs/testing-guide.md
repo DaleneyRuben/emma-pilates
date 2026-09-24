@@ -725,7 +725,10 @@ pnpm --filter @pilates/backend test
 
 This currently covers backend domain behavior, security helpers, registration
 rules, job behavior, and worker building blocks. It does not run the separate
-backend end-to-end or database integration suites.
+backend end-to-end or database integration suites. The script sets Node's
+`--experimental-vm-modules` flag (the pg-boss runtime loads its ESM package
+with a dynamic import), so the `ExperimentalWarning` line at the top is
+expected; a bare `jest` call without the flag fails that one spec.
 
 It also runs the architecture checks, including the audit catalog check: every
 audit action code the backend writes must be listed in
