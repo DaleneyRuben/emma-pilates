@@ -3811,6 +3811,71 @@
         ]
       }
     },
+    "/api/v1/administrator/payments": {
+      "get": {
+        "operationId": "listAdminPayments",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Client name fragment, accents and case ignored",
+            "schema": {}
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "all",
+                "pending",
+                "confirmed",
+                "rejected"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPaymentPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPaymentList"
+        ]
+      }
+    },
     "/api/v1/evaluation-slots": {
       "get": {
         "operationId": "listEvaluationSlots",
@@ -8570,6 +8635,111 @@
           "creditAvailableCentavos",
           "referralCode",
           "referredClientCount"
+        ]
+      },
+      "AdminPaymentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "planPriceCentavos": {
+            "type": "number",
+            "minimum": 1,
+            "description": "Money Amount in BOB centavos"
+          },
+          "creditAppliedCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Credit taken off the Plan price"
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "minimum": 1,
+            "description": "The Plan price less the Credit applied: what was transferred"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "confirmed",
+              "rejected"
+            ]
+          },
+          "submittedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "receiptAvailable": {
+            "type": "boolean",
+            "description": "Whether the receipt image is still retained"
+          }
+        },
+        "required": [
+          "id",
+          "clientId",
+          "clientName",
+          "planName",
+          "planPriceCentavos",
+          "creditAppliedCentavos",
+          "amountDueCentavos",
+          "state",
+          "submittedAt",
+          "decidedAt",
+          "receiptAvailable"
+        ]
+      },
+      "AdminPaymentPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPaymentDto"
+            }
+          },
+          "page": {
+            "type": "number",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalItems": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Payments matching the filters"
+          },
+          "pendingCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Pending transfers in the whole studio, whatever the filters"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "pendingCount"
         ]
       },
       "EvaluationSlotDto": {

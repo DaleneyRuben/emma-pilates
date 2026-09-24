@@ -17,6 +17,7 @@
     "deactivateStaffMember",
     "listAdminClients",
     "getAdminClient",
+    "listAdminPayments",
     "listAdminBranches",
     "createBranch",
     "updateBranch",

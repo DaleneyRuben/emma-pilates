@@ -33,6 +33,7 @@ import type {
   AdminExpenseCategoryDto,
   AdminExpenseDto,
   AdminExpensePageDto,
+  AdminPaymentPageDto,
   AdminPlanDto,
   AdminPlanPageDto,
   AdminReferralPageDto,
@@ -100,6 +101,7 @@ import type {
   ListAdminCreditsParams,
   ListAdminEvaluationsParams,
   ListAdminExpensesParams,
+  ListAdminPaymentsParams,
   ListAdminPlansParams,
   ListAdminReferralsParams,
   ListAdminSalaryPaymentsParams,
@@ -15391,6 +15393,211 @@ export function useGetAdminClient<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetAdminClientQueryOptions(clientId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type listAdminPaymentsResponse200 = {
+  data: AdminPaymentPageDto;
+  status: 200;
+};
+
+export type listAdminPaymentsResponseSuccess = listAdminPaymentsResponse200 & {
+  headers: Headers;
+};
+export type listAdminPaymentsResponse = listAdminPaymentsResponseSuccess;
+
+export const getListAdminPaymentsUrl = (params?: ListAdminPaymentsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/payments?${stringifiedParams}`
+    : `/api/v1/administrator/payments`;
+};
+
+export const listAdminPayments = async (
+  params?: ListAdminPaymentsParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminPaymentsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminPaymentsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminPaymentsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminPaymentsResponse;
+};
+
+export const getListAdminPaymentsQueryKey = (
+  params?: ListAdminPaymentsParams,
+) => {
+  return [
+    `/api/v1/administrator/payments`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminPaymentsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminPayments>>,
+  TError = unknown,
+>(
+  params?: ListAdminPaymentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminPaymentsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminPayments>>
+  > = ({ signal }) =>
+    listAdminPayments(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminPayments>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminPaymentsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminPayments>>
+>;
+export type ListAdminPaymentsQueryError = unknown;
+
+export function useListAdminPayments<
+  TData = Awaited<ReturnType<typeof listAdminPayments>>,
+  TError = unknown,
+>(
+  params: undefined | ListAdminPaymentsParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPayments>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminPayments>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminPayments>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminPayments<
+  TData = Awaited<ReturnType<typeof listAdminPayments>>,
+  TError = unknown,
+>(
+  params?: ListAdminPaymentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPayments>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminPayments>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminPayments>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminPayments<
+  TData = Awaited<ReturnType<typeof listAdminPayments>>,
+  TError = unknown,
+>(
+  params?: ListAdminPaymentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminPayments<
+  TData = Awaited<ReturnType<typeof listAdminPayments>>,
+  TError = unknown,
+>(
+  params?: ListAdminPaymentsParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminPayments>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminPaymentsQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
