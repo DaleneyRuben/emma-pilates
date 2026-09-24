@@ -76,6 +76,10 @@ export class AdminEvaluationPageDto {
 export class AdminReferralDto {
   @ApiProperty({ format: 'uuid' }) referralId!: string;
   @ApiProperty() referrerName!: string;
+  @ApiProperty({
+    description: 'Every Referral of the referrer, searched or not',
+  })
+  referrerReferralCount!: number;
   @ApiProperty() referredName!: string;
   @ApiProperty({ format: 'date-time' }) registeredAt!: Date;
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
@@ -89,6 +93,14 @@ export class AdminReferralPageDto {
   @ApiProperty() page!: number;
   @ApiProperty() pageSize!: number;
   @ApiProperty() totalItems!: number;
+  @ApiProperty({
+    description: "The studio's awarded Referrals, whatever the search",
+  })
+  awardedCount!: number;
+  @ApiProperty({
+    description: "The studio's pending Referrals, whatever the search",
+  })
+  pendingCount!: number;
 }
 
 export class AdminCreditBalanceDto {
@@ -96,6 +108,12 @@ export class AdminCreditBalanceDto {
   @ApiProperty() clientName!: string;
   @ApiProperty({ description: 'BOB centavos' }) availableCentavos!: number;
   @ApiProperty({ format: 'date-time' }) lastMovementAt!: Date;
+  @ApiProperty({
+    enum: ['earned', 'reserved', 'spent', 'returned'],
+    description:
+      'The last ledger entry: a Referral award, a reservation for an open purchase, its spend at confirmation, or its release',
+  })
+  lastMovementKind!: 'earned' | 'reserved' | 'spent' | 'returned';
 }
 
 export class AdminCreditPageDto {
