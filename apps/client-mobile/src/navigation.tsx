@@ -12,7 +12,7 @@ import { BrowseSessionsScreen } from "./booking/browse-sessions-screen";
 import { ClassHistoryScreen } from "./booking/class-history-screen";
 import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
-import { ClientFetcherContext } from "./client-fetcher";
+import { ClientApiBaseUrlContext, ClientFetcherContext } from "./client-fetcher";
 import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
 import { MyEvaluationsScreen } from "./evaluations/my-evaluations-screen";
@@ -100,6 +100,7 @@ const AuthenticatedClientNavigation = createStaticNavigation(ClientTabs);
 
 export function ClientNavigation({
   accountId,
+  apiBaseUrl,
   apiFetcher,
   authenticationApi,
   authenticationIntent,
@@ -112,7 +113,9 @@ export function ClientNavigation({
     return (
       <MobileQueryProvider accountId={accountId}>
         <ClientFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
-          <AuthenticatedClientNavigation />
+          <ClientApiBaseUrlContext.Provider value={apiBaseUrl}>
+            <AuthenticatedClientNavigation />
+          </ClientApiBaseUrlContext.Provider>
         </ClientFetcherContext.Provider>
       </MobileQueryProvider>
     );

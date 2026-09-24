@@ -1,6 +1,7 @@
 export * from "./account/change-password-screen";
 export * from "./account/initials";
 export * from "./account/logout-confirmation";
+export * from "./api/fetcher";
 export * from "./application";
 export * from "./auth/authentication-api";
 export * from "./auth/authentication-flow";

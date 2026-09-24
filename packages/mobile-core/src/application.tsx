@@ -36,6 +36,8 @@ import { fontAssets } from "./ui/fonts";
 
 export type MobileRuntime = {
   allowedLinkHosts: readonly string[];
+  // Where public image URLs answered as API paths resolve (ADR-0077 locally).
+  apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
   authenticationApi: AuthenticationApi;
   linkSource?: LinkSource;
@@ -47,6 +49,7 @@ export type MobileNavigationProps = {
   accountId?: string;
   authenticationApi: AuthenticationApi;
   authenticationIntent: AuthenticationLinkIntent | null;
+  apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
   onBiometricUnlock?: () => void;
   onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
@@ -76,6 +79,7 @@ export function createDefaultMobileRuntime({
 
   return {
     allowedLinkHosts: [new URL(apiBaseUrl).hostname],
+    apiBaseUrl,
     apiFetcher: createApiFetcher({
       baseUrl: apiBaseUrl,
       getCredential: credentialStore.load,
@@ -102,11 +106,13 @@ export function createDefaultMobileRuntime({
 function IdentityNavigation({
   Navigation,
   authenticationApi,
+  apiBaseUrl,
   apiFetcher,
   login,
 }: {
   Navigation: ComponentType<MobileNavigationProps>;
   authenticationApi: AuthenticationApi;
+  apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
   login: MobileRuntime["login"];
 }) {
@@ -135,6 +141,7 @@ function IdentityNavigation({
       accountId={identity.session?.accountId}
       authenticationApi={authenticationApi}
       authenticationIntent={intent}
+      apiBaseUrl={apiBaseUrl}
       apiFetcher={apiFetcher}
       onBiometricUnlock={
         identity.status === "biometric-locked"
@@ -173,6 +180,7 @@ export function MobileApplication({
             <IdentityNavigation
               Navigation={Navigation}
               authenticationApi={mobileRuntime.authenticationApi}
+              apiBaseUrl={mobileRuntime.apiBaseUrl}
               apiFetcher={mobileRuntime.apiFetcher}
               login={mobileRuntime.login}
             />
