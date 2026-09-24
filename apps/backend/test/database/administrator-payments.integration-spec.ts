@@ -165,8 +165,8 @@ describe('Administrator Payment list (PostgreSQL)', () => {
     ]);
     expect(page.items[1]).toEqual({
       id: paymentIds.sofia,
-      clientId: expect.any(String),
-      clientName: expect.stringMatching(/^Sofía/),
+      clientId: expect.any(String) as string,
+      clientName: expect.stringMatching(/^Sofía/) as string,
       planName: 'Paquete de 8 clases',
       planPriceCentavos: plan.priceCentavos,
       creditAppliedCentavos: 6000,
