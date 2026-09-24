@@ -11,6 +11,10 @@ import {
   startDatabaseTestContext,
 } from './database-test-context';
 
+// Every case runs on an injected clock: the Subscriptions below cover a fixed
+// month, so the Sessions built from the clock must fall inside it.
+const clock = new Date('2026-10-01T14:00:00.000Z'); // 10:00 in Bolivia
+
 describe('Booking commands', () => {
   let context: DatabaseTestContext;
   let prisma: PrismaClient;
@@ -26,7 +30,7 @@ describe('Booking commands', () => {
   });
 
   it('creates a Booking and consumes one allowance atomically', async () => {
-    const fixture = await createFixture(prisma);
+    const fixture = await createFixture(prisma, { now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
 
     const booking = await commands.create(
@@ -49,7 +53,7 @@ describe('Booking commands', () => {
   });
 
   it('replays a Booking command without consuming another allowance', async () => {
-    const fixture = await createFixture(prisma);
+    const fixture = await createFixture(prisma, { now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const principal = {
       accountId: fixture.accountId,
@@ -79,7 +83,7 @@ describe('Booking commands', () => {
   });
 
   it('joins a full Session Waitlist without consuming allowance', async () => {
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
 
     await commands.create(
@@ -111,7 +115,7 @@ describe('Booking commands', () => {
   });
 
   it('replays a Waitlist command without creating another entry', async () => {
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
 
     await commands.create(
@@ -154,7 +158,7 @@ describe('Booking commands', () => {
   });
 
   it('rejects a second active Waitlist Entry for the same Client', async () => {
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
 
     await commands.create(
@@ -180,7 +184,7 @@ describe('Booking commands', () => {
   });
 
   it('promotes the first eligible Waitlist Entry and consumes allowance', async () => {
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const booking = await commands.create(
       { sessionId: fixture.sessionId },
@@ -234,7 +238,7 @@ describe('Booking commands', () => {
   });
 
   it('cancels a Booking, restores its allowance, and promotes the oldest eligible Waitlist Entry atomically', async () => {
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const booking = await commands.create(
       { sessionId: fixture.sessionId },
@@ -358,7 +362,7 @@ describe('Booking commands', () => {
   });
 
   it('records a complete Attendance roster after a Session ends', async () => {
-    const fixture = await createFixture(prisma);
+    const fixture = await createFixture(prisma, { now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const booking = await commands.create(
       { sessionId: fixture.sessionId },
@@ -411,7 +415,7 @@ describe('Booking commands', () => {
   });
 
   it('promotes the Waitlist before a direct Booking uses freed capacity', async () => {
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const booking = await commands.create(
       { sessionId: fixture.sessionId },
@@ -462,7 +466,7 @@ describe('Booking commands', () => {
   });
 
   it('prioritizes the Waitlist before an idempotent Booking uses freed capacity', async () => {
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const booking = await commands.create(
       { sessionId: fixture.sessionId },
@@ -514,7 +518,7 @@ describe('Booking commands', () => {
   });
 
   it('allocates only one Booking when Clients race for the last Session spot', async () => {
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
     const firstClient = await createClientWithSubscription(prisma);
     const secondClient = await createClientWithSubscription(prisma);
@@ -550,7 +554,7 @@ describe('Booking commands', () => {
 
   it('writes the idempotency records from the injected clock even when it lies far in the past', async () => {
     const pastNow = new Date('2026-09-01T12:00:00.000Z');
-    const fixture = await createFixture(prisma, { capacity: 1 });
+    const fixture = await createFixture(prisma, { capacity: 1, now: clock });
     const commands = new PrismaBookingCommands(prisma, () => pastNow);
     const bookingKey = randomUUID();
     const waitlistKey = randomUUID();
@@ -598,9 +602,9 @@ describe('Booking commands', () => {
 
 const createFixture = async (
   prisma: PrismaClient,
-  options: { capacity?: number; startsAt?: Date; now?: Date } = {},
+  options: { capacity?: number; startsAt?: Date; now: Date },
 ) => {
-  const now = options.now ?? new Date();
+  const now = options.now;
   const branch = await prisma.branch.create({
     data: { name: randomUUID(), address: 'Calle Uno' },
   });
