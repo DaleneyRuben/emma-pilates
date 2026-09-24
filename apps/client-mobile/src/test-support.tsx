@@ -25,6 +25,7 @@ export function routeFetcher(
 export function createClientRuntime(fetcher: typeof globalThis.fetch) {
   return {
     allowedLinkHosts: ["links.emmapilates.test"],
+    apiBaseUrl: "https://api.test/api/v1",
     apiFetcher: fetcher,
     authenticationApi: {
       activateAccount: jest.fn(),
