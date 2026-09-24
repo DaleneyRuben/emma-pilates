@@ -10,7 +10,7 @@ you are starting with no project knowledge.
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10) | The Promotions carousel and push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
-| Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); Promotions and receipt images wait for image delivery |
+| Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
 | Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The captured verification email does not have a beginner-facing inbox yet                                                                                     |
@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31) | Promociones is still a placeholder (WEB-006, the API is ready: Test 32); valid activation and recovery links still cannot be read from the local email capture; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33) | Valid activation and recovery links still cannot be read from the local email capture; the Playwright journeys run in Chromium only |
 
 ## Before you begin
 
@@ -791,7 +791,7 @@ restores a signed-in browser; a later `authentication_required` returns to
 Login once; recovery requests stay neutral; the create-password page inspects
 the link first and handles current, expired, used, and invalid links for both
 activation and recovery; and the user menu changes the password and logs out
-on desktop and narrow widths. Every sidebar entry opens its placeholder page, the current
+on desktop and narrow widths. Every sidebar entry opens its page, the current
 section is marked, the Branch selector switches Branches and explains the
 studio-wide pages, the narrow-browser drawer and bottom sheet work, unknown
 paths land on "Página no encontrada", and list pages normalize `?page=` and
@@ -1489,10 +1489,8 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
    Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
    Referidos, Créditos). There is no "Descuentos". Every entry is a real page
-   (Tests 25 to 30) except Promociones, which opens a page with that title,
-   "Esta sección aún no está disponible.", and the design screen it will
-   implement ("Pantalla AW17"); the entry is highlighted in the sidebar and
-   the address changes (`/promociones`).
+   (Tests 25 to 30 and 33); the entry you choose is highlighted in the
+   sidebar and the address changes (`/promociones`, for example).
 2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
    popover lists Centro, Equipetrol, and Urubó with their addresses, marks the
    current one with a check, and ends with **Gestionar sucursales** (opens
@@ -1947,7 +1945,7 @@ pnpm test:admin-e2e
 The script builds the backend and the admin web, then runs
 `playwright test` in `apps/admin-web`. Its global setup prints the two
 process ids, the ports, and the `pilates_test_*` database name it made, and
-its teardown stops both servers and drops that database. The nine journeys
+its teardown stops both servers and drops that database. The ten journeys
 take about twenty seconds:
 
 1. **Sessions.** Paola signs in and lands on Horario; the
@@ -1974,6 +1972,10 @@ take about twenty seconds:
 6. **Narrow browser.** At 420 px the sidebar is behind **Abrir menú**, the
    Branch selector opens as a bottom sheet, Personal shows one labelled card
    per member, and nothing scrolls sideways.
+7. **Promociones.** The empty carousel, two drafts saved without an image,
+   the second dragged above the first by its handle (the "Soltar en posición
+   1" line, the saved order surviving a reload), and one deleted after the
+   confirmation.
 
 To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
@@ -2057,6 +2059,68 @@ An Assistant or a Client gets `403 administration_access_denied` from every
 Promotions stay in `booking.promotions`; the fixtures command does not remove
 them.
 
+## Test 33: manage Promociones in the admin web
+
+Start the backend and the worker on `pilates_dev_sim` after loading the
+fixtures (Test 32: the worker rebuilds every uploaded image), start the admin
+web, and log in as `paola.mendoza@example.com` / `emma-local-2026`, as Test 24
+describes. The fixtures ship no Promotion, so the page starts empty. Have a
+horizontal image at hand: JPG, PNG, or WEBP, at least 1200 × 675 pixels and
+under 20 MB (any landscape photo; a portrait one works too and shows the
+crop).
+
+1. **Empty carousel.** Promociones → **Promociones** reads "Ninguna
+   promoción en el carrusel" under the title, then one box: "Todavía no hay
+   promociones." and "Crea la primera con «Nueva promoción»; las clientas la
+   verán en el inicio de la app cuando la publiques.". The Branch selector
+   is not applied: Promotions belong to the studio.
+2. **Nueva promoción.** The side panel ("Entrará al final del carrusel")
+   starts with the image: drop a file on the dashed target or click **Sube
+   una imagen**. The target reads "Subiendo la imagen…" while the three
+   upload calls and the worker run (a second or two), then the preview
+   appears at 16:9 with the file name and size ("portada.jpg · 1600 × 900")
+   and **Cambiar imagen** / **Quitar**. A portrait or very wide file shows
+   its discarded edges dimmed and says which ones are lost. A file smaller
+   than 1200 × 675, another format, or one over 20 MB is refused under the
+   target before anything is uploaded. Fill **Título** (80 characters),
+   **Descripción** (280), **Fecha de inicio**, and **Fecha de fin**;
+   **Publicar** stays disabled until all of them and the image exist, while
+   **Guardar borrador** saves a private draft at any time (an empty submit
+   marks each missing field; an end date before the start is refused on its
+   field).
+3. **States.** A draft card reads **Borrador** and, without an image, shows
+   "Sin imagen" in place of the thumbnail. **Publicar** makes it **Activa**
+   when today falls inside the window, **Programada** before it, and
+   **Finalizada** after it. The page says what happened ("Promoción «…»
+   publicada.") and the card shows its position badge and the 480 px
+   thumbnail read from the API with your session (never cached).
+4. **Reorder.** Drag a card by its six-dot handle: the lifted card tilts,
+   the others dim, and a line reads "Soltar en posición N"; dropping saves
+   the whole order and the badges renumber. From the keyboard, focus a handle,
+   press the space bar, move with the arrows, press the space bar again to
+   drop (Escape puts it back). Reload: the order stays, and `GET
+   /api/v1/promotions` as `lucia@example.com` (Test 32C) lists the published
+   ones in that order.
+5. **Editar promoción.** Click a card: the panel names its position, shows
+   the current image ("Imagen actual · 1600 × 900"), and, on a published
+   Promotion, whether today is inside the range. A published one offers
+   **Guardar cambios** and **Dejar de publicar**; a draft offers **Guardar
+   borrador** and **Publicar**. **Cambiar imagen** or **Quitar** on a
+   published one warns that it stops being published when saved: save, see
+   the card drop to **Borrador**, then publish it again.
+6. **Eliminar promoción.** The link under the footer asks first ("¿Eliminar
+   la promoción «…»?", **Volver** / **Eliminar**); afterwards the card is
+   gone and the page says so. The row is archived, never removed, and its
+   image is released: the worker deletes the variants at its next hourly
+   sweep or when it starts.
+7. **Narrow browser.** At 420 px the cards stack with the handle on the
+   left, the headline wraps to two lines, and the panel is a full-screen
+   sheet with the dates stacked.
+
+Deleted Promotions stay archived in `booking.promotions`; the fixtures
+command does not remove them. A refused upload leaves nothing behind; one the
+worker refused waits under `pending/` for the 24-hour cleanup (Test 13).
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -2071,10 +2135,9 @@ The following are not ready for manual product testing:
   mobile-link domain and native association files are configured;
 - the Promotions carousel on Client Home (MOB-019) or push notifications (the
   in-app inbox works, see Test 9; buying a Plan works, see Test 10; the
-  Promotion API works through Swagger, see Test 32);
+  Promotion API works through Swagger, see Test 32, and the admin web manages
+  Promotions, see Test 33);
 - profile photos in any app (the variants are built, no screen uploads one);
-- the admin web's Promociones page, still a placeholder (every other page
-  works, Tests 23 to 30);
 - the admin web on a real Vercel preview or production origin, so the proxy,
   cookies, and trusted origins of ADR-0084 are only proven locally (EXT-003);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
