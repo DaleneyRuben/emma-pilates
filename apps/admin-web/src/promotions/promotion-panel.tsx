@@ -1,7 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { AdminPromotionDto } from "@pilates/api-contracts";
-import { ImagePlus } from "lucide-react";
-import { useId, useState } from "react";
+import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 import { useIdempotencyKey } from "../api/idempotency-key";
@@ -17,8 +16,13 @@ import {
 } from "../components/form/form";
 import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
+import { getGetAdminPromotionImageUrl } from "@pilates/api-contracts";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
+import {
+  PromotionImageField,
+  type AttachedImage,
+} from "./promotion-image-field";
 import { promotionFailureMessage } from "./promotion-problems";
 import { usePromotionChange } from "./promotion-queries";
 
@@ -46,13 +50,6 @@ const promotionSchema = z
 type PromotionInput = z.input<typeof promotionSchema>;
 type PromotionOutput = z.output<typeof promotionSchema>;
 
-/** The image the form will save: the current one or a freshly uploaded one. */
-export type AttachedImage = {
-  imageAssetId: string;
-  width: number;
-  height: number;
-};
-
 /**
  * AW18 with follow-ups 39 and 60: image first, then Título, Descripción,
  * and the display window; «Guardar borrador» keeps a private draft and
@@ -67,17 +64,21 @@ export function PromotionPanelForm({
 }) {
   const change = usePromotionChange();
   const keyFor = useIdempotencyKey();
-  const dropHintId = useId();
   // Once created, a retry of «Publicar» publishes the saved row instead of
   // creating a second one.
   const [saved, setSaved] = useState(promotion);
-  const [image] = useState<AttachedImage | null>(
+  const [image, setImage] = useState<AttachedImage | null>(
     promotion?.image === null || promotion?.image === undefined
       ? null
       : {
           imageAssetId: promotion.image.imageAssetId,
           width: promotion.image.width,
           height: promotion.image.height,
+          // AW18's attached preview reads the 1440 px private variant.
+          previewUrl: getGetAdminPromotionImageUrl(promotion.id, {
+            variant: "promotion_1440",
+          }),
+          label: "Imagen actual",
         },
   );
   const [failure, setFailure] = useState<string | null>(null);
@@ -145,30 +146,7 @@ export function PromotionPanelForm({
         className="flex flex-1 flex-col"
       >
         <SidePanelBody>
-          <div className="flex flex-col gap-1.5">
-            <span className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
-              Imagen
-            </span>
-            <div className="flex flex-col items-center gap-1 rounded-control border border-dashed border-borde-fuerte bg-superficie px-4 py-6 text-center">
-              <button
-                type="button"
-                aria-describedby={dropHintId}
-                className="flex flex-col items-center gap-1 rounded-control text-nota font-medium text-texto hover:text-primario focus-visible:shadow-foco"
-              >
-                <ImagePlus
-                  size={22}
-                  strokeWidth={1.5}
-                  aria-hidden="true"
-                  className="text-primario"
-                />
-                Sube una imagen
-              </button>
-              <p id={dropHintId} className="text-ayuda text-texto-tenue">
-                Arrastra el archivo o haz clic · JPG, PNG o WEBP horizontal,
-                mínimo 1200 × 675 px
-              </p>
-            </div>
-          </div>
+          <PromotionImageField value={image} onChange={setImage} />
           <FormField
             control={form.control}
             name="headline"

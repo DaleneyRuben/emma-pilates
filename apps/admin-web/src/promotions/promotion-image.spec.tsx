@@ -177,13 +177,17 @@ describe("AW18 image upload (follow-up 60, UPL-002)", () => {
       within(panel).getByRole("button", { name: "Sube una imagen" }),
     ).toBeVisible();
 
-    await user.upload(
-      fileInput(panel),
-      new File([new Uint8Array([71, 73, 70])], "anim.gif", {
-        type: "image/gif",
-      }),
-      { applyAccept: false },
-    );
+    // The picker's `accept` keeps other formats out; a dropped file does not.
+    fireEvent.drop(within(panel).getByTestId("promotion-drop-target"), {
+      dataTransfer: {
+        files: [
+          new File([new Uint8Array([71, 73, 70])], "anim.gif", {
+            type: "image/gif",
+          }),
+        ],
+        types: ["Files"],
+      },
+    });
     expect(await within(panel).findByRole("alert")).toHaveTextContent(
       "Elige un archivo JPG, PNG o WEBP.",
     );
