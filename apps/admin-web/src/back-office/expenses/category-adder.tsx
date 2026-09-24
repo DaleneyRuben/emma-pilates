@@ -50,13 +50,13 @@ export function CategoryAdder({
 
   return (
     <Form {...form}>
-      <div className="flex items-start gap-2">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem className="flex-1">
-              <FormLabel>Nombre de la categoría</FormLabel>
+      <FormField
+        control={form.control}
+        name="name"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Nombre de la categoría</FormLabel>
+            <div className="flex gap-2">
               <FormControl>
                 <Input
                   autoFocus={autoFocus}
@@ -69,19 +69,19 @@ export function CategoryAdder({
                   }}
                 />
               </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button
-          variant="neutral"
-          className="mt-[22px] h-[44px]"
-          disabled={change.isPending}
-          onClick={() => void add()}
-        >
-          Agregar
-        </Button>
-      </div>
+              <Button
+                variant="neutral"
+                className="h-[44px]"
+                disabled={change.isPending}
+                onClick={() => void add()}
+              >
+                Agregar
+              </Button>
+            </div>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </Form>
   );
 }
