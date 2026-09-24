@@ -23,7 +23,8 @@ import { PlansPage } from "../catalog/plans/plans-page";
 import { listSearchSchema } from "../components/table/pagination";
 import { NotFoundPage } from "../pages/not-found-page";
 import { ClientsPage } from "../people/clients/clients-page";
-import { clientSearchSchema } from "../people/people-search";
+import { clientSearchSchema, staffSearchSchema } from "../people/people-search";
+import { StaffPage } from "../people/staff/staff-page";
 import { PlaceholderPage } from "../pages/placeholder-page";
 import { StartupErrorPage } from "../pages/startup-error-page";
 import { SchedulePage } from "../schedule/schedule-page";
@@ -180,12 +181,30 @@ const clientsRoute = createRoute({
   },
 });
 
+const staffRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/personal",
+  validateSearch: staffSearchSchema,
+  component: function StaffRoute() {
+    const navigate = staffRoute.useNavigate();
+    return (
+      <StaffPage
+        search={staffRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
 const pageRoutes = [
   scheduleRoute,
   branchesRoute,
   classTypesRoute,
   plansRoute,
   clientsRoute,
+  staffRoute,
 ];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)

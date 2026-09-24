@@ -7,3 +7,17 @@ export const clientSearchSchema = listSearchSchema.extend({
   q: z.string().trim().min(1).max(100).optional().catch(undefined),
 });
 export type ClientSearch = z.infer<typeof clientSearchSchema>;
+
+export const staffRoles = [
+  "trainer",
+  "assistant",
+  "administrator",
+  "nutritionist",
+] as const;
+export type StaffRole = (typeof staffRoles)[number];
+
+// AW23: one Role at a time, "Todos" by default (ADR-0062 allowlist).
+export const staffSearchSchema = listSearchSchema.extend({
+  role: z.enum(["all", ...staffRoles]).catch("all"),
+});
+export type StaffSearch = z.infer<typeof staffSearchSchema>;

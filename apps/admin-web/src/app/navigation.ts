@@ -106,6 +106,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/personal",
         screen: "AW23",
         list: true,
+        built: true,
       },
       {
         label: "Nómina",
