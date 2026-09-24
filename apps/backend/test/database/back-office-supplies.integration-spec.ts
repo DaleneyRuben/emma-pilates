@@ -92,10 +92,12 @@ describe('Prisma Back Office supplies', () => {
     ).resolves.toBe('back_office_access_denied');
 
     const listed = await supplies().listSupplies(
-      { branchId: centro },
+      { branchId: centro, status: 'active', page: 1, pageSize: 20 },
       await administrator(),
     );
-    expect(listed.map((supply) => [supply.name, supply.lowStock])).toEqual([
+    expect(
+      listed.items.map((supply) => [supply.name, supply.lowStock]),
+    ).toEqual([
       ['Jabón líquido', true],
       ['Papel higiénico', false],
     ]);
@@ -237,10 +239,10 @@ describe('Prisma Back Office supplies', () => {
     ).resolves.toEqual(archived);
 
     const listed = await supplies().listSupplies(
-      { branchId: centro },
+      { branchId: centro, status: 'active', page: 1, pageSize: 20 },
       await administrator(),
     );
-    expect(listed.map((supply) => supply.id)).not.toContain(bleach.id);
+    expect(listed.items.map((supply) => supply.id)).not.toContain(bleach.id);
     await expect(
       codeOf(
         supplies().recordWithdrawal(
