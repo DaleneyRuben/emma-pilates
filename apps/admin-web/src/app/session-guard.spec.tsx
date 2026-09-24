@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import { ApiError } from "../api/problem";
 import { http, HttpResponse } from "msw";
 import { apiUrl, server, useMockServer } from "../test/msw";
@@ -74,6 +74,52 @@ describe("admin session guard", () => {
     });
     expect(router.history.length).toBe(2);
     expect(queryClient.getQueryData(["uno"])).toBeUndefined();
+  });
+
+  it("reports an expiry again after a session restored without Login (another tab signed in)", async () => {
+    server.use(
+      ...signedInHandlers(),
+      http.delete(apiUrl(currentSessionPath), () => {
+        server.use(...signedOutHandlers());
+        return new HttpResponse(null, { status: 204 });
+      }),
+    );
+    const { router, queryClient, user } = renderAdmin("/back-office/gastos");
+    await heading("Gastos");
+
+    await user.click(await screen.findByRole("button", { name: /Tu cuenta/ }));
+    const menu = await screen.findByRole("dialog", { name: "Tu cuenta" });
+    await user.click(
+      within(menu).getByRole("button", { name: "Cerrar sesión" }),
+    );
+    await user.click(
+      within(menu).getByRole("button", { name: "Cerrar sesión" }),
+    );
+    await heading("Iniciar sesión");
+
+    // Another tab signed in; this tab goes back and the probe finds a session.
+    server.use(...signedInHandlers());
+    await router.navigate({
+      to: "/back-office/gastos",
+      search: { page: 1, pageSize: 20 },
+    });
+    await heading("Gastos");
+
+    server.use(...signedOutHandlers());
+    await queryClient
+      .fetchQuery({
+        queryKey: ["tarde"],
+        queryFn: () =>
+          Promise.reject(
+            new ApiError({ status: 401, code: "authentication_required" }),
+          ),
+      })
+      .catch(() => undefined);
+
+    expect(await heading("Iniciar sesión")).toBeInTheDocument();
+    expect(
+      screen.getByText("Tu sesión terminó. Vuelve a iniciar sesión."),
+    ).toBeInTheDocument();
   });
 
   it("offers a retry instead of Login when the backend cannot be reached at startup", async () => {
