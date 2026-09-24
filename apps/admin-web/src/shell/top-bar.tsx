@@ -44,8 +44,12 @@ export function TopBar() {
 
   return (
     <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-borde bg-blanco px-4 lg:px-6">
-      {narrow ? <MenuDrawer /> : null}
-      <span className="font-serif text-titulo-2 text-texto">Emma</span>
+      {narrow ? (
+        <>
+          <MenuDrawer />
+          <span className="font-serif text-titulo-2 text-texto">Emma</span>
+        </>
+      ) : null}
       <div className="ml-auto flex items-center gap-2">
         {!ownBranchFilter ? (
           <BranchSelector />

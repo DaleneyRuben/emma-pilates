@@ -6,9 +6,10 @@ import { SidebarNav } from "./sidebar-nav";
 import { TopBar } from "./top-bar";
 import { useIsNarrowViewport } from "./use-media-query";
 
-// AW02: persistent 236px sidebar plus a top bar with the wordmark, the
-// Branch selector, and the account cell; the sidebar collapses to a drawer
-// on narrow browsers.
+// AW02 and design/README.md: a persistent 236px sidebar whose top cell holds
+// the one "Emma" wordmark, a top bar with the Branch selector and the account
+// cell, and the main area on Superficie; the sidebar collapses to a drawer
+// on narrow browsers, where the top bar carries the wordmark instead.
 const noBranches: never[] = [];
 
 export function AdminShell() {
@@ -31,7 +32,7 @@ export function AdminShell() {
         )}
         <div className="flex min-w-0 flex-1 flex-col">
           <TopBar />
-          <main className="flex-1 px-4 py-5 lg:px-8 lg:py-7">
+          <main className="flex-1 bg-superficie px-4 py-5 lg:px-8 lg:py-7">
             <Outlet />
           </main>
         </div>
