@@ -45,9 +45,7 @@ describe("Bolivia civil time", () => {
   });
 
   it("labels the week, the day tabs, and a Session in Spanish", () => {
-    expect(formatWeekRange("2026-09-21")).toBe(
-      "21 – 27 de septiembre de 2026",
-    );
+    expect(formatWeekRange("2026-09-21")).toBe("21 – 27 de septiembre de 2026");
     expect(formatWeekRange("2026-09-28")).toBe(
       "28 de septiembre – 4 de octubre de 2026",
     );
