@@ -140,8 +140,7 @@ import { createPrismaCatalogAdministration } from './administration/prisma-catal
 import { createPrismaCatalogLists } from './administration/prisma-catalog-lists';
 import { createPrismaOversight } from './administration/prisma-oversight';
 import { createPrismaScheduleAdministration } from './administration/prisma-schedule-administration';
-import { administratorClientProvider } from './clients/administrator-client-operations';
-import { AdministratorClientsController } from './clients/administrator-clients.controller';
+import { adminWebReads } from './admin-web-reads';
 
 const bookingPrisma = Symbol('bookingPrisma');
 
@@ -183,7 +182,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     AdministratorPaymentsController,
     AdministratorSessionsController,
     AssistantClientsController,
-    AdministratorClientsController,
+    ...adminWebReads.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
     NutritionistEvaluationsController,
@@ -620,7 +619,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
       inject: [bookingPrisma],
       useFactory: (prisma: PrismaClient) => createPrismaCatalogLists(prisma),
     },
-    administratorClientProvider(bookingPrisma),
+    ...adminWebReads.providers(bookingPrisma),
     {
       provide: BookingRuntimeCleanup,
       inject: [bookingPrisma],
