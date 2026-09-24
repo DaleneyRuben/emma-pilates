@@ -1,4 +1,5 @@
 import type { PrismaClient } from '../../generated/prisma/client';
+import { containsPattern } from '../search-pattern';
 import {
   summarizeCredit,
   type CreditLedgerKind,
@@ -72,7 +73,7 @@ export const createAssistantClientRepository = (
   // STAFF-004: names and emails match without accents or case through
   // booking.search_text; LIKE wildcards in the query are matched literally.
   searchClients: async ({ query, limit }) => {
-    const pattern = `%${query.replace(/[\\%_]/g, (character) => `\\${character}`)}%`;
+    const pattern = containsPattern(query);
     const matches = await prisma.$queryRaw<{ id: string }[]>`
       SELECT c.id
       FROM booking.clients c

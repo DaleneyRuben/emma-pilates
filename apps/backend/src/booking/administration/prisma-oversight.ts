@@ -7,15 +7,12 @@ import {
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
+import { containsPattern } from '../search-pattern';
 import { requireAdministrator } from './administration-errors';
 
 type Paging = { page: number; pageSize: number };
 
 const offset = ({ page, pageSize }: Paging) => (page - 1) * pageSize;
-
-// LIKE pattern over booking.search_text, with wildcards matched literally.
-const searchPattern = (query: string) =>
-  `%${query.trim().replace(/[\\%_]/g, (character) => `\\${character}`)}%`;
 
 const methodNames: Record<PaymentMethod, 'cash' | 'transfer' | 'credit_only'> =
   {
@@ -99,8 +96,8 @@ export const createPrismaOversight = (
               FROM booking.referrals r
               JOIN booking.clients referrer ON referrer.id = r.referrer_client_id
               JOIN booking.clients referred ON referred.id = r.referred_client_id
-              WHERE booking.search_text(referrer.name) LIKE booking.search_text(${searchPattern(query.query)})
-                 OR booking.search_text(referred.name) LIKE booking.search_text(${searchPattern(query.query)})`
+              WHERE booking.search_text(referrer.name) LIKE booking.search_text(${containsPattern(query.query)})
+                 OR booking.search_text(referred.name) LIKE booking.search_text(${containsPattern(query.query)})`
           ).map(({ id }) => id);
     const where: Prisma.ReferralWhereInput =
       ids === undefined ? {} : { id: { in: ids } };
@@ -146,7 +143,7 @@ export const createPrismaOversight = (
     const pattern =
       query.query === undefined || query.query.trim() === ''
         ? null
-        : searchPattern(query.query);
+        : containsPattern(query.query);
     const balances = await prisma.$queryRaw<
       {
         client_id: string;
