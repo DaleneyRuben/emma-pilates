@@ -209,6 +209,26 @@ describe("AW16 Reporte on a desktop browser", () => {
     );
   });
 
+  it("returns to every Branch when the address names a Branch the studio does not have", async () => {
+    server.use(...reports());
+    const { router } = renderAdmin(
+      `${path}&branch=0b6f6f2e-1d38-5a52-9d44-7a0cf0a1c099`,
+    );
+    await heading();
+
+    await waitFor(() =>
+      expect(router.state.matches.at(-1)?.search).toMatchObject({
+        branch: "all",
+      }),
+    );
+    expect(
+      await screen.findByText("01/08/2026 – 30/09/2026 · Todas las sucursales"),
+    ).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "Sucursal" })).toHaveValue(
+      "all",
+    );
+  });
+
   it("opens on the last six Bolivia months when the address names no range", async () => {
     server.use(...reports());
     renderAdmin("/reporte");

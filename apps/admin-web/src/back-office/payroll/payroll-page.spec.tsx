@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import {
   camilaSeptember,
@@ -110,6 +110,27 @@ describe("AW11 Nómina on a desktop browser", () => {
       pageSize: 20,
       staffMemberId: emma.id,
     });
+  });
+
+  it("forgets a Staff Member the address names who is not in the list", async () => {
+    server.use(
+      payrollTable(() =>
+        jsonResponse(salaryPage([emmaSeptember, camilaSeptember])),
+      ),
+    );
+    const { router } = renderAdmin(
+      "/back-office/nomina?staffMemberId=5f000000-0000-5000-8000-000000000099&page=2",
+    );
+    await rowOf("Camila Rojas");
+
+    await waitFor(() =>
+      expect(router.state.matches.at(-1)?.search).toEqual({
+        page: 1,
+        pageSize: 20,
+      }),
+    );
+    expect(screen.getByLabelText("Empleado")).toHaveValue("all");
+    expect(reads.at(-1)?.has("staffMemberId")).toBe(false);
   });
 
   it("stays the same list whichever Branch the selector names", async () => {
