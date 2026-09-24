@@ -1,5 +1,6 @@
 import {
   getGetAdminClientQueryKey,
+  getGetIncomeReportQueryKey,
   getGetPaymentReviewQueryKey,
   getListAdminClientsQueryKey,
   getListAdminCreditsQueryKey,
@@ -11,6 +12,13 @@ import type { QueryClient } from "@tanstack/react-query";
 export type DecisionOutcome = "confirmed" | "rejected" | "unknown";
 
 const clientsPath = getListAdminClientsQueryKey()[0];
+const incomeReportPath = getGetIncomeReportQueryKey()[0];
+
+// A confirmed transfer is studio-wide income: it counts only in the
+// all-Branches report, never in a single Branch's (CONTEXT-MAP).
+const isStudioIncomeKey = ({ queryKey }: { queryKey: readonly unknown[] }) =>
+  queryKey[0] === incomeReportPath &&
+  (queryKey[1] as { branchId?: string } | undefined)?.branchId === undefined;
 
 /**
  * ADR-0042: exactly the cached reads a decision changes. Every Payment list
@@ -18,7 +26,8 @@ const clientsPath = getListAdminClientsQueryKey()[0];
  * Client's Plan (the Clientes directory and her detail) and a first Payment
  * may award Credit to her referrer, whom the admin web cannot name, so every
  * Client detail and the Referral and Credit lists; a rejection releases only
- * her reserved Credit (her detail and the Credit list). A decision taken
+ * her reserved Credit (her detail and the Credit list). A confirmed
+ * transfer also adds to the all-Branches income report. A decision taken
  * elsewhere (a conflict) may have been either.
  */
 export async function refreshAfterDecision(
@@ -54,6 +63,7 @@ export async function refreshAfterDecision(
       queryClient.invalidateQueries({
         queryKey: getListAdminReferralsQueryKey(),
       }),
+      queryClient.invalidateQueries({ predicate: isStudioIncomeKey }),
     );
   }
   await Promise.all(refreshes);
