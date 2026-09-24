@@ -3,6 +3,7 @@ import {
   boliviaInstant,
   boliviaParts,
   boliviaToday,
+  formatCivilMoment,
   formatDayTab,
   formatSessionMoment,
   formatWeekRange,
@@ -55,6 +56,16 @@ describe("Bolivia civil time", () => {
     expect(formatDayTab("2026-09-23")).toEqual({ weekday: "Mié", day: "23" });
     expect(formatSessionMoment("2026-09-23T20:00:00.000Z")).toBe(
       "Mié 23 sep · 16:00",
+    );
+  });
+
+  it("writes an instant as its Bolivia date and 24-hour time", () => {
+    // 01:30 UTC on the 16th is still the evening of the 15th in Bolivia.
+    expect(formatCivilMoment("2026-09-16T01:30:00.000Z")).toBe(
+      "15/09/2026 · 21:30",
+    );
+    expect(formatCivilMoment("2026-08-15T13:12:00.000Z")).toBe(
+      "15/08/2026 · 09:12",
     );
   });
 });
