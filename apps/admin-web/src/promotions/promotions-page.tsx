@@ -4,7 +4,7 @@ import { isForbidden } from "../components/page/is-forbidden";
 import { PageHeader } from "../components/page/page-header";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
-import { PromotionCard } from "./promotion-card";
+import { PromotionCardList } from "./promotion-card-list";
 import { carouselSubtitle } from "./promotion-format";
 import { promotionListQueryOptions } from "./promotion-queries";
 
@@ -58,20 +58,7 @@ export function PromotionsPage() {
       ) : query.data.length === 0 ? (
         <EmptyCarousel />
       ) : (
-        <ol
-          aria-label="Promociones en el orden del carrusel"
-          className="flex flex-col gap-2.5"
-        >
-          {query.data.map((promotion, index) => (
-            <li key={promotion.id}>
-              <PromotionCard
-                promotion={promotion}
-                position={index + 1}
-                onOpen={() => undefined}
-              />
-            </li>
-          ))}
-        </ol>
+        <PromotionCardList promotions={query.data} onOpen={() => undefined} />
       )}
     </article>
   );

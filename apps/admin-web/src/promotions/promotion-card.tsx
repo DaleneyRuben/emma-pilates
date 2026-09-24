@@ -1,7 +1,23 @@
 import type { AdminPromotionDto } from "@pilates/api-contracts";
 import { GripVertical, Image } from "lucide-react";
+import type { KeyboardEvent, PointerEvent, Ref } from "react";
 import { StatusPill } from "../components/ui/status-pill";
+import { cn } from "../lib/cn";
 import { formatDisplayWindow, statePills } from "./promotion-format";
+
+export type CardState = {
+  dragging: boolean;
+  dimmed: boolean;
+  /** How far the pointer has carried the lifted card. */
+  offsetY: number;
+};
+
+export type HandleState = {
+  grabbed: boolean;
+  describedBy: string;
+  onPointerDown: (event: PointerEvent<HTMLButtonElement>) => void;
+  onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
+};
 
 /**
  * AW17 card (design/README.md → Drag to reorder): a six-dot handle on the
@@ -13,25 +29,52 @@ export function PromotionCard({
   promotion,
   position,
   onOpen,
+  cardRef,
+  card,
+  handle,
 }: {
   promotion: AdminPromotionDto;
   position: number;
   onOpen: () => void;
+  /** Lets the list measure the card while another one is dragged. */
+  cardRef: Ref<HTMLElement>;
+  card: CardState;
+  handle: HandleState;
 }) {
   const pill =
     promotion.state === "archived" ? undefined : statePills[promotion.state];
 
   return (
     <article
+      ref={cardRef}
       aria-label={promotion.headline}
+      data-promotion-id={promotion.id}
+      data-dragging={card.dragging ? "true" : undefined}
+      data-dimmed={card.dimmed ? "true" : undefined}
       onClick={onOpen}
-      className="flex cursor-pointer items-center gap-3 rounded-tarjeta border border-borde bg-blanco py-3 pr-4 pl-1 transition-shadow hover:shadow-tarjeta-hover"
+      style={
+        card.offsetY === 0
+          ? undefined
+          : { transform: `translateY(${card.offsetY}px) rotate(-0.6deg)` }
+      }
+      className={cn(
+        "relative flex cursor-pointer items-center gap-3 rounded-tarjeta border border-borde bg-blanco py-3 pr-4 pl-1 transition-shadow hover:shadow-tarjeta-hover",
+        card.dragging && "z-10 border-primario shadow-arrastre",
+        card.dimmed && "opacity-[0.55]",
+      )}
     >
       <button
         type="button"
         aria-label={`Mover ${promotion.headline}`}
+        aria-pressed={handle.grabbed}
+        aria-describedby={handle.describedBy}
+        onPointerDown={handle.onPointerDown}
+        onKeyDown={handle.onKeyDown}
         onClick={(event) => event.stopPropagation()}
-        className="flex h-10 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-control text-texto-muy-tenue hover:bg-hover-fila hover:text-texto-tenue focus-visible:shadow-foco active:cursor-grabbing"
+        className={cn(
+          "flex h-10 w-7 shrink-0 cursor-grab touch-none items-center justify-center rounded-control text-texto-muy-tenue hover:bg-hover-fila hover:text-texto-tenue focus-visible:shadow-foco active:cursor-grabbing",
+          handle.grabbed && "bg-primario-tinte text-primario-profundo",
+        )}
       >
         <GripVertical size={18} strokeWidth={1.6} aria-hidden="true" />
       </button>
