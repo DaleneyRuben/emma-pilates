@@ -73,7 +73,7 @@ export function TableCell({ className, ...props }: ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-3 py-2.5 align-middle max-md:flex max-md:justify-between max-md:gap-4 max-md:px-0 max-md:py-1.5 max-md:before:text-cabecera-tabla max-md:before:font-medium max-md:before:tracking-[0.14em] max-md:before:text-texto-tenue max-md:before:uppercase max-md:before:content-[attr(data-label)]",
+        "px-3 py-2.5 align-middle max-md:flex max-md:empty:hidden max-md:justify-between max-md:gap-4 max-md:px-0 max-md:py-1.5 max-md:before:text-cabecera-tabla max-md:before:font-medium max-md:before:tracking-[0.14em] max-md:before:text-texto-tenue max-md:before:uppercase max-md:before:content-[attr(data-label)]",
         className,
       )}
       {...props}
