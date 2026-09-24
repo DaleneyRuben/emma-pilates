@@ -42,6 +42,7 @@ export default tseslint.config(
     files: [
       "src/**/*.spec.{ts,tsx}",
       "src/test/**/*.{ts,tsx}",
+      "e2e/support/*.test.ts",
       "jest.setup.ts",
     ],
     languageOptions: {

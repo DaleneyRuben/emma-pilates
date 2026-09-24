@@ -70,7 +70,8 @@
       "<rootDir>/jest.setup.ts"
     ],
     "testMatch": [
-      "<rootDir>/src/**/*.spec.ts?(x)"
+      "<rootDir>/src/**/*.spec.ts?(x)",
+      "<rootDir>/e2e/support/*.test.ts"
     ],
     "transform": {
       "^.+\\.(mjs|cjs|[tj]sx?)$": [

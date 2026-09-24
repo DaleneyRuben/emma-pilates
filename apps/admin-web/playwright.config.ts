@@ -11,6 +11,8 @@ import { webOrigin } from "./e2e/support/environment";
  */
 export default defineConfig({
   testDir: "./e2e",
+  // The harness's own Jest specs are `*.test.ts`; only journeys are specs.
+  testMatch: "**/*.spec.ts",
   globalSetup: "./e2e/support/global-setup.ts",
   fullyParallel: false,
   workers: 1,
