@@ -96,7 +96,10 @@ describe("AW10 Registrar retiro on a desktop browser", () => {
 
     await user.selectOptions(supply, detergent.id);
     const quantity = quantityField(panel, "Cantidad retirada");
-    expect(quantity).toHaveAccessibleDescription("Máximo: 12 unid.");
+    // The empty submit's own error stays until a quantity is typed.
+    expect(quantity).toHaveAccessibleDescription(
+      expect.stringContaining("Máximo: 12 unid."),
+    );
     await user.type(quantity, "13");
     expect(quantity).toHaveAccessibleDescription(
       "Máximo: 12 unid. Solo hay 12 unid. en stock.",
