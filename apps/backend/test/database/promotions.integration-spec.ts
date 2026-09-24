@@ -138,8 +138,8 @@ describe('Promotion commands (PostgreSQL)', () => {
     await rm(storageRoot, { recursive: true, force: true });
   });
 
+  // Audit records are append-only; every assertion on them names its target.
   afterEach(async () => {
-    await prisma.auditRecord.deleteMany({ where: { targetType: 'promotion' } });
     await prisma.promotion.deleteMany();
   });
 

@@ -81,7 +81,12 @@ export const requirePromotionValues = (
   ) {
     throw new PromotionError('invalid_promotion_value');
   }
-  return { ...input, headline, description };
+  return {
+    headline,
+    description,
+    displayStartsOn: input.displayStartsOn,
+    displayEndsOn: input.displayEndsOn,
+  };
 };
 
 // AW17 drag order: the request must name every live Promotion exactly once.
