@@ -9,7 +9,6 @@ import {
   colors,
   confirmLogout,
   Heading,
-  initials,
   QueryFailure,
   radii,
   Screen,
@@ -24,6 +23,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import { subscriptionBadge } from "../home/home-format";
 import { formatBolivianos } from "../plans/plan-format";
+import { ClientAvatar } from "./client-avatar";
+import { useClientPhoto } from "./use-client-photo";
 
 type ProfileNavigation = {
   navigate: (
@@ -107,6 +108,7 @@ export function ProfileScreen() {
   }
 
   const client = profile.data.data;
+  const photoUri = useClientPhoto(client.photo?.imageAssetId ?? null);
   const status =
     subscription.data?.status === 200 ? subscription.data.data.status : null;
   const unreadCount =
@@ -119,9 +121,7 @@ export function ProfileScreen() {
       {header}
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.summary}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>{initials(client.name)}</Text>
-          </View>
+          <ClientAvatar name={client.name} photoUri={photoUri} size={56} />
           <View style={styles.summaryBody}>
             <Text style={styles.name}>{client.name}</Text>
             <BodyText>{client.email}</BodyText>
@@ -194,19 +194,6 @@ export function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 56,
-    justifyContent: "center",
-    width: 56,
-  },
-  avatarText: {
-    color: colors.primaryDeep,
-    fontSize: typography.bodyLarge,
-    fontWeight: "600",
-  },
   badge: {
     alignItems: "center",
     backgroundColor: colors.primary,

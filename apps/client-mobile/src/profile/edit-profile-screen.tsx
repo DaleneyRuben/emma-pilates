@@ -3,6 +3,7 @@ import {
   getGetCurrentClientProfileQueryKey,
   updateCurrentClientProfile,
   useGetCurrentClientProfile,
+  type ClientProfileDto,
 } from "@pilates/api-contracts";
 import {
   BodyText,
@@ -30,6 +31,7 @@ import { z } from "zod";
 
 import { useClientFetcher } from "../client-fetcher";
 import { BackLink } from "@pilates/mobile-core";
+import { ProfilePhotoSection } from "./profile-photo-section";
 
 const profileSchema = z.object({
   name: z.string().trim().min(1, "Escribe tu nombre."),
@@ -39,14 +41,15 @@ const profileSchema = z.object({
 type ProfileValues = z.infer<typeof profileSchema>;
 
 function EditProfileForm({
+  client,
   defaults,
-  email,
   onSaved,
 }: {
+  client: ClientProfileDto;
   defaults: ProfileValues;
-  email: string;
   onSaved: () => void;
 }) {
+  const email = client.email;
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
   const [failed, setFailed] = useState(false);
@@ -89,6 +92,7 @@ function EditProfileForm({
         contentContainerStyle={styles.form}
         keyboardShouldPersistTaps="handled"
       >
+        <ProfilePhotoSection client={client} />
         <Controller
           control={control}
           name="name"
@@ -177,8 +181,8 @@ export function EditProfileScreen() {
     <Screen style={styles.screen}>
       {header}
       <EditProfileForm
+        client={client}
         defaults={{ name: client.name, phone: client.phone ?? "" }}
-        email={client.email}
         onSaved={() => navigation.goBack()}
       />
     </Screen>

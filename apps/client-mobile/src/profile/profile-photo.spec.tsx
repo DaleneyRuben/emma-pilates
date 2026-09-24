@@ -1,3 +1,4 @@
+import type { ClientProfileDto } from "@pilates/api-contracts";
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache, encodeBase64 } from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
@@ -10,7 +11,7 @@ jest.setTimeout(20_000);
 
 const pngBytes = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
 const photoDataUri = `data:image/png;base64,${encodeBase64(pngBytes)}`;
-const withPhoto = { ...profile, photo: { imageAssetId: "asset-1" } };
+const withPhoto: ClientProfileDto = { ...profile, photo: { imageAssetId: "asset-1" } };
 const photoRoutes = {
   "/api/v1/clients/current": () => jsonResponse(withPhoto),
   "/api/v1/clients/current/photo?variant=display": () =>
@@ -67,7 +68,7 @@ describe("Client profile photo", () => {
   it("picks, uploads, and attaches a new photo from Editar perfil", async () => {
     pickedPhoto();
     const calls: string[] = [];
-    let current: typeof profile = profile;
+    let current: ClientProfileDto = profile;
     const screen = await openProfile(
       createClientRuntime(
         routeFetcher({
@@ -120,7 +121,7 @@ describe("Client profile photo", () => {
 
   it("removes the photo and falls back to the initials", async () => {
     let removed = false;
-    let current = withPhoto;
+    let current: ClientProfileDto = withPhoto;
     const screen = await openProfile(
       createClientRuntime(
         routeFetcher({
