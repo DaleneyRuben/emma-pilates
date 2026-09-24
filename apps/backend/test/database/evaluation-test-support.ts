@@ -51,6 +51,8 @@ export const startEvaluationTestWorld =
     await applyDevelopmentFixtures(prisma, {
       fixtures,
       passwordHash: 'not-a-real-hash',
+      // The slot horizon follows this clock, so it must agree with fixtureNow.
+      now: () => new Date('2026-10-15T15:00:00.000Z'),
     });
 
     for (const [key, name, branches] of [
