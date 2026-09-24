@@ -129,7 +129,7 @@ export function CreditsPage({
             aria-label="Total en saldo activo"
             className="flex items-center justify-between gap-3 rounded-control border border-divisor bg-superficie px-3 py-2.5"
           >
-            <h2 className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+            <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
               Total en saldo activo
             </h2>
             <p className="text-celda font-medium text-texto tabular">

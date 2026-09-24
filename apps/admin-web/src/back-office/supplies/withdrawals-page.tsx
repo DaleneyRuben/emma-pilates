@@ -171,7 +171,7 @@ function BranchWithdrawals({
           />
           {query.data.totals.length === 0 ? null : (
             <section className="flex flex-col gap-1 rounded-control border border-divisor bg-superficie px-3 py-2.5">
-              <h2 className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+              <h2 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
                 Consumo del mes
               </h2>
               <p className="text-nota text-texto tabular">
