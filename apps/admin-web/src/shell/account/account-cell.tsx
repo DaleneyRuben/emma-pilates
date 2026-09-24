@@ -39,7 +39,7 @@ export function AccountCell() {
     >
       <span
         aria-hidden="true"
-        className="inline-flex size-[26px] items-center justify-center rounded-full bg-rosa-empolvado font-serif text-[12px] text-blanco"
+        className="inline-flex size-[26px] items-center justify-center rounded-full bg-rosa-empolvado font-serif text-ayuda text-blanco"
       >
         {initials(name)}
       </span>

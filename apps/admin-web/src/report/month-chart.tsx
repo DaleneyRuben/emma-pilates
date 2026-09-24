@@ -26,7 +26,7 @@ function Legend() {
         <li key={label} className="flex items-center gap-1.5">
           <span
             aria-hidden="true"
-            className={cn("size-2.5 rounded-sm", tone)}
+            className={cn("size-2.5 rounded-full", tone)}
           />
           {label}
         </li>
@@ -148,14 +148,14 @@ export function MonthChart({ months }: { months: readonly ReportMonth[] }) {
               <span className="flex items-center gap-1.5">
                 <span
                   aria-hidden="true"
-                  className="size-2 rounded-sm bg-exito"
+                  className="size-2 rounded-full bg-exito"
                 />
                 {`Ingresos ${formatBolivianos(shown.incomeCentavos)}`}
               </span>
               <span className="flex items-center gap-1.5">
                 <span
                   aria-hidden="true"
-                  className="size-2 rounded-sm bg-error"
+                  className="size-2 rounded-full bg-error"
                 />
                 {`Gastos ${formatBolivianos(shown.expensesCentavos)}`}
               </span>

@@ -2,6 +2,7 @@ import type { StaffProfileDto } from "@pilates/api-contracts";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
 import { Separator } from "../../components/ui/separator";
+import { cn } from "../../lib/cn";
 import { useLogout } from "./use-logout";
 
 // Same label the Staff app's Perfil uses (S23): a role, not a status pill.
@@ -62,7 +63,7 @@ export function AccountMenu({
   return (
     <div className="flex flex-col py-2">
       <div className="flex flex-col gap-0.5 px-4 pt-1 pb-3">
-        <span className="text-[14px] font-medium text-texto">
+        <span className="text-celda font-medium text-texto">
           {profile?.name ?? ""}
         </span>
         <span className="text-ayuda text-texto-muy-tenue">
@@ -74,14 +75,14 @@ export function AccountMenu({
       <div className="flex flex-col pt-2">
         <button
           type="button"
-          className={`${rowClass} text-texto`}
+          className={cn(rowClass, "text-texto")}
           onClick={onChangePassword}
         >
           Cambiar contraseña
         </button>
         <button
           type="button"
-          className={`${rowClass} text-error hover:text-error-texto`}
+          className={cn(rowClass, "text-error hover:text-error-texto")}
           onClick={() => setConfirming(true)}
         >
           Cerrar sesión

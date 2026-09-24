@@ -112,7 +112,7 @@ function ClientSummary({ client }: { client: AdminClientDetailDto }) {
             : client.referredClientCount}
         </SummaryRow>
         <SummaryRow label="Código">
-          <span className="rounded-md border border-borde bg-blanco px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
+          <span className="rounded-control border border-borde bg-blanco px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
             {client.referralCode}
           </span>
         </SummaryRow>

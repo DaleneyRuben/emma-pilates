@@ -40,7 +40,7 @@ export function WeekStepper({
       >
         Hoy
       </Button>
-      <p className="font-serif text-[17px] text-texto">
+      <p className="font-serif text-cuerpo-grande text-texto">
         {formatWeekRange(monday)}
       </p>
     </div>

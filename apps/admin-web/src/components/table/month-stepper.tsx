@@ -28,7 +28,7 @@ export function MonthStepper({
       </Button>
       <p
         aria-live="polite"
-        className="min-w-[150px] text-center font-serif text-[17px] text-texto"
+        className="min-w-[150px] text-center font-serif text-cuerpo-grande text-texto"
       >
         {formatMonth(month)}
       </p>
