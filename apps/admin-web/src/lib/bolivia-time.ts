@@ -55,7 +55,7 @@ export function boliviaParts(instant: string | Date): BoliviaParts {
   return {
     date: `${parts.year}-${parts.month}-${parts.day}`,
     time: `${parts.hour}:${parts.minute}`,
-    weekday: weekdays.indexOf(parts.weekday) + 1,
+    weekday: weekdays.indexOf(parts.weekday ?? "") + 1,
     minutes: hours * 60 + minutes,
   };
 }
@@ -89,7 +89,7 @@ export function boliviaInstant(date: string, time: string): string {
 
 const dayMonth = (date: string) => ({
   day: Number(date.slice(8, 10)),
-  month: months[Number(date.slice(5, 7)) - 1],
+  month: months[Number(date.slice(5, 7)) - 1] ?? "",
   year: date.slice(0, 4),
 });
 

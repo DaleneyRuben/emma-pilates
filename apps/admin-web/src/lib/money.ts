@@ -27,7 +27,7 @@ export function parseBolivianos(text: string): number | null {
   }
   const match = /^(\d{1,3}(?:\.\d{3})+|\d+)(?:,(\d{1,2}))?$/.exec(value);
   if (match === null) return null;
-  const whole = Number.parseInt(match[1].replaceAll(".", ""), 10);
+  const whole = Number.parseInt((match[1] ?? "").replaceAll(".", ""), 10);
   const fraction = Number.parseInt((match[2] ?? "0").padEnd(2, "0"), 10);
   return whole * 100 + fraction;
 }
