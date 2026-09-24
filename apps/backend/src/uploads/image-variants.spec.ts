@@ -116,9 +116,9 @@ describe('buildImageVariants', () => {
       'promotion_960',
       'promotion_1440',
     ]);
-    expect(variants.every((variant) => variant.mediaType === 'image/webp')).toBe(
-      true,
-    );
+    expect(
+      variants.every((variant) => variant.mediaType === 'image/webp'),
+    ).toBe(true);
     expect(await dimensions(variants[0].bytes)).toMatchObject({
       width: 480,
       height: 270,
