@@ -44,7 +44,8 @@ type ClientRow = {
   } | null;
 };
 
-const accountStatus = (
+// Shared by every Booking read that shows a Client's Account state.
+export const accountStatus = (
   account: NonNullable<ClientRow['account']>,
 ): ClientAccountStatus => {
   if (account.disabledAt !== null) return 'disabled';

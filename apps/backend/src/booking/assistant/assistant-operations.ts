@@ -1,8 +1,7 @@
 import type { PrismaClient } from '../../generated/prisma/client';
 import { boliviaDate } from '../../time/bolivia-time';
-import type { SubscriptionSummary } from '../catalog/catalog-repository';
 import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
-import type { ClientSubscriptionSummary } from '../client/client-subscription';
+import { toSubscriptionSummary } from '../client/client-subscription';
 import type { PaymentCommands } from '../payments/prisma-payment-commands';
 import {
   listAssistantClientBookings,
@@ -14,20 +13,6 @@ import {
 } from './assistant-clients';
 import type { AssistantClientOperations } from './assistant.controller';
 import { createAssistantClientRepository } from './prisma-assistant-client-repository';
-
-const toSubscriptionSummary = (
-  subscription: SubscriptionSummary | null,
-): ClientSubscriptionSummary | null =>
-  subscription === null
-    ? null
-    : {
-        id: subscription.id,
-        planName: subscription.planNameSnapshot,
-        originalClassAllowance: subscription.originalClassAllowance,
-        remainingClassAllowance: subscription.remainingClassAllowance,
-        startsOn: subscription.startsOn,
-        endsOn: subscription.endsOn,
-      };
 
 // Composes the Assistant use cases over the Booking repositories and the
 // payment commands; every operation receives the authenticated principal.

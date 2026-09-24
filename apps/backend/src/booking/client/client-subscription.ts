@@ -1,4 +1,5 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import type { SubscriptionSummary } from '../catalog/catalog-repository';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 
 export type ClientSubscriptionSummary = {
@@ -9,6 +10,20 @@ export type ClientSubscriptionSummary = {
   startsOn: Date;
   endsOn: Date;
 };
+
+export const toSubscriptionSummary = (
+  subscription: SubscriptionSummary | null,
+): ClientSubscriptionSummary | null =>
+  subscription === null
+    ? null
+    : {
+        id: subscription.id,
+        planName: subscription.planNameSnapshot,
+        originalClassAllowance: subscription.originalClassAllowance,
+        remainingClassAllowance: subscription.remainingClassAllowance,
+        startsOn: subscription.startsOn,
+        endsOn: subscription.endsOn,
+      };
 
 export type ClientSubscriptionStatus =
   'active' | 'expiring_soon' | 'expired' | 'none';
