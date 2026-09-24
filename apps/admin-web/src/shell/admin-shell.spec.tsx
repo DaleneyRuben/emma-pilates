@@ -70,12 +70,14 @@ describe("admin shell", () => {
       ).not.toHaveAttribute("aria-current");
     });
 
-    it("keeps the wordmark, the Branch cell, and the account cell in the top bar", async () => {
+    it("draws the wordmark once, in the sidebar cell, and keeps the Branch and account cells in the top bar", async () => {
       renderShell("/");
       await heading("Horario");
 
+      // design/README.md: the "Emma" wordmark sits in the 236 px cell.
+      expect(screen.getAllByText("Emma")).toHaveLength(1);
       const topBar = screen.getByRole("banner");
-      expect(within(topBar).getByText("Emma")).toBeInTheDocument();
+      expect(within(topBar).queryByText("Emma")).not.toBeInTheDocument();
       expect(
         await within(topBar).findByRole("button", { name: "Sucursal Centro" }),
       ).toHaveAttribute("aria-expanded", "false");
@@ -84,6 +86,13 @@ describe("admin shell", () => {
           name: "Tu cuenta: Paola Mendoza",
         }),
       ).toBeInTheDocument();
+    });
+
+    it("paints the main area in Superficie, as the handoff draws it", async () => {
+      renderShell("/");
+      await heading("Horario");
+
+      expect(screen.getByRole("main")).toHaveClass("bg-superficie");
     });
 
     it("switches the Branch from the selector without leaving the page or asking to confirm", async () => {
@@ -294,6 +303,10 @@ describe("admin shell", () => {
       expect(
         screen.queryByRole("navigation", { name: "Secciones" }),
       ).not.toBeInTheDocument();
+      // Without the sidebar cell, the top bar carries the one wordmark.
+      expect(
+        within(screen.getByRole("banner")).getByText("Emma"),
+      ).toBeInTheDocument();
 
       await user.click(screen.getByRole("button", { name: "Abrir menú" }));
 
