@@ -60,6 +60,32 @@ describe('UploadsController', () => {
     });
   });
 
+  it('accepts the admin web session credential the cookie middleware sets (ADR-0084)', async () => {
+    createPendingUpload.mockResolvedValue({
+      id: 'asset-id',
+      pendingObjectKey: 'pending/promotion/asset-id',
+      expiresAt: new Date('2026-09-21T12:15:00.000Z'),
+    });
+
+    await expect(
+      controller.create(
+        'AdminSession AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+        {
+          purpose: 'promotion',
+          mediaType: 'image/jpeg',
+          byteSize: 1_000,
+          checksum: Buffer.alloc(32).toString('base64'),
+        },
+      ),
+    ).resolves.toMatchObject({ id: 'asset-id' });
+
+    expect(resolvePrincipal).toHaveBeenCalledWith(
+      'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+      true,
+      'admin_web',
+    );
+  });
+
   it('requires authentication to create a pending upload', async () => {
     await expect(
       controller.create(undefined, {
@@ -157,7 +183,9 @@ describe('UploadsController', () => {
       mediaType: 'image/jpeg',
     });
 
-    await expect(controller.status(imageAssetId, validAuthorization)).resolves.toEqual({
+    await expect(
+      controller.status(imageAssetId, validAuthorization),
+    ).resolves.toEqual({
       id: imageAssetId,
       state: 'ready',
       mediaType: 'image/jpeg',
@@ -165,11 +193,15 @@ describe('UploadsController', () => {
     expect(readUploadStatus).toHaveBeenCalledWith(imageAssetId, 'account-id');
 
     readUploadStatus.mockResolvedValue(null);
-    await expect(controller.status(imageAssetId, validAuthorization)).rejects.toMatchObject({
+    await expect(
+      controller.status(imageAssetId, validAuthorization),
+    ).rejects.toMatchObject({
       status: 404,
       response: { code: 'upload_not_found' },
     });
-    await expect(controller.status('nope', validAuthorization)).rejects.toMatchObject({
+    await expect(
+      controller.status('nope', validAuthorization),
+    ).rejects.toMatchObject({
       status: 400,
     });
   });
