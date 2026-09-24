@@ -9,6 +9,7 @@ import { ListFilter } from "../../components/table/list-filter";
 import { StatusPill } from "../../components/ui/status-pill";
 import { staffRoles, type StaffRole, type StaffSearch } from "../people-search";
 import { branchNames, roleLabels, statusPills } from "./staff-format";
+import { StaffPanelForm } from "./staff-panel";
 import { staffTableQueryOptions } from "./staff-queries";
 
 const roleOptions: { value: StaffSearch["role"]; label: string }[] = [
@@ -112,7 +113,9 @@ export function StaffPage({
       onPageChange={(page) => onSearchChange({ page })}
       query={query}
       columns={staffColumns(names)}
-      renderForm={() => null}
+      renderForm={(member, done) => (
+        <StaffPanelForm member={member} onDone={done} />
+      )}
     />
   );
 }

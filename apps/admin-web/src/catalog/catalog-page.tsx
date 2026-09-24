@@ -4,6 +4,7 @@ import { Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
 import { PageHeader } from "../components/page/page-header";
+import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { SidePanel } from "../components/panel/side-panel";
 import { DataTable } from "../components/table/data-table";
@@ -28,7 +29,11 @@ type CatalogPageProps<Row extends { id: string }> = {
   query: UseQueryResult<{ items: Row[]; totalItems: number }>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- each accessor column carries its own value type.
   columns: (open: (row: Row) => void) => ColumnDef<Row, any>[];
-  renderForm: (row: Row | undefined, done: () => void) => ReactNode;
+  /** `done` closes the panel; a message becomes the page notice. */
+  renderForm: (
+    row: Row | undefined,
+    done: (notice?: string) => void,
+  ) => ReactNode;
 };
 
 type PanelState<Row> = { open: false } | { open: true; row?: Row };
@@ -56,8 +61,16 @@ export function CatalogPage<Row extends { id: string }>({
   renderForm,
 }: CatalogPageProps<Row>) {
   const [panel, setPanel] = useState<PanelState<Row>>({ open: false });
-  const open = (row: Row) => setPanel({ open: true, row });
+  const [notice, setNotice] = useState<string | null>(null);
+  const open = (row?: Row) => {
+    setNotice(null);
+    setPanel({ open: true, row });
+  };
   const close = () => setPanel({ open: false });
+  const done = (message?: string) => {
+    close();
+    setNotice(message ?? null);
+  };
 
   return (
     <article className="flex flex-col gap-5">
@@ -66,7 +79,7 @@ export function CatalogPage<Row extends { id: string }>({
         subtitle={subtitle}
         actions={
           createLabel === undefined || isForbidden(query.error) ? undefined : (
-            <Button onClick={() => setPanel({ open: true })}>
+            <Button onClick={() => open()}>
               <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
               {createLabel}
             </Button>
@@ -74,6 +87,7 @@ export function CatalogPage<Row extends { id: string }>({
         }
       />
       {filter}
+      {notice === null ? null : <PageNotice>{notice}</PageNotice>}
       {query.isPending ? (
         <LoadingNotice>{loadingMessage}</LoadingNotice>
       ) : query.isError ? (
@@ -113,7 +127,7 @@ export function CatalogPage<Row extends { id: string }>({
       >
         {panel.open ? (
           <div key={panel.row?.id ?? "new"} className="flex flex-1 flex-col">
-            {renderForm(panel.row, close)}
+            {renderForm(panel.row, done)}
           </div>
         ) : null}
       </SidePanel>
