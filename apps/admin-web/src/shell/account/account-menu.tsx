@@ -37,6 +37,8 @@ function LogoutConfirmation({ onCancel }: { onCancel: () => void }) {
         variant="link"
         size="sm"
         className="self-center"
+        // The row that opened this is gone; focus lands on the way back.
+        autoFocus
         onClick={onCancel}
       >
         Cancelar
@@ -55,9 +57,17 @@ export function AccountMenu({
   onChangePassword: () => void;
 }) {
   const [confirming, setConfirming] = useState(false);
+  const [cancelled, setCancelled] = useState(false);
 
   if (confirming) {
-    return <LogoutConfirmation onCancel={() => setConfirming(false)} />;
+    return (
+      <LogoutConfirmation
+        onCancel={() => {
+          setConfirming(false);
+          setCancelled(true);
+        }}
+      />
+    );
   }
 
   return (
@@ -83,6 +93,8 @@ export function AccountMenu({
         <button
           type="button"
           className={cn(rowClass, "text-error hover:text-error-texto")}
+          // Back from the confirmation, focus returns to the row it left.
+          autoFocus={cancelled}
           onClick={() => setConfirming(true)}
         >
           Cerrar sesión
