@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { StaffMemberDto } from "@pilates/api-contracts";
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import {
@@ -17,6 +18,8 @@ import {
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { currentSessionQueryOptions } from "../../session/session-queries";
+import { StaffEditForm } from "./staff-edit-form";
 import {
   emptyStaffForm,
   staffFormSchema,
@@ -25,6 +28,7 @@ import {
 } from "./staff-form-schema";
 import { staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
+import { StaffReadOnly } from "./staff-read-only";
 import { StaffRoleFields } from "./staff-role-fields";
 
 const contactFields = [
@@ -40,12 +44,7 @@ const helpers: Partial<Record<keyof StaffFormInput, string>> = {
 
 // AW24 create with follow-up 35: the new person gets an emailed Activation
 // Link; nobody sees or relays a password.
-export function StaffPanelForm({
-  onDone,
-}: {
-  member: StaffMemberDto | undefined;
-  onDone: (notice?: string) => void;
-}) {
+function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
   const change = useStaffChange();
   const [failure, setFailure] = useState<string | null>(null);
   const form = useForm<StaffFormInput, unknown, StaffFormOutput>({
@@ -113,4 +112,37 @@ export function StaffPanelForm({
       </form>
     </Form>
   );
+}
+
+export function StaffPanelForm({
+  member,
+  onDone,
+}: {
+  member: StaffMemberDto | undefined;
+  onDone: (notice?: string) => void;
+}) {
+  const { data: principal } = useQuery(currentSessionQueryOptions());
+  const ownStaffMemberId =
+    principal?.identity.kind === "staff"
+      ? principal.identity.staffMemberId
+      : undefined;
+
+  if (member === undefined) return <StaffCreateForm onDone={onDone} />;
+  if (member.id === ownStaffMemberId) {
+    return (
+      <StaffReadOnly
+        member={member}
+        note="Es tu cuenta: no puedes cambiar tu rol ni desactivarla desde aquí."
+      />
+    );
+  }
+  if (member.status === "deactivated") {
+    return (
+      <StaffReadOnly
+        member={member}
+        note="Esta cuenta está desactivada: ya no puede entrar."
+      />
+    );
+  }
+  return <StaffEditForm member={member} onDone={onDone} />;
 }
