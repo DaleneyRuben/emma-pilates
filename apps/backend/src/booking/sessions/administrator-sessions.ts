@@ -5,6 +5,7 @@ export type AdministratorSessionQuery = {
   from: Date;
   until: Date;
   limit: number;
+  branchId?: string;
 };
 
 // API-002: Administrators act on the schedule across every Branch, so their

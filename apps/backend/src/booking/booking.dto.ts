@@ -93,6 +93,17 @@ export class SessionAvailabilityDto {
   waitlistCount!: number;
 }
 
+// The Administrator's projection (API-002, WEB-003): the same Session plus
+// the weekly schedule that generated it, so an edit can offer "Esta y las
+// futuras", and whether it is already an exception.
+export class AdministratorSessionAvailabilityDto extends SessionAvailabilityDto {
+  @ApiProperty({ type: String, format: 'uuid', nullable: true })
+  sessionScheduleId!: string | null;
+
+  @ApiProperty()
+  isException!: boolean;
+}
+
 export class TrainerScheduleSessionDto {
   @ApiProperty({ format: 'uuid' })
   sessionId!: string;
@@ -206,6 +217,7 @@ const administratorSessionQuerySchema = z
     from: z.iso.datetime(),
     until: z.iso.datetime(),
     limit: z.coerce.number().int().min(1).max(100).default(50),
+    branchId: z.uuid().optional(),
   })
   .refine(({ from, until }) => new Date(from) < new Date(until), {
     message: 'until must be after from',
@@ -213,13 +225,16 @@ const administratorSessionQuerySchema = z
 
 export const parseAdministratorSessionQuery = (
   value: unknown,
-): { from: Date; until: Date; limit: number } | null => {
+): { from: Date; until: Date; limit: number; branchId?: string } | null => {
   const result = administratorSessionQuerySchema.safeParse(value);
   if (!result.success) return null;
   return {
     from: new Date(result.data.from),
     until: new Date(result.data.until),
     limit: result.data.limit,
+    ...(result.data.branchId === undefined
+      ? {}
+      : { branchId: result.data.branchId }),
   };
 };
 

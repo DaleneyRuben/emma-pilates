@@ -33,11 +33,12 @@ import {
 } from '../../system-identity/authentication/bearer-principal';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
+  AdministratorSessionAvailabilityDto,
   parseAdministratorSessionQuery,
   parseUuid,
-  SessionAvailabilityDto,
 } from '../booking.dto';
 import type { SessionCancellationResult } from '../commands/cancel-session';
+import type { AdministratorSessionQuery } from '../sessions/administrator-sessions';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import {
   PaymentDto,
@@ -55,9 +56,9 @@ export const cancelSessionCommand = Symbol('cancelSessionCommand');
 export const administratorSessionSearch = Symbol('administratorSessionSearch');
 
 export type AdministratorSessionSearch = (
-  query: { from: Date; until: Date; limit: number },
+  query: AdministratorSessionQuery,
   principal: AuthenticatedPrincipal,
-) => Promise<SessionAvailabilityDto[]>;
+) => Promise<AdministratorSessionAvailabilityDto[]>;
 
 // The uploads storage port, narrowed to what receipt viewing needs.
 export type ReceiptObjectStorage = { get(key: string): Promise<Buffer> };
@@ -217,12 +218,13 @@ export class AdministratorSessionsController {
   @ApiQuery({ name: 'from', required: true, format: 'date-time' })
   @ApiQuery({ name: 'until', required: true, format: 'date-time' })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  @ApiOkResponse({ type: SessionAvailabilityDto, isArray: true })
+  @ApiQuery({ name: 'branchId', required: false, schema: { format: 'uuid' } })
+  @ApiOkResponse({ type: AdministratorSessionAvailabilityDto, isArray: true })
   @Header('Cache-Control', 'no-store')
   async search(
     @Headers('authorization') authorization: string | undefined,
     @Query() query: unknown,
-  ): Promise<SessionAvailabilityDto[]> {
+  ): Promise<AdministratorSessionAvailabilityDto[]> {
     const parsed = parseAdministratorSessionQuery(query);
     if (parsed === null) throw invalidRequest('Invalid Session search');
     const principal = await authenticateBearer(
