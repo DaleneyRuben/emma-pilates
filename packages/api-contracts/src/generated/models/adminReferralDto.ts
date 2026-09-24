@@ -9,6 +9,8 @@ import type { AdminReferralDtoState } from "./adminReferralDtoState";
 export interface AdminReferralDto {
   referralId: string;
   referrerName: string;
+  /** Every Referral of the referrer, searched or not */
+  referrerReferralCount: number;
   referredName: string;
   registeredAt: string;
   /** @nullable */

@@ -11,4 +11,8 @@ export interface AdminReferralPageDto {
   page: number;
   pageSize: number;
   totalItems: number;
+  /** The studio's awarded Referrals, whatever the search */
+  awardedCount: number;
+  /** The studio's pending Referrals, whatever the search */
+  pendingCount: number;
 }

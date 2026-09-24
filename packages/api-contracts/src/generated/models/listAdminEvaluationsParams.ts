@@ -8,6 +8,10 @@
 export type ListAdminEvaluationsParams = {
   pageSize?: number;
   page?: number;
+  /**
+   * Only the Evaluations held at this Branch
+   */
+  branchId?: unknown;
   nutritionistStaffMemberId?: unknown;
   until: unknown;
   from: unknown;

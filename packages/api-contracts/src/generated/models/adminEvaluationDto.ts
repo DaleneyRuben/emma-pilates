@@ -4,13 +4,17 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { AdminEvaluationDtoKind } from "./adminEvaluationDtoKind";
 
 export interface AdminEvaluationDto {
   evaluationId: string;
   clientName: string;
   nutritionistStaffMemberId: string;
   nutritionistName: string;
+  branchId: string;
   branchName: string;
   startsAt: string;
   endsAt: string;
+  /** Derived from the Client's earlier booked Evaluations */
+  kind: AdminEvaluationDtoKind;
 }

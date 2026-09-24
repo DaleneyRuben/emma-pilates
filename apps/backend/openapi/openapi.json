@@ -2649,6 +2649,15 @@
             }
           },
           {
+            "name": "branchId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            },
+            "description": "Only the Evaluations held at this Branch"
+          },
+          {
             "name": "nutritionistStaffMemberId",
             "required": false,
             "in": "query",
@@ -7351,6 +7360,10 @@
           "nutritionistName": {
             "type": "string"
           },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
           "branchName": {
             "type": "string"
           },
@@ -7361,6 +7374,14 @@
           "endsAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "first",
+              "follow_up"
+            ],
+            "description": "Derived from the Client's earlier booked Evaluations"
           }
         },
         "required": [
@@ -7368,9 +7389,11 @@
           "clientName",
           "nutritionistStaffMemberId",
           "nutritionistName",
+          "branchId",
           "branchName",
           "startsAt",
-          "endsAt"
+          "endsAt",
+          "kind"
         ]
       },
       "AdminEvaluationPageDto": {
@@ -7409,6 +7432,10 @@
           "referrerName": {
             "type": "string"
           },
+          "referrerReferralCount": {
+            "type": "number",
+            "description": "Every Referral of the referrer, searched or not"
+          },
           "referredName": {
             "type": "string"
           },
@@ -7432,6 +7459,7 @@
         "required": [
           "referralId",
           "referrerName",
+          "referrerReferralCount",
           "referredName",
           "registeredAt",
           "awardedAt",
@@ -7455,13 +7483,23 @@
           },
           "totalItems": {
             "type": "number"
+          },
+          "awardedCount": {
+            "type": "number",
+            "description": "The studio's awarded Referrals, whatever the search"
+          },
+          "pendingCount": {
+            "type": "number",
+            "description": "The studio's pending Referrals, whatever the search"
           }
         },
         "required": [
           "items",
           "page",
           "pageSize",
-          "totalItems"
+          "totalItems",
+          "awardedCount",
+          "pendingCount"
         ]
       },
       "AdminCreditBalanceDto": {
@@ -7481,13 +7519,24 @@
           "lastMovementAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "lastMovementKind": {
+            "type": "string",
+            "enum": [
+              "earned",
+              "reserved",
+              "spent",
+              "returned"
+            ],
+            "description": "The last ledger entry: a Referral award, a reservation for an open purchase, its spend at confirmation, or its release"
           }
         },
         "required": [
           "clientId",
           "clientName",
           "availableCentavos",
-          "lastMovementAt"
+          "lastMovementAt",
+          "lastMovementKind"
         ]
       },
       "AdminCreditPageDto": {
