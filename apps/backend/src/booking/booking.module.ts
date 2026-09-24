@@ -141,6 +141,7 @@ import { createPrismaCatalogLists } from './administration/prisma-catalog-lists'
 import { createPrismaOversight } from './administration/prisma-oversight';
 import { createPrismaScheduleAdministration } from './administration/prisma-schedule-administration';
 import { adminWebReads } from './admin-web-reads';
+import { receiptReadProvider } from './payments/prisma-receipt-read';
 
 const bookingPrisma = Symbol('bookingPrisma');
 
@@ -620,6 +621,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
       useFactory: (prisma: PrismaClient) => createPrismaCatalogLists(prisma),
     },
     ...adminWebReads.providers(bookingPrisma),
+    receiptReadProvider(bookingPrisma),
     {
       provide: BookingRuntimeCleanup,
       inject: [bookingPrisma],

@@ -52,6 +52,7 @@ import { paymentCommands, runPaymentCommand } from './payments.controller';
 import type { PaymentCommands } from './prisma-payment-commands';
 
 export const receiptObjectStorage = Symbol('receiptObjectStorage');
+export const receiptRead = Symbol('receiptRead');
 export const cancelSessionCommand = Symbol('cancelSessionCommand');
 export const administratorSessionSearch = Symbol('administratorSessionSearch');
 
@@ -62,6 +63,17 @@ export type AdministratorSessionSearch = (
 
 // The uploads storage port, narrowed to what receipt viewing needs.
 export type ReceiptObjectStorage = { get(key: string): Promise<Buffer> };
+
+const receiptVariants = ['readable', 'thumbnail'] as const;
+type ReceiptVariant = (typeof receiptVariants)[number];
+export type ReceiptReadHandler = (
+  command: { paymentId: string; variant: ReceiptVariant },
+  principal: AuthenticatedPrincipal,
+) => Promise<{ objectKey: string; mediaType: string }>;
+
+const isReceiptVariant = (value: unknown): value is ReceiptVariant =>
+  typeof value === 'string' &&
+  (receiptVariants as readonly string[]).includes(value);
 
 export type CancelSessionHandler = (
   command: { sessionId: string },
@@ -87,6 +99,7 @@ export class AdministratorPaymentsController {
     @Inject(paymentCommands) private readonly commands: PaymentCommands,
     @Inject(receiptObjectStorage)
     private readonly storage: ReceiptObjectStorage,
+    @Inject(receiptRead) private readonly readReceipt: ReceiptReadHandler,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
   ) {}
@@ -130,24 +143,33 @@ export class AdministratorPaymentsController {
     };
   }
 
+  // UPL-002: `readable` fits AW29's enlarged viewer and S12's zoom, so it is
+  // the default both keep; `thumbnail` fits the 408 px panel.
   @Get(':paymentId/receipt')
   @ApiOperation({ operationId: 'getPaymentReceipt' })
   @ApiParam({ name: 'paymentId', format: 'uuid' })
+  @ApiQuery({ name: 'variant', required: false, enum: receiptVariants })
   @ApiProduces('image/jpeg', 'image/png', 'image/webp')
   @ApiOkResponse({ schema: { type: 'string', format: 'binary' } })
   async receipt(
     @Param('paymentId') paymentId: string,
+    @Query('variant') variant: string | undefined,
     @Headers('authorization') authorization: string | undefined,
     @Res({ passthrough: true }) response: Response,
   ): Promise<StreamableFile> {
     const id = requireUuid(paymentId, 'Invalid Payment identifier');
+    const chosen = variant ?? 'readable';
+    if (!isReceiptVariant(chosen)) {
+      throw invalidRequest('Invalid receipt variant');
+    }
     const principal = await this.authenticate(authorization);
     const receipt = await runPaymentCommand(() =>
-      this.commands.readReceiptObject({ paymentId: id }, principal),
+      this.readReceipt({ paymentId: id, variant: chosen }, principal),
     );
     const bytes = await this.storage.get(receipt.objectKey);
     response.setHeader('Content-Type', receipt.mediaType);
     response.setHeader('Cache-Control', 'no-store');
+    response.setHeader('X-Content-Type-Options', 'nosniff');
     return new StreamableFile(bytes);
   }
 

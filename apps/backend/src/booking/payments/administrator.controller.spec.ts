@@ -43,14 +43,15 @@ describe('AdministratorPaymentsController', () => {
   const commands = {
     listPendingPayments: jest.fn(),
     readPaymentReview: jest.fn(),
-    readReceiptObject: jest.fn(),
     confirmTransfer: jest.fn(),
     rejectTransfer: jest.fn(),
   };
   const storage = { get: jest.fn() };
+  const readReceiptObject = jest.fn();
   const controller = new AdministratorPaymentsController(
     commands as never,
     storage,
+    readReceiptObject,
     resolvePrincipal,
   );
 
@@ -86,29 +87,46 @@ describe('AdministratorPaymentsController', () => {
   });
 
   it('streams the receipt object without caching', async () => {
-    commands.readReceiptObject.mockResolvedValue({
+    readReceiptObject.mockResolvedValue({
       objectKey: 'pending/transfer_receipt/x',
       mediaType: 'image/png',
     });
     storage.get.mockResolvedValue(Buffer.from('png'));
     const response = { setHeader: jest.fn() };
 
-    const file = await controller.receipt(paymentId, bearer, response as never);
+    const file = await controller.receipt(
+      paymentId,
+      undefined,
+      bearer,
+      response as never,
+    );
 
     expect(storage.get).toHaveBeenCalledWith('pending/transfer_receipt/x');
-    expect(response.setHeader).toHaveBeenCalledWith('Content-Type', 'image/png');
-    expect(response.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store');
+    expect(response.setHeader).toHaveBeenCalledWith(
+      'Content-Type',
+      'image/png',
+    );
+    expect(response.setHeader).toHaveBeenCalledWith(
+      'Cache-Control',
+      'no-store',
+    );
     expect(file.getStream().read().toString()).toBe('png');
   });
 
   it('confirms and rejects with normalized reasons', async () => {
-    commands.confirmTransfer.mockResolvedValue({ ...review, state: 'confirmed' });
+    commands.confirmTransfer.mockResolvedValue({
+      ...review,
+      state: 'confirmed',
+    });
     commands.rejectTransfer.mockResolvedValue({ ...review, state: 'rejected' });
 
     await expect(controller.confirm(paymentId, bearer)).resolves.toMatchObject({
       state: 'confirmed',
     });
-    expect(commands.confirmTransfer).toHaveBeenCalledWith({ paymentId }, administrator);
+    expect(commands.confirmTransfer).toHaveBeenCalledWith(
+      { paymentId },
+      administrator,
+    );
     await expect(
       controller.reject(paymentId, bearer, { reason: 'El monto no coincide.' }),
     ).resolves.toMatchObject({ state: 'rejected' });
@@ -121,7 +139,10 @@ describe('AdministratorPaymentsController', () => {
   it('rejects an empty reason and maps rule conflicts and denied access', async () => {
     await expect(
       controller.reject(paymentId, bearer, { reason: '   ' }),
-    ).rejects.toMatchObject({ status: 400, response: { code: 'invalid_request' } });
+    ).rejects.toMatchObject({
+      status: 400,
+      response: { code: 'invalid_request' },
+    });
     commands.confirmTransfer.mockRejectedValue(
       new PaymentRuleError('payment_confirmation_conflict', 'already rejected'),
     );
@@ -129,7 +150,9 @@ describe('AdministratorPaymentsController', () => {
       status: 409,
       response: { code: 'payment_confirmation_conflict' },
     });
-    commands.listPendingPayments.mockRejectedValue(new BookingAccessDeniedError());
+    commands.listPendingPayments.mockRejectedValue(
+      new BookingAccessDeniedError(),
+    );
     await expect(controller.pending(bearer)).rejects.toMatchObject({
       status: 403,
       response: { code: 'booking_access_denied' },

@@ -82,7 +82,6 @@ describe('Administrator receipt read (PostgreSQL)', () => {
         declaredMediaType: 'PNG',
         declaredByteSize: 1234,
         declaredChecksum: toPrismaBytes(Buffer.alloc(32, 1)),
-        verifiedMediaType: 'PNG',
         createdAt: openedAt,
         expiresAt: new Date(openedAt.getTime() + 15 * 60 * 1_000),
         finalizedAt: openedAt,
