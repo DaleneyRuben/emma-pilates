@@ -1,9 +1,15 @@
 import {
+  getGetExpenseReportQueryKey,
+  getListAdminSalaryPaymentsQueryKey,
   getListAdminSuppliesQueryKey,
   getListAdminWithdrawalsQueryKey,
+  getListStaffMembersQueryKey,
 } from "@pilates/api-contracts";
 import { QueryClient } from "@tanstack/react-query";
-import { refreshAfterSupplyChange } from "./back-office-cache";
+import {
+  refreshAfterSalaryPayment,
+  refreshAfterSupplyChange,
+} from "./back-office-cache";
 
 const centro = "0b6f6f2e-1d38-5a52-9d44-7a0cf0a1c001";
 const equipetrol = "0b6f6f2e-1d38-5a52-9d44-7a0cf0a1c002";
@@ -100,5 +106,36 @@ describe("the cache after a Supply change", () => {
       kind: "restock",
     });
     expect(invalidated(queryClient, supplyKeys)).toEqual(["equipetrolList"]);
+  });
+});
+
+const range = {
+  from: "2026-09-01T04:00:00.000Z",
+  until: "2026-10-01T04:00:00.000Z",
+};
+const payrollKeys = {
+  payroll: getListAdminSalaryPaymentsQueryKey({ page: 1, pageSize: 20 }),
+  emmaPayroll: getListAdminSalaryPaymentsQueryKey({
+    page: 1,
+    pageSize: 20,
+    staffMemberId: "7cde0ef6-5eb1-568d-ace7-938c98ee0a02",
+  }),
+  studioReport: getGetExpenseReportQueryKey(range),
+  centroReport: getGetExpenseReportQueryKey({ ...range, branchId: centro }),
+  staff: getListStaffMembersQueryKey({ page: 1, pageSize: 100 }),
+  centroList: supplyKeys.centroList,
+} as const;
+
+describe("the cache after a Salary Payment", () => {
+  it("refreshes the payroll lists and only the all-Branches expense report", async () => {
+    const queryClient = seeded(payrollKeys);
+    await refreshAfterSalaryPayment(queryClient);
+    // Salary Payments are studio-wide and count only without a Branch
+    // (CONTEXT-MAP, BKO-001 Q3).
+    expect(invalidated(queryClient, payrollKeys)).toEqual([
+      "emmaPayroll",
+      "payroll",
+      "studioReport",
+    ]);
   });
 });
