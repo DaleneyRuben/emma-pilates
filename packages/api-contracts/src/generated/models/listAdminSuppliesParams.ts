@@ -4,7 +4,11 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ListAdminSuppliesStatus } from "./listAdminSuppliesStatus";
 
 export type ListAdminSuppliesParams = {
+  pageSize?: number;
+  page?: number;
+  status?: ListAdminSuppliesStatus;
   branchId: unknown;
 };

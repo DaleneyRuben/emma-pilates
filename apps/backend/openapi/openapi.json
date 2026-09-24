@@ -4358,6 +4358,35 @@
         "operationId": "listAdminSupplies",
         "parameters": [
           {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "active",
+                "archived",
+                "all"
+              ],
+              "type": "string"
+            }
+          },
+          {
             "name": "branchId",
             "required": true,
             "in": "query",
@@ -4372,10 +4401,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AdminSupplyDto"
-                  }
+                  "$ref": "#/components/schemas/AdminSupplyPageDto"
                 }
               }
             }
@@ -9224,6 +9250,37 @@
           "lowStockThreshold",
           "lowStock",
           "archivedAt"
+        ]
+      },
+      "AdminSupplyPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminSupplyDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          },
+          "lowStockCount": {
+            "type": "number",
+            "description": "Active Supplies of the Branch at or below their threshold, on every page"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems",
+          "lowStockCount"
         ]
       },
       "SupplyInputDto": {

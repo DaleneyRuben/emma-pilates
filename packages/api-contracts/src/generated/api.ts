@@ -42,6 +42,7 @@ import type {
   AdminSessionDto,
   AdminSessionScheduleDto,
   AdminSupplyDto,
+  AdminSupplyPageDto,
   AdminWebPasswordRecoveryResultDto,
   AdministratorSessionAvailabilityDto,
   AssistantCashPaymentDto,
@@ -17326,7 +17327,7 @@ export const useEndAvailabilityBlock = <TError = unknown, TContext = unknown>(
 };
 
 export type listAdminSuppliesResponse200 = {
-  data: AdminSupplyDto[];
+  data: AdminSupplyPageDto;
   status: 200;
 };
 
