@@ -96,7 +96,10 @@ describe("AW08 Insumos on a desktop browser", () => {
     ]);
     expect(
       screen.getByRole("link", { name: "Ver historial de retiros" }),
-    ).toHaveAttribute("href", "/back-office/insumos/retiros");
+    ).toHaveAttribute(
+      "href",
+      "/back-office/insumos/retiros?page=1&pageSize=20",
+    );
     expect(screen.getByText("Sucursal Centro · ningún insumo con stock bajo"));
   });
 
