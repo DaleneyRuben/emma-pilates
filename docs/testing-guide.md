@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25) | People, Payments, Promotions, Back Office, oversight lists, and the report are still placeholders (WEB-004 onward); valid activation and recovery links still cannot be read from the local email capture |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26) | Payments, Promotions, Back Office, oversight lists, and the report are still placeholders (WEB-005 onward); valid activation and recovery links still cannot be read from the local email capture |
 
 ## Before you begin
 
@@ -1283,8 +1283,9 @@ gone a few seconds later. The worker logs only a sanitized
 
 ## Test 17: manage Staff Members as the Administrator (API)
 
-The admin web is not built yet, so try these through Swagger or curl as
-`paola.mendoza@example.com` (Test 3 shows how to log in and authorize):
+The admin web now does all of this on the Personal page (Test 26); to try
+the API directly, use Swagger or curl as `paola.mendoza@example.com` (Test 3
+shows how to log in and authorize):
 
 1. `GET /api/v1/administrator/staff-members` lists every Staff Member with
    `page`, `pageSize` (up to 100), and optional `role`, `branchId`, and
@@ -1601,6 +1602,63 @@ shown elsewhere stay Bolivia dates and 24-hour times. The changes you make stay
 in `pilates_dev_sim`; run the fixtures command again to restore the fixture
 Accounts and catalog (it does not remove Sessions or schedules you created).
 
+## Test 26: look up Clients and manage Staff Members in the admin web
+
+Start the backend on `pilates_dev_sim` after loading the fixtures and start
+the admin web, exactly as Test 24 describes, and log in as
+`paola.mendoza@example.com` / `emma-local-2026`.
+
+1. **Clientes.** Back Office → **Clientes** lists every Client of the studio,
+   read-only: no **+ Nuevo** button, because accounts are born in the Staff app
+   or by registration. The subtitle counts them in the feminine ("6 clientas ·
+   5 con plan activo") and the footer says "Mostrando 6 de 6 clientas". Each
+   row shows the name, the email and phone, the current Plan (or "Sin plan
+   activo"), and **Activo**, **Expirado** (had a Plan before), or **Sin plan**
+   (never bought one). The Branch selector says this page is not filtered by
+   Branch.
+2. **Search.** Type in **Buscar por nombre, correo o teléfono**: after a
+   moment the address gains `?q=…` and the table shows the matches. Accents
+   and capitals do not matter ("guzman" finds Sofía Guzmán). A search that
+   matches no one keeps the table header and says "No se encontró ninguna
+   clienta.", "Revisa cómo escribiste el nombre o el teléfono.", and where
+   accounts come from, with "Mostrando 0 de 6 clientas" and both page buttons
+   disabled.
+3. **Detalle de cliente.** Click a Client: the side panel (the whole screen on
+   a phone) shows "Cliente desde dd/mm/aaaa", the contact, the Plan with its
+   dates and remaining classes ("5 de 8"), the Credit as `Bs 0,00`, how many
+   Clients she referred, and her referral code. Without an active Plan the
+   block reads "Sin plan activo", plus "Último plan vencido el dd/mm/aaaa." if
+   she had one. A Client invited from the Staff app who has not created her
+   password yet shows **Pendiente de activación**. Nothing here is editable.
+4. **Personal.** Back Office → **Personal** lists every Staff Member with the
+   Role as a plain label (Entrenador, Asistente, Administrador, Nutricionista),
+   the contact, the Branches ("Todas" for an Administrator), and **Activo**,
+   **Pendiente**, or **Desactivado**. The **Rol** filter shows one Role at a
+   time and stays in the address (`?role=trainer`).
+5. **Nuevo miembro.** **+ Nuevo miembro** opens the 408 px panel: Nombre,
+   Correo electrónico ("Le enviaremos un enlace de activación a este correo.
+   Vence en 7 días."), Teléfono (opcional), the four Roles as a 2×2 choice, and
+   the Branches as chips. Choosing **Administrador** replaces the chips with
+   "Todas las sucursales (implícito por el rol)". **Guardar** with empty fields
+   marks each one; an email that already has an Account is marked on its
+   field. Saving closes the panel and says "Invitación enviada a …: tiene 7
+   días para activar su cuenta."; there is never a temporary password.
+6. **Editar miembro.** Click a Staff Member. The name, email, and phone are
+   read-only. Change the Role or the Branches and **Guardar**: the page says
+   "Guardamos los cambios de …". A Trainer who still leads upcoming Sessions
+   (Emma Vargas) keeps her Branch and the panel explains to swap her in
+   Horario first. A pending member shows when the link expires and
+   **Reenviar enlace**; a second resend within a minute says it is too soon.
+   **Desactivar cuenta** asks first and then signs the person out everywhere.
+   Your own account and a deactivated one open read-only.
+7. **Horario follows.** After a Staff change, **+ Nueva sesión** in Horario
+   offers the updated list of Trainers for the selected Branch.
+
+Every change stays in `pilates_dev_sim`; the fixtures command restores the
+fixture Accounts but does not delete Staff Members you created. The activation
+email goes to the worker's local capture, so the new person cannot activate
+from this test yet (see "What you cannot test yet").
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1615,12 +1673,11 @@ The following are not ready for manual product testing:
   mobile-link domain and native association files are configured;
 - Promotions on Client Home or push notifications (the in-app inbox works, see
   Test 9; buying a Plan works, see Test 10);
-- creating, reassigning, and deactivating Staff Members in a screen (the
-  API works, see Test 17; the admin screens are WEB-004);
 - Promotions and image variants (UPL-002);
 - Back Office screens (the API works, see Test 22; the screens are WEB-007);
-- any admin-web section beyond logging in, Horario, and the Catálogo pages
-  (Tests 23 to 25): the other sections are placeholders;
+- any admin-web section beyond logging in, Horario, the Catálogo pages,
+  Clientes, and Personal (Tests 23 to 26): the other sections are
+  placeholders;
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
 
