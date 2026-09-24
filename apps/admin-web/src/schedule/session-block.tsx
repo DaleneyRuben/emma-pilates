@@ -46,26 +46,28 @@ export function SessionBlock({
       onClick={() => onOpen(session)}
       style={style}
       className={cn(
-        "flex w-full flex-col items-start gap-0.5 overflow-hidden rounded-control border-l-[3px] px-2.5 py-1.5 text-left transition-shadow hover:shadow-tarjeta-hover focus-visible:shadow-foco",
+        "flex w-full flex-col items-start justify-center gap-0.5 overflow-hidden rounded-control border-l-[3px] px-2 py-1 text-left transition-shadow hover:shadow-tarjeta-hover focus-visible:shadow-foco",
         full
           ? "border-advertencia bg-advertencia/12"
           : "border-primario bg-primario-tinte",
         className,
       )}
     >
-      <span className="w-full truncate text-[12.5px] font-medium text-texto">
-        {session.classTypeName}
+      <span className="flex w-full items-baseline justify-between gap-2">
+        <span className="truncate text-[12.5px] font-medium text-texto">
+          {session.classTypeName}
+        </span>
+        <span
+          className={cn(
+            "shrink-0 text-ayuda tabular",
+            full ? "text-advertencia-texto" : "text-primario-profundo",
+          )}
+        >
+          {occupancy(session)}
+        </span>
       </span>
       <span className="w-full truncate text-ayuda text-texto-secundario tabular">
         {start} – {end} · {session.trainerName}
-      </span>
-      <span
-        className={cn(
-          "text-ayuda tabular",
-          full ? "text-advertencia-texto" : "text-primario-profundo",
-        )}
-      >
-        {occupancy(session)}
       </span>
     </button>
   );

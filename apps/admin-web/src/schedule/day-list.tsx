@@ -51,10 +51,10 @@ export function DayList({
               )}
             >
               <span>{tab.weekday}</span>
-              <span className="font-serif text-[15px] tabular">
-                {tab.day}
-                {date === today ? " ·" : ""}
-              </span>
+              <span className="font-serif text-[15px] tabular">{tab.day}</span>
+              {date === today ? (
+                <span className="text-[10px] leading-none">hoy</span>
+              ) : null}
             </button>
           );
         })}

@@ -5,7 +5,7 @@ import { SessionBlock } from "./session-block";
 
 type Session = AdministratorSessionAvailabilityDto;
 
-const hourHeight = 56;
+const hourHeight = 64;
 
 /** The hours the grid spans: 06:00–22:00, widened to fit every Session. */
 function hourRange(sessions: readonly Session[]) {
@@ -119,7 +119,7 @@ export function WeekGrid({
                     className="absolute inset-x-1"
                     style={{
                       top: ((start - first * 60) / 60) * hourHeight + 1,
-                      height: Math.max((minutes / 60) * hourHeight - 2, 52),
+                      height: Math.max((minutes / 60) * hourHeight - 2, 44),
                     }}
                   />
                 );
