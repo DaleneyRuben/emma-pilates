@@ -10,9 +10,19 @@ import {
   useMockServer,
 } from "../test/msw";
 
-const branches = [
-  { id: "b1", name: "Centro", address: "Calle Libertad 123", archivedAt: null },
-];
+const branches = {
+  items: [
+    {
+      id: "b1",
+      name: "Centro",
+      address: "Calle Libertad 123",
+      archivedAt: null,
+    },
+  ],
+  page: 1,
+  pageSize: 20,
+  totalItems: 1,
+};
 
 const rejection = async (work: Promise<unknown>): Promise<unknown> => {
   try {
@@ -34,7 +44,7 @@ describe("createAdminFetcher", () => {
       ),
     );
 
-    const response = await listAdminBranches(undefined, adminFetch);
+    const response = await listAdminBranches(undefined, undefined, adminFetch);
 
     expect(response.status).toBe(200);
     expect(response.data).toEqual(branches);
@@ -49,7 +59,7 @@ describe("createAdminFetcher", () => {
       }),
     );
 
-    await listAdminBranches(undefined, adminFetch);
+    await listAdminBranches(undefined, undefined, adminFetch);
 
     expect(seen?.credentials).toBe("same-origin");
     expect(seen?.headers.get("accept")).toContain("application/problem+json");
@@ -67,7 +77,9 @@ describe("createAdminFetcher", () => {
       ),
     );
 
-    const error = await rejection(listAdminBranches(undefined, adminFetch));
+    const error = await rejection(
+      listAdminBranches(undefined, undefined, adminFetch),
+    );
 
     expect(isApiError(error)).toBe(true);
     if (!isApiError(error)) throw new Error("expected an ApiError");
@@ -88,7 +100,9 @@ describe("createAdminFetcher", () => {
       ),
     );
 
-    const error = await rejection(listAdminBranches(undefined, adminFetch));
+    const error = await rejection(
+      listAdminBranches(undefined, undefined, adminFetch),
+    );
 
     expect(isApiError(error) && error.problem.retryAfterSeconds).toBe(30);
   });
@@ -103,7 +117,9 @@ describe("createAdminFetcher", () => {
       ),
     );
 
-    const error = await rejection(listAdminBranches(undefined, adminFetch));
+    const error = await rejection(
+      listAdminBranches(undefined, undefined, adminFetch),
+    );
 
     expect(isApiError(error) && error.problem).toEqual({
       status: 502,
@@ -118,7 +134,9 @@ describe("createAdminFetcher", () => {
       ),
     );
 
-    const error = await rejection(listAdminBranches(undefined, adminFetch));
+    const error = await rejection(
+      listAdminBranches(undefined, undefined, adminFetch),
+    );
 
     expect(isApiError(error) && error.problem).toEqual({
       status: 0,
