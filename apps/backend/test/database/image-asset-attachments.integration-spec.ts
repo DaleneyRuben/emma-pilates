@@ -66,8 +66,9 @@ describe('image asset attachments (PostgreSQL)', () => {
         declaredMediaType: 'PNG',
         declaredByteSize: 10,
         declaredChecksum: toPrismaBytes(Buffer.alloc(32, 2)),
-        createdAt: now,
-        expiresAt: now,
+        createdAt: new Date(now.getTime() - 60 * 60 * 1_000),
+        expiresAt: new Date(now.getTime() - 45 * 60 * 1_000),
+        finalizedAt: new Date(now.getTime() - 30 * 60 * 1_000),
         deletionDueAt: now,
         variants: {
           create: ['PROMOTION_480', 'PROMOTION_960', 'PROMOTION_1440'].map(
