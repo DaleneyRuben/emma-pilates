@@ -79,6 +79,7 @@ describe("AW23 Personal on a desktop browser", () => {
       within(await rowOf("Rita Salas")).getByText("Desactivado"),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Nuevo miembro" })).toBeEnabled();
+    expect(screen.getByText("Mostrando 1–5 de 5 miembros")).toBeVisible();
     expect(reads[0]?.has("role")).toBe(false);
   });
 
