@@ -1,4 +1,8 @@
-import { formatBolivianos, parseBolivianos } from "./money";
+import {
+  formatBolivianos,
+  formatSignedBolivianos,
+  parseBolivianos,
+} from "./money";
 
 describe("formatBolivianos", () => {
   it("prints integer centavos as Bs with dot thousands and comma decimals (ADR-0082)", () => {
@@ -7,6 +11,14 @@ describe("formatBolivianos", () => {
     expect(formatBolivianos(960_000)).toBe("Bs 9.600,00");
     expect(formatBolivianos(15_050)).toBe("Bs 150,50");
     expect(formatBolivianos(5)).toBe("Bs 0,05");
+  });
+});
+
+describe("formatSignedBolivianos", () => {
+  it("puts a minus sign before Bs when a net figure is below zero", () => {
+    expect(formatSignedBolivianos(-120_000)).toBe("−Bs 1.200,00");
+    expect(formatSignedBolivianos(96_000)).toBe("Bs 960,00");
+    expect(formatSignedBolivianos(0)).toBe("Bs 0,00");
   });
 });
 
