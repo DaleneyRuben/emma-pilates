@@ -224,6 +224,27 @@ describe("AW29 Revisar pago on a desktop browser", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("names the reason of a rejection someone else already made", async () => {
+    server.use(
+      ...handlers(() =>
+        jsonResponse(
+          reviewOf(sofiaPayment, {
+            state: "rejected",
+            decidedAt: "2026-09-21T19:00:00.000Z",
+            rejectionReason: "El monto no coincide.",
+          }),
+        ),
+      ),
+    );
+    const { panel } = await open("Sofía Guzmán");
+
+    expect(await within(panel).findByText("Rechazado")).toBeInTheDocument();
+    expect(within(panel).getByText("Motivo")).toBeInTheDocument();
+    expect(
+      within(panel).getByText("El monto no coincide."),
+    ).toBeInTheDocument();
+  });
+
   it("offers a retry when the Payment cannot load and says when it is gone", async () => {
     let answer = () => problemResponse(500, "unexpected_error");
     server.use(...handlers(() => answer()));
