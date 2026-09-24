@@ -60,12 +60,19 @@ describe("admin navigation", () => {
     ]);
   });
 
-  it("marks only the studio-wide pages the design system names", () => {
+  it("marks only the studio-wide pages, Expense Categories included (BKO-001 D13)", () => {
     expect(
       navigationItems
         .filter((item) => item.studioWide !== undefined)
         .map((item) => item.label),
-    ).toEqual(["Clientes", "Pagos", "Nómina", "Referidos", "Créditos"]);
+    ).toEqual([
+      "Clientes",
+      "Pagos",
+      "Nómina",
+      "Categorías de gasto",
+      "Referidos",
+      "Créditos",
+    ]);
   });
 });
 
