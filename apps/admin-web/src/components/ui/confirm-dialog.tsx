@@ -5,7 +5,8 @@ import { Button } from "./button";
 /**
  * A destructive action asks first (AW03 "pide confirmación antes de
  * ejecutarse"); the confirming button carries the Error tone and the other
- * one simply goes back.
+ * one simply goes back. An irreversible action that is not destructive
+ * (confirming a Payment, AW29) asks with the primary tone.
  */
 export function ConfirmDialog({
   open,
@@ -15,6 +16,7 @@ export function ConfirmDialog({
   confirmLabel,
   cancelLabel = "Volver",
   pending = false,
+  tone = "destructive",
   onConfirm,
 }: {
   open: boolean;
@@ -24,6 +26,7 @@ export function ConfirmDialog({
   confirmLabel: string;
   cancelLabel?: string;
   pending?: boolean;
+  tone?: "destructive" | "primary";
   onConfirm: () => void;
 }) {
   return (
@@ -43,11 +46,7 @@ export function ConfirmDialog({
             <AlertDialog.Cancel asChild>
               <Button variant="neutral">{cancelLabel}</Button>
             </AlertDialog.Cancel>
-            <Button
-              variant="destructive"
-              disabled={pending}
-              onClick={onConfirm}
-            >
+            <Button variant={tone} disabled={pending} onClick={onConfirm}>
               {confirmLabel}
             </Button>
           </div>

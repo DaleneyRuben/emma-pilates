@@ -2,11 +2,11 @@ import type { AdminPaymentDto, PaymentReviewDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
 import { isApiError } from "../api/problem";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
-import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
+import { SidePanelBody } from "../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../components/panel/summary-rows";
-import { Button } from "../components/ui/button";
 import { formatCivilMoment } from "../lib/bolivia-time";
 import { formatBolivianos } from "../lib/money";
+import { PaymentDecision } from "./payment-decision";
 import { paymentReviewQueryOptions } from "./payment-queries";
 import { PaymentStatePill } from "./payment-state-pill";
 import { ReceiptViewer } from "./receipt-viewer";
@@ -48,10 +48,14 @@ function PaymentSummary({ review }: { review: PaymentReviewDto }) {
 
 function ReviewBody({
   review,
+  clientId,
   onRetry,
+  onDone,
 }: {
   review: PaymentReviewDto;
+  clientId: string;
   onRetry: () => Promise<unknown>;
+  onDone: (notice: string) => void;
 }) {
   return (
     <>
@@ -73,14 +77,7 @@ function ReviewBody({
         />
       </SidePanelBody>
       {review.state === "pending" ? (
-        <SidePanelFooter>
-          <div className="grid grid-cols-2 gap-2">
-            <Button size="lg">Confirmar pago</Button>
-            <Button variant="destructive" size="lg">
-              Rechazar
-            </Button>
-          </div>
-        </SidePanelFooter>
+        <PaymentDecision review={review} clientId={clientId} onDone={onDone} />
       ) : null}
     </>
   );
@@ -88,7 +85,13 @@ function ReviewBody({
 
 // AW29: the transfer under review, read fresh from the backend each time
 // the panel opens (the Staff app may have decided it meanwhile).
-export function PaymentReviewPanel({ payment }: { payment: AdminPaymentDto }) {
+export function PaymentReviewPanel({
+  payment,
+  onDone,
+}: {
+  payment: AdminPaymentDto;
+  onDone: (notice: string) => void;
+}) {
   const review = useQuery(paymentReviewQueryOptions(payment.id));
 
   if (review.isPending) {
@@ -116,5 +119,12 @@ export function PaymentReviewPanel({ payment }: { payment: AdminPaymentDto }) {
       </SidePanelBody>
     );
   }
-  return <ReviewBody review={review.data} onRetry={() => review.refetch()} />;
+  return (
+    <ReviewBody
+      review={review.data}
+      clientId={payment.clientId}
+      onRetry={() => review.refetch()}
+      onDone={onDone}
+    />
+  );
 }

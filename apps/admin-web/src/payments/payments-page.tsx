@@ -178,8 +178,10 @@ export function PaymentsPage({
       }
       query={query}
       columns={paymentColumns}
-      renderForm={(payment) =>
-        payment === undefined ? null : <PaymentReviewPanel payment={payment} />
+      renderForm={(payment, done) =>
+        payment === undefined ? null : (
+          <PaymentReviewPanel payment={payment} onDone={done} />
+        )
       }
     />
   );
