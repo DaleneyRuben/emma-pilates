@@ -4,7 +4,13 @@ type ApiFetcherOptions = {
   fetch?: typeof globalThis.fetch;
 };
 
-function joinApiUrl(baseUrl: string, requestPath: string): string {
+// Generated request paths already carry the API version; an absolute URL
+// (a public image on its own origin, ADR-0077) is returned as is.
+export function resolveApiUrl(baseUrl: string, requestPath: string): string {
+  if (/^https?:\/\//i.test(requestPath)) {
+    return requestPath;
+  }
+
   const base = new URL(baseUrl);
   const basePath = base.pathname.replace(/\/$/, "");
   const path = `/${requestPath.replace(/^\//, "")}`;
@@ -30,7 +36,7 @@ export function createApiFetcher({
     }
 
     const path = typeof input === "string" ? input : input.toString();
-    const url = joinApiUrl(baseUrl, path);
+    const url = resolveApiUrl(baseUrl, path);
 
     return fetchImplementation(url, { ...init, headers });
   };
