@@ -17,12 +17,14 @@ describe("admin session guard", () => {
 
   it("sends a signed-out visitor to Login and remembers the page they wanted", async () => {
     server.use(...signedOutHandlers());
-    const { router } = renderAdmin("/back-office/insumos?page=2");
+    const { router } = renderAdmin(
+      "/back-office/evaluaciones-nutricionales?page=2",
+    );
 
     expect(await heading("Iniciar sesión")).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/iniciar-sesion");
     expect(router.state.location.search).toEqual({
-      redirect: "/back-office/insumos?page=2&pageSize=20",
+      redirect: "/back-office/evaluaciones-nutricionales?page=2&pageSize=20",
     });
     expect(
       screen.queryByRole("navigation", { name: "Secciones" }),
@@ -31,9 +33,9 @@ describe("admin session guard", () => {
 
   it("restores a signed-in browser session at startup without asking again", async () => {
     server.use(...signedInHandlers());
-    renderAdmin("/back-office/insumos");
+    renderAdmin("/back-office/evaluaciones-nutricionales");
 
-    expect(await heading("Insumos")).toBeInTheDocument();
+    expect(await heading("Evaluaciones nutricionales")).toBeInTheDocument();
     expect(
       screen.getByRole("navigation", { name: "Secciones" }),
     ).toBeInTheDocument();

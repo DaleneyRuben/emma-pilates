@@ -42,15 +42,20 @@ describe("AW01 Login", () => {
         return jsonResponse(paolaPrincipal, 201);
       }),
     );
-    const { router, user } = renderAdmin("/back-office/insumos?page=2");
+    const { router, user } = renderAdmin(
+      "/back-office/evaluaciones-nutricionales?page=2",
+    );
 
     await fillLogin(user);
 
     expect(
-      await screen.findByRole("heading", { level: 1, name: "Insumos" }),
+      await screen.findByRole("heading", {
+        level: 1,
+        name: "Evaluaciones nutricionales",
+      }),
     ).toBeInTheDocument();
     expect(router.state.location.href).toBe(
-      "/back-office/insumos?page=2&pageSize=20",
+      "/back-office/evaluaciones-nutricionales?page=2&pageSize=20",
     );
     expect(body).toEqual({
       email: "paola.mendoza@example.com",

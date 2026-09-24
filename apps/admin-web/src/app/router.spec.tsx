@@ -104,24 +104,29 @@ describe("admin routes", () => {
     expect(listPaths).not.toContain("/");
     expect(listPaths).not.toContain("/reporte");
 
-    const router = renderAt("/back-office/insumos?page=abc&pageSize=500");
-    await screen.findByRole("heading", { level: 1, name: "Insumos" });
+    const router = renderAt(
+      "/back-office/evaluaciones-nutricionales?page=abc&pageSize=500",
+    );
+    await screen.findByRole("heading", {
+      level: 1,
+      name: "Evaluaciones nutricionales",
+    });
     expect(router.state.matches.at(-1)?.search).toEqual({
       page: 1,
       pageSize: 20,
     });
 
     await router.navigate({
-      to: "/back-office/gastos",
+      to: "/promociones/creditos",
       search: { page: 3, pageSize: 50 },
     });
-    await screen.findByRole("heading", { level: 1, name: "Gastos" });
+    await screen.findByRole("heading", { level: 1, name: "Créditos" });
     expect(router.state.matches.at(-1)?.search).toEqual({
       page: 3,
       pageSize: 50,
     });
     expect(router.state.location.href).toBe(
-      "/back-office/gastos?page=3&pageSize=50",
+      "/promociones/creditos?page=3&pageSize=50",
     );
   });
 
