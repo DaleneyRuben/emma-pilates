@@ -28,7 +28,7 @@ function FieldTitle({ children }: { children: string }) {
   );
 }
 
-export function ReadOnlyRow({ children }: { children: string }) {
+function ReadOnlyRow({ children }: { children: string }) {
   return (
     <p className="rounded-control border border-divisor bg-superficie px-3 py-2.5 text-nota text-texto-secundario">
       {children}

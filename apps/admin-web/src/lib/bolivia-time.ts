@@ -35,7 +35,7 @@ const months = [
   "diciembre",
 ];
 
-export type BoliviaParts = {
+type BoliviaParts = {
   date: string;
   time: string;
   /** ISO weekday, Monday = 1. */

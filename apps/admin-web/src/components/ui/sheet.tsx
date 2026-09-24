@@ -8,7 +8,6 @@ import { cn } from "../../lib/cn";
 // drawer, all share the Dialog behavior: scrim, focus trap, Esc to close.
 export const Sheet = SheetPrimitive.Root;
 export const SheetTrigger = SheetPrimitive.Trigger;
-export const SheetClose = SheetPrimitive.Close;
 
 // design/README.md, side-panel header (and follow-up 21's viewer): a 30px
 // square, 1px Borde on Superficie, whose border turns Palo de rosa on hover.
