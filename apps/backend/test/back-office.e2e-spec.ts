@@ -91,7 +91,13 @@ describe('back office endpoints (e2e)', () => {
         branchIds: [],
       },
     });
-    supplies.listSupplies.mockResolvedValue([supply]);
+    supplies.listSupplies.mockResolvedValue({
+      items: [supply],
+      page: 1,
+      pageSize: 100,
+      totalItems: 1,
+      lowStockCount: 1,
+    });
     supplies.createSupply.mockResolvedValue(supply);
     supplies.recordWithdrawal.mockResolvedValue({
       id: other,

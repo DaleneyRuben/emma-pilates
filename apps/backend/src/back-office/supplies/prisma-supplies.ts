@@ -24,6 +24,13 @@ export type SupplyChange = {
   lowStockThreshold: number;
 };
 export type MovementInput = { supplyId: string; quantity: number };
+export type SupplyStatus = 'active' | 'archived' | 'all';
+
+const statusFilters: Record<SupplyStatus, Prisma.SupplyWhereInput> = {
+  active: { archivedAt: null },
+  archived: { archivedAt: { not: null } },
+  all: {},
+};
 
 const supplySelect = {
   id: true,
@@ -143,17 +150,42 @@ export const createPrismaSupplies = (
   };
 
   return {
+    // AW08 pages a Branch's Supplies by name; AW31's filter also needs the
+    // archived ones. The sidebar's count covers every active Supply at or
+    // below its threshold, whatever the page (BKO-001 D8).
     listSupplies: async (
-      query: { branchId: string },
+      query: Paging & { branchId: string; status: SupplyStatus },
       principal: AuthenticatedPrincipal,
     ) => {
       requireAdministrator(principal);
-      const rows = await prisma.supply.findMany({
-        where: { branchId: query.branchId, archivedAt: null },
-        orderBy: [{ name: 'asc' }, { id: 'asc' }],
-        select: supplySelect,
-      });
-      return rows.map(toSupplyView);
+      const where: Prisma.SupplyWhereInput = {
+        branchId: query.branchId,
+        ...statusFilters[query.status],
+      };
+      const [rows, totalItems, lowStockCount] = await Promise.all([
+        prisma.supply.findMany({
+          where,
+          orderBy: [{ name: 'asc' }, { id: 'asc' }],
+          skip: (query.page - 1) * query.pageSize,
+          take: query.pageSize,
+          select: supplySelect,
+        }),
+        prisma.supply.count({ where }),
+        prisma.supply.count({
+          where: {
+            branchId: query.branchId,
+            archivedAt: null,
+            quantityOnHand: { lte: prisma.supply.fields.lowStockThreshold },
+          },
+        }),
+      ]);
+      return {
+        items: rows.map(toSupplyView),
+        page: query.page,
+        pageSize: query.pageSize,
+        totalItems,
+        lowStockCount,
+      };
     },
 
     createSupply: async (

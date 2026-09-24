@@ -162,7 +162,13 @@ export class AdministratorSuppliesController extends BackOfficeController {
   ): Promise<AdminSupplyDto[]> {
     const input = parsed(parseSupplyQuery(query), 'Invalid Supply filters');
     const principal = await this.authenticate(authorization);
-    return run(() => this.operations.supplies.listSupplies(input, principal));
+    const page = await run(() =>
+      this.operations.supplies.listSupplies(
+        { ...input, status: 'active', page: 1, pageSize: 100 },
+        principal,
+      ),
+    );
+    return page.items;
   }
 
   @Post()
