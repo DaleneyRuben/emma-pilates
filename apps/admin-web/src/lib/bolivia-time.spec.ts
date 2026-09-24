@@ -1,10 +1,13 @@
 import {
   addDays,
+  addMonths,
   boliviaInstant,
+  boliviaMonth,
   boliviaParts,
   boliviaToday,
   formatCivilMoment,
   formatDayTab,
+  formatMonth,
   formatSessionMoment,
   formatWeekRange,
   weekStartOf,
@@ -67,5 +70,14 @@ describe("Bolivia civil time", () => {
     expect(formatCivilMoment("2026-08-15T13:12:00.000Z")).toBe(
       "15/08/2026 · 09:12",
     );
+  });
+
+  it("names the Bolivia month of an instant and walks months across years", () => {
+    // 03:30 UTC on 1 October is still 30 September in Bolivia.
+    expect(boliviaMonth(new Date("2026-10-01T03:30:00.000Z"))).toBe("2026-09");
+    expect(boliviaMonth(new Date("2026-10-01T04:30:00.000Z"))).toBe("2026-10");
+    expect(addMonths("2026-12", 1)).toBe("2027-01");
+    expect(addMonths("2026-01", -1)).toBe("2025-12");
+    expect(formatMonth("2026-08")).toBe("agosto de 2026");
   });
 });
