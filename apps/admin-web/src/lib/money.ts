@@ -31,3 +31,7 @@ export function parseBolivianos(text: string): number | null {
   const fraction = Number.parseInt((match[2] ?? "0").padEnd(2, "0"), 10);
   return whole * 100 + fraction;
 }
+
+/** A net figure: "−Bs 1.200,00" below zero, the plain amount otherwise. */
+export const formatSignedBolivianos = (centavos: number): string =>
+  centavos < 0 ? `−${formatBolivianos(-centavos)}` : formatBolivianos(centavos);
