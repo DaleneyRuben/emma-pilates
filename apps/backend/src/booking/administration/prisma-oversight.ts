@@ -2,6 +2,7 @@ import {
   EvaluationState,
   PaymentMethod,
   PaymentState,
+  ReferralState,
   type Prisma,
   type PrismaClient,
 } from '../../generated/prisma/client';
@@ -21,6 +22,17 @@ const methodNames: Record<PaymentMethod, 'cash' | 'transfer' | 'credit_only'> =
     [PaymentMethod.TRANSFER]: 'transfer',
     [PaymentMethod.CREDIT_ONLY]: 'credit_only',
   };
+
+// AW27's "Última actividad": what the last ledger entry did to the balance.
+const creditMovements: Record<
+  string,
+  'earned' | 'reserved' | 'spent' | 'returned'
+> = {
+  referral_award: 'earned',
+  payment_reservation: 'reserved',
+  payment_spend: 'spent',
+  payment_release: 'returned',
+};
 
 // ADM-001 slices D and E: read-only oversight for AW25–AW27 and the income
 // half of AW16 (expenses join from Back Office in BKO-002).
@@ -112,7 +124,7 @@ export const createPrismaOversight = (
           ).map(({ id }) => id);
     const where: Prisma.ReferralWhereInput =
       ids === undefined ? {} : { id: { in: ids } };
-    const [rows, totalItems] = await Promise.all([
+    const [rows, totalItems, byState] = await Promise.all([
       prisma.referral.findMany({
         where,
         orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
@@ -123,16 +135,36 @@ export const createPrismaOversight = (
           state: true,
           createdAt: true,
           awardedAt: true,
+          referrerClientId: true,
           referrer: { select: { name: true } },
           referred: { select: { name: true } },
         },
       }),
       prisma.referral.count({ where }),
+      // AW26's subtitle counts the whole studio, whatever the search.
+      prisma.referral.groupBy({ by: ['state'], _count: { _all: true } }),
     ]);
+    // "N referidas en total": every Referral of the referrer, not only
+    // the ones the search kept.
+    const referrerTotals = await prisma.referral.groupBy({
+      by: ['referrerClientId'],
+      where: {
+        referrerClientId: {
+          in: [...new Set(rows.map((row) => row.referrerClientId))],
+        },
+      },
+      _count: { _all: true },
+    });
+    const countOf = (state: ReferralState) =>
+      byState.find((group) => group.state === state)?._count._all ?? 0;
     return {
       items: rows.map((row) => ({
         referralId: row.id,
         referrerName: row.referrer.name,
+        referrerReferralCount:
+          referrerTotals.find(
+            (group) => group.referrerClientId === row.referrerClientId,
+          )?._count._all ?? 0,
         referredName: row.referred.name,
         registeredAt: row.createdAt,
         awardedAt: row.awardedAt,
@@ -142,6 +174,8 @@ export const createPrismaOversight = (
       page: query.page,
       pageSize: query.pageSize,
       totalItems,
+      awardedCount: countOf(ReferralState.AWARDED),
+      pendingCount: countOf(ReferralState.PENDING),
     };
   },
 
@@ -161,9 +195,15 @@ export const createPrismaOversight = (
         name: string;
         available: bigint;
         last_movement_at: Date;
+        last_movement_kind: string;
       }[]
     >`
       SELECT c.id AS client_id, c.name,
+             (SELECT last.kind::text
+              FROM booking.credit_ledger_entries last
+              WHERE last.client_id = c.id
+              ORDER BY last.occurred_at DESC, last.id DESC
+              LIMIT 1) AS last_movement_kind,
              sum(CASE e.kind
                    WHEN 'referral_award' THEN e.amount_centavos
                    WHEN 'payment_release' THEN e.amount_centavos
@@ -201,6 +241,7 @@ export const createPrismaOversight = (
           clientName: row.name,
           availableCentavos: Number(row.available),
           lastMovementAt: row.last_movement_at,
+          lastMovementKind: creditMovements[row.last_movement_kind] ?? 'earned',
         })),
       page: query.page,
       pageSize: query.pageSize,
