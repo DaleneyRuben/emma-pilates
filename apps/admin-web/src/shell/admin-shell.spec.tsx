@@ -58,12 +58,12 @@ describe("admin shell", () => {
       const { user } = renderShell("/");
       await heading("Horario");
 
-      await user.click(screen.getByRole("link", { name: "Planes" }));
+      await user.click(screen.getByRole("link", { name: "Insumos" }));
 
-      await heading("Planes");
+      await heading("Insumos");
       const sidebar = screen.getByRole("navigation", { name: "Secciones" });
       expect(
-        within(sidebar).getByRole("link", { name: "Planes" }),
+        within(sidebar).getByRole("link", { name: "Insumos" }),
       ).toHaveAttribute("aria-current", "page");
       expect(
         within(sidebar).getByRole("link", { name: "Horario" }),

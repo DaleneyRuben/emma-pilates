@@ -104,8 +104,8 @@ describe("admin routes", () => {
     expect(listPaths).not.toContain("/");
     expect(listPaths).not.toContain("/reporte");
 
-    const router = renderAt("/catalogo/planes?page=abc&pageSize=500");
-    await screen.findByRole("heading", { level: 1, name: "Planes" });
+    const router = renderAt("/back-office/insumos?page=abc&pageSize=500");
+    await screen.findByRole("heading", { level: 1, name: "Insumos" });
     expect(router.state.matches.at(-1)?.search).toEqual({
       page: 1,
       pageSize: 20,
