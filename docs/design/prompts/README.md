@@ -161,6 +161,7 @@ Each of these was sent as the next message in the existing design session for th
 | [51](./followups/51-report-salary-all-branches.md) | Shows «Nómina» only in `AW16`'s «Todas las sucursales» view, with a single-Branch frame and caption (BKO-001 Q3) | 🕓 pending |
 | [52](./followups/52-admin-user-menu-role-label.md) | Labels the Role «Administración» (as `S23` does) instead of «Administradora» in `AW33`, and uses Hover de fila for its rows (WEB-002) | 🕓 pending |
 | [53](./followups/53-booking-administration-controls.md) | `AW03` cancels only a booked Session, keeps the Class Type read-only on edit, and gains «Terminar la serie»; `AW02` result line; Plan order and visibility on `AW04`/`AW05`; archive actions and Estado filters on `AW06`/`AW07`/`AW19`/`AW20` (WEB-003) | 🕓 pending |
+| [54](./followups/54-people-administration-controls.md) | «Sin plan» for a Client who never bought one on `AW21`, the pending-activation box on `AW22`, an Estado column and on-palette Role tag on `AW23`, and `AW24`'s read-only contact, resend, deactivation, and read-only own/deactivated states without «Restablecer contraseña» (WEB-004) | 🕓 pending |
 
 ## Status
 
