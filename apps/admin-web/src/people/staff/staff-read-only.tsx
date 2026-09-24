@@ -11,7 +11,7 @@ const allBranches = { status: "all", page: 1, pageSize: 100 } as const;
 export function StaffContact({ member }: { member: StaffMemberDto }) {
   const rows = [
     ["Nombre", member.name],
-    ["Correo electrónico", member.email],
+    ["Correo", member.email],
     ["Teléfono", member.phone ?? "Sin teléfono"],
   ] as const;
   return (
@@ -21,10 +21,12 @@ export function StaffContact({ member }: { member: StaffMemberDto }) {
           key={label}
           className="flex items-baseline justify-between gap-4 px-3 py-2"
         >
-          <dt className="text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
+          <dt className="shrink-0 text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
             {label}
           </dt>
-          <dd className="text-right text-nota text-texto">{value}</dd>
+          <dd className="min-w-0 text-right text-nota break-words text-texto">
+            {value}
+          </dd>
         </div>
       ))}
     </dl>

@@ -41,6 +41,8 @@ export function SearchFilter({
     return () => clearTimeout(timer);
   }, [text, value]);
 
+  // The native search clear button paints outside the closed palette, so
+  // it is hidden; clearing the text does the same.
   return (
     <div className="relative w-full max-w-[380px]">
       <Search
@@ -55,7 +57,7 @@ export function SearchFilter({
         placeholder={label}
         value={text}
         onChange={(event) => setText(event.target.value)}
-        className="h-[38px] pl-9 text-nota"
+        className="h-[38px] pl-9 text-nota [&::-webkit-search-cancel-button]:appearance-none"
       />
     </div>
   );
