@@ -10,6 +10,11 @@ export const Sheet = SheetPrimitive.Root;
 export const SheetTrigger = SheetPrimitive.Trigger;
 export const SheetClose = SheetPrimitive.Close;
 
+// design/README.md, side-panel header (and follow-up 21's viewer): a 30px
+// square, 1px Borde on Superficie, whose border turns Palo de rosa on hover.
+export const closeButtonClass =
+  "inline-flex size-[30px] items-center justify-center rounded-control border border-borde bg-superficie text-texto-tenue hover:border-primario hover:text-texto focus-visible:shadow-foco";
+
 const sheetVariants = cva(
   "fixed z-50 flex flex-col bg-blanco text-texto shadow-panel outline-none",
   {
@@ -53,7 +58,7 @@ export function SheetContent({
         {children}
         {hideClose ? null : (
           <SheetPrimitive.Close
-            className="absolute top-3 right-3 inline-flex size-[30px] items-center justify-center rounded-control text-texto-tenue hover:bg-hover-fila hover:text-texto focus-visible:shadow-foco"
+            className={cn("absolute top-3 right-3", closeButtonClass)}
             aria-label={closeLabel}
           >
             <X size={16} strokeWidth={1.6} aria-hidden="true" />

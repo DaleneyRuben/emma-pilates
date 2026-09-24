@@ -2,6 +2,7 @@ import { X, ZoomIn } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useState, type ReactNode } from "react";
 import { Button } from "../components/ui/button";
+import { closeButtonClass } from "../components/ui/sheet";
 import { cn } from "../lib/cn";
 import { useIsNarrowViewport } from "../shell/use-media-query";
 
@@ -123,16 +124,13 @@ export function ReceiptViewer({
             >
               <span
                 className={cn(
-                  "text-[12px]",
+                  "text-ayuda",
                   narrow ? "text-texto-tenue" : "text-superficie",
                 )}
               >
                 {caption}
               </span>
-              <Dialog.Close
-                aria-label="Cerrar"
-                className="inline-flex size-[30px] items-center justify-center rounded-control border border-borde bg-superficie text-texto-tenue hover:border-primario hover:text-texto focus-visible:shadow-foco"
-              >
+              <Dialog.Close aria-label="Cerrar" className={closeButtonClass}>
                 <X size={16} strokeWidth={1.6} aria-hidden="true" />
               </Dialog.Close>
             </div>
