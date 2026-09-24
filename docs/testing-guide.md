@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31) | Promotions are still a placeholder (WEB-006); valid activation and recovery links still cannot be read from the local email capture; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31) | Promociones is still a placeholder (WEB-006, the API is ready: Test 32); valid activation and recovery links still cannot be read from the local email capture; the Playwright journeys run in Chromium only |
 
 ## Before you begin
 
@@ -602,7 +602,7 @@ same key again returns the same result instead of a duplicate.
 | 1    | `GET /api/v1/transfer-instructions`                   | Beneficiary, bank, account number, and `qrImageUrl` (`…/transfer-instructions/qr`)      |
 | 2    | `POST /api/v1/purchase-intents` `{ "planId": … }`     | `201` with frozen Plan snapshots, `amountDueCentavos`, `state: open`, 24 h `expiresAt`  |
 | 3    | `GET /api/v1/purchase-intents/current`                | The same open Intent; `404 purchase_intent_not_found` once it is submitted or expired    |
-| 4    | `POST /api/v1/uploads` + `PUT …/object` + `…/finalize`| A `TRANSFER_RECEIPT` image asset that the worker leaves `READY` (Test 6 upload flow)     |
+| 4    | `POST /api/v1/uploads` + `PUT …/object` + `…/finalize`| A `TRANSFER_RECEIPT` image asset that the worker leaves `READY` (Test 32 has the upload steps) |
 | 5    | `POST /api/v1/purchase-intents/{id}/receipt`          | `receiptAttached: true`; another asset replaces the first one                            |
 | 6    | `POST /api/v1/purchase-intents/{id}/submit`           | `201` pending transfer Payment; the Administrator inbox gets "Comprobante por revisar"  |
 | 7    | `GET /api/v1/payments/current`                        | Your latest Payment with `state`, amounts, and `rejectionReason` once decided            |
@@ -626,7 +626,7 @@ authorize that credential:
 | ----------------------------------------------------- | -------------------------------------------------------------------------------------- |
 | `GET /api/v1/administrator/payments/pending`          | Pending transfers oldest first with client, Plan, amount, `submittedAt`, receipt flag  |
 | `GET /api/v1/administrator/payments/{paymentId}`      | The review projection plus `receiptUrl`                                                |
-| `GET …/payments/{paymentId}/receipt`                  | The receipt image itself (`Cache-Control: no-store`); Trainers and Clients get `403`   |
+| `GET …/payments/{paymentId}/receipt`                  | The rebuilt `readable` JPEG (`?variant=thumbnail` for the small one), `no-store`; Trainers and Clients get `403` |
 | `POST …/payments/{paymentId}/confirm`                 | `state: confirmed`, a new Subscription starting today, the Client notified             |
 | `POST …/payments/{paymentId}/reject` `{ "reason" }`   | `state: rejected` with the trimmed reason; the Client's Credit is released             |
 | `POST /api/v1/administrator/sessions/{id}/cancel`     | `{ affectedBookings }`: every Booking refunded, waitlist closed, Clients + Trainer told |
@@ -1990,6 +1990,70 @@ Set `TEST_DATABASE_URL` to another `pilates_test_*` admin database, or
 `E2E_API_PORT` and `E2E_WEB_PORT` to other ports, when the defaults collide
 with something on your machine.
 
+## Test 32: image variants and Promotions through Swagger
+
+Start the backend and the worker on `pilates_dev_sim` after loading the
+fixtures (Tests 5A and 10B). The worker is what rebuilds every upload into its
+serving variants (ADR-0073; the sizes are in
+[`UPL-002-image-variants.md`](./implementation/UPL-002-image-variants.md)).
+
+### A. Upload an image and watch the variants appear
+
+Log in through Swagger as any fixture Account. Every upload takes three calls:
+
+| Step | Endpoint                                  | What you should see                                                                              |
+| ---- | ----------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| 1    | `POST /api/v1/uploads`                    | `{ purpose, mediaType, byteSize, checksum }` (base64 SHA-256 of the bytes) → `201` with `uploadUrl` |
+| 2    | `PUT /api/v1/uploads/{id}/object`         | The raw bytes with their `Content-Type` → `204` (curl: `--data-binary @file`)                   |
+| 3    | `POST /api/v1/uploads/{id}/finalize`      | With an `idempotency-key` → `202 processing`                                                     |
+| 4    | `GET /api/v1/uploads/{id}`                | `processing`, then `ready` a second later (`failed` with the worker stopped never happens: it waits) |
+
+Once it is `ready`, `apps/backend/.data/uploads/private/<purpose>/<id>/` holds
+one file per variant (`readable` and `thumbnail` for a receipt, `display` and
+`thumbnail` for a profile photo, `promotion_480/960/1440` for a Promotion) and
+the `pending/<purpose>/<id>` original is gone. A Promotion image smaller than
+1200×675 ends `failed` with `image_dimensions_too_small`; an animated image
+with `image_animated_not_allowed`. Failed originals stay under `pending/` until
+the 24-hour cleanup (Test 13's worker) removes them.
+
+### B. The receipt variants in the review screens
+
+Raise a transfer with a receipt as a Client without a Plan (Test 7, "Buying a
+Plan through Swagger"; `mariana@example.com` unless an earlier walk already
+bought her one, then `isabel@example.com`). As `paola.mendoza@example.com`,
+`GET /api/v1/administrator/payments/{paymentId}/receipt` answers the
+`readable` JPEG (longest edge 2048 px, metadata stripped) and
+`?variant=thumbnail` the 800 px one; `?variant=original` is a `400`. The admin
+web's Revisar pago (Test 27) and the Staff app's review (Test 10C) keep their
+routes and show the readable variant in the panel and enlarged. A receipt
+uploaded before this change has no variants and is served from its original
+while that file exists.
+
+### C. Promotions as the Administrator
+
+Still as Paola, upload a horizontal image of at least 1200×675 with
+`purpose: promotion` (section A), then:
+
+| Step | Endpoint                                                      | What you should see                                                                       |
+| ---- | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| 1    | `POST /api/v1/administrator/promotions` (`idempotency-key`)   | `{ headline, description, displayStartsOn, displayEndsOn, imageAssetId }` → `201`, `state: draft`, last `displayOrder`; the same key replays the same row |
+| 2    | `GET /api/v1/administrator/promotions`                        | Every live Promotion in carousel order with `state` (`draft`, `scheduled`, `active`, `ended`) and `image.thumbnailUrl` |
+| 3    | `GET …/promotions/{id}/image?variant=promotion_480`           | The private 480×270 WebP, `no-store`                                                      |
+| 4    | `POST …/promotions/{id}/publish`                              | `state: active` when today is inside the window; without an image `409 promotion_image_required` |
+| 5    | `GET /api/v1/promotions` (as `lucia@example.com`)             | Only published Promotions inside their window, each with three public `image.sources` URLs |
+| 6    | `GET /api/v1/promotion-images/{asset}/{kind}/{version}`       | No credential needed; `Cache-Control: public, max-age=31536000, immutable`               |
+| 7    | `PUT …/promotions/order` `{ "promotionIds": [...] }`          | Every live id exactly once, or `409 promotion_order_incomplete`                            |
+| 8    | `PUT …/promotions/{id}`                                       | Edits copy, window, or image; a new or removed image unpublishes (follow-up 39)           |
+| 9    | `POST …/promotions/{id}/unpublish`                            | `state: draft`; the public URLs answer `404` from then on                                 |
+| 10   | `DELETE …/promotions/{id}`                                    | `204`; the row is archived and its image released                                          |
+
+An Assistant or a Client gets `403 administration_access_denied` from every
+`administrator/promotions` route. When the worker next runs its hourly sweep
+(or right after it starts), the released variants disappear from
+`.data/uploads` and `system.image_variants` gets their `deleted_at`. Archived
+Promotions stay in `booking.promotions`; the fixtures command does not remove
+them.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -2002,9 +2066,10 @@ The following are not ready for manual product testing:
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
-- Promotions on Client Home or push notifications (the in-app inbox works, see
-  Test 9; buying a Plan works, see Test 10);
-- Promotions and image variants (UPL-002);
+- the Promotions carousel on Client Home (MOB-019) or push notifications (the
+  in-app inbox works, see Test 9; buying a Plan works, see Test 10; the
+  Promotion API works through Swagger, see Test 32);
+- profile photos in any app (the variants are built, no screen uploads one);
 - the admin web's Promociones page, still a placeholder (every other page
   works, Tests 23 to 30);
 - the admin web on a real Vercel preview or production origin, so the proxy,
