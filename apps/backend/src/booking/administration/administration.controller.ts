@@ -1,13 +1,10 @@
 import {
-  BadRequestException,
   Body,
   Controller,
-  Delete,
   Get,
   Header,
   Headers,
   HttpCode,
-  HttpException,
   HttpStatus,
   Inject,
   Param,
@@ -20,43 +17,36 @@ import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
-  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
   ApiQuery,
 } from '@nestjs/swagger';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
+import type { PrincipalResolver } from '../../system-identity/authentication/bearer-principal';
 import {
-  authenticateBearer,
-  type PrincipalResolver,
-} from '../../system-identity/authentication/bearer-principal';
-import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { parseUuid } from '../booking.dto';
-import { runEvaluationCommand } from '../evaluations/evaluations.controller';
-import { AdministrationError } from './administration-errors';
+  AdministrationController,
+  administrationOperations,
+  parsed,
+  requireId,
+  run,
+  type AdministrationOperations,
+} from './administration-http';
 import {
   AdminBranchDto,
   AdminClassTypeDto,
-  AdminCreditPageDto,
-  AdminEvaluationPageDto,
   AdminPlanDto,
-  AdminReferralPageDto,
   AdminSessionDto,
   AdminSessionScheduleDto,
   BranchInputDto,
   ClassTypeInputDto,
-  IncomeReportDto,
   parseBranchInput,
   parseClassTypeInput,
-  parseEvaluationListQuery,
-  parseIncomeQuery,
   parsePlanInput,
   parsePlanVisibility,
   parseScheduleEnd,
   parseScheduleInput,
   parseScheduleQuery,
-  parseSearchListQuery,
   parseSessionChange,
   parseSessionInput,
   PlanInputDto,
@@ -69,54 +59,14 @@ import {
   SessionScheduleInputDto,
   SessionScheduleReplacementDto,
 } from './administration.dto';
-import type { CatalogAdministration } from './prisma-catalog-administration';
-import type { Oversight } from './prisma-oversight';
-import type { ScheduleAdministration } from './prisma-schedule-administration';
+import { AdministratorOversightController } from './oversight.controller';
 
-export const administrationOperations = Symbol('administrationOperations');
-
-export type AdministrationOperations = {
-  catalog: CatalogAdministration;
-  schedules: ScheduleAdministration;
-  oversight: Oversight;
-  cancelEvaluation: (
-    evaluationId: string,
-    principal: AuthenticatedPrincipal,
-  ) => Promise<void>;
-};
-
-const invalidRequest = (detail: string) =>
-  new BadRequestException({ code: 'invalid_request', detail });
-
-export const run = async <Result>(
-  work: () => Promise<Result>,
-): Promise<Result> => {
-  try {
-    return await work();
-  } catch (error) {
-    if (error instanceof AdministrationError) {
-      throw new HttpException(
-        { code: error.code, detail: error.message },
-        error.status,
-      );
-    }
-    throw error;
-  }
-};
-
-export const parsed = <Value>(
-  result: { success: true; data: Value } | { success: false },
-  detail: string,
-): Value => {
-  if (!result.success) throw invalidRequest(detail);
-  return result.data;
-};
-
-const requireId = (value: string, detail: string): string => {
-  const id = parseUuid(value);
-  if (id === null) throw invalidRequest(detail);
-  return id;
-};
+export {
+  administrationOperations,
+  parsed,
+  run,
+  type AdministrationOperations,
+} from './administration-http';
 
 const civil = (date: Date | null): string | null =>
   date === null ? null : date.toISOString().slice(0, 10);
@@ -163,17 +113,6 @@ const toSessionDto = (session: {
   ...session,
   state: session.state === 'CANCELLED' ? 'cancelled' : 'scheduled',
 });
-
-abstract class AdministrationController {
-  constructor(
-    protected readonly operations: AdministrationOperations,
-    private readonly principalResolver: PrincipalResolver,
-  ) {}
-
-  protected authenticate(authorization: string | undefined) {
-    return authenticateBearer(this.principalResolver, authorization);
-  }
-}
 
 @Controller({ path: 'administrator/branches', version: '1' })
 @ApiBearerAuth()
@@ -515,112 +454,6 @@ export class AdministratorSessionEditsController extends AdministrationControlle
         ),
       ),
     );
-  }
-}
-
-@Controller({ path: 'administrator', version: '1' })
-@ApiBearerAuth()
-export class AdministratorOversightController extends AdministrationController {
-  constructor(
-    @Inject(administrationOperations) operations: AdministrationOperations,
-    @Inject(authenticatedPrincipalResolver) resolver: PrincipalResolver,
-  ) {
-    super(operations, resolver);
-  }
-
-  @Get('evaluations')
-  @ApiOperation({ operationId: 'listAdminEvaluations' })
-  @ApiQuery({ name: 'from', required: true, format: 'date-time' })
-  @ApiQuery({ name: 'until', required: true, format: 'date-time' })
-  @ApiQuery({
-    name: 'nutritionistStaffMemberId',
-    required: false,
-    schema: { format: 'uuid' },
-  })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number })
-  @ApiOkResponse({ type: AdminEvaluationPageDto })
-  @Header('Cache-Control', 'no-store')
-  async evaluations(
-    @Headers('authorization') authorization: string | undefined,
-    @Query() query: unknown,
-  ): Promise<AdminEvaluationPageDto> {
-    const input = parsed(
-      parseEvaluationListQuery(query),
-      'Invalid Evaluation filters',
-    );
-    const principal = await this.authenticate(authorization);
-    return run(() =>
-      this.operations.oversight.listEvaluations(input, principal),
-    );
-  }
-
-  @Delete('evaluations/:evaluationId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ operationId: 'cancelAdminEvaluation' })
-  @ApiParam({ name: 'evaluationId', format: 'uuid' })
-  @ApiNoContentResponse()
-  @Header('Cache-Control', 'no-store')
-  async cancelEvaluation(
-    @Param('evaluationId') evaluationId: string,
-    @Headers('authorization') authorization: string | undefined,
-  ): Promise<void> {
-    const id = requireId(evaluationId, 'Invalid Evaluation identifier');
-    const principal = await this.authenticate(authorization);
-    await runEvaluationCommand(() =>
-      this.operations.cancelEvaluation(id, principal),
-    );
-  }
-
-  @Get('referrals')
-  @ApiOperation({ operationId: 'listAdminReferrals' })
-  @ApiQuery({ name: 'query', required: false })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number })
-  @ApiOkResponse({ type: AdminReferralPageDto })
-  @Header('Cache-Control', 'no-store')
-  async referrals(
-    @Headers('authorization') authorization: string | undefined,
-    @Query() query: unknown,
-  ): Promise<AdminReferralPageDto> {
-    const input = parsed(
-      parseSearchListQuery(query),
-      'Invalid Referral filters',
-    );
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.oversight.listReferrals(input, principal));
-  }
-
-  @Get('credits')
-  @ApiOperation({ operationId: 'listAdminCredits' })
-  @ApiQuery({ name: 'query', required: false })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'pageSize', required: false, type: Number })
-  @ApiOkResponse({ type: AdminCreditPageDto })
-  @Header('Cache-Control', 'no-store')
-  async credits(
-    @Headers('authorization') authorization: string | undefined,
-    @Query() query: unknown,
-  ): Promise<AdminCreditPageDto> {
-    const input = parsed(parseSearchListQuery(query), 'Invalid Credit filters');
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.oversight.listCredits(input, principal));
-  }
-
-  @Get('reports/income')
-  @ApiOperation({ operationId: 'getIncomeReport' })
-  @ApiQuery({ name: 'from', required: true, format: 'date-time' })
-  @ApiQuery({ name: 'until', required: true, format: 'date-time' })
-  @ApiQuery({ name: 'branchId', required: false, schema: { format: 'uuid' } })
-  @ApiOkResponse({ type: IncomeReportDto })
-  @Header('Cache-Control', 'no-store')
-  async income(
-    @Headers('authorization') authorization: string | undefined,
-    @Query() query: unknown,
-  ): Promise<IncomeReportDto> {
-    const input = parsed(parseIncomeQuery(query), 'Invalid report range');
-    const principal = await this.authenticate(authorization);
-    return run(() => this.operations.oversight.incomeReport(input, principal));
   }
 }
 
