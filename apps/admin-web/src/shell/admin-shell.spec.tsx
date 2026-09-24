@@ -1,17 +1,12 @@
 import { screen, within } from "@testing-library/react";
-import { server, useMockServer } from "../test/msw";
+import { http } from "msw";
+import { activeBranchesHandler, branchesPath } from "../test/booking-handlers";
+import { apiUrl, problemResponse, server, useMockServer } from "../test/msw";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
-import type { Branch } from "./branch/branch-context";
 
-const branches: Branch[] = [
-  { id: "centro", name: "Centro", address: "Calle Ayacucho 245" },
-  { id: "equipetrol", name: "Equipetrol", address: "Av. San Martín 1120" },
-  { id: "urubo", name: "Urubó", address: "Condominio Los Tajibos" },
-];
-
-const renderShell = (path = "/") => renderAdmin(path, { branches });
+const renderShell = (path = "/") => renderAdmin(path);
 
 describe("admin shell", () => {
   useMockServer();
@@ -82,7 +77,7 @@ describe("admin shell", () => {
       const topBar = screen.getByRole("banner");
       expect(within(topBar).getByText("Emma")).toBeInTheDocument();
       expect(
-        within(topBar).getByRole("button", { name: "Sucursal Centro" }),
+        await within(topBar).findByRole("button", { name: "Sucursal Centro" }),
       ).toHaveAttribute("aria-expanded", "false");
       expect(
         await within(topBar).findByRole("button", {
@@ -95,14 +90,16 @@ describe("admin shell", () => {
       const { user } = renderShell("/");
       await heading("Horario");
 
-      await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
+      await user.click(
+        await screen.findByRole("button", { name: "Sucursal Centro" }),
+      );
 
       const popover = await screen.findByRole("dialog", { name: "Sucursal" });
       const options = within(popover).getAllByRole("option");
       expect(options.map((option) => option.textContent)).toEqual([
         "CentroCalle Ayacucho 245",
         "EquipetrolAv. San Martín 1120",
-        "UrubóCondominio Los Tajibos",
+        "NorteAv. Banzer, 4.º anillo",
       ]);
       expect(options[0]).toHaveAttribute("aria-selected", "true");
       expect(options[2]).toHaveAttribute("aria-selected", "false");
@@ -113,13 +110,13 @@ describe("admin shell", () => {
         within(popover).queryByText(/no se filtra por sucursal/),
       ).not.toBeInTheDocument();
 
-      await user.click(within(popover).getByRole("option", { name: /Urubó/ }));
+      await user.click(within(popover).getByRole("option", { name: /Norte/ }));
 
       expect(
         screen.queryByRole("dialog", { name: "Sucursal" }),
       ).not.toBeInTheDocument();
       expect(
-        screen.getByRole("button", { name: "Sucursal Urubó" }),
+        screen.getByRole("button", { name: "Sucursal Norte" }),
       ).toBeInTheDocument();
       expect(
         screen.getByRole("heading", { level: 1, name: "Horario" }),
@@ -130,7 +127,9 @@ describe("admin shell", () => {
       const { user } = renderShell("/");
       await heading("Horario");
 
-      await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
+      await user.click(
+        await screen.findByRole("button", { name: "Sucursal Centro" }),
+      );
       await screen.findByRole("dialog", { name: "Sucursal" });
       await user.keyboard("{Escape}");
 
@@ -146,7 +145,9 @@ describe("admin shell", () => {
       const { user } = renderShell("/back-office/pagos");
       await heading("Pagos");
 
-      await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
+      await user.click(
+        await screen.findByRole("button", { name: "Sucursal Centro" }),
+      );
 
       const popover = await screen.findByRole("dialog", { name: "Sucursal" });
       expect(
@@ -172,11 +173,79 @@ describe("admin shell", () => {
       ).toBeInTheDocument();
     });
 
+    it("reads the active Branches for the selector, so archived ones never appear", async () => {
+      const requests: URLSearchParams[] = [];
+      server.events.on("request:start", ({ request }) => {
+        const url = new URL(request.url);
+        if (url.pathname === branchesPath) requests.push(url.searchParams);
+      });
+      const { user } = renderShell("/");
+      await heading("Horario");
+
+      expect(
+        await screen.findByRole("button", { name: "Sucursal Centro" }),
+      ).toBeInTheDocument();
+      await user.click(
+        await screen.findByRole("button", { name: "Sucursal Centro" }),
+      );
+      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
+      expect(
+        within(popover).getByRole("option", { name: /Norte/ }),
+      ).toBeInTheDocument();
+      expect(requests.map((params) => params.get("status"))).toContain(
+        "active",
+      );
+      expect(requests.every((params) => params.get("pageSize") === "100")).toBe(
+        true,
+      );
+      server.events.removeAllListeners();
+    });
+
+    it("says when there is no active Branch yet and still links to Sucursales", async () => {
+      server.use(activeBranchesHandler([]));
+      const { user } = renderShell("/");
+      await heading("Horario");
+
+      const trigger = await screen.findByRole("button", {
+        name: "Sin sucursal",
+      });
+      await user.click(trigger);
+      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
+      expect(
+        within(popover).getByText("Todavía no hay sucursales activas."),
+      ).toBeInTheDocument();
+      expect(
+        within(popover).getByRole("link", { name: "Gestionar sucursales" }),
+      ).toBeInTheDocument();
+    });
+
+    it("says when the Branches could not be loaded", async () => {
+      server.use(
+        http.get(apiUrl(branchesPath), () =>
+          problemResponse(500, "unexpected_error"),
+        ),
+      );
+      const { user } = renderShell("/");
+      await heading("Horario");
+
+      await user.click(
+        await screen.findByRole("button", { name: "Sin sucursal" }),
+      );
+      const popover = await screen.findByRole("dialog", { name: "Sucursal" });
+      expect(
+        await within(popover).findByText(
+          "No pudimos cargar las sucursales. Inténtalo de nuevo.",
+        ),
+      ).toBeInTheDocument();
+    });
+
     it("links to the Sucursales page from the selector", async () => {
       const { user } = renderShell("/");
       await heading("Horario");
 
-      await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
+      await user.click(
+        await screen.findByRole("button", { name: "Sucursal Centro" }),
+      );
       const popover = await screen.findByRole("dialog", { name: "Sucursal" });
       await user.click(
         within(popover).getByRole("link", { name: "Gestionar sucursales" }),
@@ -215,7 +284,9 @@ describe("admin shell", () => {
       const { user } = renderShell("/");
       await heading("Horario");
 
-      await user.click(screen.getByRole("button", { name: "Sucursal Centro" }));
+      await user.click(
+        await screen.findByRole("button", { name: "Sucursal Centro" }),
+      );
 
       const sheet = await screen.findByRole("dialog", { name: "Sucursal" });
       expect(sheet).toHaveAttribute("data-side", "bottom");
