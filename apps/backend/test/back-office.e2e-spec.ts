@@ -91,13 +91,6 @@ describe('back office endpoints (e2e)', () => {
         branchIds: [],
       },
     });
-    supplies.listSupplies.mockResolvedValue({
-      items: [supply],
-      page: 1,
-      pageSize: 100,
-      totalItems: 1,
-      lowStockCount: 1,
-    });
     supplies.createSupply.mockResolvedValue(supply);
     supplies.recordWithdrawal.mockResolvedValue({
       id: other,
@@ -177,17 +170,8 @@ describe('back office endpoints (e2e)', () => {
     jest.clearAllMocks();
   });
 
-  it('lists and creates a Branch’s Supplies', async () => {
-    await request(app.getHttpServer())
-      .get(`/api/v1/administrator/supplies?branchId=${other}`)
-      .set('authorization', bearer)
-      .expect(200)
-      .expect('Cache-Control', 'no-store')
-      .expect(({ body }) => expect(body).toEqual([supply]));
-    await request(app.getHttpServer())
-      .get('/api/v1/administrator/supplies')
-      .set('authorization', bearer)
-      .expect(400);
+  // The paged list is in back-office-supply-list.e2e-spec.ts.
+  it('creates a Branch’s Supply', async () => {
     await request(app.getHttpServer())
       .post('/api/v1/administrator/supplies')
       .set('authorization', bearer)
