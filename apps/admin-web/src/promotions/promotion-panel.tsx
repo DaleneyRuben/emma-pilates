@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "../components/form/form";
 import { SidePanelBody } from "../components/panel/side-panel";
+import { ConfirmDialog } from "../components/ui/confirm-dialog";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { boliviaToday } from "../lib/bolivia-time";
@@ -78,6 +79,7 @@ export function PromotionPanelForm({
   const [saved, setSaved] = useState(promotion);
   const [image, setImage] = useState(attachedImage(promotion));
   const [failure, setFailure] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const form = useForm<PromotionInput, unknown, PromotionOutput>({
     resolver: zodResolver(promotionSchema),
     defaultValues: {
@@ -107,6 +109,8 @@ export function PromotionPanelForm({
       onDone(await work());
     } catch (error) {
       setFailure(promotionFailureMessage(error));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -147,6 +151,14 @@ export function PromotionPanelForm({
       if (saved === undefined) throw new Error("unsaved");
       await change.mutateAsync({ kind: "unpublish", promotionId: saved.id });
       return `Promoción «${saved.headline}» ya no se publica en la app.`;
+    });
+
+  // Delete archives the row and releases its image (BKM-001, ADR-0076).
+  const remove = () =>
+    run(async () => {
+      if (saved === undefined) throw new Error("unsaved");
+      await change.mutateAsync({ kind: "delete", promotionId: saved.id });
+      return `Promoción «${saved.headline}» eliminada.`;
     });
 
   return (
@@ -248,9 +260,24 @@ export function PromotionPanelForm({
           onPublish={() => void save("publish")}
           onSaveChanges={() => void save("changes")}
           onUnpublish={() => void unpublish()}
-          onDelete={() => undefined}
+          onDelete={() => setDeleting(true)}
         />
       </form>
+      {saved === undefined ? null : (
+        <ConfirmDialog
+          open={deleting}
+          onOpenChange={setDeleting}
+          title={`¿Eliminar la promoción «${saved.headline}»?`}
+          confirmLabel="Eliminar"
+          pending={change.isPending}
+          onConfirm={() => void remove()}
+        >
+          <p>
+            Se quita del carrusel y de esta lista, y su imagen se borra. Esta
+            acción no se puede deshacer.
+          </p>
+        </ConfirmDialog>
+      )}
     </Form>
   );
 }
