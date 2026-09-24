@@ -1455,7 +1455,8 @@ pnpm dev:admin
 ```
 
 Open [http://localhost:5173](http://localhost:5173) in any browser (the tab is
-titled "Emma · Administración" and loads Lora and Work Sans from Google Fonts).
+titled after the page, "Horario · Emma", and loads Lora and Work Sans from
+Google Fonts; before you sign in it reads "Iniciar sesión · Emma").
 Every page now needs a signed-in Administrator, so start the backend
 (Test 2) and log in first as Test 24 describes; `/api/v1` is proxied to
 `http://127.0.0.1:3100` like the Vercel origin will do.
@@ -1478,7 +1479,9 @@ check load first, and each page's code arrives the first time you open it
 (or as soon as you point at its sidebar entry). In the browser's developer
 tools (Network) you can see one small `*-route-*.js` file per page.
 
-1. **Sidebar.** On a desktop-width window the left sidebar shows **Horario**,
+1. **Sidebar.** On a desktop-width window the "Emma" wordmark sits once, at
+   the top of the sidebar, and the content area is the warm Superficie tone,
+   a shade lighter than the sand behind the Login card. The left sidebar shows **Horario**,
    then **Catálogo** (Tipos de clase, Planes, Sucursales), **Back Office**
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
    Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
@@ -1492,6 +1495,11 @@ tools (Network) you can see one small `*-route-*.js` file per page.
    current one with a check, and ends with **Gestionar sucursales** (opens
    Sucursales). Choosing Urubó closes the popover, the cell reads **Sucursal
    Urubó**, and you stay on the same page. Esc or a click outside closes it.
+   It works from the keyboard too: open it with Enter, the current Branch
+   has focus, the arrow keys (and Home/End) move between Branches, and Enter
+   chooses. Press Tab on a fresh page and the first thing focused is a
+   **Saltar al contenido** link that jumps past the sidebar; after any
+   sidebar navigation focus lands on the new page's content.
    On **Reporte** the cell is replaced by "El reporte usa su propio filtro de
    sucursal" (the report has its own selector, Test 30). On **Pagos**,
    **Clientes**, **Nómina**, **Categorías de gasto**, **Referidos**, or
@@ -1553,7 +1561,8 @@ pnpm dev:admin
    must use the new password next time; run the fixtures command again to
    restore `emma-local-2026`.
 5. **Log out.** Open the menu, choose **Cerrar sesión**: it first asks
-   "¿Cerrar sesión?" with **Cancelar**. Confirm, and you are back on Login;
+   "¿Cerrar sesión?" with **Cancelar**, which has focus (press Enter to keep
+   your session). Confirm, and you are back on Login;
    the session cookie is gone and going back to a page asks you to log in.
 6. **Throttling.** On Login, submit a made-up email such as
    `nobody.admin-login@example.com` with any password six times. The seventh
@@ -1591,7 +1600,8 @@ Bolivia time, whatever time zone your computer uses.
    Sessions ("Sucursal Centro · sala única · 10 sesiones esta semana"). The
    arrows and **Hoy** move between weeks and the address remembers the week
    (`/?week=2026-09-28`). Choosing another Branch in the top bar redraws the
-   grid for it without leaving the page.
+   grid for it without leaving the page: "Cargando el horario…" first, then
+   that Branch's Sessions, never the previous Branch's under the new name.
 2. **Nueva sesión.** **+ Nueva sesión** opens the 408 px side panel. **Una sola
    vez** asks for Tipo de clase, Entrenador (only Trainers assigned to the
    Branch), Fecha, Hora, and Capacidad (filled from the Class Type). **Cada
@@ -1674,7 +1684,10 @@ the admin web, exactly as Test 24 describes, and log in as
    días para activar su cuenta."; there is never a temporary password.
 6. **Editar miembro.** Click a Staff Member. The name, email, and phone are
    read-only. Change the Role or the Branches and **Guardar**: the page says
-   "Guardamos los cambios de …". A Trainer who still leads upcoming Sessions
+   "Guardamos los cambios de …". The chips list the active Branches; a
+   member still assigned to a Branch archived since shows only the active
+   ones, and saving sends only those (the archived assignment is dropped
+   rather than refused). A Trainer who still leads upcoming Sessions
    (Emma Vargas) keeps her Branch and the panel explains to swap her in
    Horario first. A pending member shows when the link expires and
    **Reenviar enlace**; a second resend within a minute says it is too soon.
@@ -1725,7 +1738,8 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    confirmado: su plan Paquete de 8 clases empieza hoy.", the badge drops, and
    Clientes shows her new Plan.
 6. **Rechazar** replaces the buttons with **Motivo del rechazo** ("La clienta
-   verá este mensaje para corregir y volver a enviar."); **Confirmar rechazo**
+   verá este mensaje para corregir y volver a enviar."), which has focus so
+   you can type at once; **Confirmar rechazo**
    stays disabled until you type a reason, refuses more than 300 characters,
    and **Cancelar** goes back. After rejecting, the page says "Pago de Mariana Peña
    rechazado: le avisamos el motivo." and she can send a new receipt.
@@ -1796,7 +1810,9 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    recorded in ("Se registra en la sucursal Centro."), and **+ Nueva
    categoría** opens a row to add a category without leaving the form; the
    new one is chosen at once. A correction changes the category, amount, or
-   date, never the Branch.
+   date, never the Branch. A pasted address naming a category (or, in
+   Nómina, a Staff Member) the studio does not have falls back to **Todas**
+   / **Todos** once the list loads.
 9. **Categorías de gasto.** The studio's categories, the same for every
    Branch (the selector says the page is not filtered by Branch). A category
    an Expense uses shows "En uso" and its delete icon is disabled; an unused
@@ -1891,7 +1907,9 @@ dates whatever your computer's time zone.
    gone, and a line says "La nómina y los ingresos por transferencia se ven
    solo en «Todas las sucursales»." Archived Branches are listed as
    "(archivada)" so their history stays readable. The Branch and the range
-   stay in the address (`?branch=…&from=2026-09-01&to=2026-09-24`).
+   stay in the address (`?branch=…&from=2026-09-01&to=2026-09-24`); an
+   address naming a Branch the studio does not have falls back to **Todas
+   las sucursales**.
 6. **Range.** Change **Desde** or **Hasta**; a start after the end says "La
    fecha inicial no puede ser posterior a la final." and keeps the last
    report. A range with no movement says "Sin ingresos ni gastos en este
@@ -1958,10 +1976,15 @@ To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
 `pnpm exec playwright test e2e/session.spec.ts --headed`. A failed journey
 leaves a screenshot and a trace under `apps/admin-web/test-results/`
-(`pnpm exec playwright show-trace <file>` opens it). If a run is killed
+(`pnpm exec playwright show-trace <file>` opens it). The two servers'
+stderr goes to `apps/admin-web/test-results/e2e-backend.stderr.log` and
+`e2e-preview.stderr.log`, so a backend that crashed at startup ("The backend
+did not answer…") can be read there; `E2E_DEBUG=1 pnpm test:admin-e2e`
+prints it in the terminal instead. If a run is killed
 before its teardown, stop the servers it left (`lsof -ti tcp:3101`,
 `lsof -ti tcp:4173`) and drop its database (the name is in the run's first
-line; `psql -l | grep pilates_test_` lists them).
+line; `psql -l | grep pilates_test_` lists them). The teardown itself waits
+at most five seconds for each server before killing it.
 
 Set `TEST_DATABASE_URL` to another `pilates_test_*` admin database, or
 `E2E_API_PORT` and `E2E_WEB_PORT` to other ports, when the defaults collide
