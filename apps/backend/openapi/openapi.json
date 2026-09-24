@@ -4297,6 +4297,100 @@
         ]
       }
     },
+    "/api/v1/clients/current/photo": {
+      "put": {
+        "operationId": "setCurrentClientPhoto",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetClientPhotoDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientProfileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientPhoto"
+        ]
+      },
+      "delete": {
+        "operationId": "removeCurrentClientPhoto",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientPhoto"
+        ]
+      },
+      "get": {
+        "operationId": "getCurrentClientPhoto",
+        "parameters": [
+          {
+            "name": "variant",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "display",
+                "thumbnail"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "image/jpeg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientPhoto"
+        ]
+      }
+    },
     "/api/v1/evaluation-slots": {
       "get": {
         "operationId": "listEvaluationSlots",
@@ -6717,6 +6811,18 @@
           "bookings"
         ]
       },
+      "ClientPhotoDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "imageAssetId"
+        ]
+      },
       "ClientProfileDto": {
         "type": "object",
         "properties": {
@@ -6737,6 +6843,15 @@
           },
           "referralCode": {
             "type": "string"
+          },
+          "photo": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientPhotoDto"
+              }
+            ]
           }
         },
         "required": [
@@ -9428,6 +9543,18 @@
           "headline",
           "description",
           "image"
+        ]
+      },
+      "SetClientPhotoDto": {
+        "type": "object",
+        "properties": {
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "imageAssetId"
         ]
       },
       "EvaluationSlotDto": {

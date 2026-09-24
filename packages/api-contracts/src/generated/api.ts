@@ -94,6 +94,7 @@ import type {
   ExpenseReportDto,
   FinalizedUploadDto,
   GetAdminPromotionImageParams,
+  GetCurrentClientPhotoParams,
   GetExpenseReportParams,
   GetIncomeReportParams,
   GetPaymentReceiptParams,
@@ -159,6 +160,7 @@ import type {
   SessionScheduleEndInputDto,
   SessionScheduleInputDto,
   SessionScheduleReplacementDto,
+  SetClientPhotoDto,
   StaffMemberDto,
   StaffMemberPageDto,
   StaffProfileDto,
@@ -17134,6 +17136,453 @@ export function useGetPromotionImage<
     deliveryVersion,
     options,
   );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type setCurrentClientPhotoResponse200 = {
+  data: ClientProfileDto;
+  status: 200;
+};
+
+export type setCurrentClientPhotoResponseSuccess =
+  setCurrentClientPhotoResponse200 & {
+    headers: Headers;
+  };
+export type setCurrentClientPhotoResponse =
+  setCurrentClientPhotoResponseSuccess;
+
+export const getSetCurrentClientPhotoUrl = () => {
+  return `/api/v1/clients/current/photo`;
+};
+
+export const setCurrentClientPhoto = async (
+  setClientPhotoDto: SetClientPhotoDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setCurrentClientPhotoResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getSetCurrentClientPhotoUrl(), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(setClientPhotoDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setCurrentClientPhotoResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setCurrentClientPhotoResponse;
+};
+
+export const getSetCurrentClientPhotoMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setCurrentClientPhoto>>,
+    TError,
+    SetCurrentClientPhotoMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setCurrentClientPhoto>>,
+  TError,
+  SetCurrentClientPhotoMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["setCurrentClientPhoto"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setCurrentClientPhoto>>,
+    SetCurrentClientPhotoMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return setCurrentClientPhoto(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetCurrentClientPhotoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setCurrentClientPhoto>>
+>;
+export type SetCurrentClientPhotoMutationBody = SetClientPhotoDto;
+export type SetCurrentClientPhotoMutationError = unknown;
+export type SetCurrentClientPhotoMutationVariables = {
+  data: SetClientPhotoDto;
+};
+
+export const useSetCurrentClientPhoto = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setCurrentClientPhoto>>,
+      TError,
+      SetCurrentClientPhotoMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setCurrentClientPhoto>>,
+  TError,
+  SetCurrentClientPhotoMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getSetCurrentClientPhotoMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type removeCurrentClientPhotoResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type removeCurrentClientPhotoResponseSuccess =
+  removeCurrentClientPhotoResponse204 & {
+    headers: Headers;
+  };
+export type removeCurrentClientPhotoResponse =
+  removeCurrentClientPhotoResponseSuccess;
+
+export const getRemoveCurrentClientPhotoUrl = () => {
+  return `/api/v1/clients/current/photo`;
+};
+
+export const removeCurrentClientPhoto = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<removeCurrentClientPhotoResponse> => {
+  const res = await (fetchFn ?? fetch)(getRemoveCurrentClientPhotoUrl(), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: removeCurrentClientPhotoResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as removeCurrentClientPhotoResponse;
+};
+
+export const getRemoveCurrentClientPhotoMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof removeCurrentClientPhoto>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof removeCurrentClientPhoto>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["removeCurrentClientPhoto"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof removeCurrentClientPhoto>>,
+    void
+  > = () => {
+    return removeCurrentClientPhoto(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RemoveCurrentClientPhotoMutationResult = NonNullable<
+  Awaited<ReturnType<typeof removeCurrentClientPhoto>>
+>;
+
+export type RemoveCurrentClientPhotoMutationError = unknown;
+
+export const useRemoveCurrentClientPhoto = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof removeCurrentClientPhoto>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof removeCurrentClientPhoto>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(
+    getRemoveCurrentClientPhotoMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getCurrentClientPhotoResponse200 = {
+  data: Blob;
+  status: 200;
+};
+
+export type getCurrentClientPhotoResponseSuccess =
+  getCurrentClientPhotoResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentClientPhotoResponse =
+  getCurrentClientPhotoResponseSuccess;
+
+export const getGetCurrentClientPhotoUrl = (
+  params?: GetCurrentClientPhotoParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/clients/current/photo?${stringifiedParams}`
+    : `/api/v1/clients/current/photo`;
+};
+
+export const getCurrentClientPhoto = async (
+  params?: GetCurrentClientPhotoParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientPhotoResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentClientPhotoUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.blob();
+  const data: getCurrentClientPhotoResponse["data"] =
+    body as getCurrentClientPhotoResponse["data"];
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientPhotoResponse;
+};
+
+export const getGetCurrentClientPhotoQueryKey = (
+  params?: GetCurrentClientPhotoParams,
+) => {
+  return [
+    `/api/v1/clients/current/photo`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getGetCurrentClientPhotoQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+  TError = unknown,
+>(
+  params?: GetCurrentClientPhotoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentClientPhotoQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientPhoto>>
+  > = ({ signal }) =>
+    getCurrentClientPhoto(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientPhotoQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientPhoto>>
+>;
+export type GetCurrentClientPhotoQueryError = unknown;
+
+export function useGetCurrentClientPhoto<
+  TData = Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+  TError = unknown,
+>(
+  params: undefined | GetCurrentClientPhotoParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientPhoto>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientPhoto<
+  TData = Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+  TError = unknown,
+>(
+  params?: GetCurrentClientPhotoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientPhoto>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientPhoto<
+  TData = Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+  TError = unknown,
+>(
+  params?: GetCurrentClientPhotoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientPhoto<
+  TData = Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+  TError = unknown,
+>(
+  params?: GetCurrentClientPhotoParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPhoto>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentClientPhotoQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,

@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ClientPhotoDto } from "./clientPhotoDto";
 
 export interface ClientProfileDto {
   id: string;
@@ -12,4 +13,6 @@ export interface ClientProfileDto {
   /** @nullable */
   phone?: string | null;
   referralCode: string;
+  /** @nullable */
+  photo?: ClientPhotoDto | null;
 }
