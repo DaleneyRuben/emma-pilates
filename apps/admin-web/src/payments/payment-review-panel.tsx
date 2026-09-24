@@ -42,6 +42,10 @@ function PaymentSummary({ review }: { review: PaymentReviewDto }) {
           <PaymentStatePill state={review.state} />
         </SummaryRow>
       )}
+      {review.rejectionReason === null ||
+      review.rejectionReason === undefined ? null : (
+        <SummaryRow label="Motivo">{review.rejectionReason}</SummaryRow>
+      )}
     </SummaryBlock>
   );
 }
