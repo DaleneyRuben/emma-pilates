@@ -32,11 +32,12 @@ const purposeToPrisma: Record<ImagePurpose, ImageAssetPurpose> = {
   promotion: ImageAssetPurpose.PROMOTION,
 };
 
-const mediaTypes: Record<ImageMediaType, string> = {
+export const imageMediaTypes: Record<ImageMediaType, string> = {
   [ImageMediaType.JPEG]: 'image/jpeg',
   [ImageMediaType.PNG]: 'image/png',
   [ImageMediaType.WEBP]: 'image/webp',
 };
+const mediaTypes = imageMediaTypes;
 
 export const attachImageAsset = async (
   tx: Transaction,

@@ -29,6 +29,8 @@ beyond what the table below names.
 | `client_invitation.cancelled` | System Identity | A pending invitation without activity is removed | Staff Account and Role | `account` | — | `email` (the removed Account no longer exists) |
 | `administrator_bootstrap.created` | System Identity | The bootstrap command creates the first, pending Administrator | `bootstrap` | `account` | — | — |
 | `administrator_bootstrap.activation_resent` | System Identity | The bootstrap command reissues the pending Administrator's link | `bootstrap` | `account` | — | — |
+| `client.photo_changed` | Booking & Membership | A Client attaches or replaces their own profile photo (Client 22); a replaced photo's variants are released at once (ADR-0076) | Client Account | `client` | — | `replaced` |
+| `client.photo_removed` | Booking & Membership | A Client removes their own profile photo; its variants are released at once (ADR-0076) | Client Account | `client` | — | — |
 | `staff_member.created` | Booking & Membership | An Administrator creates a Staff Member with a pending Account | Administrator | `account` | — | `role`, `branchIds` |
 | `staff_member.activation_resent` | Booking & Membership | An Administrator reissues a pending Staff Member's Activation Link | Administrator | `account` | — | — |
 | `staff_member.role_changed` | Booking & Membership | An Administrator changes a Staff Member's Role | Administrator | `account` | — | `previousRole`, `role` |

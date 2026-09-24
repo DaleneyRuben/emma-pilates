@@ -135,9 +135,9 @@ describe('client profile photo (PostgreSQL)', () => {
       include: { variants: true },
     });
     expect(released.deleteRequestedAt).toEqual(later);
-    expect(released.variants.map((variant) => variant.deleteRequestedAt)).toEqual(
-      [later, later],
-    );
+    expect(
+      released.variants.map((variant) => variant.deleteRequestedAt),
+    ).toEqual([later, later]);
     expect(
       (await prisma.imageAsset.findUniqueOrThrow({ where: { id: second.id } }))
         .deleteRequestedAt,

@@ -13,8 +13,7 @@ export const clientPhotoVariants: readonly ClientPhotoVariant[] = [
 ];
 
 export type ClientPhotoErrorCode =
-  | 'profile_photo_not_ready'
-  | 'profile_photo_not_found';
+  'profile_photo_not_ready' | 'profile_photo_not_found';
 
 const statuses: Record<ClientPhotoErrorCode, number> = {
   profile_photo_not_ready: 409,
@@ -33,17 +32,17 @@ export class ClientPhotoError extends Error {
 
 export type ClientPhotoGateway = {
   // Attaches the new upload before releasing the previous photo (ADR-0076).
-  replacePhoto(input: {
+  replacePhoto: (input: {
     clientId: string;
     ownerAccountId: string;
     imageAssetId: string;
     now: Date;
-  }): Promise<ClientProfile>;
-  removePhoto(input: { clientId: string; now: Date }): Promise<void>;
-  readPhotoObject(input: {
+  }) => Promise<ClientProfile>;
+  removePhoto: (input: { clientId: string; now: Date }) => Promise<void>;
+  readPhotoObject: (input: {
     clientId: string;
     variant: ClientPhotoVariant;
-  }): Promise<{ objectKey: string; mediaType: string } | null>;
+  }) => Promise<{ objectKey: string; mediaType: string } | null>;
 };
 
 const requireClient = (principal: AuthenticatedPrincipal): string => {
