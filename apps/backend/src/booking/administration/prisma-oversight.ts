@@ -7,6 +7,7 @@ import {
 } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
+import { readEvaluationKinds } from '../evaluations/evaluation-kinds';
 import { containsPattern } from '../search-pattern';
 import { requireAdministrator } from './administration-errors';
 
@@ -32,6 +33,7 @@ export const createPrismaOversight = (
       from: Date;
       until: Date;
       nutritionistStaffMemberId?: string;
+      branchId?: string;
     },
     principal: AuthenticatedPrincipal,
   ) => {
@@ -40,6 +42,7 @@ export const createPrismaOversight = (
       state: EvaluationState.BOOKED,
       slot: {
         startsAt: { gte: query.from, lt: query.until },
+        ...(query.branchId === undefined ? {} : { branchId: query.branchId }),
         ...(query.nutritionistStaffMemberId === undefined
           ? {}
           : { nutritionistStaffMemberId: query.nutritionistStaffMemberId }),
@@ -53,11 +56,13 @@ export const createPrismaOversight = (
         take: query.pageSize,
         select: {
           id: true,
+          clientId: true,
           client: { select: { name: true } },
           slot: {
             select: {
               startsAt: true,
               endsAt: true,
+              branchId: true,
               branch: { select: { name: true } },
               nutritionist: { select: { id: true, name: true } },
             },
@@ -66,15 +71,21 @@ export const createPrismaOversight = (
       }),
       prisma.evaluation.count({ where }),
     ]);
+    const kindOf = await readEvaluationKinds(
+      prisma,
+      rows.map((row) => row.clientId),
+    );
     return {
       items: rows.map((row) => ({
         evaluationId: row.id,
         clientName: row.client.name,
         nutritionistStaffMemberId: row.slot.nutritionist.id,
         nutritionistName: row.slot.nutritionist.name,
+        branchId: row.slot.branchId,
         branchName: row.slot.branch.name,
         startsAt: row.slot.startsAt,
         endsAt: row.slot.endsAt,
+        kind: kindOf(row.clientId, row.slot.startsAt),
       })),
       page: query.page,
       pageSize: query.pageSize,
