@@ -1,6 +1,6 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { ChevronLeft, ChevronRight, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
 import { NoBranchPage } from "../components/page/no-branch-page";
@@ -8,12 +8,8 @@ import { PageHeader } from "../components/page/page-header";
 import { PageNotice } from "../components/page/page-notice";
 import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { Button } from "../components/ui/button";
-import {
-  addDays,
-  boliviaToday,
-  formatWeekRange,
-  weekStartOf,
-} from "../lib/bolivia-time";
+import { WeekStepper } from "../components/table/week-stepper";
+import { addDays, boliviaToday, weekStartOf } from "../lib/bolivia-time";
 import { useBranchSelection } from "../shell/branch/use-branch-selection";
 import { useIsNarrowViewport } from "../shell/use-media-query";
 import { DayList } from "./day-list";
@@ -95,34 +91,7 @@ export function SchedulePage({
           )
         }
       />
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="neutral"
-          size="icon"
-          aria-label="Semana anterior"
-          onClick={() => onWeekChange(addDays(monday, -7))}
-        >
-          <ChevronLeft size={16} strokeWidth={1.8} aria-hidden="true" />
-        </Button>
-        <Button
-          variant="neutral"
-          size="icon"
-          aria-label="Semana siguiente"
-          onClick={() => onWeekChange(addDays(monday, 7))}
-        >
-          <ChevronRight size={16} strokeWidth={1.8} aria-hidden="true" />
-        </Button>
-        <Button
-          variant="neutral"
-          size="sm"
-          onClick={() => onWeekChange(weekStartOf(today))}
-        >
-          Hoy
-        </Button>
-        <p className="font-serif text-[17px] text-texto">
-          {formatWeekRange(monday)}
-        </p>
-      </div>
+      <WeekStepper monday={monday} today={today} onChange={onWeekChange} />
       {notice === null ? null : <PageNotice>{notice}</PageNotice>}
       {sessions.isPending ? (
         <LoadingNotice>Cargando el horario…</LoadingNotice>
