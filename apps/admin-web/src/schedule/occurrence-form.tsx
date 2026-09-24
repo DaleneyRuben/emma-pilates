@@ -106,7 +106,7 @@ export function OccurrenceForm({
       onDone("Sesión actualizada.");
     } catch (error) {
       const problem = scheduleProblem(error);
-      if (problem.field === undefined || problem.field === "effectiveFrom") {
+      if (problem.field === undefined) {
         onFailure(problem.message);
       } else {
         form.setError(problem.field, { message: problem.message });

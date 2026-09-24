@@ -1,7 +1,6 @@
 import { isApiError } from "../api/problem";
 
-export type ScheduleField =
-  "trainerStaffMemberId" | "capacity" | "date" | "effectiveFrom";
+export type ScheduleField = "trainerStaffMemberId" | "capacity" | "date";
 
 type Problem = { field?: ScheduleField; message: string };
 
