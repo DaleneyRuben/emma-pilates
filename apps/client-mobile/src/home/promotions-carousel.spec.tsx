@@ -105,7 +105,7 @@ describe("Client Home Promotions carousel", () => {
     expect(image).toHaveStyle({ aspectRatio: 16 / 9 });
 
     expect(screen.getByLabelText("Promoción 1 de 2")).toBeOnTheScreen();
-    fireEvent(screen.getByTestId("promotions-carousel"), "momentumScrollEnd", {
+    await fireEvent(screen.getByTestId("promotions-carousel"), "momentumScrollEnd", {
       nativeEvent: { contentOffset: { x: 732 } },
     });
     expect(screen.getByLabelText("Promoción 2 de 2")).toBeOnTheScreen();
@@ -167,7 +167,7 @@ describe("Client Home Promotions carousel", () => {
       expect(screen.getByText("Nueva sala de Reformer en Urubó")).toBeOnTheScreen();
     });
 
-    fireEvent(screen.getByLabelText("Nueva sala de Reformer en Urubó"), "error");
+    await fireEvent(screen.getByLabelText("Nueva sala de Reformer en Urubó"), "error");
 
     await waitFor(() => {
       expect(screen.queryByText("Nueva sala de Reformer en Urubó")).not.toBeOnTheScreen();
@@ -195,7 +195,10 @@ describe("Client Home Promotions carousel", () => {
       expect(screen.getByText("Nueva sala de Reformer en Urubó")).toBeOnTheScreen();
     });
 
-    fireEvent(screen.getByTestId("home-refresh"), "refresh");
+    // React Native's Jest mock keeps no props on the refresh control host, so
+    // it is the scroll view's first child; the event still reaches onRefresh.
+    const [refreshControl] = screen.getByTestId("home-scroll").children;
+    await fireEvent(refreshControl as Parameters<typeof fireEvent>[0], "refresh");
 
     await waitFor(() => {
       expect(screen.queryByText("Novedades del estudio")).not.toBeOnTheScreen();

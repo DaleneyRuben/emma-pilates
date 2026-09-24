@@ -3,6 +3,7 @@ import {
   useGetCurrentClientReferrals,
   useGetCurrentClientSubscription,
   useListEvaluations,
+  useListPromotions,
   type ClientSubscriptionDto,
 } from "@pilates/api-contracts";
 import {
@@ -18,7 +19,15 @@ import {
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useState } from "react";
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import {
@@ -29,6 +38,7 @@ import {
   referralShortcut,
   subscriptionBadge,
 } from "./home-format";
+import { PromotionsCarousel } from "./promotions-carousel";
 
 type HomeNavigation = {
   navigate: (
@@ -164,9 +174,21 @@ export function HomeScreen() {
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const evaluations = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const referrals = useGetCurrentClientReferrals(queryOptions);
+  const promotions = useListPromotions(queryOptions);
+  const [refreshing, setRefreshing] = useState(false);
 
   const retry = () => {
     void Promise.all([profile.refetch(), subscription.refetch()]);
+  };
+
+  const refresh = async () => {
+    setRefreshing(true);
+    await Promise.all(
+      [profile, subscription, evaluations, referrals, promotions].map((query) =>
+        query.refetch(),
+      ),
+    );
+    setRefreshing(false);
   };
 
   if (profile.isPending || subscription.isPending) {
@@ -206,8 +228,23 @@ export function HomeScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl
+            onRefresh={() => void refresh()}
+            refreshing={refreshing}
+            tintColor={colors.primary}
+          />
+        }
+        testID="home-scroll"
+      >
         <Heading accessibilityLabel="Inicio">{`Hola, ${firstName(profile.data.data.name)}`}</Heading>
+        <PromotionsCarousel
+          loading={promotions.isPending}
+          onImageMissing={() => void promotions.refetch()}
+          promotions={promotions.data?.status === 200 ? promotions.data.data : []}
+        />
         {hasActivePlan ? (
           <SubscriptionCard
             onDetail={() => navigation.navigate("Subscription")}
