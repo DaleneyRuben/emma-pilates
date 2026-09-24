@@ -6,6 +6,7 @@ import { branchTableQueryOptions } from "../../catalog/branches/branch-queries";
 import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { ListFilter } from "../../components/table/list-filter";
+import { pageRangeLabel } from "../../components/table/pagination";
 import { StatusPill } from "../../components/ui/status-pill";
 import { staffRoles, type StaffRole, type StaffSearch } from "../people-search";
 import { branchNames, roleLabels, statusPills } from "./staff-format";
@@ -111,6 +112,11 @@ export function StaffPage({
       }
       search={search}
       onPageChange={(page) => onSearchChange({ page })}
+      rangeLabel={(window) =>
+        window.totalItems === 0
+          ? pageRangeLabel(window)
+          : `${pageRangeLabel(window)} ${window.totalItems === 1 ? "miembro" : "miembros"}`
+      }
       query={query}
       columns={staffColumns(names)}
       renderForm={(member, done) => (
