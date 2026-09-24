@@ -11,9 +11,8 @@ import {
 } from './database-test-context';
 
 const today = new Date('2026-09-21T00:00:00.000Z');
-// Bookings take the database clock as created_at, so the command clock must
-// not run behind it.
-const now = new Date();
+// The clock after September, while the fixtures stay pinned to 21/09.
+const now = new Date('2026-10-15T14:00:00.000Z');
 
 describe('Administrator Session cancellation', () => {
   let context: DatabaseTestContext;
@@ -62,7 +61,7 @@ describe('Administrator Session cancellation', () => {
   });
 
   it('cancels the Session, refunds every booked Client, closes the waitlist, audits, and notifies', async () => {
-    const commands = new PrismaBookingCommands(prisma, () => new Date());
+    const commands = new PrismaBookingCommands(prisma, () => now);
     const lucia = await principalOf('lucia@example.com');
     const valeria = await principalOf('valeria@example.com');
     const admin = await principalOf('paola.mendoza@example.com');
