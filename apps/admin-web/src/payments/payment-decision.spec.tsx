@@ -185,6 +185,10 @@ describe("AW29 decisions on a desktop browser", () => {
     const { panel, user } = await openSofia();
 
     await user.click(within(panel).getByRole("button", { name: "Rechazar" }));
+    // The buttons are gone: focus moves to the reason, the next step.
+    expect(
+      within(panel).getByRole("textbox", { name: "Motivo del rechazo" }),
+    ).toHaveFocus();
     await user.type(
       within(panel).getByRole("textbox", { name: "Motivo del rechazo" }),
       "No encuentro la transferencia",
@@ -206,6 +210,9 @@ describe("AW29 decisions on a desktop browser", () => {
     expect(
       within(panel).queryByRole("textbox", { name: "Motivo del rechazo" }),
     ).not.toBeInTheDocument();
+    expect(
+      within(panel).getByRole("button", { name: "Rechazar" }),
+    ).toHaveFocus();
   });
 
   it("shows the settled Payment when someone else decided it first", async () => {
