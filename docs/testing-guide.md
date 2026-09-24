@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26) | Payments, Promotions, Back Office, oversight lists, and the report are still placeholders (WEB-005 onward); valid activation and recovery links still cannot be read from the local email capture |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27) | Promotions, Back Office, oversight lists, and the report are still placeholders (WEB-006 onward); valid activation and recovery links still cannot be read from the local email capture |
 
 ## Before you begin
 
@@ -1659,6 +1659,56 @@ fixture Accounts but does not delete Staff Members you created. The activation
 email goes to the worker's local capture, so the new person cannot activate
 from this test yet (see "What you cannot test yet").
 
+## Test 27: review transfer Payments in the admin web
+
+Start the backend on `pilates_dev_sim` after loading the fixtures, start the
+worker next to it (receipt uploads are verified by the worker), and start the
+admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
+`mariana@example.com` from the Client app (Test 10B) or through Swagger (Test
+7, "Buying a Plan through Swagger"). Then log in to the admin web as
+`paola.mendoza@example.com` / `emma-local-2026`.
+
+1. **The badge.** The sidebar shows the number of transfers waiting next to
+   **Pagos** on every page; with nothing waiting it shows no number.
+2. **Pagos.** Back Office → **Pagos** lists the studio's transfer Payments,
+   not only one Branch's (the Branch selector says this page is not filtered
+   by Branch). There is no **+ Nuevo** button: Clients raise Payments from the
+   app. The subtitle reads "Todo el estudio · 1 transferencia esperando
+   revisión". The **Estado** filter starts on **Pendiente**, oldest first;
+   **Todos**, **Confirmado**, and **Rechazado** stay in the address
+   (`?status=all`). Each row shows the Client, the Plan, the amount she
+   transferred as `Bs 560,00` on the right (with "con Bs 60,00 de crédito"
+   under it when Credit paid part), the date and time sent in Bolivia time
+   (`23/09/2026 · 22:51`), and **Pendiente**, **Confirmado**, or **Rechazado**.
+   Cash and Credit-only Payments never appear: they are confirmed when they are
+   recorded. **Buscar por cliente** finds a name without accents or capitals
+   ("mariana").
+3. **Only pending rows open.** A **Confirmado** or **Rechazado** row does
+   nothing; the row is the whole record.
+4. **Revisar pago.** Click a pending Client: the side panel (the whole screen
+   on a phone) shows the Client and Plan, **Monto a verificar**, the Plan price
+   and **Crédito aplicado** when Credit was used, the date, **Transferencia**,
+   and the receipt image read straight from the API (never cached). **Ver en
+   grande** (or a click on the image) opens it above everything; Esc, the ✕,
+   or a click outside returns to the panel as it was.
+5. **Confirmar pago** asks first ("¿Confirmar el pago de Mariana Peña?"); after
+   confirming, the panel closes, the page says "Pago de Mariana Peña
+   confirmado: su plan Paquete de 8 clases empieza hoy.", the badge drops, and
+   Clientes shows her new Plan.
+6. **Rechazar** replaces the buttons with **Motivo del rechazo** ("La clienta
+   verá este mensaje para corregir y volver a enviar."); **Confirmar rechazo**
+   stays disabled until you type a reason, refuses more than 300 characters,
+   and **Cancelar** goes back. After rejecting, the page says "Pago de Mariana Peña
+   rechazado: le avisamos el motivo." and she can send a new receipt.
+7. **Someone else first.** Open a pending Payment, decide it from the Staff app
+   (Test 10C) or Swagger, then press **Confirmar pago** in the browser: the
+   panel says "Otra persona ya decidió este pago." with the new state (and the
+   reason of a rejection) and offers no buttons.
+
+Payments, their Subscriptions, and the Credit ledger are append-only money
+history, so the Payments you make here stay in `pilates_dev_sim`; the fixtures
+command does not remove them.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1676,7 +1726,7 @@ The following are not ready for manual product testing:
 - Promotions and image variants (UPL-002);
 - Back Office screens (the API works, see Test 22; the screens are WEB-007);
 - any admin-web section beyond logging in, Horario, the Catálogo pages,
-  Clientes, and Personal (Tests 23 to 26): the other sections are
+  Clientes, Pagos, and Personal (Tests 23 to 27): the other sections are
   placeholders;
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
