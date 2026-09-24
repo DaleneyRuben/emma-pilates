@@ -28,6 +28,10 @@ const keptNote = (kept: number, suffix: string): string =>
     ? `1 con reservas se mantiene${suffix}`
     : `${kept} con reservas se mantienen${suffix}`;
 
+// Only the groups of Sessions that exist are named.
+const clauses = (parts: (string | false)[]): string =>
+  parts.filter((part): part is string => part !== false).join(" y ");
+
 export const replacedNotice = (
   result: {
     created: number;
@@ -36,14 +40,34 @@ export const replacedNotice = (
     keptSessions: number;
   },
   effectiveFrom: string,
-): string =>
-  `Serie actualizada desde el ${formatCivilDate(effectiveFrom)}: ${count(result.created, "sesión nueva", "sesiones nuevas")}; ${result.cancelledSessions} sin reservas ${result.cancelledSessions === 1 ? "se reemplazó" : "se reemplazaron"} y ${keptNote(result.keptSessions, " sin cambios")}.${skippedNote(result.skipped)}`;
+): string => {
+  const changed = clauses([
+    result.cancelledSessions > 0 &&
+      `${result.cancelledSessions} sin reservas ${result.cancelledSessions === 1 ? "se reemplazó" : "se reemplazaron"}`,
+    result.keptSessions > 0 && keptNote(result.keptSessions, " sin cambios"),
+  ]);
+  const created = count(result.created, "sesión nueva", "sesiones nuevas");
+  return `Serie actualizada desde el ${formatCivilDate(effectiveFrom)}: ${created}${changed === "" ? "" : `; ${changed}`}.${skippedNote(result.skipped)}`;
+};
 
 export const endedNotice = (
   result: { cancelledSessions: number; keptSessions: number },
   effectiveFrom: string,
-): string =>
-  `La serie deja de repetirse desde el ${formatCivilDate(effectiveFrom)}: ${count(result.cancelledSessions, "sesión sin reservas se canceló", "sesiones sin reservas se cancelaron")} y ${keptNote(result.keptSessions, "")}.`;
+): string => {
+  const date = formatCivilDate(effectiveFrom);
+  const changed = clauses([
+    result.cancelledSessions > 0 &&
+      count(
+        result.cancelledSessions,
+        "sesión sin reservas se canceló",
+        "sesiones sin reservas se cancelaron",
+      ),
+    result.keptSessions > 0 && keptNote(result.keptSessions, ""),
+  ]);
+  return changed === ""
+    ? `La serie deja de repetirse desde el ${date}. No había sesiones futuras que cambiar.`
+    : `La serie deja de repetirse desde el ${date}: ${changed}.`;
+};
 
 export const cancelledNotice = (affectedBookings: number): string =>
   `Sesión cancelada: ${count(affectedBookings, "reserva reembolsada", "reservas reembolsadas")} y avisos enviados.`;
