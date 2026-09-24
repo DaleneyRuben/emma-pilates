@@ -38,6 +38,9 @@ describe('Upload cleanup gateway', () => {
   });
 
   afterEach(async () => {
+    await prisma.imageVariant.deleteMany({
+      where: { imageAsset: { ownerAccountId: { in: createdAccountIds } } },
+    });
     await prisma.imageAsset.deleteMany({
       where: { ownerAccountId: { in: createdAccountIds } },
     });
@@ -104,7 +107,10 @@ describe('Upload cleanup gateway', () => {
     });
     await storage.put(asset.pendingObjectKey, Buffer.from('bytes'));
 
-    await expect(runCleanup(now)).resolves.toEqual({ cleaned: 1 });
+    await expect(runCleanup(now)).resolves.toEqual({
+      cleaned: 1,
+      variantsCleaned: 0,
+    });
 
     const reloaded = await prisma.imageAsset.findUniqueOrThrow({
       where: { id: asset.id },
@@ -122,7 +128,10 @@ describe('Upload cleanup gateway', () => {
       deletionDueAt: new Date('2026-09-17T00:00:00Z'),
     });
 
-    await expect(runCleanup(now)).resolves.toEqual({ cleaned: 0 });
+    await expect(runCleanup(now)).resolves.toEqual({
+      cleaned: 0,
+      variantsCleaned: 0,
+    });
 
     const reloaded = await prisma.imageAsset.findUniqueOrThrow({
       where: { id: asset.id },
@@ -131,7 +140,28 @@ describe('Upload cleanup gateway', () => {
     expect(reloaded.deletedAt).toBeNull();
   });
 
-  it('deletes an attached transfer receipt once its retention has ended', async () => {
+  const createVariant = (
+    imageAssetId: string,
+    kind: 'READABLE' | 'THUMBNAIL' | 'PROMOTION_480',
+    visibility: 'PRIVATE' | 'PUBLIC',
+    deleteRequestedAt: Date | null = null,
+  ) =>
+    prisma.imageVariant.create({
+      data: {
+        imageAssetId,
+        kind,
+        visibility,
+        storageKey: `${visibility.toLowerCase()}/${imageAssetId}/${kind.toLowerCase()}-${randomUUID()}`,
+        mediaType: ImageMediaType.JPEG,
+        byteSize: 5,
+        width: 2,
+        height: 2,
+        deleteRequestedAt,
+      },
+    });
+
+  // ADR-0075: every variant of a retained receipt goes with it.
+  it('deletes an attached transfer receipt and every variant once its retention has ended', async () => {
     const account = await createAccount();
     const now = new Date('2026-09-18T00:00:00Z');
     const asset = await createImageAsset(account.id, {
@@ -139,15 +169,66 @@ describe('Upload cleanup gateway', () => {
       purpose: 'TRANSFER_RECEIPT',
       deletionDueAt: new Date('2026-09-17T00:00:00Z'),
     });
-    await storage.put(asset.pendingObjectKey, Buffer.from('bytes'));
+    const readable = await createVariant(asset.id, 'READABLE', 'PRIVATE');
+    const thumbnail = await createVariant(asset.id, 'THUMBNAIL', 'PRIVATE');
+    await storage.put(readable.storageKey, Buffer.from('bytes'));
+    await storage.put(thumbnail.storageKey, Buffer.from('bytes'));
 
-    await expect(runCleanup(now)).resolves.toEqual({ cleaned: 1 });
+    await expect(runCleanup(now)).resolves.toEqual({
+      cleaned: 1,
+      variantsCleaned: 0,
+    });
 
     const reloaded = await prisma.imageAsset.findUniqueOrThrow({
       where: { id: asset.id },
+      include: { variants: true },
     });
     expect(reloaded.state).toBe('DELETED');
     expect(reloaded.deletedAt).toEqual(now);
+    expect(reloaded.variants.map((v) => v.deletedAt)).toEqual([now, now]);
+    await expect(storage.get(readable.storageKey)).rejects.toThrow();
+    await expect(storage.get(thumbnail.storageKey)).rejects.toThrow();
+  });
+
+  // ADR-0077: unpublished public copies go on their own; the private
+  // variants and the asset stay.
+  it('deletes variants whose deletion was requested and keeps the rest of the asset', async () => {
+    const account = await createAccount();
+    const now = new Date('2026-09-18T00:00:00Z');
+    const asset = await createImageAsset(account.id, {
+      state: ImageAssetState.ATTACHED,
+    });
+    const kept = await createVariant(asset.id, 'PROMOTION_480', 'PRIVATE');
+    const unpublished = await createVariant(
+      asset.id,
+      'PROMOTION_480',
+      'PUBLIC',
+      new Date('2026-09-17T23:00:00Z'),
+    );
+    await storage.put(kept.storageKey, Buffer.from('bytes'));
+    await storage.put(unpublished.storageKey, Buffer.from('bytes'));
+
+    await expect(runCleanup(now)).resolves.toEqual({
+      cleaned: 0,
+      variantsCleaned: 1,
+    });
+
+    const variants = await prisma.imageVariant.findMany({
+      where: { imageAssetId: asset.id },
+      orderBy: { visibility: 'asc' },
+    });
+    expect(variants.map((v) => [v.visibility, v.deletedAt])).toEqual([
+      ['PRIVATE', null],
+      ['PUBLIC', now],
+    ]);
+    await expect(storage.get(kept.storageKey)).resolves.toEqual(
+      Buffer.from('bytes'),
+    );
+    await expect(storage.get(unpublished.storageKey)).rejects.toThrow();
+    expect(
+      (await prisma.imageAsset.findUniqueOrThrow({ where: { id: asset.id } }))
+        .state,
+    ).toBe('ATTACHED');
   });
 
   it('leaves an upload that is not yet due untouched', async () => {
@@ -157,7 +238,10 @@ describe('Upload cleanup gateway', () => {
       deletionDueAt: new Date('2026-09-19T00:00:00Z'),
     });
 
-    await expect(runCleanup(now)).resolves.toEqual({ cleaned: 0 });
+    await expect(runCleanup(now)).resolves.toEqual({
+      cleaned: 0,
+      variantsCleaned: 0,
+    });
 
     const reloaded = await prisma.imageAsset.findUniqueOrThrow({
       where: { id: asset.id },
@@ -175,7 +259,10 @@ describe('Upload cleanup gateway', () => {
     });
     await storage.put(asset.pendingObjectKey, Buffer.from('bytes'));
 
-    await expect(runCleanup(now)).resolves.toEqual({ cleaned: 1 });
+    await expect(runCleanup(now)).resolves.toEqual({
+      cleaned: 1,
+      variantsCleaned: 0,
+    });
 
     const reloaded = await prisma.imageAsset.findUniqueOrThrow({
       where: { id: asset.id },
