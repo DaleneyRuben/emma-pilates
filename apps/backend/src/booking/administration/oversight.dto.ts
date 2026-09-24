@@ -15,6 +15,7 @@ export const parseEvaluationListQuery = (value: unknown) =>
       from: z.iso.datetime(),
       until: z.iso.datetime(),
       nutritionistStaffMemberId: uuid.optional(),
+      branchId: uuid.optional(),
       ...paging,
     })
     .refine(({ from, until }) => new Date(from) < new Date(until))
@@ -53,9 +54,15 @@ export class AdminEvaluationDto {
   @ApiProperty() clientName!: string;
   @ApiProperty({ format: 'uuid' }) nutritionistStaffMemberId!: string;
   @ApiProperty() nutritionistName!: string;
+  @ApiProperty({ format: 'uuid' }) branchId!: string;
   @ApiProperty() branchName!: string;
   @ApiProperty({ format: 'date-time' }) startsAt!: Date;
   @ApiProperty({ format: 'date-time' }) endsAt!: Date;
+  @ApiProperty({
+    enum: ['first', 'follow_up'],
+    description: "Derived from the Client's earlier booked Evaluations",
+  })
+  kind!: 'first' | 'follow_up';
 }
 
 export class AdminEvaluationPageDto {

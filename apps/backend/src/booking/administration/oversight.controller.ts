@@ -60,6 +60,12 @@ export class AdministratorOversightController extends AdministrationController {
     required: false,
     schema: { format: 'uuid' },
   })
+  @ApiQuery({
+    name: 'branchId',
+    required: false,
+    schema: { format: 'uuid' },
+    description: 'Only the Evaluations held at this Branch',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
   @ApiOkResponse({ type: AdminEvaluationPageDto })
