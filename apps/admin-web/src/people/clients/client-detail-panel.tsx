@@ -4,7 +4,6 @@ import {
   type AdminClientDetailDto,
 } from "@pilates/api-contracts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
-import type { ReactNode } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { isApiError } from "../../api/problem";
 import {
@@ -12,6 +11,7 @@ import {
   QueryFailure,
 } from "../../components/page/query-failure";
 import { SidePanelBody } from "../../components/panel/side-panel";
+import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { StatusPill } from "../../components/ui/status-pill";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
@@ -24,90 +24,51 @@ const clientDetailQueryOptions = (clientId: string) =>
         .data as AdminClientDetailDto,
   });
 
-function Block({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <section className="flex flex-col gap-1.5">
-      <h3 className="font-sans text-etiqueta-campo font-medium tracking-[0.14em] text-texto-tenue uppercase">
-        {title}
-      </h3>
-      <dl className="flex flex-col divide-y divide-divisor rounded-control border border-divisor bg-superficie">
-        {children}
-      </dl>
-    </section>
-  );
-}
-
-// Read-only rows on Superficie (AW22): the whole panel is a summary.
-function Row({
-  label,
-  children,
-  figure = false,
-}: {
-  label: string;
-  children: ReactNode;
-  figure?: boolean;
-}) {
-  return (
-    <div className="flex items-baseline justify-between gap-4 px-3 py-2">
-      <dt className="text-nota text-texto-tenue">{label}</dt>
-      <dd
-        className={
-          figure
-            ? "text-right font-serif text-[15px] text-texto tabular"
-            : "text-right text-nota text-texto"
-        }
-      >
-        {children}
-      </dd>
-    </div>
-  );
-}
-
 function PlanBlock({ view }: { view: AdminClientDetailDto["subscription"] }) {
   const current = view.subscription;
   if (current === null || current === undefined || view.status === "none") {
     return (
-      <Block title="Plan">
-        <Row label="Plan">
+      <SummaryBlock title="Plan">
+        <SummaryRow label="Plan">
           <span className="text-texto-muy-tenue">Sin plan activo</span>
-        </Row>
-      </Block>
+        </SummaryRow>
+      </SummaryBlock>
     );
   }
   if (view.status === "expired") {
     return (
-      <Block title="Plan">
-        <Row label="Plan">
+      <SummaryBlock title="Plan">
+        <SummaryRow label="Plan">
           <span className="flex items-center justify-end gap-2">
             <span className="text-texto-muy-tenue">Sin plan activo</span>
             <StatusPill tone="error">Expirado</StatusPill>
           </span>
-        </Row>
+        </SummaryRow>
         <p className="px-3 py-2 text-ayuda text-texto-tenue">
           Último plan vencido el {formatCivilDate(current.endsOn)}.
         </p>
-      </Block>
+      </SummaryBlock>
     );
   }
   return (
-    <Block title="Plan">
-      <Row label="Plan">
+    <SummaryBlock title="Plan">
+      <SummaryRow label="Plan">
         <span className="flex items-center justify-end gap-2">
           {current.planName}
           <StatusPill tone="exito">Activo</StatusPill>
         </span>
-      </Row>
-      <Row label="Vigencia">
+      </SummaryRow>
+      <SummaryRow label="Vigencia">
         <span className="tabular">
           {formatCivilDate(current.startsOn)} –{" "}
           {formatCivilDate(current.endsOn)}
         </span>
-      </Row>
+      </SummaryRow>
       {/* Every Plan grants a fixed number of classes (follow-up 11). */}
-      <Row label="Clases disponibles" figure>
+      <SummaryRow label="Clases disponibles" figure>
         {current.remainingClassAllowance} de {current.originalClassAllowance}
-      </Row>
-    </Block>
+      </SummaryRow>
+    </SummaryBlock>
   );
 }
 
@@ -128,34 +89,34 @@ function ClientSummary({ client }: { client: AdminClientDetailDto }) {
       {client.accountStatus === "disabled" ? (
         <StatusPill tone="neutral">Cuenta desactivada</StatusPill>
       ) : null}
-      <Block title="Contacto">
-        <Row label="Correo">{client.email}</Row>
-        <Row label="Teléfono">
+      <SummaryBlock title="Contacto">
+        <SummaryRow label="Correo">{client.email}</SummaryRow>
+        <SummaryRow label="Teléfono">
           {client.phone === null ? (
             <span className="text-texto-muy-tenue">Sin teléfono</span>
           ) : (
             <span className="tabular">{client.phone}</span>
           )}
-        </Row>
-      </Block>
+        </SummaryRow>
+      </SummaryBlock>
       <PlanBlock view={client.subscription} />
-      <Block title="Crédito">
-        <Row label="Saldo disponible" figure>
+      <SummaryBlock title="Crédito">
+        <SummaryRow label="Saldo disponible" figure>
           {formatBolivianos(client.creditAvailableCentavos)}
-        </Row>
-      </Block>
-      <Block title="Referidos">
-        <Row label="Clientas referidas" figure>
+        </SummaryRow>
+      </SummaryBlock>
+      <SummaryBlock title="Referidos">
+        <SummaryRow label="Clientas referidas" figure>
           {client.referredClientCount === 0
             ? "Ninguna todavía"
             : client.referredClientCount}
-        </Row>
-        <Row label="Código">
+        </SummaryRow>
+        <SummaryRow label="Código">
           <span className="rounded-md border border-borde bg-blanco px-2 py-0.5 font-mono text-ayuda tracking-wider text-texto-secundario">
             {client.referralCode}
           </span>
-        </Row>
-      </Block>
+        </SummaryRow>
+      </SummaryBlock>
     </>
   );
 }
