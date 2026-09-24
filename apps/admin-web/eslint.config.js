@@ -33,6 +33,12 @@ export default tseslint.config(
     },
   },
   {
+    // The Playwright suite and its config run in Node, not the browser.
+    files: ["e2e/**/*.ts", "playwright.config.ts"],
+    languageOptions: { globals: globals.node },
+    rules: { "react-refresh/only-export-components": "off" },
+  },
+  {
     files: [
       "src/**/*.spec.{ts,tsx}",
       "src/test/**/*.{ts,tsx}",
