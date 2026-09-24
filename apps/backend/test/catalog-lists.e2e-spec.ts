@@ -138,7 +138,9 @@ describe('catalog list endpoints (e2e)', () => {
         .get(path)
         .set('authorization', bearer)
         .expect(400)
-        .expect(({ body }) => expect(body.code).toBe('invalid_request'));
+        .expect(({ body }: { body: { code?: string } }) =>
+          expect(body.code).toBe('invalid_request'),
+        );
     }
     expect(lists.listBranches).not.toHaveBeenCalled();
   });
@@ -151,7 +153,7 @@ describe('catalog list endpoints (e2e)', () => {
       .get('/api/v1/administrator/plans')
       .set('authorization', bearer)
       .expect(403)
-      .expect(({ body }) =>
+      .expect(({ body }: { body: { code?: string } }) =>
         expect(body.code).toBe('administration_access_denied'),
       );
   });
