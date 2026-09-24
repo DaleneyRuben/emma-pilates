@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27) | Promotions, Back Office, oversight lists, and the report are still placeholders (WEB-006 onward); valid activation and recovery links still cannot be read from the local email capture |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29) | Promotions and the report are still placeholders (WEB-006, WEB-009); valid activation and recovery links still cannot be read from the local email capture |
 
 ## Before you begin
 
@@ -1387,9 +1387,13 @@ Roles get `403 administration_access_denied`.
    Session; `PATCH …/{id}` changes its start, Trainer, or capacity. Overlaps
    answer `409 session_overlap`, and capacity below the booked count answers
    `409 capacity_below_bookings`.
-4. **Oversight**: `GET evaluations?from=…&until=…`, `DELETE evaluations/{id}`
-   (cancels it for the Client), `GET referrals?query=sofia`, `GET credits`
-   (Clients with available Credit and the studio total), and
+4. **Oversight**: `GET evaluations?from=…&until=…&branchId=…` (booked
+   Evaluations of one Branch, each with `kind` `first` or `follow_up`),
+   `DELETE evaluations/{id}` (cancels it for the Client), `GET
+   referrals?query=sofia` (with the studio's `awardedCount` and
+   `pendingCount` and each referrer's `referrerReferralCount`), `GET credits`
+   (Clients with available Credit, the studio total, and each one's
+   `lastMovementKind`), and
    `GET reports/income?from=…&until=…&branchId=…` (income by month and method;
    with a Branch only its cash counts).
 
@@ -1460,11 +1464,11 @@ Every page now needs a signed-in Administrator, so start the backend
    (Clientes, Pagos, Insumos, Evaluaciones nutricionales, Personal, Nómina,
    Gastos, Categorías de gasto), **Reporte**, and **Promociones** (Promociones,
    Referidos, Créditos). There is no "Descuentos". Horario, the Catálogo
-   pages, and the Back Office pages except Evaluaciones nutricionales are
-   real (Tests 25 to 28); every other entry opens a page with that title,
-   "Esta sección aún no está disponible.", and the design screen it will
-   implement (for example "Pantalla AW25"); the entry is highlighted in the
-   sidebar and the address changes (`/back-office/evaluaciones-nutricionales`).
+   pages, the Back Office pages, Referidos, and Créditos are real (Tests 25
+   to 29); Reporte and Promociones open a page with that title, "Esta
+   sección aún no está disponible.", and the design screen it will implement
+   (for example "Pantalla AW17"); the entry is highlighted in the sidebar and
+   the address changes (`/promociones`).
 2. **Branch selector.** The top bar shows **Sucursal Centro**. Click it: a
    popover lists Centro, Equipetrol, and Urubó with their addresses, marks the
    current one with a check, and ends with **Gestionar sucursales** (opens
@@ -1481,8 +1485,8 @@ Every page now needs a signed-in Administrator, so start the backend
    pick one, and the Branch selector opens as a sheet from the bottom.
 4. **Unknown address.** Open `http://localhost:5173/no-existe`: "Página no
    encontrada" with **Volver al horario**. A list address with a bad page,
-   such as `/promociones/creditos?page=abc&pageSize=500`, is accepted and
-   treated as page 1 of 20.
+   such as `/promociones?page=abc&pageSize=500`, is accepted and treated as
+   page 1 of 20.
 
 The account cell on the right shows the signed-in Administrator; Test 24
 walks through its menu. Press `Ctrl+C` in the Terminal to stop the server.
@@ -1788,6 +1792,57 @@ deleted (Withdrawals and Restocks cannot even be edited), so what you create
 here stays in `pilates_dev_sim`; only an unused category can be deleted. Date
 pickers follow the browser's language, as Test 25 notes.
 
+## Test 29: read the Evaluation, Referral, and Credit lists in the admin web
+
+Start the backend on `pilates_dev_sim` after loading the fixtures and start
+the admin web, exactly as Test 24 describes, and log in as
+`paola.mendoza@example.com` / `emma-local-2026`. The fixtures hold no
+Evaluations: book a few first as Clients (Test 15, or Test 7's API calls as
+`lucia@example.com` and `valeria@example.com`, whose Plans cover this
+month). The fixtures' Referrals and Credit belong to Sofía (an earlier walk
+or Test 10 may have added more). All three pages are read-only: there is no
+**Nuevo** button, and clicking a row opens nothing.
+
+1. **Evaluaciones nutricionales.** Back Office → **Evaluaciones
+   nutricionales** shows the selected Branch's booked Evaluations for the
+   current Bolivia week: **Cliente** with "Primera evaluación" or
+   "Seguimiento" under the name (a Client's second Evaluation is a
+   Seguimiento), **Nutricionista**, and **Fecha y hora** ("jue 24/09 ·
+   15:00", Bolivia time whatever your computer's zone). The subtitle counts
+   them ("Sucursal Centro · 2 evaluaciones agendadas"); there is no status
+   column. The arrows and **Hoy** move between weeks, and **Nutricionista**
+   narrows to one of the Branch's Nutritionists; both stay in the address
+   (`?week=2026-09-28&nutritionistStaffMemberId=…`). A week without
+   Evaluations says "Sin evaluaciones en este rango.".
+2. **Branch scope.** Evaluations happen at a Branch, so choosing another
+   Branch in the top bar shows only that Branch's Evaluations. To see one at
+   Equipetrol, assign Gabriela to Centro and Equipetrol in **Personal**,
+   publish a block there as Gabriela (Test 15), and book it as a Client.
+3. **Referidos.** Promociones → **Referidos** lists every Referral with
+   **Cliente que refiere** (and "N referidas en total" under her name),
+   **Cliente referido**, **Fecha de registro**, and a green **Crédito
+   otorgado** or amber **Pendiente** pill. The subtitle counts the whole
+   studio ("2 referidos · 2 con crédito otorgado, 0 pendientes") and stays
+   put while you search; **Buscar por nombre de cliente** finds either
+   Client, ignoring accents ("mariana pena"). A search that finds nothing
+   keeps the table's header and says "No se encontró ningún referido.".
+4. **Créditos.** Promociones → **Créditos** lists the Clients whose
+   available Credit is above zero, the amount right-aligned ("Bs 60,00"),
+   and the last movement's date with what it did: "Crédito ganado",
+   "Reservado para un pago", "Usado en un pago", or "Devuelto al saldo". The
+   subtitle reads "Bs 60,00 en saldo activo · 1 clienta con crédito", and
+   **Total en saldo activo** closes the table while nothing is searched.
+5. **Studio-wide pages.** On Referidos and Créditos the Branch selector says
+   "Esta página no se filtra por sucursal — …" and switching Branch changes
+   nothing on the page.
+6. **After a Payment decision.** Confirm a transfer in **Pagos** (Test 27)
+   whose Client was referred, then open Referidos and Créditos: the Referral
+   turns **Crédito otorgado** and the referrer's Credit appears or grows
+   without reloading the browser.
+7. **Narrow browser.** At a phone width each row becomes a labelled card,
+   the week stepper and the search stay above the cards, and the Créditos
+   total stays under them.
+
 ## What you cannot test yet
 
 The following are not ready for manual product testing:
@@ -1804,9 +1859,9 @@ The following are not ready for manual product testing:
   Test 9; buying a Plan works, see Test 10);
 - Promotions and image variants (UPL-002);
 - any admin-web section beyond logging in, Horario, the Catálogo pages,
-  Clientes, Pagos, Personal, and the Back Office pages of Test 28 (Tests 23
-  to 28): Evaluaciones nutricionales, Reporte, Promociones, Referidos, and
-  Créditos are still placeholders;
+  Clientes, Pagos, Personal, the Back Office pages of Test 28, and the
+  read-only lists of Test 29 (Tests 23 to 29): Reporte and Promociones are
+  still placeholders;
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
 
