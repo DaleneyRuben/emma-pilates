@@ -288,8 +288,11 @@ describe('Booking commands', () => {
   });
 
   it('reschedules a Booking to a same-day Session without changing allowance', async () => {
-    const now = new Date();
+    // A fixed clock: the rule is "same Bolivia day", so the target Session
+    // three hours later must not depend on when the suite runs.
+    const now = new Date('2026-09-16T01:30:00.000Z');
     const fixture = await createFixture(prisma, {
+      now,
       startsAt: new Date(now.getTime() + 90 * 60 * 1_000),
     });
     const commands = new PrismaBookingCommands(prisma, () => fixture.now);
@@ -595,9 +598,9 @@ describe('Booking commands', () => {
 
 const createFixture = async (
   prisma: PrismaClient,
-  options: { capacity?: number; startsAt?: Date } = {},
+  options: { capacity?: number; startsAt?: Date; now?: Date } = {},
 ) => {
-  const now = new Date();
+  const now = options.now ?? new Date();
   const branch = await prisma.branch.create({
     data: { name: randomUUID(), address: 'Calle Uno' },
   });
