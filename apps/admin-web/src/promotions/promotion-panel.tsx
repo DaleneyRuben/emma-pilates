@@ -1,10 +1,11 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { AdminPromotionDto } from "@pilates/api-contracts";
+import {
+  getGetAdminPromotionImageUrl,
+  type AdminPromotionDto,
+} from "@pilates/api-contracts";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
 import { useIdempotencyKey } from "../api/idempotency-key";
-import { civilDateField } from "../components/form/date-field";
 import {
   Form,
   FormControl,
@@ -14,46 +15,54 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
-import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
-import { Button } from "../components/ui/button";
-import { getGetAdminPromotionImageUrl } from "@pilates/api-contracts";
+import { SidePanelBody } from "../components/panel/side-panel";
 import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
+import { boliviaToday } from "../lib/bolivia-time";
+import {
+  imageChangeWarning,
+  promotionSchema,
+  windowStatus,
+  type PromotionInput,
+  type PromotionOutput,
+} from "./promotion-form-schema";
 import {
   PromotionImageField,
   type AttachedImage,
 } from "./promotion-image-field";
+import { PromotionPanelFooter } from "./promotion-panel-footer";
 import { promotionFailureMessage } from "./promotion-problems";
 import { usePromotionChange } from "./promotion-queries";
 
-// The backend's copy limits (UPL-002: 80 and 280 characters after trimming)
-// and an inclusive window whose end is never before its start.
-const promotionSchema = z
-  .object({
-    headline: z
-      .string()
-      .trim()
-      .min(1, "Escribe el título.")
-      .max(80, "Escribe hasta 80 caracteres."),
-    description: z
-      .string()
-      .trim()
-      .min(1, "Escribe la descripción.")
-      .max(280, "Escribe hasta 280 caracteres."),
-    displayStartsOn: civilDateField("Elige la fecha de inicio."),
-    displayEndsOn: civilDateField("Elige la fecha de fin."),
-  })
-  .refine((values) => values.displayEndsOn >= values.displayStartsOn, {
-    path: ["displayEndsOn"],
-    message: "La fecha de fin no puede ser anterior a la de inicio.",
-  });
-type PromotionInput = z.input<typeof promotionSchema>;
-type PromotionOutput = z.output<typeof promotionSchema>;
+const attachedImage = (
+  promotion: AdminPromotionDto | undefined,
+): AttachedImage | null =>
+  promotion?.image === null || promotion?.image === undefined
+    ? null
+    : {
+        imageAssetId: promotion.image.imageAssetId,
+        width: promotion.image.width,
+        height: promotion.image.height,
+        // AW18's attached preview reads the 1440 px private variant.
+        previewUrl: getGetAdminPromotionImageUrl(promotion.id, {
+          variant: "promotion_1440",
+        }),
+        label: "Imagen actual",
+      };
+
+type Outcome = "draft" | "changes" | "publish";
+
+const notices: Record<Outcome, string> = {
+  draft: "guardada como borrador.",
+  changes: "guardada.",
+  publish: "publicada.",
+};
 
 /**
  * AW18 with follow-ups 39 and 60: image first, then Título, Descripción,
- * and the display window; «Guardar borrador» keeps a private draft and
- * «Publicar» is disabled until the image, both texts, and both dates exist.
+ * and the display window. A draft stays private until «Publicar»; on a
+ * published Promotion, replacing or removing the image warns that it
+ * unpublishes on save and must be published again.
  */
 export function PromotionPanelForm({
   promotion,
@@ -67,20 +76,7 @@ export function PromotionPanelForm({
   // Once created, a retry of «Publicar» publishes the saved row instead of
   // creating a second one.
   const [saved, setSaved] = useState(promotion);
-  const [image, setImage] = useState<AttachedImage | null>(
-    promotion?.image === null || promotion?.image === undefined
-      ? null
-      : {
-          imageAssetId: promotion.image.imageAssetId,
-          width: promotion.image.width,
-          height: promotion.image.height,
-          // AW18's attached preview reads the 1440 px private variant.
-          previewUrl: getGetAdminPromotionImageUrl(promotion.id, {
-            variant: "promotion_1440",
-          }),
-          label: "Imagen actual",
-        },
-  );
+  const [image, setImage] = useState(attachedImage(promotion));
   const [failure, setFailure] = useState<string | null>(null);
   const form = useForm<PromotionInput, unknown, PromotionOutput>({
     resolver: zodResolver(promotionSchema),
@@ -92,7 +88,7 @@ export function PromotionPanelForm({
     },
   });
   const typed = useWatch({ control: form.control });
-  const complete =
+  const publishable =
     image !== null &&
     [
       typed.headline,
@@ -100,12 +96,25 @@ export function PromotionPanelForm({
       typed.displayStartsOn,
       typed.displayEndsOn,
     ].every((value) => (value ?? "").trim() !== "");
+  const imageChanged =
+    (image?.imageAssetId ?? null) !== (saved?.image?.imageAssetId ?? null);
+  const wasPublished = saved?.publishedAt != null;
+  const published = wasPublished && !imageChanged;
+
+  const run = async (work: () => Promise<string>) => {
+    setFailure(null);
+    try {
+      onDone(await work());
+    } catch (error) {
+      setFailure(promotionFailureMessage(error));
+    }
+  };
 
   const persist = async (
     values: PromotionOutput,
   ): Promise<AdminPromotionDto> => {
     const input = { ...values, imageAssetId: image?.imageAssetId ?? null };
-    const row =
+    const row = (
       saved === undefined
         ? await change.mutateAsync({
             kind: "create",
@@ -116,37 +125,47 @@ export function PromotionPanelForm({
             kind: "update",
             promotionId: saved.id,
             input,
-          });
-    const result = row as AdminPromotionDto;
-    setSaved(result);
-    return result;
+          })
+    ) as AdminPromotionDto;
+    setSaved(row);
+    return row;
   };
 
-  const submit = (publish: boolean) =>
-    form.handleSubmit(async (values) => {
-      setFailure(null);
-      try {
+  const save = (outcome: Outcome) =>
+    form.handleSubmit((values) =>
+      run(async () => {
         const row = await persist(values);
-        if (publish) {
+        if (outcome === "publish") {
           await change.mutateAsync({ kind: "publish", promotionId: row.id });
-          onDone(`Promoción «${row.headline}» publicada.`);
-        } else {
-          onDone(`Promoción «${row.headline}» guardada como borrador.`);
         }
-      } catch (error) {
-        setFailure(promotionFailureMessage(error));
-      }
+        return `Promoción «${row.headline}» ${notices[outcome]}`;
+      }),
+    )();
+
+  const unpublish = () =>
+    run(async () => {
+      if (saved === undefined) throw new Error("unsaved");
+      await change.mutateAsync({ kind: "unpublish", promotionId: saved.id });
+      return `Promoción «${saved.headline}» ya no se publica en la app.`;
     });
 
   return (
     <Form {...form}>
       <form
-        onSubmit={submit(false)}
+        onSubmit={(event) => {
+          event.preventDefault();
+          void save(published ? "changes" : "draft");
+        }}
         noValidate
         className="flex flex-1 flex-col"
       >
         <SidePanelBody>
           <PromotionImageField value={image} onChange={setImage} />
+          {wasPublished && imageChanged ? (
+            <p className="rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-2 text-ayuda text-advertencia-texto">
+              {imageChangeWarning(image !== null)}
+            </p>
+          ) : null}
           <FormField
             control={form.control}
             name="headline"
@@ -205,31 +224,32 @@ export function PromotionPanelForm({
               )}
             />
           </div>
+          {wasPublished ? (
+            <p className="rounded-control border border-divisor bg-superficie px-3 py-2 text-ayuda text-texto-tenue">
+              {windowStatus(
+                boliviaToday(),
+                typed.displayStartsOn ?? "",
+                typed.displayEndsOn ?? "",
+              )}
+            </p>
+          ) : null}
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
               {failure}
             </p>
           )}
         </SidePanelBody>
-        <SidePanelFooter>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              type="submit"
-              variant="secondary"
-              size="lg"
-              disabled={change.isPending}
-            >
-              Guardar borrador
-            </Button>
-            <Button
-              size="lg"
-              disabled={!complete || change.isPending}
-              onClick={() => void submit(true)()}
-            >
-              Publicar
-            </Button>
-          </div>
-        </SidePanelFooter>
+        <PromotionPanelFooter
+          published={published}
+          publishable={publishable}
+          pending={change.isPending}
+          editing={saved !== undefined}
+          onSaveDraft={() => void save("draft")}
+          onPublish={() => void save("publish")}
+          onSaveChanges={() => void save("changes")}
+          onUnpublish={() => void unpublish()}
+          onDelete={() => undefined}
+        />
       </form>
     </Form>
   );

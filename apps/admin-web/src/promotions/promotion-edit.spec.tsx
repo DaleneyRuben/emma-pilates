@@ -68,12 +68,14 @@ describe("AW18 Editar promoción (follow-up 39)", () => {
       promotionList([showing, scheduled, horario, draftWithImage]),
       ...uploadHandlers(seen),
       http.put(apiUrl(`${promotionsPath}/:id`), async ({ params, request }) => {
-        calls.push({
-          method: "PUT",
-          path: String(params.id),
-          body: await request.json(),
+        const body = (await request.json()) as Record<string, unknown>;
+        calls.push({ method: "PUT", path: String(params.id), body });
+        return jsonResponse({
+          ...showing,
+          ...body,
+          id: String(params.id),
+          image: showing.image,
         });
-        return jsonResponse(showing);
       }),
       http.post(apiUrl(`${promotionsPath}/:id/publish`), ({ params }) => {
         calls.push({
@@ -284,7 +286,9 @@ describe("AW18 Editar promoción (follow-up 39)", () => {
       within(panel).getByRole("button", { name: "Publicar" }),
     ).toBeDisabled();
     expect(
-      within(panel).queryByText(/hoy está dentro del rango|fuera del rango/),
+      within(panel).queryByText(
+        /Se está mostrando ahora|Hoy está fuera del rango:/,
+      ),
     ).not.toBeInTheDocument();
     await user.keyboard("{Escape}");
 

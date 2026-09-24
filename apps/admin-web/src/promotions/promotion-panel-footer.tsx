@@ -1,0 +1,92 @@
+import { SidePanelFooter } from "../components/panel/side-panel";
+import { Button } from "../components/ui/button";
+
+/**
+ * AW18 footer (follow-up 39 §3). A private draft, or a published Promotion
+ * whose image is about to change, offers «Guardar borrador» and «Publicar»
+ * (disabled until image, title, description, and both dates exist). A
+ * published Promotion keeps «Guardar cambios» and «Dejar de publicar».
+ * One solid button per view: «Publicar» or «Guardar cambios».
+ */
+export function PromotionPanelFooter({
+  published,
+  publishable,
+  pending,
+  editing,
+  onSaveDraft,
+  onPublish,
+  onSaveChanges,
+  onUnpublish,
+  onDelete,
+}: {
+  published: boolean;
+  publishable: boolean;
+  pending: boolean;
+  /** An existing Promotion can also be deleted. */
+  editing: boolean;
+  onSaveDraft: () => void;
+  onPublish: () => void;
+  onSaveChanges: () => void;
+  onUnpublish: () => void;
+  onDelete: () => void;
+}) {
+  return (
+    <SidePanelFooter>
+      {published ? (
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            type="submit"
+            size="lg"
+            disabled={pending}
+            onClick={(event) => {
+              event.preventDefault();
+              onSaveChanges();
+            }}
+          >
+            Guardar cambios
+          </Button>
+          <Button
+            variant="destructive"
+            size="lg"
+            disabled={pending}
+            onClick={onUnpublish}
+          >
+            Dejar de publicar
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            type="submit"
+            variant="secondary"
+            size="lg"
+            disabled={pending}
+            onClick={(event) => {
+              event.preventDefault();
+              onSaveDraft();
+            }}
+          >
+            Guardar borrador
+          </Button>
+          <Button
+            size="lg"
+            disabled={!publishable || pending}
+            onClick={onPublish}
+          >
+            Publicar
+          </Button>
+        </div>
+      )}
+      {editing ? (
+        <Button
+          variant="link"
+          className="self-center text-error hover:text-error-texto"
+          disabled={pending}
+          onClick={onDelete}
+        >
+          Eliminar promoción
+        </Button>
+      ) : null}
+    </SidePanelFooter>
+  );
+}
