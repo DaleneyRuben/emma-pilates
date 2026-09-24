@@ -19,12 +19,9 @@ import { PlaceholderPage } from "../pages/placeholder-page";
 import { StartupErrorPage } from "../pages/startup-error-page";
 import { readSignedInSession } from "../session/session-queries";
 import { AdminShell } from "../shell/admin-shell";
-import type { Branch } from "../shell/branch/branch-context";
-import { placeholderBranches } from "../shell/branch/placeholder-branches";
 import { navigationItems } from "./navigation";
 
 export type AdminRouterContext = {
-  branches: readonly Branch[];
   queryClient: QueryClient;
   sessionExpiry: SessionExpiry;
 };
@@ -84,10 +81,7 @@ const authenticatedRoute = createRoute({
     }
   },
   errorComponent: StartupErrorPage,
-  component: function AuthenticatedLayout() {
-    const { branches } = authenticatedRoute.useRouteContext();
-    return <AdminShell branches={branches} />;
-  },
+  component: AdminShell,
 });
 
 // List pages validate their page-and-offset search (ADR-0061) so the URL,
@@ -116,7 +110,6 @@ const routeTree = rootRoute.addChildren([
 
 export function createAdminRouter(options: {
   history?: RouterHistory;
-  branches?: readonly Branch[];
   queryClient: QueryClient;
   sessionExpiry: SessionExpiry;
 }) {
@@ -124,7 +117,6 @@ export function createAdminRouter(options: {
     routeTree,
     history: options.history,
     context: {
-      branches: options.branches ?? placeholderBranches,
       queryClient: options.queryClient,
       sessionExpiry: options.sessionExpiry,
     },

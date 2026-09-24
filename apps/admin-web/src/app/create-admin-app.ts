@@ -1,7 +1,6 @@
 import type { RouterHistory } from "@tanstack/react-router";
 import { createAdminQueryClient } from "../api/query-client";
 import { createSessionExpiry } from "../api/session-expiry";
-import type { Branch } from "../shell/branch/branch-context";
 import { createAdminRouter, type AdminRouter } from "./router";
 
 /**
@@ -9,9 +8,7 @@ import { createAdminRouter, type AdminRouter } from "./router";
  * session gone, cached Administrator data is dropped and the browser returns
  * to Login once, remembering where the Administrator was.
  */
-export function createAdminApp(
-  options: { history?: RouterHistory; branches?: readonly Branch[] } = {},
-) {
+export function createAdminApp(options: { history?: RouterHistory } = {}) {
   const routerRef: { current?: AdminRouter } = {};
   const sessionExpiry = createSessionExpiry(() => {
     const router = routerRef.current;
@@ -28,7 +25,6 @@ export function createAdminApp(
   const queryClient = createAdminQueryClient({ sessionExpiry });
   const router = createAdminRouter({
     history: options.history,
-    branches: options.branches,
     queryClient,
     sessionExpiry,
   });

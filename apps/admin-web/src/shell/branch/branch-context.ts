@@ -8,6 +8,8 @@ export type Branch = {
 
 export type BranchSelection = {
   branches: readonly Branch[];
+  /** Whether the active Branches could be read at all. */
+  status: "pending" | "error" | "success";
   selectedBranch: Branch | undefined;
   selectBranch: (branchId: string) => void;
 };

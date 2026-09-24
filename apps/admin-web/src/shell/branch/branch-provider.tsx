@@ -12,10 +12,12 @@ import {
  */
 export function BranchProvider({
   branches,
+  status,
   initialBranchId,
   children,
 }: {
   branches: readonly Branch[];
+  status: BranchSelection["status"];
   initialBranchId?: string;
   children: ReactNode;
 }) {
@@ -26,6 +28,7 @@ export function BranchProvider({
   const value = useMemo<BranchSelection>(
     () => ({
       branches,
+      status,
       selectedBranch:
         branches.find((branch) => branch.id === selectedBranchId) ??
         branches[0],
@@ -35,7 +38,7 @@ export function BranchProvider({
         }
       },
     }),
-    [branches, selectedBranchId],
+    [branches, status, selectedBranchId],
   );
 
   return (

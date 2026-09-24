@@ -26,7 +26,8 @@ function BranchRows({
   onDone: () => void;
   rowHeightClass: string;
 }) {
-  const { branches, selectedBranch, selectBranch } = useBranchSelection();
+  const { branches, status, selectedBranch, selectBranch } =
+    useBranchSelection();
 
   const choose = (branch: Branch) => {
     selectBranch(branch.id);
@@ -46,6 +47,18 @@ function BranchRows({
           Esta página no se filtra por sucursal — {studioWideNote}
         </p>
       )}
+      {branches.length === 0 ? (
+        <p
+          role={status === "error" ? "alert" : undefined}
+          className="px-4 py-2 text-ayuda text-texto-tenue"
+        >
+          {status === "error"
+            ? "No pudimos cargar las sucursales. Inténtalo de nuevo."
+            : status === "pending"
+              ? "Cargando sucursales…"
+              : "Todavía no hay sucursales activas."}
+        </p>
+      ) : null}
       <div role="listbox" aria-labelledby={labelId} className="flex flex-col">
         {branches.map((branch) => {
           const selected = branch.id === selectedBranch?.id;
@@ -122,8 +135,14 @@ function BranchTrigger({
         aria-hidden="true"
         className="text-texto-tenue"
       />
-      <span className="text-texto-tenue">Sucursal</span>{" "}
-      <span className="font-medium">{branch?.name ?? "—"}</span>
+      {branch === undefined ? (
+        <span className="text-texto-tenue">Sin sucursal</span>
+      ) : (
+        <>
+          <span className="text-texto-tenue">Sucursal</span>{" "}
+          <span className="font-medium">{branch.name}</span>
+        </>
+      )}
       <ChevronDown
         size={14}
         strokeWidth={1.8}
