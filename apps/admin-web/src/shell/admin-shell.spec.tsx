@@ -58,16 +58,12 @@ describe("admin shell", () => {
       const { user } = renderShell("/");
       await heading("Horario");
 
-      await user.click(
-        screen.getByRole("link", { name: "Evaluaciones nutricionales" }),
-      );
+      await user.click(screen.getByRole("link", { name: "Promociones" }));
 
-      await heading("Evaluaciones nutricionales");
+      await heading("Promociones");
       const sidebar = screen.getByRole("navigation", { name: "Secciones" });
       expect(
-        within(sidebar).getByRole("link", {
-          name: "Evaluaciones nutricionales",
-        }),
+        within(sidebar).getByRole("link", { name: "Promociones" }),
       ).toHaveAttribute("aria-current", "page");
       expect(
         within(sidebar).getByRole("link", { name: "Horario" }),
@@ -170,10 +166,8 @@ describe("admin shell", () => {
         screen.getByRole("button", { name: "Sucursal Equipetrol" }),
       ).toBeInTheDocument();
 
-      await user.click(
-        screen.getByRole("link", { name: "Evaluaciones nutricionales" }),
-      );
-      await heading("Evaluaciones nutricionales");
+      await user.click(screen.getByRole("link", { name: "Promociones" }));
+      await heading("Promociones");
       expect(
         screen.getByRole("button", { name: "Sucursal Equipetrol" }),
       ).toBeInTheDocument();
