@@ -14,6 +14,7 @@ import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
 import type { Branch } from "../../shell/branch/branch-context";
 import { useBranchSelection } from "../../shell/branch/use-branch-selection";
+import { SupplyPanelForm } from "./supply-panel";
 import { supplyTableQueryOptions } from "./supply-queries";
 
 const columns = createColumnHelper<AdminSupplyDto>();
@@ -94,7 +95,9 @@ function BranchSupplies({
       }
       query={query}
       columns={supplyColumns}
-      renderForm={() => null}
+      renderForm={(supply, done) => (
+        <SupplyPanelForm branchId={branch.id} supply={supply} onDone={done} />
+      )}
       panelActions={[
         { label: "Registrar retiro", render: () => null },
         { label: "Registrar reposición", render: () => null },
