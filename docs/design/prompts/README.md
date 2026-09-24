@@ -162,6 +162,7 @@ Each of these was sent as the next message in the existing design session for th
 | [52](./followups/52-admin-user-menu-role-label.md) | Labels the Role «Administración» (as `S23` does) instead of «Administradora» in `AW33`, and uses Hover de fila for its rows (WEB-002) | 🕓 pending |
 | [53](./followups/53-booking-administration-controls.md) | `AW03` cancels only a booked Session, keeps the Class Type read-only on edit, and gains «Terminar la serie»; `AW02` result line; Plan order and visibility on `AW04`/`AW05`; archive actions and Estado filters on `AW06`/`AW07`/`AW19`/`AW20` (WEB-003) | 🕓 pending |
 | [54](./followups/54-people-administration-controls.md) | «Sin plan» for a Client who never bought one on `AW21`, the pending-activation box on `AW22`, an Estado column and on-palette Role tag on `AW23`, and `AW24`'s read-only contact, resend, deactivation, and read-only own/deactivated states without «Restablecer contraseña» (WEB-004) | 🕓 pending |
+| [55](./followups/55-payment-review-controls.md) | The Credit line under `AW28`'s amount, its empty and no-results frames; `AW29`'s price and Credit rows, the confirmation before «Confirmar pago», the already-decided and receipt-unavailable states, and «tú» in both notes (WEB-005) | 🕓 pending |
 
 ## Status
 
