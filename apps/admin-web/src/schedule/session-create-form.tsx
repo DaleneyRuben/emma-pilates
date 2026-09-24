@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
+import { ChoiceChips } from "../components/form/choice-chips";
 import {
   Form,
   FormControl,
@@ -152,28 +153,22 @@ export function SessionCreateForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
-          <fieldset className="flex gap-2">
-            <legend className="sr-only">Frecuencia</legend>
-            {(
-              [
-                ["once", "Una sola vez"],
-                ["weekly", "Cada semana"],
-              ] as const
-            ).map(([value, label]) => (
-              <label
-                key={value}
-                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-control border border-borde-fuerte px-3 py-2 text-nota has-checked:border-primario has-checked:bg-primario-tinte has-checked:font-medium has-checked:text-primario-profundo"
-              >
-                <input
-                  type="radio"
-                  value={value}
-                  className="sr-only"
-                  {...form.register("frequency")}
-                />
-                {label}
-              </label>
-            ))}
-          </fieldset>
+          <FormField
+            control={form.control}
+            name="frequency"
+            render={({ field }) => (
+              <ChoiceChips
+                legend="Frecuencia"
+                name={field.name}
+                value={field.value}
+                options={[
+                  ["once", "Una sola vez"],
+                  ["weekly", "Cada semana"],
+                ]}
+                onChange={field.onChange}
+              />
+            )}
+          />
           {frequency === "weekly" ? (
             <p className="text-ayuda text-texto-tenue">
               Genera las sesiones de los próximos 30 días y las sigue creando
