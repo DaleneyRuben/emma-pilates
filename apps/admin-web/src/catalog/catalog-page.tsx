@@ -43,6 +43,8 @@ type CatalogPageProps<Row extends { id: string }> = {
   panelActions?: readonly PanelAction[];
   /** Quiet text links after the actions (AW08's withdrawal history). */
   links?: ReactNode;
+  /** A summary under a loaded table (AW27's studio total). */
+  footer?: ReactNode;
 };
 
 export type PanelAction = {
@@ -82,6 +84,7 @@ export function CatalogPage<Row extends { id: string }>({
   renderForm,
   panelActions = [],
   links,
+  footer,
 }: CatalogPageProps<Row>) {
   const [panel, setPanel] = useState<PanelState<Row>>({ kind: "closed" });
   const [notice, setNotice] = useState<string | null>(null);
@@ -139,21 +142,24 @@ export function CatalogPage<Row extends { id: string }>({
           onRetry={() => void query.refetch()}
         />
       ) : (
-        <DataTable
-          columns={columns(open)}
-          rows={query.data.items}
-          rowId={(row) => row.id}
-          emptyMessage={emptyMessage}
-          onRowClick={renderForm === undefined ? undefined : open}
-          canClickRow={canOpen}
-          pagination={{
-            page: search.page,
-            pageSize: search.pageSize,
-            totalItems: query.data.totalItems,
-            onPageChange,
-            rangeLabel,
-          }}
-        />
+        <>
+          <DataTable
+            columns={columns(open)}
+            rows={query.data.items}
+            rowId={(row) => row.id}
+            emptyMessage={emptyMessage}
+            onRowClick={renderForm === undefined ? undefined : open}
+            canClickRow={canOpen}
+            pagination={{
+              page: search.page,
+              pageSize: search.pageSize,
+              totalItems: query.data.totalItems,
+              onPageChange,
+              rangeLabel,
+            }}
+          />
+          {footer}
+        </>
       )}
       {panelTitles === undefined || renderForm === undefined ? null : (
         <SidePanel

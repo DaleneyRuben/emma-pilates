@@ -1,6 +1,7 @@
 import { createRoute } from "@tanstack/react-router";
 import { EvaluationsPage } from "../oversight/evaluations/evaluations-page";
 import { evaluationSearchSchema } from "../oversight/evaluations/evaluation-search";
+import { CreditsPage } from "../oversight/credits/credits-page";
 import { nameSearchSchema } from "../oversight/oversight-search";
 import { ReferralsPage } from "../oversight/referrals/referrals-page";
 import { authenticatedRoute } from "./root-routes";
@@ -40,4 +41,21 @@ const referralsRoute = createRoute({
   },
 });
 
-export const oversightRoutes = [evaluationsRoute, referralsRoute];
+const creditsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/promociones/creditos",
+  validateSearch: nameSearchSchema,
+  component: function CreditsRoute() {
+    const navigate = creditsRoute.useNavigate();
+    return (
+      <CreditsPage
+        search={creditsRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
+export const oversightRoutes = [evaluationsRoute, referralsRoute, creditsRoute];

@@ -165,6 +165,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/promociones/creditos",
         screen: "AW27",
         list: true,
+        built: true,
         studioWide: "los créditos son del estudio, no de una sede.",
       },
     ],
