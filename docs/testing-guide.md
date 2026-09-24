@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10) | The Promotions carousel and push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
@@ -1311,10 +1311,22 @@ shows how to log in and authorize):
 You cannot change or deactivate yourself (`409 own_staff_member`) or remove the
 last active Administrator (`409 last_administrator`). Other Roles get `403`.
 
-## Test 18: Home shortcuts, Mi plan, and notification taps
+## Test 18: the Promotions carousel, Home shortcuts, Mi plan, and notification taps
 
 In the Client app as `lucia@example.com`:
 
+0. **Novedades del estudio.** With the two Promotions of Test 33 published
+   (the fixtures ship none), **Inicio** shows the carousel under the
+   greeting: one card per published Promotion in the admin web's order, the
+   image at 16:9 (the portrait one is centre-cropped), the headline, and the
+   description; swipe sideways to page one card at a time and watch the dots
+   under the cards follow ("Promoción 1 de 2" for VoiceOver). A card does
+   nothing when tapped. While the list loads, a beige placeholder card holds
+   the space; with nothing published, or when the API cannot be reached, the
+   section disappears and the rest of Inicio stays. Unpublish both in the
+   admin web (Test 33, **Dejar de publicar**) and pull Inicio down to
+   refresh: the section is gone. On an iPad the card stops at 720 pt and the
+   next one peeks on the right.
 1. **Inicio** shows three quick actions: **Reservar una clase**, **Evaluación
    nutricional** ("Próxima: …" when one is booked, otherwise "Agenda tu cita
    del mes"; it opens Mis evaluaciones or the availability), and **Mis
@@ -1332,9 +1344,12 @@ Nutritionist's Evaluation notices open **Mi agenda**.
 
 ## Test 19: run the mobile critical journeys and the release smoke check
 
-With fixtures freshly applied (Test 5A), the backend running, and both apps
-served (client Metro on any free port, staff on 8082), run the committed Maestro
-journeys from each app folder:
+With fixtures freshly applied (Test 5A), the two Promotions of Test 33
+published (the Home flow asserts «Nueva sala de Reformer en Urubó» and «Clases
+de Barre los sábados»; pass `-e PROMOTION_1=… -e PROMOTION_2=…` for other
+headlines), the backend running, and both apps served (client Metro on any
+free port, staff on 8082), run the committed Maestro journeys from each app
+folder:
 
 ```sh
 cd apps/client-mobile
@@ -1345,8 +1360,8 @@ maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8082 \
   -e PASSWORD=emma-local-2026 .maestro
 ```
 
-The Client suite books and cancels a class, walks Home, Mi plan, and the
-notification destinations, and books and cancels an Evaluation. The Staff suite
+The Client suite books and cancels a class, walks Home with its carousel, Mi
+plan, and the notification destinations, and books and cancels an Evaluation. The Staff suite
 covers the Administrator's pending payments, the Trainer's agenda and inbox,
 the Assistant's Client search, and the Nutritionist's availability. Each flow
 changes the development database, so re-apply fixtures before running again.
@@ -2133,10 +2148,10 @@ The following are not ready for manual product testing:
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
-- the Promotions carousel on Client Home (MOB-019) or push notifications (the
-  in-app inbox works, see Test 9; buying a Plan works, see Test 10; the
-  Promotion API works through Swagger, see Test 32, and the admin web manages
-  Promotions, see Test 33);
+- push notifications (the in-app inbox works, see Test 9; buying a Plan
+  works, see Test 10; the Promotion API works through Swagger, see Test 32,
+  the admin web manages Promotions, see Test 33, and the Client app shows
+  them, see Test 18);
 - profile photos in any app (the variants are built, no screen uploads one);
 - the admin web on a real Vercel preview or production origin, so the proxy,
   cookies, and trusted origins of ADR-0084 are only proven locally (EXT-003);
