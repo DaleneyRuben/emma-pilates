@@ -8,20 +8,23 @@ import { LoadingNotice, QueryFailure } from "../components/page/query-failure";
 import { SidePanel } from "../components/panel/side-panel";
 import { DataTable } from "../components/table/data-table";
 import type { ListSearch } from "../components/table/pagination";
+import type { RangeLabel } from "../components/table/table-pagination";
 import { Button } from "../components/ui/button";
 
 type CatalogPageProps<Row extends { id: string }> = {
   title: string;
-  subtitle: string;
-  createLabel: string;
+  subtitle?: ReactNode;
+  /** The "+ Nuevo …" action; a read-only list (AW21) has none. */
+  createLabel?: string;
   loadingMessage: string;
   /** Completes "No pudimos cargar …". */
   what: string;
-  emptyMessage: string;
-  panelTitles: { create: string; edit: string };
+  emptyMessage: ReactNode;
+  panelTitles: { create: string; edit: string | ((row: Row) => string) };
   filter: ReactNode;
   search: ListSearch;
   onPageChange: (page: number) => void;
+  rangeLabel?: RangeLabel;
   query: UseQueryResult<{ items: Row[]; totalItems: number }>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- each accessor column carries its own value type.
   columns: (open: (row: Row) => void) => ColumnDef<Row, any>[];
@@ -31,9 +34,10 @@ type CatalogPageProps<Row extends { id: string }> = {
 type PanelState<Row> = { open: false } | { open: true; row?: Row };
 
 /**
- * The catalog list convention (design system → List pages): title and a
- * "+ Nuevo …" primary action, one allowlisted filter, a dense page-and-offset
- * table whose rows open the record in the side panel.
+ * The list convention (design system → List pages): title and a "+ Nuevo …"
+ * primary action (absent on read-only lists), one allowlisted filter, a
+ * dense page-and-offset table whose rows open the record in the side panel.
+ * The catalog pages and the People pages (WEB-004) share it.
  */
 export function CatalogPage<Row extends { id: string }>({
   title,
@@ -46,6 +50,7 @@ export function CatalogPage<Row extends { id: string }>({
   filter,
   search,
   onPageChange,
+  rangeLabel,
   query,
   columns,
   renderForm,
@@ -60,7 +65,7 @@ export function CatalogPage<Row extends { id: string }>({
         title={title}
         subtitle={subtitle}
         actions={
-          isForbidden(query.error) ? undefined : (
+          createLabel === undefined || isForbidden(query.error) ? undefined : (
             <Button onClick={() => setPanel({ open: true })}>
               <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
               {createLabel}
@@ -89,6 +94,7 @@ export function CatalogPage<Row extends { id: string }>({
             pageSize: search.pageSize,
             totalItems: query.data.totalItems,
             onPageChange,
+            rangeLabel,
           }}
         />
       )}
@@ -98,9 +104,11 @@ export function CatalogPage<Row extends { id: string }>({
           if (!next) close();
         }}
         title={
-          panel.open && panel.row !== undefined
-            ? panelTitles.edit
-            : panelTitles.create
+          !panel.open || panel.row === undefined
+            ? panelTitles.create
+            : typeof panelTitles.edit === "string"
+              ? panelTitles.edit
+              : panelTitles.edit(panel.row)
         }
       >
         {panel.open ? (

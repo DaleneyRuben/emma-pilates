@@ -22,6 +22,8 @@ import {
 import { PlansPage } from "../catalog/plans/plans-page";
 import { listSearchSchema } from "../components/table/pagination";
 import { NotFoundPage } from "../pages/not-found-page";
+import { ClientsPage } from "../people/clients/clients-page";
+import { clientSearchSchema } from "../people/people-search";
 import { PlaceholderPage } from "../pages/placeholder-page";
 import { StartupErrorPage } from "../pages/startup-error-page";
 import { SchedulePage } from "../schedule/schedule-page";
@@ -161,7 +163,30 @@ const plansRoute = createRoute({
   },
 });
 
-const pageRoutes = [scheduleRoute, branchesRoute, classTypesRoute, plansRoute];
+const clientsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/clientes",
+  validateSearch: clientSearchSchema,
+  component: function ClientsRoute() {
+    const navigate = clientsRoute.useNavigate();
+    return (
+      <ClientsPage
+        search={clientsRoute.useSearch()}
+        onSearchChange={(change) =>
+          void navigate({ search: (previous) => ({ ...previous, ...change }) })
+        }
+      />
+    );
+  },
+});
+
+const pageRoutes = [
+  scheduleRoute,
+  branchesRoute,
+  classTypesRoute,
+  plansRoute,
+  clientsRoute,
+];
 const placeholderRoutes = navigationItems
   .filter((item) => item.built !== true)
   .map((item) =>

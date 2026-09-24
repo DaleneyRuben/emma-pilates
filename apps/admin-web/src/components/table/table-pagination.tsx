@@ -6,8 +6,13 @@ import {
   type PageWindow,
 } from "./pagination";
 
+export type RangeLabel = (window: PageWindow & { shown: number }) => string;
+
 type TablePaginationProps = PageWindow & {
   onPageChange: (page: number) => void;
+  /** Rows on this page; a list with its own counter wording needs it. */
+  shown?: number;
+  rangeLabel?: RangeLabel;
 };
 
 export function TablePagination({
@@ -15,6 +20,8 @@ export function TablePagination({
   pageSize,
   totalItems,
   onPageChange,
+  shown = 0,
+  rangeLabel,
 }: TablePaginationProps) {
   const pages = pageCount(totalItems, pageSize);
 
@@ -23,7 +30,11 @@ export function TablePagination({
       aria-label="Paginación"
       className="flex flex-wrap items-center justify-between gap-3 text-nota text-texto-tenue tabular"
     >
-      <p>{pageRangeLabel({ page, pageSize, totalItems })}</p>
+      <p>
+        {rangeLabel === undefined
+          ? pageRangeLabel({ page, pageSize, totalItems })
+          : rangeLabel({ page, pageSize, totalItems, shown })}
+      </p>
       <div className="flex items-center gap-2">
         <p>
           Página {countFormat.format(page)} de {countFormat.format(pages)}

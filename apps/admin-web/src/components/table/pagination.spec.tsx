@@ -122,7 +122,7 @@ describe("DataTable", () => {
     expect(onPageChange).toHaveBeenCalledWith(3);
   });
 
-  it("shows the empty message instead of an empty table body", () => {
+  it("keeps the header and shows the empty message across the body", () => {
     render(
       <DataTable
         columns={rowColumns}
@@ -138,8 +138,10 @@ describe("DataTable", () => {
       />,
     );
 
-    expect(screen.getByText("No hay sucursales.")).toBeInTheDocument();
-    expect(screen.queryByRole("cell")).not.toBeInTheDocument();
+    expect(screen.getAllByRole("columnheader")).toHaveLength(2);
+    expect(
+      screen.getByRole("cell", { name: "No hay sucursales." }),
+    ).toHaveAttribute("colspan", "2");
     expect(screen.getByText("Sin resultados")).toBeInTheDocument();
   });
 });

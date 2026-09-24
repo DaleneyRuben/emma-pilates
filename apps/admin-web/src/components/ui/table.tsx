@@ -80,16 +80,3 @@ export function TableCell({ className, ...props }: ComponentProps<"td">) {
     />
   );
 }
-
-export function TableEmpty({ className, ...props }: ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="table-empty"
-      className={cn(
-        "px-4 py-10 text-center text-cuerpo text-texto-tenue",
-        className,
-      )}
-      {...props}
-    />
-  );
-}

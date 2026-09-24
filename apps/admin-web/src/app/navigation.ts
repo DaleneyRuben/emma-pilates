@@ -79,6 +79,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/clientes",
         screen: "AW21",
         list: true,
+        built: true,
         studioWide: "los clientes son del estudio, no de una sede.",
       },
       {

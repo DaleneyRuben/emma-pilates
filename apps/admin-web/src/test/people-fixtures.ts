@@ -11,13 +11,20 @@ import { paolaPrincipal } from "./session-handlers";
 export const clientsPath = "/api/v1/administrator/clients";
 export const staffMembersPath = "/api/v1/administrator/staff-members";
 
+// "Lucía Fernández" → "lucia": emails carry no accents.
+const plain = (name: string) =>
+  (name.split(" ")[0] ?? "")
+    .normalize("NFD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase();
+
 export const clientRow = (
   name: string,
   extra: Partial<AdminClientDto> = {},
 ): AdminClientDto => ({
   id: `c1000000-0000-5000-8000-${String(name.length).padStart(12, "0")}`,
   name,
-  email: `${name.split(" ")[0]?.toLowerCase()}@example.com`,
+  email: `${plain(name)}@example.com`,
   phone: "+591 70011001",
   accountStatus: "active",
   planName: "Paquete de 8 clases",
@@ -85,7 +92,7 @@ const member = (
   id: `5f000000-0000-5000-8000-0000000000${suffix}`,
   accountId: `5a000000-0000-5000-8000-0000000000${suffix}`,
   name,
-  email: `${name.split(" ")[0]?.toLowerCase()}@emmapilates.bo`,
+  email: `${plain(name)}@emmapilates.bo`,
   phone: "+591 70822001",
   role: "trainer",
   branchIds: [centro.id],

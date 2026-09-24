@@ -9,13 +9,13 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableEmpty,
   TableHead,
   TableHeader,
   TableRow,
 } from "../ui/table";
+import type { ReactNode } from "react";
 import type { PageWindow } from "./pagination";
-import { TablePagination } from "./table-pagination";
+import { TablePagination, type RangeLabel } from "./table-pagination";
 
 declare module "@tanstack/react-table" {
   // Money and dates sit on the right (design system → Table convention).
@@ -30,10 +30,13 @@ type DataTableProps<Row> = {
   columns: ColumnDef<Row, any>[];
   rows: Row[];
   rowId: (row: Row) => string;
-  emptyMessage?: string;
+  emptyMessage?: ReactNode;
   /** The whole row opens the record (design system → Table convention). */
   onRowClick?: (row: Row) => void;
-  pagination: PageWindow & { onPageChange: (page: number) => void };
+  pagination: PageWindow & {
+    onPageChange: (page: number) => void;
+    rangeLabel?: RangeLabel;
+  };
 };
 
 /**
@@ -93,9 +96,20 @@ export function DataTable<Row>({
             </TableRow>
           ))}
         </TableHeader>
-        {rows.length === 0 ? null : (
-          <TableBody>
-            {table.getRowModel().rows.map((row) => (
+        <TableBody>
+          {rows.length === 0 ? (
+            // The header stays and the message sits in the body, so an empty
+            // result reads as "nothing matched", not as a broken page.
+            <TableRow className="hover:bg-transparent max-md:border-0 max-md:bg-transparent">
+              <TableCell
+                colSpan={columns.length}
+                className="py-10 text-center text-cuerpo text-texto-tenue max-md:block max-md:before:content-none"
+              >
+                {emptyMessage}
+              </TableCell>
+            </TableRow>
+          ) : (
+            table.getRowModel().rows.map((row) => (
               <TableRow
                 key={row.id}
                 onClick={
@@ -121,12 +135,11 @@ export function DataTable<Row>({
                   </TableCell>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        )}
+            ))
+          )}
+        </TableBody>
       </Table>
-      {rows.length === 0 ? <TableEmpty>{emptyMessage}</TableEmpty> : null}
-      <TablePagination {...pagination} />
+      <TablePagination {...pagination} shown={rows.length} />
     </div>
   );
 }
