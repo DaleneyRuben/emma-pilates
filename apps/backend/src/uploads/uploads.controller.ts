@@ -13,7 +13,6 @@ import {
   Post,
   Put,
   Req,
-  UnauthorizedException,
   Get,
   Header,
   NotFoundException,
@@ -29,8 +28,11 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { authenticatedPrincipalResolver } from '../system-identity/authentication/authentication.controller';
+import {
+  authenticateBearer,
+  type PrincipalResolver,
+} from '../system-identity/authentication/bearer-principal';
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
-import { AuthenticationRequiredError } from '../system-identity/authentication/resolve-authenticated-principal';
 import { UploadAccessDeniedError } from './finalize-upload';
 import type { ImagePurpose } from './image-purpose';
 import {
@@ -74,11 +76,6 @@ type FinalizeUploadHandler = (
   idempotencyKey: string,
 ) => Promise<{ id: string; state: string }>;
 
-type PrincipalResolver = (
-  credential: string,
-  meaningfulActivity: boolean,
-) => Promise<AuthenticatedPrincipal>;
-
 type RawBodySource = Pick<Readable, 'on'>;
 
 const maxUploadObjectBytes = 25 * 1024 * 1024;
@@ -104,14 +101,6 @@ const readRawBody = (source: RawBodySource): Promise<Buffer> =>
     source.on('end', () => resolve(Buffer.concat(chunks)));
     source.on('error', reject);
   });
-
-const parseBearerCredential = (authorization: string | undefined): string => {
-  const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
-  if (match?.[1] === undefined) {
-    throw new UnauthorizedException('Authentication is required');
-  }
-  return match[1];
-};
 
 const invalidRequest = (detail: string): HttpException =>
   new HttpException(
@@ -319,22 +308,10 @@ export class UploadsController {
     return status;
   }
 
-  private async authenticate(
+  // Both the mobile bearer and the admin web's session cookie (ADR-0084).
+  private authenticate(
     authorization: string | undefined,
   ): Promise<AuthenticatedPrincipal> {
-    try {
-      return await this.principalResolver(
-        parseBearerCredential(authorization),
-        true,
-      );
-    } catch (error) {
-      if (
-        error instanceof AuthenticationRequiredError ||
-        error instanceof UnauthorizedException
-      ) {
-        throw new UnauthorizedException('Authentication is required');
-      }
-      throw error;
-    }
+    return authenticateBearer(this.principalResolver, authorization);
   }
 }
