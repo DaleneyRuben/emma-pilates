@@ -169,6 +169,7 @@ Each of these was sent as the next message in the existing design session for th
 | [59](./followups/59-admin-review-design-findings.md) | Design findings of the 2026-09-24 admin review: the two quiet text tones and the focus ring on solid buttons fail contrast, «Pendiente» versus the glossary (open question), «sortable columns», `AW23`'s name search, checklist 30 §5's Reporte, «Entrenador» beside feminine copy, the single-Branch caption in 51 versus 58, 49's dialog buttons, `AW22`'s deactivated Account, and the 32 px figure (WEB-011) | 🕓 pending |
 | [60](./followups/60-image-crops-and-formats.md) | Client `22` previews the centre-cropped circular profile photo; `AW18` previews the 16:9 centre crop, accepts WEBP, and shows the too-small message (UPL-002) | 🕓 pending |
 | [61](./followups/61-promotions-as-built.md) | `AW17`'s empty frame, result line, «Sin imagen» card, and narrow wrap; `AW18`'s footer by state, the image-change warning, «Eliminar promoción» with its dialog, the «Imagen actual» caption, and the crop and refusal copy (WEB-006) | 🕓 pending |
+| [62](./followups/62-home-promotions-carousel-as-built.md) | Client `02`'s Promotions carousel as built: one 16:9 card per page with position dots, the loading placeholder, the section hidden when nothing is published, pull to refresh, and the 720 px tablet card (MOB-019) | 🕓 pending |
 
 ## Status
 
