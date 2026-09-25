@@ -1,0 +1,56 @@
+# Critical journey: ask to change the login email from Editar perfil, see the
+# pending card, resend, and cancel (IDN-008). The link itself is read from the
+# worker's .data/email-capture directory (Test 34).
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+  NEW_EMAIL: lucia.nueva@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    text: "Perfil, tab.*"
+- extendedWaitUntil:
+    visible: "Cerrar sesión"
+    timeout: 15000
+- tapOn: "Editar"
+- extendedWaitUntil:
+    visible: "Guardar cambios"
+    timeout: 10000
+- assertNotVisible: "Revisa tu correo nuevo"
+- tapOn:
+    text: ${EMAIL}
+- eraseText: 40
+- inputText: ${NEW_EMAIL}
+- tapOn: "Editar perfil"
+- takeScreenshot: client-email-1-editado
+- tapOn: "Guardar cambios"
+- extendedWaitUntil:
+    visible: "Revisa tu correo nuevo"
+    timeout: 15000
+# The keyboard closes as the card appears, and on a phone the card's links
+# sit below the fold: settle, then scroll them into view.
+- waitForAnimationToEnd:
+    timeout: 3000
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- assertVisible:
+    text: ".*lucia.nueva@example.com.*"
+- assertVisible: "Reenviar correo"
+- assertVisible: "Cancelar cambio"
+- takeScreenshot: client-email-2-pendiente
+- tapOn: "Reenviar correo"
+- extendedWaitUntil:
+    visible: "Te enviamos otro enlace."
+    timeout: 10000
+- takeScreenshot: client-email-3-reenviado
+- tapOn: "Cancelar cambio"
+- extendedWaitUntil:
+    notVisible: "Revisa tu correo nuevo"
+    timeout: 10000
+- takeScreenshot: client-email-4-cancelado
+- tapOn: "Volver"
+- extendedWaitUntil:
+    visible: "Editar"
+    timeout: 10000
+- assertVisible: ${EMAIL}
