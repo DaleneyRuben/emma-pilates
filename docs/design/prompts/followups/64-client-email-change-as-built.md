@@ -45,6 +45,10 @@ pending (also when the Client reopens `22` later):
   de nuevo.» / «No pudimos cancelar el cambio. Inténtalo de nuevo.» in the
   same place.
 - No countdown, no «enviado a las», no way to see or copy the link.
+- On a 393 × 852 phone the card's body ends at the fold and its two links
+  need one scroll (the fields and the photo section take the top); the
+  footer button stays pinned. If the studio would rather see the links
+  without scrolling, say so and the photo section can shrink on `22`.
 
 ## 3. The link's screen (new frame, any state of the app)
 
