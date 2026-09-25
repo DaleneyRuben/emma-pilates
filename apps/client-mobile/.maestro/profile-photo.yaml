@@ -1,0 +1,59 @@
+# Critical journey: pick, upload, see, and remove the profile photo (MOB-020).
+# Needs at least one image in the Simulator's photo library (xcrun simctl addmedia).
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    text: "Perfil, tab.*"
+- extendedWaitUntil:
+    visible: "Cerrar sesión"
+    timeout: 15000
+- assertVisible: "LF"
+- takeScreenshot: client-photo-1-perfil-iniciales
+- tapOn: "Editar"
+- extendedWaitUntil:
+    visible: "Cambiar foto"
+    timeout: 10000
+- assertNotVisible: "Quitar foto"
+- takeScreenshot: client-photo-2-editar-iniciales
+- tapOn: "Cambiar foto"
+# The system photo picker (PHPicker) runs outside the app; pick the first photo.
+- extendedWaitUntil:
+    visible: "Photos|Fotos|Recents|Recientes|Cancel"
+    timeout: 20000
+- takeScreenshot: client-photo-3-picker
+- tapOn:
+    point: "16%,28%"
+- extendedWaitUntil:
+    visible: "Se recorta al centro en forma de círculo."
+    timeout: 60000
+- extendedWaitUntil:
+    visible: "Quitar foto"
+    timeout: 60000
+- assertVisible: "Foto de perfil"
+- takeScreenshot: client-photo-4-editar-foto
+- tapOn: "Volver"
+- extendedWaitUntil:
+    visible: "Editar"
+    timeout: 10000
+- assertVisible: "Foto de perfil"
+- assertNotVisible: "LF"
+- takeScreenshot: client-photo-5-perfil-foto
+- tapOn: "Editar"
+- extendedWaitUntil:
+    visible: "Quitar foto"
+    timeout: 10000
+- tapOn: "Quitar foto"
+- extendedWaitUntil:
+    visible: "LF"
+    timeout: 15000
+- assertNotVisible: "Quitar foto"
+- takeScreenshot: client-photo-6-editar-quitada
+- tapOn: "Volver"
+- extendedWaitUntil:
+    visible: "Editar"
+    timeout: 10000
+- assertVisible: "LF"
+- takeScreenshot: client-photo-7-perfil-quitada

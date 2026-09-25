@@ -8,6 +8,13 @@ appId: ${APP_ID}
     clearState: true
 - openLink: ${APP_LINK}
 - extendedWaitUntil:
+    visible: "Open"
+    timeout: 8000
+    optional: true
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
     visible:
       text: "Continue|Iniciar sesión"
     timeout: 180000
