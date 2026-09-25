@@ -1,5 +1,4 @@
 import { AuthenticationTokenPurpose } from '../../generated/prisma/enums';
-import type { AuthenticationEmailJob } from './authentication-email-job';
 import type { AuthenticationEmailStateReader } from './process-authentication-email';
 import type { AuthenticationEmailState } from './process-authentication-email';
 
@@ -10,6 +9,7 @@ type AuthenticationTokenRecord = {
   usedAt: Date | null;
   invalidatedAt: Date | null;
   account: { email: string };
+  emailChange: { newEmail: string } | null;
 };
 
 type AuthenticationTokenReader = {
@@ -23,6 +23,7 @@ type AuthenticationTokenReader = {
         usedAt: true;
         invalidatedAt: true;
         account: { select: { email: true } };
+        emailChange: { select: { newEmail: true } };
       };
     }): Promise<AuthenticationTokenRecord | null>;
   };
@@ -43,6 +44,7 @@ export class PrismaAuthenticationEmailStateReader implements AuthenticationEmail
         usedAt: true,
         invalidatedAt: true,
         account: { select: { email: true } },
+        emailChange: { select: { newEmail: true } },
       },
     });
 
@@ -63,13 +65,14 @@ export class PrismaAuthenticationEmailStateReader implements AuthenticationEmail
       expiresAt: token.expiresAt,
       usedAt: token.usedAt,
       invalidatedAt: token.invalidatedAt,
+      pendingEmail: token.emailChange?.newEmail ?? null,
     };
   }
 }
 
 const mapPurpose = (
   purpose: AuthenticationTokenPurpose,
-): AuthenticationEmailJob['purpose'] | null => {
+): AuthenticationEmailState['purpose'] | null => {
   switch (purpose) {
     case AuthenticationTokenPurpose.VERIFICATION:
       return 'verification';
@@ -77,6 +80,8 @@ const mapPurpose = (
       return 'activation';
     case AuthenticationTokenPurpose.PASSWORD_RECOVERY:
       return 'password_recovery';
+    case AuthenticationTokenPurpose.EMAIL_CHANGE:
+      return 'email_change';
     case AuthenticationTokenPurpose.REGISTRATION_CONTINUATION:
       return null;
   }

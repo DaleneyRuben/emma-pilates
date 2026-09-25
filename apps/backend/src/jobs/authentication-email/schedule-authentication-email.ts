@@ -10,7 +10,11 @@ export const scheduleAuthenticationEmail = async (
 ): Promise<string> => {
   const jobId = await boss.send(AUTHENTICATION_EMAIL_QUEUE, job, {
     db: fromPrisma(transaction),
-    singletonKey: job.authenticationTokenId,
+    // The notice shares the link's token, so it needs its own singleton key.
+    singletonKey:
+      job.purpose === 'email_change_notice'
+        ? `${job.authenticationTokenId}:notice`
+        : job.authenticationTokenId,
   });
 
   if (jobId === null) {
