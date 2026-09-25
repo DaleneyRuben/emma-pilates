@@ -7,20 +7,20 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
-| Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The captured verification email does not have a beginner-facing inbox yet                                                                                     |
+| Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The worker writes every captured email under `apps/backend/.data/email-capture/` (Test 34); the link opens nothing on the Simulator until LNK-001 wires universal links, so paste its token into Swagger |
 | Pending registration actions | Correct the email, request another verification email, or cancel using the continuation returned by registration                | Resend deliberately gives the same neutral response whether it sends or suppresses an email                                                                   |
-| Email verification           | Confirm that an unknown token returns `invalid`                                                                                 | A valid token cannot be obtained manually until local email capture is runnable                                                                               |
+| Email verification           | Confirm that an unknown token returns `invalid`; complete a real verification with the token from `.data/email-capture` (Test 34) | The link is a URL the Simulator cannot open yet (LNK-001)                                                                                                    |
 | Login and logout             | Log in from the mobile app, restore the protected credential at startup, inspect identity in Swagger, and revoke it             | Log out from Perfil with a confirmation in both apps (Test 9)                                                                                                  |
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
-| Account security             | Request recovery from mobile, reject expired links before password entry, and exercise activation/recovery link screens with automated tests | Valid activation and recovery links cannot yet be copied from the in-process local email capture                                                    |
+| Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33) | Valid activation and recovery links still cannot be read from the local email capture; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 
 ## Before you begin
 
@@ -355,10 +355,11 @@ Press `Ctrl+C` in the backend Terminal when you are finished.
 
 ## Test 5: try Login, current identity, throttling, and logout
 
-The mobile email-link UI is connected, but the local captured-email viewer is
-not available yet. For this local test only, create a second registration and
-mark it verified directly in your local database. Never use this shortcut on a
-shared or production database.
+The mobile email-link UI is connected. With the worker running, every
+captured email lands under `apps/backend/.data/email-capture/` (Test 34), so
+you can verify a second registration with its real token; the older shortcut
+of marking it verified directly in your local database still works. Never use
+that shortcut on a shared or production database.
 
 ### A. Load the local development fixtures
 
@@ -557,11 +558,11 @@ If `currentPassword` is wrong, the change returns `400` with stable code
 ### D. What requires automated tests for now
 
 The backend can activate an Account and complete password recovery with valid
-single-use links. However, the development email capture currently exists only
-inside the worker process and has no beginner-facing inbox or command that
-reveals a captured link. Until that viewer exists, use the automated tests for
-successful activation, link expiry, recovery-wide session revocation, and the
-replacement credential.
+single-use links; since IDN-008 the worker writes each captured email under
+`apps/backend/.data/email-capture/` (Test 34), so the recovery token can be
+pasted into `POST /api/v1/password-recoveries`. Link expiry, recovery-wide
+session revocation, and the replacement credential remain covered by the
+automated tests.
 
 ## Test 7: read the Client discovery data
 
@@ -2198,3 +2199,56 @@ Please include:
 
 Do not include passwords, registration continuations, verification tokens,
 database URLs containing credentials, or values from `.env`.
+
+## Test 34: change the login email and read the captured emails
+
+Since IDN-008 an active Account changes its email only after opening a link
+sent to the new address (the rule is in
+[`IDN-008-email-change-proposal.md`](./implementation/IDN-008-email-change-proposal.md)).
+Start the API and the worker on `pilates_dev_sim` (Test 5A); the worker is
+what delivers the emails, and in local development it also writes each one as
+a JSON file under `apps/backend/.data/email-capture/`
+(`<time>-<purpose>-<recipient>.json`, with `subject` and `link`).
+
+### A. In the Client app
+
+Log in as `lucia@example.com`, open **Perfil → Editar**. The **Correo
+electrónico** field is editable now (the note «escríbenos al estudio» is
+gone). Type `lucia.nueva@example.com` and tap **Guardar cambios**: the screen
+stays on Editar perfil, the field goes back to the current address, and a
+card reads **Revisa tu correo nuevo** with the new address and the 24-hour
+deadline. **Reenviar correo** answers «Te enviamos otro enlace.» whether or
+not an email went out (one per address per minute, five per hour, ten per day,
+like registration); **Cancelar cambio** removes the card. Saving with the
+same address only saves name and phone and returns to Perfil. Meanwhile the
+capture directory holds two files: `email_change` to the new address (with
+the link) and `email_change_notice` to the current one (no link).
+
+### B. Confirm the change
+
+The Simulator cannot open the link yet (LNK-001). Copy the `token` from the
+`email_change` file's `link` and send it to `POST /api/v1/email-changes` as
+`{ "token": "…" }` (Swagger, no credential needed): `{ "status": "changed" }`
+the first time, `expired` the second. Pull Perfil: the summary shows
+`lucia.nueva@example.com`, the signed-in session keeps working (ADR-0030),
+Login now needs the new address and refuses the old one, and
+`system.audit_records` holds `account.email_change_requested` and
+`account.email_changed` (with `previousEmail`). Change it back the same way
+before other tests, or reload the fixtures.
+
+### C. What stays neutral
+
+Asking for an address that another Account already uses (`sofia@example.com`)
+answers `202` and shows the same pending card, but no email is written and
+no link can ever be opened; asking for the current address answers `400`
+`email_unchanged`. A password change or recovery cancels the pending change.
+The admin web's client detail (AW22) always shows the current address.
+
+### D. Other captured links
+
+The same directory holds registration verification (`verification`),
+activation (`activation`), and recovery (`password_recovery`) emails, so
+Tests 4 and 6 can be completed with real tokens through
+`POST /api/v1/client-email-verifications`, `POST /api/v1/account-activations`,
+and `POST /api/v1/password-recoveries`. The directory is ignored by Git and
+safe to delete.
