@@ -93,6 +93,8 @@ const environmentSchema = z
       .min(1)
       .default(localTransferInstructions.TRANSFER_QR_IMAGE_PATH),
     UPLOADS_LOCAL_STORAGE_ROOT: z.string().min(1).default('.data/uploads'),
+    // Where the local email capture writes each message (never production).
+    EMAIL_CAPTURE_DIRECTORY: z.string().min(1).default('.data/email-capture'),
   })
   .superRefine((environment, context) => {
     if (environment.NODE_ENV !== 'production') {

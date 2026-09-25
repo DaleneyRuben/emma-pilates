@@ -75,7 +75,10 @@ async function bootstrap(): Promise<void> {
       stateReader: new PrismaAuthenticationEmailStateReader(prisma),
       decryptor: linkCipher,
       renderer: new PlaceholderAuthenticationEmailRenderer(),
-      delivery: new LocalEmailCapture(environment.NODE_ENV),
+      delivery: new LocalEmailCapture(
+        environment.NODE_ENV,
+        environment.EMAIL_CAPTURE_DIRECTORY,
+      ),
     },
     finalizeUpload: createFinalizeUploadJobCommands(prisma, storage, now),
     pendingAccountCleanup: {
