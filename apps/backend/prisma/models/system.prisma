@@ -3,6 +3,7 @@ enum AuthenticationTokenPurpose {
   REGISTRATION_CONTINUATION @map("registration_continuation")
   ACTIVATION                @map("activation")
   PASSWORD_RECOVERY         @map("password_recovery")
+  EMAIL_CHANGE              @map("email_change")
 
   @@schema("system")
 }
@@ -163,6 +164,7 @@ model Account {
   staffMember               StaffMember?            @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
   authenticationTokens      AuthenticationToken[]
   authenticationSessions    AuthenticationSession[]
+  emailChange               AccountEmailChange?
   emailSuppressionsResolved EmailSuppression[]      @relation("EmailSuppressionResolver")
   auditRecords              AuditRecord[]           @relation("AuditActor")
   cancelledSessions         Session[]
@@ -204,10 +206,26 @@ model AuthenticationToken {
   usedAt        DateTime?                  @map("used_at") @db.Timestamptz(3)
   invalidatedAt DateTime?                  @map("invalidated_at") @db.Timestamptz(3)
   account       Account                    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  emailChange   AccountEmailChange?
 
   @@index([accountId, purpose])
   @@index([expiresAt])
   @@map("authentication_tokens")
+  @@schema("system")
+}
+
+// IDN-008: the one pending email change of an active Account, live while its
+// email_change token is unused, not invalidated, and not expired.
+model AccountEmailChange {
+  accountId             String              @id @map("account_id") @db.Uuid
+  newEmail              String              @map("new_email")
+  authenticationTokenId String              @unique @map("authentication_token_id") @db.Uuid
+  requestedAt           DateTime            @map("requested_at") @db.Timestamptz(3)
+  expiresAt             DateTime            @map("expires_at") @db.Timestamptz(3)
+  account               Account             @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  authenticationToken   AuthenticationToken @relation(fields: [authenticationTokenId], references: [id], onDelete: Cascade)
+
+  @@map("account_email_changes")
   @@schema("system")
 }
 
