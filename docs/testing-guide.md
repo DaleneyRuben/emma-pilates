@@ -2244,7 +2244,7 @@ no link can ever be opened; asking for the current address answers `400`
 `email_unchanged`. A password change or recovery cancels the pending change.
 The admin web's client detail (AW22) always shows the current address.
 
-### D. Other captured links
+### D. Other captured links and the Spanish templates
 
 The same directory holds registration verification (`verification`),
 activation (`activation`), and recovery (`password_recovery`) emails, so
@@ -2252,3 +2252,15 @@ Tests 4 and 6 can be completed with real tokens through
 `POST /api/v1/client-email-verifications`, `POST /api/v1/account-activations`,
 and `POST /api/v1/password-recoveries`. The directory is ignored by Git and
 safe to delete.
+
+Since EML-001 each file is the real message: `subject`, `text` (plain text),
+and `html` (a simple card in the design palette with the link as a Palo de
+rosa button and as a bare URL). The subjects are «Confirma tu correo para
+activar tu cuenta» (24 horas), «Activa tu cuenta en Emma Pilates Studio»
+(7 días), «Crea una contraseña nueva» (30 minutos), «Confirma tu correo
+nuevo» (24 horas), and, for the current address of an email change, «Alguien
+pidió cambiar el correo de tu cuenta» (no link). Links start with
+`AUTHENTICATION_LINK_BASE_URL` (`https://links.emmapilates.test` locally; the
+real domain comes with LNK-001). Open the `html` value in a browser to see
+the card; the copy comes from design follow-ups 33–38 and the IDN-008 rule
+while the DES-001 export stays pending.
