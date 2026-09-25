@@ -23,6 +23,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -67,6 +68,7 @@ function EditProfileForm({
   });
 
   const save = handleSubmit(async (values) => {
+    Keyboard.dismiss();
     setFailed(false);
     const response = await updateCurrentClientProfile(
       {
