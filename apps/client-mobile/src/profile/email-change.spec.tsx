@@ -1,5 +1,6 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { Keyboard } from "react-native";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -64,12 +65,16 @@ describe("Client email change", () => {
     expect(screen.getByLabelText("Correo electrónico")).not.toHaveProp("editable", false);
     expect(screen.queryByText("Para cambiar tu correo, escríbenos al estudio.")).not.toBeOnTheScreen();
 
+    const dismiss = jest.spyOn(Keyboard, "dismiss").mockImplementation(() => undefined);
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "Sofia.Nueva@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
 
     await waitFor(() => {
       expect(screen.getByText("Revisa tu correo nuevo")).toBeOnTheScreen();
     });
+    // The card sits under the fields: the keyboard must not hide it.
+    expect(dismiss).toHaveBeenCalled();
+    dismiss.mockRestore();
     expect(calls).toEqual([
       `patch ${JSON.stringify({ name: "Sofía Guzmán", phone: "+591 70011004" })}`,
       "request Sofia.Nueva@example.com",
