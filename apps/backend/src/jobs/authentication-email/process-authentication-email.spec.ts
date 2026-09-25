@@ -147,4 +147,84 @@ describe('processAuthenticationEmail', () => {
     expect(renderer.render).not.toHaveBeenCalled();
     expect(delivery.deliver).not.toHaveBeenCalled();
   });
+
+  describe('email change (IDN-008)', () => {
+    const state = {
+      accountId: job.accountId,
+      email: 'client@example.com',
+      pendingEmail: 'client.nueva@example.com',
+      purpose: 'email_change' as const,
+      expiresAt: new Date('2026-09-25T16:00:00.000Z'),
+      usedAt: null,
+      invalidatedAt: null,
+    };
+    const dependencies = () => ({
+      stateReader: { find: jest.fn().mockResolvedValue(state) },
+      decryptor: { decrypt: jest.fn().mockResolvedValue('link-secret') },
+      renderer: {
+        render: jest
+          .fn()
+          .mockImplementation((input: { recipient: string }) => ({
+            recipient: input.recipient,
+            purpose: 'email_change',
+            subject: 'x',
+            link: 'y',
+          })),
+      },
+      delivery: { deliver: jest.fn().mockResolvedValue(undefined) },
+    });
+
+    it('sends the link to the pending new address', async () => {
+      const deps = dependencies();
+
+      await expect(
+        processAuthenticationEmail(
+          { ...job, purpose: 'email_change' },
+          new Date('2026-09-25T15:00:00.000Z'),
+          deps,
+        ),
+      ).resolves.toBe('delivered');
+
+      expect(deps.renderer.render).toHaveBeenCalledWith({
+        recipient: 'client.nueva@example.com',
+        purpose: 'email_change',
+        linkSecret: 'link-secret',
+        newEmail: 'client.nueva@example.com',
+      });
+    });
+
+    it('sends the notice to the current address without decrypting the link', async () => {
+      const deps = dependencies();
+
+      await expect(
+        processAuthenticationEmail(
+          { ...job, purpose: 'email_change_notice' },
+          new Date('2026-09-25T15:00:00.000Z'),
+          deps,
+        ),
+      ).resolves.toBe('delivered');
+
+      expect(deps.decryptor.decrypt).not.toHaveBeenCalled();
+      expect(deps.renderer.render).toHaveBeenCalledWith({
+        recipient: 'client@example.com',
+        purpose: 'email_change_notice',
+        linkSecret: null,
+        newEmail: 'client.nueva@example.com',
+      });
+    });
+
+    it('treats a link or notice whose change is gone as stale', async () => {
+      const deps = dependencies();
+      deps.stateReader.find.mockResolvedValue({ ...state, pendingEmail: null });
+
+      await expect(
+        processAuthenticationEmail(
+          { ...job, purpose: 'email_change_notice' },
+          new Date('2026-09-25T15:00:00.000Z'),
+          deps,
+        ),
+      ).resolves.toBe('stale');
+      expect(deps.delivery.deliver).not.toHaveBeenCalled();
+    });
+  });
 });

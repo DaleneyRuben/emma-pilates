@@ -45,4 +45,14 @@ describe('authentication email job contract', () => {
       deadLetter: 'system.authentication-email.failed.v1',
     });
   });
+
+  it.each(['email_change', 'email_change_notice'] as const)(
+    'accepts the %s purpose of IDN-008',
+    (purpose) => {
+      expect(parseAuthenticationEmailJob({ ...payload, purpose })).toEqual({
+        ...payload,
+        purpose,
+      });
+    },
+  );
 });

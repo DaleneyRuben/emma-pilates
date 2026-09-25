@@ -46,4 +46,24 @@ describe('scheduleAuthenticationEmail', () => {
       scheduleAuthenticationEmail(boss, transaction, job),
     ).rejects.toThrow('pg-boss did not create the authentication email job');
   });
+
+  it('keys the old-address notice apart from the link of the same token (IDN-008)', async () => {
+    const transaction = { $queryRawUnsafe: jest.fn() };
+    const boss = {
+      send: jest.fn().mockResolvedValue('job-id'),
+    } as unknown as Pick<PgBoss, 'send'>;
+
+    await scheduleAuthenticationEmail(boss, transaction, {
+      ...job,
+      purpose: 'email_change_notice',
+    });
+
+    expect(boss.send).toHaveBeenCalledWith(
+      AUTHENTICATION_EMAIL_QUEUE,
+      expect.objectContaining({ purpose: 'email_change_notice' }),
+      expect.objectContaining({
+        singletonKey: `${job.authenticationTokenId}:notice`,
+      }),
+    );
+  });
 });
