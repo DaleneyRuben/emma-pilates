@@ -21,11 +21,29 @@ env:
 - tapOn: "Cambiar foto"
 # The system photo picker (PHPicker) runs outside the app; pick the first photo.
 - extendedWaitUntil:
-    visible: "Photos|Fotos|Recents|Recientes|Cancel"
+    visible: "Cancel|Cancelar"
     timeout: 20000
+- extendedWaitUntil:
+    notVisible: "Loading…|Loading...|Cargando…"
+    timeout: 60000
+- extendedWaitUntil:
+    visible: "Photos|Fotos|Recents|Recientes|Albums|Álbumes"
+    timeout: 60000
 - takeScreenshot: client-photo-3-picker
-- tapOn:
-    point: "16%,28%"
+# First grid cell of the system picker: the iPad shows an album sidebar
+# first, the phone grid starts at the left edge.
+- runFlow:
+    when:
+      visible: "Favorites|Favoritos"
+    commands:
+      - tapOn:
+          point: "36%,17%"
+- runFlow:
+    when:
+      notVisible: "Favorites|Favoritos"
+    commands:
+      - tapOn:
+          point: "16%,28%"
 - extendedWaitUntil:
     visible: "Se recorta al centro en forma de círculo."
     timeout: 60000
