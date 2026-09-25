@@ -1,6 +1,7 @@
 import {
   activateAccount as activateAccountRequest,
   cancelPendingClientRegistration,
+  completeEmailChange as completeEmailChangeRequest,
   completePasswordRecovery as completePasswordRecoveryRequest,
   correctPendingClientEmail,
   inspectAuthenticationLink,
@@ -57,6 +58,19 @@ export function createAuthenticationApi({
           `Registration cancellation failed with ${response.status}`,
         );
       }
+    },
+    async completeEmailChange(token: string) {
+      const response = await completeEmailChangeRequest(
+        { token },
+        undefined,
+        fetcher,
+      );
+
+      if (response.status !== 200) {
+        throw new Error(`Email change completion failed with ${response.status}`);
+      }
+
+      return response.data;
     },
     async completePasswordRecovery(values: CompletePasswordRecoveryDto) {
       const response = await completePasswordRecoveryRequest(

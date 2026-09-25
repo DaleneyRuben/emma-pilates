@@ -1,4 +1,5 @@
 export * from "./account/change-password-screen";
+export * from "./account/email-change-link-screen";
 export * from "./account/initials";
 export * from "./account/logout-confirmation";
 export * from "./api/fetcher";

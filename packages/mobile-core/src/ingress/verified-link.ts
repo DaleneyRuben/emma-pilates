@@ -1,5 +1,9 @@
 export type AuthenticationLinkIntent = {
-  type: "verify-email" | "activate-account" | "recover-password";
+  type:
+    | "verify-email"
+    | "activate-account"
+    | "recover-password"
+    | "confirm-email-change";
   token: string;
 };
 
@@ -9,6 +13,8 @@ const authenticationPaths: Readonly<
   "/authentication/verify-email": "verify-email",
   "/authentication/activate-account": "activate-account",
   "/authentication/recover-password": "recover-password",
+  // IDN-008: the link sent to a new address confirms the email change.
+  "/authentication/confirm-email-change": "confirm-email-change",
 };
 
 export function parseVerifiedLink(

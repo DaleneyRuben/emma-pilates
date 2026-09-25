@@ -9,7 +9,13 @@ describe("EmailChangeLinkScreen", () => {
     ["invalid", "Enlace no válido", "Este enlace no es válido."],
     ["email_unavailable", "Correo no disponible", "Ese correo ya está en uso. Pide el cambio con otro correo desde Editar perfil."],
   ] as const)("completes the link and shows the %s outcome", async (status, title, body) => {
-    const completeEmailChange = jest.fn().mockResolvedValue({ status });
+    let finish: (result: { status: typeof status }) => void = () => undefined;
+    const completeEmailChange = jest.fn(
+      () =>
+        new Promise<{ status: typeof status }>((resolve) => {
+          finish = resolve;
+        }),
+    );
     const onDone = jest.fn();
     const screen = await render(
       <EmailChangeLinkScreen
@@ -20,6 +26,7 @@ describe("EmailChangeLinkScreen", () => {
     );
 
     expect(screen.getByText("Confirmando tu correo")).toBeOnTheScreen();
+    finish({ status });
     await waitFor(() => {
       expect(screen.getByText(title)).toBeOnTheScreen();
     });
