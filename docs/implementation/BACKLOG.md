@@ -146,6 +146,8 @@ written but not yet applied by the external design session, or still to write:
 | 41–46 (NUT-001: S15 cancel, S16/S17 dates and Branch picker, Client 13/15 rules, 19/S20 notices) | Client 13–15, 19; Staff S15–S17, S20 | MOB-016 (built from accepted behavior) | 🕓 pending export |
 | 48–51 (BKO-001: AW08 Restock, AW09 archive, AW10 stock limit, AW16 payroll only across all Branches) | Admin web AW08–AW10, AW16 | WEB-007, WEB-009 | 🕓 pending export |
 | 52 (WEB-002: AW33 role label «Administración», row hover) | Admin web AW33 | WEB-002 (built from the corrected behavior) | 🕓 pending export |
+| 63 (MOB-020: Client 18/22 profile photo as built; invariant 9 «never a photo» versus prompt 22 and follow-up 60 §1) | Client 18, 22; checklist 30 §9 | MOB-020 (built with the photo on 18 and 22 only) | 🕓 pending export; the studio must settle the invariant |
+| 64 (IDN-008: Client 22 editable email, pending card, link confirmation screen) | Client 22 | IDN-008 (built from the decided rule) | 🕓 pending export |
 | Image variant sizes and quality (ADR-0073) | Receipts, profile photos, Promotions | UPL-002 | decided in `UPL-002-image-variants.md`; follow-up 60 records the crops taken |
 | Tab-bar unread badge | Client and Staff navigation | MOB-017 gap | not designed |
 
