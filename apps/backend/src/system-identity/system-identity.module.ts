@@ -65,6 +65,7 @@ import {
   type ClientInvitationOperations,
 } from './invitations/client-invitations.controller';
 import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-invitation-unit-of-work';
+import { emailChangeWiring } from './email-change/email-change-wiring';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { argon2PasswordHasher } from './security/argon2-password-hasher';
@@ -106,10 +107,12 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     AdminWebSessionController,
     AssistantClientInvitationsController,
     AuthenticationController,
+    ...emailChangeWiring.controllers,
     ClientEmailVerificationController,
     ClientRegistrationController,
   ],
   providers: [
+    ...emailChangeWiring.providers(systemIdentityPrisma),
     {
       provide: systemIdentityPrisma,
       inject: [ConfigService],
