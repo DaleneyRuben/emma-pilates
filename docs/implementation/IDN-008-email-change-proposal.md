@@ -42,8 +42,10 @@ either (IDN-007 left staff email correction out).
 `account_id` as the primary key enforces one pending change per Account (E5).
 The pending record is *live* only while its token is unused, not invalidated,
 and not expired; a stale row is replaced by the next request and removed by
-completion, cancellation, or BE-008's retention sweep of expired tokens (the
-cascade on the token removes it).
+completion or cancellation. Expired tokens are not swept yet (BE-008 sweeps
+idempotency records, sessions, throttle events, and notifications), so a
+stale row can outlive its link until the next request; when tokens are swept
+the cascade removes it.
 
 The email is stored in clear like `accounts.email` (it becomes that column on
 completion). Throttle digests use the existing HMAC key.
