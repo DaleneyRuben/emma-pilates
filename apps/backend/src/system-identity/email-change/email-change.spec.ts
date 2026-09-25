@@ -1,3 +1,4 @@
+import type { AuthenticationEmailJob } from '../../jobs/authentication-email/authentication-email-job';
 import {
   cancelEmailChange,
   completeEmailChange,
@@ -119,7 +120,7 @@ describe('resendEmailChange', () => {
       linkJob: expect.objectContaining({
         purpose: 'email_change',
         authenticationTokenId: 'token-id',
-      }),
+      }) as AuthenticationEmailJob,
     });
 
     deps.gateway.resend.mockResolvedValueOnce('suppressed');
