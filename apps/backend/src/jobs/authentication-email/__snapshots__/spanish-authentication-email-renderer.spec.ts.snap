@@ -1,0 +1,94 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SpanishAuthenticationEmailRenderer renders the activation email with its link as a button and a bare URL 1`] = `
+{
+  "subject": "Activa tu cuenta en Emma Pilates Studio",
+  "text": "Hola,
+
+El estudio creó una cuenta para ti. Abre el enlace para elegir tu contraseña y activar tu cuenta.
+
+https://links.emmapilates.test/authentication/activate-account?token=secret-1
+
+Este enlace vence en 7 días. Si vence, pide en el estudio que te envíen uno nuevo.
+
+Activar tu cuenta no inicia sesión: después vuelve a la app e ingresa con tu correo y la contraseña que elijas.
+
+Emma Pilates Studio · Movimiento · Equilibrio · Bienestar",
+}
+`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the activation email with its link as a button and a bare URL 2`] = `"<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#F2ECE5;font-family:'Work Sans',Helvetica,Arial,sans-serif;"><div style="max-width:560px;margin:0 auto;padding:32px 16px;"><div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:32px 24px;"><h1 style="margin:0 0 24px;font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;color:#4A4A4A;">Activa tu cuenta en Emma Pilates Studio</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Hola,</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">El estudio creó una cuenta para ti. Abre el enlace para elegir tu contraseña y activar tu cuenta.</p><p style="margin:24px 0;"><a href="https://links.emmapilates.test/authentication/activate-account?token=secret-1" style="display:inline-block;background:#B78380;color:#FFFFFF;text-decoration:none;font-weight:500;padding:14px 24px;border-radius:8px;">Activar mi cuenta</a></p><p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#6E6663;">Si el botón no funciona, copia este enlace en tu navegador:<br><a href="https://links.emmapilates.test/authentication/activate-account?token=secret-1" style="color:#B78380;word-break:break-all;">https://links.emmapilates.test/authentication/activate-account?token=secret-1</a></p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Este enlace vence en 7 días. Si vence, pide en el estudio que te envíen uno nuevo.</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Activar tu cuenta no inicia sesión: después vuelve a la app e ingresa con tu correo y la contraseña que elijas.</p></div><p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Emma Pilates Studio<br>Movimiento · Equilibrio · Bienestar</p></div></body></html>"`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the email_change email with its link as a button and a bare URL 1`] = `
+{
+  "subject": "Confirma tu correo nuevo",
+  "text": "Hola,
+
+Pediste usar este correo para entrar a Emma Pilates Studio. Abre el enlace para confirmar el cambio.
+
+https://links.emmapilates.test/authentication/confirm-email-change?token=secret-1
+
+Este enlace vence en 24 horas. Hasta que lo confirmes, tu correo anterior sigue siendo el de tu cuenta.
+
+Si no pediste este cambio, ignora este correo.
+
+Emma Pilates Studio · Movimiento · Equilibrio · Bienestar",
+}
+`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the email_change email with its link as a button and a bare URL 2`] = `"<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#F2ECE5;font-family:'Work Sans',Helvetica,Arial,sans-serif;"><div style="max-width:560px;margin:0 auto;padding:32px 16px;"><div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:32px 24px;"><h1 style="margin:0 0 24px;font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;color:#4A4A4A;">Confirma tu correo nuevo</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Hola,</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Pediste usar este correo para entrar a Emma Pilates Studio. Abre el enlace para confirmar el cambio.</p><p style="margin:24px 0;"><a href="https://links.emmapilates.test/authentication/confirm-email-change?token=secret-1" style="display:inline-block;background:#B78380;color:#FFFFFF;text-decoration:none;font-weight:500;padding:14px 24px;border-radius:8px;">Confirmar mi correo nuevo</a></p><p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#6E6663;">Si el botón no funciona, copia este enlace en tu navegador:<br><a href="https://links.emmapilates.test/authentication/confirm-email-change?token=secret-1" style="color:#B78380;word-break:break-all;">https://links.emmapilates.test/authentication/confirm-email-change?token=secret-1</a></p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Este enlace vence en 24 horas. Hasta que lo confirmes, tu correo anterior sigue siendo el de tu cuenta.</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Si no pediste este cambio, ignora este correo.</p></div><p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Emma Pilates Studio<br>Movimiento · Equilibrio · Bienestar</p></div></body></html>"`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the old-address notice without any link, naming the new address 1`] = `
+{
+  "subject": "Alguien pidió cambiar el correo de tu cuenta",
+  "text": "Hola,
+
+Desde tu cuenta se pidió cambiar el correo a lucia.nueva@example.com. Nada cambia hasta que ese correo confirme el enlace que le enviamos.
+
+Si fuiste tú, no tienes que hacer nada más.
+
+Si no fuiste tú, cancela el cambio desde Editar perfil en la app y cambia tu contraseña: eso cierra las demás sesiones. Si necesitas ayuda, escríbenos al estudio.
+
+Emma Pilates Studio · Movimiento · Equilibrio · Bienestar",
+}
+`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the old-address notice without any link, naming the new address 2`] = `"<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#F2ECE5;font-family:'Work Sans',Helvetica,Arial,sans-serif;"><div style="max-width:560px;margin:0 auto;padding:32px 16px;"><div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:32px 24px;"><h1 style="margin:0 0 24px;font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;color:#4A4A4A;">Alguien pidió cambiar el correo de tu cuenta</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Hola,</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Desde tu cuenta se pidió cambiar el correo a lucia.nueva@example.com. Nada cambia hasta que ese correo confirme el enlace que le enviamos.</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Si fuiste tú, no tienes que hacer nada más.</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Si no fuiste tú, cancela el cambio desde Editar perfil en la app y cambia tu contraseña: eso cierra las demás sesiones. Si necesitas ayuda, escríbenos al estudio.</p></div><p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Emma Pilates Studio<br>Movimiento · Equilibrio · Bienestar</p></div></body></html>"`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the password_recovery email with its link as a button and a bare URL 1`] = `
+{
+  "subject": "Crea una contraseña nueva",
+  "text": "Hola,
+
+Recibimos un pedido para restablecer la contraseña de tu cuenta. Abre el enlace para crear una nueva.
+
+https://links.emmapilates.test/authentication/recover-password?token=secret-1
+
+Este enlace vence en 30 minutos. Al terminar, cerraremos tus otras sesiones.
+
+Si no pediste cambiar tu contraseña, ignora este correo: tu contraseña sigue igual.
+
+Emma Pilates Studio · Movimiento · Equilibrio · Bienestar",
+}
+`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the password_recovery email with its link as a button and a bare URL 2`] = `"<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#F2ECE5;font-family:'Work Sans',Helvetica,Arial,sans-serif;"><div style="max-width:560px;margin:0 auto;padding:32px 16px;"><div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:32px 24px;"><h1 style="margin:0 0 24px;font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;color:#4A4A4A;">Crea una contraseña nueva</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Hola,</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Recibimos un pedido para restablecer la contraseña de tu cuenta. Abre el enlace para crear una nueva.</p><p style="margin:24px 0;"><a href="https://links.emmapilates.test/authentication/recover-password?token=secret-1" style="display:inline-block;background:#B78380;color:#FFFFFF;text-decoration:none;font-weight:500;padding:14px 24px;border-radius:8px;">Crear contraseña nueva</a></p><p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#6E6663;">Si el botón no funciona, copia este enlace en tu navegador:<br><a href="https://links.emmapilates.test/authentication/recover-password?token=secret-1" style="color:#B78380;word-break:break-all;">https://links.emmapilates.test/authentication/recover-password?token=secret-1</a></p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Este enlace vence en 30 minutos. Al terminar, cerraremos tus otras sesiones.</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Si no pediste cambiar tu contraseña, ignora este correo: tu contraseña sigue igual.</p></div><p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Emma Pilates Studio<br>Movimiento · Equilibrio · Bienestar</p></div></body></html>"`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the verification email with its link as a button and a bare URL 1`] = `
+{
+  "subject": "Confirma tu correo para activar tu cuenta",
+  "text": "Hola,
+
+Gracias por registrarte en Emma Pilates Studio. Confirma tu correo para terminar de crear tu cuenta.
+
+https://links.emmapilates.test/authentication/verify-email?token=secret-1
+
+Este enlace vence en 24 horas. Después de confirmar, vuelve a la app e inicia sesión con tu correo y tu contraseña.
+
+Si pediste otro enlace, solo el más reciente funciona.
+
+Emma Pilates Studio · Movimiento · Equilibrio · Bienestar",
+}
+`;
+
+exports[`SpanishAuthenticationEmailRenderer renders the verification email with its link as a button and a bare URL 2`] = `"<!doctype html><html lang="es"><body style="margin:0;padding:0;background:#F2ECE5;font-family:'Work Sans',Helvetica,Arial,sans-serif;"><div style="max-width:560px;margin:0 auto;padding:32px 16px;"><div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:32px 24px;"><h1 style="margin:0 0 24px;font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;color:#4A4A4A;">Confirma tu correo para activar tu cuenta</h1><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Hola,</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Gracias por registrarte en Emma Pilates Studio. Confirma tu correo para terminar de crear tu cuenta.</p><p style="margin:24px 0;"><a href="https://links.emmapilates.test/authentication/verify-email?token=secret-1" style="display:inline-block;background:#B78380;color:#FFFFFF;text-decoration:none;font-weight:500;padding:14px 24px;border-radius:8px;">Confirmar mi correo</a></p><p style="margin:0 0 16px;font-size:13px;line-height:1.5;color:#6E6663;">Si el botón no funciona, copia este enlace en tu navegador:<br><a href="https://links.emmapilates.test/authentication/verify-email?token=secret-1" style="color:#B78380;word-break:break-all;">https://links.emmapilates.test/authentication/verify-email?token=secret-1</a></p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Este enlace vence en 24 horas. Después de confirmar, vuelve a la app e inicia sesión con tu correo y tu contraseña.</p><p style="margin:0 0 16px;font-size:15px;line-height:1.6;color:#4A4A4A;">Si pediste otro enlace, solo el más reciente funciona.</p></div><p style="margin:24px 0 0;text-align:center;font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Emma Pilates Studio<br>Movimiento · Equilibrio · Bienestar</p></div></body></html>"`;

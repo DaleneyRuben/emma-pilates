@@ -10,6 +10,9 @@ const localTransferInstructions = {
   TRANSFER_QR_IMAGE_PATH: '.data/transfer-qr.png',
 } as const;
 const localAdminWebOrigin = 'http://localhost:5173';
+// The HTTPS host the apps accept for authentication links (ADR-0036); the
+// real domain is LNK-001's, so production must set it explicitly.
+const localLinkBaseUrl = 'https://links.emmapilates.test';
 
 // ADR-0084: exact scheme, host, and port only; a wildcard, path, or bare
 // host is never a trusted credentialed origin.
@@ -56,6 +59,13 @@ const environmentSchema = z
       .string()
       .min(1)
       .default(localLinkEncryptionKeyId),
+    AUTHENTICATION_LINK_BASE_URL: z
+      .url()
+      .refine(
+        (value) => value.startsWith('https://'),
+        'AUTHENTICATION_LINK_BASE_URL must use HTTPS',
+      )
+      .default(localLinkBaseUrl),
     DATABASE_URL: z
       .url()
       .refine(
@@ -108,6 +118,7 @@ const environmentSchema = z
       ['AUTHENTICATION_EMAIL_DIGEST_KEY', localEmailDigestKey],
       ['AUTHENTICATION_LINK_ENCRYPTION_KEY', localLinkEncryptionKey],
       ['AUTHENTICATION_LINK_ENCRYPTION_KEY_ID', localLinkEncryptionKeyId],
+      ['AUTHENTICATION_LINK_BASE_URL', localLinkBaseUrl],
       ...(Object.entries(localTransferInstructions) as [
         keyof typeof localTransferInstructions,
         string,

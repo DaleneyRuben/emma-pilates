@@ -3,7 +3,7 @@ import { createPrismaAdapter } from './database/prisma-adapter';
 import { validateEnvironment } from './config/environment';
 import { PrismaClient } from './generated/prisma/client';
 import { LocalEmailCapture } from './jobs/authentication-email/local-email-capture';
-import { PlaceholderAuthenticationEmailRenderer } from './jobs/authentication-email/placeholder-authentication-email-renderer';
+import { SpanishAuthenticationEmailRenderer } from './jobs/authentication-email/spanish-authentication-email-renderer';
 import { PrismaAuthenticationEmailStateReader } from './jobs/authentication-email/prisma-authentication-email-state-reader';
 import { createPgBoss } from './jobs/pg-boss-runtime';
 import { createWorkerLog } from './jobs/worker-log';
@@ -74,7 +74,9 @@ async function bootstrap(): Promise<void> {
     authenticationEmail: {
       stateReader: new PrismaAuthenticationEmailStateReader(prisma),
       decryptor: linkCipher,
-      renderer: new PlaceholderAuthenticationEmailRenderer(),
+      renderer: new SpanishAuthenticationEmailRenderer({
+        linkBaseUrl: environment.AUTHENTICATION_LINK_BASE_URL,
+      }),
       delivery: new LocalEmailCapture(
         environment.NODE_ENV,
         environment.EMAIL_CAPTURE_DIRECTORY,

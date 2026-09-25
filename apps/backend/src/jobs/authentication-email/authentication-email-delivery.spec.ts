@@ -9,6 +9,8 @@ const message = {
   purpose: 'verification',
   subject: 'Verify your Pilates account',
   link: 'pilates://verify?token=link-secret',
+  text: 'text',
+  html: '<p>html</p>',
 } as const;
 
 describe('authentication email delivery deadline', () => {

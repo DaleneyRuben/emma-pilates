@@ -11,6 +11,8 @@ describe('local authentication email capture', () => {
       purpose: 'verification' as const,
       subject: 'Verify your Pilates account',
       link: 'pilates://verify?token=local-secret',
+      text: 'text',
+      html: '<p>html</p>',
     };
 
     await capture.deliver(message);
@@ -25,6 +27,8 @@ describe('local authentication email capture', () => {
       purpose: 'activation' as const,
       subject: 'Activate your Pilates account',
       link: 'pilates://activate?token=local-secret',
+      text: 'text',
+      html: '<p>html</p>',
     };
 
     await capture.deliver(message);
@@ -50,18 +54,22 @@ describe('local authentication email capture', () => {
         purpose: 'email_change',
         subject: 'Confirma tu correo nuevo',
         link: 'https://links.emmapilates.test/authentication/confirm-email-change?token=s',
+        text: 'text',
+        html: '<p>html</p>',
       });
 
       const files = await readdir(directory);
       expect(files).toHaveLength(1);
       expect(files[0]).toMatch(/email_change-client_at_example\.com\.json$/);
       expect(
-        JSON.parse(await readFile(join(directory, files[0]!), 'utf8')),
+        JSON.parse(await readFile(join(directory, files[0]), 'utf8')),
       ).toEqual({
         recipient: 'client@example.com',
         purpose: 'email_change',
         subject: 'Confirma tu correo nuevo',
         link: 'https://links.emmapilates.test/authentication/confirm-email-change?token=s',
+        text: 'text',
+        html: '<p>html</p>',
       });
     } finally {
       await rm(directory, { recursive: true, force: true });

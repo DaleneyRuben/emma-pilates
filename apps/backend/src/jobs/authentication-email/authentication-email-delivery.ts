@@ -7,7 +7,10 @@ export type AuthenticationEmailMessage = {
   recipient: string;
   purpose: AuthenticationEmailJob['purpose'];
   subject: string;
-  link: string;
+  // Null only for the old-address notice of an email change (IDN-008).
+  link: string | null;
+  text: string;
+  html: string;
 };
 
 export interface AuthenticationEmailDelivery {

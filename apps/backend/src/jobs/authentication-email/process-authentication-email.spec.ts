@@ -31,6 +31,8 @@ describe('processAuthenticationEmail', () => {
         purpose: 'verification',
         subject: 'Verify your Pilates account',
         link: 'pilates://verify?token=link-secret',
+        text: 'text',
+        html: '<p>html</p>',
       }),
     };
     const deliver = jest
@@ -66,6 +68,8 @@ describe('processAuthenticationEmail', () => {
       purpose: 'verification',
       subject: 'Verify your Pilates account',
       link: 'pilates://verify?token=link-secret',
+      text: 'text',
+      html: '<p>html</p>',
     });
     expect(delivery.deliver.mock.calls[0][1].signal).toBeInstanceOf(
       AbortSignal,
@@ -169,6 +173,8 @@ describe('processAuthenticationEmail', () => {
             purpose: 'email_change',
             subject: 'x',
             link: 'y',
+            text: 'text',
+            html: '<p>html</p>',
           })),
       },
       delivery: { deliver: jest.fn().mockResolvedValue(undefined) },

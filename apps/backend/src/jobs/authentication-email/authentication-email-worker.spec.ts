@@ -34,6 +34,8 @@ const dependencies = (deliveryError?: AuthenticationEmailDeliveryError) => ({
       purpose: payload.purpose,
       subject: 'Verify your Pilates account',
       link: 'pilates://verify?token=link-secret',
+      text: 'text',
+      html: '<p>html</p>',
     }),
   },
   delivery: {
