@@ -171,6 +171,7 @@ Each of these was sent as the next message in the existing design session for th
 | [61](./followups/61-promotions-as-built.md) | `AW17`'s empty frame, result line, «Sin imagen» card, and narrow wrap; `AW18`'s footer by state, the image-change warning, «Eliminar promoción» with its dialog, the «Imagen actual» caption, and the crop and refusal copy (WEB-006) | 🕓 pending |
 | [62](./followups/62-home-promotions-carousel-as-built.md) | Client `02`'s Promotions carousel as built: one 16:9 card per page with position dots, the loading placeholder, the section hidden when nothing is published, pull to refresh, and the 720 px tablet card (MOB-019) | 🕓 pending |
 | [63](./followups/63-client-profile-photo-as-built.md) | Client `18`'s summary card and `22`'s Cambiar foto / Quitar foto with the photo inside the circular avatar as built, and the conflict between prompt 22, follow-up 60 §1, and invariant 9 (the avatar is «never a photo») for the design session to settle (MOB-020) | 🕓 pending |
+| [64](./followups/64-client-email-change-as-built.md) | Client `22`'s editable email, the «Revisa tu correo nuevo» pending card with Reenviar correo and Cancelar cambio, and the link's confirmation screen as built (IDN-008) | 🕓 pending |
 
 ## Status
 
