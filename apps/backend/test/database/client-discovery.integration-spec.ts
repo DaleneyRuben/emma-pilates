@@ -51,6 +51,7 @@ describe('Client discovery reads', () => {
       email: 'lucia@example.com',
       phone: '+591 70011001',
       referralCode: 'REF-LUCIA',
+      photo: null,
     });
   });
 
@@ -69,6 +70,7 @@ describe('Client discovery reads', () => {
       email: 'isabel@example.com',
       phone: null,
       referralCode: 'REF-ISABEL',
+      photo: null,
     });
     await expect(
       prisma.client.findUniqueOrThrow({ where: { id: isabel.id } }),
