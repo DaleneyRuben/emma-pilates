@@ -21,6 +21,9 @@ beyond what the table below names.
 | `account.activated` | System Identity | An invited Client or Staff Member (or the bootstrap Administrator) sets their first password through an Activation Link | The Account itself (`account`) | `account` | — | `domainIdentity` (`client` / `staff`) |
 | `account.password_changed` | System Identity | A signed-in Account changes its password; its other Authentication Sessions are revoked | The Account itself | `account` | — | — |
 | `account.password_recovered` | System Identity | A Password-Recovery Link replaces the password; every Authentication Session is revoked | The Account itself | `account` | — | — |
+| `account.email_change_requested` | System Identity | A signed-in active Account asks to change its login email; a Verification Link goes to the new address and a notice to the current one (IDN-008) | The Account itself | `account` | — | — |
+| `account.email_change_cancelled` | System Identity | The Account cancels its pending email change from Editar perfil (IDN-008) | The Account itself | `account` | — | — |
+| `account.email_changed` | System Identity | The link sent to the new address is opened: the login email changes and is verified; Authentication Sessions stay valid (IDN-008) | The Account itself | `account` | — | `previousEmail` |
 | `pending_client_registration.cancelled` | System Identity | A self-registering Client cancels the pending registration | `system` (unauthenticated continuation) | `account` | — | `initiatedBy` |
 | `pending_account.expired` | System Identity | The cleanup removes an expired, untouched pending Account | `system` | `account` | — | `domainIdentity` |
 | `client_invitation.created` | System Identity | An Assistant or Administrator invites a Client | Staff Account and Role | `account` | — | — |
@@ -93,9 +96,10 @@ BE-007 (ADR-0055). Until BE-007 decides them:
 - audit records are kept **indefinitely**; the append-only triggers mean no
   application path can delete them, and BE-008's retention sweeps never touch
   this table;
-- the two codes that carry an email (`client_invitation.email_corrected`,
-  `client_invitation.cancelled`) are the only personal data stored in
-  metadata; BE-007 decides whether Account closure redacts them.
+- the three codes that carry an email (`client_invitation.email_corrected`,
+  `client_invitation.cancelled`, `account.email_changed`) are the only
+  personal data stored in metadata; BE-007 decides whether Account closure
+  redacts them.
 
 Open question for BE-007: how long must audit records be kept (for example,
 financial records under Bolivian tax obligations versus security events), and

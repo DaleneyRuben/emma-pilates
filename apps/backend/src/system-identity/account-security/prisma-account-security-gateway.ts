@@ -239,6 +239,11 @@ export class PrismaAccountSecurityGateway
             AuthenticationSessionRevocationReason.PASSWORD_CHANGED,
         },
       });
+      await cancelPendingEmailChange(
+        transaction,
+        input.accountId,
+        input.changedAt,
+      );
       await transaction.auditRecord.create({
         data: {
           id: input.auditRecordId,
@@ -300,6 +305,11 @@ export class PrismaAccountSecurityGateway
             AuthenticationSessionRevocationReason.PASSWORD_RECOVERED,
         },
       });
+      await cancelPendingEmailChange(
+        transaction,
+        token.accountId,
+        input.completedAt,
+      );
       const staffMember =
         token.account.staffMemberId === null
           ? null
@@ -365,6 +375,23 @@ const isCurrentToken = (
       token.account.passwordHash === null &&
       token.account.pendingExpiresAt !== null &&
       token.account.pendingExpiresAt > now);
+
+// IDN-008 E11: taking the Account back also drops a pending email change.
+const cancelPendingEmailChange = async (
+  transaction: Prisma.TransactionClient,
+  accountId: string,
+  at: Date,
+): Promise<void> => {
+  await transaction.authenticationToken.updateMany({
+    where: {
+      accountId,
+      purpose: AuthenticationTokenPurpose.EMAIL_CHANGE,
+      usedAt: null,
+      invalidatedAt: null,
+    },
+    data: { invalidatedAt: at },
+  });
+};
 
 const findToken = (transaction: Prisma.TransactionClient, digest: Uint8Array) =>
   transaction.authenticationToken.findUnique({
