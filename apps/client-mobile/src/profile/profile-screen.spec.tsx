@@ -137,7 +137,7 @@ describe("Client Profile", () => {
     ).toBeOnTheScreen();
   });
 
-  it("edits the name and phone and keeps the email read-only", async () => {
+  it("edits the name and phone and saves them through the API", async () => {
     const saved = jest.fn();
     const screen = await openProfile(
       createClientRuntime(
@@ -163,9 +163,10 @@ describe("Client Profile", () => {
       "value",
       "Sofía Guzmán",
     );
+    // The email is editable since IDN-008; unchanged, it sends no request.
     expect(screen.getByLabelText("Correo electrónico")).toHaveProp(
-      "editable",
-      false,
+      "value",
+      "sofia@example.com",
     );
 
     fireEvent.changeText(screen.getByLabelText("Nombre"), "Sofía Guzmán Vega");

@@ -30,6 +30,7 @@ export function createClientRuntime(fetcher: typeof globalThis.fetch) {
     authenticationApi: {
       activateAccount: jest.fn(),
       cancelRegistration: jest.fn(),
+      completeEmailChange: jest.fn(),
       completePasswordRecovery: jest.fn(),
       correctRegistrationEmail: jest.fn(),
       inspectLink: jest.fn(),
@@ -40,7 +41,7 @@ export function createClientRuntime(fetcher: typeof globalThis.fetch) {
     },
     linkSource: {
       addEventListener: () => ({ remove: jest.fn() }),
-      getInitialURL: async () => null,
+      getInitialURL: async (): Promise<string | null> => null,
     },
     login: jest.fn(),
     sessionManager: {

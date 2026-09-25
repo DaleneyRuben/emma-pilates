@@ -6,6 +6,7 @@ function createAuthenticationApiMock() {
   return {
     activateAccount: jest.fn(),
     cancelRegistration: jest.fn(),
+    completeEmailChange: jest.fn(),
     completePasswordRecovery: jest.fn(),
     correctRegistrationEmail: jest.fn(),
     inspectLink: jest.fn(),

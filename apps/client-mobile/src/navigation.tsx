@@ -1,8 +1,12 @@
 import {
   AuthenticationFlow,
+  EmailChangeLinkScreen,
   MobileQueryProvider,
   type MobileNavigationProps,
 } from "@pilates/mobile-core";
+import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createStaticNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -98,6 +102,34 @@ const ClientTabs = createBottomTabNavigator({
 
 const AuthenticatedClientNavigation = createStaticNavigation(ClientTabs);
 
+// IDN-008: the link sent to the new address is confirmed here whether or not
+// someone is signed in; a signed-in Client then sees the new email on Perfil.
+function SignedInEmailChangeLink({
+  api,
+  onDone,
+  token,
+}: {
+  api: MobileNavigationProps["authenticationApi"];
+  onDone: () => void;
+  token: string;
+}) {
+  const queryClient = useQueryClient();
+  return (
+    <EmailChangeLinkScreen
+      api={api}
+      onDone={(changed) => {
+        if (changed) {
+          void queryClient.invalidateQueries({
+            queryKey: getGetCurrentClientProfileQueryKey(),
+          });
+        }
+        onDone();
+      }}
+      token={token}
+    />
+  );
+}
+
 export function ClientNavigation({
   accountId,
   apiBaseUrl,
@@ -109,15 +141,40 @@ export function ClientNavigation({
   onRecoveryCredential,
   role,
 }: MobileNavigationProps) {
+  const [handledLink, setHandledLink] = useState<string | null>(null);
+  const emailChangeToken =
+    authenticationIntent?.type === "confirm-email-change" &&
+    authenticationIntent.token !== handledLink
+      ? authenticationIntent.token
+      : null;
+
   if (role === "client") {
     return (
       <MobileQueryProvider accountId={accountId}>
         <ClientFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
           <ClientApiBaseUrlContext.Provider value={apiBaseUrl}>
-            <AuthenticatedClientNavigation />
+            {emailChangeToken === null ? (
+              <AuthenticatedClientNavigation />
+            ) : (
+              <SignedInEmailChangeLink
+                api={authenticationApi}
+                onDone={() => setHandledLink(emailChangeToken)}
+                token={emailChangeToken}
+              />
+            )}
           </ClientApiBaseUrlContext.Provider>
         </ClientFetcherContext.Provider>
       </MobileQueryProvider>
+    );
+  }
+
+  if (emailChangeToken !== null) {
+    return (
+      <EmailChangeLinkScreen
+        api={authenticationApi}
+        onDone={() => setHandledLink(emailChangeToken)}
+        token={emailChangeToken}
+      />
     );
   }
 

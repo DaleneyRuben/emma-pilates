@@ -1,6 +1,8 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  getGetCurrentAccountEmailChangeQueryKey,
   getGetCurrentClientProfileQueryKey,
+  requestCurrentAccountEmailChange,
   updateCurrentClientProfile,
   useGetCurrentClientProfile,
   type ClientProfileDto,
@@ -31,10 +33,12 @@ import { z } from "zod";
 
 import { useClientFetcher } from "../client-fetcher";
 import { BackLink } from "@pilates/mobile-core";
+import { EmailChangeSection, normalizeEmail } from "./email-change-section";
 import { ProfilePhotoSection } from "./profile-photo-section";
 
 const profileSchema = z.object({
   name: z.string().trim().min(1, "Escribe tu nombre."),
+  email: z.string().trim().email("Escribe un correo válido."),
   phone: z.string(),
 });
 
@@ -49,7 +53,6 @@ function EditProfileForm({
   defaults: ProfileValues;
   onSaved: () => void;
 }) {
-  const email = client.email;
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
   const [failed, setFailed] = useState(false);
@@ -57,6 +60,7 @@ function EditProfileForm({
     control,
     formState: { errors, isSubmitting },
     handleSubmit,
+    reset,
   } = useForm<ProfileValues>({
     defaultValues: defaults,
     resolver: zodResolver(profileSchema),
@@ -77,9 +81,27 @@ function EditProfileForm({
       setFailed(true);
       return;
     }
-
     queryClient.setQueryData(getGetCurrentClientProfileQueryKey(), response);
-    onSaved();
+
+    // A new address is only asked for (IDN-008): the profile keeps the
+    // current one until the link sent to the new mailbox is opened.
+    if (normalizeEmail(values.email) === normalizeEmail(client.email)) {
+      onSaved();
+      return;
+    }
+    const requested = await requestCurrentAccountEmailChange(
+      { email: values.email.trim() },
+      { headers: { "Content-Type": "application/json" } },
+      fetcher,
+    );
+    if (requested.status !== 202) {
+      setFailed(true);
+      return;
+    }
+    await queryClient.invalidateQueries({
+      queryKey: getGetCurrentAccountEmailChangeQueryKey(),
+    });
+    reset({ ...values, email: client.email });
   });
 
   return (
@@ -107,10 +129,23 @@ function EditProfileForm({
             />
           )}
         />
-        <FormField editable={false} label="Correo electrónico" value={email} />
-        <BodyText style={styles.note}>
-          Para cambiar tu correo, escríbenos al estudio.
-        </BodyText>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <FormField
+              autoCapitalize="none"
+              autoCorrect={false}
+              error={errors.email?.message}
+              keyboardType="email-address"
+              label="Correo electrónico"
+              onBlur={field.onBlur}
+              onChangeText={field.onChange}
+              value={field.value}
+            />
+          )}
+        />
+        <EmailChangeSection />
         <Controller
           control={control}
           name="phone"
@@ -182,7 +217,7 @@ export function EditProfileScreen() {
       {header}
       <EditProfileForm
         client={client}
-        defaults={{ name: client.name, phone: client.phone ?? "" }}
+        defaults={{ name: client.name, email: client.email, phone: client.phone ?? "" }}
         onSaved={() => navigation.goBack()}
       />
     </Screen>
@@ -194,6 +229,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   footer: { paddingTop: spacing.md },
   form: { gap: spacing.lg, paddingBottom: spacing.lg },
-  note: { color: colors.textMuted, fontSize: typography.note },
   screen: { gap: spacing.lg },
 });

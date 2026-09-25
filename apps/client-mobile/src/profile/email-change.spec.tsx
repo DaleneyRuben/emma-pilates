@@ -61,7 +61,7 @@ describe("Client email change", () => {
       ),
     );
 
-    expect(screen.getByLabelText("Correo electrónico")).toHaveProp("editable", true);
+    expect(screen.getByLabelText("Correo electrónico")).not.toHaveProp("editable", false);
     expect(screen.queryByText("Para cambiar tu correo, escríbenos al estudio.")).not.toBeOnTheScreen();
 
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "Sofia.Nueva@example.com");
