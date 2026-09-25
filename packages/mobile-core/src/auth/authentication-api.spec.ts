@@ -134,4 +134,24 @@ describe("createAuthenticationApi", () => {
       status: "recovered",
     });
   });
+
+  it("completes an email change link (IDN-008)", async () => {
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ status: "changed" }), { status: 200 }),
+      );
+    const api = createAuthenticationApi({
+      baseUrl: "https://api.example.com/api/v1",
+      fetch: fetchMock,
+    });
+
+    await expect(api.completeEmailChange("change-secret")).resolves.toEqual({
+      status: "changed",
+    });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://api.example.com/api/v1/email-changes",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
 });

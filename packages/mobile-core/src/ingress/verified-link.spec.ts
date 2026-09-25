@@ -14,6 +14,10 @@ describe("parseVerifiedLink", () => {
       "https://links.emmapilates.test/authentication/recover-password?token=recovery-secret",
       { type: "recover-password", token: "recovery-secret" },
     ],
+    [
+      "https://links.emmapilates.test/authentication/confirm-email-change?token=change-secret",
+      { type: "confirm-email-change", token: "change-secret" },
+    ],
   ] as const)("maps the verified URL %s to one safe intent", (url, intent) => {
     expect(parseVerifiedLink(url, ["links.emmapilates.test"])).toEqual(intent);
   });
