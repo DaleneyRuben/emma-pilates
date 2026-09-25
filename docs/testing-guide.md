@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
@@ -871,6 +871,26 @@ card you should see the rows **Mi plan**, **Notificaciones**, and **Cambiar
 contraseña**, an outlined **Cerrar sesión** button, and the footer
 "Emma Pilates Studio · versión 1.0". The Notificaciones row shows a small badge
 with the unread count when it is greater than zero.
+
+**Profile photo (MOB-020).** The summary card's circle shows two initials
+until a photo is attached. Put an image into the Simulator's library first
+(`xcrun simctl addmedia <udid> photo.jpg`; the fixtures ship no photo), start
+the worker (it rebuilds the upload), then tap **Editar**. Above the fields, a
+larger circle with the initials and the link **Cambiar foto**. Tapping it
+opens the photo library; pick an image and it appears inside the circle at
+once, centre-cropped, with "Subiendo foto…" under it while the upload runs
+(declare, upload, finalize, wait for the worker, attach: a few seconds). Then
+"Se recorta al centro en forma de círculo." and a second link, **Quitar
+foto**, appear. **Volver** shows the same photo in the Perfil summary card.
+**Quitar foto** removes it: the initials come back on both screens. HEIC
+photos are converted to JPEG on the phone; the API keeps a 320 px display
+and a 96 px thumbnail variant without metadata and releases them at once when
+the photo is replaced or removed (check `system.audit_records` for
+`client.photo_changed` / `client.photo_removed`). Through Swagger the same
+journey is `POST /api/v1/uploads` with `purpose: profile_photo` (Test 32A),
+`PUT /api/v1/clients/current/photo` with the ready `imageAssetId`,
+`GET /api/v1/clients/current/photo?variant=display|thumbnail` (`no-store`),
+and `DELETE /api/v1/clients/current/photo`.
 
 ### B. The notification inbox
 
