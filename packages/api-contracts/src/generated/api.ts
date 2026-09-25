@@ -75,6 +75,7 @@ import type {
   ClientProfileDto,
   ClientSubscriptionDto,
   CompleteAccountActivationDto,
+  CompleteEmailChangeDto,
   CompletePasswordRecoveryDto,
   CorrectInvitationEmailDto,
   CorrectPendingClientEmailDto,
@@ -86,6 +87,9 @@ import type {
   CreatedBookingDto,
   CreditDto,
   CurrentAuthenticationPrincipalDto,
+  EmailChangeCompletionResultDto,
+  EmailChangeRequestResultDto,
+  EmailChangeResendResultDto,
   EvaluationAvailabilityDto,
   EvaluationSlotDto,
   ExpenseCategoryInputDto,
@@ -130,6 +134,7 @@ import type {
   PaymentDto,
   PaymentReviewDto,
   PendingClientRegistrationDto,
+  PendingEmailChangeStateDto,
   PendingEmailCorrectionDto,
   PendingPaymentDto,
   PendingRegistrationContinuationDto,
@@ -147,6 +152,7 @@ import type {
   RecordCashPaymentDto,
   ReferralsDto,
   RejectPaymentDto,
+  RequestEmailChangeDto,
   RequestPasswordRecoveryDto,
   SalaryPaymentInputDto,
   SearchAssistantClientsParams,
@@ -2904,6 +2910,678 @@ export const useLogoutCurrentAuthenticationSession = <
 > => {
   return useMutation(
     getLogoutCurrentAuthenticationSessionMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type requestCurrentAccountEmailChangeResponse202 = {
+  data: EmailChangeRequestResultDto;
+  status: 202;
+};
+
+export type requestCurrentAccountEmailChangeResponseSuccess =
+  requestCurrentAccountEmailChangeResponse202 & {
+    headers: Headers;
+  };
+export type requestCurrentAccountEmailChangeResponse =
+  requestCurrentAccountEmailChangeResponseSuccess;
+
+export const getRequestCurrentAccountEmailChangeUrl = () => {
+  return `/api/v1/accounts/current/email-change`;
+};
+
+export const requestCurrentAccountEmailChange = async (
+  requestEmailChangeDto: RequestEmailChangeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<requestCurrentAccountEmailChangeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getRequestCurrentAccountEmailChangeUrl(),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(requestEmailChangeDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: requestCurrentAccountEmailChangeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as requestCurrentAccountEmailChangeResponse;
+};
+
+export const getRequestCurrentAccountEmailChangeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestCurrentAccountEmailChange>>,
+    TError,
+    RequestCurrentAccountEmailChangeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestCurrentAccountEmailChange>>,
+  TError,
+  RequestCurrentAccountEmailChangeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["requestCurrentAccountEmailChange"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestCurrentAccountEmailChange>>,
+    RequestCurrentAccountEmailChangeMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestCurrentAccountEmailChange(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestCurrentAccountEmailChangeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestCurrentAccountEmailChange>>
+>;
+export type RequestCurrentAccountEmailChangeMutationBody =
+  RequestEmailChangeDto;
+export type RequestCurrentAccountEmailChangeMutationError = unknown;
+export type RequestCurrentAccountEmailChangeMutationVariables = {
+  data: RequestEmailChangeDto;
+};
+
+export const useRequestCurrentAccountEmailChange = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof requestCurrentAccountEmailChange>>,
+      TError,
+      RequestCurrentAccountEmailChangeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof requestCurrentAccountEmailChange>>,
+  TError,
+  RequestCurrentAccountEmailChangeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRequestCurrentAccountEmailChangeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getCurrentAccountEmailChangeResponse200 = {
+  data: PendingEmailChangeStateDto;
+  status: 200;
+};
+
+export type getCurrentAccountEmailChangeResponseSuccess =
+  getCurrentAccountEmailChangeResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentAccountEmailChangeResponse =
+  getCurrentAccountEmailChangeResponseSuccess;
+
+export const getGetCurrentAccountEmailChangeUrl = () => {
+  return `/api/v1/accounts/current/email-change`;
+};
+
+export const getCurrentAccountEmailChange = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentAccountEmailChangeResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetCurrentAccountEmailChangeUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentAccountEmailChangeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentAccountEmailChangeResponse;
+};
+
+export const getGetCurrentAccountEmailChangeQueryKey = () => {
+  return [`/api/v1/accounts/current/email-change`] as const;
+};
+
+export const getGetCurrentAccountEmailChangeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentAccountEmailChangeQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentAccountEmailChange>>
+  > = ({ signal }) =>
+    getCurrentAccountEmailChange({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentAccountEmailChangeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentAccountEmailChange>>
+>;
+export type GetCurrentAccountEmailChangeQueryError = unknown;
+
+export function useGetCurrentAccountEmailChange<
+  TData = Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentAccountEmailChange>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentAccountEmailChange<
+  TData = Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentAccountEmailChange>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentAccountEmailChange<
+  TData = Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentAccountEmailChange<
+  TData = Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentAccountEmailChange>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetCurrentAccountEmailChangeQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type cancelCurrentAccountEmailChangeResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type cancelCurrentAccountEmailChangeResponseSuccess =
+  cancelCurrentAccountEmailChangeResponse204 & {
+    headers: Headers;
+  };
+export type cancelCurrentAccountEmailChangeResponse =
+  cancelCurrentAccountEmailChangeResponseSuccess;
+
+export const getCancelCurrentAccountEmailChangeUrl = () => {
+  return `/api/v1/accounts/current/email-change`;
+};
+
+export const cancelCurrentAccountEmailChange = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<cancelCurrentAccountEmailChangeResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getCancelCurrentAccountEmailChangeUrl(),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: cancelCurrentAccountEmailChangeResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as cancelCurrentAccountEmailChangeResponse;
+};
+
+export const getCancelCurrentAccountEmailChangeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof cancelCurrentAccountEmailChange>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof cancelCurrentAccountEmailChange>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["cancelCurrentAccountEmailChange"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof cancelCurrentAccountEmailChange>>,
+    void
+  > = () => {
+    return cancelCurrentAccountEmailChange(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CancelCurrentAccountEmailChangeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof cancelCurrentAccountEmailChange>>
+>;
+
+export type CancelCurrentAccountEmailChangeMutationError = unknown;
+
+export const useCancelCurrentAccountEmailChange = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof cancelCurrentAccountEmailChange>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof cancelCurrentAccountEmailChange>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(
+    getCancelCurrentAccountEmailChangeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type resendCurrentAccountEmailChangeResponse202 = {
+  data: EmailChangeResendResultDto;
+  status: 202;
+};
+
+export type resendCurrentAccountEmailChangeResponseSuccess =
+  resendCurrentAccountEmailChangeResponse202 & {
+    headers: Headers;
+  };
+export type resendCurrentAccountEmailChangeResponse =
+  resendCurrentAccountEmailChangeResponseSuccess;
+
+export const getResendCurrentAccountEmailChangeUrl = () => {
+  return `/api/v1/accounts/current/email-change/resends`;
+};
+
+export const resendCurrentAccountEmailChange = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<resendCurrentAccountEmailChangeResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getResendCurrentAccountEmailChangeUrl(),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resendCurrentAccountEmailChangeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as resendCurrentAccountEmailChangeResponse;
+};
+
+export const getResendCurrentAccountEmailChangeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof resendCurrentAccountEmailChange>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof resendCurrentAccountEmailChange>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["resendCurrentAccountEmailChange"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof resendCurrentAccountEmailChange>>,
+    void
+  > = () => {
+    return resendCurrentAccountEmailChange(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ResendCurrentAccountEmailChangeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof resendCurrentAccountEmailChange>>
+>;
+
+export type ResendCurrentAccountEmailChangeMutationError = unknown;
+
+export const useResendCurrentAccountEmailChange = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof resendCurrentAccountEmailChange>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof resendCurrentAccountEmailChange>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(
+    getResendCurrentAccountEmailChangeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type completeEmailChangeResponse200 = {
+  data: EmailChangeCompletionResultDto;
+  status: 200;
+};
+
+export type completeEmailChangeResponseSuccess =
+  completeEmailChangeResponse200 & {
+    headers: Headers;
+  };
+export type completeEmailChangeResponse = completeEmailChangeResponseSuccess;
+
+export const getCompleteEmailChangeUrl = () => {
+  return `/api/v1/email-changes`;
+};
+
+export const completeEmailChange = async (
+  completeEmailChangeDto: CompleteEmailChangeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<completeEmailChangeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCompleteEmailChangeUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(completeEmailChangeDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: completeEmailChangeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as completeEmailChangeResponse;
+};
+
+export const getCompleteEmailChangeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof completeEmailChange>>,
+    TError,
+    CompleteEmailChangeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof completeEmailChange>>,
+  TError,
+  CompleteEmailChangeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["completeEmailChange"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof completeEmailChange>>,
+    CompleteEmailChangeMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return completeEmailChange(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CompleteEmailChangeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof completeEmailChange>>
+>;
+export type CompleteEmailChangeMutationBody = CompleteEmailChangeDto;
+export type CompleteEmailChangeMutationError = unknown;
+export type CompleteEmailChangeMutationVariables = {
+  data: CompleteEmailChangeDto;
+};
+
+export const useCompleteEmailChange = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof completeEmailChange>>,
+      TError,
+      CompleteEmailChangeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof completeEmailChange>>,
+  TError,
+  CompleteEmailChangeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCompleteEmailChangeMutationOptions(options),
     queryClient,
   );
 };

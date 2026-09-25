@@ -588,6 +588,145 @@
         ]
       }
     },
+    "/api/v1/accounts/current/email-change": {
+      "post": {
+        "operationId": "requestCurrentAccountEmailChange",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestEmailChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailChangeRequestResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EmailChange"
+        ]
+      },
+      "get": {
+        "operationId": "getCurrentAccountEmailChange",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingEmailChangeStateDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EmailChange"
+        ]
+      },
+      "delete": {
+        "operationId": "cancelCurrentAccountEmailChange",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EmailChange"
+        ]
+      }
+    },
+    "/api/v1/accounts/current/email-change/resends": {
+      "post": {
+        "operationId": "resendCurrentAccountEmailChange",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailChangeResendResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EmailChange"
+        ]
+      }
+    },
+    "/api/v1/email-changes": {
+      "post": {
+        "operationId": "completeEmailChange",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteEmailChangeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailChangeCompletionResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "",
+        "tags": [
+          "EmailChange"
+        ]
+      }
+    },
     "/api/v1/client-email-verifications": {
       "post": {
         "operationId": "verifyClientEmail",
@@ -6433,6 +6572,117 @@
         },
         "required": [
           "credential"
+        ]
+      },
+      "RequestEmailChangeDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "lucia.nueva@example.com",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
+        ]
+      },
+      "EmailChangeRequestResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "verification_required"
+            ]
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "status",
+          "email"
+        ]
+      },
+      "PendingEmailChangeDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "requestedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "expiresAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "requestedAt",
+          "expiresAt"
+        ]
+      },
+      "PendingEmailChangeStateDto": {
+        "type": "object",
+        "properties": {
+          "pending": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PendingEmailChangeDto"
+              }
+            ]
+          }
+        }
+      },
+      "EmailChangeResendResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "verification_required"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "CompleteEmailChangeDto": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "EmailChangeCompletionResultDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "changed",
+              "expired",
+              "invalid",
+              "email_unavailable"
+            ]
+          }
+        },
+        "required": [
+          "status"
         ]
       },
       "VerifyClientEmailDto": {
