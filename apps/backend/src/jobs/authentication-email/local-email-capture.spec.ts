@@ -1,3 +1,6 @@
+import { mkdtemp, readdir, readFile, rm } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { LocalEmailCapture } from './local-email-capture';
 
 describe('local authentication email capture', () => {
@@ -36,5 +39,32 @@ describe('local authentication email capture', () => {
     expect(() => new LocalEmailCapture('production')).toThrow(
       'Local email capture is unavailable in production',
     );
+  });
+
+  it('also writes each captured message to a file when given a directory, so testers can open the link', async () => {
+    const directory = await mkdtemp(join(tmpdir(), 'pilates-email-capture-'));
+    try {
+      const capture = new LocalEmailCapture('development', directory);
+      await capture.deliver({
+        recipient: 'client@example.com',
+        purpose: 'email_change',
+        subject: 'Confirma tu correo nuevo',
+        link: 'https://links.emmapilates.test/authentication/confirm-email-change?token=s',
+      });
+
+      const files = await readdir(directory);
+      expect(files).toHaveLength(1);
+      expect(files[0]).toMatch(/email_change-client_at_example\.com\.json$/);
+      expect(
+        JSON.parse(await readFile(join(directory, files[0]!), 'utf8')),
+      ).toEqual({
+        recipient: 'client@example.com',
+        purpose: 'email_change',
+        subject: 'Confirma tu correo nuevo',
+        link: 'https://links.emmapilates.test/authentication/confirm-email-change?token=s',
+      });
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
   });
 });
