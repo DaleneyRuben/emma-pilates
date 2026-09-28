@@ -128,7 +128,7 @@ export const createPrismaScheduleAdministration = (
           role: true,
           account: { select: { disabledAt: true } },
           branchAssignments: {
-            where: { branchId: input.branchId },
+            where: { branchId: input.branchId, deletedAt: null },
             select: { branchId: true },
           },
         },

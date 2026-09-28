@@ -177,7 +177,10 @@ export class PrismaAuthenticationGateway {
                 select: {
                   id: true,
                   role: true,
-                  branchAssignments: { select: { branchId: true } },
+                  branchAssignments: {
+                    where: { deletedAt: null },
+                    select: { branchId: true },
+                  },
                 },
               },
             },

@@ -100,7 +100,12 @@ export const createPrismaSessionMaterializer = (
         effectiveUntil: true,
         classType: { select: { durationMinutes: true } },
         trainer: {
-          select: { branchAssignments: { select: { branchId: true } } },
+          select: {
+            branchAssignments: {
+              where: { deletedAt: null },
+              select: { branchId: true },
+            },
+          },
         },
       },
     });

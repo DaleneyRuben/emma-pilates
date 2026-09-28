@@ -39,6 +39,7 @@ const staffSelect = {
   phone: true,
   role: true,
   branchAssignments: {
+    where: { deletedAt: null },
     select: { branchId: true },
     orderBy: { branchId: 'asc' },
   },
@@ -137,8 +138,8 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
     return {
       findAccountByEmail: (email) => accounts.findAccountByEmail(email),
       findStaffMember: async (staffMemberId) => {
-        const row = await transaction.staffMember.findUnique({
-          where: { id: staffMemberId },
+        const row = await transaction.staffMember.findFirst({
+          where: { id: staffMemberId, deletedAt: null },
           select: staffSelect,
         });
         return row === null ? null : toRecord(row);
@@ -219,11 +220,15 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
         });
       },
       replaceBranches: async (input) => {
-        await transaction.staffBranchAssignment.deleteMany({
+        // ADR-0086: a removed assignment stays, marked removed; re-adding the
+        // Branch inserts a new live row.
+        await transaction.staffBranchAssignment.updateMany({
           where: {
             staffMemberId: input.staffMemberId,
             branchId: { notIn: input.branchIds },
+            deletedAt: null,
           },
+          data: { deletedAt: this.dependencies.now() },
         });
         await transaction.staffBranchAssignment.createMany({
           data: input.branchIds.map((branchId) => ({
@@ -263,6 +268,7 @@ export const createPrismaStaffDirectory = (
 ): StaffDirectory => ({
   list: async (query) => {
     const where: Prisma.StaffMemberWhereInput = {
+      deletedAt: null,
       account:
         query.status === undefined
           ? { isNot: null }
@@ -270,7 +276,11 @@ export const createPrismaStaffDirectory = (
       ...(query.role === undefined ? {} : { role: roles[query.role] }),
       ...(query.branchId === undefined
         ? {}
-        : { branchAssignments: { some: { branchId: query.branchId } } }),
+        : {
+            branchAssignments: {
+              some: { branchId: query.branchId, deletedAt: null },
+            },
+          }),
     };
     const [rows, totalItems] = await Promise.all([
       prisma.staffMember.findMany({
@@ -290,8 +300,8 @@ export const createPrismaStaffDirectory = (
     };
   },
   read: async (staffMemberId) => {
-    const row = await prisma.staffMember.findUnique({
-      where: { id: staffMemberId },
+    const row = await prisma.staffMember.findFirst({
+      where: { id: staffMemberId, deletedAt: null },
       select: staffSelect,
     });
     return row === null ? null : toRecord(row);

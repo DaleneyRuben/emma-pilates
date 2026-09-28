@@ -254,6 +254,7 @@ export function createCatalogRepository(
             role: true,
             account: { select: { email: true } },
             branchAssignments: {
+              where: { deletedAt: null },
               select: { branch: { select: { id: true, name: true } } },
               orderBy: { branch: { name: 'asc' } },
             },
