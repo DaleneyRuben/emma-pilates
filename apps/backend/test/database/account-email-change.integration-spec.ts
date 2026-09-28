@@ -268,7 +268,7 @@ describe('account email change (PostgreSQL)', () => {
     ).resolves.toBe('none');
   });
 
-  it('cancels the pending change, invalidating its link, and is idempotent', async () => {
+  it('cancels the pending change by marking it removed, invalidating its link, and is idempotent', async () => {
     const { accountId } = await activeAccount();
     const { issued, outcome } = request(
       accountId,
@@ -287,6 +287,12 @@ describe('account email change (PostgreSQL)', () => {
         where: { accountId, deletedAt: null },
       }),
     ).resolves.toBeNull();
+    await expect(
+      prisma.accountEmailChange.findMany({
+        where: { accountId },
+        select: { deletedAt: true },
+      }),
+    ).resolves.toEqual([{ deletedAt: later(1) }]);
     expect(
       (
         await prisma.authenticationToken.findUniqueOrThrow({
@@ -303,7 +309,7 @@ describe('account email change (PostgreSQL)', () => {
     ]);
   });
 
-  it('completes the change from the link: new email verified, token used, row gone, audited', async () => {
+  it('completes the change from the link: new email verified, token used, row marked removed, audited', async () => {
     const { accountId, email } = await activeAccount();
     const newEmail = `${randomUUID()}@example.com`;
     const { issued, outcome } = request(accountId, newEmail);
@@ -331,6 +337,12 @@ describe('account email change (PostgreSQL)', () => {
         where: { accountId, deletedAt: null },
       }),
     ).resolves.toBeNull();
+    await expect(
+      prisma.accountEmailChange.findMany({
+        where: { accountId },
+        select: { deletedAt: true },
+      }),
+    ).resolves.toEqual([{ deletedAt: later(30) }]);
     expect(await audits(accountId)).toMatchObject([
       { actionCode: 'account.email_change_requested' },
       {
