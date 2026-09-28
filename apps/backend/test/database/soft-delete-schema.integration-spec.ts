@@ -201,13 +201,13 @@ const insertEmailChange = async (
   deletedAt: string,
 ): Promise<void> => {
   const tokenId = randomUUID();
-  // A removed change's token is already invalidated, so only the live one
-  // counts toward the one-current-token-per-purpose index.
+  // Tokens are inserted invalidated so the one-current-token-per-purpose
+  // index never fires first; only the change row's uniqueness is under test.
   await client.query(
     `INSERT INTO system.authentication_tokens
        (id, account_id, purpose, token_digest, expires_at, invalidated_at)
      VALUES ($1, $2, 'email_change', $3, CURRENT_TIMESTAMP + INTERVAL '1 day',
-             ${deletedAt})`,
+             CURRENT_TIMESTAMP)`,
     [tokenId, accountId, Buffer.from(tokenId)],
   );
   await client.query(
