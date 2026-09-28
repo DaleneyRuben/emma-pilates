@@ -99,6 +99,7 @@ Use the narrowest meaningful test level:
 - Prisma is an infrastructure detail used through context-owned repository adapters. Controllers and application use cases must not inject Prisma Client directly.
 - Never create, modify, apply, or reset a migration without explicit user approval. Present the proposed schema and migration impact first.
 - Never use schema pushing or runtime auto-synchronization in production.
+- Nothing in the database is ever physically deleted ([ADR-0086](../../../docs/adr/0086-soft-delete-every-database-row.md)). A removal is an existing end state or a `deleted_at` column; never call Prisma `delete`/`deleteMany` or run raw `DELETE`/`TRUNCATE` in production code. Foreign keys are `ON DELETE RESTRICT`, uniqueness that removed rows must not block is partial on `deleted_at IS NULL`, and every active read excludes removed rows.
 - Protect concurrency-sensitive workflows with database constraints and short, deliberate transactions using an explicit isolation and bounded-retry strategy.
 - Raw SQL must be parameterized, live inside the owning infrastructure adapter, and be covered by an integration test.
 

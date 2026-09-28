@@ -58,6 +58,7 @@ Accepted architecture decisions:
 - [x] Delete pending uploads and failed processing artifacts that remain unattached after 24 hours.
 - [x] Retain a transfer receipt while its Payment is pending, then delete it at the later of 45 days after upload or seven days after the decision.
 - [x] Delete profile-photo and Promotion-image variants immediately after removal, replacement, or owner deletion.
+- [x] Never physically delete a database row; every removal is a soft delete, and only object-storage bytes are erased (ADR-0086).
 - [x] Deliver active Promotion images through public, versioned, cacheable R2 URLs while every other image purpose remains private.
 - [x] Run serialized, backward-compatible production migrations before API and worker rollout, stopping the release on failure.
 - [x] Keep runtime secrets in environment-specific provider stores and give CI only narrowly scoped deployment credentials.
