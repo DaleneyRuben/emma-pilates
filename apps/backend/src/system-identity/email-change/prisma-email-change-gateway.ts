@@ -255,8 +255,9 @@ export const createPrismaEmailChangeGateway = (
         );
         if (pending === null) return 'none';
         await invalidateCurrentLink(transaction, input.accountId, input.now);
-        await transaction.accountEmailChange.deleteMany({
+        await transaction.accountEmailChange.updateMany({
           where: { accountId: input.accountId, deletedAt: null },
+          data: { deletedAt: input.now },
         });
         await recordAudit(transaction, {
           actionCode: 'account.email_change_cancelled',
@@ -310,8 +311,9 @@ export const createPrismaEmailChangeGateway = (
           where: { id: token.id },
           data: { usedAt: input.now },
         });
-        await transaction.accountEmailChange.deleteMany({
+        await transaction.accountEmailChange.updateMany({
           where: { accountId: token.accountId, deletedAt: null },
+          data: { deletedAt: input.now },
         });
         await transaction.account.update({
           where: { id: token.accountId },
