@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { INestApplicationContext } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { AppModule } from '../../src/app.module';
 import { RegisterClient } from '../../src/system-identity/registration/register-client';
 import {
   DatabaseTestContext,
@@ -16,6 +15,10 @@ describe('client registration runtime', () => {
     context = await startDatabaseTestContext();
     process.env.DATABASE_URL = context.databaseUrl;
     process.env.NODE_ENV = 'test';
+    // ConfigModule.forRoot() reads the environment when AppModule is first
+    // imported, so the import must follow the DATABASE_URL override or the
+    // spec would write to the database named in .env.
+    const { AppModule } = await import('../../src/app.module');
     application = await NestFactory.createApplicationContext(AppModule, {
       abortOnError: false,
       logger: false,
