@@ -79,9 +79,10 @@ export const createAssistantClientRepository = (
       SELECT c.id
       FROM booking.clients c
       JOIN system.accounts a ON a.client_id = c.id
-      WHERE booking.search_text(c.name) LIKE booking.search_text(${pattern})
-         OR booking.search_text(a.email) LIKE booking.search_text(${pattern})
-         OR c.phone ILIKE ${pattern}
+      WHERE c.deleted_at IS NULL
+        AND (booking.search_text(c.name) LIKE booking.search_text(${pattern})
+          OR booking.search_text(a.email) LIKE booking.search_text(${pattern})
+          OR c.phone ILIKE ${pattern})
       ORDER BY c.name, c.id
       LIMIT ${limit}`;
     const rows = await prisma.client.findMany({
@@ -93,7 +94,10 @@ export const createAssistantClientRepository = (
   },
   findClient: (clientId) =>
     prisma.client
-      .findUnique({ where: { id: clientId }, select: clientSelect })
+      .findFirst({
+        where: { id: clientId, deletedAt: null },
+        select: clientSelect,
+      })
       .then((row) => (row === null ? null : toSummary(row))),
   readAvailableCredit: (clientId) =>
     prisma.creditLedgerEntry

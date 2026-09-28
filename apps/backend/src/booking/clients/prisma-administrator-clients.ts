@@ -33,6 +33,7 @@ const activeOn = (today: Date) =>
 // Clients without an Account are unreachable for the studio and stay hidden,
 // as in the Assistant search.
 const withAccount = {
+  deletedAt: null,
   account: { isNot: null },
 } satisfies Prisma.ClientWhereInput;
 
@@ -64,14 +65,14 @@ export const createPrismaAdministratorClients = (
             SELECT c.id
             FROM booking.clients c
             JOIN system.accounts a ON a.client_id = c.id
-            WHERE TRUE ${search}
+            WHERE c.deleted_at IS NULL ${search}
             ORDER BY c.name, c.id
             LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`,
           prisma.$queryRaw<{ total: bigint }[]>`
             SELECT count(*) AS total
             FROM booking.clients c
             JOIN system.accounts a ON a.client_id = c.id
-            WHERE TRUE ${search}`,
+            WHERE c.deleted_at IS NULL ${search}`,
           prisma.client.count({ where: withAccount }),
           prisma.client.count({
             where: { ...withAccount, subscriptions: { some: activeOn(today) } },
@@ -128,8 +129,8 @@ export const createPrismaAdministratorClients = (
     },
 
     read: async (clientId) => {
-      const row = await prisma.client.findUnique({
-        where: { id: clientId },
+      const row = await prisma.client.findFirst({
+        where: { id: clientId, deletedAt: null },
         select: {
           id: true,
           name: true,

@@ -16,12 +16,15 @@ export const attributeReferral = async (
   transaction: Prisma.TransactionClient,
   input: { referredClientId: string; referralCode: string },
 ): Promise<void> => {
-  const referrer = await transaction.client.findUnique({
-    where: { referralCode: input.referralCode },
+  const referrer = await transaction.client.findFirst({
+    where: { referralCode: input.referralCode, deletedAt: null },
     select: { id: true },
   });
   if (referrer === null) {
-    throw new PaymentRuleError('referral_code_invalid', 'Unknown referral code');
+    throw new PaymentRuleError(
+      'referral_code_invalid',
+      'Unknown referral code',
+    );
   }
   if (referrer.id === input.referredClientId) {
     throw new PaymentRuleError(
