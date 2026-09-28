@@ -77,8 +77,8 @@ describe('Client registration transaction', () => {
       email: ` ANA-${randomUUID()}@Example.COM `,
       password: 'correct horse battery staple',
     });
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email: result.email },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email: result.email, deletedAt: null },
       include: { client: true, authenticationTokens: true },
     });
     const verificationToken = account.authenticationTokens.find(
@@ -172,8 +172,8 @@ describe('Client registration transaction', () => {
       email: originalEmail,
       password: 'original password',
     });
-    const originalAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: originalEmail },
+    const originalAccount = await prisma.account.findFirstOrThrow({
+      where: { email: originalEmail, deletedAt: null },
       include: { authenticationTokens: true },
     });
     const correction = new CorrectPendingClientEmail({
@@ -192,10 +192,12 @@ describe('Client registration transaction', () => {
       }),
     ).resolves.toEqual({ status: 'corrected', email: correctedEmail });
     await expect(
-      prisma.account.findUnique({ where: { email: originalEmail } }),
+      prisma.account.findFirst({
+        where: { email: originalEmail, deletedAt: null },
+      }),
     ).resolves.toBeNull();
-    const correctedAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: correctedEmail },
+    const correctedAccount = await prisma.account.findFirstOrThrow({
+      where: { email: correctedEmail, deletedAt: null },
       include: { client: true, authenticationTokens: true },
     });
     const currentVerificationTokens =
@@ -257,7 +259,7 @@ describe('Client registration transaction', () => {
     );
   });
 
-  it('cancels a pending self-registration and retains only its audit record', async () => {
+  it('cancels a pending self-registration by marking its Account and Client removed and invalidating its links', async () => {
     const registeredAt = new Date(Date.now() + 120_000);
     const cancelledAt = new Date(registeredAt.getTime() + 60_000);
     const tokens = authenticationTokens;
@@ -284,8 +286,8 @@ describe('Client registration transaction', () => {
       email: `cancelled-${randomUUID()}@example.com`,
       password: 'cancelled password',
     });
-    const pendingAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: registration.email },
+    const pendingAccount = await prisma.account.findFirstOrThrow({
+      where: { email: registration.email, deletedAt: null },
     });
     const correlationId = randomUUID();
     const cancel = new CancelPendingClientRegistration({
@@ -301,14 +303,20 @@ describe('Client registration transaction', () => {
       }),
     ).resolves.toEqual({ status: 'cancelled' });
     await expect(
-      prisma.account.findUnique({ where: { id: pendingAccount.id } }),
-    ).resolves.toBeNull();
+      prisma.account.findUniqueOrThrow({ where: { id: pendingAccount.id } }),
+    ).resolves.toMatchObject({ deletedAt: cancelledAt });
     await expect(
-      prisma.client.findUnique({ where: { id: pendingAccount.clientId! } }),
-    ).resolves.toBeNull();
+      prisma.client.findUniqueOrThrow({
+        where: { id: pendingAccount.clientId! },
+      }),
+    ).resolves.toMatchObject({ deletedAt: cancelledAt });
     await expect(
       prisma.authenticationToken.count({
-        where: { accountId: pendingAccount.id },
+        where: {
+          accountId: pendingAccount.id,
+          usedAt: null,
+          invalidatedAt: null,
+        },
       }),
     ).resolves.toBe(0);
     await expect(
@@ -354,8 +362,8 @@ describe('Client registration transaction', () => {
       email: `verified-${randomUUID()}@example.com`,
       password: 'verified password',
     });
-    const pendingAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: registration.email },
+    const pendingAccount = await prisma.account.findFirstOrThrow({
+      where: { email: registration.email, deletedAt: null },
     });
     const jobs = await boss.findJobs(AUTHENTICATION_EMAIL_QUEUE, {
       id: undefined,
@@ -410,7 +418,7 @@ describe('Client registration transaction', () => {
     ).resolves.toBe(0);
   });
 
-  it('cleans up an expired pending Account and its provisional Client', async () => {
+  it('cleans up an expired pending Account and its provisional Client by marking them removed', async () => {
     const registeredAt = new Date();
     const cleanupAt = new Date(
       registeredAt.getTime() + 8 * 24 * 60 * 60 * 1_000,
@@ -438,8 +446,8 @@ describe('Client registration transaction', () => {
       email: `expired-${randomUUID()}@example.com`,
       password: 'expired password',
     });
-    const pendingAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: registration.email },
+    const pendingAccount = await prisma.account.findFirstOrThrow({
+      where: { email: registration.email, deletedAt: null },
     });
     const correlationId = randomUUID();
     const cleanup = new CleanupExpiredPendingAccounts({
@@ -452,14 +460,20 @@ describe('Client registration transaction', () => {
 
     expect(result.cleaned).toBeGreaterThanOrEqual(1);
     await expect(
-      prisma.account.findUnique({ where: { id: pendingAccount.id } }),
-    ).resolves.toBeNull();
+      prisma.account.findUniqueOrThrow({ where: { id: pendingAccount.id } }),
+    ).resolves.toMatchObject({ deletedAt: cleanupAt });
     await expect(
-      prisma.client.findUnique({ where: { id: pendingAccount.clientId! } }),
-    ).resolves.toBeNull();
+      prisma.client.findUniqueOrThrow({
+        where: { id: pendingAccount.clientId! },
+      }),
+    ).resolves.toMatchObject({ deletedAt: cleanupAt });
     await expect(
       prisma.authenticationToken.count({
-        where: { accountId: pendingAccount.id },
+        where: {
+          accountId: pendingAccount.id,
+          usedAt: null,
+          invalidatedAt: null,
+        },
       }),
     ).resolves.toBe(0);
     await expect(
@@ -482,7 +496,10 @@ describe('Client registration transaction', () => {
   it('attributes the referrer at signup and refuses unknown referral codes atomically', async () => {
     const now = new Date(Date.now() + 60_000);
     const referrer = await prisma.client.create({
-      data: { name: 'Lucía Referente', referralCode: `REF-LUCIA-${randomUUID().slice(0, 6).toUpperCase()}` },
+      data: {
+        name: 'Lucía Referente',
+        referralCode: `REF-LUCIA-${randomUUID().slice(0, 6).toUpperCase()}`,
+      },
       select: { id: true, referralCode: true },
     });
     const registerClient = new RegisterClient({
@@ -511,15 +528,18 @@ describe('Client registration transaction', () => {
       password: 'correct horse battery staple',
       referralCode: referrer.referralCode.toLowerCase(),
     });
-    const referred = await prisma.account.findUniqueOrThrow({
-      where: { email: result.email },
+    const referred = await prisma.account.findFirstOrThrow({
+      where: { email: result.email, deletedAt: null },
       select: { clientId: true },
     });
     await expect(
       prisma.referral.findUniqueOrThrow({
         where: { referredClientId: referred.clientId! },
       }),
-    ).resolves.toMatchObject({ referrerClientId: referrer.id, state: 'PENDING' });
+    ).resolves.toMatchObject({
+      referrerClientId: referrer.id,
+      state: 'PENDING',
+    });
 
     const unknownEmail = `sin-referente-${randomUUID()}@example.com`;
     await expect(
@@ -531,7 +551,9 @@ describe('Client registration transaction', () => {
       }),
     ).rejects.toMatchObject({ code: 'referral_code_invalid' });
     await expect(
-      prisma.account.findUnique({ where: { email: unknownEmail } }),
+      prisma.account.findFirst({
+        where: { email: unknownEmail, deletedAt: null },
+      }),
     ).resolves.toBeNull();
   });
 });

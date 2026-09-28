@@ -82,8 +82,8 @@ describe('Client invitation unit of work', () => {
       fixtures,
       passwordHash: 'not-a-real-hash',
     });
-    const camila = await prisma.account.findUniqueOrThrow({
-      where: { email: 'camila.rojas@example.com' },
+    const camila = await prisma.account.findFirstOrThrow({
+      where: { email: 'camila.rojas@example.com', deletedAt: null },
       select: { id: true, staffMemberId: true },
     });
     assistant = {
@@ -106,8 +106,8 @@ describe('Client invitation unit of work', () => {
   it('commits the pending Client, Account, activation link, throttle event, email job, and audit together', async () => {
     const result = await invite();
 
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email: result.email },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email: result.email, deletedAt: null },
       include: { client: true, authenticationTokens: true },
     });
     expect(result.status).toBe('invited');
@@ -215,8 +215,8 @@ describe('Client invitation unit of work', () => {
       activationExpiresAt: new Date(correctedAt.getTime() + 7 * day),
     });
 
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email: corrected },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email: corrected, deletedAt: null },
       include: { authenticationTokens: { orderBy: { issuedAt: 'asc' } } },
     });
     expect(account.clientId).toBe(result.clientId);
@@ -237,10 +237,10 @@ describe('Client invitation unit of work', () => {
     ).resolves.toBe(1);
   });
 
-  it('cancels an invitation without activity and removes its Account, Client, and links', async () => {
+  it('cancels an invitation without activity by marking its Account and Client removed and invalidating its links', async () => {
     const result = await invite();
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email: result.email },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email: result.email, deletedAt: null },
       select: { id: true },
     });
 
@@ -251,13 +251,15 @@ describe('Client invitation unit of work', () => {
     );
 
     await expect(
-      prisma.account.findUnique({ where: { id: account.id } }),
-    ).resolves.toBeNull();
+      prisma.account.findUniqueOrThrow({ where: { id: account.id } }),
+    ).resolves.toMatchObject({ deletedAt: expect.any(Date) });
     await expect(
-      prisma.client.findUnique({ where: { id: result.clientId } }),
-    ).resolves.toBeNull();
+      prisma.client.findUniqueOrThrow({ where: { id: result.clientId } }),
+    ).resolves.toMatchObject({ deletedAt: expect.any(Date) });
     await expect(
-      prisma.authenticationToken.count({ where: { accountId: account.id } }),
+      prisma.authenticationToken.count({
+        where: { accountId: account.id, usedAt: null, invalidatedAt: null },
+      }),
     ).resolves.toBe(0);
     await expect(
       prisma.auditRecord.findFirstOrThrow({
@@ -317,10 +319,14 @@ describe('Client invitation unit of work', () => {
     await cleanup.execute();
 
     await expect(
-      prisma.client.findUnique({ where: { id: result.clientId } }),
+      prisma.client.findFirst({
+        where: { id: result.clientId, deletedAt: null },
+      }),
     ).resolves.not.toBeNull();
     await expect(
-      prisma.account.findUnique({ where: { email: result.email } }),
+      prisma.account.findFirst({
+        where: { email: result.email, deletedAt: null },
+      }),
     ).resolves.not.toBeNull();
   });
 });

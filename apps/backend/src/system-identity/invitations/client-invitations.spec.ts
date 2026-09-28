@@ -51,7 +51,7 @@ const createTransaction = (
   replaceStaffInvitationActivation: jest.fn().mockResolvedValue(undefined),
   replaceSelfRegistrationVerification: jest.fn().mockResolvedValue(undefined),
   changeInvitationEmail: jest.fn().mockResolvedValue(undefined),
-  deleteInvitation: jest.fn().mockResolvedValue(undefined),
+  removeInvitation: jest.fn().mockResolvedValue(undefined),
   scheduleAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
   recordAudit: jest.fn().mockResolvedValue(undefined),
   ...overrides,
@@ -379,9 +379,10 @@ describe('pending invitation management', () => {
       dependencies(transaction),
     );
 
-    expect(transaction.deleteInvitation).toHaveBeenCalledWith({
+    expect(transaction.removeInvitation).toHaveBeenCalledWith({
       accountId: 'account-1',
       clientId: 'client-1',
+      now,
     });
     expect(transaction.recordAudit).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -406,7 +407,7 @@ describe('pending invitation management', () => {
         dependencies(transaction),
       ),
     ).rejects.toBeInstanceOf(InvitationHasActivityError);
-    expect(transaction.deleteInvitation).not.toHaveBeenCalled();
+    expect(transaction.removeInvitation).not.toHaveBeenCalled();
     await expect(
       readClientInvitation(
         { clientId: 'client-1' },
