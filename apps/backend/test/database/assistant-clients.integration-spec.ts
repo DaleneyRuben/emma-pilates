@@ -162,4 +162,25 @@ describe('Assistant Client repository', () => {
     );
     await expect(repository().readAvailableCredit(lucia.id)).resolves.toBe(0);
   });
+
+  it('hides a removed Client from search and lookup', async () => {
+    const removedId = await createPendingClient(
+      'Retirada Prueba',
+      'retirada@example.com',
+    );
+    const removedAt = new Date('2026-09-22T00:00:00.000Z');
+    await prisma.account.updateMany({
+      where: { clientId: removedId },
+      data: { deletedAt: removedAt },
+    });
+    await prisma.client.update({
+      where: { id: removedId },
+      data: { deletedAt: removedAt },
+    });
+
+    await expect(repository().findClient(removedId)).resolves.toBeNull();
+    await expect(
+      repository().searchClients({ query: 'Retirada', limit: 20 }),
+    ).resolves.toEqual([]);
+  });
 });

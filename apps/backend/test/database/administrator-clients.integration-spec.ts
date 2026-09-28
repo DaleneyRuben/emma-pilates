@@ -231,4 +231,32 @@ describe('Administrator Client directory (PostgreSQL)', () => {
     await expect(directory().read(ids.noAccount)).resolves.toBeNull();
     await expect(directory().read(randomUUID())).resolves.toBeNull();
   });
+
+  it('leaves a removed Client out of the directory, its counts, and reads', async () => {
+    const removedId = randomUUID();
+    const removedAt = new Date('2026-09-22T00:00:00.000Z');
+    await createClient({
+      id: removedId,
+      name: 'Retirada Prueba',
+      email: 'retirada@example.com',
+      referralCode: 'REF-RETIRADA',
+      activatedAt: null,
+    });
+    await prisma.account.updateMany({
+      where: { clientId: removedId },
+      data: { deletedAt: removedAt },
+    });
+    await prisma.client.update({
+      where: { id: removedId },
+      data: { deletedAt: removedAt },
+    });
+
+    await expect(
+      directory().list({ page: 1, pageSize: 50, today }),
+    ).resolves.toMatchObject({ totalItems: 3, studioClientCount: 3 });
+    await expect(
+      directory().list({ page: 1, pageSize: 50, query: 'Retirada', today }),
+    ).resolves.toMatchObject({ items: [], totalItems: 0 });
+    await expect(directory().read(removedId)).resolves.toBeNull();
+  });
 });

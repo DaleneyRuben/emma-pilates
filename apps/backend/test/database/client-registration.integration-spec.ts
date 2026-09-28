@@ -19,6 +19,7 @@ import { ResendPendingClientVerification } from '../../src/system-identity/regis
 import { VerifyClientEmail } from '../../src/system-identity/registration/verify-client-email';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
 import { authenticationTokens } from '../../src/system-identity/security/authentication-token-service';
+import { attributeReferral } from '../../src/booking/payments/referral-attribution';
 import {
   DatabaseTestContext,
   startDatabaseTestContext,
@@ -555,6 +556,26 @@ describe('Client registration transaction', () => {
         where: { email: unknownEmail, deletedAt: null },
       }),
     ).resolves.toBeNull();
+  });
+
+  it('refuses the referral code of a removed Client', async () => {
+    const removed = await prisma.client.create({
+      data: {
+        name: 'Retirada Prueba',
+        referralCode: `REF-GONE-${randomUUID().slice(0, 6).toUpperCase()}`,
+        deletedAt: new Date(),
+      },
+      select: { referralCode: true },
+    });
+
+    await expect(
+      prisma.$transaction((transaction) =>
+        attributeReferral(transaction, {
+          referredClientId: randomUUID(),
+          referralCode: removed.referralCode,
+        }),
+      ),
+    ).rejects.toMatchObject({ code: 'referral_code_invalid' });
   });
 });
 
