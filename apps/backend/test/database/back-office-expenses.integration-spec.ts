@@ -50,7 +50,7 @@ describe('Prisma Back Office expenses', () => {
     await world?.stop();
   });
 
-  it('adds unique Expense Categories and deletes only unused ones', async () => {
+  it('adds unique Expense Categories and removes only unused ones, keeping them hidden', async () => {
     const maintenance = await category(' Mantenimiento ');
     expect(maintenance).toMatchObject({ name: 'Mantenimiento', inUse: false });
     await expect(codeOf(category('MANTENIMIENTO'))).resolves.toBe(
@@ -97,6 +97,34 @@ describe('Prisma Back Office expenses', () => {
         ),
       ),
     ).resolves.toBe('expense_category_not_found');
+    // ADR-0086: the removed category stays, hidden, and frees its name.
+    await expect(
+      world.prisma.expenseCategory.findUniqueOrThrow({
+        where: { id: cleaning.id },
+      }),
+    ).resolves.toMatchObject({ deletedAt: expect.any(Date) });
+    await expect(
+      expenses()
+        .listExpenseCategories(await administrator())
+        .then((categories) => categories.map(({ name }) => name)),
+    ).resolves.toEqual(['Mantenimiento']);
+    await expect(
+      codeOf(
+        expenses().recordExpense(
+          {
+            branchId: centro,
+            expenseCategoryId: cleaning.id,
+            amountCentavos: 5_000,
+            incurredOn: civil('2026-09-10'),
+          },
+          await administrator(),
+          randomUUID(),
+        ),
+      ),
+    ).resolves.toBe('expense_category_not_found');
+    await expect(category('Limpieza')).resolves.toMatchObject({
+      name: 'Limpieza',
+    });
     await expect(
       codeOf(
         expenses().createExpenseCategory({ name: 'Otros' }, await assistant()),
