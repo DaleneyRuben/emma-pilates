@@ -72,11 +72,13 @@ export const createPrismaExpenses = (
     transaction: Transaction,
     expenseCategoryId: string,
   ) => {
-    const category = await transaction.expenseCategory.findUnique({
-      where: { id: expenseCategoryId },
-      select: { id: true },
-    });
-    if (category === null) {
+    // FOR SHARE waits for a concurrent removal and then sees it, so an
+    // Expense never lands on a category removed meanwhile.
+    const category = await transaction.$queryRaw<{ id: string }[]>`
+      SELECT "id" FROM "back_office"."expense_categories"
+      WHERE "id" = ${expenseCategoryId}::uuid AND "deleted_at" IS NULL
+      FOR SHARE`;
+    if (category.length === 0) {
       throw new BackOfficeError('expense_category_not_found');
     }
   };
@@ -103,6 +105,7 @@ export const createPrismaExpenses = (
     listExpenseCategories: async (principal: AuthenticatedPrincipal) => {
       requireAdministrator(principal);
       const categories = await prisma.expenseCategory.findMany({
+        where: { deletedAt: null },
         orderBy: [{ name: 'asc' }, { id: 'asc' }],
         select: {
           id: true,
@@ -133,18 +136,30 @@ export const createPrismaExpenses = (
       return { ...category, inUse: false };
     },
 
-    // A label is deleted outright; the restrictive key refuses a used one.
+    // An unused label is marked removed (ADR-0086); the row lock makes an
+    // Expense recorded concurrently either count as a use or be refused.
     deleteExpenseCategory: async (
       input: { expenseCategoryId: string },
       principal: AuthenticatedPrincipal,
     ) => {
       requireAdministrator(principal);
-      const deleted = await prisma.expenseCategory
-        .deleteMany({ where: { id: input.expenseCategoryId } })
-        .catch(translate);
-      if (deleted.count === 0) {
-        throw new BackOfficeError('expense_category_not_found');
-      }
+      await prisma.$transaction(async (transaction) => {
+        const locked = await transaction.$queryRaw<{ id: string }[]>`
+          SELECT "id" FROM "back_office"."expense_categories"
+          WHERE "id" = ${input.expenseCategoryId}::uuid AND "deleted_at" IS NULL
+          FOR UPDATE`;
+        if (locked.length === 0) {
+          throw new BackOfficeError('expense_category_not_found');
+        }
+        const uses = await transaction.expense.count({
+          where: { expenseCategoryId: input.expenseCategoryId },
+        });
+        if (uses > 0) throw new BackOfficeError('expense_category_in_use');
+        await transaction.expenseCategory.update({
+          where: { id: input.expenseCategoryId },
+          data: { deletedAt: dependencies.now() },
+        });
+      });
     },
 
     listExpenses: async (
