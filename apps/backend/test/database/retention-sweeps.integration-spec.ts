@@ -113,7 +113,7 @@ describe('Prisma retention sweeps', () => {
     await context?.stop();
   });
 
-  it('deletes only rows past their provisional window, in batches, and never audit records', async () => {
+  it('marks only rows past their provisional window removed, in batches, keeps every row, and never touches audit records', async () => {
     await idempotency('old-expired', ago(49 * hour), ago(hour));
     const young = await idempotency('young-expired', ago(47 * hour), ago(hour));
     const unexpired = await idempotency(
@@ -199,21 +199,27 @@ describe('Prisma retention sweeps', () => {
     });
     await expect(
       prisma.idempotencyRecord.findMany({
+        where: { deletedAt: null },
         select: { id: true },
         orderBy: { command: 'asc' },
       }),
     ).resolves.toEqual([{ id: unexpired.id }, { id: young.id }]);
     const kept = await prisma.authenticationSession.findMany({
+      where: { deletedAt: null },
       select: { id: true },
     });
     expect(
       kept.map(({ id }) => sessions.find((s) => s.id === id)?.label).sort(),
     ).toEqual(['active', 'idle-recently', 'revoked-recently']);
     await expect(
-      prisma.authenticationThrottleEvent.findMany({ select: { id: true } }),
+      prisma.authenticationThrottleEvent.findMany({
+        where: { deletedAt: null },
+        select: { id: true },
+      }),
     ).resolves.toEqual([{ id: recentThrottle.id }]);
     expect(oldThrottle.id).not.toBe(recentThrottle.id);
     const notifications = await prisma.notification.findMany({
+      where: { deletedAt: null },
       select: { id: true },
     });
     expect(notifications.map(({ id }) => id).sort()).toEqual(
@@ -221,6 +227,25 @@ describe('Prisma retention sweeps', () => {
     );
     expect(notifications.map(({ id }) => id)).not.toContain(readLongAgo.id);
     await expect(prisma.auditRecord.count()).resolves.toBe(1);
+    // ADR-0086: every swept row stays, marked removed at the sweep time.
+    await expect(
+      Promise.all([
+        prisma.idempotencyRecord.findMany({ where: { deletedAt: now } }),
+        prisma.authenticationSession.findMany({ where: { deletedAt: now } }),
+        prisma.authenticationThrottleEvent.findMany({
+          where: { deletedAt: now },
+        }),
+        prisma.notification.findMany({ where: { deletedAt: now } }),
+      ]).then((tables) => tables.map((rows) => rows.length)),
+    ).resolves.toEqual([1, 3, 1, 1]);
+    await expect(
+      Promise.all([
+        prisma.idempotencyRecord.count(),
+        prisma.authenticationSession.count(),
+        prisma.authenticationThrottleEvent.count(),
+        prisma.notification.count(),
+      ]),
+    ).resolves.toEqual([3, 6, 2, 3]);
 
     await expect(
       createPrismaRetentionSweeps(prisma, {
