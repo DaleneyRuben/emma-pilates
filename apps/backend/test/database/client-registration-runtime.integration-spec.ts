@@ -18,7 +18,7 @@ describe('client registration runtime', () => {
     // ConfigModule.forRoot() reads the environment when AppModule is first
     // imported, so the import must follow the DATABASE_URL override or the
     // spec would write to the database named in .env.
-    const { AppModule } = await import('../../src/app.module');
+    const { AppModule } = await import('../../src/app.module.js');
     application = await NestFactory.createApplicationContext(AppModule, {
       abortOnError: false,
       logger: false,
