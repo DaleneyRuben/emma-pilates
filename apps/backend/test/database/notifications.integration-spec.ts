@@ -209,4 +209,31 @@ describe('Notification store', () => {
     await expect(store.markAllRead({ accountId, readAt })).resolves.toBe(1);
     await expect(store.countUnread(accountId)).resolves.toBe(0);
   });
+
+  it('hides a notification the retention sweep marked removed', async () => {
+    const store = createNotificationStore(prisma);
+    await store.record(prisma, {
+      accountId,
+      category: 'announcement',
+      type: 'studio_announcement',
+      businessEventKey: `announcement:${randomUUID()}`,
+      title: 'Aviso',
+      message: 'Aviso barrido',
+      destination: null,
+      occurredAt: new Date('2026-12-31T23:00:00.000Z'),
+    });
+    const swept = await prisma.notification.findFirstOrThrow({
+      where: { accountId, message: 'Aviso barrido' },
+    });
+    const unreadBefore = await store.countUnread(accountId);
+    await prisma.notification.update({
+      where: { id: swept.id },
+      data: { deletedAt: new Date('2027-01-01T00:00:00.000Z') },
+    });
+
+    const page = await store.findPage({ accountId, after: null, limit: 50 });
+
+    expect(page.map((item) => item.id)).not.toContain(swept.id);
+    await expect(store.countUnread(accountId)).resolves.toBe(unreadBefore - 1);
+  });
 });
