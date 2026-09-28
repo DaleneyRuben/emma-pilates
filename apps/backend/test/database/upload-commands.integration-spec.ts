@@ -185,6 +185,80 @@ describe('Prisma upload commands', () => {
     });
   });
 
+  it('keeps variant rows a retried verification replaces, marked removed', async () => {
+    await withRollback(async (tx) => {
+      const account = await createAccount(tx);
+      const bytes = await receiptBytes();
+      const checksum = createHash('sha256').update(bytes).digest();
+      const commands = createPrismaUploadCommands(
+        tx,
+        storage,
+        () => new Date('2026-09-18T12:00:00Z'),
+        boss,
+      );
+      const verifiedAt = new Date('2026-09-18T12:05:00Z');
+      const jobCommands = createFinalizeUploadJobCommands(
+        tx,
+        storage,
+        () => verifiedAt,
+      );
+      const intent = await commands.createPendingUpload({
+        ownerAccountId: account.id,
+        purpose: 'transfer_receipt',
+        mediaType: 'image/jpeg',
+        byteSize: bytes.byteLength,
+        checksum,
+      });
+      await storage.put(intent.pendingObjectKey, bytes);
+      await commands.finalizeUpload({ imageAssetId: intent.id }, account.id);
+      // Rows an earlier attempt recorded before failing: one under a key the
+      // retry no longer writes, one under the key it writes again.
+      const recorded = (kind: 'DISPLAY' | 'THUMBNAIL', storageKey: string) =>
+        tx.imageVariant.create({
+          data: {
+            imageAssetId: intent.id,
+            kind,
+            visibility: 'PRIVATE',
+            storageKey,
+            mediaType: 'JPEG',
+            byteSize: 1,
+            width: 1,
+            height: 1,
+          },
+        });
+      const stale = await recorded(
+        'DISPLAY',
+        `private/transfer_receipt/${intent.id}/display`,
+      );
+      await recorded(
+        'THUMBNAIL',
+        `private/transfer_receipt/${intent.id}/thumbnail`,
+      );
+
+      await jobCommands.process({ imageAssetId: intent.id });
+
+      await expect(
+        tx.imageVariant.findUniqueOrThrow({ where: { id: stale.id } }),
+      ).resolves.toMatchObject({
+        deleteRequestedAt: verifiedAt,
+        deletedAt: verifiedAt,
+      });
+      const live = await tx.imageVariant.findMany({
+        where: { imageAssetId: intent.id, deletedAt: null },
+        orderBy: { kind: 'asc' },
+      });
+      expect(live.map((variant) => variant.kind)).toEqual([
+        'THUMBNAIL',
+        'READABLE',
+      ]);
+      expect(live.every((v) => v.width === 20 && v.height === 10)).toBe(true);
+      await expect(
+        tx.imageVariant.count({ where: { imageAssetId: intent.id } }),
+      ).resolves.toBe(3);
+      for (const variant of live) await storage.delete(variant.storageKey);
+    });
+  });
+
   it('writes bytes to a pending upload the requesting Account owns', async () => {
     await withRollback(async (tx) => {
       const account = await createAccount(tx);
