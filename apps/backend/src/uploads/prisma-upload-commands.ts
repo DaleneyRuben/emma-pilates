@@ -230,30 +230,48 @@ export function createFinalizeUploadJobCommands(
         buildVariants: buildImageVariants,
         storeVariant: (storageKey, bytes) => storage.replace(storageKey, bytes),
         deleteObject: (objectKey) => storage.delete(objectKey),
-        // A retried job replaces the variant rows it recorded before failing.
+        // A retried job reuses the rows of the keys it writes again and marks
+        // the others removed (ADR-0086), so no earlier row is ever deleted.
         markVerified: async ({ imageAssetId, verified, variants }) => {
-          await prisma.imageVariant.deleteMany({ where: { imageAssetId } });
+          const verifiedAt = now();
+          await prisma.imageVariant.updateMany({
+            where: {
+              imageAssetId,
+              deletedAt: null,
+              storageKey: { notIn: variants.map((v) => v.storageKey) },
+            },
+            data: { deleteRequestedAt: verifiedAt, deletedAt: verifiedAt },
+          });
+          for (const variant of variants) {
+            const recorded = {
+              kind: variantKindToPrisma[variant.kind],
+              visibility: ImageVariantVisibility.PRIVATE,
+              mediaType: mediaTypeToPrisma[variant.mediaType],
+              byteSize: variant.byteSize,
+              width: variant.width,
+              height: variant.height,
+            };
+            await prisma.imageVariant.upsert({
+              where: { storageKey: variant.storageKey },
+              create: {
+                ...recorded,
+                imageAssetId,
+                storageKey: variant.storageKey,
+              },
+              // The key holds the new bytes, so its row is live again.
+              update: { ...recorded, deleteRequestedAt: null, deletedAt: null },
+            });
+          }
           await prisma.imageAsset.update({
             where: { id: imageAssetId },
             data: {
               state: ImageAssetState.READY,
-              finalizedAt: now(),
+              finalizedAt: verifiedAt,
               verifiedMediaType: mediaTypeToPrisma[verified.mediaType],
               verifiedByteSize: verified.byteSize,
               verifiedChecksum: Buffer.from(verified.checksum),
               verifiedWidth: verified.width,
               verifiedHeight: verified.height,
-              variants: {
-                create: variants.map((variant) => ({
-                  kind: variantKindToPrisma[variant.kind],
-                  visibility: ImageVariantVisibility.PRIVATE,
-                  storageKey: variant.storageKey,
-                  mediaType: mediaTypeToPrisma[variant.mediaType],
-                  byteSize: variant.byteSize,
-                  width: variant.width,
-                  height: variant.height,
-                })),
-              },
             },
           });
         },
