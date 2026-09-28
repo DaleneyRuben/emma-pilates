@@ -119,9 +119,10 @@ export interface ClientInvitationTransaction {
     accountId: string;
     email: string;
   }) => Promise<void>;
-  deleteInvitation: (input: {
+  removeInvitation: (input: {
     accountId: string;
     clientId: string;
+    now: Date;
   }) => Promise<void>;
   scheduleAuthenticationEmail: (job: AuthenticationEmailJob) => Promise<void>;
   recordAudit: (audit: InvitationAudit) => Promise<void>;
@@ -469,9 +470,10 @@ export const cancelClientInvitation = async (
     const invitation = await requireInvitation(transaction, command.clientId);
     if (invitation.hasActivity) throw new InvitationHasActivityError();
 
-    await transaction.deleteInvitation({
+    await transaction.removeInvitation({
       accountId: invitation.accountId,
       clientId: invitation.clientId,
+      now,
     });
     await transaction.recordAudit(
       audit(actor, dependencies, {

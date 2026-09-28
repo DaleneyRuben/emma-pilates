@@ -383,13 +383,12 @@ export const createPrismaEvaluationCommands = (
     work: () => Promise<Result>,
   ): Promise<Result> => {
     const requestHash = hashRequest(record.request);
-    const existing = await transaction.idempotencyRecord.findUnique({
+    const existing = await transaction.idempotencyRecord.findFirst({
       where: {
-        accountId_command_idempotencyKey: {
-          accountId: record.accountId,
-          command: record.command,
-          idempotencyKey: record.idempotencyKey,
-        },
+        accountId: record.accountId,
+        command: record.command,
+        idempotencyKey: record.idempotencyKey,
+        deletedAt: null,
       },
       select: { requestHash: true, responseBody: true },
     });
@@ -464,8 +463,8 @@ export const createPrismaEvaluationCommands = (
     staffMemberId: string,
     branchId: string,
   ): Promise<void> => {
-    const assignment = await transaction.staffBranchAssignment.findUnique({
-      where: { staffMemberId_branchId: { staffMemberId, branchId } },
+    const assignment = await transaction.staffBranchAssignment.findFirst({
+      where: { staffMemberId, branchId, deletedAt: null },
       select: { branch: { select: { archivedAt: true } } },
     });
     if (assignment === null || assignment.branch.archivedAt !== null) {

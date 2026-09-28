@@ -173,13 +173,12 @@ describe('Finalize upload idempotency', () => {
     );
 
     await expect(
-      prisma.idempotencyRecord.findUniqueOrThrow({
+      prisma.idempotencyRecord.findFirstOrThrow({
         where: {
-          accountId_command_idempotencyKey: {
-            accountId: account.id,
-            command: 'finalize_upload',
-            idempotencyKey,
-          },
+          accountId: account.id,
+          command: 'finalize_upload',
+          idempotencyKey,
+          deletedAt: null,
         },
         select: { createdAt: true, expiresAt: true },
       }),

@@ -21,14 +21,20 @@ describe('Administrator Session cancellation', () => {
   let prisma: PrismaClient;
   const fixtures = buildDevelopmentFixtures({ today });
 
-  const principalOf = async (email: string): Promise<AuthenticatedPrincipal> => {
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email },
+  const principalOf = async (
+    email: string,
+  ): Promise<AuthenticatedPrincipal> => {
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email, deletedAt: null },
       select: {
         id: true,
         clientId: true,
         staffMember: {
-          select: { id: true, role: true, branchAssignments: { select: { branchId: true } } },
+          select: {
+            id: true,
+            role: true,
+            branchAssignments: { select: { branchId: true } },
+          },
         },
       },
     });
@@ -53,8 +59,13 @@ describe('Administrator Session cancellation', () => {
 
   beforeAll(async () => {
     context = await startDatabaseTestContext();
-    prisma = new PrismaClient({ adapter: createPrismaAdapter(context.databaseUrl) });
-    await applyDevelopmentFixtures(prisma, { fixtures, passwordHash: 'not-a-real-hash' });
+    prisma = new PrismaClient({
+      adapter: createPrismaAdapter(context.databaseUrl),
+    });
+    await applyDevelopmentFixtures(prisma, {
+      fixtures,
+      passwordHash: 'not-a-real-hash',
+    });
   });
 
   afterAll(async () => {
@@ -71,10 +82,15 @@ describe('Administrator Session cancellation', () => {
       .filter((s) => s.startsAt.getTime() > now.getTime() + 3 * 60 * 60 * 1_000)
       .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime())[0];
     const trainer = await principalOf(
-      fixtures.staffMembers.find((m) => m.id === session.trainerStaffMemberId)!.email,
+      fixtures.staffMembers.find((m) => m.id === session.trainerStaffMemberId)!
+        .email,
     );
     const luciaSubscription = await prisma.subscription.findFirstOrThrow({
-      where: { clientId: lucia.identity.kind === 'client' ? lucia.identity.clientId : '' , state: 'ACTIVE' },
+      where: {
+        clientId:
+          lucia.identity.kind === 'client' ? lucia.identity.clientId : '',
+        state: 'ACTIVE',
+      },
       select: { id: true, remainingClassAllowance: true },
     });
 
@@ -82,14 +98,17 @@ describe('Administrator Session cancellation', () => {
     const waitlistEntry = await prisma.waitlistEntry.create({
       data: {
         sessionId: session.id,
-        clientId: valeria.identity.kind === 'client' ? valeria.identity.clientId : '',
+        clientId:
+          valeria.identity.kind === 'client' ? valeria.identity.clientId : '',
         joinedByAccountId: valeria.accountId,
         joinedAt: now,
       },
       select: { id: true },
     });
 
-    await expect(commands.cancelSession({ sessionId: session.id }, trainer)).rejects.toThrow();
+    await expect(
+      commands.cancelSession({ sessionId: session.id }, trainer),
+    ).rejects.toThrow();
 
     await expect(
       commands.cancelSession({ sessionId: session.id }, admin),
@@ -111,31 +130,51 @@ describe('Administrator Session cancellation', () => {
       cancelledByAccountId: admin.accountId,
     });
     await expect(
-      prisma.subscription.findUniqueOrThrow({ where: { id: luciaSubscription.id } }),
+      prisma.subscription.findUniqueOrThrow({
+        where: { id: luciaSubscription.id },
+      }),
     ).resolves.toMatchObject({
       remainingClassAllowance: luciaSubscription.remainingClassAllowance,
     });
     await expect(
-      prisma.waitlistEntry.findUniqueOrThrow({ where: { id: waitlistEntry.id } }),
-    ).resolves.toMatchObject({ closureReason: 'SESSION_CANCELLED', closedAt: expect.any(Date) });
+      prisma.waitlistEntry.findUniqueOrThrow({
+        where: { id: waitlistEntry.id },
+      }),
+    ).resolves.toMatchObject({
+      closureReason: 'SESSION_CANCELLED',
+      closedAt: expect.any(Date),
+    });
     await expect(
-      prisma.auditRecord.findFirst({ where: { actionCode: 'session.cancelled', targetId: session.id } }),
-    ).resolves.toMatchObject({ actorAccountId: admin.accountId, branchId: session.branchId });
-    const classTypeName = fixtures.classTypes.find((c) => c.id === session.classTypeId)!.name;
+      prisma.auditRecord.findFirst({
+        where: { actionCode: 'session.cancelled', targetId: session.id },
+      }),
+    ).resolves.toMatchObject({
+      actorAccountId: admin.accountId,
+      branchId: session.branchId,
+    });
+    const classTypeName = fixtures.classTypes.find(
+      (c) => c.id === session.classTypeId,
+    )!.name;
     await expect(
-      prisma.notification.findFirst({ where: { accountId: lucia.accountId, type: 'session_cancelled' } }),
+      prisma.notification.findFirst({
+        where: { accountId: lucia.accountId, type: 'session_cancelled' },
+      }),
     ).resolves.toMatchObject({
       message: `Tu clase de ${classTypeName} fue cancelada. Tu clase fue reembolsada a tu plan.`,
     });
     await expect(
-      prisma.notification.count({ where: { accountId: valeria.accountId, type: 'session_cancelled' } }),
+      prisma.notification.count({
+        where: { accountId: valeria.accountId, type: 'session_cancelled' },
+      }),
     ).resolves.toBe(1);
     await expect(
-      prisma.notification.count({ where: { accountId: trainer.accountId, type: 'session_cancelled' } }),
+      prisma.notification.count({
+        where: { accountId: trainer.accountId, type: 'session_cancelled' },
+      }),
     ).resolves.toBe(1);
 
-    await expect(commands.cancelSession({ sessionId: session.id }, admin)).rejects.toThrow(
-      'Session is not cancellable',
-    );
+    await expect(
+      commands.cancelSession({ sessionId: session.id }, admin),
+    ).rejects.toThrow('Session is not cancellable');
   });
 });

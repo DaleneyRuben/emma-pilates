@@ -54,17 +54,26 @@ const upsertAccount = async (
     now: Date;
   },
 ): Promise<void> => {
-  await transaction.account.upsert({
-    where: { email: input.email },
-    create: {
-      id: deterministicId(`account:${input.email}`),
-      email: input.email,
-      passwordHash: input.passwordHash,
-      emailVerifiedAt: input.now,
-      activatedAt: input.now,
-      ...input.link,
-    },
-    update: {
+  const existing = await transaction.account.findFirst({
+    where: { email: input.email, deletedAt: null },
+    select: { id: true },
+  });
+  if (existing === null) {
+    await transaction.account.create({
+      data: {
+        id: deterministicId(`account:${input.email}`),
+        email: input.email,
+        passwordHash: input.passwordHash,
+        emailVerifiedAt: input.now,
+        activatedAt: input.now,
+        ...input.link,
+      },
+    });
+    return;
+  }
+  await transaction.account.update({
+    where: { id: existing.id },
+    data: {
       passwordHash: input.passwordHash,
       disabledAt: null,
       pendingExpiresAt: null,
@@ -122,12 +131,10 @@ export const applyDevelopmentFixtures = async (
         });
 
         for (const branchId of member.branchIds) {
-          await transaction.staffBranchAssignment.upsert({
-            where: {
-              staffMemberId_branchId: { staffMemberId: member.id, branchId },
-            },
-            create: { staffMemberId: member.id, branchId },
-            update: {},
+          // Skips a Branch the Staff Member already holds a live assignment to.
+          await transaction.staffBranchAssignment.createMany({
+            data: [{ staffMemberId: member.id, branchId }],
+            skipDuplicates: true,
           });
         }
 

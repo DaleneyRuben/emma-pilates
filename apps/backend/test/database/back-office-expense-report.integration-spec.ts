@@ -57,8 +57,8 @@ describe('Prisma Back Office expense report', () => {
         randomUUID(),
       );
     }
-    const emma = await world.prisma.account.findUniqueOrThrow({
-      where: { email: 'emma.vargas@example.com' },
+    const emma = await world.prisma.account.findFirstOrThrow({
+      where: { email: 'emma.vargas@example.com', deletedAt: null },
       select: { staffMemberId: true },
     });
     await payroll.recordSalaryPayment(

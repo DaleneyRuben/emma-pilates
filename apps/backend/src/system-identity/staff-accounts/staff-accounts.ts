@@ -67,8 +67,8 @@ export const createStaffAccountOperations = (
 
   return {
     findAccountByEmail: (email: string) =>
-      transaction.account.findUnique({
-        where: { email },
+      transaction.account.findFirst({
+        where: { email, deletedAt: null },
         select: { id: true },
       }),
 

@@ -149,7 +149,8 @@ enum ImageVariantVisibility {
 
 model Account {
   id                        String                  @id @default(uuid()) @db.Uuid
-  email                     String                  @unique
+  // Unique among live rows only: a partial index in the BE-011 migration.
+  email                     String
   passwordHash              String?                 @map("password_hash")
   passwordChangedAt         DateTime?               @map("password_changed_at") @db.Timestamptz(3)
   emailVerifiedAt           DateTime?               @map("email_verified_at") @db.Timestamptz(3)
@@ -160,11 +161,12 @@ model Account {
   staffMemberId             String?                 @unique @map("staff_member_id") @db.Uuid
   createdAt                 DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt                 DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt                 DateTime?               @map("deleted_at") @db.Timestamptz(3)
   client                    Client?                 @relation(fields: [clientId], references: [id], onDelete: Restrict)
   staffMember               StaffMember?            @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
   authenticationTokens      AuthenticationToken[]
   authenticationSessions    AuthenticationSession[]
-  emailChange               AccountEmailChange?
+  emailChanges              AccountEmailChange[]
   emailSuppressionsResolved EmailSuppression[]      @relation("EmailSuppressionResolver")
   auditRecords              AuditRecord[]           @relation("AuditActor")
   cancelledSessions         Session[]
@@ -205,7 +207,7 @@ model AuthenticationToken {
   expiresAt     DateTime                   @map("expires_at") @db.Timestamptz(3)
   usedAt        DateTime?                  @map("used_at") @db.Timestamptz(3)
   invalidatedAt DateTime?                  @map("invalidated_at") @db.Timestamptz(3)
-  account       Account                    @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account       Account                    @relation(fields: [accountId], references: [id], onDelete: Restrict)
   emailChange   AccountEmailChange?
 
   @@index([accountId, purpose])
@@ -217,14 +219,18 @@ model AuthenticationToken {
 // IDN-008: the one pending email change of an active Account, live while its
 // email_change token is unused, not invalidated, and not expired.
 model AccountEmailChange {
-  accountId             String              @id @map("account_id") @db.Uuid
+  id                    String              @id @default(uuid()) @db.Uuid
+  accountId             String              @map("account_id") @db.Uuid
   newEmail              String              @map("new_email")
   authenticationTokenId String              @unique @map("authentication_token_id") @db.Uuid
   requestedAt           DateTime            @map("requested_at") @db.Timestamptz(3)
   expiresAt             DateTime            @map("expires_at") @db.Timestamptz(3)
-  account               Account             @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  authenticationToken   AuthenticationToken @relation(fields: [authenticationTokenId], references: [id], onDelete: Cascade)
+  deletedAt             DateTime?           @map("deleted_at") @db.Timestamptz(3)
+  account               Account             @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  authenticationToken   AuthenticationToken @relation(fields: [authenticationTokenId], references: [id], onDelete: Restrict)
 
+  // accountId is unique among live rows only: a partial index in the BE-011
+  // migration.
   @@map("account_email_changes")
   @@schema("system")
 }
@@ -241,8 +247,9 @@ model AuthenticationSession {
   absoluteExpiresAt        DateTime                               @map("absolute_expires_at") @db.Timestamptz(3)
   revokedAt                DateTime?                              @map("revoked_at") @db.Timestamptz(3)
   revocationReason         AuthenticationSessionRevocationReason? @map("revocation_reason")
-  account                  Account                                @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  accountDevice            AccountDevice?                         @relation(fields: [accountDeviceId], references: [id], onDelete: SetNull)
+  deletedAt                DateTime?                              @map("deleted_at") @db.Timestamptz(3)
+  account                  Account                                @relation(fields: [accountId], references: [id], onDelete: Restrict)
+  accountDevice            AccountDevice?                         @relation(fields: [accountDeviceId], references: [id], onDelete: Restrict)
 
   @@index([accountId, revokedAt])
   @@index([idleExpiresAt])
@@ -261,6 +268,7 @@ model AuthenticationThrottleEvent {
   networkDigest   Bytes?                          @map("network_digest") @db.ByteA
   occurredAt      DateTime                        @default(now()) @map("occurred_at") @db.Timestamptz(3)
   expiresAt       DateTime                        @map("expires_at") @db.Timestamptz(3)
+  deletedAt       DateTime?                       @map("deleted_at") @db.Timestamptz(3)
 
   @@index([purpose, recipientDigest, occurredAt])
   @@index([loginLaneDigest, occurredAt])
@@ -283,7 +291,7 @@ model EmailSuppression {
   resolvedByAccountId String?                @map("resolved_by_account_id") @db.Uuid
   resolutionReason    String?                @map("resolution_reason")
   resolutionNote      String?                @map("resolution_note")
-  resolvedByAccount   Account?               @relation("EmailSuppressionResolver", fields: [resolvedByAccountId], references: [id], onDelete: SetNull)
+  resolvedByAccount   Account?               @relation("EmailSuppressionResolver", fields: [resolvedByAccountId], references: [id], onDelete: Restrict)
 
   @@unique([provider, providerEventId])
   @@index([emailDigest])
@@ -304,7 +312,7 @@ model AuditRecord {
   correlationId  String         @map("correlation_id") @db.Uuid
   metadata       Json?
   occurredAt     DateTime       @default(now()) @map("occurred_at") @db.Timestamptz(3)
-  actorAccount   Account?       @relation("AuditActor", fields: [actorAccountId], references: [id], onDelete: SetNull)
+  actorAccount   Account?       @relation("AuditActor", fields: [actorAccountId], references: [id], onDelete: Restrict)
   branch         Branch?        @relation(fields: [branchId], references: [id], onDelete: Restrict)
 
   @@index([actorAccountId, occurredAt])
@@ -325,9 +333,11 @@ model IdempotencyRecord {
   responseBody   Json?    @map("response_body")
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
   expiresAt      DateTime @map("expires_at") @db.Timestamptz(3)
-  account        Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  deletedAt      DateTime? @map("deleted_at") @db.Timestamptz(3)
+  account        Account  @relation(fields: [accountId], references: [id], onDelete: Restrict)
 
-  @@unique([accountId, command, idempotencyKey])
+  // (accountId, command, idempotencyKey) is unique among live rows only: a
+  // partial index in the BE-011 migration.
   @@index([expiresAt])
   @@map("idempotency_records")
   @@schema("system")
@@ -345,7 +355,8 @@ model Notification {
   destinationId    String?                @map("destination_id") @db.Uuid
   createdAt        DateTime               @default(now()) @map("created_at") @db.Timestamptz(3)
   readAt           DateTime?              @map("read_at") @db.Timestamptz(3)
-  account          Account                @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  deletedAt        DateTime?              @map("deleted_at") @db.Timestamptz(3)
+  account          Account                @relation(fields: [accountId], references: [id], onDelete: Restrict)
   deliveries       NotificationDelivery[]
 
   @@unique([accountId, businessEventKey])
@@ -365,7 +376,7 @@ model AccountDevice {
   lastSeenAt           DateTime                         @default(now()) @map("last_seen_at") @db.Timestamptz(3)
   deactivatedAt        DateTime?                        @map("deactivated_at") @db.Timestamptz(3)
   deactivationReason   AccountDeviceDeactivationReason? @map("deactivation_reason")
-  account              Account                          @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account              Account                          @relation(fields: [accountId], references: [id], onDelete: Restrict)
   sessions             AuthenticationSession[]
   deliveries           NotificationDelivery[]
 
@@ -386,7 +397,7 @@ model NotificationDelivery {
   failureCategory  String?                   @map("failure_category")
   createdAt        DateTime                  @default(now()) @map("created_at") @db.Timestamptz(3)
   completedAt      DateTime?                 @map("completed_at") @db.Timestamptz(3)
-  notification     Notification              @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  notification     Notification              @relation(fields: [notificationId], references: [id], onDelete: Restrict)
   accountDevice    AccountDevice             @relation(fields: [accountDeviceId], references: [id], onDelete: Restrict)
 
   @@unique([notificationId, accountDeviceId])

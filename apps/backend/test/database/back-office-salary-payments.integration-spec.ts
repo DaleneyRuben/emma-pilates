@@ -27,8 +27,8 @@ describe('Prisma Back Office salary payments', () => {
   const assistant = () => world.principalOf('camila.rojas@example.com');
   const staffIdOf = async (email: string) =>
     (
-      await world.prisma.account.findUniqueOrThrow({
-        where: { email },
+      await world.prisma.account.findFirstOrThrow({
+        where: { email, deletedAt: null },
         select: { staffMemberId: true },
       })
     ).staffMemberId!;

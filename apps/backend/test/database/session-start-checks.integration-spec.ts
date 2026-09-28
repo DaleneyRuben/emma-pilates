@@ -44,8 +44,8 @@ describe('Prisma Session start checks', () => {
   const principalOf = async (
     email: string,
   ): Promise<AuthenticatedPrincipal & { clientId: string }> => {
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email, deletedAt: null },
       select: { id: true, clientId: true },
     });
     return {
@@ -57,7 +57,11 @@ describe('Prisma Session start checks', () => {
   };
 
   const accountIdOf = async (email: string) =>
-    (await prisma.account.findUniqueOrThrow({ where: { email } })).id;
+    (
+      await prisma.account.findFirstOrThrow({
+        where: { email, deletedAt: null },
+      })
+    ).id;
 
   const createSession = (slot: number, capacity = 10) => {
     const startsAt = slotStart(slot);

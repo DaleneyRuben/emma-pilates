@@ -271,8 +271,8 @@ describe('Prisma evaluation booking commands', () => {
       book('camila.rojas@example.com', '2026-09-28T13:00:00.000Z'),
     ).resolves.toBe('booking_access_denied');
 
-    const isabel = await world.prisma.account.findUniqueOrThrow({
-      where: { email: 'isabel@example.com' },
+    const isabel = await world.prisma.account.findFirstOrThrow({
+      where: { email: 'isabel@example.com', deletedAt: null },
       select: {
         id: true,
         client: {

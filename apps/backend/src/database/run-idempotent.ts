@@ -30,13 +30,12 @@ export const runIdempotent = async <Response extends Prisma.InputJsonObject>(
   const lockKey = `${record.accountId}:${record.command}:${record.idempotencyKey}`;
   return prisma.$transaction(async (transaction) => {
     await transaction.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${lockKey}, 0))`;
-    const existing = await transaction.idempotencyRecord.findUnique({
+    const existing = await transaction.idempotencyRecord.findFirst({
       where: {
-        accountId_command_idempotencyKey: {
-          accountId: record.accountId,
-          command: record.command,
-          idempotencyKey: record.idempotencyKey,
-        },
+        accountId: record.accountId,
+        command: record.command,
+        idempotencyKey: record.idempotencyKey,
+        deletedAt: null,
       },
       select: { requestHash: true, responseBody: true },
     });

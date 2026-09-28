@@ -311,13 +311,12 @@ export function createPrismaPaymentCommands(
     work: () => Promise<Result>,
   ): Promise<Result> => {
     const requestHash = hashRequest(record.request);
-    const existing = await transaction.idempotencyRecord.findUnique({
+    const existing = await transaction.idempotencyRecord.findFirst({
       where: {
-        accountId_command_idempotencyKey: {
-          accountId: record.accountId,
-          command: record.command,
-          idempotencyKey: record.idempotencyKey,
-        },
+        accountId: record.accountId,
+        command: record.command,
+        idempotencyKey: record.idempotencyKey,
+        deletedAt: null,
       },
       select: { requestHash: true, responseBody: true },
     });

@@ -41,8 +41,8 @@ export class PrismaAccountSecurityGateway
     }
 
     return this.prisma.$transaction(async (transaction) => {
-      const account = await transaction.account.findUnique({
-        where: { email: input.email },
+      const account = await transaction.account.findFirst({
+        where: { email: input.email, deletedAt: null },
         select: {
           id: true,
           passwordHash: true,

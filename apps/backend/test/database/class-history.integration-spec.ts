@@ -36,12 +36,12 @@ describe('Client class history', () => {
 
   it('lists attended past Bookings with Session facts, newest first', async () => {
     const template = fixtures.sessions[0];
-    const trainerAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: 'emma.vargas@example.com' },
+    const trainerAccount = await prisma.account.findFirstOrThrow({
+      where: { email: 'emma.vargas@example.com', deletedAt: null },
       select: { id: true },
     });
-    const luciaAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: lucia.email },
+    const luciaAccount = await prisma.account.findFirstOrThrow({
+      where: { email: lucia.email, deletedAt: null },
       select: { id: true },
     });
     const subscription = await prisma.subscription.findFirstOrThrow({

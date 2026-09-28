@@ -182,8 +182,8 @@ describe('Prisma Back Office supplies', () => {
       ),
     ).resolves.toBe('back_office_access_denied');
 
-    const account = await world.prisma.account.findUniqueOrThrow({
-      where: { email: 'paola.mendoza@example.com' },
+    const account = await world.prisma.account.findFirstOrThrow({
+      where: { email: 'paola.mendoza@example.com', deletedAt: null },
     });
     await expect(
       world.prisma.withdrawal.findMany({

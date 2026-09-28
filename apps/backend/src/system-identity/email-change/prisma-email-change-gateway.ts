@@ -66,8 +66,8 @@ export const createPrismaEmailChangeGateway = (
     accountId: string,
     now: Date,
   ) => {
-    const change = await transaction.accountEmailChange.findUnique({
-      where: { accountId },
+    const change = await transaction.accountEmailChange.findFirst({
+      where: { accountId, deletedAt: null },
       include: { authenticationToken: true },
     });
     if (
@@ -125,8 +125,8 @@ export const createPrismaEmailChangeGateway = (
       >[0][];
     },
   ): Promise<boolean> => {
-    const inUse = await transaction.account.findUnique({
-      where: { email: input.newEmail },
+    const inUse = await transaction.account.findFirst({
+      where: { email: input.newEmail, deletedAt: null },
       select: { id: true },
     });
     if (inUse !== null) return false;
@@ -172,22 +172,26 @@ export const createPrismaEmailChangeGateway = (
 
         await invalidateCurrentLink(transaction, input.accountId, input.now);
         await createLink(transaction, input.accountId, input.token, input.now);
-        await transaction.accountEmailChange.upsert({
-          where: { accountId: input.accountId },
-          create: {
-            accountId: input.accountId,
-            newEmail: input.newEmail,
-            authenticationTokenId: input.token.id,
-            requestedAt: input.now,
-            expiresAt: input.token.expiresAt,
-          },
-          update: {
+        const replaced = await transaction.accountEmailChange.updateMany({
+          where: { accountId: input.accountId, deletedAt: null },
+          data: {
             newEmail: input.newEmail,
             authenticationTokenId: input.token.id,
             requestedAt: input.now,
             expiresAt: input.token.expiresAt,
           },
         });
+        if (replaced.count === 0) {
+          await transaction.accountEmailChange.create({
+            data: {
+              accountId: input.accountId,
+              newEmail: input.newEmail,
+              authenticationTokenId: input.token.id,
+              requestedAt: input.now,
+              expiresAt: input.token.expiresAt,
+            },
+          });
+        }
         await sendIfAllowed(transaction, {
           newEmail: input.newEmail,
           now: input.now,
@@ -209,8 +213,8 @@ export const createPrismaEmailChangeGateway = (
           input.now,
         );
         if (pending === null) return 'none';
-        const inUse = await transaction.account.findUnique({
-          where: { email: pending.newEmail },
+        const inUse = await transaction.account.findFirst({
+          where: { email: pending.newEmail, deletedAt: null },
           select: { id: true },
         });
         const allowed =
@@ -227,8 +231,8 @@ export const createPrismaEmailChangeGateway = (
         if (!allowed) return 'suppressed';
         await invalidateCurrentLink(transaction, input.accountId, input.now);
         await createLink(transaction, input.accountId, input.token, input.now);
-        await transaction.accountEmailChange.update({
-          where: { accountId: input.accountId },
+        await transaction.accountEmailChange.updateMany({
+          where: { accountId: input.accountId, deletedAt: null },
           data: {
             authenticationTokenId: input.token.id,
             expiresAt: input.token.expiresAt,
@@ -251,8 +255,8 @@ export const createPrismaEmailChangeGateway = (
         );
         if (pending === null) return 'none';
         await invalidateCurrentLink(transaction, input.accountId, input.now);
-        await transaction.accountEmailChange.delete({
-          where: { accountId: input.accountId },
+        await transaction.accountEmailChange.deleteMany({
+          where: { accountId: input.accountId, deletedAt: null },
         });
         await recordAudit(transaction, {
           actionCode: 'account.email_change_cancelled',
@@ -295,8 +299,8 @@ export const createPrismaEmailChangeGateway = (
         ) {
           return 'expired';
         }
-        const taken = await transaction.account.findUnique({
-          where: { email: token.emailChange.newEmail },
+        const taken = await transaction.account.findFirst({
+          where: { email: token.emailChange.newEmail, deletedAt: null },
           select: { id: true },
         });
         if (taken !== null) return 'email_unavailable';
@@ -306,8 +310,8 @@ export const createPrismaEmailChangeGateway = (
           where: { id: token.id },
           data: { usedAt: input.now },
         });
-        await transaction.accountEmailChange.delete({
-          where: { accountId: token.accountId },
+        await transaction.accountEmailChange.deleteMany({
+          where: { accountId: token.accountId, deletedAt: null },
         });
         await transaction.account.update({
           where: { id: token.accountId },

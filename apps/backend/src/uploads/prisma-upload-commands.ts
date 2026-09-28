@@ -301,13 +301,12 @@ export function createFinalizeUploadIdempotent(
     return retrySerializable(() =>
       prisma.$transaction(
         async (transaction) => {
-          const existing = await transaction.idempotencyRecord.findUnique({
+          const existing = await transaction.idempotencyRecord.findFirst({
             where: {
-              accountId_command_idempotencyKey: {
-                accountId: ownerAccountId,
-                command: 'finalize_upload',
-                idempotencyKey,
-              },
+              accountId: ownerAccountId,
+              command: 'finalize_upload',
+              idempotencyKey,
+              deletedAt: null,
             },
             select: { requestHash: true, responseBody: true },
           });

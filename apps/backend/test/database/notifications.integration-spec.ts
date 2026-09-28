@@ -27,8 +27,8 @@ describe('Notification store', () => {
       passwordHash: 'not-a-real-hash',
     });
     accountId = (
-      await prisma.account.findUniqueOrThrow({
-        where: { email: 'lucia@example.com' },
+      await prisma.account.findFirstOrThrow({
+        where: { email: 'lucia@example.com', deletedAt: null },
         select: { id: true },
       })
     ).id;
@@ -91,12 +91,12 @@ describe('Notification store', () => {
     const valeria = fixtures.clients.find(
       (c) => c.email === 'valeria@example.com',
     )!;
-    const valeriaAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: valeria.email },
+    const valeriaAccount = await prisma.account.findFirstOrThrow({
+      where: { email: valeria.email, deletedAt: null },
       select: { id: true },
     });
-    const luciaAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: 'lucia@example.com' },
+    const luciaAccount = await prisma.account.findFirstOrThrow({
+      where: { email: 'lucia@example.com', deletedAt: null },
       select: { id: true },
     });
     const now = new Date('2026-09-21T12:00:00.000Z');
@@ -152,8 +152,8 @@ describe('Notification store', () => {
   });
 
   it('reminds Clients whose Subscription ends in three days exactly once', async () => {
-    const valeriaAccount = await prisma.account.findUniqueOrThrow({
-      where: { email: 'valeria@example.com' },
+    const valeriaAccount = await prisma.account.findFirstOrThrow({
+      where: { email: 'valeria@example.com', deletedAt: null },
       select: { id: true },
     });
     await prisma.notification.deleteMany({

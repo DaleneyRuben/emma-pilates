@@ -15,6 +15,7 @@ model Client {
   referralCode        String          @unique @map("referral_code")
   createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime        @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt           DateTime?       @map("deleted_at") @db.Timestamptz(3)
   account             Account?
   subscriptions       Subscription[]
   bookings            Booking[]
@@ -40,6 +41,7 @@ model StaffMember {
   profileImageAssetId String?                 @unique @map("profile_image_asset_id") @db.Uuid
   createdAt           DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt           DateTime?               @map("deleted_at") @db.Timestamptz(3)
   account             Account?
   profileImageAsset   ImageAsset?             @relation("StaffProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
   branchAssignments   StaffBranchAssignment[]
@@ -75,13 +77,16 @@ model Branch {
 }
 
 model StaffBranchAssignment {
+  id            String      @id @default(uuid()) @db.Uuid
   staffMemberId String      @map("staff_member_id") @db.Uuid
   branchId      String      @map("branch_id") @db.Uuid
   assignedAt    DateTime    @default(now()) @map("assigned_at") @db.Timestamptz(3)
-  staffMember   StaffMember @relation(fields: [staffMemberId], references: [id], onDelete: Cascade)
+  deletedAt     DateTime?   @map("deleted_at") @db.Timestamptz(3)
+  staffMember   StaffMember @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
   branch        Branch      @relation(fields: [branchId], references: [id], onDelete: Restrict)
 
-  @@id([staffMemberId, branchId])
+  // (staffMemberId, branchId) is unique among live rows only: a partial index
+  // in the BE-011 migration.
   @@map("staff_branch_assignments")
   @@schema("booking")
 }

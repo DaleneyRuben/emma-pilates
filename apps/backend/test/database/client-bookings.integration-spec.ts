@@ -20,8 +20,8 @@ describe('Client upcoming bookings', () => {
   const lucia = fixtures.clients.find((c) => c.email === 'lucia@example.com')!;
   const luciaAccountId = () =>
     prisma.account
-      .findUniqueOrThrow({
-        where: { email: lucia.email },
+      .findFirstOrThrow({
+        where: { email: lucia.email, deletedAt: null },
         select: { id: true },
       })
       .then((account) => account.id);

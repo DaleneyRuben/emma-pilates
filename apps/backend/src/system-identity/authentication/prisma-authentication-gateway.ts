@@ -24,8 +24,8 @@ export class PrismaAuthenticationGateway {
 
   findAccountByEmail(email: string): Promise<AccountCredentials | null> {
     return this.prisma.account
-      .findUnique({
-        where: { email },
+      .findFirst({
+        where: { email, deletedAt: null },
         select: {
           id: true,
           passwordHash: true,

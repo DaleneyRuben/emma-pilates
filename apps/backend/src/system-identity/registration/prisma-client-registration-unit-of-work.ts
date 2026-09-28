@@ -32,6 +32,7 @@ import type {
   ClientEmailVerification,
   ClientEmailVerificationStatus,
 } from './verify-client-email';
+import { removePendingAccount } from './remove-pending-account';
 
 const hourMilliseconds = 60 * 60 * 1_000;
 const dayMilliseconds = 24 * hourMilliseconds;
@@ -101,8 +102,8 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
         return 'expired';
       }
 
-      const conflictingAccount = await transaction.account.findUnique({
-        where: { email: correction.email },
+      const conflictingAccount = await transaction.account.findFirst({
+        where: { email: correction.email, deletedAt: null },
         select: { id: true },
       });
 
@@ -270,8 +271,12 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
 
       const { id: accountId, clientId } = continuation.account;
 
-      await transaction.account.delete({ where: { id: accountId } });
-      await transaction.client.delete({ where: { id: clientId } });
+      await removePendingAccount(transaction, {
+        accountId,
+        clientId,
+        staffMemberId: null,
+        now: cancellation.now,
+      });
       await transaction.auditRecord.create({
         data: {
           actionCode: 'pending_client_registration.cancelled',
@@ -365,6 +370,7 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
       const expiredAccounts = await transaction.account.findMany({
         where: {
           pendingExpiresAt: { lte: request.now },
+          deletedAt: null,
           emailVerifiedAt: null,
           activatedAt: null,
           OR: [
@@ -385,17 +391,12 @@ export class PrismaClientRegistrationUnitOfWork implements ClientRegistrationUni
         expiredAccounts.map(async (account) => {
           const domainIdentity = account.clientId === null ? 'staff' : 'client';
 
-          await transaction.account.delete({ where: { id: account.id } });
-
-          if (account.clientId !== null) {
-            await transaction.client.delete({
-              where: { id: account.clientId },
-            });
-          } else if (account.staffMemberId !== null) {
-            await transaction.staffMember.delete({
-              where: { id: account.staffMemberId },
-            });
-          }
+          await removePendingAccount(transaction, {
+            accountId: account.id,
+            clientId: account.clientId,
+            staffMemberId: account.staffMemberId,
+            now: request.now,
+          });
 
           await transaction.auditRecord.create({
             data: {
@@ -430,8 +431,8 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
     domainIdentity: 'client' | 'staff';
     pendingFlow: 'self_registration' | 'staff_invitation' | 'none';
   } | null> {
-    const account = await this.transaction.account.findUnique({
-      where: { email },
+    const account = await this.transaction.account.findFirst({
+      where: { email, deletedAt: null },
       select: {
         id: true,
         clientId: true,

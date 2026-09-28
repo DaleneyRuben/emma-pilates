@@ -106,8 +106,8 @@ describe('development fixtures', () => {
   });
 
   it('lets Sofía read Bs 60 of referral credit and both referrals through the payment reads', async () => {
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email: 'sofia@example.com' },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email: 'sofia@example.com', deletedAt: null },
       select: { id: true, clientId: true },
     });
     const sofia: AuthenticatedPrincipal = {
@@ -134,8 +134,8 @@ describe('development fixtures', () => {
   });
 
   it("publishes Gabriela's Availability Blocks with their 30-day slots once", async () => {
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email: 'gabriela.flores@example.com' },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email: 'gabriela.flores@example.com', deletedAt: null },
       select: {
         id: true,
         staffMember: {
@@ -176,8 +176,8 @@ describe('development fixtures', () => {
   });
 
   it('creates active Client Accounts that authenticate with the shared password', async () => {
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email: 'lucia@example.com' },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email: 'lucia@example.com', deletedAt: null },
       include: { client: true },
     });
 
@@ -191,12 +191,12 @@ describe('development fixtures', () => {
   });
 
   it('creates one active Staff Account per Role with Branch assignments', async () => {
-    const trainer = await prisma.account.findUniqueOrThrow({
-      where: { email: 'emma.vargas@example.com' },
+    const trainer = await prisma.account.findFirstOrThrow({
+      where: { email: 'emma.vargas@example.com', deletedAt: null },
       include: { staffMember: { include: { branchAssignments: true } } },
     });
-    const administrator = await prisma.account.findUniqueOrThrow({
-      where: { email: 'paola.mendoza@example.com' },
+    const administrator = await prisma.account.findFirstOrThrow({
+      where: { email: 'paola.mendoza@example.com', deletedAt: null },
       include: { staffMember: true },
     });
 

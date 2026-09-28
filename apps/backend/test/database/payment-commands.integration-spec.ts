@@ -20,9 +20,11 @@ describe('Prisma payment commands', () => {
   const fixtures = buildDevelopmentFixtures({ today });
   const plan = fixtures.plans.find((p) => p.name === 'Paquete de 8 clases')!;
 
-  const principalOf = async (email: string): Promise<AuthenticatedPrincipal> => {
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email },
+  const principalOf = async (
+    email: string,
+  ): Promise<AuthenticatedPrincipal> => {
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email, deletedAt: null },
       select: { id: true, clientId: true },
     });
     return {
@@ -127,10 +129,12 @@ describe('Prisma payment commands', () => {
   it('reserves available Credit against the Plan price and records the reservation in the ledger', async () => {
     const sofia = await principalOf('sofia@example.com');
     const isabel = await principalOf('isabel@example.com');
-    const isabelId = isabel.identity.kind === 'client' ? isabel.identity.clientId : '';
-    const valeriaId = sofia.identity.kind === 'client' ? sofia.identity.clientId : '';
-    const admin = await prisma.account.findUniqueOrThrow({
-      where: { email: 'paola.mendoza@example.com' },
+    const isabelId =
+      isabel.identity.kind === 'client' ? isabel.identity.clientId : '';
+    const valeriaId =
+      sofia.identity.kind === 'client' ? sofia.identity.clientId : '';
+    const admin = await prisma.account.findFirstOrThrow({
+      where: { email: 'paola.mendoza@example.com', deletedAt: null },
       select: { id: true },
     });
     const branch = fixtures.branches[0];
@@ -221,21 +225,28 @@ describe('Prisma payment commands', () => {
       where: { purchaseIntentId: intent.id },
       include: { ledgerEntries: true },
     });
-    expect(reservation).toMatchObject({ state: 'RESERVED', amountCentavos: 6000 });
+    expect(reservation).toMatchObject({
+      state: 'RESERVED',
+      amountCentavos: 6000,
+    });
     expect(reservation.ledgerEntries).toHaveLength(1);
   });
 
   it('lists recent Credit activity newest first and the Client referral code with referred Clients', async () => {
     const isabel = await principalOf('isabel@example.com');
     const sofia = await principalOf('sofia@example.com');
-    const sofiaId = sofia.identity.kind === 'client' ? sofia.identity.clientId : '';
+    const sofiaId =
+      sofia.identity.kind === 'client' ? sofia.identity.clientId : '';
 
     const activity = await commands().readCreditActivity(isabel);
     expect(activity.map((entry) => entry.kind)).toEqual([
       'payment_reservation',
       'referral_award',
     ]);
-    expect(activity[0]).toMatchObject({ amountCentavos: 6000, occurredAt: expect.any(Date) });
+    expect(activity[0]).toMatchObject({
+      amountCentavos: 6000,
+      occurredAt: expect.any(Date),
+    });
 
     const referrals = await commands().readReferrals(isabel);
     expect(referrals.referralCode).toEqual(expect.any(String));
@@ -309,13 +320,12 @@ describe('Prisma payment commands', () => {
     }).createPurchaseIntent({ planId: plan.id }, principal, key);
 
     await expect(
-      prisma.idempotencyRecord.findUniqueOrThrow({
+      prisma.idempotencyRecord.findFirstOrThrow({
         where: {
-          accountId_command_idempotencyKey: {
-            accountId: account.id,
-            command: 'create_purchase_intent',
-            idempotencyKey: key,
-          },
+          accountId: account.id,
+          command: 'create_purchase_intent',
+          idempotencyKey: key,
+          deletedAt: null,
         },
         select: { createdAt: true, expiresAt: true },
       }),

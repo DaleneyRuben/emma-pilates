@@ -34,8 +34,8 @@ describe('Administrator Payment list (PostgreSQL)', () => {
   const principalOf = async (
     email: string,
   ): Promise<AuthenticatedPrincipal> => {
-    const account = await prisma.account.findUniqueOrThrow({
-      where: { email },
+    const account = await prisma.account.findFirstOrThrow({
+      where: { email, deletedAt: null },
       select: { id: true, clientId: true, staffMember: true },
     });
     return {

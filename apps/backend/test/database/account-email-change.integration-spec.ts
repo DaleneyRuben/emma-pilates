@@ -139,7 +139,9 @@ describe('account email change (PostgreSQL)', () => {
     expect(token.purpose).toBe('EMAIL_CHANGE');
     expect(token.expiresAt).toEqual(later(24 * 60));
     await expect(
-      prisma.accountEmailChange.findUniqueOrThrow({ where: { accountId } }),
+      prisma.accountEmailChange.findFirstOrThrow({
+        where: { accountId, deletedAt: null },
+      }),
     ).resolves.toMatchObject({
       newEmail,
       authenticationTokenId: issued.token.id,
@@ -182,7 +184,9 @@ describe('account email change (PostgreSQL)', () => {
 
     await expect(outcome).resolves.toBe('requested');
     await expect(
-      prisma.accountEmailChange.findUniqueOrThrow({ where: { accountId } }),
+      prisma.accountEmailChange.findFirstOrThrow({
+        where: { accountId, deletedAt: null },
+      }),
     ).resolves.toMatchObject({ newEmail: other.email });
     await expect(jobsFor(issued.token.id)).resolves.toEqual([]);
     await expect(throttleEvents(other.email)).resolves.toBe(0);
@@ -266,8 +270,11 @@ describe('account email change (PostgreSQL)', () => {
 
   it('cancels the pending change, invalidating its link, and is idempotent', async () => {
     const { accountId } = await activeAccount();
-    const { issued } = request(accountId, `${randomUUID()}@example.com`);
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    const { issued, outcome } = request(
+      accountId,
+      `${randomUUID()}@example.com`,
+    );
+    await outcome;
 
     await expect(gateway.cancel({ accountId, now: later(1) })).resolves.toBe(
       'cancelled',
@@ -276,7 +283,9 @@ describe('account email change (PostgreSQL)', () => {
       'none',
     );
     await expect(
-      prisma.accountEmailChange.findUnique({ where: { accountId } }),
+      prisma.accountEmailChange.findFirst({
+        where: { accountId, deletedAt: null },
+      }),
     ).resolves.toBeNull();
     expect(
       (
@@ -297,8 +306,8 @@ describe('account email change (PostgreSQL)', () => {
   it('completes the change from the link: new email verified, token used, row gone, audited', async () => {
     const { accountId, email } = await activeAccount();
     const newEmail = `${randomUUID()}@example.com`;
-    const { issued } = request(accountId, newEmail);
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    const { issued, outcome } = request(accountId, newEmail);
+    await outcome;
 
     await expect(
       gateway.complete({ tokenDigest: issued.digest, now: later(30) }),
@@ -318,7 +327,9 @@ describe('account email change (PostgreSQL)', () => {
       ).usedAt,
     ).toEqual(later(30));
     await expect(
-      prisma.accountEmailChange.findUnique({ where: { accountId } }),
+      prisma.accountEmailChange.findFirst({
+        where: { accountId, deletedAt: null },
+      }),
     ).resolves.toBeNull();
     expect(await audits(accountId)).toMatchObject([
       { actionCode: 'account.email_change_requested' },
@@ -341,8 +352,8 @@ describe('account email change (PostgreSQL)', () => {
   it('refuses to complete once the link expired or the address was taken meanwhile', async () => {
     const { accountId } = await activeAccount();
     const newEmail = `${randomUUID()}@example.com`;
-    const { issued } = request(accountId, newEmail);
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    const { issued, outcome } = request(accountId, newEmail);
+    await outcome;
     await expect(
       gateway.readPending({ accountId, now: later(25 * 60) }),
     ).resolves.toBeNull();
@@ -372,8 +383,11 @@ describe('account email change (PostgreSQL)', () => {
 
   it('is cancelled by a password change (E11)', async () => {
     const { accountId } = await activeAccount();
-    const { issued } = request(accountId, `${randomUUID()}@example.com`);
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    const { issued, outcome } = request(
+      accountId,
+      `${randomUUID()}@example.com`,
+    );
+    await outcome;
     const security = new PrismaAccountSecurityGateway(prisma);
 
     await security.completePasswordChange({

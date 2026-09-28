@@ -8,6 +8,7 @@ import {
 } from '../../generated/prisma/enums';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import { PrismaClientRegistrationTransaction } from '../registration/prisma-client-registration-unit-of-work';
+import { removePendingAccount } from '../registration/remove-pending-account';
 import type {
   ClientInvitationRecord,
   ClientInvitationTransaction,
@@ -60,8 +61,8 @@ const createInvitationTransaction = (
   findAccountByEmail: async (email): Promise<ExistingAccount | null> => {
     const [existing, account] = await Promise.all([
       registration.findAccountByEmail(email),
-      transaction.account.findUnique({
-        where: { email },
+      transaction.account.findFirst({
+        where: { email, deletedAt: null },
         select: { clientId: true },
       }),
     ]);
@@ -70,8 +71,8 @@ const createInvitationTransaction = (
       : { ...existing, clientId: account?.clientId ?? null };
   },
   findInvitation: async (clientId): Promise<ClientInvitationRecord | null> => {
-    const client = await transaction.client.findUnique({
-      where: { id: clientId },
+    const client = await transaction.client.findFirst({
+      where: { id: clientId, deletedAt: null },
       select: {
         id: true,
         name: true,
@@ -166,10 +167,8 @@ const createInvitationTransaction = (
       data: { email: input.email },
     });
   },
-  deleteInvitation: async (input) => {
-    await transaction.account.delete({ where: { id: input.accountId } });
-    await transaction.client.delete({ where: { id: input.clientId } });
-  },
+  removeInvitation: (input) =>
+    removePendingAccount(transaction, { ...input, staffMemberId: null }),
   scheduleAuthenticationEmail: (job) =>
     registration.scheduleAuthenticationEmail(job),
   recordAudit: async (audit) => {

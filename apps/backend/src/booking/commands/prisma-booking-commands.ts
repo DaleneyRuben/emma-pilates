@@ -85,13 +85,12 @@ export class PrismaBookingCommands {
     const result = await retrySerializable(() =>
       this.prisma.$transaction(
         async (transaction) => {
-          const existing = await transaction.idempotencyRecord.findUnique({
+          const existing = await transaction.idempotencyRecord.findFirst({
             where: {
-              accountId_command_idempotencyKey: {
-                accountId: principal.accountId,
-                command: 'create_booking',
-                idempotencyKey,
-              },
+              accountId: principal.accountId,
+              command: 'create_booking',
+              idempotencyKey,
+              deletedAt: null,
             },
             select: { requestHash: true, responseBody: true },
           });
@@ -185,7 +184,9 @@ export class PrismaBookingCommands {
                   startsAt: true,
                   state: true,
                   _count: {
-                    select: { bookings: { where: { state: BookingState.BOOKED } } },
+                    select: {
+                      bookings: { where: { state: BookingState.BOOKED } },
+                    },
                   },
                 },
               });
@@ -196,8 +197,7 @@ export class PrismaBookingCommands {
                     branchId: session.branchId,
                     startsAt: session.startsAt,
                     state: session.state.toLowerCase() as
-                      | 'scheduled'
-                      | 'cancelled',
+                      'scheduled' | 'cancelled',
                     liveBookingCount: session._count.bookings,
                   };
             },
@@ -356,13 +356,12 @@ export class PrismaBookingCommands {
     return retrySerializable(() =>
       this.prisma.$transaction(
         async (transaction) => {
-          const existing = await transaction.idempotencyRecord.findUnique({
+          const existing = await transaction.idempotencyRecord.findFirst({
             where: {
-              accountId_command_idempotencyKey: {
-                accountId: principal.accountId,
-                command: 'join_waitlist',
-                idempotencyKey,
-              },
+              accountId: principal.accountId,
+              command: 'join_waitlist',
+              idempotencyKey,
+              deletedAt: null,
             },
             select: { requestHash: true, responseBody: true },
           });

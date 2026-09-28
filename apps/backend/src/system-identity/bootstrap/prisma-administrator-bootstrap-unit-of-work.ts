@@ -62,8 +62,8 @@ export class PrismaAdministratorBootstrapUnitOfWork implements AdministratorBoot
           }));
         },
         findAccountByEmail: (email) =>
-          transaction.account.findUnique({
-            where: { email },
+          transaction.account.findFirst({
+            where: { email, deletedAt: null },
             select: { id: true },
           }),
         canIssueAuthenticationEmail: (input) =>
