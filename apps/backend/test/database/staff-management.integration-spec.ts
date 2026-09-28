@@ -17,6 +17,7 @@ import {
   createPrismaStaffDirectory,
   PrismaStaffManagementUnitOfWork,
 } from '../../src/booking/staff/prisma-staff-management';
+import { PrismaAuthenticationGateway } from '../../src/system-identity/authentication/prisma-authentication-gateway';
 import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
 import { AuthenticationLinkCipher } from '../../src/system-identity/security/authentication-link-cipher';
 import { authenticationTokens } from '../../src/system-identity/security/authentication-token-service';
@@ -194,6 +195,88 @@ describe('Prisma staff management', () => {
     await expect(
       prisma.staffBranchAssignment.count({ where: { staffMemberId: emma } }),
     ).resolves.toBe(before);
+  });
+
+  it('marks a removed Branch assignment removed, keeps it, and grants its Branch again only when re-added', async () => {
+    const created = await createStaffMember(
+      {
+        name: 'Julia Rivas',
+        email: `julia.${randomUUID()}@example.com`,
+        phone: null,
+        role: 'assistant',
+        branchIds: [branchId('Centro'), branchId('Equipetrol')],
+      },
+      paola,
+      dependencies(),
+    );
+    const directory = createPrismaStaffDirectory(prisma);
+    const credentialDigest = Buffer.from(randomUUID());
+    await prisma.authenticationSession.create({
+      data: {
+        accountId: created.accountId,
+        surface: 'MOBILE',
+        credentialDigest,
+        lastMeaningfulActivityAt: now,
+        createdAt: now,
+        idleExpiresAt: new Date(now.getTime() + 60_000),
+        absoluteExpiresAt: new Date(now.getTime() + 120_000),
+      },
+    });
+    const principalBranches = async () =>
+      (
+        await new PrismaAuthenticationGateway(
+          prisma,
+        ).findSessionByCredentialDigest(credentialDigest)
+      )?.staffMember?.branchIds.sort();
+
+    await changeStaffBranches(
+      { staffMemberId: created.id, branchIds: [branchId('Centro')] },
+      paola,
+      dependencies(),
+    );
+
+    await expect(
+      prisma.staffBranchAssignment.findMany({
+        where: {
+          staffMemberId: created.id,
+          branchId: branchId('Equipetrol'),
+        },
+        select: { deletedAt: true },
+      }),
+    ).resolves.toEqual([{ deletedAt: now }]);
+    await expect(directory.read(created.id)).resolves.toMatchObject({
+      branchIds: [branchId('Centro')],
+    });
+    await expect(
+      directory.list({
+        page: 1,
+        pageSize: 50,
+        branchId: branchId('Equipetrol'),
+      }),
+    ).resolves.toMatchObject({
+      items: expect.not.arrayContaining([
+        expect.objectContaining({ id: created.id }),
+      ]),
+    });
+    await expect(principalBranches()).resolves.toEqual([branchId('Centro')]);
+
+    await changeStaffBranches(
+      {
+        staffMemberId: created.id,
+        branchIds: [branchId('Centro'), branchId('Equipetrol')],
+      },
+      paola,
+      dependencies(),
+    );
+
+    await expect(
+      prisma.staffBranchAssignment.count({
+        where: { staffMemberId: created.id },
+      }),
+    ).resolves.toBe(3);
+    await expect(principalBranches()).resolves.toEqual(
+      [branchId('Centro'), branchId('Equipetrol')].sort(),
+    );
   });
 
   it('deactivates an Assistant by disabling the Account and revoking her sessions', async () => {
