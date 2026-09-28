@@ -78,6 +78,7 @@ export const createNotificationStore = (prisma: PrismaClient) => ({
       .findMany({
         where: {
           accountId: input.accountId,
+          deletedAt: null,
           ...(input.after === null
             ? {}
             : {
@@ -98,7 +99,9 @@ export const createNotificationStore = (prisma: PrismaClient) => ({
         rows.map((row) => ({ ...row, category: categoryNames[row.category] })),
       ),
   countUnread: (accountId: string): Promise<number> =>
-    prisma.notification.count({ where: { accountId, readAt: null } }),
+    prisma.notification.count({
+      where: { accountId, readAt: null, deletedAt: null },
+    }),
   markRead: (input: {
     notificationId: string;
     accountId: string;
