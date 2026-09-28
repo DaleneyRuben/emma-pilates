@@ -7,8 +7,6 @@ import {
   ImageAssetPurpose,
   ImageAssetState,
   ImageMediaType,
-  ImageVariantKind,
-  ImageVariantVisibility,
 } from '../generated/prisma/enums';
 import { createPendingUpload } from './create-pending-upload';
 import { finalizeUpload } from './finalize-upload';
@@ -20,6 +18,10 @@ import { buildImageVariants } from './image-variants';
 import type { LocalObjectStorage } from './local-object-storage';
 import { processFinalizeUploadJob } from './process-finalize-upload-job';
 import { putPendingUploadObject } from './put-pending-upload-object';
+import {
+  mediaTypeToPrisma,
+  recordVerifiedVariants,
+} from './record-verified-variants';
 import {
   verifyImageBytes,
   type VerifiableMediaType,
@@ -37,21 +39,6 @@ const purposeFromPrisma: Record<ImageAssetPurpose, ImagePurpose> = {
   PROFILE_PHOTO: 'profile_photo',
   TRANSFER_RECEIPT: 'transfer_receipt',
   PROMOTION: 'promotion',
-};
-
-const mediaTypeToPrisma: Record<string, ImageMediaType> = {
-  'image/jpeg': ImageMediaType.JPEG,
-  'image/png': ImageMediaType.PNG,
-  'image/webp': ImageMediaType.WEBP,
-};
-
-const variantKindToPrisma: Record<string, ImageVariantKind> = {
-  thumbnail: ImageVariantKind.THUMBNAIL,
-  display: ImageVariantKind.DISPLAY,
-  readable: ImageVariantKind.READABLE,
-  promotion_480: ImageVariantKind.PROMOTION_480,
-  promotion_960: ImageVariantKind.PROMOTION_960,
-  promotion_1440: ImageVariantKind.PROMOTION_1440,
 };
 
 const mediaTypeFromPrisma: Record<ImageMediaType, VerifiableMediaType> = {
@@ -230,38 +217,13 @@ export function createFinalizeUploadJobCommands(
         buildVariants: buildImageVariants,
         storeVariant: (storageKey, bytes) => storage.replace(storageKey, bytes),
         deleteObject: (objectKey) => storage.delete(objectKey),
-        // A retried job reuses the rows of the keys it writes again and marks
-        // the others removed (ADR-0086), so no earlier row is ever deleted.
         markVerified: async ({ imageAssetId, verified, variants }) => {
           const verifiedAt = now();
-          await prisma.imageVariant.updateMany({
-            where: {
-              imageAssetId,
-              deletedAt: null,
-              storageKey: { notIn: variants.map((v) => v.storageKey) },
-            },
-            data: { deleteRequestedAt: verifiedAt, deletedAt: verifiedAt },
+          await recordVerifiedVariants(prisma, {
+            imageAssetId,
+            variants,
+            verifiedAt,
           });
-          for (const variant of variants) {
-            const recorded = {
-              kind: variantKindToPrisma[variant.kind],
-              visibility: ImageVariantVisibility.PRIVATE,
-              mediaType: mediaTypeToPrisma[variant.mediaType],
-              byteSize: variant.byteSize,
-              width: variant.width,
-              height: variant.height,
-            };
-            await prisma.imageVariant.upsert({
-              where: { storageKey: variant.storageKey },
-              create: {
-                ...recorded,
-                imageAssetId,
-                storageKey: variant.storageKey,
-              },
-              // The key holds the new bytes, so its row is live again.
-              update: { ...recorded, deleteRequestedAt: null, deletedAt: null },
-            });
-          }
           await prisma.imageAsset.update({
             where: { id: imageAssetId },
             data: {
