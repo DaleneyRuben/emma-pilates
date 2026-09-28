@@ -1,7 +1,7 @@
 # BE-011 — Soft-delete migration review
 
-Status: **proposed 2026-09-28**, awaiting approval before any migration is
-created ([ADR-0086](../adr/0086-soft-delete-every-database-row.md)).
+Status: **approved 2026-09-28**. The owner settled the pg-boss question and
+the rest was approved under the blanket backlog-decision approval ([ADR-0086](../adr/0086-soft-delete-every-database-row.md)).
 
 The red architecture spec `src/architecture/soft-delete-only.spec.ts`
 (`b4a89c0`) lists the 16 physical deletes this item removes. This review
@@ -74,9 +74,6 @@ notifications.
 6. Image variant detach and Expense Category removal; the architecture spec
    turns green.
 
-## Open question (does not block the slices)
+## pg-boss (decided)
 
-Does ADR-0086 also cover pg-boss's own `pgboss` job tables? pg-boss deletes
-completed jobs after its retention window and failed jobs after 30 days
-(ADR-0065). Keeping them would mean configuring pg-boss never to delete, which
-grows `pgboss.job` without bound.
+The owner decided on 2026-09-28 that pg-boss's own `pgboss` job tables are out of scope. pg-boss keeps pruning them as configured (ADR-0065), and this migration does not touch them.
