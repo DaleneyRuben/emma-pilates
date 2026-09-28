@@ -74,6 +74,37 @@ notifications.
 6. Image variant detach and Expense Category removal; the architecture spec
    turns green.
 
+## As built
+
+- `20260928000000_soft_delete`: the columns, surrogate keys (backfilled with
+  `gen_random_uuid()`), live-only unique indexes, and `RESTRICT` keys above.
+  It was generated with `prisma migrate diff --from-config-datasource` against
+  `pilates_dev_sim`, with the `DropForeignKey` drift for the raw composite keys
+  stripped. The partial indexes are raw SQL under the original index names.
+- `20260928010000_expense_category_live_name`: a follow-up the first review
+  missed. `expense_categories_normalized_name_key` becomes live-only, so a
+  removed category frees its name.
+- Applied to `pilates_dev_sim`, `pilates_test_fixtures`, and the disposable
+  `pilates_test_*` databases. `emma_pilates` is not touched.
+- Removal paths as built:
+  - A pending Account, with its Client or Staff Member, is marked removed and
+    every unused link is invalidated (`remove-pending-account.ts`).
+  - Email changes, swept retention rows, Staff Branch assignments, and unused
+    Expense Categories are marked removed.
+  - Removing an Expense Category locks the category row with `FOR UPDATE`.
+    Recording an Expense reads it with `FOR SHARE`, so the two cannot race.
+  - A retried upload verification reuses the variant rows of the keys it
+    writes again and marks the others removed (`record-verified-variants.ts`).
+- Reads that exclude removed rows:
+  - Account email lookups and live email changes.
+  - Idempotency lookups.
+  - The notification inbox and unread count.
+  - Every Staff Branch assignment relation, including the principal's Branch
+    scope.
+  - The staff directory.
+  - The Administrator and Assistant Client directories and their counts.
+  - Invitation lookups and referral codes.
+
 ## pg-boss (decided)
 
 The owner decided on 2026-09-28 that pg-boss's own `pgboss` job tables are out of scope. pg-boss keeps pruning them as configured (ADR-0065), and this migration does not touch them.
