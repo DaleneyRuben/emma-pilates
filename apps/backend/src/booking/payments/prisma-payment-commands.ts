@@ -28,6 +28,10 @@ import { boliviaDate } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { summarizeCredit, type CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
+import {
+  scheduleReceiptDeletion,
+  settleReservation,
+} from './purchase-intent-settlement';
 import { evaluatePurchaseEligibility } from './purchase-eligibility';
 import {
   computeSubscriptionTerm,
@@ -126,14 +130,9 @@ export type PaymentCommandsDependencies = {
 };
 
 const hourMilliseconds = 60 * 60 * 1_000;
-const dayMilliseconds = 24 * hourMilliseconds;
 const purchaseIntentLifetimeMilliseconds = 24 * hourMilliseconds;
 // Retained at least 48 hours after the Intent's 24-hour lifetime ends.
 const idempotencyRetentionMilliseconds = 72 * hourMilliseconds;
-// Receipts are deleted at the later of 45 days after finalization or 7 days
-// after the decision, keeping the metadata tombstone.
-const receiptRetentionAfterFinalizationMilliseconds = 45 * dayMilliseconds;
-const receiptRetentionAfterDecisionMilliseconds = 7 * dayMilliseconds;
 const rejectionReasonMaxLength = 300;
 
 const intentStates: Record<PurchaseIntentState, PurchaseIntentView['state']> = {
@@ -479,80 +478,6 @@ export function createPrismaPaymentCommands(
       throw rule('purchase_intent_expired', 'Purchase Intent has expired');
     }
     return intent;
-  };
-
-  const settleReservation = async (
-    transaction: Transaction,
-    input: {
-      purchaseIntentId: string;
-      outcome: 'spent' | 'released';
-      now: Date;
-      actor: { kind: CreditLedgerActorKind; accountId: string | null };
-      correlationId: string;
-    },
-  ): Promise<void> => {
-    const reservation = await transaction.creditReservation.findUnique({
-      where: { purchaseIntentId: input.purchaseIntentId },
-      select: { id: true, clientId: true, amountCentavos: true, state: true },
-    });
-    if (
-      reservation === null ||
-      reservation.state !== CreditReservationState.RESERVED
-    ) {
-      return;
-    }
-    await transaction.creditReservation.update({
-      where: { id: reservation.id },
-      data: {
-        state:
-          input.outcome === 'spent'
-            ? CreditReservationState.SPENT
-            : CreditReservationState.RELEASED,
-        settledAt: input.now,
-      },
-    });
-    await transaction.creditLedgerEntry.create({
-      data: {
-        clientId: reservation.clientId,
-        kind:
-          input.outcome === 'spent'
-            ? CreditLedgerEntryKind.PAYMENT_SPEND
-            : CreditLedgerEntryKind.PAYMENT_RELEASE,
-        amountCentavos: reservation.amountCentavos,
-        occurredAt: input.now,
-        reservationId: reservation.id,
-        actorKind: input.actor.kind,
-        actorAccountId: input.actor.accountId,
-        correlationId: input.correlationId,
-      },
-    });
-  };
-
-  const scheduleReceiptDeletion = async (
-    transaction: Transaction,
-    receiptImageAssetId: string | null,
-    now: Date,
-    afterDecision: boolean,
-  ): Promise<void> => {
-    if (receiptImageAssetId === null) return;
-    const asset = await transaction.imageAsset.findUnique({
-      where: { id: receiptImageAssetId },
-      select: { finalizedAt: true },
-    });
-    if (asset === null) return;
-    const dueAt = afterDecision
-      ? new Date(
-          Math.max(
-            (asset.finalizedAt ?? now).getTime() +
-              receiptRetentionAfterFinalizationMilliseconds,
-            now.getTime() + receiptRetentionAfterDecisionMilliseconds,
-          ),
-        )
-      : now;
-    await transaction.imageAsset.update({
-      where: { id: receiptImageAssetId },
-      data: { deletionDueAt: dueAt },
-    });
   };
 
   const recordPaymentAudit = (
