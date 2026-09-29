@@ -2,7 +2,8 @@ export type CreditLedgerKind =
   | 'referral_award'
   | 'payment_reservation'
   | 'payment_spend'
-  | 'payment_release';
+  | 'payment_release'
+  | 'account_closure';
 
 export type CreditLedgerLine = {
   kind: CreditLedgerKind;
@@ -15,7 +16,8 @@ export type CreditSummary = {
 };
 
 // The append-only ledger is the only balance source: awards and releases add
-// available Credit, reservations hold it, spends consume what was held.
+// available Credit, reservations hold it, spends consume what was held, and
+// account closure forfeits what is left.
 export const summarizeCredit = (
   entries: readonly CreditLedgerLine[],
 ): CreditSummary => {
@@ -29,6 +31,7 @@ export const summarizeCredit = (
       payment_reservation: 0,
       payment_spend: 0,
       payment_release: 0,
+      account_closure: 0,
     },
   );
 
@@ -36,7 +39,8 @@ export const summarizeCredit = (
     availableCentavos:
       totals.referral_award +
       totals.payment_release -
-      totals.payment_reservation,
+      totals.payment_reservation -
+      totals.account_closure,
     reservedCentavos:
       totals.payment_reservation -
       totals.payment_spend -

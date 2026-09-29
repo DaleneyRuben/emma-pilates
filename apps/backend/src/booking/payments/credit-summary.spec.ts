@@ -33,4 +33,14 @@ describe('summarizeCredit', () => {
     expect(released).toEqual({ availableCentavos: 6000, reservedCentavos: 0 });
     expect(spent).toEqual({ availableCentavos: 0, reservedCentavos: 0 });
   });
+
+  it('removes forfeited credit at account closure', () => {
+    expect(
+      summarizeCredit([
+        { kind: 'referral_award', amountCentavos: 6000 },
+        { kind: 'referral_award', amountCentavos: 6000 },
+        { kind: 'account_closure', amountCentavos: 12000 },
+      ]),
+    ).toEqual({ availableCentavos: 0, reservedCentavos: 0 });
+  });
 });
