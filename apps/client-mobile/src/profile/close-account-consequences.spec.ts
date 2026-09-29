@@ -37,7 +37,7 @@ describe("describeAccountClosure", () => {
       "Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.",
       "Sales de 1 lista de espera.",
       "Tu plan Mensual 16 clases termina hoy. No se devuelve dinero y pierdes las 11 clases que te quedan.",
-      "Pierdes tu crédito de Bs 120,00.",
+      "Pierdes tu crédito de Bs 120.",
       ...always,
     ]);
   });
