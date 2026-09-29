@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { createPrismaAccountClosure } from '../../src/booking/account-closure/prisma-account-closure';
+import { createPrismaAdministratorClients } from '../../src/booking/clients/prisma-administrator-clients';
 import { PrismaBookingCommands } from '../../src/booking/commands/prisma-booking-commands';
 import { createPrismaEvaluationCommands } from '../../src/booking/evaluations/prisma-evaluation-commands';
 import {
@@ -371,5 +372,36 @@ describe('closing a Client Account (PostgreSQL)', () => {
     await expect(
       closure().close({ clientId: ana.clientId }, world.administrator),
     ).rejects.toMatchObject({ code: 'client_not_found' });
+  });
+
+  it('previews for AW22 exactly what closure then cancels', async () => {
+    const ana = await world.newClient('Ana Justiniano');
+    const bea = await world.newClient('Bea Montaño');
+    const full = await world.newSession({ capacity: 1 });
+    const open = await world.newSession({});
+    await bookings().create({ sessionId: full }, bea.principal);
+    await bookings().joinWaitlist({ sessionId: full }, ana.principal);
+    await bookings().create({ sessionId: open }, ana.principal);
+    await world.backdate(ana.clientId);
+    await world.backdate(bea.clientId);
+
+    const outlook = await createPrismaAdministratorClients(
+      world.prisma,
+    ).readClosureOutlook(ana.clientId, closureNow);
+    const summary = await closure().close(
+      { clientId: ana.clientId },
+      world.administrator,
+    );
+
+    expect(outlook).toEqual({
+      futureBookingCount: summary.cancelledBookings,
+      activeWaitlistEntryCount: summary.closedWaitlistEntries,
+      upcomingEvaluationCount: summary.cancelledEvaluations,
+      transferPaymentPending: false,
+    });
+    expect(outlook).toMatchObject({
+      futureBookingCount: 1,
+      activeWaitlistEntryCount: 1,
+    });
   });
 });

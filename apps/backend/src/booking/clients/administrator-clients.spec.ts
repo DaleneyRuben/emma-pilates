@@ -46,6 +46,12 @@ const subscription = {
   startsOn: new Date('2026-09-01T00:00:00.000Z'),
   endsOn: new Date('2026-09-30T00:00:00.000Z'),
 };
+const outlook = {
+  futureBookingCount: 3,
+  activeWaitlistEntryCount: 1,
+  upcomingEvaluationCount: 1,
+  transferPaymentPending: false,
+};
 const emptyPage = {
   items: [],
   page: 1,
@@ -63,6 +69,7 @@ const directory = (
   findActiveSubscription: jest.fn().mockResolvedValue(subscription),
   findLatestSubscription: jest.fn().mockResolvedValue(subscription),
   readAvailableCredit: jest.fn().mockResolvedValue(105_000),
+  readClosureOutlook: jest.fn().mockResolvedValue(outlook),
   ...overrides,
 });
 
@@ -138,11 +145,14 @@ describe('Administrator Client detail', () => {
       ...lucia,
       subscription: { status: 'active', subscription },
       creditAvailableCentavos: 105_000,
+      closure: outlook,
     });
     expect(clients.findActiveSubscription).toHaveBeenCalledWith(
       'client-id',
       today,
     );
+    // AW22's Cerrar cuenta dialog counts what is still ahead right now.
+    expect(clients.readClosureOutlook).toHaveBeenCalledWith('client-id', now);
   });
 
   it('names the last expired Plan when none is active', async () => {
