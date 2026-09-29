@@ -55,6 +55,8 @@ export type MobileNavigationProps = {
   onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
   onRecoveryCredential: (credential: string) => Promise<void>;
   role?: AppRole;
+  /** The login screen's one-time notice, such as after closing the Account. */
+  signOutNotice?: string | null;
 };
 
 export function createDefaultMobileRuntime({
@@ -151,6 +153,7 @@ function IdentityNavigation({
       onLogin={handleLogin}
       onRecoveryCredential={identity.start}
       role={identity.session?.role}
+      signOutNotice={identity.signOutNotice}
     />
   );
 }

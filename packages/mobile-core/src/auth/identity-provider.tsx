@@ -19,7 +19,11 @@ type MobileIdentityState = {
 };
 
 type MobileIdentity = MobileIdentityState & {
+  /** Signs out after the server closed the Account and revoked every session. */
+  endClosedSession: (notice: string) => Promise<void>;
   logout: () => Promise<void>;
+  /** Shown once on the login screen after a closure; cleared by the next sign-in. */
+  signOutNotice: string | null;
   start: (
     credential: string,
     options?: { protectWithBiometrics?: boolean },
@@ -43,6 +47,7 @@ export function MobileIdentityProvider({
     session: null,
     status: "restoring",
   });
+  const [signOutNotice, setSignOutNotice] = useState<string | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -79,6 +84,7 @@ export function MobileIdentityProvider({
           ? await manager.start(credential)
           : await manager.start(credential, options);
 
+      setSignOutNotice(null);
       setIdentity({
         session,
         status: session === null ? "signed-out" : "signed-in",
@@ -105,9 +111,27 @@ export function MobileIdentityProvider({
     setIdentity({ session: null, status: "signed-out" });
   }, [identity.session, manager]);
 
+  const endClosedSession = useCallback(
+    async (notice: string) => {
+      if (identity.session !== null) {
+        await manager.endLocally(identity.session);
+      }
+      setSignOutNotice(notice);
+      setIdentity({ session: null, status: "signed-out" });
+    },
+    [identity.session, manager],
+  );
+
   return (
     <MobileIdentityContext.Provider
-      value={{ ...identity, logout, start, unlockWithBiometrics }}
+      value={{
+        ...identity,
+        endClosedSession,
+        logout,
+        signOutNotice,
+        start,
+        unlockWithBiometrics,
+      }}
     >
       {children}
     </MobileIdentityContext.Provider>

@@ -54,6 +54,7 @@ export function createStaffRuntime(
     },
     login: jest.fn(),
     sessionManager: {
+      endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
       restore: jest.fn().mockResolvedValue({ accountId: "account-1", role }),

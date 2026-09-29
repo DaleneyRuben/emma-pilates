@@ -33,6 +33,8 @@ type SessionManagerOptions = {
 };
 
 export type SessionManager = {
+  /** Forgets a session the server already revoked, such as a closed Account's. */
+  endLocally: (session: MobileSession) => Promise<void>;
   hasBiometricSession: () => Promise<boolean>;
   logout: (session: MobileSession) => Promise<void>;
   restore: () => Promise<MobileSession | null>;
@@ -139,6 +141,11 @@ export function createSessionManager(
         await revokeCurrent(credential);
       }
 
+      activeCredential = null;
+      await credentialStore.clear();
+      await clearAccountCache(session.accountId);
+    },
+    async endLocally(session: MobileSession): Promise<void> {
       activeCredential = null;
       await credentialStore.clear();
       await clearAccountCache(session.accountId);

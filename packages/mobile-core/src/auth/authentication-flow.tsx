@@ -43,6 +43,7 @@ type AuthenticationFlowProps = {
   allowClientRegistration?: boolean;
   api: AuthenticationApi;
   intent?: AuthenticationLinkIntent | null;
+  notice?: string | null;
   onBiometricUnlock?: () => void;
   onLogin?: (
     values: LoginValues,
@@ -516,6 +517,7 @@ export function AuthenticationFlow({
   allowClientRegistration = true,
   api,
   intent,
+  notice = null,
   onBiometricUnlock,
   onLogin,
   onRecoveryCredential = () => undefined,
@@ -599,6 +601,7 @@ export function AuthenticationFlow({
 
   return (
     <LoginScreen
+      notice={notice}
       onBiometricUnlock={onBiometricUnlock}
       onForgotPassword={() => setRoute("recovery-request")}
       onRegister={

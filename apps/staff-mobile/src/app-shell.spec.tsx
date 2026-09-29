@@ -27,6 +27,7 @@ function createRuntime(role?: "client" | "trainer") {
     },
     login: jest.fn(),
     sessionManager: {
+      endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
       restore: jest.fn().mockResolvedValue(

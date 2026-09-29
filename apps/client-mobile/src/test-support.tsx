@@ -45,6 +45,7 @@ export function createClientRuntime(fetcher: typeof globalThis.fetch) {
     },
     login: jest.fn(),
     sessionManager: {
+      endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
       restore: jest

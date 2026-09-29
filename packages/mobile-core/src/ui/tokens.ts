@@ -24,6 +24,9 @@ export const colors = {
   warningText: "#9A7434",
   error: "#B25D4B",
   errorText: "#94493A",
+  successTint: "rgba(124,148,115,0.14)",
+  warningTint: "rgba(201,154,78,0.12)",
+  errorTint: "rgba(178,93,75,0.08)",
   disabledBackground: "#E7DCD8",
   disabledText: "#B3A9A5",
 } as const;

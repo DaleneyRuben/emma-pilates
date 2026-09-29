@@ -47,6 +47,7 @@ describe("MobileIdentityProvider", () => {
       session: { accountId: string; role: "trainer" },
     ) => void = () => undefined;
     const manager = {
+      endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
       restore: jest.fn().mockReturnValue(
@@ -75,6 +76,7 @@ describe("MobileIdentityProvider", () => {
   it("starts a newly authenticated session and logs it out", async () => {
     const session = { accountId: "account-2", role: "assistant" as const };
     const manager = {
+      endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn().mockResolvedValue(undefined),
       restore: jest.fn().mockResolvedValue(null),
@@ -110,6 +112,7 @@ describe("MobileIdentityProvider", () => {
   it("waits for an explicit biometric unlock before restoring the session", async () => {
     const session = { accountId: "account-3", role: "client" as const };
     const manager = {
+      endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(true),
       logout: jest.fn(),
       restore: jest.fn().mockResolvedValue(null),

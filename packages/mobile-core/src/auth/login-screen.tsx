@@ -32,6 +32,8 @@ export type LoginSubmissionResult =
   | { retryAfterSeconds: number; status: "throttled" };
 
 type LoginScreenProps = {
+  /** A one-time message, such as the one left by closing the Account. */
+  notice?: string | null;
   onBiometricUnlock?: () => void;
   onForgotPassword?: () => void;
   onRegister?: () => void;
@@ -41,6 +43,7 @@ type LoginScreenProps = {
 };
 
 export function LoginScreen({
+  notice = null,
   onBiometricUnlock,
   onForgotPassword,
   onRegister,
@@ -91,6 +94,11 @@ export function LoginScreen({
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
+          {notice === null ? null : (
+            <View accessibilityRole="summary" style={styles.notice}>
+              <BodyText style={styles.noticeText}>{notice}</BodyText>
+            </View>
+          )}
           <View style={styles.brand}>
             <Text style={styles.wordmark}>Emma</Text>
             <View style={styles.brandRule} />
@@ -169,6 +177,15 @@ export function LoginScreen({
 }
 
 const styles = StyleSheet.create({
+  notice: {
+    backgroundColor: colors.successTint,
+    borderColor: "rgba(124,148,115,0.30)",
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
+  },
+  noticeText: { color: colors.successText },
   brand: {
     alignItems: "center",
     gap: spacing.md,
