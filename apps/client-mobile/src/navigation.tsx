@@ -28,6 +28,7 @@ import { PaymentStatusScreen } from "./payments/payment-status-screen";
 import { PlanDetailScreen } from "./plans/plan-detail-screen";
 import { PlansScreen } from "./plans/plans-screen";
 import { ClientChangePasswordScreen } from "./profile/change-password-screen";
+import { CloseAccountScreen } from "./profile/close-account-screen";
 import { EditProfileScreen } from "./profile/edit-profile-screen";
 import { ClientNotificationsScreen } from "./profile/notifications-screen";
 import { ProfileScreen } from "./profile/profile-screen";
@@ -85,6 +86,7 @@ const ProfileStack = createNativeStackNavigator({
     EditProfile: EditProfileScreen,
     Notifications: ClientNotificationsScreen,
     ChangePassword: ClientChangePasswordScreen,
+    CloseAccount: CloseAccountScreen,
     ...shortcutScreens,
     ...planScreens,
   },
@@ -140,6 +142,7 @@ export function ClientNavigation({
   onLogin,
   onRecoveryCredential,
   role,
+  signOutNotice,
 }: MobileNavigationProps) {
   const [handledLink, setHandledLink] = useState<string | null>(null);
   const emailChangeToken =
@@ -182,6 +185,7 @@ export function ClientNavigation({
     <AuthenticationFlow
       api={authenticationApi}
       intent={authenticationIntent}
+      notice={signOutNotice}
       onBiometricUnlock={onBiometricUnlock}
       onLogin={onLogin}
       onRecoveryCredential={onRecoveryCredential}

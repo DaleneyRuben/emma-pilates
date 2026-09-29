@@ -81,7 +81,7 @@ async function openClosure(routes = closureRoutes()) {
   const runtime = createClientRuntime(routeFetcher(routes));
   const screen = await openProfile(runtime);
 
-  fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
   await waitFor(() => {
     expect(
       screen.getByText(
@@ -116,7 +116,7 @@ describe("Cerrar mi cuenta", () => {
       screen.getByRole("button", { name: "Cerrar mi cuenta" }),
     ).toBeDisabled();
 
-    fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
 
     expect(
       screen.getByRole("button", { name: "Cerrar mi cuenta" }),
@@ -137,8 +137,8 @@ describe("Cerrar mi cuenta", () => {
       closureRoutes({ "POST /api/v1/accounts/current/closure": closure }),
     );
 
-    fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
-    fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
       expect(
@@ -166,8 +166,8 @@ describe("Cerrar mi cuenta", () => {
       }),
     );
 
-    fireEvent.changeText(screen.getByLabelText("Contraseña"), "wrong");
-    fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "wrong");
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
       expect(screen.getByText("La contraseña no es correcta.")).toBeOnTheScreen();
@@ -185,8 +185,8 @@ describe("Cerrar mi cuenta", () => {
       }),
     );
 
-    fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
-    fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
       expect(
@@ -206,7 +206,7 @@ describe("Cerrar mi cuenta", () => {
     );
     const screen = await openProfile(runtime);
 
-    fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
 
     await waitFor(() => {
       expect(
@@ -216,7 +216,7 @@ describe("Cerrar mi cuenta", () => {
       ).toBeOnTheScreen();
     });
     expect(screen.queryByLabelText("Contraseña")).toBeNull();
-    fireEvent.press(screen.getByRole("button", { name: "Volver al perfil" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Volver al perfil" }));
     await waitFor(() => {
       expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();
     });

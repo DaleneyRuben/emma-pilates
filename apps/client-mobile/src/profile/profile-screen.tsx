@@ -33,6 +33,7 @@ type ProfileNavigation = {
       | "Subscription"
       | "Notifications"
       | "ChangePassword"
+      | "CloseAccount"
       | "Referrals"
       | "Credit"
       | "EvaluationAvailability"
@@ -185,6 +186,15 @@ export function ProfileScreen() {
             </Text>
           )}
         </Pressable>
+        <Pressable
+          accessibilityLabel="Cerrar mi cuenta"
+          accessibilityRole="button"
+          hitSlop={spacing.sm}
+          onPress={() => navigation.navigate("CloseAccount")}
+          style={styles.closeAccount}
+        >
+          <Text style={styles.closeAccountText}>Cerrar mi cuenta</Text>
+        </Pressable>
         <BodyText style={styles.footer}>
           Emma Pilates Studio · versión 1.0
         </BodyText>
@@ -205,6 +215,17 @@ const styles = StyleSheet.create({
   },
   badgeText: { color: colors.white, fontSize: typography.note, fontWeight: "600" },
   chevron: { color: colors.textSubtle, fontSize: typography.titleSecondary },
+  closeAccount: {
+    alignSelf: "center",
+    justifyContent: "center",
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+  },
+  closeAccountText: {
+    color: colors.error,
+    fontSize: typography.note,
+    fontWeight: "500",
+  },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   footer: {
     color: colors.textSubtle,
