@@ -26,6 +26,9 @@ const clientDetailQueryOptions = (clientId: string) =>
     queryFn: async ({ signal }) =>
       (await getAdminClient(clientId, { signal }, adminFetch))
         .data as AdminClientDetailDto,
+    // The summary decides a closure (follow-up 66), so every opening reads
+    // the current Bookings, Plan, and Credit instead of a cached copy.
+    staleTime: 0,
   });
 
 function PlanBlock({ view }: { view: AdminClientDetailDto["subscription"] }) {
