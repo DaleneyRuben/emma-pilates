@@ -1,0 +1,40 @@
+# Critical journey: close the Client's own Account from Perfil (BE-007,
+# prompt 24). It is permanent, so run it against a disposable copy of the
+# fixtures (Test 35), never the database you keep.
+appId: ${APP_ID}
+env:
+  EMAIL: sofia@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    text: "Perfil, tab.*"
+- extendedWaitUntil:
+    visible: "Cerrar sesión"
+    timeout: 15000
+# The link sits under «Cerrar sesión», below the fold on a phone.
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- takeScreenshot: client-close-1-perfil
+- tapOn: "Cerrar mi cuenta"
+- extendedWaitUntil:
+    visible: ".*Esto es lo que va a pasar.*"
+    timeout: 15000
+- assertVisible: ".*Pierdes tu crédito de Bs 60.*"
+- assertVisible: "Cerramos tu sesión en todos tus dispositivos."
+- takeScreenshot: client-close-2-consecuencias
+# On a phone the password field sits under the pinned footer: scroll the
+# consequences up before typing.
+- swipe:
+    start: "50%,55%"
+    end: "50%,25%"
+- tapOn: "Tu contraseña"
+- inputText: ${PASSWORD}
+- takeScreenshot: client-close-3-contrasena
+- tapOn:
+    id: "close-account-confirm"
+- extendedWaitUntil:
+    visible: "Cerramos tu cuenta. Gracias por entrenar con nosotras."
+    timeout: 15000
+- assertVisible: "Iniciar sesión"
+- takeScreenshot: client-close-4-cerrada

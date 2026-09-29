@@ -43,13 +43,16 @@ function DestructiveButton({
   disabled,
   label,
   onPress,
+  testID,
 }: {
   disabled: boolean;
   label: string;
   onPress: () => void;
+  testID: string;
 }) {
   return (
     <Pressable
+      testID={testID}
       accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ disabled }}
@@ -248,6 +251,7 @@ export function CloseAccountScreen() {
             disabled={password === "" || submitting}
             label="Cerrar mi cuenta"
             onPress={() => void close()}
+            testID="close-account-confirm"
           />
           <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
         </View>
