@@ -29,6 +29,7 @@ import {
   type EvaluationRuleCode,
 } from './evaluation-errors';
 import { readEvaluationKinds } from './evaluation-kinds';
+import { releaseSlot } from './evaluation-slot-release';
 import {
   evaluationBookedNotice,
   evaluationCancelledByStudioNotice,
@@ -1234,31 +1235,6 @@ export const createPrismaEvaluationCommands = (
 
   // Kept slots of an ended block are withdrawn once their Evaluation is
   // cancelled, so the replacement block can publish that time instead.
-  const releaseSlot = async (
-    transaction: Transaction,
-    slotId: string,
-    now: Date,
-  ): Promise<void> => {
-    const slot = await transaction.evaluationSlot.findUniqueOrThrow({
-      where: { id: slotId },
-      select: {
-        startsAt: true,
-        state: true,
-        block: { select: { effectiveUntil: true } },
-      },
-    });
-    if (
-      slot.state === EvaluationSlotState.PUBLISHED &&
-      slot.block.effectiveUntil !== null &&
-      boliviaDate(slot.startsAt) >= slot.block.effectiveUntil
-    ) {
-      await transaction.evaluationSlot.update({
-        where: { id: slotId },
-        data: { state: EvaluationSlotState.WITHDRAWN, withdrawnAt: now },
-      });
-    }
-  };
-
   const cancellationTarget = {
     id: true,
     clientId: true,
