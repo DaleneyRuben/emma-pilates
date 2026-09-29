@@ -82,6 +82,12 @@ export const luciaDetail: AdminClientDetailDto = {
   creditAvailableCentavos: 105_000,
   referralCode: "LUCIA25",
   referredClientCount: 3,
+  closure: {
+    futureBookingCount: 3,
+    activeWaitlistEntryCount: 1,
+    upcomingEvaluationCount: 1,
+    transferPaymentPending: false,
+  },
 };
 
 const member = (
