@@ -124,8 +124,10 @@ export function ClientsPage({
       }
       query={query}
       columns={clientColumns}
-      renderForm={(client) =>
-        client === undefined ? null : <ClientDetailPanel clientId={client.id} />
+      renderForm={(client, done) =>
+        client === undefined ? null : (
+          <ClientDetailPanel clientId={client.id} onClosed={done} />
+        )
       }
     />
   );

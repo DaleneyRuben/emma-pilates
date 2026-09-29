@@ -10,11 +10,15 @@ import {
   LoadingNotice,
   QueryFailure,
 } from "../../components/page/query-failure";
-import { SidePanelBody } from "../../components/panel/side-panel";
+import {
+  SidePanelBody,
+  SidePanelFooter,
+} from "../../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { StatusPill } from "../../components/ui/status-pill";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
+import { CloseClientAccountAction } from "./close-client-account-action";
 
 const clientDetailQueryOptions = (clientId: string) =>
   queryOptions({
@@ -121,29 +125,43 @@ function ClientSummary({ client }: { client: AdminClientDetailDto }) {
   );
 }
 
-// AW22: a support summary of one Client, read-only, with no footer button.
-export function ClientDetailPanel({ clientId }: { clientId: string }) {
+// AW22: a support summary of one Client, read-only; its only action is
+// closing the Account (follow-up 66).
+export function ClientDetailPanel({
+  clientId,
+  onClosed,
+}: {
+  clientId: string;
+  onClosed: (notice: string) => void;
+}) {
   const query = useQuery(clientDetailQueryOptions(clientId));
 
   return (
-    <SidePanelBody>
-      {query.isPending ? (
-        <LoadingNotice>Cargando la ficha…</LoadingNotice>
-      ) : query.isError ? (
-        isApiError(query.error) && query.error.code === "client_not_found" ? (
-          <p role="alert" className="text-cuerpo text-texto-secundario">
-            Esta clienta ya no existe.
-          </p>
+    <>
+      <SidePanelBody>
+        {query.isPending ? (
+          <LoadingNotice>Cargando la ficha…</LoadingNotice>
+        ) : query.isError ? (
+          isApiError(query.error) && query.error.code === "client_not_found" ? (
+            <p role="alert" className="text-cuerpo text-texto-secundario">
+              Esta clienta ya no existe.
+            </p>
+          ) : (
+            <QueryFailure
+              error={query.error}
+              what="la ficha de la clienta"
+              onRetry={() => void query.refetch()}
+            />
+          )
         ) : (
-          <QueryFailure
-            error={query.error}
-            what="la ficha de la clienta"
-            onRetry={() => void query.refetch()}
-          />
-        )
-      ) : (
-        <ClientSummary client={query.data} />
+          <ClientSummary client={query.data} />
+        )}
+      </SidePanelBody>
+      {query.data === undefined ? null : (
+        <SidePanelFooter>
+          <CloseClientAccountAction client={query.data} onClosed={onClosed} />
+        </SidePanelFooter>
       )}
-    </SidePanelBody>
+    </>
   );
 }
