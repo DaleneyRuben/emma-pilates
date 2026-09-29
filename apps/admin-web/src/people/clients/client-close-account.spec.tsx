@@ -111,7 +111,9 @@ describe("AW22 Cerrar cuenta", () => {
     const { dialog, user } = await openDialog();
     const readsBefore = listReads;
 
-    await user.click(within(dialog).getByRole("button", { name: "Cerrar cuenta" }));
+    await user.click(
+      within(dialog).getByRole("button", { name: "Cerrar cuenta" }),
+    );
 
     expect(
       await screen.findByText("Cuenta de Lucía Fernández cerrada."),
@@ -132,7 +134,9 @@ describe("AW22 Cerrar cuenta", () => {
     );
     const { dialog, user } = await openDialog();
 
-    await user.click(within(dialog).getByRole("button", { name: "Cerrar cuenta" }));
+    await user.click(
+      within(dialog).getByRole("button", { name: "Cerrar cuenta" }),
+    );
 
     expect(
       await within(dialog).findByText(
@@ -170,7 +174,9 @@ describe("AW22 Cerrar cuenta", () => {
     );
     const { dialog, user } = await openDialog();
 
-    await user.click(within(dialog).getByRole("button", { name: "Cerrar cuenta" }));
+    await user.click(
+      within(dialog).getByRole("button", { name: "Cerrar cuenta" }),
+    );
 
     expect(
       await within(dialog).findByText(
