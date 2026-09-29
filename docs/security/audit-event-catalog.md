@@ -89,19 +89,23 @@ Back Office money records follow BKO-001 D17: Salary Payments and Expenses are a
 | Admin-web Evaluation, Referral, and Credit lists (WEB-008) | Ordinary read-only oversight reads (ADR-0055); AW25–AW27 change nothing. The Administrator Evaluation cancel is not on the admin web (AW25 is read-only, invariant 10); where it is used, it keeps writing `evaluation.cancelled_by_staff`. |
 | Admin-web income and expense report (WEB-009) | An ordinary read of two existing aggregates (ADR-0055); AW16 changes nothing and shows no personal data beyond totals, and the Payments, Expenses, and Salary Payments it sums keep their own audit records. |
 
-## Retention (provisional)
+## Retention
 
-Audit retention, archival, and export are data-governance decisions reserved to
-BE-007 (ADR-0055). Until BE-007 decides them:
+Decided by BE-007 ([proposal](../implementation/BE-007-data-governance-proposal.md),
+G1 and G7; ADR-0055 reserved it there):
 
-- audit records are kept **indefinitely**; the append-only triggers mean no
-  application path can delete them, and BE-008's retention sweeps never touch
-  this table;
-- the three codes that carry an email (`client_invitation.email_corrected`,
-  `client_invitation.cancelled`, `account.email_changed`) are the only
-  personal data stored in metadata; BE-007 decides whether Account closure
-  redacts them.
-
-Open question for BE-007: how long must audit records be kept (for example,
-financial records under Bolivian tax obligations versus security events), and
-must personal data in audit metadata be redacted when an Account is closed?
+- **Audit records are kept indefinitely.** The append-only triggers mean no
+  application path can change or delete them, BE-008's retention sweeps never
+  touch this table, and [ADR-0086](../adr/0086-soft-delete-every-database-row.md)
+  rules out physical deletion anyway. Indefinite retention already covers any
+  Bolivian tax or accounting period, so no per-code period is set.
+- **Nothing in the metadata is redacted or anonymized**, including when an
+  Account is closed. The three codes that carry an email
+  (`client_invitation.email_corrected`, `client_invitation.cancelled`,
+  `account.email_changed`) keep it, and `account.closed` records the closure
+  without copying any personal data. A closed Account keeps its name, email,
+  phone, and history in the database, hidden from every screen and endpoint
+  (G7).
+- Who may read audit records, and how a person's own records are given back to
+  them, is the operator procedure in
+  [personal-data-requests.md](../runbooks/personal-data-requests.md).
