@@ -3,8 +3,8 @@
 Status: **proposed 2026-09-28**. The decisions below were taken under the blanket
 backlog-decision approval on top of
 [ADR-0086](../adr/0086-soft-delete-every-database-row.md): nothing in the
-application schemas is ever physically deleted. One question for the owner is
-queued at the end.
+application schemas is ever physically deleted. The owner confirmed G7 on
+2026-09-28.
 
 It answers the questions earlier items left for BE-007:
 
@@ -51,15 +51,10 @@ It answers the questions earlier items left for BE-007:
    `docs/runbooks/incident-response.md` (G10).
 6. The audit catalog's retention section is replaced by G1 and G7.
 
-## Open question for the owner (queued; G7 is provisional)
+## App Store account deletion (decided)
 
 Apple's App Store guideline 5.1.1(v) requires an app that creates accounts to
-let people delete their account from inside the app. Apple reads "delete" as
-removing the account and its personal data, except what a law requires the
-app to keep. G2–G6 give Clients in-app closure, but under the no-deletion rule
-the name, email, and phone stay in the database, only hidden.
-
-Is that acceptable, or should closure overwrite a closed Client's name,
-email, and phone with a placeholder? Overwriting keeps every row, so ADR-0086
-still holds, and it would likely satisfy App Review. Until the owner answers,
-the rows keep their values (G7).
+let people delete their account from inside the app. G2–G6 give Clients
+in-app closure. On 2026-09-28 the owner confirmed that a closed Client's name,
+email, and phone stay in the database, hidden from every screen and endpoint,
+with no anonymization (G7).
