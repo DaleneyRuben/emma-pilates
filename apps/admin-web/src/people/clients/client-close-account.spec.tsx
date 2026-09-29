@@ -187,4 +187,36 @@ describe("AW22 Cerrar cuenta", () => {
       within(dialog).getByRole("button", { name: "Cerrar cuenta" }),
     ).toBeEnabled();
   });
+
+  it("reads the summary afresh each time the panel opens, since it decides a closure", async () => {
+    let bookings = 0;
+    server.use(
+      http.get(apiUrl(clientsPath), () => jsonResponse(clientPage([lucia]))),
+      http.get(apiUrl(`${clientsPath}/:clientId`), () =>
+        jsonResponse({
+          ...luciaDetail,
+          closure: { ...luciaDetail.closure, futureBookingCount: bookings },
+        }),
+      ),
+    );
+    const { dialog, user } = await openDialog();
+    expect(
+      within(dialog).queryByText(/reservas futuras/),
+    ).not.toBeInTheDocument();
+
+    await user.click(within(dialog).getByRole("button", { name: "Volver" }));
+    await user.keyboard("{Escape}");
+    bookings = 2;
+    await user.click(
+      await screen.findByRole("button", { name: "Lucía Fernández" }),
+    );
+    const panel = await screen.findByRole("dialog", { name: "Lucía Fernández" });
+    await user.click(
+      await within(panel).findByRole("button", { name: "Cerrar cuenta" }),
+    );
+
+    expect(
+      await screen.findByText(/Se cancelan sus 2 reservas futuras/),
+    ).toBeInTheDocument();
+  });
 });
