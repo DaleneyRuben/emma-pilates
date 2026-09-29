@@ -1,6 +1,6 @@
 # BE-007 — Data governance proposal
 
-Status: **proposed 2026-09-28**. The decisions below were taken under the blanket
+Status: **accepted and built 2026-09-28** (backend, contracts, runbooks; the Client and admin screens wait for their design, see the BE-007 row in the backlog). The decisions below were taken under the blanket
 backlog-decision approval on top of
 [ADR-0086](../adr/0086-soft-delete-every-database-row.md): nothing in the
 application schemas is ever physically deleted. The owner confirmed G7 on
