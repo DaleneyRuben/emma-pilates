@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  input::placeholder { color: #A79E9A; }
+  a { color: #B78380; text-decoration: none; }
+  a:hover { color: #9C6764; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:2240px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 24</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Cerrar mi cuenta</h1>
+    <p style="margin:0;max-width:860px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Se abre desde el enlace discreto «Cerrar mi cuenta» bajo «Cerrar sesión» en la pantalla 18. Es la clienta cerrando su propia cuenta: antes de confirmar ve exactamente qué pasa con sus reservas, su plan y su crédito, y confirma con su contraseña. No es «Cerrar sesión» (eso solo termina esta sesión). Sin barra de pestañas: la flecha y «Cancelar» regresan al perfil sin hacer nada.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:44px;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Con plan, reservas y crédito</div>
+          <div style="font-size:12px;color:#8A807C;">Todas las consecuencias · contraseña vacía · botón deshabilitado</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button aria-label="Volver al perfil" style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:#F2ECE5;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cerrar mi cuenta</span>
+          </div>
+
+          <div style="flex:1;padding:20px 20px 28px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font-size:14.5px;line-height:1.5;color:#4A4A4A;text-wrap:pretty;">Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:</div>
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><line x1="5" y1="7" x2="19" y2="7"></line><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="17" x2="13" y2="17"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Sales de 1 lista de espera.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Tu plan Mensual 16 clases termina hoy. No se devuelve dinero y pierdes las 11 clases que te quedan.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Pierdes tu crédito de Bs 120,00.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="6" y="3.5" width="12" height="17" rx="2.5"></rect><line x1="10.5" y1="17.5" x2="13.5" y2="17.5"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Cerramos tu sesión en todos tus dispositivos.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"></rect><path d="M4 7l8 6 8-6"></path></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Tu correo queda libre por si quieres registrarte de nuevo.</span>
+                </div>
+            </div>
+            <div style="font-size:12.5px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la app y en las listas del estudio.</div>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" placeholder="Tu contraseña" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <span style="font-size:12.5px;line-height:1.45;color:#8A807C;">Escribe tu contraseña para confirmar que eres tú.</span>
+            </label>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px 34px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);">
+              <button disabled="{{ true }}" style="height:54px;width:100%;border:1px solid #E7CFC8;border-radius:8px;background:#FFFFFF;color:#D4A99F;font-size:16px;font-weight:500;cursor:not-allowed;">Cerrar mi cuenta</button>
+              <a href="#" style="display:block;margin-top:8px;text-align:center;font-size:14px;font-weight:500;color:#8A807C;padding:6px;" style-hover="color:#4A4A4A;">Cancelar</a>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Sin nada pendiente</div>
+          <div style="font-size:12px;color:#8A807C;">Sin plan, reservas ni crédito: solo las dos líneas de siempre y la nota</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button aria-label="Volver al perfil" style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:#F2ECE5;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cerrar mi cuenta</span>
+          </div>
+
+          <div style="flex:1;padding:20px 20px 28px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font-size:14.5px;line-height:1.5;color:#4A4A4A;text-wrap:pretty;">Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:</div>
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="6" y="3.5" width="12" height="17" rx="2.5"></rect><line x1="10.5" y1="17.5" x2="13.5" y2="17.5"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Cerramos tu sesión en todos tus dispositivos.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"></rect><path d="M4 7l8 6 8-6"></path></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Tu correo queda libre por si quieres registrarte de nuevo.</span>
+                </div>
+            </div>
+            <div style="font-size:12.5px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la app y en las listas del estudio.</div>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" placeholder="Tu contraseña" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <span style="font-size:12.5px;line-height:1.45;color:#8A807C;">Escribe tu contraseña para confirmar que eres tú.</span>
+            </label>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px 34px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);">
+              <button disabled="{{ true }}" style="height:54px;width:100%;border:1px solid #E7CFC8;border-radius:8px;background:#FFFFFF;color:#D4A99F;font-size:16px;font-weight:500;cursor:not-allowed;">Cerrar mi cuenta</button>
+              <a href="#" style="display:block;margin-top:8px;text-align:center;font-size:14px;font-weight:500;color:#8A807C;padding:6px;" style-hover="color:#4A4A4A;">Cancelar</a>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Contraseña incorrecta</div>
+          <div style="font-size:12px;color:#8A807C;">Rechazo del servidor · el error va bajo el campo · el botón vuelve a habilitarse</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button aria-label="Volver al perfil" style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:#F2ECE5;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cerrar mi cuenta</span>
+          </div>
+
+          <div style="flex:1;padding:20px 20px 28px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font-size:14.5px;line-height:1.5;color:#4A4A4A;text-wrap:pretty;">Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:</div>
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><line x1="5" y1="7" x2="19" y2="7"></line><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="17" x2="13" y2="17"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Sales de 1 lista de espera.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Tu plan Mensual 16 clases termina hoy. No se devuelve dinero y pierdes las 11 clases que te quedan.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Pierdes tu crédito de Bs 120,00.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="6" y="3.5" width="12" height="17" rx="2.5"></rect><line x1="10.5" y1="17.5" x2="13.5" y2="17.5"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Cerramos tu sesión en todos tus dispositivos.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"></rect><path d="M4 7l8 6 8-6"></path></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Tu correo queda libre por si quieres registrarte de nuevo.</span>
+                </div>
+            </div>
+            <div style="font-size:12.5px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la app y en las listas del estudio.</div>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" defaultValue="{{ errada }}" style="height:52px;width:100%;padding:0 16px;border:1px solid #C08A7E;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(192,138,126,0.18);" />
+              <span style="display:flex;align-items:flex-start;gap:7px;font-size:13px;line-height:1.45;color:#B0655B;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0655B" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>
+                La contraseña no es correcta.
+              </span>
+            </label>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px 34px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);">
+              <button style="height:54px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);border-color:#94493A;color:#94493A;" style-active="background:rgba(178,93,75,0.12);">Cerrar mi cuenta</button>
+              <a href="#" style="display:block;margin-top:8px;text-align:center;font-size:14px;font-weight:500;color:#8A807C;padding:6px;" style-hover="color:#4A4A4A;">Cancelar</a>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Pago en revisión</div>
+          <div style="font-size:12px;color:#8A807C;">Cerrar no está disponible · sin campo de contraseña · solo «Volver al perfil»</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button aria-label="Volver al perfil" style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:#F2ECE5;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cerrar mi cuenta</span>
+          </div>
+
+          <div style="flex:1;padding:20px 20px 28px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);border:1px solid rgba(201,154,78,0.35);">
+              <div style="display:flex;align-items:center;gap:9px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A7434" stroke-width="1.6" stroke-linecap="round" style="flex:none;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                <span style="font-family:Lora,Georgia,serif;font-size:17px;font-weight:500;color:#7C5D2A;">Pago en revisión</span>
+              </div>
+              <span style="font-size:14px;line-height:1.55;color:#6E5A36;text-wrap:pretty;">Tienes un pago por transferencia en revisión. Podrás cerrar tu cuenta cuando el estudio lo confirme o lo rechace.</span>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px 34px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);">
+              <button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Volver al perfil</button>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · No se pudo cerrar</div>
+          <div style="font-size:12px;color:#8A807C;">Falla de red · aviso sobre el botón · la contraseña se conserva</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button aria-label="Volver al perfil" style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:#F2ECE5;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cerrar mi cuenta</span>
+          </div>
+
+          <div style="flex:1;padding:20px 20px 28px;display:flex;flex-direction:column;gap:14px;">
+            <div style="font-size:14.5px;line-height:1.5;color:#4A4A4A;text-wrap:pretty;">Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:</div>
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><line x1="5" y1="7" x2="19" y2="7"></line><line x1="5" y1="12" x2="19" y2="12"></line><line x1="5" y1="17" x2="13" y2="17"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Sales de 1 lista de espera.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Tu plan Mensual 16 clases termina hoy. No se devuelve dinero y pierdes las 11 clases que te quedan.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Pierdes tu crédito de Bs 120,00.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;border-bottom:1px solid #EFE7DE;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="6" y="3.5" width="12" height="17" rx="2.5"></rect><line x1="10.5" y1="17.5" x2="13.5" y2="17.5"></line></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Cerramos tu sesión en todos tus dispositivos.</span>
+                </div>
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"></rect><path d="M4 7l8 6 8-6"></path></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Tu correo queda libre por si quieres registrarte de nuevo.</span>
+                </div>
+            </div>
+            <div style="font-size:12.5px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la app y en las listas del estudio.</div>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" defaultValue="{{ clave }}" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <span style="font-size:12.5px;line-height:1.45;color:#8A807C;">Escribe tu contraseña para confirmar que eres tú.</span>
+            </label>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px 34px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 12px;margin-bottom:12px;border-radius:8px;background:rgba(178,93,75,0.08);font-size:13px;line-height:1.45;color:#94493A;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B25D4B" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>
+                No pudimos cerrar tu cuenta. Inténtalo de nuevo.
+              </div>
+              <button style="height:54px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);border-color:#94493A;color:#94493A;" style-active="background:rgba(178,93,75,0.12);">Cerrar mi cuenta</button>
+              <a href="#" style="display:block;margin-top:8px;text-align:center;font-size:14px;font-weight:500;color:#8A807C;padding:6px;" style-hover="color:#4A4A4A;">Cancelar</a>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Campos llenos</div>
+          <div style="font-size:12px;color:#8A807C;">Contraseña escrita · botón habilitado · teclado abierto: la vista se desplaza hasta el campo · encabezado de Android</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:44px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button aria-label="Volver al perfil" style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:#F2ECE5;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cerrar mi cuenta</span>
+          </div>
+
+          <div style="flex:1;padding:20px 20px 28px;display:flex;flex-direction:column;gap:14px;">
+                <div style="display:flex;align-items:flex-start;gap:11px;padding:9px 14px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:0 0 16px 16px;border-top:none;">
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><rect x="3.5" y="5.5" width="17" height="13" rx="2.5"></rect><path d="M4 7l8 6 8-6"></path></svg>
+                  <span style="font-size:13.5px;line-height:1.45;color:#4A4A4A;text-wrap:pretty;">Tu correo queda libre por si quieres registrarte de nuevo.</span>
+                </div>
+            <div style="font-size:12.5px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la app y en las listas del estudio.</div>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" defaultValue="{{ clave }}" style="height:52px;width:100%;padding:0 16px;border:1px solid #B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <span style="font-size:12.5px;line-height:1.45;color:#8A807C;">Escribe tu contraseña para confirmar que eres tú.</span>
+            </label>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
+            <div style="padding:18px 20px 26px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);">
+              <button style="height:54px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);border-color:#94493A;color:#94493A;" style-active="background:rgba(178,93,75,0.12);">Cerrar mi cuenta</button>
+              <a href="#" style="display:block;margin-top:8px;text-align:center;font-size:14px;font-weight:500;color:#8A807C;padding:6px;" style-hover="color:#4A4A4A;">Cancelar</a>
+            </div>
+            <div aria-hidden="true" style="height:252px;background:#E6DED6;border-top:1px solid #D8C9BB;display:flex;align-items:center;justify-content:center;font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8A807C;">teclado</div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Después de cerrar</div>
+          <div style="font-size:12px;color:#8A807C;">La app cierra la sesión y abre Iniciar sesión (pantalla 01) con un aviso de éxito arriba</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;padding:62px 24px 40px;gap:30px;">
+          <div role="status" style="display:flex;align-items:flex-start;gap:10px;padding:13px 14px;border-radius:12px;background:rgba(124,148,115,0.14);border:1px solid rgba(124,148,115,0.30);">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#5F7457" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="9"></circle><polyline points="8,12.5 11,15.5 16.5,9.5"></polyline></svg>
+            <span style="font-size:14px;line-height:1.5;color:#4C5F46;">Cerramos tu cuenta. Gracias por entrenar con nosotras.</span>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:36px;">
+            <span style="font-family:Lora,Georgia,serif;font-size:44px;font-weight:400;line-height:1;">Emma</span>
+            <span style="font-size:12px;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Movimiento · Equilibrio · Bienestar</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;padding-top:10px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico o teléfono</span>
+              <input type="text" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:16px;outline:none;" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:16px;outline:none;" />
+            </label>
+            <button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">Iniciar sesión</button>
+            <a href="#" style="align-self:center;font-size:14px;">¿Olvidaste tu contraseña?</a>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+  </div>
+
+  <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Solo lo que aplica</span>Cada línea de consecuencia aparece solo si le pasa a esta clienta, con sus números. Las dos últimas —sesión y correo— van siempre.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Destructivo, no primario</span>El botón va en contorno del tono Error, nunca en palo de rosa sólido: la acción no se puede deshacer y no es la que la pantalla invita a tomar.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Pago en revisión</span>Mientras una transferencia espera revisión, cerrar no está disponible: la tarjeta de advertencia reemplaza a las consecuencias y no se pide la contraseña.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Después de cerrar</span>La app cierra la sesión y abre Iniciar sesión (pantalla 01) con un aviso de éxito arriba; el resto de la pantalla 01 no cambia.</div>
+  </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true,
+      clave: "Emma2026lucia",
+      errada: "Emma2025lucia"
+    };
+  }
+}
+</script>
+</body>
+</html>

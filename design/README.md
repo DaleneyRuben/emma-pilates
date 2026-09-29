@@ -6,7 +6,7 @@ Three surfaces for a Pilates studio in Santa Cruz de la Sierra, Bolivia:
 
 | Surface | Files | Form factor | Users |
 |---|---|---|---|
-| **Client app** | `01`–`23` | Mobile (iOS/Android, 390×844 reference) | Clients: booking, plans, payments, nutrition, referrals |
+| **Client app** | `01`–`24` | Mobile (iOS/Android, 390×844 reference) | Clients: booking, plans, payments, nutrition, referrals |
 | **Staff app** | `S01`–`S23` | Mobile | Trainers, front desk, administration, nutritionist |
 | **Admin web** | `AW01`–`AW34` | Desktop web (1440px reference, 420px narrow) | Studio management: schedule, catalog, back office, reports, promotions |
 | **Design system** | `Sistema de Diseño.dc.html` | — | Source of truth for tokens and components |
@@ -170,12 +170,13 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `15` | Mis evaluaciones | Assessment history |
 | `16` | Mis referidos | Referral code + status |
 | `17` | Mi crédito | Credit balance and movements |
-| `18` | Perfil | Profile and settings |
+| `18` | Perfil | Profile and settings; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
 | `19` | Notificaciones | Notification list |
 | `20` | Recuperar contraseña | Request a reset link |
 | `21` | Crear contraseña | Set password from the emailed link / first login |
 | `22` | Editar perfil | Edit name, email, phone |
 | `23` | Cambiar contraseña | Self-service change, session open |
+| `24` | Cerrar mi cuenta | Close the Account for good from `18`: the consequences that apply (future bookings and evaluation cancelled, waitlists left, plan ended without refund, credit forfeited, every session closed, email freed), password re-entry, Error-outline button; refused while a transfer payment awaits review; ends on `01` with a success notice |
 
 ### Staff app (mobile)
 
@@ -229,8 +230,8 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW18` | Formulario de promoción | Image upload, título, descripción, date range |
 | `AW19` | Sucursales | Two-column table (Nombre / Dirección); feeds the top-bar selector; no delete |
 | `AW20` | Formulario de sucursal | Side panel; nombre + dirección only; edit mode carries a fixed note about linked records |
-| `AW21` | Clientes | Read-only directory, 4 columns, search only, paginated; **no primary action** |
-| `AW22` | Detalle de cliente | Read-only side panel: contacto, plan, crédito, referidos; **no footer / no Guardar** |
+| `AW21` | Clientes | Read-only directory, 4 columns, search only, paginated; **no primary action**; after a closure from `AW22` it reloads without her and shows «Cuenta de … cerrada.» |
+| `AW22` | Detalle de cliente | Read-only side panel: contacto, plan, crédito, referidos; **no Guardar**; one quiet footer action «Cerrar cuenta» (Error outline) opening a consequences confirmation, refused while a transfer payment awaits review |
 | `AW23` | Personal | Team accounts, 4 columns, role filter; row → `AW24` |
 | `AW24` | Formulario de personal | One role (2×2 grid), assigned branches, temporary password on create |
 | `AW25` | Evaluaciones nutricionales | Read-only list, date range + nutritionist filter, no status column; empty state |
@@ -253,6 +254,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `AW01→AW30` via "¿Olvidaste tu contraseña?"; `AW01→AW32` from the emailed link / a first login with a temporary password.
 - `AW08→AW31` via "Ver historial de retiros"; the back link returns to `AW08`.
 - The top-bar user cell opens the `AW33` menu overlay (change-password side panel, log-out confirm) from any shell page.
+- `AW22` → «Cerrar cuenta» opens a confirmation that lists what the closure does to that client; **Volver** / **Cerrar cuenta** (Error outline). A pending transfer keeps the dialog open with a refusal and a link to `AW28`; a completed closure returns to `AW21` with an Éxito line.
 - Read-only pages with no primary action: `AW21`, `AW22`, `AW25`, `AW26`, `AW27`, `AW28`, `AW31`, plus `AW16`.
 - `AW08` has three actions: **Ver historial de retiros** (link → `AW31`), **Registrar retiro** (secondary, outlined — it subtracts stock) and **+ Nuevo insumo** (primary).
 
@@ -260,6 +262,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - Four-tab bar: Inicio · Reservar · Mis Reservas · Perfil. Child screens replace the tab bar with a header and a back arrow.
 - `01→20` via "¿Olvidaste tu contraseña?". `01→21` is forced after a first login with a temporary password — the client cannot reach `02` until it completes.
 - `18→22` (Editar perfil) and `18→23` (Cambiar contraseña); both return to `18`.
+- `18→24` (Cerrar mi cuenta) through the quiet Error-tone link under «Cerrar sesión»; the back arrow and «Cancelar» return to `18`, and a completed closure signs the client out onto `01` with the notice «Cerramos tu cuenta. Gracias por entrenar con nosotras.»
 - Booking and assessment confirmations are acknowledged on arrival, not on a result screen: `04→05` and `14→15` land with a transient Éxito-tinted notice strip under the header (check glyph + "Reserva confirmada" / "Evaluación confirmada" and the class, day and time in the Nota style). It fades after a few seconds or on first scroll and never returns for that record; while it shows, the new card carries a 3px Éxito left edge so it can be found in the list. No button, no dismiss control. `05` adds one muted balance line ("Te quedan 7 clases en tu plan."); `15` has none — an assessment consumes no class allowance.
 
 **Navigation — staff app**
