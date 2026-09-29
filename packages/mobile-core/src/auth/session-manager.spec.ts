@@ -244,4 +244,26 @@ describe("createSessionManager", () => {
     expect(revokeCurrent).toHaveBeenCalledWith("protected-credential");
     expect(loadWithBiometrics).toHaveBeenCalledTimes(1);
   });
+
+  it("ends a session the server already revoked without calling it again", async () => {
+    const clearAccountCache = jest.fn();
+    const clearCredential = jest.fn();
+    const revokeCurrent = jest.fn();
+    const manager = createSessionManager({
+      clearAccountCache,
+      credentialStore: {
+        clear: clearCredential,
+        load: jest.fn().mockResolvedValue("stored-credential"),
+        save: jest.fn(),
+      },
+      resolveCurrent: jest.fn(),
+      revokeCurrent,
+    });
+
+    await manager.endLocally({ accountId: "account-1", role: "client" });
+
+    expect(revokeCurrent).not.toHaveBeenCalled();
+    expect(clearCredential).toHaveBeenCalledTimes(1);
+    expect(clearAccountCache).toHaveBeenCalledWith("account-1");
+  });
 });

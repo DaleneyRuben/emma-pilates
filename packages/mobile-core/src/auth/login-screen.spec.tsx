@@ -52,4 +52,14 @@ describe("LoginScreen", () => {
       screen.getByRole("button", { name: "Iniciar sesión" }),
     ).toBeDisabled();
   });
+
+  it("shows the notice left by a closed Account", async () => {
+    const screen = await render(
+      <LoginScreen notice="Cerramos tu cuenta. Gracias por entrenar con nosotras." />,
+    );
+
+    expect(
+      screen.getByText("Cerramos tu cuenta. Gracias por entrenar con nosotras."),
+    ).toBeOnTheScreen();
+  });
 });

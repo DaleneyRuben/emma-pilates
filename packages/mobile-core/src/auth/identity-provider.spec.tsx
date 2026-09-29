@@ -135,4 +135,69 @@ describe("MobileIdentityProvider", () => {
     });
     expect(manager.unlockWithBiometrics).toHaveBeenCalledTimes(1);
   });
+
+  it("signs out a closed Account locally and keeps a notice for the login screen", async () => {
+    const manager = {
+      endLocally: jest.fn().mockResolvedValue(undefined),
+      hasBiometricSession: jest.fn().mockResolvedValue(false),
+      logout: jest.fn(),
+      restore: jest
+        .fn()
+        .mockResolvedValue({ accountId: "account-1", role: "client" }),
+      start: jest
+        .fn()
+        .mockResolvedValue({ accountId: "account-2", role: "client" }),
+      unlockWithBiometrics: jest.fn(),
+    };
+
+    function ClosureProbe() {
+      const identity = useMobileIdentity();
+
+      return (
+        <>
+          <Text>{`${identity.status}|${identity.signOutNotice ?? "none"}`}</Text>
+          <Button
+            onPress={() => identity.endClosedSession("Cerramos tu cuenta.")}
+            title="Close"
+          />
+          <Button
+            onPress={() => identity.start("new-credential")}
+            title="Start"
+          />
+        </>
+      );
+    }
+
+    const screen = await render(
+      <MobileIdentityProvider manager={manager}>
+        <ClosureProbe />
+      </MobileIdentityProvider>,
+    );
+    await waitFor(() =>
+      expect(screen.getByText("signed-in|none")).toBeOnTheScreen(),
+    );
+
+    await act(async () => {
+      fireEvent.press(screen.getByText("Close"));
+    });
+
+    await waitFor(() =>
+      expect(
+        screen.getByText("signed-out|Cerramos tu cuenta."),
+      ).toBeOnTheScreen(),
+    );
+    expect(manager.endLocally).toHaveBeenCalledWith({
+      accountId: "account-1",
+      role: "client",
+    });
+    expect(manager.logout).not.toHaveBeenCalled();
+
+    await act(async () => {
+      fireEvent.press(screen.getByText("Start"));
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText("signed-in|none")).toBeOnTheScreen(),
+    );
+  });
 });
