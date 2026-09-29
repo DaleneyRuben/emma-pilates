@@ -2264,3 +2264,39 @@ pidió cambiar el correo de tu cuenta» (no link). Links start with
 real domain comes with LNK-001). Open the `html` value in a browser to see
 the card; the copy comes from design follow-ups 33–38 and the IDN-008 rule
 while the DES-001 export stays pending.
+
+## Test 35: close a Client Account
+
+BE-007 lets a Client close their own Account and an Administrator close a
+Client's. The screens ("Cerrar mi cuenta" in Perfil and "Cerrar cuenta" in
+AW22) wait for their design (follow-ups 65 and 66), so try the API. Closing
+is permanent, so use a disposable database, not the one you keep:
+
+```sh
+createdb -T pilates_dev_sim pilates_test_closure
+DATABASE_URL="postgresql://$USER@localhost:5432/pilates_test_closure" \
+  pnpm --filter @pilates/backend start
+```
+
+1. Log in as `sofia@example.com` (Test 3 shows how) and read
+   `GET /api/v1/clients/current/credit`: Bs 60 available.
+2. `POST /api/v1/accounts/current/closure` with `{"password": "wrong"}` returns
+   `400` `current_password_incorrect`; with `{}` it returns `400`
+   `invalid_request`.
+3. Repeat with the fixture password. It returns `200` with the counts:
+   `forfeitedCreditCentavos: 6000` and the classes left on the ended Plan.
+4. The old credential now returns `401`, and logging in again with the same
+   email and password returns `401`.
+5. Log in as `paola.mendoza@example.com` and
+   `POST /api/v1/administrator/clients/{id}/closure` for `lucia@example.com`'s
+   Client id (`GET /api/v1/administrator/clients?q=lucia` before closing). A
+   second call returns `404` `client_not_found`, and Lucía no longer appears in
+   the Clientes list.
+6. In `psql`, see the two `account.closed` audit records (actor role empty for
+   Sofía's own closure, `administrator` for Lucía's) and Sofía's
+   `account_closure` ledger entry of 6000.
+7. A Client with a transfer Payment awaiting review gets `409`
+   `closure_payment_pending` and nothing changes; confirm or reject the Payment
+   in Pagos first (Test 27).
+
+Drop the copy afterwards: `dropdb pilates_test_closure`.
