@@ -26,7 +26,10 @@ import {
 } from './cancel-session';
 import { joinWaitlist } from './join-waitlist';
 import { leaveWaitlist } from './leave-waitlist';
-import { promoteWaitlist } from './promote-waitlist';
+import {
+  loadSession,
+  promoteWaitlistInTransaction,
+} from './waitlist-promotion';
 import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendance } from './record-attendance';
 import { retrySerializable } from '../../database/retry-serializable';
@@ -678,101 +681,10 @@ export class PrismaBookingCommands {
     transaction: Prisma.TransactionClient,
     sessionId: string,
   ): Promise<{ entryId: string; bookingId: string }[]> {
-    return promoteWaitlist(
-      { sessionId },
-      {
-        loadSession: (id) => this.loadSession(transaction, id),
-        countLiveBookings: (id) =>
-          transaction.booking.count({
-            where: { sessionId: id, state: 'BOOKED' },
-          }),
-        loadActiveEntries: (id) =>
-          transaction.waitlistEntry.findMany({
-            where: { sessionId: id, closedAt: null },
-            select: {
-              id: true,
-              clientId: true,
-              joinedByAccountId: true,
-            },
-            orderBy: [{ joinedAt: 'asc' }, { id: 'asc' }],
-          }),
-        findEligibleSubscription: ({ clientId, onDate }) =>
-          transaction.subscription.findFirst({
-            where: {
-              clientId,
-              state: 'ACTIVE',
-              startsOn: { lte: boliviaDate(onDate) },
-              endsOn: { gte: boliviaDate(onDate) },
-              remainingClassAllowance: { gt: 0 },
-            },
-            select: { id: true },
-          }),
-        hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
-          transaction.booking
-            .findFirst({
-              where: {
-                clientId,
-                state: 'BOOKED',
-                session: {
-                  startsAt: { lt: endsAt },
-                  endsAt: { gt: startsAt },
-                },
-              },
-              select: { id: true },
-            })
-            .then((booking) => booking !== null),
-        createBooking: async (input) => {
-          const consumed = await transaction.subscription.updateMany({
-            where: {
-              id: input.subscriptionId,
-              clientId: input.clientId,
-              remainingClassAllowance: { gt: 0 },
-            },
-            data: { remainingClassAllowance: { decrement: 1 } },
-          });
-
-          if (consumed.count !== 1) {
-            throw new Error('No eligible Subscription');
-          }
-
-          return transaction.booking.create({
-            data: input,
-            select: { id: true },
-          });
-        },
-        closeAsPromoted: async ({ entryId, bookingId }) => {
-          const closedAt = new Date();
-          await transaction.waitlistEntry.update({
-            where: { id: entryId },
-            data: {
-              closedAt,
-              closureReason: WaitlistClosureReason.PROMOTED,
-              promotedBookingId: bookingId,
-            },
-          });
-          const promoted = await transaction.booking.findUniqueOrThrow({
-            where: { id: bookingId },
-            select: {
-              client: { select: { account: { select: { id: true } } } },
-              session: { select: { classType: { select: { name: true } } } },
-            },
-          });
-          if (promoted.client.account !== null) {
-            await this.recordNotification(transaction, {
-              accountId: promoted.client.account.id,
-              category: 'booking_schedule',
-              type: 'waitlist_promoted',
-              businessEventKey: `waitlist-promoted:${entryId}`,
-              title: 'Cupo liberado',
-              message: `¡Tienes un cupo! Te promovimos de la lista de espera para tu clase de ${promoted.session.classType.name}.`,
-              destination: { type: 'booking', id: bookingId },
-              occurredAt: closedAt,
-            });
-          }
-        },
-        now: this.now,
-      },
-    );
+    return promoteWaitlistInTransaction(transaction, sessionId, {
+      now: this.now,
+      recordNotification: this.recordNotification,
+    });
   }
 
   async leaveWaitlist(
@@ -928,27 +840,10 @@ export class PrismaBookingCommands {
     });
   }
 
-  private async loadSession(
+  private loadSession(
     transaction: Prisma.TransactionClient,
     sessionId: string,
   ) {
-    const session = await transaction.session.findUnique({
-      where: { id: sessionId },
-      select: {
-        id: true,
-        branchId: true,
-        startsAt: true,
-        endsAt: true,
-        capacity: true,
-        state: true,
-      },
-    });
-
-    return session === null
-      ? null
-      : {
-          ...session,
-          state: session.state.toLowerCase() as 'scheduled' | 'cancelled',
-        };
+    return loadSession(transaction, sessionId);
   }
 }
