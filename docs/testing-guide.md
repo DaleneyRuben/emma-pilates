@@ -2267,10 +2267,9 @@ while the DES-001 export stays pending.
 
 ## Test 35: close a Client Account
 
-BE-007 lets a Client close their own Account and an Administrator close a
-Client's. The screens ("Cerrar mi cuenta" in Perfil and "Cerrar cuenta" in
-AW22) wait for their design (follow-ups 65 and 66), so try the API. Closing
-is permanent, so use a disposable database, not the one you keep:
+BE-007 lets a Client close their own Account (Perfil → «Cerrar mi cuenta»,
+screen 24) and an Administrator close a Client's (AW22 → «Cerrar cuenta»).
+Closing is permanent, so use a disposable database, not the one you keep:
 
 ```sh
 createdb -T pilates_dev_sim pilates_test_closure
@@ -2298,5 +2297,19 @@ DATABASE_URL="postgresql://$USER@localhost:5432/pilates_test_closure" \
 7. A Client with a transfer Payment awaiting review gets `409`
    `closure_payment_pending` and nothing changes; confirm or reject the Payment
    in Pagos first (Test 27).
+
+In the Client app (API on the copy, `EXPO_PUBLIC_API_URL=http://127.0.0.1:3100/api/v1`),
+log in as `sofia@example.com`, open Perfil, scroll to the Error-tone
+«Cerrar mi cuenta» link under «Cerrar sesión», read the consequences (her
+plan ends and her Bs 60 of Credit is forfeited), type the password, and
+confirm: the app returns to Iniciar sesión with «Cerramos tu cuenta. Gracias
+por entrenar con nosotras.». The Maestro flow `.maestro/close-account.yaml`
+does the same.
+
+In the admin web, open a Client in Clientes and press «Cerrar cuenta» at the
+foot of the panel: the dialog lists what applies to her, and after
+confirming the list reloads without her under «Cuenta de … cerrada.». For
+`isabel@example.com`, whose transfer awaits review, the dialog refuses at
+once and links to Pagos.
 
 Drop the copy afterwards: `dropdb pilates_test_closure`.
