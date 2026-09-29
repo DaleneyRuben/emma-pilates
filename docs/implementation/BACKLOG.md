@@ -149,7 +149,7 @@ written but not yet applied by the external design session, or still to write:
 | 52 (WEB-002: AW33 role label «Administración», row hover) | Admin web AW33 | WEB-002 (built from the corrected behavior) | 🕓 pending export |
 | 63 (MOB-020: Client 18/22 profile photo as built; invariant 9 «never a photo» versus prompt 22 and follow-up 60 §1) | Client 18, 22; checklist 30 §9 | MOB-020 (built with the photo on 18 and 22 only) | 🕓 pending export; the studio must settle the invariant |
 | 64 (IDN-008: Client 22 editable email, pending card, link confirmation screen) | Client 22 | IDN-008 (built from the decided rule) | 🕓 pending export |
-| 65–66 and prompt `client/24` (BE-007: Client 18 «Cerrar mi cuenta» link, the new Client 24 screen, AW22 «Cerrar cuenta» dialog) | Client 18, 24; AW22, AW21 | BE-007 (the two screens are built after the export) | 🕓 pending: send to Claude Design with checklist 30 |
+| 65–66 and prompt `client/24` (BE-007: Client 18 «Cerrar mi cuenta» link, the new Client 24 screen, AW22 «Cerrar cuenta» dialog) | Client 18, 24; AW22, AW21 | BE-007 (the two screens are built after the export) | ✅ applied: exported 2026-09-28 (`a8b629f`) |
 | Image variant sizes and quality (ADR-0073) | Receipts, profile photos, Promotions | UPL-002 | decided in `UPL-002-image-variants.md`; follow-up 60 records the crops taken |
 | Tab-bar unread badge | Client and Staff navigation | MOB-017 gap | not designed |
 
