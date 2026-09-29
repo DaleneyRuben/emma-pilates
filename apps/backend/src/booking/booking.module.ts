@@ -140,6 +140,7 @@ import { createPrismaCatalogAdministration } from './administration/prisma-catal
 import { createPrismaCatalogLists } from './administration/prisma-catalog-lists';
 import { createPrismaOversight } from './administration/prisma-oversight';
 import { createPrismaScheduleAdministration } from './administration/prisma-schedule-administration';
+import { accountClosure } from './account-closure/account-closure-provider';
 import { adminWebReads } from './admin-web-reads';
 import { receiptReadProvider } from './payments/prisma-receipt-read';
 import { promotionsWiring } from './promotions/promotions-wiring';
@@ -186,6 +187,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     AdministratorSessionsController,
     AssistantClientsController,
     ...adminWebReads.controllers,
+    ...accountClosure.controllers,
     ...promotionsWiring.controllers,
     ...clientPhotoWiring.controllers,
     EvaluationSlotsController,
@@ -625,6 +627,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
       useFactory: (prisma: PrismaClient) => createPrismaCatalogLists(prisma),
     },
     ...adminWebReads.providers(bookingPrisma),
+    ...accountClosure.providers(bookingPrisma),
     receiptReadProvider(bookingPrisma),
     ...promotionsWiring.providers(bookingPrisma),
     ...clientPhotoWiring.providers(bookingPrisma),
