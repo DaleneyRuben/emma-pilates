@@ -9502,6 +9502,36 @@
           "activePlanClientCount"
         ]
       },
+      "AdminClientClosureOutlookDto": {
+        "type": "object",
+        "properties": {
+          "futureBookingCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Future Bookings closure cancels"
+          },
+          "activeWaitlistEntryCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Waitlist entries closure closes"
+          },
+          "upcomingEvaluationCount": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Upcoming Evaluations closure cancels"
+          },
+          "transferPaymentPending": {
+            "type": "boolean",
+            "description": "A transfer Payment awaits review, so closure is refused"
+          }
+        },
+        "required": [
+          "futureBookingCount",
+          "activeWaitlistEntryCount",
+          "upcomingEvaluationCount",
+          "transferPaymentPending"
+        ]
+      },
       "AdminClientDetailDto": {
         "type": "object",
         "properties": {
@@ -9548,6 +9578,9 @@
           "referredClientCount": {
             "type": "number",
             "minimum": 0
+          },
+          "closure": {
+            "$ref": "#/components/schemas/AdminClientClosureOutlookDto"
           }
         },
         "required": [
@@ -9560,7 +9593,8 @@
           "subscription",
           "creditAvailableCentavos",
           "referralCode",
-          "referredClientCount"
+          "referredClientCount",
+          "closure"
         ]
       },
       "AdminPaymentDto": {

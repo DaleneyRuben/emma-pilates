@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { AdminClientClosureOutlookDto } from "./adminClientClosureOutlookDto";
 import type { AdminClientDetailDtoAccountStatus } from "./adminClientDetailDtoAccountStatus";
 import type { ClientSubscriptionDto } from "./clientSubscriptionDto";
 
@@ -26,4 +27,5 @@ export interface AdminClientDetailDto {
   referralCode: string;
   /** @minimum 0 */
   referredClientCount: number;
+  closure: AdminClientClosureOutlookDto;
 }

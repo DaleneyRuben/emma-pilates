@@ -12,6 +12,7 @@ export * from "./adminBranchDto";
 export * from "./adminBranchPageDto";
 export * from "./adminClassTypeDto";
 export * from "./adminClassTypePageDto";
+export * from "./adminClientClosureOutlookDto";
 export * from "./adminClientDetailDto";
 export * from "./adminClientDetailDtoAccountStatus";
 export * from "./adminClientDto";
