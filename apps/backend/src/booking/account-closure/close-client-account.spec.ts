@@ -193,7 +193,7 @@ describe('closeClientAccount', () => {
       code: 'closure_payment_pending',
       status: 409,
     });
-    expect(fake.calls).toEqual(['transaction']);
+    expect(fake.calls).toEqual(['transaction', 'lockClient']);
     expect(fake.audit).toEqual([]);
   });
 
