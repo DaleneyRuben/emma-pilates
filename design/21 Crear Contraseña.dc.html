@@ -26,7 +26,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 21</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Crear contraseña</h1>
-    <p style="margin:0;max-width:760px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Paso obligatorio que se inserta justo después de la pantalla 01, la primera vez que una clienta entra con la contraseña temporal que le generó una asistente en S05. Sin barra de pestañas y sin flecha de retorno: no se puede saltar ni salir mientras la contraseña temporal siga activa. Al guardar, la app abre directo en Inicio.</p>
+    <p style="margin:0;max-width:760px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Es la página que abre el enlace de un correo, sin sesión, sin barra de pestañas y sin flecha de retorno. Tiene dos variantes: Activar cuenta, desde la invitación que se envía cuando una asistente crea la cuenta en S05, y Restablecer contraseña, desde el enlace que pide la pantalla 20. Activar vuelve a la pantalla 01 para entrar; restablecer entra directo a Inicio. El equipo nunca ve ni dicta una contraseña.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:44px;">
@@ -34,142 +34,107 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:13px;font-weight:500;">iOS · Campos vacíos</div>
-          <div style="font-size:12px;color:#8A807C;">Botón inactivo hasta llenar y coincidir</div>
+          <div style="font-size:13px;font-weight:500;">iOS · Activar cuenta</div>
+          <div style="font-size:12px;color:#8A807C;">Desde el enlace de la invitación · botón inactivo hasta llenar y coincidir</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
-        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;gap:36px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-            <div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div>
-            <div style="width:28px;height:1px;background:#D8C9BB;"></div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2>
-            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu asistente te creó una cuenta con una contraseña temporal. Elige una nueva para continuar.</p>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:18px;">
-            <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
-              <input type="password" placeholder="Mínimo 8 caracteres" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-            </label>
-            <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
-              <input type="password" placeholder="Repite la contraseña" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-            </label>
-            <button disabled="{{ isTrue }}" style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Guardar y continuar</button>
-          </div>
-        </div>
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;gap:32px;"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;"><div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div><div style="width:28px;height:1px;background:#D8C9BB;"></div></div><div style="display:flex;flex-direction:column;gap:12px;width:100%;"><div style="align-self:flex-start;padding:5px 12px;border:1px solid #D8C9BB;border-radius:999px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;background:rgba(216,189,184,0.16);">Activar cuenta</div><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2><p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Elegir tu contraseña activa tu cuenta y confirma tu correo. Luego inicias sesión con ella.</p></div><div style="display:flex;flex-direction:column;gap:18px;width:100%;"><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span><input type="password" placeholder="Mínimo 8 caracteres" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span><input type="password" placeholder="Repite la contraseña" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><button disabled="{{ true }}" style="height:54px;width:100%;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Activar cuenta</button></div></div>
       </x-import>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:13px;font-weight:500;">iOS · No coinciden</div>
+          <div style="font-size:13px;font-weight:500;">iOS · Activar cuenta · no coinciden</div>
           <div style="font-size:12px;color:#8A807C;">Validación en línea bajo el segundo campo</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
-        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;gap:36px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-            <div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div>
-            <div style="width:28px;height:1px;background:#D8C9BB;"></div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2>
-            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu asistente te creó una cuenta con una contraseña temporal. Elige una nueva para continuar.</p>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:18px;">
-            <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
-              <input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-            </label>
-            <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
-              <input type="password" value="pilates202" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" />
-              <span style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.5;color:#8A4433;">
-                <span style="width:6px;height:6px;border-radius:50%;background:#B25D4B;margin-top:6px;flex:none;"></span>
-                Las contraseñas no coinciden.
-              </span>
-            </label>
-            <button disabled="{{ isTrue }}" style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Guardar y continuar</button>
-          </div>
-        </div>
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;gap:32px;"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;"><div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div><div style="width:28px;height:1px;background:#D8C9BB;"></div></div><div style="display:flex;flex-direction:column;gap:12px;width:100%;"><div style="align-self:flex-start;padding:5px 12px;border:1px solid #D8C9BB;border-radius:999px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;background:rgba(216,189,184,0.16);">Activar cuenta</div><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2><p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Elegir tu contraseña activa tu cuenta y confirma tu correo. Luego inicias sesión con ella.</p></div><div style="display:flex;flex-direction:column;gap:18px;width:100%;"><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span><input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span><input type="password" value="pilates202" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /><span style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.5;color:#8A4433;"><span style="width:6px;height:6px;border-radius:50%;background:#B25D4B;margin-top:6px;flex:none;"></span>Las contraseñas no coinciden.</span></label><button disabled="{{ true }}" style="height:54px;width:100%;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Activar cuenta</button></div></div>
       </x-import>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:13px;font-weight:500;">iOS · Listo para guardar</div>
-          <div style="font-size:12px;color:#8A807C;">Coinciden: el botón toma el palo de rosa</div>
+          <div style="font-size:13px;font-weight:500;">iOS · Cuenta activada</div>
+          <div style="font-size:12px;color:#8A807C;">Confirmación breve · sin sesión: vuelve a la pantalla 01</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
-        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;gap:36px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-            <div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div>
-            <div style="width:28px;height:1px;background:#D8C9BB;"></div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2>
-            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu asistente te creó una cuenta con una contraseña temporal. Elige una nueva para continuar.</p>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:18px;">
-            <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
-              <input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-            </label>
-            <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
-              <input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-            </label>
-            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar y continuar</button>
-          </div>
-        </div>
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;align-items:center;gap:18px;"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;"><div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div><div style="width:28px;height:1px;background:#D8C9BB;"></div></div><div style="height:24px;"></div><div style="width:76px;height:76px;border-radius:50%;background:rgba(124,148,115,0.14);display:flex;align-items:center;justify-content:center;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5,12.5 10,17.5 19,7.5"></polyline></svg></div><div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;text-align:center;">Tu cuenta está activa</div><p style="margin:0;max-width:300px;text-align:center;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu correo quedó verificado. Inicia sesión con tu correo y la contraseña que acabas de crear.</p><div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;"><button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Ir a iniciar sesión</button></div></div>
       </x-import>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:13px;font-weight:500;">Android · Listo para guardar</div>
-          <div style="font-size:12px;color:#8A807C;">Mismo contenido, sin flecha de retorno del sistema en el encabezado</div>
+          <div style="font-size:13px;font-weight:500;">iOS · Restablecer contraseña</div>
+          <div style="font-size:12px;color:#8A807C;">Desde el enlace de recuperación · al guardar entra a Inicio (pantalla 02)</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;gap:32px;"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;"><div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div><div style="width:28px;height:1px;background:#D8C9BB;"></div></div><div style="display:flex;flex-direction:column;gap:12px;width:100%;"><div style="align-self:flex-start;padding:5px 12px;border:1px solid #D8C9BB;border-radius:999px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;background:rgba(216,189,184,0.16);">Restablecer contraseña</div><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea una contraseña nueva</h2><p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Elige una contraseña nueva para tu cuenta.</p></div><div style="display:flex;flex-direction:column;gap:18px;width:100%;"><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span><input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span><input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar contraseña</button></div></div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Restablecer contraseña</div>
+          <div style="font-size:12px;color:#8A807C;">Mismo contenido, encabezado con altura de Android</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
-        <div style="min-height:100%;background:#FAF7F2;padding:72px 28px 44px;display:flex;flex-direction:column;gap:36px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
-            <div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div>
-            <div style="width:28px;height:1px;background:#D8C9BB;"></div>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea tu contraseña</h2>
-            <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Tu asistente te creó una cuenta con una contraseña temporal. Elige una nueva para continuar.</p>
-          </div>
-          <div style="display:flex;flex-direction:column;gap:18px;">
-            <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
-              <input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-            </label>
-            <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
-              <input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-            </label>
-            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar y continuar</button>
-          </div>
+        <div style="min-height:100%;background:#FAF7F2;padding:72px 28px 44px;display:flex;flex-direction:column;gap:32px;"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;"><div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div><div style="width:28px;height:1px;background:#D8C9BB;"></div></div><div style="display:flex;flex-direction:column;gap:12px;width:100%;"><div style="align-self:flex-start;padding:5px 12px;border:1px solid #D8C9BB;border-radius:999px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;background:rgba(216,189,184,0.16);">Restablecer contraseña</div><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;">Crea una contraseña nueva</h2><p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Elige una contraseña nueva para tu cuenta.</p></div><div style="display:flex;flex-direction:column;gap:18px;width:100%;"><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span><input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span><input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar contraseña</button></div></div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Invitación vencida</div>
+          <div style="font-size:12px;color:#8A807C;">El enlace pasó sus 7 días · la cuenta sigue pendiente</div>
         </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;align-items:center;gap:18px;"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;"><div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div><div style="width:28px;height:1px;background:#D8C9BB;"></div></div><div style="height:24px;"></div><div style="width:76px;height:76px;border-radius:50%;background:rgba(183,131,128,0.14);display:flex;align-items:center;justify-content:center;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg></div><div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;text-align:center;">Este enlace ya no es válido</div><p style="margin:0;max-width:300px;text-align:center;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Las invitaciones vencen a los 7 días y sirven una sola vez. Pide en el estudio que te envíen una nueva.</p><div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;"><button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Ir a iniciar sesión</button></div></div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Invitación eliminada</div>
+          <div style="font-size:12px;color:#8A807C;">30 días sin activar, actualizar ni reenviar · no se recrea desde el enlace</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;align-items:center;gap:18px;"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;"><div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div><div style="width:28px;height:1px;background:#D8C9BB;"></div></div><div style="height:24px;"></div><div style="width:76px;height:76px;border-radius:50%;background:rgba(183,131,128,0.14);display:flex;align-items:center;justify-content:center;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg></div><div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;text-align:center;">Esta invitación ya no está activa</div><p style="margin:0;max-width:300px;text-align:center;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Pasaron 30 días sin activarla, así que se eliminó. Para tener una cuenta, el estudio tiene que crear una invitación nueva.</p><div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;"><button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Ir a iniciar sesión</button></div></div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Enlace de recuperación vencido</div>
+          <div style="font-size:12px;color:#8A807C;">Pasaron los 30 minutos · vuelve a la pantalla 20</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;align-items:center;gap:18px;"><div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;"><div style="font-family:Lora,Georgia,serif;font-size:34px;line-height:1;font-weight:400;">Emma</div><div style="width:28px;height:1px;background:#D8C9BB;"></div></div><div style="height:24px;"></div><div style="width:76px;height:76px;border-radius:50%;background:rgba(183,131,128,0.14);display:flex;align-items:center;justify-content:center;"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg></div><div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;line-height:1.2;text-align:center;">Este enlace ya no es válido</div><p style="margin:0;max-width:300px;text-align:center;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Los enlaces para restablecer la contraseña vencen a los 30 minutos y sirven una sola vez. Pide uno nuevo.</p><div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;"><button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Pedir un enlace nuevo</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;font-size:15px;font-weight:500;color:#B78380;padding:0 8px;">Volver a iniciar sesión</a></div></div>
       </x-import>
     </div>
 
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Paso obligatorio</span>Sin flecha de retorno ni barra de pestañas: Inicio queda fuera de alcance hasta guardar la contraseña nueva.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Botón condicionado</span>Inactivo (#E7DCD8 sobre texto #B3A9A5) hasta que los dos campos estén llenos y sean iguales.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Validación en línea</span>El aviso aparece bajo el segundo campo, con borde #B25D4B; el primer campo no se marca.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin pantalla de éxito</span>Al guardar, la app entra directo a Inicio (pantalla 02) con la barra de pestañas.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Dos variantes</span>Activar cuenta (invitación del estudio) y Restablecer contraseña (recuperación). Mismos campos y la misma validación; solo cambian el texto y el botón.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Activar no abre sesión</span>Crear la primera contraseña activa la cuenta y verifica el correo. Una confirmación breve lleva a la pantalla 01 para entrar.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Recuperar sí abre sesión</span>Guardar la contraseña nueva cierra las sesiones anteriores y abre una sola en este aparato: la app entra directo a Inicio (pantalla 02).</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Tres plazos</span>Invitación: cada enlace dura 7 días y la invitación se elimina a los 30 días sin actividad. Recuperación: 30 minutos. Ningún enlace se recrea a sí mismo.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Botón condicionado</span>Inactivo (#E7DCD8 sobre texto #B3A9A5) hasta que los dos campos estén llenos y sean iguales. El aviso va bajo el segundo campo, con borde #B25D4B.</div>
   </div>
 
 </div>

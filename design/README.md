@@ -153,7 +153,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 | File | Screen | Purpose |
 |---|---|---|
-| `01` | Iniciar sesión | Phone + password login |
+| `01` | Iniciar sesión | Email + password login, registration, «Revisa tu correo» verification states, throttled login |
 | `02` | Inicio | Promotions carousel, next class, plan status |
 | `03` | Reservar | Browse sessions by day |
 | `04` | Detalle de sesión | Session detail + book |
@@ -172,8 +172,8 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `17` | Mi crédito | Credit balance and movements |
 | `18` | Perfil | Profile and settings; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
 | `19` | Notificaciones | Notification list |
-| `20` | Recuperar contraseña | Request a reset link |
-| `21` | Crear contraseña | Set password from the emailed link / first login |
+| `20` | Recuperar contraseña | Request a reset link by email; neutral sent and temporary-limit states |
+| `21` | Crear contraseña | Page opened by an emailed link: Activar cuenta or Restablecer contraseña, plus expired and removed-invitation states |
 | `22` | Editar perfil | Edit name, email, phone |
 | `23` | Cambiar contraseña | Self-service change, session open |
 | `24` | Cerrar mi cuenta | Close the Account for good from `18`: the consequences that apply (future bookings and evaluation cancelled, waitlists left, plan ended without refund, credit forfeited, every session closed, email freed), password re-entry, Error-outline button; refused while a transfer payment awaits review; ends on `01` with a success notice |
@@ -182,11 +182,11 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 | File | Screen | Role |
 |---|---|---|
-| `S01` | Iniciar sesión | All staff |
+| `S01` | Iniciar sesión | All staff — email + password, throttled state |
 | `S02` | Mi agenda | Trainer |
 | `S03` | Lista de asistentes | Trainer — attendance marking |
 | `S04` | Buscar cliente | Front desk |
-| `S05` | Nuevo cliente | Front desk |
+| `S05` | Nuevo cliente | Front desk — email + optional phone, activation-link invitation and its pending states |
 | `S06` | Resumen del cliente | Front desk |
 | `S07` | Reservar una clase | Front desk (on behalf of a client) |
 | `S08` | Detalle de sesión | Front desk |
@@ -199,8 +199,8 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `S15` | Mi agenda | Nutritionist |
 | `S16` | Mi disponibilidad | Nutritionist |
 | `S17` | Formulario de horario | Nutritionist |
-| `S18` | Recuperar contraseña | All staff |
-| `S19` | Crear contraseña | All staff — first login |
+| `S18` | Recuperar contraseña | All staff — reset link by email |
+| `S19` | Crear contraseña | All staff — Activar cuenta or Restablecer contraseña from an emailed link |
 | `S20` | Notificaciones | All staff — no menu entry; reached from a push, filtered by role |
 | `S21` | Reservas de la clienta | Front desk |
 | `S22` | Historial de la clienta | Front desk |
@@ -210,7 +210,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 | File | Screen | Notes |
 |---|---|---|
-| `AW01` | Iniciar sesión | Centered card, email + password, error state |
+| `AW01` | Iniciar sesión | Centered card, email + password, error and throttled states |
 | `AW02` | Horario | Week grid of sessions; establishes the shell |
 | `AW03` | Formulario de sesión | Side panel; seats booked + waitlist count, capacity constraints, trainer notification; cancelling refunds every booking and notifies the waitlist too |
 | `AW04` | Planes | Catalog table |
@@ -233,15 +233,15 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW21` | Clientes | Read-only directory, 4 columns, search only, paginated; **no primary action**; after a closure from `AW22` it reloads without her and shows «Cuenta de … cerrada.» |
 | `AW22` | Detalle de cliente | Read-only side panel: contacto, plan, crédito, referidos; **no Guardar**; one quiet footer action «Cerrar cuenta» (Error outline) opening a consequences confirmation, refused while a transfer payment awaits review |
 | `AW23` | Personal | Team accounts, 4 columns, role filter; row → `AW24` |
-| `AW24` | Formulario de personal | One role (2×2 grid), assigned branches, temporary password on create |
+| `AW24` | Formulario de personal | One role (2×2 grid), assigned branches, email + optional phone, activation-link invitation and pending states |
 | `AW25` | Evaluaciones nutricionales | Read-only list, date range + nutritionist filter, no status column; empty state |
 | `AW26` | Referidos | Read-only, 4 columns, Crédito otorgado / Pendiente pill |
 | `AW27` | Créditos | Read-only, 3 columns, right-aligned tabular amounts, total row |
 | `AW28` | Pagos | Studio-wide transfers; search + status filter (default Pendiente); pending row → `AW29` |
 | `AW29` | Revisar pago | Review panel: summary, large receipt, Confirmar pago / Rechazar (+ mandatory reason) |
-| `AW30` | Recuperar contraseña | Request a reset link + "link sent" state |
+| `AW30` | Recuperar contraseña | Request a reset link + neutral "link sent" and temporary-limit states |
 | `AW31` | Retiros e insumos consumidos | Withdrawal history behind `AW08` |
-| `AW32` | Crear contraseña | Set password from the emailed link / first login |
+| `AW32` | Crear contraseña | Page opened by an emailed link: Desde una invitación or Restablecer contraseña, plus expired and removed-invitation states |
 | `AW33` | Menú de usuario y cambiar contraseña | Top-bar user menu overlay, change-password side panel, log-out confirm |
 | `AW34` | Selector de sucursal | Not a page: the open states of the top-bar branch control (branches come from `AW19`); picking one closes the popover and reloads the current page in that scope |
 
@@ -251,7 +251,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 **Navigation — admin web**
 - Sidebar item → page. `+ Nuevo …` and any table row → the matching side panel (`AW04→AW05`, `AW06→AW07`, `AW08→AW09`, `AW11→AW12`, `AW13→AW14`, `AW17→AW18`, `AW19→AW20`, `AW21→AW22`, `AW23→AW24`, `AW28→AW29`). Close icon or scrim dismisses the panel.
-- `AW01→AW30` via "¿Olvidaste tu contraseña?"; `AW01→AW32` from the emailed link / a first login with a temporary password.
+- `AW01→AW30` via "¿Olvidaste tu contraseña?". The emailed links open `AW32`: an activation from `AW24` returns to `AW01` with «Tu cuenta está activa. Inicia sesión con tu nueva contraseña.» and no session; a password reset revokes older sessions and lands on `AW02` with a new one. A throttled `AW01` shows «Demasiados intentos. Intenta de nuevo en un momento.» with the server-provided wait and never says the account is locked.
 - `AW08→AW31` via "Ver historial de retiros"; the back link returns to `AW08`.
 - The top-bar user cell opens the `AW33` menu overlay (change-password side panel, log-out confirm) from any shell page.
 - `AW22` → «Cerrar cuenta» opens a confirmation that lists what the closure does to that client; **Volver** / **Cerrar cuenta** (Error outline). A pending transfer keeps the dialog open with a refusal and a link to `AW28`; a completed closure returns to `AW21` with an Éxito line.
@@ -260,14 +260,17 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 **Navigation — client app**
 - Four-tab bar: Inicio · Reservar · Mis Reservas · Perfil. Child screens replace the tab bar with a header and a back arrow.
-- `01→20` via "¿Olvidaste tu contraseña?". `01→21` is forced after a first login with a temporary password — the client cannot reach `02` until it completes.
+- `01→20` via "¿Olvidaste tu contraseña?". Email is the only login, registration, and recovery identifier; phone is optional contact data added later in `22`.
+- `01` registration → «Revisa tu correo» (no tab bar, no route to `02`): the submitted address with «Cambiar correo», «Reenviar correo», «Volver a iniciar sesión», and a quiet «Cancelar registro» with confirmation. The link expires in 24 hours; the pending registration is removed after 7 days without verification, correction, or resend, after which «El registro venció» sends the person back to register. Opening the link verifies the email but does not sign in.
+- Emailed links open `21`: **Activar cuenta** (from an `S05` invitation, 7-day links, removed after 30 days of inactivity) returns to `01` without a session; **Restablecer contraseña** (from `20`, 30-minute links) lands on `02` with a new session. Expired recovery links return to `20`.
 - `18→22` (Editar perfil) and `18→23` (Cambiar contraseña); both return to `18`.
 - `18→24` (Cerrar mi cuenta) through the quiet Error-tone link under «Cerrar sesión»; the back arrow and «Cancelar» return to `18`, and a completed closure signs the client out onto `01` with the notice «Cerramos tu cuenta. Gracias por entrenar con nosotras.»
 - Booking and assessment confirmations are acknowledged on arrival, not on a result screen: `04→05` and `14→15` land with a transient Éxito-tinted notice strip under the header (check glyph + "Reserva confirmada" / "Evaluación confirmada" and the class, day and time in the Nota style). It fades after a few seconds or on first scroll and never returns for that record; while it shows, the new card carries a 3px Éxito left edge so it can be found in the list. No button, no dismiss control. `05` adds one muted balance line ("Te quedan 7 clases en tu plan."); `15` has none — an assessment consumes no class allowance.
 
 **Navigation — staff app**
 - No tab bar for any role. Each role lands on its own root — `S02` Trainer, `S04` Front desk, `S11` Administration, `S15` Nutritionist — and navigates in depth from a header with a back arrow.
-- `S01→S18` via "¿Olvidaste tu contraseña?"; `S01→S19` on first login with a temporary password.
+- `S01→S18` via "¿Olvidaste tu contraseña?". Emailed links open `S19`: **Activar cuenta** (from an `AW24` invitation) returns to `S01` without a session; **Restablecer contraseña** lands on the role root (`S02`, `S04`, `S11`, `S15`) with a new session.
+- `S05` sends an activation link instead of a password. While the Client is pending it shows the invitation with «Cambiar correo», «Reenviar enlace», «Cancelar invitación» (confirmation, returns to `S04`) and «Ver resumen de la clienta» (`S06`); it also draws the same-email, self-registered, other-account, and resend-limit states.
 - `S06→S21` (Reservas de la clienta) and `S06→S22` (Historial de la clienta).
 - `S15` cards are selectable, not navigable: tapping highlights a card (border → `#B78380`) so the nutritionist keeps their place down the day. There is no assessment detail screen anywhere — an Evaluation records the appointment, not its content (same reason `AW25` rows are not links).
 - `S20` has no menu entry — it is reached from a push notification and filtered by role. Every role root (`S02`, `S04`, `S11`, `S15`) carries a 46px circular initials avatar as the **last control on the right** of its header, labelled "Tu cuenta", and it is the only path to `S23` — and therefore to change password and log out. Where the root also has a screen action (`S11` → `S13`, `S15` → `S16`), that action is a 46px rounded square with a 1px `#D8C9BB` border and sits **before** the avatar (10px gap): outlined square = screen action, filled circle with initials = your account.
@@ -279,7 +282,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `AW21` no-results: search is the whole interface, so the miss is drawn. The table card and its header row stay, with the message centred in the body — "No se encontró ninguna clienta." + "Revisa cómo escribiste el nombre o el teléfono." + a quieter "Las cuentas se crean desde la app del personal o cuando la clienta se registra." **No call to action** (unlike `S04`, this screen cannot create a client). Footer reads "Mostrando 0 de 148 clientas" and both pagination controls render in the disabled tone. At 420px the stacked cards are replaced by the same message with the search field pinned above.
 - `AW22`: read-only summary panel on `#FAF7F2` rows — contacto, plan (vigencia, clases disponibles), crédito, referidos (código). With no active plan the Plan block collapses to one muted line ("Último plan vencido el 30/06/2026."). No footer, no editable fields.
 - `AW23`: `+ Nuevo miembro` and any row open `AW24`. Role renders as a neutral label, not a status pill; branch assignment listed as plain text ("Equipetrol, Urubó" / "Todas"). One-at-a-time role filter, default "Todos".
-- `AW24`: exactly one role, chosen in a 2×2 grid (selected = Palo de rosa, others neutral). Choosing **Administrador** replaces the branch picker with a read-only row ("Todas las sucursales (implícito por el rol)"). Create mode shows a generated temporary password (`emma-9T57`) with **Copiar** and the note that the person changes it at first login — same pattern as `S05`. Edit mode drops the temporary password and offers **Restablecer contraseña**; removing a branch warns that already-assigned sessions are not reassigned.
+- `AW24`: exactly one role, chosen in a 2×2 grid (selected = Palo de rosa, others neutral). Choosing **Administrador** replaces the branch picker with a read-only row ("Todas las sucursales (implícito por el rol)"). Email is required and phone is a separate optional contact field. Create mode sends an activation link (7 days) — same pattern as `S05`; nobody sees a password. A pending member's edit state shows «Pendiente de activación», «Cambiar correo», «Reenviar enlace», the 30-day removal note, and a quiet «Cancelar invitación» with confirmation; a suppressed resend shows the server-provided wait, and an email that belongs to a Client is refused without changes. An activated member's edit mode offers **Restablecer contraseña**; removing a branch warns that already-assigned sessions are not reassigned.
 - `AW25`: read-only. Filters are a date range and a nutritionist dropdown ("Nutricionista: todas"). No status column — an assessment records no attendance. Empty state: "Sin evaluaciones en este rango" + "Prueba con otra semana o quita el filtro de nutricionista."
 - `AW26`: read-only, no manual creation — a referral exists only when someone registers with another client's code. Status pill: **Crédito otorgado** (Éxito) / **Pendiente** (Advertencia); credit is granted when the referred client's first payment is confirmed.
 - `AW27`: read-only, no manual adjustment. Columns Cliente / Saldo de crédito / Última actividad, amounts right-aligned and tabular, last-activity sub-line says "Crédito ganado" or "Usado en un pago". A summary row carries **Total en saldo activo**.
@@ -318,7 +321,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - Per-list: search query, category/month filters, pagination ("Mostrando 8 de 24").
 - Panel state: open/closed, create vs. edit, the record being edited, dirty fields, validation.
 - `AW17`: ordered promotion list + drag state (dragged id, hovered index).
-- `AW23`/`AW24`: role (one of trainer, front desk, administration, nutritionist) + assigned branch ids; administration implies all branches. Generated temporary password + `mustChangePassword` flag.
+- `AW23`/`AW24`: role (one of trainer, front desk, administration, nutritionist) + assigned branch ids; administration implies all branches. Account state (pending activation with link expiry, or active); no temporary password.
 - `AW25`: date range + nutritionist filter.
 - `AW28`/`AW29`: payment status (`pendiente` | `confirmado` | `rechazado`), search query, status filter (default `pendiente`), open payment id, receipt URL, rejection-reason text + its non-empty validation. Confirming a payment activates the subscription and consumes any credit; rejecting stores the reason and notifies the client to resend.
 - Derived/server data: low-stock flag (`quantity <= threshold`), category usage counts (gates deletion), monthly totals, income/expense aggregates.
