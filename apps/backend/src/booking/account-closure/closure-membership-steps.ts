@@ -2,7 +2,6 @@ import type { Prisma } from '../../generated/prisma/client';
 import {
   CreditLedgerActorKind,
   CreditLedgerEntryKind,
-  PaymentState,
   PurchaseIntentState,
   SubscriptionState,
 } from '../../generated/prisma/client';
@@ -12,6 +11,7 @@ import {
   settleReservation,
 } from '../payments/purchase-intent-settlement';
 import type { ClosureTransaction } from './close-client-account';
+import { closureScope } from './closure-scope';
 
 type Steps = Pick<
   ClosureTransaction,
@@ -27,7 +27,7 @@ export const createMembershipSteps = (
 ): Steps => ({
   hasPendingTransferPayment: async (clientId) =>
     (await transaction.payment.count({
-      where: { clientId, state: PaymentState.PENDING },
+      where: closureScope.pendingPayments(clientId),
     })) > 0,
 
   // An open Intent holds Credit and possibly an uploaded receipt; both go

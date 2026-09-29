@@ -67,6 +67,25 @@ export class AdminClientPageDto {
   activePlanClientCount!: number;
 }
 
+export class AdminClientClosureOutlookDto {
+  @ApiProperty({ minimum: 0, description: 'Future Bookings closure cancels' })
+  futureBookingCount!: number;
+
+  @ApiProperty({ minimum: 0, description: 'Waitlist entries closure closes' })
+  activeWaitlistEntryCount!: number;
+
+  @ApiProperty({
+    minimum: 0,
+    description: 'Upcoming Evaluations closure cancels',
+  })
+  upcomingEvaluationCount!: number;
+
+  @ApiProperty({
+    description: 'A transfer Payment awaits review, so closure is refused',
+  })
+  transferPaymentPending!: boolean;
+}
+
 export class AdminClientDetailDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
@@ -100,6 +119,9 @@ export class AdminClientDetailDto {
 
   @ApiProperty({ minimum: 0 })
   referredClientCount!: number;
+
+  @ApiProperty({ type: AdminClientClosureOutlookDto })
+  closure!: AdminClientClosureOutlookDto;
 }
 
 // Search is the directory's only filter; unknown parameters are refused

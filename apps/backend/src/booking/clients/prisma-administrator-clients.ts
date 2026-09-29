@@ -4,6 +4,7 @@ import {
   accountStatus,
   createAssistantClientRepository,
 } from '../assistant/prisma-assistant-client-repository';
+import { closureScope } from '../account-closure/closure-scope';
 import { createCatalogRepository } from '../catalog/prisma-catalog-repository';
 import { toSubscriptionSummary } from '../client/client-subscription';
 import { containsPattern } from '../search-pattern';
@@ -161,5 +162,25 @@ export const createPrismaAdministratorClients = (
     findLatestSubscription: (clientId) =>
       catalog.findLatestSubscription(clientId).then(toSubscriptionSummary),
     readAvailableCredit: (clientId) => credit.readAvailableCredit(clientId),
+    readClosureOutlook: async (clientId, now) => {
+      const [bookings, waitlist, evaluations, pending] = await Promise.all([
+        prisma.booking.count({
+          where: closureScope.futureBookings(clientId, now),
+        }),
+        prisma.waitlistEntry.count({
+          where: closureScope.activeWaitlistEntries(clientId),
+        }),
+        prisma.evaluation.count({
+          where: closureScope.upcomingEvaluations(clientId, now),
+        }),
+        prisma.payment.count({ where: closureScope.pendingPayments(clientId) }),
+      ]);
+      return {
+        futureBookingCount: bookings,
+        activeWaitlistEntryCount: waitlist,
+        upcomingEvaluationCount: evaluations,
+        transferPaymentPending: pending > 0,
+      };
+    },
   };
 };

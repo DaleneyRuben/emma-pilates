@@ -4,13 +4,13 @@ import {
   BookingState,
   EvaluationCancellationCause,
   EvaluationState,
-  SessionState,
   WaitlistClosureReason,
 } from '../../generated/prisma/client';
 import { promoteWaitlistInTransaction } from '../commands/waitlist-promotion';
 import { releaseSlot } from '../evaluations/evaluation-slot-release';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import type { ClosureTransaction } from './close-client-account';
+import { closureScope } from './closure-scope';
 
 type Steps = Pick<
   ClosureTransaction,
@@ -29,7 +29,7 @@ export const createScheduleSteps = (
 ): Steps => ({
   closeWaitlistEntries: async ({ clientId, accountId, occurredAt }) => {
     const closed = await transaction.waitlistEntry.updateMany({
-      where: { clientId, closedAt: null },
+      where: closureScope.activeWaitlistEntries(clientId),
       data: {
         closedAt: occurredAt,
         closureReason: WaitlistClosureReason.LEFT,
@@ -41,14 +41,7 @@ export const createScheduleSteps = (
 
   cancelFutureBookings: async ({ clientId, accountId, occurredAt }) => {
     const future = await transaction.booking.findMany({
-      where: {
-        clientId,
-        state: BookingState.BOOKED,
-        session: {
-          state: SessionState.SCHEDULED,
-          startsAt: { gt: occurredAt },
-        },
-      },
+      where: closureScope.futureBookings(clientId, occurredAt),
       select: { id: true, sessionId: true },
     });
     await transaction.booking.updateMany({
@@ -68,11 +61,7 @@ export const createScheduleSteps = (
 
   cancelFutureEvaluations: async ({ clientId, accountId, occurredAt }) => {
     const future = await transaction.evaluation.findMany({
-      where: {
-        clientId,
-        state: EvaluationState.BOOKED,
-        slot: { startsAt: { gt: occurredAt } },
-      },
+      where: closureScope.upcomingEvaluations(clientId, occurredAt),
       select: { id: true, evaluationSlotId: true },
     });
     for (const evaluation of future) {

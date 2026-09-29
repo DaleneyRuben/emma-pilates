@@ -54,6 +54,12 @@ const detail = {
     },
   },
   creditAvailableCentavos: 105_000,
+  closure: {
+    futureBookingCount: 3,
+    activeWaitlistEntryCount: 1,
+    upcomingEvaluationCount: 1,
+    transferPaymentPending: false,
+  },
 };
 
 type Operation = jest.Mock<(...args: unknown[]) => Promise<unknown>>;

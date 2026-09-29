@@ -48,9 +48,19 @@ export type AdministratorClientRecord = {
   referredClientCount: number;
 };
 
+// What closing this Client's Account would cancel now (AW22, BE-007).
+export type ClientClosureOutlook = {
+  futureBookingCount: number;
+  activeWaitlistEntryCount: number;
+  upcomingEvaluationCount: number;
+  /** Closure is refused while a transfer Payment awaits review (G3). */
+  transferPaymentPending: boolean;
+};
+
 export type AdministratorClientDetail = AdministratorClientRecord & {
   subscription: ClientSubscriptionView;
   creditAvailableCentavos: number;
+  closure: ClientClosureOutlook;
 };
 
 export interface AdministratorClientDirectory {
@@ -69,6 +79,10 @@ export interface AdministratorClientDirectory {
     clientId: string,
   ) => Promise<ClientSubscriptionSummary | null>;
   readAvailableCredit: (clientId: string) => Promise<number>;
+  readClosureOutlook: (
+    clientId: string,
+    now: Date,
+  ) => Promise<ClientClosureOutlook>;
 }
 
 type Dependencies = {
@@ -101,15 +115,17 @@ export const readAdministratorClient = async (
   requireAdministrator(principal);
   const client = await directory.read(command.clientId);
   if (client === null) throw new AdministrationError('client_not_found');
-  const [subscription, creditAvailableCentavos] = await Promise.all([
+  const instant = now();
+  const [subscription, creditAvailableCentavos, closure] = await Promise.all([
     describeSubscription(client.id, {
-      today: boliviaDate(now()),
+      today: boliviaDate(instant),
       findActiveSubscription: (clientId, onDate) =>
         directory.findActiveSubscription(clientId, onDate),
       findLatestSubscription: (clientId) =>
         directory.findLatestSubscription(clientId),
     }),
     directory.readAvailableCredit(client.id),
+    directory.readClosureOutlook(client.id, instant),
   ]);
-  return { ...client, subscription, creditAvailableCentavos };
+  return { ...client, subscription, creditAvailableCentavos, closure };
 };
