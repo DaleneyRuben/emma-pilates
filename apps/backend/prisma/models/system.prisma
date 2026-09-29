@@ -22,6 +22,7 @@ enum AuthenticationSessionRevocationReason {
   PASSWORD_RECOVERED   @map("password_recovered")
   ACCOUNT_DISABLED     @map("account_disabled")
   SECURITY_ACTION      @map("security_action")
+  ACCOUNT_CLOSED       @map("account_closed")
 
   @@schema("system")
 }

@@ -27,6 +27,7 @@ enum CreditLedgerEntryKind {
   PAYMENT_RESERVATION @map("payment_reservation")
   PAYMENT_SPEND       @map("payment_spend")
   PAYMENT_RELEASE     @map("payment_release")
+  ACCOUNT_CLOSURE     @map("account_closure")
 
   @@schema("booking")
 }

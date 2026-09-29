@@ -15,6 +15,7 @@ enum EvaluationState {
 enum EvaluationCancellationCause {
   CLIENT_REQUEST  @map("client_request")
   STAFF_CANCELLED @map("staff_cancelled")
+  ACCOUNT_CLOSED  @map("account_closed")
 
   @@schema("booking")
 }
