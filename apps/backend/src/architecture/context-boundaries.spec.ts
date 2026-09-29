@@ -35,6 +35,9 @@ const sharedContextSlices = [
   // Account inside its own transaction through this System Identity slice
   // (IDN-007).
   'system-identity/staff-accounts',
+  // Closing a Client's Account revokes its sessions and marks the Account
+  // removed inside the Booking & Membership closure transaction (BE-007).
+  'system-identity/account-closure',
 ];
 // Shared kernel folders may depend on each other but never on a context.
 const sharedKernel = [
