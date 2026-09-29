@@ -22,6 +22,7 @@ import type {
 
 import type {
   AccountActivationResultDto,
+  AccountClosureSummaryDto,
   AdminBranchDto,
   AdminBranchPageDto,
   AdminClassTypeDto,
@@ -74,6 +75,7 @@ import type {
   ClientOverviewDto,
   ClientProfileDto,
   ClientSubscriptionDto,
+  CloseAccountRequestDto,
   CompleteAccountActivationDto,
   CompleteEmailChangeDto,
   CompletePasswordRecoveryDto,
@@ -16332,6 +16334,254 @@ export function useListAdminPayments<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type closeCurrentClientAccountResponse200 = {
+  data: AccountClosureSummaryDto;
+  status: 200;
+};
+
+export type closeCurrentClientAccountResponseSuccess =
+  closeCurrentClientAccountResponse200 & {
+    headers: Headers;
+  };
+export type closeCurrentClientAccountResponse =
+  closeCurrentClientAccountResponseSuccess;
+
+export const getCloseCurrentClientAccountUrl = () => {
+  return `/api/v1/accounts/current/closure`;
+};
+
+export const closeCurrentClientAccount = async (
+  closeAccountRequestDto: CloseAccountRequestDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<closeCurrentClientAccountResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCloseCurrentClientAccountUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(closeAccountRequestDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: closeCurrentClientAccountResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as closeCurrentClientAccountResponse;
+};
+
+export const getCloseCurrentClientAccountMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof closeCurrentClientAccount>>,
+    TError,
+    CloseCurrentClientAccountMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof closeCurrentClientAccount>>,
+  TError,
+  CloseCurrentClientAccountMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["closeCurrentClientAccount"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof closeCurrentClientAccount>>,
+    CloseCurrentClientAccountMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return closeCurrentClientAccount(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CloseCurrentClientAccountMutationResult = NonNullable<
+  Awaited<ReturnType<typeof closeCurrentClientAccount>>
+>;
+export type CloseCurrentClientAccountMutationBody = CloseAccountRequestDto;
+export type CloseCurrentClientAccountMutationError = unknown;
+export type CloseCurrentClientAccountMutationVariables = {
+  data: CloseAccountRequestDto;
+};
+
+export const useCloseCurrentClientAccount = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof closeCurrentClientAccount>>,
+      TError,
+      CloseCurrentClientAccountMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof closeCurrentClientAccount>>,
+  TError,
+  CloseCurrentClientAccountMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCloseCurrentClientAccountMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type closeAdminClientAccountResponse200 = {
+  data: AccountClosureSummaryDto;
+  status: 200;
+};
+
+export type closeAdminClientAccountResponseSuccess =
+  closeAdminClientAccountResponse200 & {
+    headers: Headers;
+  };
+export type closeAdminClientAccountResponse =
+  closeAdminClientAccountResponseSuccess;
+
+export const getCloseAdminClientAccountUrl = (clientId: string) => {
+  return `/api/v1/administrator/clients/${clientId}/closure`;
+};
+
+export const closeAdminClientAccount = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<closeAdminClientAccountResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getCloseAdminClientAccountUrl(clientId),
+    {
+      ...options,
+      method: "POST",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: closeAdminClientAccountResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as closeAdminClientAccountResponse;
+};
+
+export const getCloseAdminClientAccountMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof closeAdminClientAccount>>,
+    TError,
+    CloseAdminClientAccountMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof closeAdminClientAccount>>,
+  TError,
+  CloseAdminClientAccountMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["closeAdminClientAccount"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof closeAdminClientAccount>>,
+    CloseAdminClientAccountMutationVariables
+  > = (props) => {
+    const { clientId } = props ?? {};
+
+    return closeAdminClientAccount(clientId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CloseAdminClientAccountMutationResult = NonNullable<
+  Awaited<ReturnType<typeof closeAdminClientAccount>>
+>;
+
+export type CloseAdminClientAccountMutationError = unknown;
+export type CloseAdminClientAccountMutationVariables = { clientId: string };
+
+export const useCloseAdminClientAccount = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof closeAdminClientAccount>>,
+      TError,
+      CloseAdminClientAccountMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof closeAdminClientAccount>>,
+  TError,
+  CloseAdminClientAccountMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCloseAdminClientAccountMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type listAdminPromotionsResponse200 = {
   data: AdminPromotionDto[];

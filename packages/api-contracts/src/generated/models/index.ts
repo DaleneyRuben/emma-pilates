@@ -7,6 +7,7 @@
 
 export * from "./accountActivationResultDto";
 export * from "./accountActivationResultDtoStatus";
+export * from "./accountClosureSummaryDto";
 export * from "./adminBranchDto";
 export * from "./adminBranchPageDto";
 export * from "./adminClassTypeDto";
@@ -89,6 +90,7 @@ export * from "./clientProfileDto";
 export * from "./clientSubscriptionDto";
 export * from "./clientSubscriptionDtoStatus";
 export * from "./clientSubscriptionSummaryDto";
+export * from "./closeAccountRequestDto";
 export * from "./completeAccountActivationDto";
 export * from "./completeEmailChangeDto";
 export * from "./completePasswordRecoveryDto";

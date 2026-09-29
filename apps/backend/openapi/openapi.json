@@ -4036,6 +4036,80 @@
         ]
       }
     },
+    "/api/v1/accounts/current/closure": {
+      "post": {
+        "operationId": "closeCurrentClientAccount",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CloseAccountRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountClosureSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AccountClosure"
+        ]
+      }
+    },
+    "/api/v1/administrator/clients/{clientId}/closure": {
+      "post": {
+        "operationId": "closeAdminClientAccount",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountClosureSummaryDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AccountClosure"
+        ]
+      }
+    },
     "/api/v1/administrator/promotions": {
       "get": {
         "operationId": "listAdminPromotions",
@@ -9592,6 +9666,54 @@
           "pageSize",
           "totalItems",
           "pendingCount"
+        ]
+      },
+      "CloseAccountRequestDto": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "format": "password",
+            "minLength": 1,
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "password"
+        ]
+      },
+      "AccountClosureSummaryDto": {
+        "type": "object",
+        "properties": {
+          "closedWaitlistEntries": {
+            "type": "number",
+            "minimum": 0
+          },
+          "cancelledBookings": {
+            "type": "number",
+            "minimum": 0
+          },
+          "cancelledEvaluations": {
+            "type": "number",
+            "minimum": 0
+          },
+          "forfeitedClasses": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Classes left on the ended Subscription, forfeited without refund"
+          },
+          "forfeitedCreditCentavos": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Credit forfeited through the account_closure ledger entry"
+          }
+        },
+        "required": [
+          "closedWaitlistEntries",
+          "cancelledBookings",
+          "cancelledEvaluations",
+          "forfeitedClasses",
+          "forfeitedCreditCentavos"
         ]
       },
       "AdminPromotionImageDto": {
