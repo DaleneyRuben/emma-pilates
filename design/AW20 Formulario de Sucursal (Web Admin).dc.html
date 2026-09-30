@@ -160,7 +160,7 @@
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
-        <div style="width:408px;height:520px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="width:408px;height:576px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar sucursal</h3>
@@ -184,8 +184,69 @@
               <span style="font-size:12px;line-height:1.55;color:#8A807C;text-wrap:pretty;">Esta sucursal ya aparece en el selector de la barra superior y en todos los registros del back office asociados a ella: sesiones, pagos, insumos, gastos y nómina. Cambiarle el nombre no mueve ni reasigna esos datos.</span>
             </div>
           </div>
-          <div style="padding:18px 22px;border-top:1px solid #EFE6DC;">
+          <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:12px;">
             <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
+            <a href="#" style="align-self:center;font-size:13.5px;color:#B25D4B;padding:4px 8px;" style-hover="color:#94493A;">Archivar sucursal</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Archivar sucursal</div>
+          <div style="font-size:12px;color:#8A807C;">Abre el enlace de archivo · el historial se conserva</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:40px 36px;display:flex;justify-content:center;">
+        <div role="dialog" aria-modal="true" style="width:460px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:14px;box-shadow:0 18px 44px rgba(74,58,48,0.18);padding:22px 24px;display:flex;flex-direction:column;gap:16px;">
+          <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:21px;line-height:1.2;">¿Archivar Equipetrol?</h3>
+          <p style="margin:0;font-size:13.5px;line-height:1.55;color:#4A4A4A;">Deja de aparecer en el selector y no recibe sesiones nuevas. Su historial se conserva.</p>
+          <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;">
+            <button style="height:36px;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;">Volver</button>
+            <button style="height:36px;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13.5px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Archivar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Archivo rechazado</div>
+          <div style="font-size:12px;color:#8A807C;">El sistema no archiva mientras algo programado depende de ella: el panel lo dice sobre el pie</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:648px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar sucursal</h3>
+              <span style="font-size:11.5px;color:#8A807C;">Activa desde marzo de 2021</span>
+            </div>
+            <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+              <input type="text" value="Equipetrol" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Dirección</span>
+              <textarea rows="3" style="width:100%;padding:12px 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;line-height:1.5;resize:none;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">Av. San Martín 245, entre 3.º y 4.º anillo</textarea>
+            </label>
+            <div style="display:flex;gap:11px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FDFAF6;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 11v5.5M12 7.8v.6" stroke-linecap="round"></path></svg>
+              <span style="font-size:12px;line-height:1.55;color:#8A807C;text-wrap:pretty;">Esta sucursal ya aparece en el selector de la barra superior y en todos los registros del back office asociados a ella: sesiones, pagos, insumos, gastos y nómina. Cambiarle el nombre no mueve ni reasigna esos datos.</span>
+            </div>
+            <div role="alert" style="padding:10px 12px;border-radius:8px;background:rgba(178,93,75,0.08);border:1px solid rgba(178,93,75,0.35);font-size:12.5px;line-height:1.5;color:#94493A;">No puedes archivarla: tiene sesiones programadas o un horario semanal vigente.</div>
+          </div>
+          <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:12px;">
+            <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
+            <a href="#" style="align-self:center;font-size:13.5px;color:#B25D4B;padding:4px 8px;" style-hover="color:#94493A;">Archivar sucursal</a>
           </div>
         </div>
       </div>
@@ -233,7 +294,7 @@
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Dos campos</span>Nombre y dirección: nada más se edita, así que el panel cabe sin scroll.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Nombre corto</span>La ayuda del campo recuerda que ese texto se lee en el selector de la barra superior.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Nota solo al editar</span>Explica que renombrar no reasigna sesiones, pagos ni gastos. No aparece al crear.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin borrar</span>Igual que en AW19, el panel no ofrece eliminar: el historial de la sucursal se conserva.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Archivar, no borrar</span>El panel no ofrece eliminar: «Archivar sucursal» la saca del selector y conserva su historial, y se rechaza mientras tenga sesiones programadas o un horario semanal vigente.</div>
     </div>
   </div>
 

@@ -15,7 +15,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button, select { font: inherit; }
-  input::placeholder { color: #A79E9A; }
+  input::placeholder { color: #7A716D; }
   a { color: #B78380; text-decoration: none; }
   a:hover { color: #9C6764; }
 </style>
@@ -26,14 +26,14 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW03</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Formulario de sesión</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Panel lateral sobre la rejilla de AW02: el armazón no cambia y la semana sigue visible detrás, así no se pierde el contexto. Cambiar "Entrenador" en una sesión existente es el cambio de entrenadora —no hay flujo aparte—. "Cancelar sesión" es la misma acción de emergencia de S14: reembolsa todas las reservas afectadas y avisa a las clientas. Al crear se elige «Una sola vez» o «Cada semana»; al editar una sesión que genera una serie semanal, «Solo esta sesión» o «Esta y las futuras».</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Panel lateral sobre la rejilla de AW02: el armazón no cambia y la semana sigue visible detrás, así no se pierde el contexto. Cambiar "Entrenadora" en una sesión existente es el cambio de entrenadora —no hay flujo aparte—. "Cancelar sesión" es la misma acción de emergencia de S14: reembolsa todas las reservas afectadas y avisa a las clientas. Al crear se elige «Una sola vez» o «Cada semana»; al editar una sesión que genera una serie semanal, «Solo esta sesión» o «Esta y las futuras».</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · Nueva sesión</div>
-        <div style="font-size:12px;color:#8A807C;">Panel derecho sobre el horario · formulario vacío</div>
+        <div style="font-size:12px;color:#766D69;">Panel derecho sobre el horario · formulario vacío · «Guardar» con foco de teclado</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -43,8 +43,8 @@
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
         </div>
-        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
           admin.emmapilates.bo/horario/nueva
         </div>
       </div>
@@ -57,12 +57,12 @@
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
             Sucursal Equipetrol
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
             <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
             <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
         </div>
       </div>
@@ -73,11 +73,11 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
             Horario
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
           <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
           <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
@@ -87,10 +87,10 @@
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
           <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
@@ -101,18 +101,18 @@
             <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
               <div style="display:flex;flex-direction:column;gap:5px;">
                 <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Horario</h2>
-                <div style="font-size:12.5px;color:#8A807C;">10 – 16 de agosto de 2026 · Sucursal Equipetrol</div>
+                <div style="font-size:12.5px;color:#766D69;">10 – 16 de agosto de 2026 · Sucursal Equipetrol</div>
               </div>
             </div>
             <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
               <div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid #E4D8CC;background:#FDFAF6;">
-                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#A79E9A;">Lun 10</div>
-                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#A79E9A;">Mar 11</div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#7A716D;">Lun 10</div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#7A716D;">Mar 11</div>
                 <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#B78380;">Mié 12</div>
-                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#A79E9A;">Jue 13</div>
-                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#A79E9A;">Vie 14</div>
-                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#A79E9A;">Sáb 15</div>
-                <div style="padding:9px 10px;font-size:11px;color:#A79E9A;">Dom 16</div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#7A716D;">Jue 13</div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#7A716D;">Vie 14</div>
+                <div style="padding:9px 10px;border-right:1px solid #EFE6DC;font-size:11px;color:#7A716D;">Sáb 15</div>
+                <div style="padding:9px 10px;font-size:11px;color:#7A716D;">Dom 16</div>
               </div>
               <div style="display:grid;grid-template-columns:repeat(7,1fr);height:560px;">
                 <div style="border-right:1px solid #EFE6DC;background:repeating-linear-gradient(to bottom,#FFFFFF 0,#FFFFFF 43px,#F4EDE4 43px,#F4EDE4 44px);padding:6px 5px;display:flex;flex-direction:column;gap:44px;"><div style="height:38px;border-radius:7px;background:#EFE0DC;border-left:3px solid #B78380;"></div><div style="height:38px;border-radius:7px;background:#E9DFD1;border-left:3px solid #CBB9A4;"></div></div>
@@ -131,7 +131,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
               <div style="display:flex;flex-direction:column;gap:3px;">
                 <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Nueva sesión</h3>
-                <span style="font-size:11.5px;color:#8A807C;">Sucursal Equipetrol · sala única</span>
+                <span style="font-size:11.5px;color:#766D69;">Sucursal Equipetrol · sala única</span>
               </div>
               <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -143,9 +143,9 @@
                 <button style="flex:1;height:38px;display:flex;align-items:center;justify-content:center;padding:0 10px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#6E6663;font-size:13px;cursor:pointer;" style-hover="border-color:#B78380;">Cada semana</button>
               </div>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Tipo de clase</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Tipo de clase</span>
                 <div style="position:relative;">
-                  <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#A79E9A;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
+                  <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#7A716D;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
                     <option>Elige un tipo de clase</option>
                     <option>Reformer Intermedio</option>
                     <option>Reformer Avanzado</option>
@@ -153,40 +153,40 @@
                     <option>Barre</option>
                     <option>Prenatal</option>
                   </select>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
                 </div>
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Entrenador</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadora</span>
                 <div style="position:relative;">
-                  <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#A79E9A;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
+                  <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#7A716D;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
                     <option>Elige una entrenadora</option>
                     <option>Camila Rojas</option>
                     <option>Daniela Ortiz</option>
                     <option>Valeria Peña</option>
                   </select>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
                 </div>
-                <span style="font-size:11.5px;color:#A79E9A;">Solo entrenadoras asignadas a esta sucursal.</span>
+                <span style="font-size:11.5px;color:#7A716D;">Solo entrenadoras asignadas a esta sucursal.</span>
               </label>
               <div style="display:grid;grid-template-columns:1fr 132px;gap:12px;">
                 <label style="display:flex;flex-direction:column;gap:7px;">
-                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Fecha</span>
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Fecha</span>
                   <input type="text" placeholder="dd/mm/aaaa" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
                 </label>
                 <label style="display:flex;flex-direction:column;gap:7px;">
-                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Hora</span>
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Hora</span>
                   <input type="text" placeholder="--:--" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
                 </label>
               </div>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Capacidad</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Capacidad</span>
                 <input type="number" placeholder="Según el tipo de clase" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-                <span style="font-size:11.5px;color:#A79E9A;">Se llena con la capacidad del tipo de clase; ajústala si hay equipo fuera de servicio.</span>
+                <span style="font-size:11.5px;color:#7A716D;">Se llena con la capacidad del tipo de clase; ajústala si hay equipo fuera de servicio.</span>
               </label>
             </div>
             <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:12px;">
-              <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
+              <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 0 0 2px #FFFFFF,0 0 0 4px rgba(74,74,74,0.55);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
             </div>
           </aside>
         </main>
@@ -200,15 +200,15 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · Editar sesión</div>
-          <div style="font-size:12px;color:#8A807C;">Sesión de una serie semanal · «Solo esta sesión» la cambia como excepción · cancelación de emergencia al pie</div>
+          <div style="font-size:12px;color:#766D69;">Sesión de una serie semanal · «Solo esta sesión» la cambia como excepción · cancelación de emergencia al pie</div>
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
-        <div style="width:408px;height:720px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="width:408px;height:740px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar sesión</h3>
-              <span style="font-size:11.5px;color:#8A807C;">8 de 10 lugares reservados · 3 en lista de espera</span>
+              <span style="font-size:11.5px;color:#766D69;">8 de 10 lugares reservados · 3 en lista de espera</span>
             </div>
             <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -219,51 +219,43 @@
               <button style="flex:1;height:38px;display:flex;align-items:center;justify-content:center;padding:0 10px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;cursor:pointer;">Solo esta sesión</button>
               <button style="flex:1;height:38px;display:flex;align-items:center;justify-content:center;padding:0 10px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#6E6663;font-size:13px;cursor:pointer;" style-hover="border-color:#B78380;">Esta y las futuras</button>
             </div>
+            <div style="display:flex;flex-direction:column;gap:7px;">
+  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Tipo de clase</span>
+  <span style="font-size:14px;color:#4A4A4A;padding:2px 0;">Reformer Avanzado</span>
+</div>
             <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Tipo de clase</span>
-              <div style="position:relative;">
-                <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
-                  <option>Reformer Avanzado</option>
-                  <option>Reformer Intermedio</option>
-                  <option>Mat Pilates</option>
-                  <option>Barre</option>
-                  <option>Prenatal</option>
-                </select>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
-              </div>
-            </label>
-            <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Entrenador</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadora</span>
               <div style="position:relative;">
                 <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;cursor:pointer;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
                   <option>Valeria Peña</option>
                   <option>Camila Rojas</option>
                   <option>Daniela Ortiz</option>
                 </select>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
               </div>
-              <span style="font-size:11.5px;color:#8A807C;">Cambiar de entrenadora aquí avisa a las clientas con reserva.</span>
+              <span style="font-size:11.5px;color:#766D69;">Si cambias de entrenadora, le avisamos a la nueva.</span>
             </label>
             <div style="display:grid;grid-template-columns:1fr 132px;gap:12px;">
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Fecha</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Fecha</span>
                 <input type="text" value="12/08/2026" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Hora</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Hora</span>
                 <input type="text" value="16:00" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
+            <span style="font-size:11.5px;line-height:1.5;color:#7A716D;margin-top:-8px;">Si cambias el día o la hora, avisamos a las clientas con reserva.</span>
             <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Capacidad</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Capacidad</span>
               <input type="number" value="10" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-              <span style="font-size:11.5px;color:#A79E9A;">No puedes bajar de 8: ya hay 8 reservas confirmadas.</span>
+              <span style="font-size:11.5px;color:#7A716D;">No puedes bajar de 8: ya hay 8 reservas confirmadas.</span>
             </label>
           </div>
           <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:14px;">
             <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
             <a href="#" style="align-self:center;font-size:13.5px;color:#B25D4B;padding:4px 8px;" style-hover="color:#8A4433;">Cancelar sesión</a>
-            <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;text-align:center;">Cancelar reembolsa las 8 reservas y avisa a cada clienta y a las 3 en lista de espera.</span>
+            <span style="font-size:11.5px;line-height:1.5;color:#7A716D;text-align:center;">Cancelar reembolsa las 8 reservas y avisa a cada clienta y a las 3 en lista de espera.</span>
           </div>
         </div>
       </div>
@@ -273,7 +265,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · Nueva sesión · Cada semana</div>
-          <div style="font-size:12px;color:#8A807C;">Día de la semana y «Vigente desde» en lugar de la fecha · genera 30 días hacia adelante</div>
+          <div style="font-size:12px;color:#766D69;">Día de la semana y «Vigente desde» en lugar de la fecha · genera 30 días hacia adelante</div>
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
@@ -281,7 +273,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Nueva sesión</h3>
-              <span style="font-size:11.5px;color:#8A807C;">Sucursal Equipetrol · sala única</span>
+              <span style="font-size:11.5px;color:#766D69;">Sucursal Equipetrol · sala única</span>
             </div>
             <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -292,9 +284,9 @@
                 <button style="flex:1;height:38px;display:flex;align-items:center;justify-content:center;padding:0 10px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#6E6663;font-size:13px;cursor:pointer;" style-hover="border-color:#B78380;">Una sola vez</button>
                 <button style="flex:1;height:38px;display:flex;align-items:center;justify-content:center;padding:0 10px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;cursor:pointer;">Cada semana</button>
               </div>
-              <span style="font-size:11.5px;line-height:1.5;color:#8A807C;">Genera las sesiones de los próximos 30 días y las sigue creando cada semana.</span>
+              <span style="font-size:11.5px;line-height:1.5;color:#766D69;">Genera las sesiones de los próximos 30 días y las sigue creando cada semana.</span>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Tipo de clase</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Tipo de clase</span>
                 <div style="position:relative;">
                   <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
                     <option>Reformer Intermedio</option>
@@ -303,24 +295,24 @@
                     <option>Barre</option>
                     <option>Prenatal</option>
                   </select>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
                 </div>
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Entrenador</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadora</span>
                 <div style="position:relative;">
                   <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
                     <option>Camila Rojas</option>
                     <option>Daniela Ortiz</option>
                     <option>Valeria Peña</option>
                   </select>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
                 </div>
-                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Solo entrenadoras asignadas a esta sucursal.</span>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Solo entrenadoras asignadas a esta sucursal.</span>
               </label>
               <div style="display:grid;grid-template-columns:1fr 132px;gap:12px;">
                 <label style="display:flex;flex-direction:column;gap:7px;">
-                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Día de la semana</span>
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Día de la semana</span>
                   <div style="position:relative;">
                     <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
                       <option>Martes</option>
@@ -331,23 +323,23 @@
                       <option>Sábado</option>
                       <option>Domingo</option>
                     </select>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
                   </div>
                 </label>
                 <label style="display:flex;flex-direction:column;gap:7px;">
-                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Hora</span>
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Hora</span>
                   <input type="text" value="07:00" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
                 </label>
               </div>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Capacidad</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Capacidad</span>
                 <input type="number" value="10" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Se llena con la capacidad del tipo de clase; ajústala si hay equipo fuera de servicio.</span>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Se llena con la capacidad del tipo de clase; ajústala si hay equipo fuera de servicio.</span>
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Vigente desde</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Vigente desde</span>
                 <input type="text" value="18/08/2026" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Fecha en hora de Bolivia.</span>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Fecha en hora de Bolivia.</span>
               </label>
           </div>
           <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:14px;">
@@ -361,15 +353,15 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · Editar sesión · Esta y las futuras</div>
-          <div style="font-size:12px;color:#8A807C;">Cierra la serie en «Vigente desde» y reemplaza solo las sesiones sin reservas desde esa fecha</div>
+          <div style="font-size:12px;color:#766D69;">Cierra la serie en «Vigente desde» y reemplaza solo las sesiones sin reservas desde esa fecha</div>
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
-        <div style="width:408px;height:760px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="width:408px;height:800px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar sesión</h3>
-              <span style="font-size:11.5px;color:#8A807C;">8 de 10 lugares reservados · 3 en lista de espera</span>
+              <span style="font-size:11.5px;color:#766D69;">8 de 10 lugares reservados · 3 en lista de espera</span>
             </div>
             <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -381,21 +373,21 @@
                 <button style="flex:1;height:38px;display:flex;align-items:center;justify-content:center;padding:0 10px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;font-size:13px;font-weight:500;cursor:pointer;">Esta y las futuras</button>
               </div>
               <span style="font-size:13px;color:#4A4A4A;">Serie semanal de Reformer Avanzado</span>
-              <span style="font-size:11.5px;line-height:1.5;color:#8A807C;">Las sesiones que ya tienen reservas o lista de espera se mantienen sin cambios.</span>
+              <span style="font-size:11.5px;line-height:1.5;color:#766D69;">Las sesiones que ya tienen reservas o lista de espera se mantienen sin cambios.</span>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Entrenador</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadora</span>
                 <div style="position:relative;">
                   <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
                     <option>Valeria Peña</option>
                     <option>Camila Rojas</option>
                     <option>Daniela Ortiz</option>
                   </select>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
                 </div>
               </label>
               <div style="display:grid;grid-template-columns:1fr 132px;gap:12px;">
                 <label style="display:flex;flex-direction:column;gap:7px;">
-                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Día de la semana</span>
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Día de la semana</span>
                   <div style="position:relative;">
                     <select style="appearance:none;height:44px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;cursor:pointer;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">
                       <option>Miércoles</option>
@@ -406,28 +398,72 @@
                       <option>Sábado</option>
                       <option>Domingo</option>
                     </select>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:16px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
                   </div>
                 </label>
                 <label style="display:flex;flex-direction:column;gap:7px;">
-                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Hora</span>
+                  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Hora</span>
                   <input type="text" value="17:00" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
                 </label>
               </div>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Capacidad</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Capacidad</span>
                 <input type="number" value="10" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Vigente desde</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Vigente desde</span>
                 <input type="text" value="19/08/2026" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Fecha en hora de Bolivia. Las sesiones anteriores no cambian.</span>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Fecha en hora de Bolivia. Las sesiones anteriores no cambian.</span>
               </label>
           </div>
           <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:14px;">
             <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
+            <a href="#" style="align-self:center;font-size:13.5px;color:#B78380;padding:4px 8px;" style-hover="color:#9C6764;">Terminar la serie</a>
             <a href="#" style="align-self:center;font-size:13.5px;color:#B25D4B;padding:4px 8px;" style-hover="color:#8A4433;">Cancelar sesión</a>
-            <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;text-align:center;">Cancelar afecta solo a la sesión del 12/08: reembolsa sus 8 reservas y avisa a cada clienta y a las 3 en lista de espera.</span>
+            <span style="font-size:11.5px;line-height:1.5;color:#7A716D;text-align:center;">Cancelar afecta solo a la sesión del 12/08: reembolsa sus 8 reservas y avisa a cada clienta y a las 3 en lista de espera.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Cancelar sesión</div>
+          <div style="font-size:12px;color:#766D69;">Solo para una sesión con reservas · reembolsa también dentro de las 2 h 30</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:40px 36px;display:flex;justify-content:center;">
+        <div role="dialog" aria-modal="true" style="width:460px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:14px;box-shadow:0 18px 44px rgba(74,58,48,0.18);padding:22px 24px;display:flex;flex-direction:column;gap:16px;">
+          <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:21px;line-height:1.2;">¿Cancelar esta sesión?</h3>
+          <p style="margin:0;font-size:13.5px;line-height:1.55;color:#4A4A4A;">Se cancelan las 8 reservas y cada clienta recupera su clase, aunque falten menos de 2 h 30. Avisamos a cada clienta y a las 3 personas en lista de espera. No se puede deshacer.</p>
+          <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;">
+            <button style="height:36px;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;">Volver</button>
+            <button style="height:36px;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13.5px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cancelar sesión</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Terminar la serie</div>
+          <div style="font-size:12px;color:#766D69;">Desde «Esta y las futuras» · cancela solo las sesiones sin reservas</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:40px 36px;display:flex;justify-content:center;">
+        <div role="dialog" aria-modal="true" style="width:460px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:14px;box-shadow:0 18px 44px rgba(74,58,48,0.18);padding:22px 24px;display:flex;flex-direction:column;gap:16px;">
+          <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:21px;line-height:1.2;">¿Terminar esta serie semanal?</h3>
+          <p style="margin:0;font-size:13.5px;line-height:1.55;color:#4A4A4A;">Reformer Avanzado deja de repetirse desde la fecha que elijas. Las sesiones sin reservas se cancelan; las que tienen reservas o lista de espera se mantienen.</p>
+          <label style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Deja de repetirse desde</span>
+            <input type="text" value="26/08/2026" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Fecha en hora de Bolivia.</span>
+          </label>
+          <div style="display:flex;justify-content:flex-end;gap:10px;padding-top:4px;">
+            <button style="height:36px;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;font-weight:500;cursor:pointer;" style-hover="border-color:#B78380;">Volver</button>
+            <button style="height:36px;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13.5px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Terminar serie</button>
           </div>
         </div>
       </div>
@@ -437,65 +473,59 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
-          <div style="font-size:12px;color:#8A807C;">El panel pasa a hoja de pantalla completa · sesión de una sola vez, sin «Solo esta sesión» / «Esta y las futuras»</div>
+          <div style="font-size:12px;color:#766D69;">El panel pasa a hoja de pantalla completa · sesión de una sola vez y sin reservas: sin elección de alcance y sin «Cancelar sesión»</div>
         </div>
       </sc-if>
       <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
         <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
-          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/horario/editar
           </div>
         </div>
         <div style="height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px;border-bottom:1px solid #EFE6DC;">
           <div style="display:flex;flex-direction:column;gap:2px;">
             <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:21px;line-height:1.1;">Editar sesión</h3>
-            <span style="font-size:11px;color:#8A807C;">Sáb 15 ago · 09:00</span>
+            <span style="font-size:11px;color:#766D69;">Sáb 15 ago · 09:00 · sin reservas</span>
           </div>
           <button style="width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
           </button>
         </div>
         <div style="padding:18px 16px 22px;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;flex-direction:column;gap:7px;">
+  <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Tipo de clase</span>
+  <span style="font-size:15px;color:#4A4A4A;padding:2px 0;">Barre</span>
+</div>
           <label style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Tipo de clase</span>
-            <div style="position:relative;">
-              <select style="appearance:none;height:48px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;cursor:pointer;">
-                <option>Barre</option>
-                <option>Reformer Avanzado</option>
-                <option>Mat Pilates</option>
-              </select>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:18px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
-            </div>
-          </label>
-          <label style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Entrenador</span>
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadora</span>
             <div style="position:relative;">
               <select style="appearance:none;height:48px;width:100%;padding:0 36px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;cursor:pointer;">
                 <option>Daniela Ortiz</option>
                 <option>Valeria Peña</option>
                 <option>Camila Rojas</option>
               </select>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2" style="position:absolute;right:14px;top:18px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2" style="position:absolute;right:14px;top:18px;pointer-events:none;"><path d="M6 9l6 6 6-6"></path></svg>
             </div>
+            <span style="font-size:11.5px;color:#7A716D;">Si cambias de entrenadora, le avisamos a la nueva.</span>
           </label>
           <div style="display:grid;grid-template-columns:1fr 120px;gap:12px;">
             <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Fecha</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Fecha</span>
               <input type="text" value="15/08/2026" style="height:48px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
             </label>
             <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Hora</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Hora</span>
               <input type="text" value="09:00" style="height:48px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
             </label>
           </div>
           <label style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Capacidad</span>
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Capacidad</span>
             <input type="number" value="10" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
-            <span style="font-size:11.5px;color:#A79E9A;">Editable si hay equipo fuera de servicio.</span>
+            <span style="font-size:11.5px;color:#7A716D;">Ajústala si hay equipo fuera de servicio.</span>
           </label>
           <button style="height:50px;width:100%;margin-top:2px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">Guardar</button>
-          <a href="#" style="align-self:center;font-size:14px;color:#B25D4B;padding:6px 8px;" style-hover="color:#8A4433;">Cancelar sesión</a>
+          <span style="align-self:center;font-size:12.5px;line-height:1.5;color:#7A716D;text-align:center;">Sin reservas: si sigue vacía, el sistema la cancela sola 2 horas antes de empezar.</span>
         </div>
       </div>
     </div>
@@ -504,11 +534,13 @@
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin perder el lugar</span>El panel se abre sobre la rejilla; al cerrar, la semana sigue donde estaba.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cambio de entrenadora</span>Es editar el campo "Entrenador" en una sesión existente: sin flujo aparte.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cambio de entrenadora</span>Es editar el campo "Entrenadora" en una sesión existente: sin flujo aparte.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Capacidad</span>Llega del tipo de clase y nunca baja del número de reservas ya confirmadas.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cancelar sesión</span>Misma acción que S14: reembolsa cada reserva y notifica; pide confirmación antes de ejecutarse. Siempre afecta a una sola sesión y no pide motivo.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cancelar sesión</span>Misma acción que S14 y solo para una sesión con reservas: reembolsa cada reserva, aun dentro de las 2 h 30, y avisa; pide confirmación y no pide motivo. Una sesión vacía no la ofrece: el sistema la cancela sola 2 horas antes.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Una sola vez o cada semana</span>«Una sola vez» pide la fecha. «Cada semana» pide el día de la semana y «Vigente desde» en hora de Bolivia, y genera las sesiones de los próximos 30 días.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Solo esta o las futuras</span>Al editar una sesión de una serie: «Solo esta sesión» crea una excepción; «Esta y las futuras» cierra la serie en «Vigente desde» y reemplaza solo las sesiones sin reservas ni lista de espera. Una sesión de una sola vez no pregunta.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Qué cambia en una sesión</span>Entrenadora, día u hora y capacidad; el tipo de clase de una sesión existente es solo lectura. Cambiar de entrenadora avisa a la nueva; cambiar el día o la hora avisa a las clientas con reserva.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Terminar la serie</span>Desde «Esta y las futuras»: pide desde qué fecha deja de repetirse, cancela las sesiones sin reservas y mantiene las que tienen reservas o lista de espera.</div>
   </div>
 
 </div>

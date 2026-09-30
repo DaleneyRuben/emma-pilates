@@ -223,10 +223,30 @@
           </div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:12px;color:#A79E9A;">
-            <span>Mostrando 8 de 34 referidos</span>
+            <span>Mostrando 1–8 de 34 referidos</span>
             <span>El crédito se otorga solo cuando se confirma el primer pago de la referida.</span>
           </div>
         </main>
+      </div>
+    </div>
+  </div>
+
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Sin resultados</div>
+          <div style="font-size:12px;color:#8A807C;">La búsqueda no coincide · la cabecera se queda · los conteos del subtítulo siguen siendo del estudio</div>
+        </div>
+      </sc-if>
+      <div style="width:1100px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Referidos</h2><div style="font-size:12.5px;color:#8A807C;">34 referidos · 27 con crédito otorgado, 7 pendientes</div></div>
+        <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;"><div>Cliente que refiere</div><div>Cliente referido</div><div>Fecha de registro</div><div>Estado</div></div>
+          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">No se encontró ningún referido.</span><span style="font-size:13px;color:#8A807C;">Revisa cómo escribiste el nombre de la clienta.</span><span style="font-size:13px;color:#8A807C;">Un referido nace cuando una clienta se registra con el código de otra.</span></div>
+        </div>
+        <div style="font-size:12px;color:#A79E9A;">Sin resultados</div>
       </div>
     </div>
   </div>
@@ -258,7 +278,7 @@
         <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;flex-direction:column;gap:3px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.15;">Referidos</h2>
-            <span style="font-size:12px;color:#8A807C;">34 referidos · 7 pendientes</span>
+            <span style="font-size:12px;color:#8A807C;">34 referidos · 27 con crédito otorgado, 7 pendientes</span>
           </div>
           <div style="height:40px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
@@ -319,6 +339,7 @@
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Dos estados</span>"Crédito otorgado" en éxito y "Pendiente" en advertencia: el pago confirmado es lo que cambia la píldora.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Filas sin clic</span>La fila es el registro completo, así que no hay panel de detalle al que ir.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Quién refiere, repetido</span>Una clienta aparece tantas veces como referidas tenga; la segunda línea da su total.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Conteos del estudio</span>El subtítulo cuenta todo el estudio aunque haya una búsqueda; sin ninguno dice «Todavía no hay referidos en el estudio». Sin coincidencias, la tabla dice «No se encontró ningún referido.» y el pie «Sin resultados».</div>
     </div>
   </div>
 

@@ -107,6 +107,10 @@
             </button>
           </div>
 
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button style="height:34px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">Estado: Todas<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+          </div>
+
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;max-width:1000px;">
             <div style="display:grid;grid-template-columns:1.3fr 2.2fr 18px;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
               <div>Nombre</div>
@@ -143,8 +147,8 @@
 
             <a href="#" style="display:grid;grid-template-columns:1.3fr 2.2fr 18px;align-items:center;gap:16px;padding:15px 20px;color:#4A4A4A;" style-hover="background:#FDF7F2;">
               <div style="display:flex;flex-direction:column;gap:2px;">
-                <span style="font-size:14px;font-weight:500;">Las Palmas</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Sin sesiones esta semana</span>
+                <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:14px;font-weight:500;">Las Palmas</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:#EFE6DC;color:#6E6663;font-size:10.5px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#A79E9A;"></span>Archivada</span></span>
+                <span style="font-size:11.5px;color:#A79E9A;">Sin sesiones programadas</span>
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Calle Los Tajibos 78, barrio Las Palmas</div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
@@ -153,7 +157,7 @@
 
           <div style="max-width:1000px;display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:12px;color:#A79E9A;">
             <span>Mostrando 4 de 4 sucursales</span>
-            <span>Una sucursal con historial de sesiones no se borra: edita su nombre o su dirección.</span>
+            <span>Una sucursal nunca se borra: se archiva cuando no tiene sesiones programadas ni horario semanal vigente.</span>
           </div>
         </main>
       </div>
@@ -216,7 +220,7 @@
             </a>
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                <span style="font-size:14.5px;font-weight:500;">Las Palmas</span>
+                <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:14.5px;font-weight:500;">Las Palmas</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:#EFE6DC;color:#6E6663;font-size:10.5px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#A79E9A;"></span>Archivada</span></span>
                 <span style="font-size:12.5px;color:#8A807C;line-height:1.45;">Calle Los Tajibos 78, barrio Las Palmas</span>
               </div>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round" style="flex:none;"><path d="M9 5l7 7-7 7"></path></svg>
@@ -229,7 +233,7 @@
     <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Raíz del alcance</span>Cada sucursal es el filtro de todo lo demás: horario, pagos, insumos, gastos y reportes.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Dos columnas</span>Nombre y dirección es todo lo que se edita, así que la tabla no necesita más ancho que 1000 px.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin borrar</span>No hay ícono de basurero en la fila: el historial de sesiones nunca queda huérfano.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Archivar, no borrar</span>No hay ícono de basurero: una sucursal se archiva desde su ficha y conserva su historial. El filtro Estado (Activas · Archivadas · Todas) muestra las activas por defecto; la píldora neutra «Archivada» marca las demás.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Navegación a AW20</span>La fila completa abre la ficha con datos; el botón abre la misma ficha vacía.</div>
     </div>
   </div>

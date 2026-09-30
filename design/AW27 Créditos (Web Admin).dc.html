@@ -160,7 +160,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 80,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">28/07/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Crédito ganado</span>
+                <span style="font-size:11.5px;color:#A79E9A;">Reservado para un pago</span>
               </div>
             </div>
 
@@ -196,7 +196,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 40,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">14/06/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Usado en un pago</span>
+                <span style="font-size:11.5px;color:#A79E9A;">Devuelto al saldo</span>
               </div>
             </div>
 
@@ -236,6 +236,43 @@
             <span>El saldo se mueve solo: entra por referidos y sale al confirmar un pago.</span>
           </div>
         </main>
+      </div>
+    </div>
+  </div>
+
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Buscando</div>
+          <div style="font-size:12px;color:#8A807C;">Con una búsqueda escrita no hay total: una página buscada no suma el saldo del estudio</div>
+        </div>
+      </sc-if>
+      <div style="width:1000px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Créditos</h2><div style="font-size:12.5px;color:#8A807C;">Bs 640,00 en saldo activo</div></div>
+        <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;"><div>Cliente</div><div>Saldo de crédito</div><div>Última actividad</div></div>
+          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">No se encontró ninguna clienta con crédito.</span><span style="font-size:13px;color:#8A807C;">Revisa cómo escribiste el nombre.</span></div>
+        </div>
+        <div style="font-size:12px;color:#A79E9A;">Sin resultados</div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Sin crédito en el estudio</div>
+          <div style="font-size:12px;color:#8A807C;">Nadie tiene saldo a favor</div>
+        </div>
+      </sc-if>
+      <div style="width:1000px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Créditos</h2><div style="font-size:12.5px;color:#8A807C;">Bs 0,00 en saldo activo</div></div>
+        <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;"><div>Cliente</div><div>Saldo de crédito</div><div>Última actividad</div></div>
+          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">Ninguna clienta tiene crédito disponible.</span><span style="font-size:13px;color:#8A807C;">El crédito se gana con los referidos y se usa al confirmar un pago.</span></div>
+        </div>
+        <div style="font-size:12px;color:#A79E9A;">Mostrando 0 de 0 clientas con crédito</div>
       </div>
     </div>
   </div>
@@ -313,6 +350,7 @@
 
     <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin ajuste manual</span>El saldo entra por referidos y sale al confirmar un pago: nadie lo edita a mano desde acá.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cuatro movimientos</span>«Última actividad» dice qué hizo el último movimiento: «Crédito ganado» (un referido), «Reservado para un pago» (una compra abierta), «Usado en un pago» (al confirmarse) o «Devuelto al saldo» (la compra venció o se rechazó). El total solo se ve sin búsqueda.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Solo saldo mayor a cero</span>Cuando el crédito se gasta por completo, la clienta sale de la lista.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Fila de total</span>Cierra la tabla con la misma suma del subtítulo, para cuadrar de un vistazo.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin historial</span>La última actividad dice si fue entrada o salida; el detalle de movimientos queda para más adelante.</div>

@@ -25,14 +25,14 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW16</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Reporte de ingresos y gastos</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">La única pantalla hecha para leer, no para editar. Cruza los pagos confirmados de los clientes contra los sueldos de AW11 y los gastos de AW13. Trae su propio rango de fechas y su propio selector de sucursal, con la opción "Todas las sucursales" que el selector de la barra superior no puede dar.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">La única pantalla hecha para leer, no para editar. Cruza los pagos confirmados de los clientes contra los sueldos de AW11 y los gastos de AW13. Trae su propio rango de fechas y su propio selector de sucursal, con la opción "Todas las sucursales" que el selector de la barra superior no puede dar.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
-        <div style="font-size:12px;color:#8A807C;">Tres cifras, un gráfico y el desglose por categoría</div>
+        <div style="font-size:12px;color:#766D69;">Tres cifras, un gráfico y el desglose por categoría</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -42,8 +42,8 @@
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
         </div>
-        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
           admin.emmapilates.bo/reporte/ingresos-y-gastos
         </div>
       </div>
@@ -53,11 +53,11 @@
           <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
         </div>
         <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
-          <span style="font-size:11.5px;color:#A79E9A;">El reporte usa su propio filtro de sucursal</span>
+          <span style="font-size:11.5px;color:#7A716D;">El reporte usa su propio filtro de sucursal</span>
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
             <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
             <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
         </div>
       </div>
@@ -65,14 +65,14 @@
       <div style="display:flex;align-items:stretch;min-height:760px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
           <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
             Horario
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
           <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
           <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
@@ -85,7 +85,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8A5D59" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
@@ -95,19 +95,10 @@
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Reporte de ingresos y gastos</h2>
-              <div style="font-size:12.5px;color:#8A807C;">Marzo a agosto de 2026 · todas las sucursales</div>
+              <div style="font-size:12.5px;color:#766D69;">01/03/2026 – 31/08/2026 · Todas las sucursales</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
-              <button style="height:36px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
-                <span style="font-variant-numeric:tabular-nums;">01/03/2026 – 31/08/2026</span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
-              </button>
-              <button style="height:36px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
-                Todas las sucursales
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
-              </button>
+              <div style="display:flex;align-items:flex-end;gap:10px;"><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Desde</span><span style="height:36px;min-width:128px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">01/03/2026</span></label><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Hasta</span><span style="height:36px;min-width:128px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">31/08/2026</span></label><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Sucursal</span><span style="height:36px;min-width:190px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">Todas las sucursales<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></span></label></div>
             </div>
           </div>
 
@@ -115,26 +106,27 @@
             <div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #7C9473;">
               <div style="display:flex;align-items:center;gap:9px;">
                 <span style="width:8px;height:8px;border-radius:50%;background:#7C9473;"></span>
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Ingresos</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Ingresos</span>
               </div>
-              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#5F7457;font-variant-numeric:tabular-nums;">Bs 281.200</div>
-              <div style="font-size:12px;color:#8A807C;">312 pagos confirmados en el rango</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#5F7457;font-variant-numeric:tabular-nums;">Bs 281.200,00</div>
+              <div style="font-size:12px;color:#766D69;">Pagos confirmados en el rango</div>
+              <div style="font-size:11.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Efectivo Bs 142.600,00 · Transferencias Bs 138.600,00</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #B25D4B;">
               <div style="display:flex;align-items:center;gap:9px;">
                 <span style="width:8px;height:8px;border-radius:50%;background:#B25D4B;"></span>
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Gastos</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Gastos</span>
               </div>
-              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#94493A;font-variant-numeric:tabular-nums;">Bs 185.200</div>
-              <div style="font-size:12px;color:#8A807C;">Sueldos de nómina más gastos de sucursal</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#94493A;font-variant-numeric:tabular-nums;">Bs 185.200,00</div>
+              <div style="font-size:12px;color:#766D69;">Nómina más los gastos de cada sucursal</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #4A4A4A;">
               <div style="display:flex;align-items:center;gap:9px;">
                 <span style="width:8px;height:8px;border-radius:50%;background:#4A4A4A;"></span>
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Neto</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Neto</span>
               </div>
-              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 96.000</div>
-              <div style="font-size:12px;color:#8A807C;">Ingresos menos gastos · 34% de margen</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 96.000,00</div>
+              <div style="font-size:12px;color:#766D69;">Ingresos menos gastos</div>
             </div>
           </div>
 
@@ -142,7 +134,7 @@
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;">
               <div style="display:flex;flex-direction:column;gap:3px;">
                 <span style="font-size:15px;font-weight:500;">Mes por mes</span>
-                <span style="font-size:12px;color:#8A807C;">Ingresos y gastos comparados, en miles de bolivianos</span>
+                <span style="font-size:12px;color:#766D69;">Ingresos y gastos de cada mes del rango, en bolivianos</span>
               </div>
               <div style="display:flex;align-items:center;gap:16px;">
                 <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#6E6663;"><span style="width:10px;height:10px;border-radius:3px;background:#7C9473;"></span>Ingresos</span>
@@ -150,12 +142,12 @@
               </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;">
+            <div style="display:grid;grid-template-columns:70px minmax(0,1fr);gap:12px;">
               <div style="height:212px;position:relative;">
-                <span style="position:absolute;top:6px;right:0;font-size:10.5px;color:#A79E9A;font-variant-numeric:tabular-nums;">60k</span>
-                <span style="position:absolute;top:72.7px;right:0;font-size:10.5px;color:#A79E9A;font-variant-numeric:tabular-nums;">40k</span>
-                <span style="position:absolute;top:139.3px;right:0;font-size:10.5px;color:#A79E9A;font-variant-numeric:tabular-nums;">20k</span>
-                <span style="position:absolute;bottom:-6px;right:0;font-size:10.5px;color:#A79E9A;font-variant-numeric:tabular-nums;">0</span>
+                <span style="position:absolute;top:6px;right:0;font-size:10.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Bs 60.000</span>
+                <span style="position:absolute;top:72.7px;right:0;font-size:10.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Bs 40.000</span>
+                <span style="position:absolute;top:139.3px;right:0;font-size:10.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Bs 20.000</span>
+                <span style="position:absolute;bottom:-6px;right:0;font-size:10.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Bs 0</span>
               </div>
               <div style="position:relative;height:212px;border-bottom:1px solid #E4D8CC;">
                 <div style="position:absolute;left:0;right:0;top:12px;border-top:1px solid #F2EBE2;"></div>
@@ -178,7 +170,7 @@
                     <div style="width:26px;height:153px;border-radius:5px 5px 0 0;background:#7C9473;"></div>
                     <div style="width:26px;height:101px;border-radius:5px 5px 0 0;background:#B25D4B;"></div>
                   </div>
-                  <div style="display:flex;align-items:flex-end;justify-content:center;gap:8px;height:100%;">
+                  <div style="position:relative;display:flex;align-items:flex-end;justify-content:center;gap:8px;height:100%;background:#FDF7F2;border-radius:6px;"><div style="position:absolute;left:50%;top:-18px;transform:translateX(-50%);z-index:2;min-width:150px;padding:9px 11px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;box-shadow:0 8px 20px rgba(74,58,48,0.12);display:flex;flex-direction:column;gap:3px;font-size:11.5px;color:#6E6663;white-space:nowrap;font-variant-numeric:tabular-nums;"><span style="font-weight:500;color:#4A4A4A;">julio de 2026</span><span>Ingresos Bs 52.500,00</span><span>Gastos Bs 33.900,00</span></div>
                     <div style="width:26px;height:175px;border-radius:5px 5px 0 0;background:#7C9473;"></div>
                     <div style="width:26px;height:113px;border-radius:5px 5px 0 0;background:#B25D4B;"></div>
                   </div>
@@ -189,60 +181,63 @@
                 </div>
               </div>
               <div></div>
-              <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:26px;padding:0 8px;font-size:11.5px;color:#8A807C;text-align:center;">
+              <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:26px;padding:0 8px;font-size:11.5px;color:#766D69;text-align:center;">
                 <span>Mar</span><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span><span>Ago</span>
               </div>
             </div>
           </div>
 
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;">
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px 14px;border-bottom:1px solid #E4D8CC;">
               <span style="font-size:15px;font-weight:500;">Gastos por categoría</span>
-              <span style="font-size:12px;color:#8A807C;">Marzo a agosto de 2026</span>
+              <span style="font-size:12px;color:#766D69;">01/03/2026 – 31/08/2026</span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+            <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
               <div>Categoría</div>
               <div style="text-align:right;">Monto total</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                 <span style="font-size:14px;font-weight:500;">Nómina</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Viene de Nómina, no de las categorías</span>
+                <span style="font-size:11.5px;color:#7A716D;">Viene de Nómina, no de las categorías</span>
               </div>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 118.400</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 118.400,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Alquiler</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 34.200</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 34.200,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Servicios básicos</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 12.600</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 12.600,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Limpieza</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 8.400</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 8.400,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Mantenimiento de equipos</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.600</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.600,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Insumos</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.100</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.100,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Marketing</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 2.200</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 2.200,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Otros</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 700</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 700,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;background:#FDFAF6;">
               <span style="font-size:13.5px;font-weight:500;color:#6E6663;">Total de gastos</span>
-              <div style="font-size:15px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums;color:#94493A;">Bs 185.200</div>
+              <div style="font-size:15px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums;color:#94493A;">Bs 185.200,00</div>
             </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px 14px;border-bottom:1px solid #E4D8CC;"><span style="font-size:15px;font-weight:500;">Totales por mes</span><span style="font-size:12px;color:#766D69;">La vista exacta del gráfico</span></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;"><div style="">Mes</div><div style="text-align:right;">Ingresos</div><div style="text-align:right;">Gastos</div><div style="text-align:right;">Neto</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>marzo de 2026</div><div style="text-align:right;">Bs 41.100,00</div><div style="text-align:right;">Bs 28.500,00</div><div style="text-align:right;">Bs 12.600,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>abril de 2026</div><div style="text-align:right;">Bs 44.700,00</div><div style="text-align:right;">Bs 29.400,00</div><div style="text-align:right;">Bs 15.300,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>mayo de 2026</div><div style="text-align:right;">Bs 47.400,00</div><div style="text-align:right;">Bs 31.200,00</div><div style="text-align:right;">Bs 16.200,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>junio de 2026</div><div style="text-align:right;">Bs 45.900,00</div><div style="text-align:right;">Bs 30.300,00</div><div style="text-align:right;">Bs 15.600,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>julio de 2026</div><div style="text-align:right;">Bs 52.500,00</div><div style="text-align:right;">Bs 33.900,00</div><div style="text-align:right;">Bs 18.600,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>agosto de 2026</div><div style="text-align:right;">Bs 49.600,00</div><div style="text-align:right;">Bs 31.900,00</div><div style="text-align:right;">Bs 17.700,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:13px 20px;background:#FDFAF6;font-size:13.5px;font-weight:500;font-variant-numeric:tabular-nums;"><div>Total del rango</div><div style="text-align:right;color:#5F7457;">Bs 281.200,00</div><div style="text-align:right;color:#94493A;">Bs 185.200,00</div><div style="text-align:right;">Bs 96.000,00</div></div></div>
           </div>
         </main>
       </div>
@@ -254,7 +249,7 @@
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · Una sucursal (Centro)</div>
-        <div style="font-size:12px;color:#8A807C;">Solo los gastos y el efectivo de Centro · sin la fila «Nómina» · la nota va sobre las cifras</div>
+        <div style="font-size:12px;color:#766D69;">Solo los gastos y el efectivo de Centro · sin la fila «Nómina» · la nota va sobre las cifras</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -264,8 +259,8 @@
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
         </div>
-        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
           admin.emmapilates.bo/reporte/ingresos-y-gastos
         </div>
       </div>
@@ -275,11 +270,11 @@
           <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
         </div>
         <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
-          <span style="font-size:11.5px;color:#A79E9A;">El reporte usa su propio filtro de sucursal</span>
+          <span style="font-size:11.5px;color:#7A716D;">El reporte usa su propio filtro de sucursal</span>
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
             <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
             <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
         </div>
       </div>
@@ -287,14 +282,14 @@
       <div style="display:flex;align-items:stretch;min-height:760px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
           <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
             Horario
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
           <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
           <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
@@ -307,7 +302,7 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#8A5D59" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
@@ -317,48 +312,39 @@
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Reporte de ingresos y gastos</h2>
-              <div style="font-size:12.5px;color:#8A807C;">Marzo a agosto de 2026 · Sucursal Centro</div>
+              <div style="font-size:12.5px;color:#766D69;">01/03/2026 – 31/08/2026 · Sucursal Centro</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
-              <button style="height:36px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
-                <span style="font-variant-numeric:tabular-nums;">01/03/2026 – 31/08/2026</span>
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
-              </button>
-              <button style="height:36px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
-                Centro
-                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
-              </button>
+              <div style="display:flex;align-items:flex-end;gap:10px;"><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Desde</span><span style="height:36px;min-width:128px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">01/03/2026</span></label><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Hasta</span><span style="height:36px;min-width:128px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">31/08/2026</span></label><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Sucursal</span><span style="height:36px;min-width:190px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">Centro<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></span></label></div>
             </div>
           </div>
 
-          <p style="margin:0;font-size:13px;line-height:1.5;color:#8A807C;">La nómina y los ingresos por transferencia se ven solo en «Todas las sucursales».</p>
+          <p style="margin:0;font-size:13px;line-height:1.5;color:#766D69;">La nómina y los ingresos por transferencia se ven solo en «Todas las sucursales».</p>
 
           <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;">
             <div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #7C9473;">
               <div style="display:flex;align-items:center;gap:9px;">
                 <span style="width:8px;height:8px;border-radius:50%;background:#7C9473;"></span>
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Ingresos</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Ingresos</span>
               </div>
-              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#5F7457;font-variant-numeric:tabular-nums;">Bs 96.500</div>
-              <div style="font-size:12px;color:#8A807C;">Pagos en efectivo cobrados en Centro</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#5F7457;font-variant-numeric:tabular-nums;">Bs 96.500,00</div>
+              <div style="font-size:12px;color:#766D69;">Pagos en efectivo cobrados en Centro</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #B25D4B;">
               <div style="display:flex;align-items:center;gap:9px;">
                 <span style="width:8px;height:8px;border-radius:50%;background:#B25D4B;"></span>
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Gastos</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Gastos</span>
               </div>
-              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#94493A;font-variant-numeric:tabular-nums;">Bs 25.300</div>
-              <div style="font-size:12px;color:#8A807C;">Gastos registrados en Centro</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#94493A;font-variant-numeric:tabular-nums;">Bs 25.300,00</div>
+              <div style="font-size:12px;color:#766D69;">Gastos registrados en Centro</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #4A4A4A;">
               <div style="display:flex;align-items:center;gap:9px;">
                 <span style="width:8px;height:8px;border-radius:50%;background:#4A4A4A;"></span>
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Neto</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Neto</span>
               </div>
-              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 71.200</div>
-              <div style="font-size:12px;color:#8A807C;">Ingresos menos gastos</div>
+              <div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 71.200,00</div>
+              <div style="font-size:12px;color:#766D69;">Ingresos menos gastos</div>
             </div>
           </div>
 
@@ -366,7 +352,7 @@
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:24px;">
               <div style="display:flex;flex-direction:column;gap:3px;">
                 <span style="font-size:15px;font-weight:500;">Mes por mes</span>
-                <span style="font-size:12px;color:#8A807C;">Ingresos y gastos comparados, en miles de bolivianos</span>
+                <span style="font-size:12px;color:#766D69;">Ingresos y gastos de cada mes del rango, en bolivianos</span>
               </div>
               <div style="display:flex;align-items:center;gap:16px;">
                 <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#6E6663;"><span style="width:10px;height:10px;border-radius:3px;background:#7C9473;"></span>Ingresos</span>
@@ -374,12 +360,12 @@
               </div>
             </div>
 
-            <div style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;">
+            <div style="display:grid;grid-template-columns:70px minmax(0,1fr);gap:12px;">
               <div style="height:212px;position:relative;">
-                <span style="position:absolute;top:6px;right:0;font-size:10.5px;color:#A79E9A;font-variant-numeric:tabular-nums;">60k</span>
-                <span style="position:absolute;top:72.7px;right:0;font-size:10.5px;color:#A79E9A;font-variant-numeric:tabular-nums;">40k</span>
-                <span style="position:absolute;top:139.3px;right:0;font-size:10.5px;color:#A79E9A;font-variant-numeric:tabular-nums;">20k</span>
-                <span style="position:absolute;bottom:-6px;right:0;font-size:10.5px;color:#A79E9A;font-variant-numeric:tabular-nums;">0</span>
+                <span style="position:absolute;top:6px;right:0;font-size:10.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Bs 60.000</span>
+                <span style="position:absolute;top:72.7px;right:0;font-size:10.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Bs 40.000</span>
+                <span style="position:absolute;top:139.3px;right:0;font-size:10.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Bs 20.000</span>
+                <span style="position:absolute;bottom:-6px;right:0;font-size:10.5px;color:#7A716D;font-variant-numeric:tabular-nums;">Bs 0</span>
               </div>
               <div style="position:relative;height:212px;border-bottom:1px solid #E4D8CC;">
                 <div style="position:absolute;left:0;right:0;top:12px;border-top:1px solid #F2EBE2;"></div>
@@ -413,70 +399,101 @@
                 </div>
               </div>
               <div></div>
-              <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:26px;padding:0 8px;font-size:11.5px;color:#8A807C;text-align:center;">
+              <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:26px;padding:0 8px;font-size:11.5px;color:#766D69;text-align:center;">
                 <span>Mar</span><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span><span>Ago</span>
               </div>
             </div>
           </div>
 
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:start;">
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px 14px;border-bottom:1px solid #E4D8CC;">
               <span style="font-size:15px;font-weight:500;">Gastos por categoría</span>
-              <span style="font-size:12px;color:#8A807C;">Marzo a agosto de 2026</span>
+              <span style="font-size:12px;color:#766D69;">01/03/2026 – 31/08/2026</span>
             </div>
-            <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+            <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
               <div>Categoría</div>
               <div style="text-align:right;">Monto total</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Alquiler</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 12.600</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 12.600,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Servicios básicos</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 4.800</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 4.800,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Limpieza</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.200</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.200,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Mantenimiento de equipos</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 2.400</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 2.400,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Insumos</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 1.300</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 1.300,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Marketing</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 800</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 800,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;">
               <span style="font-size:14px;font-weight:500;">Otros</span>
-              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 200</div>
+              <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 200,00</div>
             </div>
             <div style="display:grid;grid-template-columns:minmax(0,2.6fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:15px 20px;background:#FDFAF6;">
               <span style="font-size:13.5px;font-weight:500;color:#6E6663;">Total de gastos</span>
-              <div style="font-size:15px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums;color:#94493A;">Bs 25.300</div>
+              <div style="font-size:15px;font-weight:500;text-align:right;font-variant-numeric:tabular-nums;color:#94493A;">Bs 25.300,00</div>
             </div>
+          </div>
+          <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px 14px;border-bottom:1px solid #E4D8CC;"><span style="font-size:15px;font-weight:500;">Totales por mes</span><span style="font-size:12px;color:#766D69;">La vista exacta del gráfico</span></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;"><div style="">Mes</div><div style="text-align:right;">Ingresos</div><div style="text-align:right;">Gastos</div><div style="text-align:right;">Neto</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>marzo de 2026</div><div style="text-align:right;">Bs 15.000,00</div><div style="text-align:right;">Bs 4.200,00</div><div style="text-align:right;">Bs 10.800,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>abril de 2026</div><div style="text-align:right;">Bs 16.000,00</div><div style="text-align:right;">Bs 4.200,00</div><div style="text-align:right;">Bs 11.800,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>mayo de 2026</div><div style="text-align:right;">Bs 16.500,00</div><div style="text-align:right;">Bs 4.500,00</div><div style="text-align:right;">Bs 12.000,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>junio de 2026</div><div style="text-align:right;">Bs 15.500,00</div><div style="text-align:right;">Bs 3.900,00</div><div style="text-align:right;">Bs 11.600,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>julio de 2026</div><div style="text-align:right;">Bs 17.500,00</div><div style="text-align:right;">Bs 4.500,00</div><div style="text-align:right;">Bs 13.000,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;font-variant-numeric:tabular-nums;"><div>agosto de 2026</div><div style="text-align:right;">Bs 16.000,00</div><div style="text-align:right;">Bs 4.000,00</div><div style="text-align:right;">Bs 12.000,00</div></div><div style="display:grid;grid-template-columns:minmax(0,1fr) repeat(3,minmax(0,1.2fr));align-items:center;gap:12px;padding:13px 20px;background:#FDFAF6;font-size:13.5px;font-weight:500;font-variant-numeric:tabular-nums;"><div>Total del rango</div><div style="text-align:right;color:#5F7457;">Bs 96.500,00</div><div style="text-align:right;color:#94493A;">Bs 25.300,00</div><div style="text-align:right;">Bs 71.200,00</div></div></div>
           </div>
         </main>
       </div>
     </div>
   </div>
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Sin movimientos</div>
+          <div style="font-size:12px;color:#766D69;">Nada entró ni salió en el rango · las cifras en Bs 0,00 y el gráfico reemplazado por una línea</div>
+        </div>
+      </sc-if>
+      <div style="width:1000px;display:flex;flex-direction:column;gap:16px;padding:24px 26px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;">
+        <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;"><div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #7C9473;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Ingresos</span><div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#5F7457;font-variant-numeric:tabular-nums;">Bs 0,00</div><div style="font-size:12px;color:#766D69;">Pagos confirmados en el rango</div></div><div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #B25D4B;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Gastos</span><div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#94493A;font-variant-numeric:tabular-nums;">Bs 0,00</div><div style="font-size:12px;color:#766D69;">Nómina más los gastos de cada sucursal</div></div><div style="display:flex;flex-direction:column;gap:10px;padding:20px 22px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;border-top:3px solid #4A4A4A;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Neto</span><div style="font-family:Lora,Georgia,serif;font-size:32px;line-height:1;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 0,00</div><div style="font-size:12px;color:#766D69;">Ingresos menos gastos</div></div></div>
+        <div style="padding:48px 24px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;text-align:center;font-size:14px;color:#766D69;">Sin ingresos ni gastos en este rango.</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Rango inválido</div>
+          <div style="font-size:12px;color:#766D69;">El inicio después del fin · el reporte anterior se queda en pantalla</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;display:flex;flex-direction:column;gap:8px;padding:20px 22px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;">
+        <div style="display:flex;align-items:flex-end;gap:10px;"><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Desde</span><span style="height:36px;min-width:128px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">30/09/2026</span></label><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Hasta</span><span style="height:36px;min-width:128px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">31/08/2026</span></label><label style="display:flex;flex-direction:column;gap:5px;"><span style="font-size:10px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Sucursal</span><span style="height:36px;min-width:190px;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">Urubó (archivada)<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></span></label></div>
+        <span role="alert" style="font-size:12px;color:#94493A;">La fecha inicial no puede ser posterior a la final.</span>
+      </div>
+    </div>
+  </div>
+
   <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
-          <div style="font-size:12px;color:#8A807C;">Cifras apiladas · el gráfico mantiene la comparación por par</div>
+          <div style="font-size:12px;color:#766D69;">Cifras apiladas · el gráfico mantiene la comparación por par</div>
         </div>
       </sc-if>
       <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
         <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
-          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/reporte/ingresos-y-gastos
           </div>
         </div>
@@ -492,30 +509,30 @@
         <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;flex-direction:column;gap:3px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:23px;line-height:1.15;">Reporte de ingresos y gastos</h2>
-            <span style="font-size:12px;color:#8A807C;">Mar–ago 2026 · todas las sucursales</span>
+            <span style="font-size:12px;color:#766D69;">Mar–ago 2026 · todas las sucursales</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <button style="height:42px;width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:13.5px;color:#4A4A4A;cursor:pointer;">
               <span style="font-variant-numeric:tabular-nums;">01/03/2026 – 31/08/2026</span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
             </button>
             <button style="height:42px;width:100%;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;font-size:13.5px;color:#4A4A4A;cursor:pointer;">
               Todas las sucursales
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
             </button>
           </div>
           <div style="display:flex;flex-direction:column;gap:10px;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-left:3px solid #7C9473;border-radius:10px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Ingresos</span>
-              <span style="font-family:Lora,Georgia,serif;font-size:21px;color:#5F7457;font-variant-numeric:tabular-nums;">Bs 281.200</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Ingresos</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:21px;color:#5F7457;font-variant-numeric:tabular-nums;">Bs 281.200,00</span>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-left:3px solid #B25D4B;border-radius:10px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Gastos</span>
-              <span style="font-family:Lora,Georgia,serif;font-size:21px;color:#94493A;font-variant-numeric:tabular-nums;">Bs 185.200</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Gastos</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:21px;color:#94493A;font-variant-numeric:tabular-nums;">Bs 185.200,00</span>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-left:3px solid #4A4A4A;border-radius:10px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Neto</span>
-              <span style="font-family:Lora,Georgia,serif;font-size:21px;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 96.000</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Neto</span>
+              <span style="font-family:Lora,Georgia,serif;font-size:21px;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 96.000,00</span>
             </div>
           </div>
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;padding:16px 14px;display:flex;flex-direction:column;gap:14px;">
@@ -537,27 +554,31 @@
                   <div style="display:flex;align-items:flex-end;justify-content:center;gap:4px;height:100%;"><div style="width:13px;height:117px;border-radius:4px 4px 0 0;background:#7C9473;"></div><div style="width:13px;height:76px;border-radius:4px 4px 0 0;background:#B25D4B;"></div></div>
                 </div>
               </div>
-              <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;font-size:11px;color:#8A807C;text-align:center;">
+              <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;font-size:11px;color:#766D69;text-align:center;">
                 <span>Mar</span><span>Abr</span><span>May</span><span>Jun</span><span>Jul</span><span>Ago</span>
               </div>
             </div>
           </div>
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
             <div style="padding:13px 14px;border-bottom:1px solid #E4D8CC;font-size:13.5px;font-weight:500;">Gastos por categoría</div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #F2EBE2;"><span style="font-size:13.5px;">Nómina</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 118.400</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #F2EBE2;"><span style="font-size:13.5px;">Alquiler</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 34.200</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #F2EBE2;"><span style="font-size:13.5px;">Servicios básicos</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 12.600</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #F2EBE2;"><span style="font-size:13.5px;">Limpieza</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 8.400</span></div>
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#FDFAF6;"><span style="font-size:13px;font-weight:500;color:#6E6663;">Total</span><span style="font-size:14px;font-weight:500;color:#94493A;font-variant-numeric:tabular-nums;">Bs 185.200</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #F2EBE2;"><span style="font-size:13.5px;">Nómina</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 118.400,00</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #F2EBE2;"><span style="font-size:13.5px;">Alquiler</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 34.200,00</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #F2EBE2;"><span style="font-size:13.5px;">Servicios básicos</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 12.600,00</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-bottom:1px solid #F2EBE2;"><span style="font-size:13.5px;">Limpieza</span><span style="font-size:13.5px;font-variant-numeric:tabular-nums;">Bs 8.400,00</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;background:#FDFAF6;"><span style="font-size:13px;font-weight:500;color:#6E6663;">Total de gastos</span><span style="font-size:14px;font-weight:500;color:#94493A;font-variant-numeric:tabular-nums;">Bs 185.200,00</span></div>
           </div>
+          <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;"><div style="padding:13px 14px;border-bottom:1px solid #E4D8CC;font-size:13.5px;font-weight:500;">Totales por mes</div><div style="display:flex;flex-direction:column;gap:4px;padding:11px 14px;border-bottom:1px solid #F2EBE2;font-size:12.5px;font-variant-numeric:tabular-nums;"><span style="font-weight:500;color:#4A4A4A;">marzo de 2026</span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Ingresos</span><span>Bs 41.100,00</span></span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Gastos</span><span>Bs 28.500,00</span></span><span style="display:flex;justify-content:space-between;color:#4A4A4A;"><span>Neto</span><span>Bs 12.600,00</span></span></div><div style="display:flex;flex-direction:column;gap:4px;padding:11px 14px;border-bottom:1px solid #F2EBE2;font-size:12.5px;font-variant-numeric:tabular-nums;"><span style="font-weight:500;color:#4A4A4A;">abril de 2026</span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Ingresos</span><span>Bs 44.700,00</span></span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Gastos</span><span>Bs 29.400,00</span></span><span style="display:flex;justify-content:space-between;color:#4A4A4A;"><span>Neto</span><span>Bs 15.300,00</span></span></div><div style="display:flex;flex-direction:column;gap:4px;padding:11px 14px;border-bottom:1px solid #F2EBE2;font-size:12.5px;font-variant-numeric:tabular-nums;"><span style="font-weight:500;color:#4A4A4A;">mayo de 2026</span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Ingresos</span><span>Bs 47.400,00</span></span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Gastos</span><span>Bs 31.200,00</span></span><span style="display:flex;justify-content:space-between;color:#4A4A4A;"><span>Neto</span><span>Bs 16.200,00</span></span></div><div style="display:flex;flex-direction:column;gap:4px;padding:11px 14px;border-bottom:1px solid #F2EBE2;font-size:12.5px;font-variant-numeric:tabular-nums;"><span style="font-weight:500;color:#4A4A4A;">junio de 2026</span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Ingresos</span><span>Bs 45.900,00</span></span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Gastos</span><span>Bs 30.300,00</span></span><span style="display:flex;justify-content:space-between;color:#4A4A4A;"><span>Neto</span><span>Bs 15.600,00</span></span></div><div style="display:flex;flex-direction:column;gap:4px;padding:11px 14px;border-bottom:1px solid #F2EBE2;font-size:12.5px;font-variant-numeric:tabular-nums;"><span style="font-weight:500;color:#4A4A4A;">julio de 2026</span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Ingresos</span><span>Bs 52.500,00</span></span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Gastos</span><span>Bs 33.900,00</span></span><span style="display:flex;justify-content:space-between;color:#4A4A4A;"><span>Neto</span><span>Bs 18.600,00</span></span></div><div style="display:flex;flex-direction:column;gap:4px;padding:11px 14px;border-bottom:1px solid #F2EBE2;font-size:12.5px;font-variant-numeric:tabular-nums;"><span style="font-weight:500;color:#4A4A4A;">agosto de 2026</span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Ingresos</span><span>Bs 49.600,00</span></span><span style="display:flex;justify-content:space-between;color:#6E6663;"><span>Gastos</span><span>Bs 31.900,00</span></span><span style="display:flex;justify-content:space-between;color:#4A4A4A;"><span>Neto</span><span>Bs 17.700,00</span></span></div><div style="display:flex;justify-content:space-between;padding:12px 14px;background:#FDFAF6;font-size:13px;font-weight:500;font-variant-numeric:tabular-nums;"><span>Total del rango</span><span>Neto Bs 96.000,00</span></div></div>
         </div>
       </div>
     </div>
 
     <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Filtro propio</span>La barra superior no muestra selector de sucursal: el reporte necesita "Todas las sucursales" y lo resuelve en su encabezado.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Filtro propio</span>La barra superior dice «El reporte usa su propio filtro de sucursal». Arriba a la derecha: Desde y Hasta (fechas de Bolivia, inclusivas) y Sucursal («Todas las sucursales» y cada sede; una archivada se lee «Urubó (archivada)»). Abre en los últimos seis meses y en «Todas las sucursales».</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Color con significado</span>Ingresos en Éxito, gastos en Error y el neto en Plomo cálido: el neto es un resumen, no un estado bueno o malo.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Gráfico sobrio</span>Barras planas del mismo par de colores, tres líneas de referencia y nada más: ni sombras, ni degradados, ni valores sobre cada barra.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Mes a mes</span>Cada mes del rango tiene su par de barras, aun vacío, en una escala redonda en bolivianos. Al pasar o enfocar un mes, la columna toma Hover de fila y un globo dice el mes y sus dos cifras. «Totales por mes» es la vista exacta del gráfico.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Siempre con centavos</span>Todo monto lleva centavos («Bs 5.690,00»); un neto negativo se lee «−Bs 2.690,50», en Plomo cálido.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cifra</span>Las tres cifras usan el paso «Cifra» de la escala (Lora 500 · 32/1.2 · tabular), agregado al sistema de diseño. La nota de una sola sucursal va sobre las cifras (58 §2; 51 §2 queda superado solo en esto).</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Nómina identificada</span>La fila «Nómina» aclara que viene de Nómina y no de las categorías de AW15, para que el total cuadre sin confundir. Solo existe en «Todas las sucursales»: un pago de sueldo cubre todas las sucursales de la persona.</div>
     </div>
   </div>

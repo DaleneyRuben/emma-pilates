@@ -84,6 +84,7 @@
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
           <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
@@ -98,7 +99,7 @@
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Gastos</h2>
-              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · agosto 2026 · Bs 18.740 en 12 gastos</div>
+              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol</div>
             </div>
             <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
@@ -112,7 +113,7 @@
               <span style="font-size:12.5px;color:#A79E9A;">Buscar un gasto</span>
             </div>
             <button style="height:34px;padding:0 13px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#6E6663;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">
-              Todas las categorías
+              Categoría: Todas
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
             </button>
             <button style="height:34px;padding:0 13px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#6E6663;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">
@@ -202,10 +203,30 @@
           </div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#A79E9A;">
-            <span>Mostrando 8 de 12 gastos</span>
+            <span>Mostrando 1–8 de 12 gastos</span>
             <span>Los sueldos no entran aquí: se registran en Nómina.</span>
           </div>
         </main>
+      </div>
+    </div>
+  </div>
+
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Sin gastos de esta categoría</div>
+          <div style="font-size:12px;color:#8A807C;">Filtro Categoría en Marketing · la tabla y sus columnas se quedan</div>
+        </div>
+      </sc-if>
+      <div style="width:900px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Gastos</h2><div style="font-size:12.5px;color:#8A807C;">Sucursal Las Palmas</div></div>
+        <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;"><div>Categoría</div><div>Monto</div><div>Fecha</div></div>
+          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">No hay gastos de esta categoría en esta sucursal.</span><span style="font-size:13px;color:#8A807C;">Sin filtro, una sucursal nueva dice «Todavía no hay gastos en esta sucursal.»</span></div>
+        </div>
+        <div style="font-size:12px;color:#A79E9A;">Mostrando 0 de 0 gastos</div>
       </div>
     </div>
   </div>
@@ -240,7 +261,7 @@
         <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;flex-direction:column;gap:3px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:24px;">Gastos</h2>
-            <span style="font-size:12px;color:#8A807C;">Agosto 2026 · Bs 18.740</span>
+            <span style="font-size:12px;color:#8A807C;">Sucursal Equipetrol</span>
           </div>
           <button style="height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;cursor:pointer;" style-hover="background:#A87370;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
@@ -290,7 +311,7 @@
     <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Por sucursal</span>A diferencia de Nómina, esta tabla sí depende del selector de la barra superior: el alquiler es de un local.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Categoría con detalle</span>La categoría manda en la fila y debajo va una línea corta que dice de qué se trató el gasto.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Total en el subtítulo</span>El acumulado del mes vive junto al título, así no hace falta una fila de totales en la tabla.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Filtro por categoría</span>El subtítulo nombra la sucursal; el filtro Categoría (Todas y cada categoría) va bajo el título. Avisos: «Gasto de Bs 450,50 en Reparación registrado en Centro.» y «Guardamos la corrección del gasto de Reparación.»</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sueldos aparte</span>El pie lo aclara: los pagos al personal se registran en Nómina y no se duplican como gasto.</div>
     </div>
   </div>

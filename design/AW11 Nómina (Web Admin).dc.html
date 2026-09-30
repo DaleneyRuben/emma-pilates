@@ -83,6 +83,8 @@
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
           <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
@@ -97,7 +99,7 @@
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Nómina</h2>
-              <div style="font-size:12.5px;color:#8A807C;">Todas las sucursales · agosto 2026 · 9 pagos registrados</div>
+              <div style="font-size:12.5px;color:#8A807C;">Todo el estudio · solo registra que el pago se hizo, no cómo se calculó.</div>
             </div>
             <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
@@ -106,10 +108,7 @@
           </div>
 
           <div style="display:flex;align-items:center;gap:10px;">
-            <div style="flex:1;max-width:300px;height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
-              <span style="font-size:12.5px;color:#A79E9A;">Buscar por empleado</span>
-            </div>
+            <button style="height:34px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;"><span style="color:#A79E9A;">Empleado</span>Todos<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
             <button style="height:34px;padding:0 13px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#6E6663;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">
               Agosto 2026
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
@@ -128,7 +127,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">CV</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Camila Vargas</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Instructora · Equipetrol, Urubó</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Entrenadora · Equipetrol, Urubó</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 6.200</div>
@@ -140,7 +139,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">RQ</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Rodrigo Quiroga</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Instructor · Equipetrol</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Entrenador · Equipetrol</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.800</div>
@@ -152,7 +151,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">LM</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Lucía Montaño</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Recepción · Urubó</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Asistente · Urubó</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 4.500</div>
@@ -176,7 +175,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">JT</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Javier Terceros</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Mantenimiento · Equipetrol, Urubó</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Administración · Todas las sucursales</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.200</div>
@@ -188,7 +187,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">PN</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Paola Nogales</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Instructora · Urubó</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Entrenadora · Urubó</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.400</div>
@@ -200,7 +199,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">CV</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Camila Vargas</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Instructora · Equipetrol, Urubó</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Entrenadora · Equipetrol, Urubó</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 6.200</div>
@@ -212,7 +211,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">RQ</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Rodrigo Quiroga</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Instructor · Equipetrol</span>
+                  <span style="font-size:11.5px;color:#A79E9A;">Entrenador · Equipetrol</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.800</div>
@@ -221,7 +220,7 @@
           </div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#A79E9A;">
-            <span>Mostrando 8 de 24 pagos</span>
+            <span>Mostrando 1–8 de 24 pagos</span>
             <span>La nómina no se filtra por sucursal: incluye a todo el personal.</span>
           </div>
         </main>
@@ -256,7 +255,7 @@
         <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;flex-direction:column;gap:3px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:24px;">Nómina</h2>
-            <span style="font-size:12px;color:#8A807C;">Agosto 2026 · 9 pagos</span>
+            <span style="font-size:12px;color:#8A807C;">Todo el estudio</span>
           </div>
           <button style="height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;cursor:pointer;" style-hover="background:#A87370;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
@@ -308,6 +307,7 @@
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Empleado con contexto</span>Inicial, nombre y una línea con cargo y sucursales donde trabaja: identifica sin abrir la ficha.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Montos alineados</span>Monto y fecha a la derecha con cifras tabulares, para comparar filas de un vistazo.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Una sola acción</span>"+ Registrar pago" abre AW12 en blanco; tocar una fila abre el mismo formulario en modo edición.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Filtro y avisos</span>Filtro Empleado (Todos y cada persona). Vacío: «Todavía no hay pagos registrados.» o, filtrado, «No hay pagos registrados para esta persona.» Avisos: «Pago de Bs 3.500,00 a Emma Vargas registrado.» y «Guardamos la corrección del pago de Emma Vargas.» Un pago se corrige, nunca se borra.</div>
     </div>
   </div>
 

@@ -100,7 +100,7 @@
           <div style="padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Planes</h2>
-              <div style="font-size:12.5px;color:#8A807C;">7 planes · 6 visibles en la app</div>
+              <div style="font-size:12.5px;color:#8A807C;">6 planes · 6 visibles en la app</div>
             </div>
             <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
               <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
@@ -143,7 +143,7 @@
               <label style="display:flex;flex-direction:column;gap:7px;">
                 <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Clases incluidas</span>
                 <input type="number" placeholder="8" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-                <span style="font-size:11.5px;color:#A79E9A;">Cupo fijo de clases durante toda la vigencia del plan.</span>
+                <span style="font-size:11.5px;color:#A79E9A;">Cantidad fija para todo el periodo; ningún plan es ilimitado.</span>
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
                 <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Precio</span>
@@ -151,6 +151,11 @@
                   <span style="width:44px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:12.5px;color:#8A807C;">Bs</span>
                   <input type="text" placeholder="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
                 </div>
+              </label>
+              <label style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Orden en la app</span>
+                <input type="number" placeholder="1" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Los planes se muestran a las clientas de menor a mayor.</span>
               </label>
             </div>
             <div style="padding:18px 22px;border-top:1px solid #EFE6DC;">
@@ -172,7 +177,7 @@
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
-        <div style="width:408px;height:620px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="width:408px;height:770px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar plan</h3>
@@ -199,6 +204,7 @@
             <label style="display:flex;flex-direction:column;gap:7px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Clases incluidas</span>
               <input type="number" value="8" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <span style="font-size:11.5px;color:#A79E9A;">Cantidad fija para todo el periodo; ningún plan es ilimitado.</span>
             </label>
             <label style="display:flex;flex-direction:column;gap:7px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Precio</span>
@@ -206,12 +212,17 @@
                 <span style="width:44px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:12.5px;color:#8A807C;">Bs</span>
                 <input type="text" value="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
               </div>
-              <span style="font-size:11.5px;color:#A79E9A;">El precio nuevo aplica solo a compras futuras.</span>
             </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Orden en la app</span>
+              <input type="number" value="1" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Los planes se muestran a las clientas de menor a mayor.</span>
+            </label>
+            <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Las suscripciones vigentes y las compras ya iniciadas conservan su precio.</span>
           </div>
           <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:12px;">
             <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
-            <a href="#" style="align-self:center;font-size:13.5px;color:#8A807C;padding:4px 8px;" style-hover="color:#B78380;">Ocultar de la app</a>
+            <a href="#" style="align-self:center;font-size:13.5px;color:#B78380;padding:4px 8px;" style-hover="color:#9C6764;">Ocultar en la app</a>
           </div>
         </div>
       </div>
@@ -262,6 +273,11 @@
               <input type="text" value="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:15px;outline:none;" />
             </div>
           </label>
+          <label style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Orden en la app</span>
+            <input type="number" value="1" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Los planes se muestran a las clientas de menor a mayor.</span>
+          </label>
           <button style="height:50px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">Guardar</button>
         </div>
       </div>
@@ -272,8 +288,8 @@
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Duración cerrada</span>Solo 1, 3, 6 o 12 meses: cuatro botones, sin campo libre que invente vigencias.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Precio en bolivianos</span>Prefijo "Bs" fijo en el campo, para que nadie lo escriba dentro del número.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cambios de precio</span>Solo afectan compras futuras; los planes ya comprados conservan lo pagado.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Ocultar en vez de borrar</span>Un plan con clientas activas se retira de la app sin eliminarlo del historial.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cambios de precio</span>Las suscripciones vigentes y las compras ya iniciadas conservan su precio; el nuevo rige para compras futuras.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Ocultar en vez de borrar</span>Un plan nunca se borra: «Ocultar en la app» lo retira de Elegir plan y «Mostrar en la app» lo devuelve. «Orden en la app» decide su lugar, de menor a mayor.</div>
   </div>
 
 </div>

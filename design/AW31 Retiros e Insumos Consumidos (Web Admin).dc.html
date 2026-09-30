@@ -99,7 +99,7 @@
           <div style="display:flex;flex-direction:column;gap:9px;">
             <a href="#" style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;color:#B78380;width:fit-content;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg>
-              Insumos
+              Volver a Insumos
             </a>
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Retiros e insumos consumidos</h2>
@@ -114,9 +114,9 @@
               </button>
               <div style="display:flex;align-items:center;gap:8px;padding:0 14px;font-size:12.5px;color:#4A4A4A;font-weight:500;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
-                Agosto 2026
+                agosto de 2026
               </div>
-              <button style="width:32px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-left:1px solid #F2EBE2;background:transparent;cursor:pointer;" style-hover="background:#FDF7F2;">
+              <button disabled="" aria-label="Mes siguiente" style="width:32px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-left:1px solid #F2EBE2;background:transparent;cursor:not-allowed;opacity:0.4;">
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg>
               </button>
             </div>
@@ -145,7 +145,7 @@
             </sc-for>
 
             <div style="display:flex;flex-direction:column;gap:9px;padding:16px 20px;background:#FDFAF6;">
-              <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Total retirado en el mes</div>
+              <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Consumo del mes</div>
               <div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:#6E6663;">
                 <sc-for list="{{ totales }}" as="t" hint-placeholder-count="5">
                   <span style="display:inline-flex;align-items:center;gap:7px;"><span style="width:4px;height:4px;border-radius:50%;background:#D2C0B2;"></span><span style="color:#4A4A4A;">{{ t.insumo }}:</span>{{ t.total }}</span>
@@ -155,7 +155,7 @@
           </div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#A79E9A;">
-            <span>Ordenado del retiro más reciente al más antiguo</span>
+            <span>Mostrando 1–14 de 14 retiros · del más reciente al más antiguo</span>
             <span>Los retiros se registran en AW10 y aquí solo se consultan.</span>
           </div>
         </main>
@@ -187,7 +187,7 @@
             </button>
             <div style="display:flex;align-items:center;gap:8px;padding:0 14px;font-size:12.5px;color:#4A4A4A;font-weight:500;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
-              Febrero 2026
+              febrero de 2026
             </div>
             <button style="width:32px;height:100%;display:flex;align-items:center;justify-content:center;border:none;border-left:1px solid #F2EBE2;background:transparent;cursor:pointer;" style-hover="background:#FDF7F2;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l6 6-6 6"></path></svg>
@@ -239,7 +239,7 @@
           <div style="display:flex;flex-direction:column;gap:7px;">
             <a href="#" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:#B78380;width:fit-content;">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 6l-6 6 6 6"></path></svg>
-              Insumos
+              Volver a Insumos
             </a>
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:23px;line-height:1.15;">Retiros e insumos consumidos</h2>
           </div>
@@ -270,7 +270,7 @@
               </div>
             </sc-for>
             <div style="display:flex;flex-direction:column;gap:8px;padding:14px;background:#FDFAF6;">
-              <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Total retirado en el mes</div>
+              <div style="font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Consumo del mes</div>
               <div style="display:flex;flex-direction:column;gap:5px;font-size:12.5px;color:#6E6663;">
                 <sc-for list="{{ totales }}" as="t" hint-placeholder-count="5">
                   <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;"><span style="color:#4A4A4A;">{{ t.insumo }}</span>{{ t.total }}</div>
@@ -284,7 +284,8 @@
 
     <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Solo lectura</span>No hay acción principal: un retiro nace en AW10, al momento de sacar el insumo, y no se edita ni se borra desde aquí.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Un mes a la vez</span>El selector arranca en el mes actual; los filtros de mes e insumo son la única interacción.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Un mes a la vez</span>El selector arranca en el mes actual de Bolivia, con flechas neutras a cada lado; la flecha de avance queda deshabilitada en el mes actual.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Insumos archivados</span>El filtro Insumo lista los insumos activos de la sucursal y después los archivados, como «Cera (archivado)»: sus retiros siguen en el historial. Con un insumo elegido el resumen lo nombra («3 retiros de Detergente en septiembre de 2026.»); sin coincidencias solo queda el estado vacío.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Los totales son el informe</span>El bloque bajo la tabla resume unidades por insumo: es el dato de consumo que se busca al entrar.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sub-vista de Insumos</span>"Insumos" queda activo en la barra lateral y el enlace de vuelta lleva a AW08.</div>
     </div>

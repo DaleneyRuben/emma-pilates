@@ -113,6 +113,7 @@
               <span style="font-size:12.5px;color:#A79E9A;">Buscar un tipo de clase</span>
             </div>
             <button style="height:34px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">Equipo<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+            <button style="height:34px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">Estado: Todos<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
           </div>
 
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
@@ -175,8 +176,8 @@
 
             <a href="#" style="display:grid;grid-template-columns:2fr 1fr 1fr 1.9fr;align-items:center;gap:16px;padding:15px 20px;color:#4A4A4A;" style-hover="background:#FDF7F2;">
               <div style="display:flex;flex-direction:column;gap:2px;">
-                <span style="font-size:14px;font-weight:500;">Reformer Iniciación</span>
-                <span style="font-size:11.5px;color:#A79E9A;">1 sesión por semana</span>
+                <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:14px;font-weight:500;">Reformer Iniciación</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:#EFE6DC;color:#6E6663;font-size:10.5px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#A79E9A;"></span>Archivado</span></span>
+                <span style="font-size:11.5px;color:#A79E9A;">Sin sesiones programadas</span>
               </div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">55 min</div>
               <div style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">6 personas</div>
@@ -258,7 +259,7 @@
     <div style="flex:1;min-width:280px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;align-content:start;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Base del horario</span>Al crear una sesión en AW03, el tipo aporta duración y capacidad por defecto.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Equipo como etiquetas</span>Varias piezas por tipo: se leen de un vistazo sin abrir la ficha.</div>
-      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Uso semanal</span>Segunda línea del nombre: dice si vale la pena editar o retirar un tipo.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Uso semanal y archivo</span>Segunda línea del nombre: cuántas sesiones lo usan. Un tipo sin horario vigente se archiva, nunca se borra; el filtro Estado (Activos · Archivados · Todos) muestra los activos por defecto y la píldora neutra «Archivado» marca los demás.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Navegación a AW07</span>La fila completa es el objetivo de clic; el botón abre el mismo formulario vacío.</div>
     </div>
   </div>

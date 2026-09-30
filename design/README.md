@@ -115,7 +115,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 Reference width **1440px**; a 420px narrow-browser variant is drawn for every screen.
 
 - **Top bar**, 44px, white, bottom border `#E4D8CC`: brand wordmark "Emma" (Lora 21) in a 236px cell with a right border, then on the right a **branch selector** (`Sucursal Equipetrol`, pin icon, chevron) and a **user menu** (26px `#D8BDB8` avatar with initials, name, chevron).
-  - The branch selector scopes most pages. Exceptions: **AW11 Nómina**, **AW21/AW22 Clientes**, **AW26 Referidos**, **AW27 Créditos** and **AW28/AW29 Pagos** are not branch-scoped (the selector stays visible for shell consistency but is ignored — those records belong to the studio, not a branch); **AW16 Reporte** replaces the top-bar selector with its own selector that adds "Todas las sucursales".
+  - The branch selector scopes most pages. Exceptions: **AW11 Nómina**, **AW21/AW22 Clientes**, **AW26 Referidos**, **AW27 Créditos**, **AW28/AW29 Pagos** and **AW15 Categorías de gasto** are not branch-scoped (the selector stays visible for shell consistency but is ignored — those records belong to the studio, not a branch); **AW16 Reporte** replaces the top-bar selector with its own selector that adds "Todas las sucursales".
   - **AW19 Sucursales** is the list that feeds the top-bar selector.
 - **Sidebar**, 236px, white, right border `#E4D8CC`, padding 18px/12px, 4px gaps. Top-level items are 36px rows with a 15px icon; group labels are 10px uppercase `0.18em` `#A79E9A`; group children are 32px rows indented to 22px left padding. Sections auto-expand; the active group label turns `#B78380`.
   - Order: **Horario** · *Catálogo* (Tipos de clase, Planes, Sucursales) · *Back Office* (Clientes, Pagos ⟨badge 6⟩, Insumos ⟨badge 3, warning tint⟩, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto) · **Reporte** · *Promociones* (Promociones, Referidos, Créditos). No "Descuentos" at any level — it does not exist in the product (ADR-0007).
@@ -154,7 +154,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | File | Screen | Purpose |
 |---|---|---|
 | `01` | Iniciar sesión | Email + password login, registration, «Revisa tu correo» verification states, throttled login |
-| `02` | Inicio | Promotions carousel, next class, plan status |
+| `02` | Inicio | Promotions carousel, next class, plan status; one full-width 16:9 card per page with position dots, a loading placeholder, the section hidden without published Promotions, a 720 px card on tablet |
 | `03` | Reservar | Browse sessions by day |
 | `04` | Detalle de sesión | Session detail + book |
 | `05` | Mis reservas | Upcoming bookings |
@@ -174,7 +174,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `19` | Notificaciones | Notification list — seven types, including the studio-cancelled Evaluation (opens `15`) |
 | `20` | Recuperar contraseña | Request a reset link by email; neutral sent and temporary-limit states |
 | `21` | Crear contraseña | Page opened by an emailed link: Activar cuenta or Restablecer contraseña, plus expired and removed-invitation states |
-| `22` | Editar perfil | Edit name, email, phone |
+| `22` | Editar perfil | Edit name, email, phone; the chosen photo previews in the circle as its centre crop («Se recorta al centro en forma de círculo.») |
 | `23` | Cambiar contraseña | Self-service change, session open |
 | `24` | Cerrar mi cuenta | Close the Account for good from `18`: the consequences that apply (future bookings and evaluation cancelled, waitlists left, plan ended without refund, credit forfeited, every session closed, email freed), password re-entry, Error-outline button; refused while a transfer payment awaits review; ends on `01` with a success notice |
 
@@ -211,36 +211,36 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | File | Screen | Notes |
 |---|---|---|
 | `AW01` | Iniciar sesión | Centered card, email + password, error and throttled states |
-| `AW02` | Horario | Week grid of sessions; establishes the shell |
-| `AW03` | Formulario de sesión | Side panel; creating chooses «Una sola vez» (Fecha) or «Cada semana» (Día de la semana + «Vigente desde» in Bolivia time, Sessions generated 30 days ahead); editing a Session of a weekly series asks «Solo esta sesión» (an exception) or «Esta y las futuras» (replaces only unbooked Sessions from «Vigente desde»); seats booked + waitlist count, capacity constraints, trainer notification; cancelling is always one Session, asks no reason, refunds every booking and notifies the waitlist too |
-| `AW04` | Planes | Catalog table |
-| `AW05` | Formulario de plan | Side panel |
-| `AW06` | Tipos de clase | Catalog table |
-| `AW07` | Formulario de tipo de clase | Side panel; required «Descripción» (one or two sentences shown on the client's session detail) after Nombre; duration/capacity row with fixed suffixes |
-| `AW08` | Insumos | Branch stock table; "Stock bajo" warning pill; four actions (nuevo insumo, registrar retiro, registrar reposición, historial de retiros); «Registrar reposición» opens an `AW10`-style panel |
-| `AW09` | Formulario de insumo | Stock editable only on create; read-only + padlock on edit; «Archivar insumo» (edit only) with a confirmation |
-| `AW10` | Registrar retiro | Two-field fast-entry panel; stock shown per option; «Máximo: N unid.» and the «Solo hay N unid. en stock.» error |
-| `AW11` | Nómina | Salary payments; **not** branch-scoped |
-| `AW12` | Formulario de pago de sueldo | Empleado / Monto / Fecha only |
-| `AW13` | Gastos | Branch expenses; month total in the subtitle |
-| `AW14` | Formulario de gasto | Categoría + inline "+ Nueva categoría" / Monto / Fecha |
-| `AW15` | Categorías de gasto | Plain list, inline add row, delete disabled when in use |
-| `AW16` | Reporte de ingresos y gastos | Own date range + "Todas las sucursales"; 3 stat tiles, bar chart, category breakdown; «Nómina» only across all Branches, and a single-Branch frame with its caption |
-| `AW17` | Promociones | Drag-to-reorder card list (order = carousel order); each card shows its derived state: Borrador, Programada, Activa, Finalizada (a deleted Promotion is archived and leaves the list) |
-| `AW18` | Formulario de promoción | Image upload, título, descripción, date range; «Guardar borrador» / «Publicar» (disabled until image, title, description, and both dates exist); a published Promotion offers «Guardar cambios» / «Dejar de publicar», and changing or removing its image unpublishes it on save with a warning |
-| `AW19` | Sucursales | Two-column table (Nombre / Dirección); feeds the top-bar selector; no delete |
-| `AW20` | Formulario de sucursal | Side panel; nombre + dirección only; edit mode carries a fixed note about linked records |
-| `AW21` | Clientes | Read-only directory, 4 columns, search only, paginated; **no primary action**; after a closure from `AW22` it reloads without her and shows «Cuenta de … cerrada.» |
-| `AW22` | Detalle de cliente | Read-only side panel: contacto, plan, crédito, referidos; **no Guardar**; one quiet footer action «Cerrar cuenta» (Error outline) opening a consequences confirmation, refused while a transfer payment awaits review |
-| `AW23` | Personal | Team accounts, 4 columns, role filter; row → `AW24` |
-| `AW24` | Formulario de personal | One role (2×2 grid), assigned branches, email + optional phone, activation-link invitation and pending states |
-| `AW25` | Evaluaciones nutricionales | Read-only list, date range + nutritionist filter, no status column; empty state |
-| `AW26` | Referidos | Read-only, 4 columns, Crédito otorgado / Pendiente pill |
-| `AW27` | Créditos | Read-only, 3 columns, right-aligned tabular amounts, total row |
-| `AW28` | Pagos | Studio-wide transfers; search + status filter (default Pendiente); pending row → `AW29` |
-| `AW29` | Revisar pago | Review panel: summary, large receipt, Confirmar pago / Rechazar (+ mandatory reason) |
+| `AW02` | Horario | Week grid of sessions; establishes the shell; an Éxito line names the result of the last change; full Sessions read «Llena · N en espera» in Advertencia |
+| `AW03` | Formulario de sesión | Side panel; creating chooses «Una sola vez» (Fecha) or «Cada semana» (Día de la semana + «Vigente desde» in Bolivia time, Sessions generated 30 days ahead); editing a Session of a weekly series asks «Solo esta sesión» (an exception) or «Esta y las futuras» (replaces only unbooked Sessions from «Vigente desde»); seats booked + waitlist count, capacity constraints, trainer notification; the Class Type of an existing Session is read-only; «Terminar la serie» ends a weekly schedule from a chosen date (unbooked Sessions cancelled); «Cancelar sesión» appears only for a Session with Bookings (an empty one shows «Sin reservas: si sigue vacía, el sistema la cancela sola 2 horas antes de empezar.»), is always one Session, asks no reason, refunds every booking and notifies the waitlist too |
+| `AW04` | Planes | Catalog table; Visibilidad pill (Éxito «Visible» / neutral «Oculto») and filter; prices with centavos |
+| `AW05` | Formulario de plan | Side panel; «Orden en la app»; edit keeps running prices and offers «Ocultar en la app» / «Mostrar en la app» |
+| `AW06` | Tipos de clase | Catalog table; Estado filter; archived Class Types carry a neutral «Archivado» pill |
+| `AW07` | Formulario de tipo de clase | Side panel; required «Descripción» (one or two sentences shown on the client's session detail) after Nombre; duration/capacity row with fixed suffixes; edit offers «Archivar tipo de clase» (refused while a weekly schedule uses it) |
+| `AW08` | Insumos | Branch stock table; "Stock bajo" warning pill; four actions (nuevo insumo, registrar retiro, registrar reposición, historial de retiros); «Registrar reposición» opens an `AW10`-style panel; subtitle «Sucursal X · N con stock bajo», an Éxito line after each change, an empty-Branch frame |
+| `AW09` | Formulario de insumo | Stock editable only on create; read-only + padlock on edit; «Archivar insumo» (edit only) with a confirmation; the stock is typed once on create; a duplicate active name is refused on Nombre |
+| `AW10` | Registrar retiro | Two-field fast-entry panel; stock shown per option; «Máximo: N unid.» and the «Solo hay N unid. en stock.» error; options read «Detergente (12 unid.)»; an empty-Branch state disables «Registrar» |
+| `AW11` | Nómina | Salary payments; **not** branch-scoped; studio-wide subtitle, Empleado filter |
+| `AW12` | Formulario de pago de sueldo | Empleado / Monto / Fecha only; every Staff Member of any Role, a deactivated one still choosable; the date cannot be after today |
+| `AW13` | Gastos | Branch expenses; month total in the subtitle; subtitle «Sucursal X», Categoría filter, empty state |
+| `AW14` | Formulario de gasto | Categoría + inline "+ Nueva categoría" / Monto / Fecha; a quiet line says which Branch the Expense belongs to; the inline category row adds with a compact neutral «Agregar» |
+| `AW15` | Categorías de gasto | Plain list, inline add row, delete disabled when in use; studio-wide; used categories say «En uso»; deleting asks first; refusals for a category in use and a taken name |
+| `AW16` | Reporte de ingresos y gastos | Own date range + "Todas las sucursales"; 3 stat tiles, bar chart, category breakdown; «Nómina» only across all Branches, and a single-Branch frame with its caption; Desde / Hasta / Sucursal controls (archived Branches included), centavos everywhere, every month on a rounded scale with a hover popover, «Totales por mes» beside the categories, empty and invalid-range states |
+| `AW17` | Promociones | Drag-to-reorder card list (order = carousel order); each card shows its derived state: Borrador, Programada, Activa, Finalizada (a deleted Promotion is archived and leaves the list); empty frame, an Éxito result line, «Sin imagen» for a draft without image; at 420 px headlines wrap and windows keep «Del … al …»; keyboard reordering on the handle |
+| `AW18` | Formulario de promoción | Image upload, título, descripción, date range; «Guardar borrador» / «Publicar» (disabled until image, title, description, and both dates exist); a published Promotion offers «Guardar cambios» / «Dejar de publicar», and changing or removing its image unpublishes it on save with a warning; accepts JPG, PNG or WEBP; «Imagen actual · ancho × alto»; a non-16:9 file previews with the cropped bands dimmed; refused-file reasons under the drop target; «Eliminar promoción» with a confirmation in every edit |
+| `AW19` | Sucursales | Two-column table (Nombre / Dirección); feeds the top-bar selector; no delete; Estado filter; archived Branches carry a neutral «Archivada» pill |
+| `AW20` | Formulario de sucursal | Side panel; nombre + dirección only; edit mode carries a fixed note about linked records; edit offers «Archivar sucursal» (refused while Sessions or a weekly schedule depend on it) |
+| `AW21` | Clientes | Read-only directory, 4 columns, search only, paginated; **no primary action**; after a closure from `AW22` it reloads without her and shows «Cuenta de … cerrada.»; a Client who never bought a Plan shows the neutral «Sin plan» pill |
+| `AW22` | Detalle de cliente | Read-only side panel: contacto, plan, crédito, referidos; **no Guardar**; one quiet footer action «Cerrar cuenta» (Error outline) opening a consequences confirmation, refused while a transfer payment awaits review; a pending Account shows «Pendiente de activación» under «Cliente desde»; a deactivated Account shows the neutral «Cuenta desactivada» pill and no «Cerrar cuenta» |
+| `AW23` | Personal | Team accounts, 4 columns, role filter; row → `AW24`; Estado column (Activo · Pendiente · Desactivado); the Role stays a Divisor tag; the Rol filter is the only filter (no name search) |
+| `AW24` | Formulario de personal | One role (2×2 grid), assigned branches, email + optional phone, activation-link invitation and pending states; edit shows the contact read-only and changes only Role and Branches; «Desactivar cuenta» with a confirmation; your own and a deactivated Account open read-only; no «Restablecer contraseña» |
+| `AW25` | Evaluaciones nutricionales | Read-only list, date range + nutritionist filter, no status column; empty state; follows the top-bar Branch; Horario's week stepper; «Primera evaluación» / «Seguimiento»; one labelled card per Evaluation at 420 px |
+| `AW26` | Referidos | Read-only, 4 columns, Crédito otorgado / Pendiente pill; studio-wide counts whatever the search; no-results state |
+| `AW27` | Créditos | Read-only, 3 columns, right-aligned tabular amounts, total row; four movements (Crédito ganado · Reservado para un pago · Usado en un pago · Devuelto al saldo); the total shows only without a search; empty and no-results states |
+| `AW28` | Pagos | Studio-wide transfers; search + status filter (default Pendiente); pending row → `AW29`; a Payment reduced by Credit shows «con Bs 60,00 de crédito» under the amount; empty («No hay pagos pendientes.») and no-results frames |
+| `AW29` | Revisar pago | Review panel: summary, large receipt, Confirmar pago / Rechazar (+ mandatory reason); Precio del plan and Crédito aplicado under the amount when Credit applied; «Confirmar pago» asks first; already-decided, active-plan refusal, and receipt-unavailable/unloaded states; the viewer is captioned «Comprobante · JPG» |
 | `AW30` | Recuperar contraseña | Request a reset link + neutral "link sent" and temporary-limit states |
-| `AW31` | Retiros e insumos consumidos | Withdrawal history behind `AW08` |
+| `AW31` | Retiros e insumos consumidos | Withdrawal history behind `AW08`; «Volver a Insumos», month arrows (forward disabled on the current month), archived Supplies in the filter, «Consumo del mes» |
 | `AW32` | Crear contraseña | Page opened by an emailed link: Desde una invitación or Restablecer contraseña, plus expired and removed-invitation states |
 | `AW33` | Menú de usuario y cambiar contraseña | Top-bar user menu overlay, change-password side panel, log-out confirm |
 | `AW34` | Selector de sucursal | Not a page: the open states of the top-bar branch control (branches come from `AW19`); picking one closes the popover and reloads the current page in that scope |
@@ -307,7 +307,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 **Report (`AW16`)**
 - Read-only screen. Tiles: Ingresos (Éxito), Gastos (Error), Neto (Plomo cálido — a summary, not a status), each with a 3px top rule in its color, a Lora 32 figure, and a one-line explanation.
-- Bar chart: paired flat bars per month (income `#7C9473`, expenses `#B25D4B`), 3 reference gridlines, linear scale of **3.333px per Bs 1.000** with the axis labels placed on that same scale. No gradients, no per-bar value labels.
+- Bar chart: paired flat bars per month (income `#7C9473`, expenses `#B25D4B`), 3 reference gridlines, linear scale of **3.333px per Bs 1.000** with the axis labels («Bs 0» … «Bs 60.000») placed on that same scale; every month of the range has its pair, and hovering or focusing a month tints its column and shows a popover with the month and both amounts. No gradients, no per-bar value labels.
 - Breakdown table: rows by expense category; with «Todas las sucursales» a `Nómina` row, annotated as coming from Nómina rather than the categories, so the total reconciles. With one Branch there is no `Nómina` row, Gastos are that Branch's Expenses, Ingresos its cash payments, and a line above the tiles says «La nómina y los ingresos por transferencia se ven solo en «Todas las sucursales».»
 
 **Responsive**

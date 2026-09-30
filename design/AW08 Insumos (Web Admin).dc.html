@@ -99,7 +99,7 @@
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Insumos</h2>
-              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · 11 insumos · 3 con stock bajo</div>
+              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · 3 con stock bajo</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;">
               <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">
@@ -117,6 +117,8 @@
               <a href="#" style="display:flex;align-items:center;height:38px;padding:0 6px;color:#B78380;font-size:13.5px;font-weight:500;" style-hover="color:#9C6764;">Ver historial de retiros</a>
             </div>
           </div>
+
+          <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;background:rgba(124,148,115,0.14);font-size:13px;line-height:1.5;color:#4A4A4A;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><circle cx="12" cy="12" r="9"></circle><polyline points="8,12.4 11,15.2 16.2,9.4"></polyline></svg><span>Retiro registrado: quedan 48 unid. de Toallas de mano.</span></div>
 
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="flex:1;max-width:300px;height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;">
@@ -216,8 +218,8 @@
           </div>
 
           <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#A79E9A;">
-            <span>Mostrando 8 de 11 insumos</span>
-            <span>El stock baja al registrar un retiro y sube al reponer desde la ficha del insumo.</span>
+            <span>Mostrando 1–8 de 11 insumos</span>
+            <span>El stock baja al registrar un retiro y sube al registrar una reposición.</span>
           </div>
         </main>
       </div>
@@ -295,7 +297,7 @@
           <div style="padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Insumos</h2>
-              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · 11 insumos · 3 con stock bajo</div>
+              <div style="font-size:12.5px;color:#8A807C;">Sucursal Equipetrol · 3 con stock bajo</div>
             </div>
             <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
               <div style="display:grid;grid-template-columns:minmax(0,2.2fr) minmax(0,1.2fr) minmax(0,1.4fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
@@ -342,7 +344,7 @@
                 <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Insumo</span>
                 <div style="display:flex;align-items:center;gap:10px;min-width:0;height:44px;padding:0 12px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;cursor:pointer;" style-hover="border-color:#B78380;">
                   <span style="flex:1;min-width:0;font-size:14px;color:#4A4A4A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Alcohol en gel 500 ml</span>
-                  <span style="flex:none;padding:4px 10px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:11.5px;font-variant-numeric:tabular-nums;">4 en stock</span>
+                  <span style="flex:none;font-size:12.5px;color:#8A807C;font-variant-numeric:tabular-nums;">(4 unid.)</span>
                   <svg width="12" height="12" style="flex:none;" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
                 </div>
               </label>
@@ -360,6 +362,26 @@
             </div>
           </aside>
         </main>
+      </div>
+    </div>
+  </div>
+
+
+  <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Sucursal sin insumos</div>
+          <div style="font-size:12px;color:#8A807C;">Otra sucursal elegida arriba · sin insignia en Insumos · las cuatro acciones siguen</div>
+        </div>
+      </sc-if>
+      <div style="width:900px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
+        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Insumos</h2><div style="font-size:12.5px;color:#8A807C;">Sucursal Las Palmas · ningún insumo con stock bajo</div></div>
+        <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;"><div>Nombre</div><div>Cantidad en stock</div><div>Estado</div></div>
+          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">Todavía no hay insumos en esta sucursal.</span><span style="font-size:13px;color:#8A807C;">Crea el primero con «Nuevo insumo».</span></div>
+        </div>
+        <div style="font-size:12px;color:#A79E9A;">Mostrando 0 de 0 insumos</div>
       </div>
     </div>
   </div>
@@ -394,7 +416,7 @@
         <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;flex-direction:column;gap:3px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:24px;">Insumos</h2>
-            <span style="font-size:12px;color:#8A807C;">11 insumos · 3 con stock bajo</span>
+            <span style="font-size:12px;color:#8A807C;">3 con stock bajo</span>
           </div>
           <div style="display:flex;flex-direction:column;gap:8px;">
             <button style="height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;cursor:pointer;" style-hover="background:#A87370;">
@@ -454,6 +476,7 @@
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Por sucursal</span>La tabla depende del selector de la barra superior: cada sucursal tiene su propio stock.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Umbral a la vista</span>Cada fila dice su umbral de alerta, así se entiende por qué hay o no insignia.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">"Stock bajo" en Advertencia</span>Aparece cuando la cantidad iguala o baja del umbral; el resto de filas queda en blanco.</div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Después de un cambio</span>Una línea Éxito dice qué pasó: «Insumo «Toallas» creado con 12 unid.», «Retiro registrado: quedan 9 unid. de Detergente.», «Reposición registrada: ahora hay 42 unid. de Detergente.» o «Papel higiénico se archivó: sus retiros siguen en el historial.» El número de Insumos en la barra lateral cuenta los insumos con stock bajo de la sucursal elegida.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cuatro acciones</span>"+ Nuevo insumo" es la acción principal; "Registrar retiro" y "Registrar reposición" son delineados porque mueven stock; "Ver historial de retiros" es un enlace de texto y abre AW31.</div>
     </div>
   </div>
