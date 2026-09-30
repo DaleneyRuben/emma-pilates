@@ -15,8 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 10</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Pago por transferencia</h1>
-    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Único método en la app de cliente: QR del estudio y comprobante adjunto. El efectivo lo registra el personal desde la app de staff.</p>
+    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#766D69;">Único método en la app de cliente: QR del estudio y comprobante adjunto. El efectivo lo registra el personal desde la app de staff.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Antes de adjuntar</div>
-          <div style="font-size:12px;color:#8A807C;">Zona de carga vacía · botón deshabilitado</div>
+          <div style="font-size:12px;color:#766D69;">Zona de carga vacía · botón deshabilitado</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -49,9 +49,9 @@
           <div style="padding:24px 20px 28px;display:flex;flex-direction:column;gap:24px;align-items:center;">
 
             <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Monto exacto</span>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Monto exacto</span>
               <span style="font-family:Lora,Georgia,serif;font-size:46px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;">Bs {{ amount }}</span>
-              <span style="font-size:13px;color:#8A807C;">Paquete de 8 clases</span>
+              <span style="font-size:13px;color:#766D69;">Paquete de 8 clases</span>
             </div>
 
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);width:100%;">
@@ -59,11 +59,11 @@
                 <span style="position:absolute;top:12px;left:12px;width:42px;height:42px;border:7px solid #4A4A4A;background:#FFFFFF;"></span>
                 <span style="position:absolute;top:12px;right:12px;width:42px;height:42px;border:7px solid #4A4A4A;background:#FFFFFF;"></span>
                 <span style="position:absolute;bottom:12px;left:12px;width:42px;height:42px;border:7px solid #4A4A4A;background:#FFFFFF;"></span>
-                <span style="position:absolute;bottom:14px;right:14px;font-family:ui-monospace,Menlo,monospace;font-size:9px;color:#8A807C;background:#FFFFFF;padding:2px 4px;">QR del estudio</span>
+                <span style="position:absolute;bottom:14px;right:14px;font-family:ui-monospace,Menlo,monospace;font-size:9px;color:#766D69;background:#FFFFFF;padding:2px 4px;">QR del estudio</span>
               </div>
               <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
                 <span style="font-size:13px;color:#6E6663;">Emma Pilates Studio S.R.L.</span>
-                <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">Banco Nacional · Cta. 4501 8823 01</span>
+                <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">Banco Nacional · Cta. 4501 8823 01</span>
               </div>
             </div>
 
@@ -72,25 +72,25 @@
             <button style="width:100%;display:flex;flex-direction:column;align-items:center;gap:10px;padding:28px 20px;border:1px dashed #B78380;border-radius:14px;background:rgba(216,189,184,0.1);cursor:pointer;" style-hover="background:rgba(216,189,184,0.2);">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 16V5"></path><polyline points="7.5,9.5 12,5 16.5,9.5"></polyline><path d="M4.5 15v3.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V15"></path></svg>
               <span style="font-size:15px;font-weight:500;color:#B78380;">Sube tu comprobante de transferencia</span>
-              <span style="font-size:12px;color:#8A807C;">JPG o PNG · máx. 5 MB</span>
+              <span style="font-size:12px;color:#766D69;">JPG o PNG · máx. 5 MB</span>
             </button>
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
             <div style="padding:18px 20px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);display:flex;flex-direction:column;gap:10px;">
               <button disabled="{{ yes }}" style="height:54px;width:100%;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Enviar comprobante</button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Adjunta tu comprobante para continuar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Adjunta tu comprobante para continuar.</span>
             </div>
             <div style="border-top:1px solid #EFE7DE;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
                 <span style="font-size:11px;">Inicio</span>
               </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
                 <span style="font-size:11px;">Reservar</span>
               </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
                 <span style="font-size:11px;">Mis Reservas</span>
               </div>
@@ -108,7 +108,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Comprobante adjunto</div>
-          <div style="font-size:12px;color:#8A807C;">Miniatura visible · botón habilitado</div>
+          <div style="font-size:12px;color:#766D69;">Miniatura visible · botón habilitado</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -123,9 +123,9 @@
           <div style="padding:24px 20px 28px;display:flex;flex-direction:column;gap:24px;align-items:center;">
 
             <div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Monto exacto</span>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Monto exacto</span>
               <span style="font-family:Lora,Georgia,serif;font-size:46px;font-weight:500;line-height:1.1;font-variant-numeric:tabular-nums;">Bs {{ amount }}</span>
-              <span style="font-size:13px;color:#8A807C;">Paquete de 8 clases</span>
+              <span style="font-size:13px;color:#766D69;">Paquete de 8 clases</span>
             </div>
 
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:22px;display:flex;flex-direction:column;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);width:100%;">
@@ -133,11 +133,11 @@
                 <span style="position:absolute;top:12px;left:12px;width:42px;height:42px;border:7px solid #4A4A4A;background:#FFFFFF;"></span>
                 <span style="position:absolute;top:12px;right:12px;width:42px;height:42px;border:7px solid #4A4A4A;background:#FFFFFF;"></span>
                 <span style="position:absolute;bottom:12px;left:12px;width:42px;height:42px;border:7px solid #4A4A4A;background:#FFFFFF;"></span>
-                <span style="position:absolute;bottom:14px;right:14px;font-family:ui-monospace,Menlo,monospace;font-size:9px;color:#8A807C;background:#FFFFFF;padding:2px 4px;">QR del estudio</span>
+                <span style="position:absolute;bottom:14px;right:14px;font-family:ui-monospace,Menlo,monospace;font-size:9px;color:#766D69;background:#FFFFFF;padding:2px 4px;">QR del estudio</span>
               </div>
               <div style="display:flex;flex-direction:column;align-items:center;gap:2px;">
                 <span style="font-size:13px;color:#6E6663;">Emma Pilates Studio S.R.L.</span>
-                <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">Banco Nacional · Cta. 4501 8823 01</span>
+                <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">Banco Nacional · Cta. 4501 8823 01</span>
               </div>
             </div>
 
@@ -145,18 +145,18 @@
 
             <div style="width:100%;display:flex;align-items:center;gap:14px;padding:14px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.04);">
               <div style="width:64px;height:78px;border-radius:8px;flex:none;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;">
-                <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#8A807C;">captura</span>
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#766D69;">captura</span>
               </div>
               <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
                 <span style="font-size:14px;font-weight:500;">comprobante.jpg</span>
-                <span style="font-size:12px;color:#8A807C;">1,2 MB · adjuntado ahora</span>
+                <span style="font-size:12px;color:#766D69;">1,2 MB · adjuntado ahora</span>
                 <span style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#5F7457;">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="4.5,12.5 9.5,17.5 19.5,7"></polyline></svg>
                   Listo para enviar
                 </span>
               </div>
               <button style="width:40px;height:40px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.35);">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="1.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="1.4" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg>
               </button>
             </div>
           </div>
@@ -164,18 +164,18 @@
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
             <div style="padding:18px 20px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);display:flex;flex-direction:column;gap:10px;">
               <button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Enviar comprobante</button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">El estudio revisará tu pago y te avisará por la app.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">El estudio revisará tu pago y te avisará por la app.</span>
             </div>
             <div style="border-top:1px solid #EFE7DE;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
                 <span style="font-size:11px;">Inicio</span>
               </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
                 <span style="font-size:11px;">Reservar</span>
               </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
                 <span style="font-size:11px;">Mis Reservas</span>
               </div>
@@ -191,12 +191,12 @@
 
     <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
-        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Zona de carga</div>
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Zona de carga</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Vacía:</strong> borde punteado en palo de rosa, ícono de subida y área táctil completa; es la única acción visible del cuerpo.</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Con archivo:</strong> pasa a tarjeta sólida con miniatura, nombre, peso y confirmación en verde; la «×» quita el archivo y vuelve al estado vacío.</div>
       </div>
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
-        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Notas</div>
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Notas</div>
         <div>El monto viene del total del plan (pantalla 09) y es ajustable desde Tweaks para revisar cifras largas.</div>
         <div>Al enviar, el pago queda en estado «Pendiente» y la app pasa a la pantalla de estado del pago (11).</div>
       </div>

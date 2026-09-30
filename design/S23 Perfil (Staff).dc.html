@@ -15,9 +15,9 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  input::placeholder { color: #A79E9A; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  input::placeholder { color: #7A716D; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -26,7 +26,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S23 · Todos los roles</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Perfil</h1>
-    <p style="margin:0;max-width:840px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">La pantalla que el avatar del encabezado ya prometía. Se llega desde la raíz de cada rol: S02 (entrenadora), S04 (asistente), S11 (administración) y S15 (nutricionista); la flecha vuelve a esa misma raíz. Sin barra de pestañas, así que este es el único lugar donde alguien del equipo puede cambiar su contraseña o cerrar sesión. Todo es de solo lectura menos la contraseña: la ficha del personal la mantiene administración en AW24.</p>
+    <p style="margin:0;max-width:840px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">La pantalla que el avatar del encabezado ya prometía. Se llega desde la raíz de cada rol: S02 (entrenadora), S04 (asistente), S11 (administración) y S15 (nutricionista); la flecha vuelve a esa misma raíz. Sin barra de pestañas, así que este es el único lugar donde alguien del equipo puede cambiar su contraseña o cerrar sesión. Todo es de solo lectura menos la contraseña: la ficha del personal la mantiene administración en AW24.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:44px;">
@@ -35,7 +35,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Entrenadora</div>
-          <div style="font-size:12px;color:#8A807C;">Una sucursal asignada · sin "Editar": los datos vienen de AW24</div>
+          <div style="font-size:12px;color:#766D69;">Una sucursal asignada · sin "Editar": los datos vienen de AW24</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -51,23 +51,23 @@
 
             <div style="display:flex;flex-direction:column;gap:14px;padding:22px 18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:center;gap:16px;">
-                <div style="width:64px;height:64px;flex:none;border-radius:999px;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:23px;font-weight:500;">CR</div>
+                <div style="width:64px;height:64px;flex:none;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:23px;font-weight:500;">CR</div>
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                   <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;line-height:1.2;">Camila Rojas</span>
-                  <span style="font-size:13.5px;color:#8A807C;">camila.rojas@emmapilates.bo</span>
-                  <span style="font-size:13.5px;color:#8A807C;font-variant-numeric:tabular-nums;">+591 707 45210</span>
+                  <span style="font-size:13.5px;color:#766D69;">camila.rojas@emmapilates.bo</span>
+                  <span style="font-size:13.5px;color:#766D69;font-variant-numeric:tabular-nums;">+591 707 45210</span>
                 </div>
               </div>
-              <div style="padding-top:14px;border-top:1px solid #EFE7DE;font-size:13px;line-height:1.55;color:#A79E9A;text-wrap:pretty;">Tus datos los actualiza administración.</div>
+              <div style="padding-top:14px;border-top:1px solid #EFE7DE;font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Tus datos los actualiza administración.</div>
             </div>
 
             <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px;padding:14px 18px;border-bottom:1px solid #EFE7DE;">
-                <span style="font-size:13px;color:#8A807C;">Rol</span>
+                <span style="font-size:13px;color:#766D69;">Rol</span>
                 <span style="font-size:15px;color:#4A4A4A;">Entrenadora</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px;padding:14px 18px;">
-                <span style="font-size:13px;color:#8A807C;flex:none;">Sucursales</span>
+                <span style="font-size:13px;color:#766D69;flex:none;">Sucursales</span>
                 <span style="font-size:15px;color:#4A4A4A;text-align:right;">Equipetrol</span>
               </div>
             </div>
@@ -87,7 +87,7 @@
 
             <button style="height:52px;width:100%;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:15px;font-weight:500;cursor:pointer;" style-hover="border-color:#B25D4B;color:#B25D4B;" style-active="border-color:#B25D4B;color:#B25D4B;background:rgba(178,93,75,0.06);">Cerrar sesión</button>
 
-            <div style="text-align:center;font-size:12px;color:#A79E9A;">Emma Pilates Studio · versión 1.0</div>
+            <div style="text-align:center;font-size:12px;color:#7A716D;">Emma Pilates Studio · versión 1.0</div>
           </div>
         </div>
       </x-import>
@@ -97,7 +97,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Cambiar contraseña</div>
-          <div style="font-size:12px;color:#8A807C;">Con sesión abierta y sabiendo la actual · no es la activación de S19 ni la recuperación de S18 · botón fijo al pie</div>
+          <div style="font-size:12px;color:#766D69;">Con sesión abierta y sabiendo la actual · no es la activación de S19 ni la recuperación de S18 · botón fijo al pie</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -111,16 +111,16 @@
 
           <div style="flex:1;padding:34px 20px 36px;display:flex;flex-direction:column;gap:26px;">
             <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña actual</span>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contraseña actual</span>
               <input type="password" defaultValue="{{ actual }}" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
             </label>
             <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contraseña nueva</span>
               <input type="password" defaultValue="{{ nueva }}" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-              <span style="font-size:13px;color:#A79E9A;">Mínimo 8 caracteres.</span>
+              <span style="font-size:13px;color:#7A716D;">Mínimo 8 caracteres.</span>
             </label>
             <label style="display:flex;flex-direction:column;gap:8px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Confirmar contraseña</span>
               <input type="password" defaultValue="{{ distinta }}" style="height:52px;width:100%;padding:0 16px;border:1px solid #C08A7E;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(192,138,126,0.18);" />
               <span style="display:flex;align-items:flex-start;gap:7px;font-size:13px;line-height:1.45;color:#B0655B;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#B0655B" stroke-width="2" stroke-linecap="round" style="flex:none;margin-top:2px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>
@@ -142,7 +142,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Administración</div>
-          <div style="font-size:12px;color:#8A807C;">Alcance total: "Todas las sucursales", igual que lo enuncia AW24</div>
+          <div style="font-size:12px;color:#766D69;">Alcance total: "Todas las sucursales", igual que lo enuncia AW24</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -158,23 +158,23 @@
 
             <div style="display:flex;flex-direction:column;gap:14px;padding:22px 18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:center;gap:16px;">
-                <div style="width:64px;height:64px;flex:none;border-radius:999px;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:23px;font-weight:500;">MF</div>
+                <div style="width:64px;height:64px;flex:none;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:23px;font-weight:500;">MF</div>
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                   <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;line-height:1.2;">María Fernanda Loza</span>
-                  <span style="font-size:13.5px;color:#8A807C;">mfloza@emmapilates.bo</span>
-                  <span style="font-size:13.5px;color:#8A807C;font-variant-numeric:tabular-nums;">+591 708 33104</span>
+                  <span style="font-size:13.5px;color:#766D69;">mfloza@emmapilates.bo</span>
+                  <span style="font-size:13.5px;color:#766D69;font-variant-numeric:tabular-nums;">+591 708 33104</span>
                 </div>
               </div>
-              <div style="padding-top:14px;border-top:1px solid #EFE7DE;font-size:13px;line-height:1.55;color:#A79E9A;text-wrap:pretty;">Tus datos los actualiza administración.</div>
+              <div style="padding-top:14px;border-top:1px solid #EFE7DE;font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Tus datos los actualiza administración.</div>
             </div>
 
             <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px;padding:14px 18px;border-bottom:1px solid #EFE7DE;">
-                <span style="font-size:13px;color:#8A807C;">Rol</span>
+                <span style="font-size:13px;color:#766D69;">Rol</span>
                 <span style="font-size:15px;color:#4A4A4A;">Administración</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px;padding:14px 18px;">
-                <span style="font-size:13px;color:#8A807C;flex:none;">Sucursales</span>
+                <span style="font-size:13px;color:#766D69;flex:none;">Sucursales</span>
                 <span style="font-size:15px;color:#4A4A4A;text-align:right;">Todas las sucursales</span>
               </div>
             </div>
@@ -194,7 +194,7 @@
 
             <button style="height:52px;width:100%;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:15px;font-weight:500;cursor:pointer;" style-hover="border-color:#B25D4B;color:#B25D4B;" style-active="border-color:#B25D4B;color:#B25D4B;background:rgba(178,93,75,0.06);">Cerrar sesión</button>
 
-            <div style="text-align:center;font-size:12px;color:#A79E9A;">Emma Pilates Studio · versión 1.0</div>
+            <div style="text-align:center;font-size:12px;color:#7A716D;">Emma Pilates Studio · versión 1.0</div>
           </div>
         </div>
       </x-import>
@@ -204,7 +204,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Android · Entrenadora</div>
-          <div style="font-size:12px;color:#8A807C;">Mismo contenido, encabezado con altura de Android · confirmación antes de salir</div>
+          <div style="font-size:12px;color:#766D69;">Mismo contenido, encabezado con altura de Android · confirmación antes de salir</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
@@ -220,23 +220,23 @@
 
             <div style="display:flex;flex-direction:column;gap:14px;padding:22px 18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:center;gap:16px;">
-                <div style="width:64px;height:64px;flex:none;border-radius:999px;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:23px;font-weight:500;">CR</div>
+                <div style="width:64px;height:64px;flex:none;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:23px;font-weight:500;">CR</div>
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                   <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;line-height:1.2;">Camila Rojas</span>
-                  <span style="font-size:13.5px;color:#8A807C;">camila.rojas@emmapilates.bo</span>
-                  <span style="font-size:13.5px;color:#8A807C;font-variant-numeric:tabular-nums;">+591 707 45210</span>
+                  <span style="font-size:13.5px;color:#766D69;">camila.rojas@emmapilates.bo</span>
+                  <span style="font-size:13.5px;color:#766D69;font-variant-numeric:tabular-nums;">+591 707 45210</span>
                 </div>
               </div>
-              <div style="padding-top:14px;border-top:1px solid #EFE7DE;font-size:13px;line-height:1.55;color:#A79E9A;text-wrap:pretty;">Tus datos los actualiza administración.</div>
+              <div style="padding-top:14px;border-top:1px solid #EFE7DE;font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Tus datos los actualiza administración.</div>
             </div>
 
             <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px;padding:14px 18px;border-bottom:1px solid #EFE7DE;">
-                <span style="font-size:13px;color:#8A807C;">Rol</span>
+                <span style="font-size:13px;color:#766D69;">Rol</span>
                 <span style="font-size:15px;color:#4A4A4A;">Entrenadora</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;min-height:56px;padding:14px 18px;">
-                <span style="font-size:13px;color:#8A807C;flex:none;">Sucursales</span>
+                <span style="font-size:13px;color:#766D69;flex:none;">Sucursales</span>
                 <span style="font-size:15px;color:#4A4A4A;text-align:right;">Equipetrol</span>
               </div>
             </div>
@@ -256,18 +256,18 @@
 
             <button style="height:52px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:rgba(178,93,75,0.06);color:#B25D4B;font-size:15px;font-weight:500;cursor:pointer;">Cerrar sesión</button>
 
-            <div style="text-align:center;font-size:12px;color:#A79E9A;">Emma Pilates Studio · versión 1.0</div>
+            <div style="text-align:center;font-size:12px;color:#7A716D;">Emma Pilates Studio · versión 1.0</div>
           </div>
 
           <div style="position:absolute;inset:0;background:rgba(74,58,48,0.28);display:flex;align-items:center;justify-content:center;padding:24px;">
             <div style="width:100%;max-width:320px;background:#FFFFFF;border-radius:16px;padding:24px 22px 18px;box-shadow:0 12px 28px rgba(74,58,48,0.14);display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;flex-direction:column;gap:7px;">
                 <span style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">¿Cerrar sesión?</span>
-                <p style="margin:0;font-size:14px;line-height:1.55;color:#8A807C;text-wrap:pretty;">Vuelves al inicio de sesión y tendrás que entrar de nuevo con tu correo y contraseña.</p>
+                <p style="margin:0;font-size:14px;line-height:1.55;color:#766D69;text-wrap:pretty;">Vuelves al inicio de sesión y tendrás que entrar de nuevo con tu correo y contraseña.</p>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 <button style="height:48px;width:100%;border:1px solid #C08A7E;border-radius:8px;background:#FFFFFF;color:#B0655B;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:#FBF1EE;">Cerrar sesión</button>
-                <button style="height:44px;align-self:center;border:none;background:transparent;color:#B78380;font-size:15px;cursor:pointer;">Cancelar</button>
+                <button style="height:44px;align-self:center;border:none;background:transparent;color:#8A5D59;font-size:15px;cursor:pointer;">Cancelar</button>
               </div>
             </div>
           </div>

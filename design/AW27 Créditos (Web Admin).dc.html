@@ -15,7 +15,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button, select { font: inherit; }
-  input::placeholder { color: #A79E9A; }
+  input::placeholder { color: #7A716D; }
   a { color: #B78380; text-decoration: none; }
   a:hover { color: #9C6764; }
 </style>
@@ -26,14 +26,14 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW27</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Créditos</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Lista de consulta con las clientas que tienen saldo a favor. El crédito se gana solo con los referidos y se descuenta solo al confirmar un pago, así que aquí no hay ajuste manual. Mismo armazón que AW02, con "Promociones" expandido y "Créditos" activo. El detalle de movimientos por clienta queda para más adelante.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Lista de consulta con las clientas que tienen saldo a favor. El crédito se gana solo con los referidos y se descuenta solo al confirmar un pago, así que aquí no hay ajuste manual. Mismo armazón que AW02, con "Promociones" expandido y "Créditos" activo. El detalle de movimientos por clienta queda para más adelante.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
-        <div style="font-size:12px;color:#8A807C;">Tres columnas · importes a la derecha en cifras tabulares</div>
+        <div style="font-size:12px;color:#766D69;">Tres columnas · importes a la derecha en cifras tabulares</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -43,8 +43,8 @@
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
         </div>
-        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
           admin.emmapilates.bo/promociones/creditos
         </div>
       </div>
@@ -57,60 +57,60 @@
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
             Sucursal Equipetrol
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
             <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
             <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
         </div>
       </div>
 
       <div style="display:flex;align-items:stretch;min-height:720px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
-          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
             Horario
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
-          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
-          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
-          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
           </a>
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Promociones</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Créditos</a>
         </nav>
 
         <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
           <div style="display:flex;flex-direction:column;gap:5px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Créditos</h2>
-            <div style="font-size:12.5px;color:#8A807C;">Bs 640,00 en saldo activo · 9 clientas con crédito</div>
+            <div style="font-size:12.5px;color:#766D69;">Bs 640,00 en saldo activo · 9 clientas con crédito</div>
           </div>
 
           <div style="display:flex;align-items:center;gap:10px;">
             <div style="flex:1;max-width:340px;height:34px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
               <input type="text" placeholder="Buscar por nombre de cliente" style="flex:1;height:100%;border:none;background:transparent;outline:none;font-size:12.5px;color:#4A4A4A;" />
             </div>
           </div>
 
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;max-width:1000px;">
-            <div style="display:grid;grid-template-columns:2fr 1fr 1.1fr;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+            <div style="display:grid;grid-template-columns:2fr 1fr 1.1fr;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
               <div>Cliente</div>
               <div style="text-align:right;">Saldo de crédito</div>
               <div>Última actividad</div>
@@ -124,7 +124,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 160,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">13/08/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Crédito ganado</span>
+                <span style="font-size:11.5px;color:#7A716D;">Crédito ganado</span>
               </div>
             </div>
 
@@ -136,7 +136,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 120,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">02/08/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Crédito ganado</span>
+                <span style="font-size:11.5px;color:#7A716D;">Crédito ganado</span>
               </div>
             </div>
 
@@ -148,7 +148,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 80,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">01/08/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Usado en un pago</span>
+                <span style="font-size:11.5px;color:#7A716D;">Usado en un pago</span>
               </div>
             </div>
 
@@ -160,7 +160,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 80,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">28/07/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Reservado para un pago</span>
+                <span style="font-size:11.5px;color:#7A716D;">Reservado para un pago</span>
               </div>
             </div>
 
@@ -172,7 +172,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 60,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">22/07/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Usado en un pago</span>
+                <span style="font-size:11.5px;color:#7A716D;">Usado en un pago</span>
               </div>
             </div>
 
@@ -184,7 +184,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 40,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">21/06/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Crédito ganado</span>
+                <span style="font-size:11.5px;color:#7A716D;">Crédito ganado</span>
               </div>
             </div>
 
@@ -196,7 +196,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 40,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">14/06/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Devuelto al saldo</span>
+                <span style="font-size:11.5px;color:#7A716D;">Devuelto al saldo</span>
               </div>
             </div>
 
@@ -208,7 +208,7 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 40,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">09/06/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Crédito ganado</span>
+                <span style="font-size:11.5px;color:#7A716D;">Crédito ganado</span>
               </div>
             </div>
 
@@ -220,18 +220,18 @@
               <div style="text-align:right;font-size:14px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 20,00</div>
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:13.5px;color:#6E6663;font-variant-numeric:tabular-nums;">30/05/2026</span>
-                <span style="font-size:11.5px;color:#A79E9A;">Usado en un pago</span>
+                <span style="font-size:11.5px;color:#7A716D;">Usado en un pago</span>
               </div>
             </div>
 
             <div style="display:grid;grid-template-columns:2fr 1fr 1.1fr;align-items:center;gap:16px;padding:13px 20px;background:#FDFAF6;border-top:1px solid #E4D8CC;">
-              <span style="font-size:12.5px;color:#8A807C;">Total en saldo activo</span>
+              <span style="font-size:12.5px;color:#766D69;">Total en saldo activo</span>
               <span style="text-align:right;font-size:14px;font-weight:600;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 640,00</span>
               <span></span>
             </div>
           </div>
 
-          <div style="max-width:1000px;display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:12px;color:#A79E9A;">
+          <div style="max-width:1000px;display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:12px;color:#7A716D;">
             <span>Mostrando 9 de 9 clientas con crédito</span>
             <span>El saldo se mueve solo: entra por referidos y sale al confirmar un pago.</span>
           </div>
@@ -246,16 +246,16 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · Buscando</div>
-          <div style="font-size:12px;color:#8A807C;">Con una búsqueda escrita no hay total: una página buscada no suma el saldo del estudio</div>
+          <div style="font-size:12px;color:#766D69;">Con una búsqueda escrita no hay total: una página buscada no suma el saldo del estudio</div>
         </div>
       </sc-if>
       <div style="width:1000px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Créditos</h2><div style="font-size:12.5px;color:#8A807C;">Bs 640,00 en saldo activo</div></div>
+        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Créditos</h2><div style="font-size:12.5px;color:#766D69;">Bs 640,00 en saldo activo</div></div>
         <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
-          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;"><div>Cliente</div><div>Saldo de crédito</div><div>Última actividad</div></div>
-          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">No se encontró ninguna clienta con crédito.</span><span style="font-size:13px;color:#8A807C;">Revisa cómo escribiste el nombre.</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;"><div>Cliente</div><div>Saldo de crédito</div><div>Última actividad</div></div>
+          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">No se encontró ninguna clienta con crédito.</span><span style="font-size:13px;color:#766D69;">Revisa cómo escribiste el nombre.</span></div>
         </div>
-        <div style="font-size:12px;color:#A79E9A;">Sin resultados</div>
+        <div style="font-size:12px;color:#7A716D;">Sin resultados</div>
       </div>
     </div>
 
@@ -263,16 +263,16 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · Sin crédito en el estudio</div>
-          <div style="font-size:12px;color:#8A807C;">Nadie tiene saldo a favor</div>
+          <div style="font-size:12px;color:#766D69;">Nadie tiene saldo a favor</div>
         </div>
       </sc-if>
       <div style="width:1000px;background:#FAF7F2;border:1px solid #D8C9BB;border-radius:14px;padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
-        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Créditos</h2><div style="font-size:12.5px;color:#8A807C;">Bs 0,00 en saldo activo</div></div>
+        <div style="display:flex;flex-direction:column;gap:5px;"><h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Créditos</h2><div style="font-size:12.5px;color:#766D69;">Bs 0,00 en saldo activo</div></div>
         <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
-          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;"><div>Cliente</div><div>Saldo de crédito</div><div>Última actividad</div></div>
-          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">Ninguna clienta tiene crédito disponible.</span><span style="font-size:13px;color:#8A807C;">El crédito se gana con los referidos y se usa al confirmar un pago.</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;"><div>Cliente</div><div>Saldo de crédito</div><div>Última actividad</div></div>
+          <div style="padding:48px 24px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;"><span style="font-size:19px;font-family:Lora,Georgia,serif;color:#4A4A4A;">Ninguna clienta tiene crédito disponible.</span><span style="font-size:13px;color:#766D69;">El crédito se gana con los referidos y se usa al confirmar un pago.</span></div>
         </div>
-        <div style="font-size:12px;color:#A79E9A;">Mostrando 0 de 0 clientas con crédito</div>
+        <div style="font-size:12px;color:#7A716D;">Mostrando 0 de 0 clientas con crédito</div>
       </div>
     </div>
   </div>
@@ -282,13 +282,13 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
-          <div style="font-size:12px;color:#8A807C;">Saldo grande a la derecha, fecha debajo del nombre</div>
+          <div style="font-size:12px;color:#766D69;">Saldo grande a la derecha, fecha debajo del nombre</div>
         </div>
       </sc-if>
       <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
         <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
-          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/promociones/creditos
           </div>
         </div>
@@ -304,43 +304,43 @@
         <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;flex-direction:column;gap:3px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.15;">Créditos</h2>
-            <span style="font-size:12px;color:#8A807C;font-variant-numeric:tabular-nums;">Bs 640,00 en saldo activo</span>
+            <span style="font-size:12px;color:#766D69;font-variant-numeric:tabular-nums;">Bs 640,00 en saldo activo</span>
           </div>
           <div style="height:40px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
-            <span style="font-size:13px;color:#A79E9A;">Buscar por nombre de cliente</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
+            <span style="font-size:13px;color:#7A716D;">Buscar por nombre de cliente</span>
           </div>
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Natalia Aguilera</span>
-                <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">13/08/2026 · crédito ganado</span>
+                <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">13/08/2026 · crédito ganado</span>
               </div>
               <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;flex:none;">Bs 160,00</span>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Andrea Céspedes</span>
-                <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">02/08/2026 · crédito ganado</span>
+                <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">02/08/2026 · crédito ganado</span>
               </div>
               <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;flex:none;">Bs 120,00</span>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Daniela Rojas Peña</span>
-                <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">01/08/2026 · usado en un pago</span>
+                <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">01/08/2026 · usado en un pago</span>
               </div>
               <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;flex:none;">Bs 80,00</span>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;border-bottom:1px solid #F2EBE2;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Camila Vargas Ortiz</span>
-                <span style="font-size:12px;color:#A79E9A;font-variant-numeric:tabular-nums;">28/07/2026 · crédito ganado</span>
+                <span style="font-size:12px;color:#7A716D;font-variant-numeric:tabular-nums;">28/07/2026 · crédito ganado</span>
               </div>
               <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;flex:none;">Bs 80,00</span>
             </div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;background:#FDFAF6;">
-              <span style="font-size:12.5px;color:#8A807C;">Total</span>
+              <span style="font-size:12.5px;color:#766D69;">Total</span>
               <span style="font-size:15px;font-weight:600;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 640,00</span>
             </div>
           </div>

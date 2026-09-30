@@ -15,8 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S10 · Rol: asistente</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Confirmar pago en efectivo</h1>
-    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">El efectivo se confirma en el momento: no hay estado pendiente. La asistente toca "Confirmar pago recibido" solo con el dinero en mano y el plan queda activo al instante.</p>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#766D69;">El efectivo se confirma en el momento: no hay estado pendiente. La asistente toca "Confirmar pago recibido" solo con el dinero en mano y el plan queda activo al instante.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Confirmación</div>
-          <div style="font-size:12px;color:#8A807C;">Desglose con crédito aplicado</div>
+          <div style="font-size:12px;color:#766D69;">Desglose con crédito aplicado</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -56,9 +56,9 @@
           <div style="padding:0 20px 24px;display:flex;flex-direction:column;gap:18px;">
             <div style="display:flex;flex-direction:column;gap:18px;padding:22px;border:1px solid #D8C9BB;border-radius:18px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;flex-direction:column;gap:5px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Plan elegido</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Plan elegido</span>
                 <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">Paquete de 8 clases</span>
-                <span style="font-size:13px;color:#8A807C;">8 clases · válido por 1 mes</span>
+                <span style="font-size:13px;color:#766D69;">8 clases · válido por 1 mes</span>
               </div>
               <div style="display:flex;flex-direction:column;gap:12px;padding-top:18px;border-top:1px solid #EFE7DE;">
                 <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
@@ -93,7 +93,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Pago registrado</div>
-          <div style="font-size:12px;color:#8A807C;">Éxito inmediato · sin barra de navegación ni retroceso</div>
+          <div style="font-size:12px;color:#766D69;">Éxito inmediato · sin barra de navegación ni retroceso</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -103,13 +103,13 @@
               <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#7C9473" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="5,12.5 10,17.5 19,7"></polyline></svg>
             </div>
             <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;">¡Pago registrado!</div>
-            <div style="font-size:14px;line-height:1.6;color:#8A807C;max-width:280px;">Se cobraron Bs 290 en efectivo a Valeria Áñez. Su plan ya está activo.</div>
+            <div style="font-size:14px;line-height:1.6;color:#766D69;max-width:280px;">Se cobraron Bs 290 en efectivo a Valeria Áñez. Su plan ya está activo.</div>
           </div>
 
           <div style="display:flex;flex-direction:column;gap:16px;padding:22px;border:1px solid #D8C9BB;border-radius:18px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
               <div style="display:flex;flex-direction:column;gap:5px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Plan activo</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Plan activo</span>
                 <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">Paquete de 8 clases</span>
               </div>
               <span style="flex:none;display:inline-flex;align-items:center;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Activa</span>
@@ -136,7 +136,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Tablet · Confirmación</div>
-          <div style="font-size:12px;color:#8A807C;">Misma tarjeta, centrada y de ancho limitado</div>
+          <div style="font-size:12px;color:#766D69;">Misma tarjeta, centrada y de ancho limitado</div>
         </div>
       </sc-if>
       <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
@@ -157,9 +157,9 @@
 
               <div style="display:flex;flex-direction:column;gap:18px;padding:32px;border:1px solid #D8C9BB;border-radius:20px;background:#FFFFFF;box-shadow:0 2px 12px rgba(74,74,74,0.05);">
                 <div style="display:flex;flex-direction:column;gap:5px;">
-                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Plan elegido</span>
+                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Plan elegido</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:500;">Paquete de 8 clases</span>
-                  <span style="font-size:13px;color:#8A807C;">8 clases · válido por 1 mes</span>
+                  <span style="font-size:13px;color:#766D69;">8 clases · válido por 1 mes</span>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:12px;padding-top:18px;border-top:1px solid #EFE7DE;">
                   <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;"><span style="font-size:15px;color:#6E6663;">Precio del plan</span><span style="font-size:16px;font-variant-numeric:tabular-nums;">Bs 350</span></div>
@@ -170,7 +170,7 @@
                   <span style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:500;font-variant-numeric:tabular-nums;">Bs 290</span>
                 </div>
                 <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Confirmar pago recibido</button>
-                <span style="font-size:13px;line-height:1.55;color:#8A807C;text-align:center;">Confirma solo cuando tengas el efectivo en mano: el plan se activa de inmediato.</span>
+                <span style="font-size:13px;line-height:1.55;color:#766D69;text-align:center;">Confirma solo cuando tengas el efectivo en mano: el plan se activa de inmediato.</span>
               </div>
             </div>
           </div>

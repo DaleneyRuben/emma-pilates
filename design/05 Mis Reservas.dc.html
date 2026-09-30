@@ -15,8 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 05</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Mis reservas</h1>
-    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Reservas próximas con sus tres estados posibles y el estado vacío. La acción de cada tarjeta depende de la ventana de cancelación de 2 h 30.</p>
+    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#766D69;">Reservas próximas con sus tres estados posibles y el estado vacío. La acción de cada tarjeta depende de la ventana de cancelación de 2 h 30.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Con reservas próximas</div>
-          <div style="font-size:12px;color:#8A807C;">Los tres estados juntos</div>
+          <div style="font-size:12px;color:#766D69;">Los tres estados juntos</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -43,18 +43,18 @@
 
             <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;">
               <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Mis reservas</div>
-              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
+              <a href="#" style="font-size:14px;font-weight:500;color:#8A5D59;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Hoy · miércoles 19</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Hoy · miércoles 19</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
                   </div>
                   <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
@@ -70,18 +70,18 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
                 </div>
               </div>
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Mañana · jueves 20</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;padding-top:6px;">Mañana · jueves 20</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
                 </div>
@@ -96,18 +96,18 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
                 </div>
               </div>
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Sábado 22 de agosto</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;padding-top:6px;">Sábado 22 de agosto</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
                   <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
@@ -123,7 +123,7 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Eres la 2.ª en la lista.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:150px;">Eres la 2.ª en la lista.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
                 </div>
               </div>
@@ -132,11 +132,11 @@
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
@@ -144,7 +144,7 @@
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;font-weight:500;">Mis Reservas</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
               <span style="font-size:11px;">Perfil</span>
             </div>
@@ -157,7 +157,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Confirmar cancelación</div>
-          <div style="font-size:12px;color:#8A807C;">Hoja inferior sobre la lista atenuada · sin pantalla nueva · al confirmar, la tarjeta desaparece</div>
+          <div style="font-size:12px;color:#766D69;">Hoja inferior sobre la lista atenuada · sin pantalla nueva · al confirmar, la tarjeta desaparece</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -166,18 +166,18 @@
 
             <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;">
               <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Mis reservas</div>
-              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
+              <a href="#" style="font-size:14px;font-weight:500;color:#8A5D59;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Hoy · miércoles 19</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Hoy · miércoles 19</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
                   </div>
                   <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
@@ -193,18 +193,18 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
                 </div>
               </div>
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Mañana · jueves 20</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;padding-top:6px;">Mañana · jueves 20</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
                 </div>
@@ -219,18 +219,18 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
                 </div>
               </div>
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Sábado 22 de agosto</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;padding-top:6px;">Sábado 22 de agosto</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
                   <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
@@ -246,7 +246,7 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Eres la 2.ª en la lista.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:150px;">Eres la 2.ª en la lista.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
                 </div>
               </div>
@@ -255,11 +255,11 @@
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
@@ -267,7 +267,7 @@
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;font-weight:500;">Mis Reservas</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
               <span style="font-size:11px;">Perfil</span>
             </div>
@@ -276,12 +276,12 @@
           <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:#FFFFFF;border-top:1px solid #D8C9BB;border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(74,58,48,0.14);padding:24px 20px 34px;display:flex;flex-direction:column;gap:16px;">
             <div style="display:flex;flex-direction:column;gap:8px;">
               <div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;">¿Cancelar esta reserva?</div>
-              <div style="font-size:13px;line-height:1.5;color:#8A807C;">Reformer Pilates · jueves 20 de agosto, 07:00 – 07:50 · Emma Vargas · Centro</div>
+              <div style="font-size:13px;line-height:1.5;color:#766D69;">Reformer Pilates · jueves 20 de agosto, 07:00 – 07:50 · Emma Vargas · Centro</div>
             </div>
             <div style="font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">La clase vuelve al saldo de tu plan y el lugar queda libre para otra clienta. Para volver a reservarlo tendrá que seguir habiendo cupo.</div>
             <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px;">
               <button style="min-height:52px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:transparent;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.08);">Sí, cancelar reserva</button>
-              <button style="min-height:44px;width:100%;border:none;border-radius:8px;background:transparent;color:#8A807C;font-size:15px;font-weight:500;cursor:pointer;" style-hover="color:#4A4A4A;">Volver</button>
+              <button style="min-height:44px;width:100%;border:none;border-radius:8px;background:transparent;color:#766D69;font-size:15px;font-weight:500;cursor:pointer;" style-hover="color:#4A4A4A;">Volver</button>
             </div>
           </div>
         </div>
@@ -292,7 +292,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Recién reservada</div>
-          <div style="font-size:12px;color:#8A807C;">Al volver de 04 · aviso pasajero, sin botón ni cierre · la tarjeta nueva lleva el filo Éxito mientras el aviso está</div>
+          <div style="font-size:12px;color:#766D69;">Al volver de 04 · aviso pasajero, sin botón ni cierre · la tarjeta nueva lleva el filo Éxito mientras el aviso está</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -301,7 +301,7 @@
 
             <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;">
               <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Mis reservas</div>
-              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
+              <a href="#" style="font-size:14px;font-weight:500;color:#8A5D59;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:8px;">
@@ -312,18 +312,18 @@
                   <span style="font-size:12px;line-height:1.45;color:#6E6663;">Reformer Pilates · jueves 20 de agosto, 07:00</span>
                 </div>
               </div>
-              <span style="font-size:12px;line-height:1.4;color:#8A807C;padding-left:2px;">Te quedan 7 clases en tu plan.</span>
+              <span style="font-size:12px;line-height:1.4;color:#766D69;padding-left:2px;">Te quedan 7 clases en tu plan.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Hoy · miércoles 19</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Hoy · miércoles 19</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
                   </div>
                   <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
@@ -339,18 +339,18 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
                 </div>
               </div>
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Mañana · jueves 20</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;padding-top:6px;">Mañana · jueves 20</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-left:3px solid #7C9473;border-radius:16px;padding:18px 18px 18px 16px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
                 </div>
@@ -365,18 +365,18 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
                 </div>
               </div>
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:6px;">Sábado 22 de agosto</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;padding-top:6px;">Sábado 22 de agosto</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
                   <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
@@ -392,7 +392,7 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Eres la 2.ª en la lista.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:150px;">Eres la 2.ª en la lista.</span>
                   <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
                 </div>
               </div>
@@ -401,11 +401,11 @@
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
@@ -413,7 +413,7 @@
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;font-weight:500;">Mis Reservas</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
               <span style="font-size:11px;">Perfil</span>
             </div>
@@ -426,7 +426,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Android · Recién reservada</div>
-          <div style="font-size:12px;color:#8A807C;">Mismo aviso con densidad Material · barra de navegación con indicador</div>
+          <div style="font-size:12px;color:#766D69;">Mismo aviso con densidad Material · barra de navegación con indicador</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
@@ -435,7 +435,7 @@
 
             <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;">
               <div style="font-family:Lora,Georgia,serif;font-size:28px;font-weight:400;line-height:1.15;">Mis reservas</div>
-              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding-bottom:3px;white-space:nowrap;">Ver historial</a>
+              <a href="#" style="font-size:14px;font-weight:500;color:#8A5D59;padding-bottom:3px;white-space:nowrap;">Ver historial</a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:6px;">
@@ -446,18 +446,18 @@
                   <span style="font-size:12px;line-height:1.4;color:#6E6663;">Reformer Pilates · jueves 20 de agosto, 07:00</span>
                 </div>
               </div>
-              <span style="font-size:12px;line-height:1.4;color:#8A807C;padding-left:2px;">Te quedan 7 clases en tu plan.</span>
+              <span style="font-size:12px;line-height:1.4;color:#766D69;padding-left:2px;">Te quedan 7 clases en tu plan.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:10px;">
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Hoy · miércoles 19</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Hoy · miércoles 19</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Mat Pilates</span>
                   </div>
                   <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
@@ -473,17 +473,17 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Faltan menos de 2 h 30 para el inicio.</span>
                   <button style="min-height:44px;padding:0 16px;border:1px solid #B78380;border-radius:999px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
                 </div>
               </div>
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:4px;">Mañana · jueves 20</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;padding-top:4px;">Mañana · jueves 20</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-left:3px solid #7C9473;border-radius:12px;padding:16px 16px 16px 14px;display:flex;flex-direction:column;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
-                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Reformer Pilates</span>
                 </div>
                 <div style="display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:#6E6663;">
@@ -497,18 +497,18 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Puedes cancelar sin costo hasta las 04:30.</span>
                   <button style="min-height:44px;padding:0 16px;border:1px solid #D8C9BB;border-radius:999px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
                 </div>
               </div>
 
               <sc-if value="{{ grouped }}" hint-placeholder-val="{{ true }}">
-                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;padding-top:4px;">Sábado 22 de agosto</div>
+                <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;padding-top:4px;">Sábado 22 de agosto</div>
               </sc-if>
               <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:12px;">
                 <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                   <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
-                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
+                    <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Reformer Pilates</span>
                   </div>
                   <span style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:8px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
@@ -524,7 +524,7 @@
                   </span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                  <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Eres la 2.ª en la lista.</span>
+                  <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:150px;">Eres la 2.ª en la lista.</span>
                   <button style="min-height:44px;padding:0 16px;border:1px solid #D8C9BB;border-radius:999px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
                 </div>
               </div>
@@ -533,13 +533,13 @@
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:12px 0 26px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#7A716D;">
               <div style="display:flex;align-items:center;justify-content:center;height:32px;padding:0 20px;border-radius:999px;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               </div>
               <span style="font-size:12px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#7A716D;">
               <div style="display:flex;align-items:center;justify-content:center;height:32px;padding:0 20px;border-radius:999px;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               </div>
@@ -551,7 +551,7 @@
               </div>
               <span style="font-size:12px;font-weight:500;">Mis Reservas</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:#7A716D;">
               <div style="display:flex;align-items:center;justify-content:center;height:32px;padding:0 20px;border-radius:999px;">
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
               </div>
@@ -566,7 +566,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Sin reservas próximas</div>
-          <div style="font-size:12px;color:#8A807C;">Estado vacío con acción única</div>
+          <div style="font-size:12px;color:#766D69;">Estado vacío con acción única</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -574,27 +574,27 @@
           <div style="padding:66px 20px 28px;display:flex;flex-direction:column;gap:24px;flex:1;">
             <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;">
               <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Mis reservas</div>
-              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
+              <a href="#" style="font-size:14px;font-weight:500;color:#8A5D59;padding-bottom:4px;white-space:nowrap;">Ver historial</a>
             </div>
 
             <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;padding:40px 8px 80px;text-align:center;">
               <div style="width:180px;height:150px;border-radius:16px;background:repeating-linear-gradient(135deg,#EFE4DC 0 10px,#E7DAD3 10px 20px);display:flex;align-items:center;justify-content:center;">
-                <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#8A807C;">ilustración</span>
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#766D69;">ilustración</span>
               </div>
               <div style="display:flex;flex-direction:column;gap:8px;">
                 <div style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">Aún no tienes reservas próximas.</div>
-                <div style="font-size:14px;line-height:1.6;color:#8A807C;max-width:270px;">Elige un horario que te acomode y nos vemos en el estudio.</div>
+                <div style="font-size:14px;line-height:1.6;color:#766D69;max-width:270px;">Elige un horario que te acomode y nos vemos en el estudio.</div>
               </div>
               <button style="height:54px;width:100%;max-width:280px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Reservar una clase</button>
             </div>
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
@@ -602,7 +602,7 @@
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;font-weight:500;">Mis Reservas</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
               <span style="font-size:11px;">Perfil</span>
             </div>
@@ -613,7 +613,7 @@
 
     <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:16px;">
-        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Estado → acción</div>
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Estado → acción</div>
         <div style="display:flex;flex-direction:column;gap:14px;font-size:14px;line-height:1.55;color:#6E6663;">
           <div style="display:flex;flex-direction:column;gap:6px;">
             <span style="color:#4A4A4A;font-weight:500;">Confirmada, fuera de la ventana</span>
@@ -630,7 +630,7 @@
         </div>
       </div>
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
-        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Detalles</div>
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Detalles</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Orden:</strong> por fecha y hora ascendente, agrupadas por día.</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Cancelar:</strong> el borde y el texto pasan a rojo semántico al posar el cursor o el dedo; nunca es un botón sólido.</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Confirmación:</strong> «Cancelar» abre una hoja inferior sobre la lista atenuada (rgba(74,58,48,0.22)) con la reserva en una línea y la consecuencia en otra; la acción destructiva va delineada en rojo semántico y «Volver» queda como texto. Confirmar cierra la hoja y la tarjeta ya no está: sin pantalla de resultado.</div>

@@ -15,8 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S06 · Rol: asistente</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Resumen del cliente</h1>
-    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">Todo lo que la asistente necesita para actuar en nombre de una clienta: estado del plan, reserva y cobro en efectivo. En tablet ocupa el panel derecho de la búsqueda (S04). Mientras la cuenta está pendiente de activación, arriba aparece la invitación con "Cambiar correo", "Reenviar enlace" y "Cancelar invitación"; es lo que abre "Crear cuenta" en S05 y lo que se ve al volver a esa clienta desde S04.</p>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#766D69;">Todo lo que la asistente necesita para actuar en nombre de una clienta: estado del plan, reserva y cobro en efectivo. En tablet ocupa el panel derecho de la búsqueda (S04). Mientras la cuenta está pendiente de activación, arriba aparece la invitación con "Cambiar correo", "Reenviar enlace" y "Cancelar invitación"; es lo que abre "Crear cuenta" en S05 y lo que se ve al volver a esa clienta desde S04.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Suscripción activa</div>
-          <div style="font-size:12px;color:#8A807C;">"Ver historial" despliega las clases pasadas · interactivo</div>
+          <div style="font-size:12px;color:#766D69;">"Ver historial" despliega las clases pasadas · interactivo</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -47,7 +47,7 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">V</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Valeria Áñez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 700 12345</span>
+                <span style="font-size:13px;color:#766D69;">+591 700 12345</span>
               </div>
             </div>
           </div>
@@ -57,7 +57,7 @@
             <div style="display:flex;flex-direction:column;gap:18px;padding:22px;border:1px solid #D8C9BB;border-radius:18px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:5px;">
-                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Plan actual</span>
+                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Plan actual</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">Paquete de 12 clases</span>
                 </div>
                 <span style="flex:none;display:inline-flex;align-items:center;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Activa</span>
@@ -89,11 +89,11 @@
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
-              <button onClick="{{ toggleHistory }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              <button onClick="{{ toggleHistory }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
                 Ver historial
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="{{ chevron }}"></polyline></svg>
               </button>
@@ -103,12 +103,12 @@
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid #EFE7DE;">
                       <span style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                         <span style="font-size:15px;">{{ h.type }}</span>
-                        <span style="font-size:13px;color:#8A807C;">{{ h.when }}</span>
+                        <span style="font-size:13px;color:#766D69;">{{ h.when }}</span>
                       </span>
                       <span style="flex:none;display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:{{ h.tagBg }};color:{{ h.tagColor }};">{{ h.tag }}</span>
                     </div>
                   </sc-for>
-                  <div style="padding:14px 18px;font-size:13px;color:#8A807C;text-align:center;">Últimas 4 clases · <a href="#" style="color:#B78380;font-weight:500;">ver todo</a></div>
+                  <div style="padding:14px 18px;font-size:13px;color:#766D69;text-align:center;">Últimas 4 clases · <a href="#" style="color:#8A5D59;font-weight:500;">ver todo</a></div>
                 </div>
               </sc-if>
             </div>
@@ -122,7 +122,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Sin plan activo</div>
-          <div style="font-size:12px;color:#8A807C;">"Reservar clase" deshabilitado; el cobro pasa a primaria</div>
+          <div style="font-size:12px;color:#766D69;">"Reservar clase" deshabilitado; el cobro pasa a primaria</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
@@ -135,7 +135,7 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+                <span style="font-size:13px;color:#766D69;">+591 707 44821</span>
               </div>
             </div>
           </div>
@@ -144,7 +144,7 @@
             <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
-              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+              <span style="font-size:13px;line-height:1.55;color:#766D69;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;">
@@ -156,15 +156,15 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
 
-            <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+            <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
 
-            <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+            <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
               Ver historial
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
             </button>
@@ -177,7 +177,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Cuenta pendiente</div>
-          <div style="font-size:12px;color:#8A807C;">Tras "Crear cuenta" en S05, o al volver desde S04 · desaparece al activarse</div>
+          <div style="font-size:12px;color:#766D69;">Tras "Crear cuenta" en S05, o al volver desde S04 · desaparece al activarse</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -190,18 +190,18 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+                <span style="font-size:13px;color:#766D69;">+591 707 44821</span>
               </div>
             </div>
           </div>
 
           <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
-            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#8A807C;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#766D69;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
 
             <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
-              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+              <span style="font-size:13px;line-height:1.55;color:#766D69;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;">
@@ -213,15 +213,15 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
-              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
                 Ver historial
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
               </button>
@@ -236,7 +236,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Ya estaba pendiente</div>
-          <div style="font-size:12px;color:#8A807C;">El mismo correo en la misma alta de S05 · no se crea otra cuenta</div>
+          <div style="font-size:12px;color:#766D69;">El mismo correo en la misma alta de S05 · no se crea otra cuenta</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -249,19 +249,19 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+                <span style="font-size:13px;color:#766D69;">+591 707 44821</span>
               </div>
             </div>
           </div>
 
           <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
             <div role="status" style="display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border:1px solid rgba(124,148,115,0.45);border-radius:10px;background:rgba(124,148,115,0.10);"><div style="width:6px;height:6px;border-radius:50%;background:#7C9473;margin-top:8px;flex:none;"></div><span style="font-size:14px;line-height:1.55;color:#5F7457;">Renata ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.</span></div>
-            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#8A807C;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#766D69;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
 
             <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
-              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+              <span style="font-size:13px;line-height:1.55;color:#766D69;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;">
@@ -273,15 +273,15 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
-              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
                 Ver historial
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
               </button>
@@ -296,7 +296,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Cambiar correo</div>
-          <div style="font-size:12px;color:#8A807C;">Conserva la clienta · anula los enlaces al correo anterior</div>
+          <div style="font-size:12px;color:#766D69;">Conserva la clienta · anula los enlaces al correo anterior</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -309,18 +309,18 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+                <span style="font-size:13px;color:#766D69;">+591 707 44821</span>
               </div>
             </div>
           </div>
 
           <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
-            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:12px;"><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#6E6663;">Nuevo correo</span><input type="email" value="renata.anez.s@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><button style="height:52px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar correo</button><button style="height:44px;align-self:center;padding:0 12px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;">Cancelar</button></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:12px;"><label style="display:flex;flex-direction:column;gap:8px;"><span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#6E6663;">Nuevo correo</span><input type="email" value="renata.anez.s@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /></label><button style="height:52px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar correo</button><button style="height:44px;align-self:center;padding:0 12px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;">Cancelar</button></div></div>
 
             <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
-              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+              <span style="font-size:13px;line-height:1.55;color:#766D69;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;">
@@ -332,15 +332,15 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
-              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
                 Ver historial
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
               </button>
@@ -355,7 +355,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Enlace reenviado</div>
-          <div style="font-size:12px;color:#8A807C;">Tras "Guardar correo": "Enviamos el enlace de activación al nuevo correo."</div>
+          <div style="font-size:12px;color:#766D69;">Tras "Guardar correo": "Enviamos el enlace de activación al nuevo correo."</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -368,18 +368,18 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+                <span style="font-size:13px;color:#766D69;">+591 707 44821</span>
               </div>
             </div>
           </div>
 
           <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
-            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><p role="status" style="margin:0;font-size:13.5px;line-height:1.5;color:#5F7457;">Enviamos un nuevo enlace de activación.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#8A807C;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><p role="status" style="margin:0;font-size:13.5px;line-height:1.5;color:#5F7457;">Enviamos un nuevo enlace de activación.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#766D69;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
 
             <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
-              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+              <span style="font-size:13px;line-height:1.55;color:#766D69;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;">
@@ -391,15 +391,15 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
-              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
                 Ver historial
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
               </button>
@@ -414,7 +414,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Reenvío limitado</div>
-          <div style="font-size:12px;color:#8A807C;">Límite temporal del servidor · el enlace vigente sigue sirviendo</div>
+          <div style="font-size:12px;color:#766D69;">Límite temporal del servidor · el enlace vigente sigue sirviendo</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -427,18 +427,18 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+                <span style="font-size:13px;color:#766D69;">+591 707 44821</span>
               </div>
             </div>
           </div>
 
           <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
-            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div role="status" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:14px;line-height:1.5;color:#4A4A4A;">Ya enviamos un correo a esa dirección hace poco. El enlace vigente sigue sirviendo.</span><span style="font-size:13px;line-height:1.5;color:#6E6663;font-variant-numeric:tabular-nums;">Podrás reenviarlo en 0:40.</span></div></div><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button disabled="{{ true }}" style="height:48px;width:100%;border:1px solid #E4DAD0;border-radius:8px;background:transparent;color:#B9AFA9;font-size:15px;font-weight:500;cursor:not-allowed;">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#8A807C;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div role="status" style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px;"><circle cx="12" cy="12" r="9"></circle><path d="M12 7.5V12l3 2"></path></svg><div style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:14px;line-height:1.5;color:#4A4A4A;">Ya enviamos un correo a esa dirección hace poco. El enlace vigente sigue sirviendo.</span><span style="font-size:13px;line-height:1.5;color:#6E6663;font-variant-numeric:tabular-nums;">Podrás reenviarlo en 0:40.</span></div></div><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button disabled="{{ true }}" style="height:48px;width:100%;border:1px solid #E4DAD0;border-radius:8px;background:transparent;color:#B9AFA9;font-size:15px;font-weight:500;cursor:not-allowed;">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#766D69;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
 
             <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
-              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+              <span style="font-size:13px;line-height:1.55;color:#766D69;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;">
@@ -450,15 +450,15 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
-              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
                 Ver historial
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
               </button>
@@ -473,7 +473,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Cancelar invitación</div>
-          <div style="font-size:12px;color:#8A807C;">Hoja de confirmación · al confirmar vuelve a S04</div>
+          <div style="font-size:12px;color:#766D69;">Hoja de confirmación · al confirmar vuelve a S04</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -486,18 +486,18 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+                <span style="font-size:13px;color:#766D69;">+591 707 44821</span>
               </div>
             </div>
           </div>
 
           <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
-            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#8A807C;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><a href="#" style="align-self:center;min-height:44px;display:flex;align-items:center;padding:0 8px;font-size:14px;color:#766D69;" style-hover="color:#B25D4B;">Cancelar invitación</a></div></div>
 
             <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
-              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+              <span style="font-size:13px;line-height:1.55;color:#766D69;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;">
@@ -509,21 +509,21 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
-              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
                 Ver historial
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
               </button>
             </div>
           </div>
-          <div style="position:absolute;inset:0;background:rgba(74,58,48,0.22);display:flex;flex-direction:column;justify-content:flex-end;"><div role="dialog" aria-modal="true" style="background:#FFFFFF;border-radius:24px 24px 0 0;padding:26px 22px 40px;box-shadow:0 -10px 28px rgba(74,58,48,0.14);display:flex;flex-direction:column;gap:16px;"><div style="align-self:center;width:36px;height:4px;border-radius:999px;background:#D8C9BB;"></div><span style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">¿Cancelar la invitación de Renata Áñez Suárez?</span><p style="margin:0;font-size:15px;line-height:1.55;color:#4A4A4A;text-wrap:pretty;">Se anularán los enlaces enviados, se liberará el correo y la cuenta pendiente desaparecerá.</p><button style="height:48px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#94493A;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:#FBF1EE;">Sí, cancelar invitación</button><button style="height:44px;align-self:center;padding:0 12px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;">Volver</button></div></div>
+          <div style="position:absolute;inset:0;background:rgba(74,58,48,0.22);display:flex;flex-direction:column;justify-content:flex-end;"><div role="dialog" aria-modal="true" style="background:#FFFFFF;border-radius:24px 24px 0 0;padding:26px 22px 40px;box-shadow:0 -10px 28px rgba(74,58,48,0.14);display:flex;flex-direction:column;gap:16px;"><div style="align-self:center;width:36px;height:4px;border-radius:999px;background:#D8C9BB;"></div><span style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">¿Cancelar la invitación de Renata Áñez Suárez?</span><p style="margin:0;font-size:15px;line-height:1.55;color:#4A4A4A;text-wrap:pretty;">Se anularán los enlaces enviados, se liberará el correo y la cuenta pendiente desaparecerá.</p><button style="height:48px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#94493A;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:#FBF1EE;">Sí, cancelar invitación</button><button style="height:44px;align-self:center;padding:0 12px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;">Volver</button></div></div>
         </div>
       </x-import>
     </div>
@@ -532,7 +532,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Teléfono · Con pagos o reservas</div>
-          <div style="font-size:12px;color:#8A807C;">La invitación no se puede cancelar · lo dice en lugar del enlace</div>
+          <div style="font-size:12px;color:#766D69;">La invitación no se puede cancelar · lo dice en lugar del enlace</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -545,18 +545,18 @@
               <div style="flex:none;width:52px;height:52px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:20px;">R</div>
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Renata Áñez Suárez</span>
-                <span style="font-size:13px;color:#8A807C;">+591 707 44821</span>
+                <span style="font-size:13px;color:#766D69;">+591 707 44821</span>
               </div>
             </div>
           </div>
 
           <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:22px;">
-            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><p style="margin:0;font-size:13px;line-height:1.55;color:#6E6663;text-align:center;">La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.</p></div></div>
+            <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border-radius:16px;background:rgba(201,154,78,0.12);"><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Cuenta pendiente de activación</span><div style="display:flex;flex-direction:column;align-items:flex-start;gap:0;"><span style="font-size:15px;color:#4A4A4A;overflow-wrap:anywhere;">renata.anez@correo.com</span><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar correo</a></div><p style="margin:0;font-size:14px;line-height:1.55;color:#6E6663;">El enlace de activación vence el 6 de octubre a las 10:40.</p><p style="margin:0;padding-top:10px;border-top:1px solid rgba(201,154,78,0.28);font-size:13px;line-height:1.55;color:#6E6663;">La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.</p><div style="display:flex;flex-direction:column;gap:6px;padding-top:4px;"><button style="height:48px;width:100%;border:1px solid #B78380;border-radius:8px;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;" style-hover="background:rgba(183,131,128,0.08);">Reenviar enlace</button><p style="margin:0;font-size:13px;line-height:1.55;color:#6E6663;text-align:center;">La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.</p></div></div>
 
             <div style="display:flex;flex-direction:column;gap:12px;padding:26px 22px;border:1px dashed #D8C9BB;border-radius:18px;background:rgba(216,201,187,0.14);text-align:center;align-items:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Sin plan activo</span>
-              <span style="font-size:13px;line-height:1.55;color:#8A807C;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
+              <span style="font-size:13px;line-height:1.55;color:#766D69;">Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:12px;">
@@ -568,15 +568,15 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:14px;">
-              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#B78380;font-size:15px;font-weight:500;">
+              <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;color:#8A5D59;font-size:15px;font-weight:500;">
                 Ver reservas
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
               </a>
-              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
+              <button style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#8A5D59;font-size:15px;font-weight:500;cursor:pointer;text-align:left;">
                 Ver historial
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
               </button>
@@ -593,7 +593,7 @@
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Tablet · Panel derecho con clienta seleccionada</div>
-        <div style="font-size:12px;color:#8A807C;">Suscripción vencida · la lista de búsqueda permanece a la izquierda</div>
+        <div style="font-size:12px;color:#766D69;">Suscripción vencida · la lista de búsqueda permanece a la izquierda</div>
       </div>
     </sc-if>
     <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
@@ -601,7 +601,7 @@
 
         <div style="border-right:1px solid #D8C9BB;display:flex;flex-direction:column;gap:18px;padding:36px 24px;overflow:hidden;">
           <div style="display:flex;flex-direction:column;gap:6px;">
-            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistente</span>
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Asistente</span>
             <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Buscar cliente</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
@@ -613,9 +613,9 @@
             Nuevo cliente
           </button>
           <div style="display:flex;flex-direction:column;gap:12px;">
-            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">2 clientes</span>
-            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #B78380;border-radius:14px;background:rgba(216,189,184,0.16);"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.55);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">P</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Paola Suárez</span><span style="font-size:13px;color:#8A807C;">+591 712 88990</span></span></div>
-            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">R</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Renata Áñez Suárez</span><span style="font-size:13px;color:#8A807C;">+591 707 44821</span></span></div>
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">2 clientes</span>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #B78380;border-radius:14px;background:rgba(216,189,184,0.16);"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.55);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">P</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Paola Suárez</span><span style="font-size:13px;color:#766D69;">+591 712 88990</span></span></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">R</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Renata Áñez Suárez</span><span style="font-size:13px;color:#766D69;">+591 707 44821</span></span></div>
           </div>
         </div>
 
@@ -624,7 +624,7 @@
             <div style="flex:none;width:58px;height:58px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:22px;">P</div>
             <div style="display:flex;flex-direction:column;gap:4px;">
               <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Paola Suárez</span>
-              <span style="font-size:14px;color:#8A807C;">+591 712 88990 · paola.suarez@correo.com</span>
+              <span style="font-size:14px;color:#766D69;">+591 712 88990 · paola.suarez@correo.com</span>
             </div>
           </div>
 
@@ -632,7 +632,7 @@
             <div style="display:flex;flex-direction:column;gap:18px;padding:24px;border:1px solid #D8C9BB;border-radius:18px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:5px;">
-                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Plan actual</span>
+                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Plan actual</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">Paquete de 8 clases</span>
                 </div>
                 <span style="flex:none;display:inline-flex;align-items:center;padding:6px 13px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(178,93,75,0.12);color:#8A4433;">Vencida</span>
@@ -656,19 +656,19 @@
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
                 Reservar clase
               </button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Necesita un plan activo para reservar.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Necesita un plan activo para reservar.</span>
             </div>
           </div>
 
           <div style="display:flex;flex-direction:column;gap:12px;">
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Historial</span>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Historial</span>
               <a href="#" style="font-size:14px;font-weight:500;">Ver historial completo</a>
             </div>
             <div style="display:flex;flex-direction:column;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;">
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid #EFE7DE;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Reformer Intermedio</span><span style="font-size:13px;color:#8A807C;">28 de julio · 07:00 · Equipetrol</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Asistió</span></div>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid #EFE7DE;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Mat Pilates</span><span style="font-size:13px;color:#8A807C;">25 de julio · 09:30 · Equipetrol</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(178,93,75,0.12);color:#8A4433;">No asistió</span></div>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Barre</span><span style="font-size:13px;color:#8A807C;">22 de julio · 19:15 · Urubó</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Asistió</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid #EFE7DE;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Reformer Intermedio</span><span style="font-size:13px;color:#766D69;">28 de julio · 07:00 · Equipetrol</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Asistió</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;border-bottom:1px solid #EFE7DE;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Mat Pilates</span><span style="font-size:13px;color:#766D69;">25 de julio · 09:30 · Equipetrol</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(178,93,75,0.12);color:#8A4433;">No asistió</span></div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 18px;"><span style="display:flex;flex-direction:column;gap:3px;"><span style="font-size:15px;">Barre</span><span style="font-size:13px;color:#766D69;">22 de julio · 19:15 · Urubó</span></span><span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Asistió</span></div>
             </div>
           </div>
         </div>

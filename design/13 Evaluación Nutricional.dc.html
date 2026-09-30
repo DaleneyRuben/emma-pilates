@@ -15,8 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 13</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Evaluación nutricional</h1>
-    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Disponibilidad de la nutricionista: solo se listan los días con bloques abiertos. Una evaluación por mes calendario de la cita, gratuita con un plan activo: los días de un mes ya usado no aparecen, los del mes siguiente sí. Los turnos se cierran 3 horas antes de empezar.</p>
+    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#766D69;">Disponibilidad de la nutricionista: solo se listan los días con bloques abiertos. Una evaluación por mes calendario de la cita, gratuita con un plan activo: los días de un mes ya usado no aparecen, los del mes siguiente sí. Los turnos se cierran 3 horas antes de empezar.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Con disponibilidad</div>
-          <div style="font-size:12px;color:#8A807C;">Días y horarios interactivos</div>
+          <div style="font-size:12px;color:#766D69;">Días y horarios interactivos</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -52,17 +52,17 @@
               <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Reserva tu evaluación gratuita con la nutricionista. Tienes una evaluación disponible por mes.</p>
               <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;">
                 <div style="width:44px;height:44px;border-radius:999px;flex:none;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
-                  <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#8A807C;">foto</span>
+                  <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#766D69;">foto</span>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:2px;">
                   <span style="font-family:Lora,Georgia,serif;font-size:17px;font-weight:500;">Carla Peña</span>
-                  <span style="font-size:12px;color:#8A807C;">Nutricionista · sesiones de 45 min</span>
+                  <span style="font-size:12px;color:#766D69;">Nutricionista · sesiones de 45 min</span>
                 </div>
               </div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <span style="padding:0 20px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Días disponibles</span>
+              <span style="padding:0 20px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Días disponibles</span>
               <div style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:2px 20px 6px;">
                 <sc-for list="{{ days }}" as="d" hint-placeholder-count="5">
                   <button onClick="{{ d.onClick }}" style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid {{ d.border }};background:{{ d.bg }};color:{{ d.color }};display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;">
@@ -75,29 +75,29 @@
 
             <div style="padding:0 20px;display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">{{ dayTitle }}</span>
-                <span style="font-size:12px;color:#A79E9A;">{{ slotCount }}</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">{{ dayTitle }}</span>
+                <span style="font-size:12px;color:#7A716D;">{{ slotCount }}</span>
               </div>
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
                 <sc-for list="{{ slots }}" as="s" hint-placeholder-count="9">
                   <button style="min-height:50px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;color:#B78380;">{{ s.time }}</button>
                 </sc-for>
               </div>
-              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Los horarios ocupados no se muestran. Al elegir uno confirmarás la cita en la siguiente pantalla.</span>
-              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Puedes reservar hasta 3 horas antes.</span>
+              <span style="font-size:12px;line-height:1.5;color:#7A716D;">Los horarios ocupados no se muestran. Al elegir uno confirmarás la cita en la siguiente pantalla.</span>
+              <span style="font-size:12px;line-height:1.5;color:#7A716D;">Puedes reservar hasta 3 horas antes.</span>
             </div>
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;">Mis Reservas</span>
             </div>
@@ -114,7 +114,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Agosto ya usada · dos sucursales</div>
-          <div style="font-size:12px;color:#8A807C;">Solo aparecen días de septiembre · la sucursal va en cada turno porque hay dos</div>
+          <div style="font-size:12px;color:#766D69;">Solo aparecen días de septiembre · la sucursal va en cada turno porque hay dos</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -132,17 +132,17 @@
               <p style="margin:0;font-size:15px;line-height:1.65;color:#6E6663;text-wrap:pretty;">Reserva tu evaluación gratuita con la nutricionista. Tienes una evaluación disponible por mes.</p>
               <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;">
                 <div style="width:44px;height:44px;border-radius:999px;flex:none;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
-                  <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#8A807C;">foto</span>
+                  <span style="font-family:ui-monospace,Menlo,monospace;font-size:8px;color:#766D69;">foto</span>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:2px;">
                   <span style="font-family:Lora,Georgia,serif;font-size:17px;font-weight:500;">Carla Peña</span>
-                  <span style="font-size:12px;color:#8A807C;">Nutricionista · sesiones de 45 min</span>
+                  <span style="font-size:12px;color:#766D69;">Nutricionista · sesiones de 45 min</span>
                 </div>
               </div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:10px;">
-              <span style="padding:0 20px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Días disponibles</span>
+              <span style="padding:0 20px;font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Días disponibles</span>
               <div style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:2px 20px 6px;">
                 <button style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">Mar</span><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">1</span></button>
                 <button style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#4A4A4A;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;"><span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">Mié</span><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">2</span></button>
@@ -154,32 +154,32 @@
 
             <div style="padding:0 20px;display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Martes 1 de septiembre</span>
-                <span style="font-size:12px;color:#A79E9A;">6 horarios</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Martes 1 de septiembre</span>
+                <span style="font-size:12px;color:#7A716D;">6 horarios</span>
               </div>
               <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;">
-                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">09:00</span><span style="font-size:11px;color:#8A807C;">Centro</span></button>
-                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">09:45</span><span style="font-size:11px;color:#8A807C;">Centro</span></button>
-                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">10:30</span><span style="font-size:11px;color:#8A807C;">Centro</span></button>
-                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">15:00</span><span style="font-size:11px;color:#8A807C;">Urubó</span></button>
-                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">15:45</span><span style="font-size:11px;color:#8A807C;">Urubó</span></button>
-                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">16:30</span><span style="font-size:11px;color:#8A807C;">Urubó</span></button>
+                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">09:00</span><span style="font-size:11px;color:#766D69;">Centro</span></button>
+                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">09:45</span><span style="font-size:11px;color:#766D69;">Centro</span></button>
+                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">10:30</span><span style="font-size:11px;color:#766D69;">Centro</span></button>
+                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">15:00</span><span style="font-size:11px;color:#766D69;">Urubó</span></button>
+                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">15:45</span><span style="font-size:11px;color:#766D69;">Urubó</span></button>
+                <button style="min-height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;border:1px solid #D8C9BB;border-radius:10px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;box-shadow:0 2px 6px rgba(74,74,74,0.04);" style-hover="border-color:#B78380;"><span style="font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;">16:30</span><span style="font-size:11px;color:#766D69;">Urubó</span></button>
               </div>
-              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Los horarios ocupados no se muestran. Al elegir uno confirmarás la cita en la siguiente pantalla.</span>
-              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Puedes reservar hasta 3 horas antes.</span>
+              <span style="font-size:12px;line-height:1.5;color:#7A716D;">Los horarios ocupados no se muestran. Al elegir uno confirmarás la cita en la siguiente pantalla.</span>
+              <span style="font-size:12px;line-height:1.5;color:#7A716D;">Puedes reservar hasta 3 horas antes.</span>
             </div>
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;">Mis Reservas</span>
             </div>
@@ -196,7 +196,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Ya usada este mes</div>
-          <div style="font-size:12px;color:#8A807C;">Solo si ningún mes sin usar tiene turnos en los próximos 30 días · sin selector ni acción</div>
+          <div style="font-size:12px;color:#766D69;">Solo si ningún mes sin usar tiene turnos en los próximos 30 días · sin selector ni acción</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -214,31 +214,31 @@
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:500;line-height:1.25;">Ya usaste tu evaluación de este mes.</div>
-              <p style="margin:0;font-size:15px;line-height:1.65;color:#8A807C;max-width:280px;text-wrap:pretty;">Podrás agendar la de septiembre desde el 1 de septiembre.</p>
+              <p style="margin:0;font-size:15px;line-height:1.65;color:#766D69;max-width:280px;text-wrap:pretty;">Podrás agendar la de septiembre desde el 1 de septiembre.</p>
             </div>
             <div style="width:100%;max-width:300px;display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;text-align:left;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;">Tu última evaluación</span>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;">Tu última evaluación</span>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px;">
-                <span style="color:#8A807C;">Fecha</span>
+                <span style="color:#766D69;">Fecha</span>
                 <span style="font-weight:500;">6 de agosto, 09:30</span>
               </div>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px;">
-                <span style="color:#8A807C;">Nutricionista</span>
+                <span style="color:#766D69;">Nutricionista</span>
                 <span style="font-weight:500;">Carla Peña</span>
               </div>
             </div>
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;">Mis Reservas</span>
             </div>
@@ -255,7 +255,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Sin plan activo</div>
-          <div style="font-size:12px;color:#8A807C;">La evaluación es gratuita pero pide una suscripción activa · «Ver planes» lleva a 08</div>
+          <div style="font-size:12px;color:#766D69;">La evaluación es gratuita pero pide una suscripción activa · «Ver planes» lleva a 08</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -273,21 +273,21 @@
             </div>
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div style="font-family:Lora,Georgia,serif;font-size:24px;font-weight:500;line-height:1.25;">Necesitas un plan activo para reservar tu evaluación.</div>
-              <p style="margin:0;font-size:15px;line-height:1.65;color:#8A807C;max-width:280px;align-self:center;text-wrap:pretty;">La evaluación es gratuita con cualquier plan.</p>
+              <p style="margin:0;font-size:15px;line-height:1.65;color:#766D69;max-width:280px;align-self:center;text-wrap:pretty;">La evaluación es gratuita con cualquier plan.</p>
             </div>
             <a href="#" style="height:54px;width:100%;max-width:290px;display:flex;align-items:center;justify-content:center;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;color:#FFFFFF;">Ver planes</a>
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;">Mis Reservas</span>
             </div>
@@ -302,7 +302,7 @@
 
     <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
-        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Disponibilidad</div>
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Disponibilidad</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Días:</strong> solo aparecen fechas con bloques abiertos; el selector no muestra días vacíos.</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Horarios:</strong> cuadrícula de tres columnas, botones de 50 px; los ocupados se omiten en vez de deshabilitarse.</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Cupo mensual:</strong> una evaluación por mes calendario de la cita, en hora de Bolivia. Los días de un mes ya usado se omiten y los de un mes sin usar se mantienen; el estado informativo aparece solo cuando ningún mes sin usar tiene turnos en los próximos 30 días, y nombra el siguiente.</div>
@@ -311,7 +311,7 @@
         <div><strong style="color:#4A4A4A;font-weight:500;">Sin plan:</strong> sin suscripción activa no hay selector; «Ver planes» lleva a Elegir plan (08).</div>
       </div>
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
-        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Tono</div>
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Tono</div>
         <div>El estado bloqueado usa arena cálida y no rojo: no es un error, es un límite ya cumplido. Sin botones, para no sugerir una salida que no existe.</div>
       </div>
     </div>

@@ -15,7 +15,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  input::placeholder { color: #A79E9A; }
+  input::placeholder { color: #7A716D; }
   a { color: #B78380; text-decoration: none; }
   a:hover { color: #9C6764; }
 </style>
@@ -26,7 +26,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW32</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Crear contraseña</h1>
-    <p style="margin:0;max-width:900px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Es la página que abre el enlace de un correo, con dos variantes. Desde una invitación: la administradora que recibió el enlace de activación de AW24 elige su primera contraseña, lo que activa la cuenta y confirma su correo; vuelve al login (AW01) sin sesión. Restablecer contraseña: desde el enlace que pide AW30; al guardar se cierran las sesiones anteriores, se abre una nueva y entra directo al Horario (AW02). Equivale a la pantalla 21 de la app de clientes y a S19 en la app del equipo. Sin barra lateral ni navegación: todavía no hay sesión.</p>
+    <p style="margin:0;max-width:900px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Es la página que abre el enlace de un correo, con dos variantes. Desde una invitación: la administradora que recibió el enlace de activación de AW24 elige su primera contraseña, lo que activa la cuenta y confirma su correo; vuelve al login (AW01) sin sesión. Restablecer contraseña: desde el enlace que pide AW30; al guardar se cierran las sesiones anteriores, se abre una nueva y entra directo al Horario (AW02). Equivale a la pantalla 21 de la app de clientes y a S19 en la app del equipo. Sin barra lateral ni navegación: todavía no hay sesión.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;">
@@ -35,7 +35,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px · Restablecer contraseña</div>
-          <div style="font-size:12px;color:#8A807C;">Desde el enlace de AW30 · al guardar abre una sesión nueva y entra al Horario (AW02)</div>
+          <div style="font-size:12px;color:#766D69;">Desde el enlace de AW30 · al guardar abre una sesión nueva y entra al Horario (AW02)</div>
         </div>
       </sc-if>
       <div style="width:1240px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -45,8 +45,8 @@
             <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
             <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           </div>
-          <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;letter-spacing:0.02em;">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;letter-spacing:0.02em;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/crear-contrasena?t=•••
           </div>
         </div>
@@ -55,7 +55,7 @@
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
               <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
               <div style="width:36px;height:1px;background:#D8C9BB;"></div>
-              <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+              <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#766D69;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:18px;">
               <div style="display:flex;flex-direction:column;gap:8px;">
@@ -63,11 +63,11 @@
                 <p style="margin:0;text-align:center;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Elige una contraseña nueva para tu cuenta.</p>
               </div>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contraseña nueva</span>
                 <input type="password" placeholder="Mínimo 8 caracteres" style="height:50px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Confirmar contraseña</span>
                 <input type="password" placeholder="Repite la contraseña" style="height:50px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <button disabled="{{ true }}" style="height:52px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#E2D3CD;color:#FFFFFF;font-size:15px;font-weight:500;cursor:not-allowed;">Guardar contraseña</button>
@@ -82,7 +82,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px · Desde una invitación</div>
-          <div style="font-size:12px;color:#8A807C;">Enlace de activación de AW24 (7 días) · al guardar vuelve a AW01 con "Tu cuenta está activa", sin sesión</div>
+          <div style="font-size:12px;color:#766D69;">Enlace de activación de AW24 (7 días) · al guardar vuelve a AW01 con "Tu cuenta está activa", sin sesión</div>
         </div>
       </sc-if>
       <div style="width:1240px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -92,8 +92,8 @@
             <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
             <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           </div>
-          <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;letter-spacing:0.02em;">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;letter-spacing:0.02em;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/crear-contrasena?t=•••
           </div>
         </div>
@@ -102,7 +102,7 @@
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
               <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
               <div style="width:36px;height:1px;background:#D8C9BB;"></div>
-              <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+              <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#766D69;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:18px;">
               <div style="display:flex;flex-direction:column;gap:8px;">
@@ -110,11 +110,11 @@
                 <p style="margin:0;text-align:center;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Elegir tu contraseña activa tu cuenta y confirma tu correo.</p>
               </div>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contraseña nueva</span>
                 <input type="password" placeholder="Mínimo 8 caracteres" style="height:50px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Confirmar contraseña</span>
                 <input type="password" placeholder="Repite la contraseña" style="height:50px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <button disabled="{{ true }}" style="height:52px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#E2D3CD;color:#FFFFFF;font-size:15px;font-weight:500;cursor:not-allowed;">Guardar contraseña</button>
@@ -129,7 +129,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px · Enlace de recuperación vencido</div>
-          <div style="font-size:12px;color:#8A807C;">Pasaron los 30 minutos · el mensaje reemplaza el formulario; el botón vuelve a AW30</div>
+          <div style="font-size:12px;color:#766D69;">Pasaron los 30 minutos · el mensaje reemplaza el formulario; el botón vuelve a AW30</div>
         </div>
       </sc-if>
       <div style="width:1240px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -139,8 +139,8 @@
             <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
             <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           </div>
-          <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;letter-spacing:0.02em;">
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;max-width:460px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;letter-spacing:0.02em;">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/crear-contrasena?t=•••
           </div>
         </div>
@@ -149,7 +149,7 @@
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
               <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
               <div style="width:36px;height:1px;background:#D8C9BB;"></div>
-              <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+              <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#766D69;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:16px;">
               <div style="width:64px;height:64px;border-radius:50%;background:rgba(183,131,128,0.14);display:flex;align-items:center;justify-content:center;">
@@ -169,13 +169,13 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px · Restablecer contraseña</div>
-          <div style="font-size:12px;color:#8A807C;">Tarjeta a todo el ancho, menos padding lateral · con la validación en línea visible</div>
+          <div style="font-size:12px;color:#766D69;">Tarjeta a todo el ancho, menos padding lateral · con la validación en línea visible</div>
         </div>
       </sc-if>
       <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
         <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
-          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/crear-contrasena
           </div>
         </div>
@@ -184,7 +184,7 @@
             <div style="display:flex;flex-direction:column;align-items:center;gap:11px;">
               <div style="font-family:Lora,Georgia,serif;font-size:46px;line-height:1;font-weight:400;">Emma</div>
               <div style="width:32px;height:1px;background:#D8C9BB;"></div>
-              <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+              <div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#766D69;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
             </div>
             <div style="display:flex;flex-direction:column;gap:16px;">
               <div style="display:flex;flex-direction:column;gap:8px;">
@@ -192,11 +192,11 @@
                 <p style="margin:0;text-align:center;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Elige una contraseña nueva para tu cuenta.</p>
               </div>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña nueva</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contraseña nueva</span>
                 <input type="password" defaultValue="{{ samplePassword }}" style="height:50px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Confirmar contraseña</span>
                 <input type="password" defaultValue="{{ sampleMismatch }}" style="height:50px;width:100%;padding:0 14px;border:1px solid #C08A7E;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#C08A7E;box-shadow:0 0 0 3px rgba(192,138,126,0.18);" />
                 <span style="display:flex;align-items:center;gap:6px;font-size:13px;color:#B0655B;line-height:1.4;">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B0655B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>
@@ -215,20 +215,20 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · invitación vencida</div>
-          <div style="font-size:12px;color:#8A807C;">El enlace de activación pasó sus 7 días · la cuenta sigue pendiente</div>
+          <div style="font-size:12px;color:#766D69;">El enlace de activación pasó sus 7 días · la cuenta sigue pendiente</div>
         </div>
       </sc-if>
-      <div style="width:520px;background:#F2ECE5;border:1px solid #D8C9BB;border-radius:14px;padding:56px 44px;display:flex;justify-content:center;"><div style="width:432px;display:flex;flex-direction:column;gap:28px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:18px;padding:44px 40px 36px;box-shadow:0 10px 30px rgba(74,58,48,0.06);"><div style="display:flex;flex-direction:column;align-items:center;gap:11px;"><div style="font-family:Lora,Georgia,serif;font-size:46px;line-height:1;font-weight:400;">Emma</div><div style="width:32px;height:1px;background:#D8C9BB;"></div><div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div></div><div style="display:flex;flex-direction:column;gap:16px;"><div style="align-self:center;width:64px;height:64px;border-radius:50%;background:rgba(183,131,128,0.14);display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg></div><div style="margin:0;text-align:center;font-family:Lora,Georgia,serif;font-weight:500;font-size:26px;line-height:1.25;">Este enlace ya no es válido</div><p style="margin:0;text-align:center;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Las invitaciones vencen a los 7 días y sirven una sola vez. Pide a la administración del estudio que te envíe una nueva.</p><a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">Volver a iniciar sesión</a></div></div></div>
+      <div style="width:520px;background:#F2ECE5;border:1px solid #D8C9BB;border-radius:14px;padding:56px 44px;display:flex;justify-content:center;"><div style="width:432px;display:flex;flex-direction:column;gap:28px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:18px;padding:44px 40px 36px;box-shadow:0 10px 30px rgba(74,58,48,0.06);"><div style="display:flex;flex-direction:column;align-items:center;gap:11px;"><div style="font-family:Lora,Georgia,serif;font-size:46px;line-height:1;font-weight:400;">Emma</div><div style="width:32px;height:1px;background:#D8C9BB;"></div><div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#766D69;text-align:center;">Movimiento · Equilibrio · Bienestar</div></div><div style="display:flex;flex-direction:column;gap:16px;"><div style="align-self:center;width:64px;height:64px;border-radius:50%;background:rgba(183,131,128,0.14);display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg></div><div style="margin:0;text-align:center;font-family:Lora,Georgia,serif;font-weight:500;font-size:26px;line-height:1.25;">Este enlace ya no es válido</div><p style="margin:0;text-align:center;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Las invitaciones vencen a los 7 días y sirven una sola vez. Pide a la administración del estudio que te envíe una nueva.</p><a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">Volver a iniciar sesión</a></div></div></div>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · invitación eliminada</div>
-          <div style="font-size:12px;color:#8A807C;">30 días sin activar, actualizar ni reenviar · nunca se recrea desde el enlace</div>
+          <div style="font-size:12px;color:#766D69;">30 días sin activar, actualizar ni reenviar · nunca se recrea desde el enlace</div>
         </div>
       </sc-if>
-      <div style="width:520px;background:#F2ECE5;border:1px solid #D8C9BB;border-radius:14px;padding:56px 44px;display:flex;justify-content:center;"><div style="width:432px;display:flex;flex-direction:column;gap:28px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:18px;padding:44px 40px 36px;box-shadow:0 10px 30px rgba(74,58,48,0.06);"><div style="display:flex;flex-direction:column;align-items:center;gap:11px;"><div style="font-family:Lora,Georgia,serif;font-size:46px;line-height:1;font-weight:400;">Emma</div><div style="width:32px;height:1px;background:#D8C9BB;"></div><div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div></div><div style="display:flex;flex-direction:column;gap:16px;"><div style="align-self:center;width:64px;height:64px;border-radius:50%;background:rgba(183,131,128,0.14);display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg></div><div style="margin:0;text-align:center;font-family:Lora,Georgia,serif;font-weight:500;font-size:26px;line-height:1.25;">Esta invitación ya no está activa</div><p style="margin:0;text-align:center;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Pasaron 30 días sin activarla, así que se eliminó. Para tener una cuenta, una administradora tiene que crear una invitación nueva en Personal.</p><a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">Volver a iniciar sesión</a></div></div></div>
+      <div style="width:520px;background:#F2ECE5;border:1px solid #D8C9BB;border-radius:14px;padding:56px 44px;display:flex;justify-content:center;"><div style="width:432px;display:flex;flex-direction:column;gap:28px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:18px;padding:44px 40px 36px;box-shadow:0 10px 30px rgba(74,58,48,0.06);"><div style="display:flex;flex-direction:column;align-items:center;gap:11px;"><div style="font-family:Lora,Georgia,serif;font-size:46px;line-height:1;font-weight:400;">Emma</div><div style="width:32px;height:1px;background:#D8C9BB;"></div><div style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#766D69;text-align:center;">Movimiento · Equilibrio · Bienestar</div></div><div style="display:flex;flex-direction:column;gap:16px;"><div style="align-self:center;width:64px;height:64px;border-radius:50%;background:rgba(183,131,128,0.14);display:flex;align-items:center;justify-content:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v4l3 2"></path></svg></div><div style="margin:0;text-align:center;font-family:Lora,Georgia,serif;font-weight:500;font-size:26px;line-height:1.25;">Esta invitación ya no está activa</div><p style="margin:0;text-align:center;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Pasaron 30 días sin activarla, así que se eliminó. Para tener una cuenta, una administradora tiene que crear una invitación nueva en Personal.</p><a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">Volver a iniciar sesión</a></div></div></div>
     </div>
 
   </div>
@@ -238,18 +238,18 @@
     <div style="font-size:13px;font-weight:500;">Estados del botón y del campo "Confirmar contraseña"</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;">
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="font-size:12px;color:#8A807C;">Campos vacíos o incompletos</div>
+        <div style="font-size:12px;color:#766D69;">Campos vacíos o incompletos</div>
         <button disabled="{{ true }}" style="height:48px;width:100%;border:none;border-radius:8px;background:#E2D3CD;color:#FFFFFF;font-size:15px;font-weight:500;cursor:not-allowed;">Guardar contraseña</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="font-size:12px;color:#8A807C;">No coinciden · sigue deshabilitado</div>
+        <div style="font-size:12px;color:#766D69;">No coinciden · sigue deshabilitado</div>
         <div style="display:flex;align-items:center;gap:6px;height:48px;padding:0 14px;border:1px solid #C08A7E;border-radius:8px;font-size:13px;color:#B0655B;">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B0655B" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16h.01"></path></svg>
           Las contraseñas no coinciden.
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:10px;">
-        <div style="font-size:12px;color:#8A807C;">Completo y coincide · habilitado</div>
+        <div style="font-size:12px;color:#766D69;">Completo y coincide · habilitado</div>
         <button style="height:48px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar contraseña</button>
       </div>
     </div>

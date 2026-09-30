@@ -25,14 +25,14 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW11</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Nómina</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Registro de pagos de sueldo. A diferencia del resto de Back Office, esta pantalla no depende de la sucursal elegida en la barra superior: una persona puede dar clases en dos sucursales y su sueldo se paga una sola vez. "+ Registrar pago" y las filas abren AW12.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Registro de pagos de sueldo. A diferencia del resto de Back Office, esta pantalla no depende de la sucursal elegida en la barra superior: una persona puede dar clases en dos sucursales y su sueldo se paga una sola vez. "+ Registrar pago" y las filas abren AW12.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
-        <div style="font-size:12px;color:#8A807C;">Tabla de pagos · una acción principal · sin filtro de sucursal</div>
+        <div style="font-size:12px;color:#766D69;">Tabla de pagos · una acción principal · sin filtro de sucursal</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -42,8 +42,8 @@
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
         </div>
-        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
           admin.emmapilates.bo/back-office/nomina
         </div>
       </div>
@@ -56,50 +56,50 @@
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
             Sucursal Equipetrol
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
             <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
             <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
         </div>
       </div>
 
       <div style="display:flex;align-items:stretch;min-height:720px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
-          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
             Horario
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Catálogo</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Back Office</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
-          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
-          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Nómina</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
-          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
         </nav>
 
         <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Nómina</h2>
-              <div style="font-size:12.5px;color:#8A807C;">Todo el estudio · solo registra que el pago se hizo, no cómo se calculó.</div>
+              <div style="font-size:12.5px;color:#766D69;">Todo el estudio · solo registra que el pago se hizo, no cómo se calculó.</div>
             </div>
             <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
@@ -108,15 +108,15 @@
           </div>
 
           <div style="display:flex;align-items:center;gap:10px;">
-            <button style="height:34px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;"><span style="color:#A79E9A;">Empleado</span>Todos<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+            <button style="height:34px;display:flex;align-items:center;gap:9px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;"><span style="color:#7A716D;">Empleado</span>Todos<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
             <button style="height:34px;padding:0 13px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#6E6663;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">
               Agosto 2026
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
             </button>
           </div>
 
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
-            <div style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+            <div style="display:grid;grid-template-columns:minmax(0,2.4fr) minmax(0,1.2fr) minmax(0,1.2fr);align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
               <div>Empleado</div>
               <div style="text-align:right;">Monto</div>
               <div style="text-align:right;">Fecha</div>
@@ -127,7 +127,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">CV</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Camila Vargas</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Entrenadora · Equipetrol, Urubó</span>
+                  <span style="font-size:11.5px;color:#7A716D;">Entrenadora · Equipetrol, Urubó</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 6.200</div>
@@ -139,7 +139,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">RQ</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Rodrigo Quiroga</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Entrenador · Equipetrol</span>
+                  <span style="font-size:11.5px;color:#7A716D;">Entrenador · Equipetrol</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.800</div>
@@ -151,7 +151,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">LM</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Lucía Montaño</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Asistente · Urubó</span>
+                  <span style="font-size:11.5px;color:#7A716D;">Asistente · Urubó</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 4.500</div>
@@ -163,7 +163,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">AS</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Andrea Salvatierra</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Nutricionista · Equipetrol</span>
+                  <span style="font-size:11.5px;color:#7A716D;">Nutricionista · Equipetrol</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.900</div>
@@ -175,7 +175,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">JT</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Javier Terceros</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Administración · Todas las sucursales</span>
+                  <span style="font-size:11.5px;color:#7A716D;">Administración · Todas las sucursales</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 3.200</div>
@@ -187,7 +187,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">PN</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Paola Nogales</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Entrenadora · Urubó</span>
+                  <span style="font-size:11.5px;color:#7A716D;">Entrenadora · Urubó</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.400</div>
@@ -199,7 +199,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">CV</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Camila Vargas</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Entrenadora · Equipetrol, Urubó</span>
+                  <span style="font-size:11.5px;color:#7A716D;">Entrenadora · Equipetrol, Urubó</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 6.200</div>
@@ -211,7 +211,7 @@
                 <div style="width:32px;height:32px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;">RQ</div>
                 <div style="display:flex;flex-direction:column;gap:2px;min-width:0;">
                   <span style="font-size:14px;font-weight:500;">Rodrigo Quiroga</span>
-                  <span style="font-size:11.5px;color:#A79E9A;">Entrenador · Equipetrol</span>
+                  <span style="font-size:11.5px;color:#7A716D;">Entrenador · Equipetrol</span>
                 </div>
               </div>
               <div style="font-size:14px;text-align:right;font-variant-numeric:tabular-nums;">Bs 5.800</div>
@@ -219,7 +219,7 @@
             </a>
           </div>
 
-          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#A79E9A;">
+          <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;color:#7A716D;">
             <span>Mostrando 1–8 de 24 pagos</span>
             <span>La nómina no se filtra por sucursal: incluye a todo el personal.</span>
           </div>
@@ -233,13 +233,13 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
-          <div style="font-size:12px;color:#8A807C;">Tarjetas apiladas · monto a la derecha</div>
+          <div style="font-size:12px;color:#766D69;">Tarjetas apiladas · monto a la derecha</div>
         </div>
       </sc-if>
       <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
         <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
-          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/back-office/nomina
           </div>
         </div>
@@ -255,7 +255,7 @@
         <div style="padding:16px 14px 24px;display:flex;flex-direction:column;gap:14px;">
           <div style="display:flex;flex-direction:column;gap:3px;">
             <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:24px;">Nómina</h2>
-            <span style="font-size:12px;color:#8A807C;">Todo el estudio</span>
+            <span style="font-size:12px;color:#766D69;">Todo el estudio</span>
           </div>
           <button style="height:44px;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;cursor:pointer;" style-hover="background:#A87370;">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
@@ -265,35 +265,35 @@
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Camila Vargas</span>
-                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+                <span style="font-size:12px;color:#766D69;">05/08/2026</span>
               </div>
               <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 6.200</span>
             </a>
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Rodrigo Quiroga</span>
-                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+                <span style="font-size:12px;color:#766D69;">05/08/2026</span>
               </div>
               <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 5.800</span>
             </a>
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Lucía Montaño</span>
-                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+                <span style="font-size:12px;color:#766D69;">05/08/2026</span>
               </div>
               <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 4.500</span>
             </a>
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Andrea Salvatierra</span>
-                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+                <span style="font-size:12px;color:#766D69;">05/08/2026</span>
               </div>
               <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 3.900</span>
             </a>
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Javier Terceros</span>
-                <span style="font-size:12px;color:#8A807C;">05/08/2026</span>
+                <span style="font-size:12px;color:#766D69;">05/08/2026</span>
               </div>
               <span style="flex:none;font-size:14.5px;font-variant-numeric:tabular-nums;">Bs 3.200</span>
             </a>

@@ -15,9 +15,9 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  input::placeholder { color: #A79E9A; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  input::placeholder { color: #7A716D; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -26,7 +26,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 22</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Editar perfil</h1>
-    <p style="margin:0;max-width:740px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Se abre desde "Editar" en la tarjeta de resumen de la pantalla 18 y vuelve ahí al guardar. Sin barra de pestañas: la flecha del encabezado regresa sin guardar. Los tres campos llegan llenos con los datos actuales. Un correo nuevo se confirma desde un enlace que llega a ese correo; al final, la pantalla de ese enlace.</p>
+    <p style="margin:0;max-width:740px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Se abre desde "Editar" en la tarjeta de resumen de la pantalla 18 y vuelve ahí al guardar. Sin barra de pestañas: la flecha del encabezado regresa sin guardar. Los tres campos llegan llenos con los datos actuales. Un correo nuevo se confirma desde un enlace que llega a ese correo; al final, la pantalla de ese enlace.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:44px;">
@@ -35,7 +35,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Datos actuales</div>
-          <div style="font-size:12px;color:#8A807C;">Con foto: la nota del recorte, «Cambiar foto» y «Quitar foto»</div>
+          <div style="font-size:12px;color:#766D69;">Con foto: la nota del recorte, «Cambiar foto» y «Quitar foto»</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -50,23 +50,23 @@
           <div style="flex:1;padding:32px 20px 36px;display:flex;flex-direction:column;gap:32px;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
               <div style="width:96px;height:96px;border-radius:999px;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
-                <span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#8A807C;">foto</span>
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#766D69;">foto</span>
               </div>
-              <span style="font-size:12px;line-height:1.4;color:#8A807C;">Se recorta al centro en forma de círculo.</span>
-              <div style="display:flex;gap:24px;"><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar foto</a><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Quitar foto</a></div>
+              <span style="font-size:12px;line-height:1.4;color:#766D69;">Se recorta al centro en forma de círculo.</span>
+              <div style="display:flex;gap:24px;"><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar foto</a><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Quitar foto</a></div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:18px;">
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo electrónico</span>
                 <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Teléfono</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
                 <input type="tel" value="+591 707 12345" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
@@ -85,7 +85,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Sin foto</div>
-          <div style="font-size:12px;color:#8A807C;">Sin foto: iniciales sobre Palo de rosa tinte y solo «Cambiar foto»</div>
+          <div style="font-size:12px;color:#766D69;">Sin foto: iniciales sobre Palo de rosa tinte y solo «Cambiar foto»</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -99,21 +99,21 @@
 
           <div style="flex:1;padding:32px 20px 36px;display:flex;flex-direction:column;gap:32px;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
-              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar foto</a>
+              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
+              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar foto</a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:18px;">
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #B78380;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo electrónico</span>
                 <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Teléfono</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
                 <input type="tel" value="+591 707 12345" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
@@ -132,7 +132,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Subiendo foto</div>
-          <div style="font-size:12px;color:#8A807C;">La imagen elegida ya se ve en el círculo; los enlaces esperan</div>
+          <div style="font-size:12px;color:#766D69;">La imagen elegida ya se ve en el círculo; los enlaces esperan</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -147,23 +147,23 @@
           <div style="flex:1;padding:32px 20px 36px;display:flex;flex-direction:column;gap:32px;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
               <div style="width:96px;height:96px;border-radius:999px;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
-                <span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#8A807C;">foto</span>
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#766D69;">foto</span>
               </div>
-              <span style="font-size:12px;line-height:1.4;color:#8A807C;">Se recorta al centro en forma de círculo.</span>
-              <span style="min-height:44px;display:flex;align-items:center;font-size:14px;color:#8A807C;">Subiendo foto…</span>
+              <span style="font-size:12px;line-height:1.4;color:#766D69;">Se recorta al centro en forma de círculo.</span>
+              <span style="min-height:44px;display:flex;align-items:center;font-size:14px;color:#766D69;">Subiendo foto…</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:18px;">
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo electrónico</span>
                 <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Teléfono</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
                 <input type="tel" value="+591 707 12345" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
@@ -182,7 +182,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · No se pudo subir</div>
-          <div style="font-size:12px;color:#8A807C;">Vuelven las iniciales (o la foto anterior) con el error debajo</div>
+          <div style="font-size:12px;color:#766D69;">Vuelven las iniciales (o la foto anterior) con el error debajo</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -196,22 +196,22 @@
 
           <div style="flex:1;padding:32px 20px 36px;display:flex;flex-direction:column;gap:32px;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
-              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar foto</a>
+              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
+              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar foto</a>
               <span style="font-size:13px;line-height:1.45;color:#94493A;text-align:center;">No pudimos subir la foto. Inténtalo de nuevo.</span>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:18px;">
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo electrónico</span>
                 <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Teléfono</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
                 <input type="tel" value="+591 707 12345" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
@@ -230,7 +230,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Cambio de correo pendiente</div>
-          <div style="font-size:12px;color:#8A807C;">El campo vuelve al correo actual; la tarjeta queda debajo</div>
+          <div style="font-size:12px;color:#766D69;">El campo vuelve al correo actual; la tarjeta queda debajo</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -244,26 +244,26 @@
 
           <div style="flex:1;padding:32px 20px 36px;display:flex;flex-direction:column;gap:32px;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
-              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar foto</a>
+              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
+              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar foto</a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:18px;">
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo electrónico</span>
                 <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <div style="display:flex;flex-direction:column;gap:6px;padding:18px 18px 10px;border-radius:16px;background:#EFE0DC;">
-                <span style="font-size:17px;font-weight:500;color:#8A5D59;">Revisa tu correo nuevo</span>
+                <span style="font-size:17px;font-weight:500;color:#7A4F4B;">Revisa tu correo nuevo</span>
                 <span style="font-size:15px;line-height:1.55;color:#4A4A4A;text-wrap:pretty;">Te enviamos un enlace a <span style="font-weight:500;overflow-wrap:anywhere;">lucia.mendoza@gmail.com</span>. Ábrelo dentro de 24 horas para confirmar el cambio; hasta entonces sigues entrando con tu correo actual.</span>
-                <div style="display:flex;gap:24px;"><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Reenviar correo</a><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cancelar cambio</a></div>
+                <div style="display:flex;gap:24px;"><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#7A4F4B;">Reenviar correo</a><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#7A4F4B;">Cancelar cambio</a></div>
               </div>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Teléfono</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
                 <input type="tel" value="+591 707 12345" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
@@ -282,7 +282,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Tras «Reenviar correo»</div>
-          <div style="font-size:12px;color:#8A807C;">La misma línea neutra, se haya enviado o no</div>
+          <div style="font-size:12px;color:#766D69;">La misma línea neutra, se haya enviado o no</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -296,27 +296,27 @@
 
           <div style="flex:1;padding:32px 20px 36px;display:flex;flex-direction:column;gap:32px;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
-              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar foto</a>
+              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
+              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar foto</a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:18px;">
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo electrónico</span>
                 <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <div style="display:flex;flex-direction:column;gap:6px;padding:18px 18px 10px;border-radius:16px;background:#EFE0DC;">
-                <span style="font-size:17px;font-weight:500;color:#8A5D59;">Revisa tu correo nuevo</span>
+                <span style="font-size:17px;font-weight:500;color:#7A4F4B;">Revisa tu correo nuevo</span>
                 <span style="font-size:15px;line-height:1.55;color:#4A4A4A;text-wrap:pretty;">Te enviamos un enlace a <span style="font-weight:500;overflow-wrap:anywhere;">lucia.mendoza@gmail.com</span>. Ábrelo dentro de 24 horas para confirmar el cambio; hasta entonces sigues entrando con tu correo actual.</span>
-                <div style="display:flex;gap:24px;"><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Reenviar correo</a><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cancelar cambio</a></div>
+                <div style="display:flex;gap:24px;"><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#7A4F4B;">Reenviar correo</a><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#7A4F4B;">Cancelar cambio</a></div>
                 <span style="font-size:13px;line-height:1.45;color:#4A4A4A;">Te enviamos otro enlace.</span>
               </div>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Teléfono</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
                 <input type="tel" value="+591 707 12345" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
@@ -335,7 +335,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Correo mal escrito</div>
-          <div style="font-size:12px;color:#8A807C;">El campo lo rechaza antes de pedir el cambio</div>
+          <div style="font-size:12px;color:#766D69;">El campo lo rechaza antes de pedir el cambio</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -349,21 +349,21 @@
 
           <div style="flex:1;padding:32px 20px 36px;display:flex;flex-direction:column;gap:32px;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
-              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
-              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar foto</a>
+              <div style="width:96px;height:96px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:32px;font-weight:500;letter-spacing:0.02em;">LM</div>
+              <a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar foto</a>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:18px;">
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo electrónico</span>
                 <input type="email" value="lucia.mendoza@correo" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" /><span style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.5;color:#8A4433;"><span style="width:6px;height:6px;border-radius:50%;background:#B25D4B;margin-top:6px;flex:none;"></span>Escribe un correo válido.</span>
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Teléfono</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
                 <input type="tel" value="+591 707 12345" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
@@ -382,7 +382,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Android · Datos actuales</div>
-          <div style="font-size:12px;color:#8A807C;">Mismo formulario, encabezado con altura de Android</div>
+          <div style="font-size:12px;color:#766D69;">Mismo formulario, encabezado con altura de Android</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
@@ -397,23 +397,23 @@
           <div style="flex:1;padding:32px 20px 36px;display:flex;flex-direction:column;gap:32px;">
             <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
               <div style="width:96px;height:96px;border-radius:999px;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
-                <span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#8A807C;">foto</span>
+                <span style="font-family:ui-monospace,Menlo,monospace;font-size:10px;color:#766D69;">foto</span>
               </div>
-              <span style="font-size:12px;line-height:1.4;color:#8A807C;">Se recorta al centro en forma de círculo.</span>
-              <div style="display:flex;gap:24px;"><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Cambiar foto</a><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#B78380;">Quitar foto</a></div>
+              <span style="font-size:12px;line-height:1.4;color:#766D69;">Se recorta al centro en forma de círculo.</span>
+              <div style="display:flex;gap:24px;"><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Cambiar foto</a><a href="#" style="min-height:44px;display:flex;align-items:center;font-size:14px;font-weight:500;color:#8A5D59;">Quitar foto</a></div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:18px;">
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Correo electrónico</span>
                 <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <label style="display:flex;flex-direction:column;gap:8px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Teléfono</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Teléfono</span>
                 <input type="tel" value="+591 707 12345" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;font-variant-numeric:tabular-nums;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
             </div>
@@ -432,7 +432,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Enlace · Confirmando</div>
-          <div style="font-size:12px;color:#8A807C;">Desde el correo nuevo, con o sin sesión, sin pestañas</div>
+          <div style="font-size:12px;color:#766D69;">Desde el correo nuevo, con o sin sesión, sin pestañas</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -444,7 +444,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Enlace · Tu correo cambió</div>
-          <div style="font-size:12px;color:#8A807C;">«Continuar»: Inicio (02) con sesión, 01 sin ella</div>
+          <div style="font-size:12px;color:#766D69;">«Continuar»: Inicio (02) con sesión, 01 sin ella</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -456,7 +456,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Enlace · Vencido</div>
-          <div style="font-size:12px;color:#8A807C;">Pasadas 24 horas, o ya usado</div>
+          <div style="font-size:12px;color:#766D69;">Pasadas 24 horas, o ya usado</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -468,7 +468,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Enlace · No válido</div>
-          <div style="font-size:12px;color:#8A807C;">Un enlace alterado o que no existe</div>
+          <div style="font-size:12px;color:#766D69;">Un enlace alterado o que no existe</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -480,7 +480,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Enlace · Correo no disponible</div>
-          <div style="font-size:12px;color:#8A807C;">Otra cuenta tomó ese correo mientras tanto</div>
+          <div style="font-size:12px;color:#766D69;">Otra cuenta tomó ese correo mientras tanto</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">

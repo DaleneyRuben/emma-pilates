@@ -25,14 +25,14 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW19</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Sucursales</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">La lista que alimenta el selector de sucursal de la barra superior: todo lo demás en la web de administración se filtra por la sucursal elegida ahí. Mismo armazón que AW02, con "Catálogo" expandido y "Sucursales" activo. "+ Nueva sucursal" y cualquier fila abren AW20. No hay acción de borrar: una sucursal con historial de sesiones solo se edita.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">La lista que alimenta el selector de sucursal de la barra superior: todo lo demás en la web de administración se filtra por la sucursal elegida ahí. Mismo armazón que AW02, con "Catálogo" expandido y "Sucursales" activo. "+ Nueva sucursal" y cualquier fila abren AW20. No hay acción de borrar: una sucursal con historial de sesiones solo se edita.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · 1440 px</div>
-        <div style="font-size:12px;color:#8A807C;">Tabla de dos columnas, misma densidad que Tipos de clase</div>
+        <div style="font-size:12px;color:#766D69;">Tabla de dos columnas, misma densidad que Tipos de clase</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -42,8 +42,8 @@
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
         </div>
-        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
           admin.emmapilates.bo/catalogo/sucursales
         </div>
       </div>
@@ -56,50 +56,50 @@
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
             Sucursal Equipetrol
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
             <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
             <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
         </div>
       </div>
 
       <div style="display:flex;align-items:stretch;min-height:700px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
-          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
             Horario
           </a>
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Catálogo</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Sucursales</a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
-          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
-          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
-          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
         </nav>
 
         <main style="flex:1;min-width:0;background:#FAF7F2;padding:24px 26px 32px;display:flex;flex-direction:column;gap:18px;">
           <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Sucursales</h2>
-              <div style="font-size:12.5px;color:#8A807C;">4 sucursales · el selector de arriba usa esta lista</div>
+              <div style="font-size:12.5px;color:#766D69;">4 sucursales · el selector de arriba usa esta lista</div>
             </div>
             <button style="height:38px;display:flex;align-items:center;gap:8px;padding:0 18px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.1" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
@@ -108,11 +108,11 @@
           </div>
 
           <div style="display:flex;align-items:center;gap:10px;">
-            <button style="height:34px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">Estado: Todas<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
+            <button style="height:34px;padding:0 13px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;font-size:12.5px;color:#4A4A4A;cursor:pointer;display:flex;align-items:center;gap:7px;" style-hover="border-color:#B78380;color:#B78380;">Estado: Todas<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg></button>
           </div>
 
           <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;max-width:1000px;">
-            <div style="display:grid;grid-template-columns:1.3fr 2.2fr 18px;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+            <div style="display:grid;grid-template-columns:1.3fr 2.2fr 18px;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
               <div>Nombre</div>
               <div>Dirección</div>
               <div></div>
@@ -121,7 +121,7 @@
             <a href="#" style="display:grid;grid-template-columns:1.3fr 2.2fr 18px;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:14px;font-weight:500;">Equipetrol</span>
-                <span style="font-size:11.5px;color:#A79E9A;">24 sesiones esta semana</span>
+                <span style="font-size:11.5px;color:#7A716D;">24 sesiones esta semana</span>
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Av. San Martín 245, entre 3.º y 4.º anillo</div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
@@ -130,7 +130,7 @@
             <a href="#" style="display:grid;grid-template-columns:1.3fr 2.2fr 18px;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:14px;font-weight:500;">Urubó</span>
-                <span style="font-size:11.5px;color:#A79E9A;">16 sesiones esta semana</span>
+                <span style="font-size:11.5px;color:#7A716D;">16 sesiones esta semana</span>
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Condominio Río Norte, local 12, camino al Urubó km 4</div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
@@ -139,7 +139,7 @@
             <a href="#" style="display:grid;grid-template-columns:1.3fr 2.2fr 18px;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;color:#4A4A4A;" style-hover="background:#FDF7F2;">
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="font-size:14px;font-weight:500;">Norte</span>
-                <span style="font-size:11.5px;color:#A79E9A;">11 sesiones esta semana</span>
+                <span style="font-size:11.5px;color:#7A716D;">11 sesiones esta semana</span>
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Av. Banzer km 6, Torre Vitri, piso 2</div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
@@ -148,14 +148,14 @@
             <a href="#" style="display:grid;grid-template-columns:1.3fr 2.2fr 18px;align-items:center;gap:16px;padding:15px 20px;color:#4A4A4A;" style-hover="background:#FDF7F2;">
               <div style="display:flex;flex-direction:column;gap:2px;">
                 <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:14px;font-weight:500;">Las Palmas</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:#EFE6DC;color:#6E6663;font-size:10.5px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#A79E9A;"></span>Archivada</span></span>
-                <span style="font-size:11.5px;color:#A79E9A;">Sin sesiones programadas</span>
+                <span style="font-size:11.5px;color:#7A716D;">Sin sesiones programadas</span>
               </div>
               <div style="font-size:13.5px;color:#6E6663;">Calle Los Tajibos 78, barrio Las Palmas</div>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round"><path d="M9 5l7 7-7 7"></path></svg>
             </a>
           </div>
 
-          <div style="max-width:1000px;display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:12px;color:#A79E9A;">
+          <div style="max-width:1000px;display:flex;align-items:center;justify-content:space-between;gap:24px;font-size:12px;color:#7A716D;">
             <span>Mostrando 4 de 4 sucursales</span>
             <span>Una sucursal nunca se borra: se archiva cuando no tiene sesiones programadas ni horario semanal vigente.</span>
           </div>
@@ -169,13 +169,13 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
-          <div style="font-size:12px;color:#8A807C;">La tabla se convierte en tarjetas apiladas</div>
+          <div style="font-size:12px;color:#766D69;">La tabla se convierte en tarjetas apiladas</div>
         </div>
       </sc-if>
       <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
         <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
-          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/catalogo/sucursales
           </div>
         </div>
@@ -200,28 +200,28 @@
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Equipetrol</span>
-                <span style="font-size:12.5px;color:#8A807C;line-height:1.45;">Av. San Martín 245, entre 3.º y 4.º anillo</span>
+                <span style="font-size:12.5px;color:#766D69;line-height:1.45;">Av. San Martín 245, entre 3.º y 4.º anillo</span>
               </div>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round" style="flex:none;"><path d="M9 5l7 7-7 7"></path></svg>
             </a>
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Urubó</span>
-                <span style="font-size:12.5px;color:#8A807C;line-height:1.45;">Condominio Río Norte, local 12, camino al Urubó km 4</span>
+                <span style="font-size:12.5px;color:#766D69;line-height:1.45;">Condominio Río Norte, local 12, camino al Urubó km 4</span>
               </div>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round" style="flex:none;"><path d="M9 5l7 7-7 7"></path></svg>
             </a>
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="font-size:14.5px;font-weight:500;">Norte</span>
-                <span style="font-size:12.5px;color:#8A807C;line-height:1.45;">Av. Banzer km 6, Torre Vitri, piso 2</span>
+                <span style="font-size:12.5px;color:#766D69;line-height:1.45;">Av. Banzer km 6, Torre Vitri, piso 2</span>
               </div>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round" style="flex:none;"><path d="M9 5l7 7-7 7"></path></svg>
             </a>
             <a href="#" style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;color:#4A4A4A;" style-hover="border-color:#B78380;">
               <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
                 <span style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;"><span style="font-size:14.5px;font-weight:500;">Las Palmas</span><span style="display:inline-flex;align-items:center;gap:6px;height:22px;padding:0 10px;border-radius:999px;background:#EFE6DC;color:#6E6663;font-size:10.5px;font-weight:500;white-space:nowrap;"><span style="width:6px;height:6px;border-radius:999px;background:#A79E9A;"></span>Archivada</span></span>
-                <span style="font-size:12.5px;color:#8A807C;line-height:1.45;">Calle Los Tajibos 78, barrio Las Palmas</span>
+                <span style="font-size:12.5px;color:#766D69;line-height:1.45;">Calle Los Tajibos 78, barrio Las Palmas</span>
               </div>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C4B8B2" stroke-width="1.9" stroke-linecap="round" style="flex:none;"><path d="M9 5l7 7-7 7"></path></svg>
             </a>

@@ -15,7 +15,7 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button, select { font: inherit; }
-  input::placeholder { color: #A79E9A; }
+  input::placeholder { color: #7A716D; }
   a { color: #B78380; text-decoration: none; }
   a:hover { color: #9C6764; }
 </style>
@@ -26,14 +26,14 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Web de administración · Pantalla AW05</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Formulario de plan</h1>
-    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Panel lateral sobre la tabla de AW04, con la misma anatomía y densidad que el formulario de sesión de AW03: encabezado con cierre, campos, y "Guardar" al pie. La duración es una elección entre 1, 3, 6 y 12 meses; las clases incluidas son un número fijo.</p>
+    <p style="margin:0;max-width:820px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Panel lateral sobre la tabla de AW04, con la misma anatomía y densidad que el formulario de sesión de AW03: encabezado con cierre, campos, y "Guardar" al pie. La duración es una elección entre 1, 3, 6 y 12 meses; las clases incluidas son un número fijo.</p>
   </header>
 
   <div style="display:flex;flex-direction:column;gap:14px;">
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · Nuevo plan</div>
-        <div style="font-size:12px;color:#8A807C;">Panel derecho sobre la tabla de planes · formulario vacío</div>
+        <div style="font-size:12px;color:#766D69;">Panel derecho sobre la tabla de planes · formulario vacío</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -43,8 +43,8 @@
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
           <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
         </div>
-        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
           admin.emmapilates.bo/catalogo/planes/nuevo
         </div>
       </div>
@@ -57,53 +57,53 @@
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
             Sucursal Equipetrol
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
           <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
             <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
             <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#8A807C" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
           </button>
         </div>
       </div>
 
       <div style="display:flex;align-items:stretch;height:660px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
-          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
             Horario
           </a>
           <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Catálogo</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
           <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Planes</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Sucursales</a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Back Office</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Clientes</a>
-          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
-          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Evaluaciones nutricionales</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Personal</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Nómina</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Gastos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Categorías de gasto</a>
-          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FAF3EC;color:#B78380;">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
             Reporte
           </a>
-          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#A79E9A;font-weight:500;">Promociones</div>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Promociones</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Referidos</a>
-          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FAF3EC;color:#B78380;">Créditos</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
         </nav>
 
         <main style="flex:1;min-width:0;position:relative;background:#FAF7F2;overflow:hidden;">
           <div style="padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
             <div style="display:flex;flex-direction:column;gap:5px;">
               <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Planes</h2>
-              <div style="font-size:12.5px;color:#8A807C;">6 planes · 6 visibles en la app</div>
+              <div style="font-size:12.5px;color:#766D69;">6 planes · 6 visibles en la app</div>
             </div>
             <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
-              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#A79E9A;font-weight:500;">
+              <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
                 <div>Nombre</div><div>Duración</div><div>Clases incluidas</div><div style="text-align:right;">Precio</div>
               </div>
               <div style="display:grid;grid-template-columns:2.1fr 1fr 1.1fr 1fr;align-items:center;gap:16px;padding:15px 20px;border-bottom:1px solid #F2EBE2;font-size:13.5px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Paquete de 8 clases</span><span>1 mes</span><span>8 clases</span><span style="text-align:right;font-variant-numeric:tabular-nums;">Bs 560</span></div>
@@ -120,7 +120,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
               <div style="display:flex;flex-direction:column;gap:3px;">
                 <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Nuevo plan</h3>
-                <span style="font-size:11.5px;color:#8A807C;">Aparecerá en "Elegir plan" al guardarlo</span>
+                <span style="font-size:11.5px;color:#766D69;">Aparecerá en "Elegir plan" al guardarlo</span>
               </div>
               <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -128,34 +128,34 @@
             </div>
             <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
                 <input type="text" placeholder="Paquete de 8 clases" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
               <div style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Duración</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Duración</span>
                 <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
-                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">1</span><span style="font-size:10px;color:#A79E9A;">mes</span></button>
-                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">3</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
-                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">6</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
-                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">12</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
+                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">1</span><span style="font-size:10px;color:#7A716D;">mes</span></button>
+                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">3</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">6</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+                  <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:13.5px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">12</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
                 </div>
               </div>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Clases incluidas</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Clases incluidas</span>
                 <input type="number" placeholder="8" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-                <span style="font-size:11.5px;color:#A79E9A;">Cantidad fija para todo el periodo; ningún plan es ilimitado.</span>
+                <span style="font-size:11.5px;color:#7A716D;">Cantidad fija para todo el periodo; ningún plan es ilimitado.</span>
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Precio</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Precio</span>
                 <div style="display:flex;align-items:center;height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;overflow:hidden;">
-                  <span style="width:44px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:12.5px;color:#8A807C;">Bs</span>
+                  <span style="width:44px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:12.5px;color:#766D69;">Bs</span>
                   <input type="text" placeholder="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
                 </div>
               </label>
               <label style="display:flex;flex-direction:column;gap:7px;">
-                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Orden en la app</span>
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Orden en la app</span>
                 <input type="number" placeholder="1" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Los planes se muestran a las clientas de menor a mayor.</span>
+                <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Los planes se muestran a las clientas de menor a mayor.</span>
               </label>
             </div>
             <div style="padding:18px 22px;border-top:1px solid #EFE6DC;">
@@ -173,7 +173,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Escritorio · Editar plan</div>
-          <div style="font-size:12px;color:#8A807C;">Valores precargados · duración 1 mes seleccionada</div>
+          <div style="font-size:12px;color:#766D69;">Valores precargados · duración 1 mes seleccionada</div>
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
@@ -181,7 +181,7 @@
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar plan</h3>
-              <span style="font-size:11.5px;color:#8A807C;">34 clientas con este plan activo</span>
+              <span style="font-size:11.5px;color:#766D69;">34 clientas con este plan activo</span>
             </div>
             <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
@@ -189,36 +189,36 @@
           </div>
           <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:18px;overflow:hidden;">
             <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
               <input type="text" value="Paquete de 8 clases" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
             </label>
             <div style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Duración</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Duración</span>
               <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
                 <button style="height:44px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:15px;font-weight:600;">1</span><span style="font-size:10px;">mes</span></button>
-                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">3</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
-                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">6</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
-                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">12</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
+                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">3</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">6</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+                <button style="height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;" style-hover="border-color:#B78380;color:#B78380;"><span style="font-size:15px;">12</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
               </div>
             </div>
             <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Clases incluidas</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Clases incluidas</span>
               <input type="number" value="8" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-              <span style="font-size:11.5px;color:#A79E9A;">Cantidad fija para todo el periodo; ningún plan es ilimitado.</span>
+              <span style="font-size:11.5px;color:#7A716D;">Cantidad fija para todo el periodo; ningún plan es ilimitado.</span>
             </label>
             <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Precio</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Precio</span>
               <div style="display:flex;align-items:center;height:44px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;overflow:hidden;">
-                <span style="width:44px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:12.5px;color:#8A807C;">Bs</span>
+                <span style="width:44px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:12.5px;color:#766D69;">Bs</span>
                 <input type="text" value="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
               </div>
             </label>
             <label style="display:flex;flex-direction:column;gap:7px;">
-              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Orden en la app</span>
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Orden en la app</span>
               <input type="number" value="1" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-              <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Los planes se muestran a las clientas de menor a mayor.</span>
+              <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Los planes se muestran a las clientas de menor a mayor.</span>
             </label>
-            <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Las suscripciones vigentes y las compras ya iniciadas conservan su precio.</span>
+            <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Las suscripciones vigentes y las compras ya iniciadas conservan su precio.</span>
           </div>
           <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:12px;">
             <button style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Guardar</button>
@@ -232,13 +232,13 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
-          <div style="font-size:12px;color:#8A807C;">El panel pasa a hoja de pantalla completa</div>
+          <div style="font-size:12px;color:#766D69;">El panel pasa a hoja de pantalla completa</div>
         </div>
       </sc-if>
       <div style="width:420px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FFFFFF;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
         <div style="height:40px;display:flex;align-items:center;padding:0 14px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
-          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#8A807C;">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#A79E9A" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:7px;padding:0 11px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
             admin.emmapilates.bo/catalogo/planes/editar
           </div>
         </div>
@@ -250,33 +250,33 @@
         </div>
         <div style="padding:18px 16px 22px;display:flex;flex-direction:column;gap:18px;">
           <label style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nombre</span>
             <input type="text" value="Paquete de 8 clases" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
           </label>
           <div style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Duración</span>
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Duración</span>
             <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
               <button style="height:48px;border:1px solid #B78380;border-radius:8px;background:#EFE0DC;color:#8A5D59;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;font-weight:600;">1</span><span style="font-size:10px;">mes</span></button>
-              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">3</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
-              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">6</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
-              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">12</span><span style="font-size:10px;color:#A79E9A;">meses</span></button>
+              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">3</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">6</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
+              <button style="height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;"><span style="font-size:16px;">12</span><span style="font-size:10px;color:#7A716D;">meses</span></button>
             </div>
           </div>
           <label style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Clases incluidas</span>
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Clases incluidas</span>
             <input type="number" value="8" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
           </label>
           <label style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Precio</span>
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Precio</span>
             <div style="display:flex;align-items:center;height:48px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;overflow:hidden;">
-              <span style="width:46px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:13px;color:#8A807C;">Bs</span>
+              <span style="width:46px;height:100%;display:flex;align-items:center;justify-content:center;border-right:1px solid #EFE6DC;background:#FDFAF6;font-size:13px;color:#766D69;">Bs</span>
               <input type="text" value="560" style="flex:1;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:15px;outline:none;" />
             </div>
           </label>
           <label style="display:flex;flex-direction:column;gap:7px;">
-            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Orden en la app</span>
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Orden en la app</span>
             <input type="number" value="1" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
-            <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Los planes se muestran a las clientas de menor a mayor.</span>
+            <span style="font-size:11.5px;line-height:1.5;color:#7A716D;">Los planes se muestran a las clientas de menor a mayor.</span>
           </label>
           <button style="height:50px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">Guardar</button>
         </div>

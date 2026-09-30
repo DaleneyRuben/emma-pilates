@@ -15,8 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 12</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Mi plan</h1>
-    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#8A807C;">Tres momentos de la misma suscripción. Solo el estado vencido ofrece compra: mientras el plan siga vigente no se puede comprar otro.</p>
+    <p style="margin:0;max-width:700px;font-size:15px;line-height:1.6;color:#766D69;">Tres momentos de la misma suscripción. Solo el estado vencido ofrece compra: mientras el plan siga vigente no se puede comprar otro.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:48px;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Activa</div>
-          <div style="font-size:12px;color:#8A807C;">Sin mensajes especiales</div>
+          <div style="font-size:12px;color:#766D69;">Sin mensajes especiales</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -50,7 +50,7 @@
 
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
               <div style="display:flex;flex-direction:column;gap:5px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Suscripción actual</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Suscripción actual</span>
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:500;line-height:1.2;">Paquete de 8 clases</span>
               </div>
               <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;background:#7C9473;"></span>Activa</span>
@@ -64,37 +64,37 @@
                 </svg>
                 <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">
                   <span style="font-family:Lora,Georgia,serif;font-size:44px;font-weight:500;line-height:1;">5</span>
-                  <span style="font-size:13px;color:#8A807C;">de 8 clases</span>
+                  <span style="font-size:13px;color:#766D69;">de 8 clases</span>
                 </div>
               </div>
-              <span style="font-size:13px;color:#8A807C;">Te quedan 5 clases por usar</span>
+              <span style="font-size:13px;color:#766D69;">Te quedan 5 clases por usar</span>
             </div>
 
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px;">
-                <span style="color:#8A807C;">Inicio</span>
+                <span style="color:#766D69;">Inicio</span>
                 <span style="font-weight:500;">30 de julio de 2026</span>
               </div>
               <div style="height:1px;background:#EFE7DE;"></div>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px;">
-                <span style="color:#8A807C;">Pagado hasta</span>
+                <span style="color:#766D69;">Pagado hasta</span>
                 <span style="font-weight:500;">30 de agosto de 2026</span>
               </div>
             </div>
 
-            <div style="font-size:13px;line-height:1.6;color:#8A807C;">Podrás comprar un plan nuevo cuando este termine.</div>
+            <div style="font-size:13px;line-height:1.6;color:#766D69;">Podrás comprar un plan nuevo cuando este termine.</div>
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;">Mis Reservas</span>
             </div>
@@ -111,7 +111,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Por vencer</div>
-          <div style="font-size:12px;color:#8A807C;">Aviso informativo · sin botón de compra</div>
+          <div style="font-size:12px;color:#766D69;">Aviso informativo · sin botón de compra</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -135,7 +135,7 @@
 
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
               <div style="display:flex;flex-direction:column;gap:5px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Suscripción actual</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Suscripción actual</span>
                 <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:500;line-height:1.2;">Paquete de 8 clases</span>
               </div>
               <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;background:#C99A4E;"></span>Por vencer</span>
@@ -149,35 +149,35 @@
                 </svg>
                 <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">
                   <span style="font-family:Lora,Georgia,serif;font-size:44px;font-weight:500;line-height:1;">2</span>
-                  <span style="font-size:13px;color:#8A807C;">de 8 clases</span>
+                  <span style="font-size:13px;color:#766D69;">de 8 clases</span>
                 </div>
               </div>
-              <span style="font-size:13px;color:#8A807C;">Te quedan 2 clases y 3 días de vigencia</span>
+              <span style="font-size:13px;color:#766D69;">Te quedan 2 clases y 3 días de vigencia</span>
             </div>
 
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px;">
-                <span style="color:#8A807C;">Inicio</span>
+                <span style="color:#766D69;">Inicio</span>
                 <span style="font-weight:500;">22 de julio de 2026</span>
               </div>
               <div style="height:1px;background:#EFE7DE;"></div>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px;">
-                <span style="color:#8A807C;">Pagado hasta</span>
+                <span style="color:#766D69;">Pagado hasta</span>
                 <span style="font-weight:500;color:#9A7434;">22 de agosto de 2026</span>
               </div>
             </div>
           </div>
 
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
               <span style="font-size:11px;">Inicio</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
               <span style="font-size:11px;">Reservar</span>
             </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
               <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
               <span style="font-size:11px;">Mis Reservas</span>
             </div>
@@ -194,7 +194,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Vencida</div>
-          <div style="font-size:12px;color:#8A807C;">Anillo vacío · compra habilitada</div>
+          <div style="font-size:12px;color:#766D69;">Anillo vacío · compra habilitada</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -210,8 +210,8 @@
 
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
               <div style="display:flex;flex-direction:column;gap:5px;">
-                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Último plan</span>
-                <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:500;line-height:1.2;color:#8A807C;">Paquete de 8 clases</span>
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Último plan</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:500;line-height:1.2;color:#766D69;">Paquete de 8 clases</span>
               </div>
               <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 14px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;background:#B25D4B;"></span>Vencida</span>
             </div>
@@ -222,21 +222,21 @@
                   <circle cx="86" cy="86" r="70" fill="none" stroke="#E7DCD8" stroke-width="12"></circle>
                 </svg>
                 <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">
-                  <span style="font-family:Lora,Georgia,serif;font-size:44px;font-weight:500;line-height:1;color:#8A807C;">0</span>
-                  <span style="font-size:13px;color:#A79E9A;">de 8 clases</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:44px;font-weight:500;line-height:1;color:#766D69;">0</span>
+                  <span style="font-size:13px;color:#7A716D;">de 8 clases</span>
                 </div>
               </div>
-              <span style="font-size:13px;color:#A79E9A;">Sin clases disponibles</span>
+              <span style="font-size:13px;color:#7A716D;">Sin clases disponibles</span>
             </div>
 
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px;">
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px;">
-                <span style="color:#8A807C;">Inicio</span>
+                <span style="color:#766D69;">Inicio</span>
                 <span style="font-weight:500;">15 de junio de 2026</span>
               </div>
               <div style="height:1px;background:#EFE7DE;"></div>
               <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:14px;">
-                <span style="color:#8A807C;">Venció el</span>
+                <span style="color:#766D69;">Venció el</span>
                 <span style="font-weight:500;color:#94493A;">15 de julio de 2026</span>
               </div>
             </div>
@@ -245,10 +245,10 @@
           <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;">
             <div style="padding:18px 20px;box-shadow:0 -6px 20px rgba(74,74,74,0.05);display:flex;flex-direction:column;gap:10px;">
               <button style="height:54px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Comprar un plan</button>
-              <span style="font-size:12px;color:#8A807C;text-align:center;">Elige el paquete que mejor te acomode.</span>
+              <span style="font-size:12px;color:#766D69;text-align:center;">Elige el paquete que mejor te acomode.</span>
             </div>
             <div style="border-top:1px solid #EFE7DE;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
                 <span style="font-size:11px;">Inicio</span>
               </div>
@@ -256,7 +256,7 @@
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
                 <span style="font-size:11px;">Reservar</span>
               </div>
-              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
                 <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
                 <span style="font-size:11px;">Mis Reservas</span>
               </div>

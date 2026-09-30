@@ -15,8 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S16 · Rol: nutricionista</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Mi disponibilidad</h1>
-    <p style="margin:0;max-width:740px;font-size:15px;line-height:1.6;color:#8A807C;">Se abre desde la cabecera de Mi agenda (S15). Aquí la nutricionista publica los rangos de los que las clientas eligen su cupo de evaluación. Tocar una tarjeta o «Nuevo horario» abre el formulario del bloque (S17).</p>
+    <p style="margin:0;max-width:740px;font-size:15px;line-height:1.6;color:#766D69;">Se abre desde la cabecera de Mi agenda (S15). Aquí la nutricionista publica los rangos de los que las clientas eligen su cupo de evaluación. Tocar una tarjeta o «Nuevo horario» abre el formulario del bloque (S17).</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Horarios publicados</div>
-          <div style="font-size:12px;color:#8A807C;">Cuatro bloques en dos sucursales · uno empieza la semana próxima · toca una tarjeta para editarla · interactivo</div>
+          <div style="font-size:12px;color:#766D69;">Cuatro bloques en dos sucursales · uno empieza la semana próxima · toca una tarjeta para editarla · interactivo</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -55,8 +55,8 @@
             <sc-if value="{{ hasBlocks }}" hint-placeholder-val="{{ true }}">
               <div style="display:flex;flex-direction:column;gap:16px;">
                 <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Horarios semanales</span>
-                  <span style="font-size:12px;color:#A79E9A;">{{ countLabel }}</span>
+                  <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Horarios semanales</span>
+                  <span style="font-size:12px;color:#7A716D;">{{ countLabel }}</span>
                 </div>
 
                 <sc-for list="{{ blocks }}" as="b" hint-placeholder-count="4">
@@ -64,16 +64,16 @@
                     <span style="flex:none;width:44px;height:44px;border-radius:12px;background:rgba(216,189,184,0.34);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;">{{ b.abbr }}</span>
                     <span style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
                       <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">{{ b.range }}</span>
-                      <span style="font-size:13px;color:#8A807C;">{{ b.detail }}</span>
+                      <span style="font-size:13px;color:#766D69;">{{ b.detail }}</span>
                       <sc-if value="{{ b.hasDates }}" hint-placeholder-val="{{ false }}">
-                        <span style="font-size:12.5px;line-height:1.45;color:#A79E9A;">{{ b.dates }}</span>
+                        <span style="font-size:12.5px;line-height:1.45;color:#7A716D;">{{ b.dates }}</span>
                       </sc-if>
                     </span>
                     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
                   </button>
                 </sc-for>
 
-                <div style="font-size:13px;line-height:1.55;color:#8A807C;padding:2px 2px 0;">Las clientas eligen cupos de 45 min dentro de estos rangos.</div>
+                <div style="font-size:13px;line-height:1.55;color:#766D69;padding:2px 2px 0;">Las clientas eligen cupos de 45 min dentro de estos rangos.</div>
               </div>
             </sc-if>
 
@@ -81,7 +81,7 @@
               <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:48px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
                 <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Aún no publicaste horarios de disponibilidad.</span>
-                <span style="font-size:13px;line-height:1.5;color:#8A807C;">Publica un rango y las clientas podrán reservar su evaluación.</span>
+                <span style="font-size:13px;line-height:1.5;color:#766D69;">Publica un rango y las clientas podrán reservar su evaluación.</span>
                 <button style="min-height:52px;width:100%;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:9px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">
                   <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"></line><line x1="5.5" y1="12" x2="18.5" y2="12"></line></svg>
                   Nuevo horario
@@ -98,7 +98,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Android · Horarios publicados</div>
-          <div style="font-size:12px;color:#8A807C;">Misma estructura, densidad Material</div>
+          <div style="font-size:12px;color:#766D69;">Misma estructura, densidad Material</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
@@ -115,15 +115,15 @@
           </div>
           <div style="flex:1;min-height:0;overflow-y:auto;padding:22px 20px 40px;display:flex;flex-direction:column;gap:16px;">
             <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
-              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Horarios semanales</span>
-              <span style="font-size:12px;color:#A79E9A;">4 horarios</span>
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Horarios semanales</span>
+              <span style="font-size:12px;color:#7A716D;">4 horarios</span>
             </div>
 
             <div style="display:flex;align-items:center;gap:16px;width:100%;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <span style="flex:none;width:44px;height:44px;border-radius:12px;background:rgba(216,189,184,0.34);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;">Lun</span>
               <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">Lunes, 9:00 – 13:00</span>
-                <span style="font-size:13px;color:#8A807C;">5 cupos de 45 min · 2 reservados · Sucursal Centro</span>
+                <span style="font-size:13px;color:#766D69;">5 cupos de 45 min · 2 reservados · Sucursal Centro</span>
               </div>
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
             </div>
@@ -132,8 +132,8 @@
               <span style="flex:none;width:44px;height:44px;border-radius:12px;background:rgba(216,189,184,0.34);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;">Mar</span>
               <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">Martes, 9:00 – 13:00</span>
-                <span style="font-size:13px;color:#8A807C;">5 cupos de 45 min · 3 reservados · Sucursal Centro</span>
-                <span style="font-size:12.5px;line-height:1.45;color:#A79E9A;">Hasta el martes 27 de octubre</span>
+                <span style="font-size:13px;color:#766D69;">5 cupos de 45 min · 3 reservados · Sucursal Centro</span>
+                <span style="font-size:12.5px;line-height:1.45;color:#7A716D;">Hasta el martes 27 de octubre</span>
               </div>
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
             </div>
@@ -142,8 +142,8 @@
               <span style="flex:none;width:44px;height:44px;border-radius:12px;background:rgba(216,189,184,0.34);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;">Jue</span>
               <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">Jueves, 14:00 – 17:00</span>
-                <span style="font-size:13px;color:#8A807C;">4 cupos de 45 min · sin reservas · Sucursal Urubó</span>
-                <span style="font-size:12.5px;line-height:1.45;color:#A79E9A;">Desde el lunes 5 de octubre</span>
+                <span style="font-size:13px;color:#766D69;">4 cupos de 45 min · sin reservas · Sucursal Urubó</span>
+                <span style="font-size:12.5px;line-height:1.45;color:#7A716D;">Desde el lunes 5 de octubre</span>
               </div>
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
             </div>
@@ -152,13 +152,13 @@
               <span style="flex:none;width:44px;height:44px;border-radius:12px;background:rgba(216,189,184,0.34);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;">Sáb</span>
               <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;font-variant-numeric:tabular-nums;">Sábado, 9:00 – 12:00</span>
-                <span style="font-size:13px;color:#8A807C;">4 cupos de 45 min · 1 reservado · Sucursal Centro</span>
-                <span style="font-size:12.5px;line-height:1.45;color:#A79E9A;">Desde el lunes 5 de octubre · hasta el sábado 31 de octubre</span>
+                <span style="font-size:13px;color:#766D69;">4 cupos de 45 min · 1 reservado · Sucursal Centro</span>
+                <span style="font-size:12.5px;line-height:1.45;color:#7A716D;">Desde el lunes 5 de octubre · hasta el sábado 31 de octubre</span>
               </div>
               <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
             </div>
 
-            <div style="font-size:13px;line-height:1.55;color:#8A807C;padding:2px 2px 0;">Las clientas eligen cupos de 45 min dentro de estos rangos.</div>
+            <div style="font-size:13px;line-height:1.55;color:#766D69;padding:2px 2px 0;">Las clientas eligen cupos de 45 min dentro de estos rangos.</div>
           </div>
         </div>
       </x-import>
@@ -168,7 +168,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Sin horarios publicados</div>
-          <div style="font-size:12px;color:#8A807C;">«Nuevo horario» pasa a acción principal dentro del estado vacío</div>
+          <div style="font-size:12px;color:#766D69;">«Nuevo horario» pasa a acción principal dentro del estado vacío</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -187,7 +187,7 @@
             <div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:48px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3 2"></path></svg>
               <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">Aún no publicaste horarios de disponibilidad.</span>
-              <span style="font-size:13px;line-height:1.5;color:#8A807C;">Publica un rango y las clientas podrán reservar su evaluación.</span>
+              <span style="font-size:13px;line-height:1.5;color:#766D69;">Publica un rango y las clientas podrán reservar su evaluación.</span>
               <button style="min-height:52px;width:100%;margin-top:2px;display:flex;align-items:center;justify-content:center;gap:9px;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><line x1="12" y1="5.5" x2="12" y2="18.5"></line><line x1="5.5" y1="12" x2="18.5" y2="12"></line></svg>
                 Nuevo horario

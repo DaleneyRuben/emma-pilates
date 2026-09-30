@@ -15,8 +15,8 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
   input, button { font: inherit; }
-  a { color: #B78380; text-decoration: none; }
-  a:hover { color: #9C6764; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
 </style>
 </helmet>
 <div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S21 · Rol: asistente</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Reservas de la clienta</h1>
-    <p style="margin:0;max-width:840px;font-size:15px;line-height:1.6;color:#8A807C;text-wrap:pretty;">Se abre desde "Ver reservas" en S06 y la flecha vuelve ahí. Misma estructura y estados que Mis reservas (pantalla 05) de la app de cliente, pero actuando en nombre de la clienta: el banner "Viendo reservas de:" acompaña toda la tarea, también al reprogramar. En tablet ocupa el panel derecho, junto a la búsqueda, igual que S06.</p>
+    <p style="margin:0;max-width:840px;font-size:15px;line-height:1.6;color:#766D69;text-wrap:pretty;">Se abre desde "Ver reservas" en S06 y la flecha vuelve ahí. Misma estructura y estados que Mis reservas (pantalla 05) de la app de cliente, pero actuando en nombre de la clienta: el banner "Viendo reservas de:" acompaña toda la tarea, también al reprogramar. En tablet ocupa el panel derecho, junto a la búsqueda, igual que S06.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:44px;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Con reservas</div>
-          <div style="font-size:12px;color:#8A807C;">Los tres estados juntos, sin barra de pestañas</div>
+          <div style="font-size:12px;color:#766D69;">Los tres estados juntos, sin barra de pestañas</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -56,7 +56,7 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Hoy · 18:30 – 19:20</span>
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">Hoy · 18:30 – 19:20</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
                 </div>
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
@@ -72,7 +72,7 @@
                 </span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:160px;">Faltan menos de 2 h 30 para el inicio.</span>
+                <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:160px;">Faltan menos de 2 h 30 para el inicio.</span>
                 <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
               </div>
             </div>
@@ -80,7 +80,7 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                 </div>
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#7C9473;"></span>Confirmada</span>
@@ -96,7 +96,7 @@
                 </span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Se puede cancelar sin costo hasta las 04:30.</span>
+                <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Se puede cancelar sin costo hasta las 04:30.</span>
                 <button onClick="{{ openSheet }}" style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
               </div>
             </div>
@@ -104,13 +104,13 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Sábado 22 · 09:00 – 09:50</span>
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">Sábado 22 · 09:00 – 09:50</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                 </div>
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:150px;">Es la 2.ª en la lista.</span>
+                <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:150px;">Es la 2.ª en la lista.</span>
                 <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
               </div>
             </div>
@@ -124,7 +124,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Confirmar cancelación</div>
-          <div style="font-size:12px;color:#8A807C;">La pregunta nombra a la clienta · interactivo</div>
+          <div style="font-size:12px;color:#766D69;">La pregunta nombra a la clienta · interactivo</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -145,13 +145,13 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                 </div>
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#7C9473;"></span>Confirmada</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:170px;">Se puede cancelar sin costo hasta las 04:30.</span>
+                <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:170px;">Se puede cancelar sin costo hasta las 04:30.</span>
                 <button onClick="{{ openSheet }}" style="min-height:44px;padding:0 18px;border:1px solid #B25D4B;border-radius:8px;background:rgba(178,93,75,0.08);color:#B25D4B;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;">Cancelar</button>
               </div>
             </div>
@@ -179,7 +179,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Sin reservas próximas</div>
-          <div style="font-size:12px;color:#8A807C;">La salida es reservar por ella (S07)</div>
+          <div style="font-size:12px;color:#766D69;">La salida es reservar por ella (S07)</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -199,7 +199,7 @@
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 32px 80px;text-align:center;">
             <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.1" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
             <div style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">Esta clienta no tiene reservas próximas.</div>
-            <p style="margin:0;font-size:14px;line-height:1.6;color:#8A807C;max-width:260px;text-wrap:pretty;">Puedes reservarle una clase desde el horario del estudio.</p>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#766D69;max-width:260px;text-wrap:pretty;">Puedes reservarle una clase desde el horario del estudio.</p>
             <button style="height:52px;min-width:220px;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Reservar una clase</button>
           </div>
         </div>
@@ -210,7 +210,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Tablet · 1024 px</div>
-          <div style="font-size:12px;color:#8A807C;">Panel derecho junto a la búsqueda, mismo reparto que S06</div>
+          <div style="font-size:12px;color:#766D69;">Panel derecho junto a la búsqueda, mismo reparto que S06</div>
         </div>
       </sc-if>
       <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
@@ -218,7 +218,7 @@
 
         <div style="border-right:1px solid #D8C9BB;display:flex;flex-direction:column;gap:18px;padding:36px 24px;overflow:hidden;">
           <div style="display:flex;flex-direction:column;gap:6px;">
-            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Asistente</span>
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Asistente</span>
             <span style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Buscar cliente</span>
           </div>
           <div style="display:flex;align-items:center;gap:10px;height:52px;padding:0 14px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
@@ -230,9 +230,9 @@
             Nuevo cliente
           </button>
           <div style="display:flex;flex-direction:column;gap:12px;">
-            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">2 clientes</span>
-            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #B78380;border-radius:14px;background:rgba(216,189,184,0.16);"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.55);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">V</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Valeria Áñez</span><span style="font-size:13px;color:#8A807C;">+591 707 12345</span></span></div>
-            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">R</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Renata Áñez Suárez</span><span style="font-size:13px;color:#8A807C;">+591 707 44821</span></span></div>
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">2 clientes</span>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #B78380;border-radius:14px;background:rgba(216,189,184,0.16);"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.55);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">V</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Valeria Áñez</span><span style="font-size:13px;color:#766D69;">+591 707 12345</span></span></div>
+            <div style="display:flex;align-items:center;gap:14px;padding:15px 16px;border:1px solid #D8C9BB;border-radius:14px;background:#FFFFFF;"><span style="flex:none;width:40px;height:40px;border-radius:50%;background:rgba(216,189,184,0.4);color:#8A5F5C;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:16px;">R</span><span style="display:flex;flex-direction:column;gap:3px;flex:1;"><span style="font-size:16px;">Renata Áñez Suárez</span><span style="font-size:13px;color:#766D69;">+591 707 44821</span></span></div>
           </div>
         </div>
 
@@ -254,13 +254,13 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Hoy · 18:30 – 19:20</span>
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">Hoy · 18:30 – 19:20</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span>
                 </div>
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>No cancelable</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:180px;">Faltan menos de 2 h 30 para el inicio.</span>
+                <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:180px;">Faltan menos de 2 h 30 para el inicio.</span>
                 <button style="min-height:44px;padding:0 18px;border:1px solid #B78380;border-radius:8px;background:transparent;color:#B78380;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="background:#F6EDEB;">Reprogramar</button>
               </div>
             </div>
@@ -268,13 +268,13 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">Mañana · 07:00 – 07:50</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                 </div>
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#7C9473;"></span>Confirmada</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:180px;">Se puede cancelar sin costo hasta las 04:30.</span>
+                <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:180px;">Se puede cancelar sin costo hasta las 04:30.</span>
                 <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cancelar</button>
               </div>
             </div>
@@ -282,13 +282,13 @@
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:4px;min-width:0;">
-                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#8A807C;font-variant-numeric:tabular-nums;">Sábado 22 · 09:00 – 09:50</span>
+                  <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">Sábado 22 · 09:00 – 09:50</span>
                   <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                 </div>
                 <span style="display:inline-flex;align-items:center;gap:7px;padding:7px 13px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:12px;font-weight:500;white-space:nowrap;flex:none;"><span style="width:6px;height:6px;border-radius:999px;flex:none;background:#C99A4E;"></span>En lista de espera</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
-                <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:180px;">Es la 2.ª en la lista.</span>
+                <span style="font-size:12px;line-height:1.4;color:#766D69;max-width:180px;">Es la 2.ª en la lista.</span>
                 <button style="min-height:44px;padding:0 18px;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;white-space:nowrap;" style-hover="border-color:#B25D4B;color:#B25D4B;">Salir de la lista</button>
               </div>
             </div>

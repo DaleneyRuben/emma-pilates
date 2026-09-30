@@ -51,16 +51,17 @@ Do not introduce colors outside this list. Tints are the semantic color at low a
 | Blanco | `#FFFFFF` | Cards, tables, panels, inputs |
 | Superficie sutil | `#FDFAF6` | Table headers, field suffixes, inline add rows |
 | Hover de fila | `#FDF7F2` | Table row / card hover |
-| Palo de rosa (primario) | `#B78380` | Primary buttons, active nav, links, focus ring |
+| Palo de rosa (primario) | `#B78380` | Primary buttons, active nav and tab, icons, admin-web links, focus ring |
 | Palo de rosa hover | `#A87370` | Primary hover |
 | Palo de rosa presionado | `#9C6764` | Primary active |
 | Palo de rosa tinte | `#EFE0DC` | Active nav background, avatars, badges |
-| Palo de rosa profundo | `#8A5D59` | Text/icon on the tint |
+| Palo de rosa profundo | `#8A5D59` | Text links on Client and Staff screens; admin-web text/icon on the tint |
+| Palo de rosa oscuro | `#7A4F4B` | Client and Staff text on Palo de rosa tinte (badges, pending cards); link hover |
 | Tinte suave | `#F6EDEB` / `#F7EEE9` | Secondary-button hover |
 | Plomo cálido | `#4A4A4A` | Primary text, neutral summary figures |
 | Texto secundario | `#6E6663` | Body text, table secondary cells |
-| Texto tenue | `#8A807C` | Subtitles, labels, helper text |
-| Texto muy tenue | `#A79E9A` | Placeholders, meta, footnotes |
+| Texto tenue | `#766D69` | Subtitles, labels, helper text |
+| Texto muy tenue | `#7A716D` | Placeholders, meta, footnotes |
 | Borde fuerte | `#D8C9BB` | Frame borders, input borders |
 | Borde | `#E4D8CC` | Card and table borders |
 | Divisor | `#F2EBE2` | Row separators inside cards |
@@ -102,7 +103,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 
 - Primary: `#B78380` fill, white text, radius 8, min-height 52 mobile / 38–46 desktop, weight 500, shadow above; hover `#A87370`, active `#9C6764`, disabled `#E7DCD8`/`#B3A9A5`.
 - Secondary: 1px `#B78380` border, transparent fill, `#B78380` text; hover tint `#F6EDEB`.
-- Tertiary/link: text only in `#B78380`; hover `#9C6764`.
+- Tertiary/link: text only. Client and Staff screens use `#8A5D59` (hover `#7A4F4B`), and `#7A4F4B` on Palo de rosa tinte; the admin web keeps `#B78380` (hover `#9C6764`).
 - Compact neutral: 1px `#D8C9BB`, `#FAF7F2` fill, `#4A4A4A` text, height 30–38; hover border `#B78380`.
 - Destructive: Error `#B25D4B` text/border, hover text `#94493A`, hover tint `rgba(178,93,75,0.10)`.
 - **One solid button per view.**
@@ -117,29 +118,29 @@ Reference width **1440px**; a 420px narrow-browser variant is drawn for every sc
 - **Top bar**, 44px, white, bottom border `#E4D8CC`: brand wordmark "Emma" (Lora 21) in a 236px cell with a right border, then on the right a **branch selector** (`Sucursal Equipetrol`, pin icon, chevron) and a **user menu** (26px `#D8BDB8` avatar with initials, name, chevron).
   - The branch selector scopes most pages. Exceptions: **AW11 Nómina**, **AW21/AW22 Clientes**, **AW26 Referidos**, **AW27 Créditos**, **AW28/AW29 Pagos** and **AW15 Categorías de gasto** are not branch-scoped (the selector stays visible for shell consistency but is ignored — those records belong to the studio, not a branch); **AW16 Reporte** replaces the top-bar selector with its own selector that adds "Todas las sucursales".
   - **AW19 Sucursales** is the list that feeds the top-bar selector.
-- **Sidebar**, 236px, white, right border `#E4D8CC`, padding 18px/12px, 4px gaps. Top-level items are 36px rows with a 15px icon; group labels are 10px uppercase `0.18em` `#A79E9A`; group children are 32px rows indented to 22px left padding. Sections auto-expand; the active group label turns `#B78380`.
+- **Sidebar**, 236px, white, right border `#E4D8CC`, padding 18px/12px, 4px gaps. Top-level items are 36px rows with a 15px icon; group labels are 10px uppercase `0.18em` `#7A716D`; group children are 32px rows indented to 22px left padding. Sections auto-expand; the active group label turns `#B78380`.
   - Order: **Horario** · *Catálogo* (Tipos de clase, Planes, Sucursales) · *Back Office* (Clientes, Pagos ⟨badge 6⟩, Insumos ⟨badge 3, warning tint⟩, Evaluaciones nutricionales, Personal, Nómina, Gastos, Categorías de gasto) · **Reporte** · *Promociones* (Promociones, Referidos, Créditos). No "Descuentos" at any level — it does not exist in the product (ADR-0007).
   - Descuentos was dropped for good — see ADR-0007; do not reintroduce it here without a new ADR superseding that one.
-  - Active item: `#EFE0DC` background, `#8A5D59` text, weight 500. Hover: `#FAF3EC` background, `#B78380` text.
+  - Active item: `#EFE0DC` background, `#8A5D59` text, weight 500. Hover: Hover de fila `#FDF7F2` background, `#4A4A4A` text.
   - Counter badges: 18px tall pill, `#EFE0DC`/`#8A5D59`, or warning `rgba(201,154,78,0.18)`/`#9A7434`.
-- **Main area**: `#FAF7F2`, padding 24px 26px 32px, 18px column gap. Header row = page title (Lora 27) + one-line subtitle (12.5 `#8A807C`) on the left, primary action(s) on the right.
+- **Main area**: `#FAF7F2`, padding 24px 26px 32px, 18px column gap. Header row = page title (Lora 27) + one-line subtitle (12.5 `#766D69`) on the left, primary action(s) on the right.
 - **Filter row** (where present): 34px search field (max 300px, magnifier icon, placeholder-style text) plus 34px dropdown/filter chips.
 
 ### Table convention
 
 White card, 1px `#E4D8CC`, radius 12, `overflow:hidden`.
-- Header row: `#FDFAF6`, bottom border `#E4D8CC`, padding 11px 20px, 10.5px uppercase `0.14em` `#A79E9A`.
+- Header row: `#FDFAF6`, bottom border `#E4D8CC`, padding 11px 20px, 10.5px uppercase `0.14em` `#7A716D`.
 - Body rows: padding 15px 20px, bottom divider `#F2EBE2` (last row none), row hover `#FDF7F2`. Whole row is the link into the edit panel.
 - Columns are CSS grid with `minmax(0,Nfr)` tracks and 16px gap. Money and dates are right-aligned and tabular.
-- Primary cell is 14px weight 500; an optional 11.5px `#A79E9A` sub-line carries context (threshold, role, description).
-- Footer strip under the card: 12px `#A79E9A`, count on the left, a clarifying rule on the right.
+- Primary cell is 14px weight 500; an optional 11.5px `#7A716D` sub-line carries context (threshold, role, description).
+- Footer strip under the card: 12px `#7A716D`, count on the left, a clarifying rule on the right.
 
 ### Side-panel form convention
 
 Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48,0.22)`) list, `border-left:1px solid #E4D8CC`, shadow `-14px 0 34px rgba(74,58,48,0.14)`. On narrow widths the panel becomes a **full-screen sheet**.
 
 - Header: 18px 22px, bottom border `#EFE6DC`; Lora 22 title + 11.5px context line; 30px square close button (1px `#E4D8CC`, `#FAF7F2`, hover border `#B78380`).
-- Body: padding 20px 22px, 18px gaps. Field = 10.5px uppercase label + 44px control (48px on mobile) + optional 11.5px `#A79E9A` helper.
+- Body: padding 20px 22px, 18px gaps. Field = 10.5px uppercase label + 44px control (48px on mobile) + optional 11.5px `#7A716D` helper.
 - Inputs: 1px `#D8C9BB`, radius 8, white, 14px text; focus ring as above. Unit suffixes ("min", "pers.", "unid.") and currency prefixes ("Bs") are fixed segments inside the control with a `#EFE6DC` divider and `#FDFAF6` fill.
 - Two short numeric fields share a row via `grid-template-columns:minmax(0,1fr) minmax(0,1fr)` (prevents overflow).
 - Read-only values render as a `#FAF7F2` row with 1px `#EFE6DC`, a padlock icon, and an explanation.
@@ -161,7 +162,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `06` | Reprogramar | Move a booking |
 | `07` | Historial de clases | Past classes |
 | `08` | Elegir plan | Plan catalog |
-| `09` | Detalle del plan | Plan detail |
+| `09` | Detalle del plan | Plan detail; the total is the price drawn minus the Credit applied, never below zero |
 | `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash) |
 | `11` | Estado del pago | Pending/confirmed/rejected states |
 | `12` | Mi plan | Active plan, sessions left, expiry |
@@ -170,7 +171,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `15` | Mis evaluaciones | Assessment history: one per month, so up to two «Próximas» across a month boundary; «Cancelar» outside the last 3 h («Ya no se puede cancelar» inside), and the sheet says the month is freed |
 | `16` | Mis referidos | Referral code + status |
 | `17` | Mi crédito | Credit balance and movements |
-| `18` | Perfil | Profile and settings; the summary card's 56 px circle shows the Client's photo (centre crop) or her initials; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
+| `18` | Perfil | Profile and settings; «Evaluación nutricional» (opens `13`) sits between «Mi plan» and «Mis evaluaciones»; the summary card's 56 px circle shows the Client's photo (centre crop) or her initials; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
 | `19` | Notificaciones | Notification list — seven types, including the studio-cancelled Evaluation (opens `15`) |
 | `20` | Recuperar contraseña | Request a reset link by email; neutral sent and temporary-limit states |
 | `21` | Crear contraseña | Page opened by an emailed link: Activar cuenta or Restablecer contraseña, plus expired and removed-invitation states |
