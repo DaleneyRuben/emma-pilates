@@ -33,7 +33,7 @@
     <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
       <div style="display:flex;flex-direction:column;gap:3px;">
         <div style="font-size:13px;font-weight:500;">Escritorio · Nuevo tipo de clase</div>
-        <div style="font-size:12px;color:#8A807C;">Panel derecho sobre la tabla · formulario vacío</div>
+        <div style="font-size:12px;color:#8A807C;">Panel derecho sobre la tabla · formulario vacío · la descripción es obligatoria</div>
       </div>
     </sc-if>
     <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
@@ -130,6 +130,11 @@
                 <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
                 <input type="text" placeholder="Reformer Pilates" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
               </label>
+              <label style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Descripción</span>
+                <textarea placeholder="Qué se trabaja y para quién es, en una o dos frases." style="height:84px;width:100%;padding:11px 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-family:inherit;font-size:14px;line-height:1.5;resize:none;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);"></textarea>
+                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Una o dos frases que la clienta lee en el detalle de la sesión.</span>
+              </label>
               <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;">
                 <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
                   <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Duración</span>
@@ -172,7 +177,7 @@
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
-        <div style="width:408px;height:560px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="width:408px;height:680px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;flex-direction:column;gap:3px;">
               <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Editar tipo de clase</h3>
@@ -186,6 +191,11 @@
             <label style="display:flex;flex-direction:column;gap:7px;">
               <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
               <input type="text" value="Reformer Avanzado" style="height:44px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Descripción</span>
+              <textarea  style="height:84px;width:100%;padding:11px 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-family:inherit;font-size:14px;line-height:1.5;resize:none;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">Reformer con más resistencia y secuencias largas, para quienes ya dominan la técnica base.</textarea>
+              <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Una o dos frases que la clienta lee en el detalle de la sesión.</span>
             </label>
             <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;">
               <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
@@ -240,6 +250,11 @@
           <label style="display:flex;flex-direction:column;gap:7px;">
             <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
             <input type="text" value="Reformer Avanzado" style="height:48px;width:100%;padding:0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:15px;outline:none;" />
+          </label>
+          <label style="display:flex;flex-direction:column;gap:7px;">
+            <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Descripción</span>
+            <textarea  style="height:92px;width:100%;padding:12px 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-family:inherit;font-size:15px;line-height:1.5;resize:none;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);">Reformer con más resistencia y secuencias largas, para quienes ya dominan la técnica base.</textarea>
+            <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Una o dos frases que la clienta lee en el detalle de la sesión.</span>
           </label>
           <label style="display:flex;flex-direction:column;gap:7px;">
             <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Duración</span>

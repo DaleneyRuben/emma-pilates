@@ -212,11 +212,11 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 |---|---|---|
 | `AW01` | Iniciar sesión | Centered card, email + password, error and throttled states |
 | `AW02` | Horario | Week grid of sessions; establishes the shell |
-| `AW03` | Formulario de sesión | Side panel; seats booked + waitlist count, capacity constraints, trainer notification; cancelling refunds every booking and notifies the waitlist too |
+| `AW03` | Formulario de sesión | Side panel; creating chooses «Una sola vez» (Fecha) or «Cada semana» (Día de la semana + «Vigente desde» in Bolivia time, Sessions generated 30 days ahead); editing a Session of a weekly series asks «Solo esta sesión» (an exception) or «Esta y las futuras» (replaces only unbooked Sessions from «Vigente desde»); seats booked + waitlist count, capacity constraints, trainer notification; cancelling is always one Session, asks no reason, refunds every booking and notifies the waitlist too |
 | `AW04` | Planes | Catalog table |
 | `AW05` | Formulario de plan | Side panel |
 | `AW06` | Tipos de clase | Catalog table |
-| `AW07` | Formulario de tipo de clase | Side panel; duration/capacity row with fixed suffixes |
+| `AW07` | Formulario de tipo de clase | Side panel; required «Descripción» (one or two sentences shown on the client's session detail) after Nombre; duration/capacity row with fixed suffixes |
 | `AW08` | Insumos | Branch stock table; "Stock bajo" warning pill; three actions (historial de retiros, registrar retiro, nuevo insumo) |
 | `AW09` | Formulario de insumo | Stock editable only on create; read-only + padlock on edit |
 | `AW10` | Registrar retiro | Two-field fast-entry panel; stock shown per option |
@@ -226,8 +226,8 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW14` | Formulario de gasto | Categoría + inline "+ Nueva categoría" / Monto / Fecha |
 | `AW15` | Categorías de gasto | Plain list, inline add row, delete disabled when in use |
 | `AW16` | Reporte de ingresos y gastos | Own date range + "Todas las sucursales"; 3 stat tiles, bar chart, category breakdown |
-| `AW17` | Promociones | Drag-to-reorder card list (order = carousel order) |
-| `AW18` | Formulario de promoción | Image upload, título, descripción, date range |
+| `AW17` | Promociones | Drag-to-reorder card list (order = carousel order); each card shows its derived state: Borrador, Programada, Activa, Finalizada (a deleted Promotion is archived and leaves the list) |
+| `AW18` | Formulario de promoción | Image upload, título, descripción, date range; «Guardar borrador» / «Publicar» (disabled until image, title, description, and both dates exist); a published Promotion offers «Guardar cambios» / «Dejar de publicar», and changing or removing its image unpublishes it on save with a warning |
 | `AW19` | Sucursales | Two-column table (Nombre / Dirección); feeds the top-bar selector; no delete |
 | `AW20` | Formulario de sucursal | Side panel; nombre + dirección only; edit mode carries a fixed note about linked records |
 | `AW21` | Clientes | Read-only directory, 4 columns, search only, paginated; **no primary action**; after a closure from `AW22` it reloads without her and shows «Cuenta de … cerrada.» |
