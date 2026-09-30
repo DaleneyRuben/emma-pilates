@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Perfil · raíz de pestaña</div>
-          <div style="font-size:12px;color:#8A807C;">Sin flecha de retorno</div>
+          <div style="font-size:12px;color:#8A807C;">Sin flecha de retorno · con foto de perfil</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -43,13 +43,103 @@
 
             <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Perfil</div>
 
-            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;align-items:center;gap:16px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
-              <div style="width:62px;height:62px;border-radius:999px;flex:none;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="width:56px;height:56px;border-radius:999px;flex:none;background:repeating-linear-gradient(135deg,#EFE4DC 0 6px,#E2D3CC 6px 12px);display:flex;align-items:center;justify-content:center;">
                 <span style="font-family:ui-monospace,Menlo,monospace;font-size:9px;color:#8A807C;">foto</span>
               </div>
               <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
                 <span style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">Lucía Mendoza</span>
-                <span style="font-size:13px;color:#8A807C;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">lucia.mendoza@correo.com</span>
+                <span style="font-size:13px;color:#8A807C;overflow-wrap:anywhere;">lucia.mendoza@correo.com</span>
+                <span style="font-size:13px;color:#8A807C;font-variant-numeric:tabular-nums;">+591 707 12345</span>
+              </div>
+              <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding:8px;flex:none;">Editar</a>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+                <span style="flex:1;font-size:16px;color:#4A4A4A;">Mi plan</span>
+                <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11px;font-weight:500;white-space:nowrap;"><span style="width:5px;height:5px;border-radius:999px;background:#7C9473;"></span>Activa</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="4,16 9,10.5 13,14 20,6.5"></polyline></svg>
+                <span style="flex:1;font-size:16px;color:#4A4A4A;">Mis evaluaciones</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                <span style="flex:1;font-size:16px;color:#4A4A4A;">Mis referidos</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><rect x="3.5" y="6.5" width="17" height="12" rx="2.5"></rect><line x1="3.5" y1="11" x2="20.5" y2="11"></line></svg>
+                <span style="flex:1;font-size:16px;color:#4A4A4A;">Mi crédito</span>
+                <span style="font-size:14px;color:#8A807C;font-variant-numeric:tabular-nums;">Bs 120</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z"></path><path d="M10.5 18.5a2 2 0 0 0 3 0"></path></svg>
+                <span style="flex:1;font-size:16px;color:#4A4A4A;">Notificaciones</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:60px;padding:0 18px;border:none;border-top:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;"><rect x="4" y="10" width="16" height="10.5" rx="2.5"></rect><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"></path></svg>
+                <span style="flex:1;font-size:16px;color:#4A4A4A;">Cambiar contraseña</span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#C4BAB6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+            </div>
+
+            <button style="height:52px;width:100%;border:1px solid #D8C9BB;border-radius:8px;background:transparent;color:#6E6663;font-size:15px;font-weight:500;cursor:pointer;" style-hover="border-color:#B25D4B;color:#B25D4B;">Cerrar sesión</button>
+
+            <a href="#" style="align-self:center;margin-top:14px;font-size:13px;font-weight:500;color:#B25D4B;padding:10px 12px;" style-hover="color:#8A4433;">Cerrar mi cuenta</a>
+
+            <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-top:4px;">
+              <span style="font-size:12px;color:#8A807C;">Emma Pilates Studio · versión 1.0</span>
+              <a href="#" style="font-size:12px;color:#8A807C;">Términos y privacidad</a>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#A79E9A;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Perfil · sin foto</div>
+          <div style="font-size:12px;color:#8A807C;">Las dos iniciales sobre Palo de rosa tinte</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="padding:66px 20px 28px;display:flex;flex-direction:column;gap:26px;">
+
+            <div style="font-family:Lora,Georgia,serif;font-size:30px;font-weight:400;line-height:1.15;">Perfil</div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="width:56px;height:56px;border-radius:999px;flex:none;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;letter-spacing:0.02em;">LM</div>
+              <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                <span style="font-family:Lora,Georgia,serif;font-size:21px;font-weight:500;">Lucía Mendoza</span>
+                <span style="font-size:13px;color:#8A807C;overflow-wrap:anywhere;">lucia.mendoza@correo.com</span>
                 <span style="font-size:13px;color:#8A807C;font-variant-numeric:tabular-nums;">+591 707 12345</span>
               </div>
               <a href="#" style="font-size:14px;font-weight:500;color:#B78380;padding:8px;flex:none;">Editar</a>
@@ -139,6 +229,10 @@
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
         <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Raíz de pestaña</div>
         <div>Sin flecha de retorno: el título vive en el cuerpo, como en Inicio y Mis reservas. Las pantallas hijas sí llevan cabecera con retorno.</div>
+      </div>
+      <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
+        <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Foto de perfil</div>
+        <div>El círculo de 56 px de la tarjeta muestra la foto de la clienta recortada al centro cuando tiene una, y si no, sus dos iniciales sobre Palo de rosa tinte; sin borde ni cuadrado. Esta tarjeta y la pantalla 22 son los únicos lugares con foto: el avatar «Tu cuenta» de las cabeceras nunca es una foto.</div>
       </div>
     </div>
 

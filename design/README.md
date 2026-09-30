@@ -170,11 +170,11 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `15` | Mis evaluaciones | Assessment history: one per month, so up to two «Próximas» across a month boundary; «Cancelar» outside the last 3 h («Ya no se puede cancelar» inside), and the sheet says the month is freed |
 | `16` | Mis referidos | Referral code + status |
 | `17` | Mi crédito | Credit balance and movements |
-| `18` | Perfil | Profile and settings; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
+| `18` | Perfil | Profile and settings; the summary card's 56 px circle shows the Client's photo (centre crop) or her initials; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
 | `19` | Notificaciones | Notification list — seven types, including the studio-cancelled Evaluation (opens `15`) |
 | `20` | Recuperar contraseña | Request a reset link by email; neutral sent and temporary-limit states |
 | `21` | Crear contraseña | Page opened by an emailed link: Activar cuenta or Restablecer contraseña, plus expired and removed-invitation states |
-| `22` | Editar perfil | Edit name, email, phone; the chosen photo previews in the circle as its centre crop («Se recorta al centro en forma de círculo.») |
+| `22` | Editar perfil | Edit name, email, phone; the chosen photo previews in the circle as its centre crop («Se recorta al centro en forma de círculo.»); «Cambiar foto» (photo library) and, with a photo, «Quitar foto» (no confirmation); «Subiendo foto…» while it uploads and the photo saves on its own, apart from «Guardar cambios»; upload and removal errors |
 | `23` | Cambiar contraseña | Self-service change, session open |
 | `24` | Cerrar mi cuenta | Close the Account for good from `18`: the consequences that apply (future bookings and evaluation cancelled, waitlists left, plan ended without refund, credit forfeited, every session closed, email freed), password re-entry, Error-outline button; refused while a transfer payment awaits review; ends on `01` with a success notice |
 
@@ -273,7 +273,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `S05` sends an activation link instead of a password. While the Client is pending it shows the invitation with «Cambiar correo», «Reenviar enlace», «Cancelar invitación» (confirmation, returns to `S04`) and «Ver resumen de la clienta» (`S06`); it also draws the same-email, self-registered, other-account, and resend-limit states.
 - `S06→S21` (Reservas de la clienta) and `S06→S22` (Historial de la clienta).
 - `S15` cards are selectable, not navigable: tapping highlights a card (border → `#B78380`) so the nutritionist keeps their place down the day, and shows «Cancelar evaluación» under it, which opens a confirmation sheet; confirming removes the card and shows «Evaluación cancelada». There is no assessment detail screen anywhere — an Evaluation records the appointment, not its content (same reason `AW25` rows are not links).
-- `S20` has no menu entry — it is reached from a push notification and filtered by role. Every role root (`S02`, `S04`, `S11`, `S15`) carries a 46px circular initials avatar as the **last control on the right** of its header, labelled "Tu cuenta", and it is the only path to `S23` — and therefore to change password and log out. Where the root also has a screen action (`S11` → `S13`, `S15` → `S16`), that action is a 46px rounded square with a 1px `#D8C9BB` border and sits **before** the avatar (10px gap): outlined square = screen action, filled circle with initials = your account.
+- `S20` has no menu entry — it is reached from a push notification and filtered by role. Every role root (`S02`, `S04`, `S11`, `S15`) carries a 46px circular initials avatar (never a photo) as the **last control on the right** of its header, labelled "Tu cuenta", and it is the only path to `S23` — and therefore to change password and log out. Where the root also has a screen action (`S11` → `S13`, `S15` → `S16`), that action is a 46px rounded square with a 1px `#D8C9BB` border and sits **before** the avatar (10px gap): outlined square = screen action, filled circle with initials = your account.
 
 **Back office (AW19–AW29)**
 - `AW19`: `+ Nueva sucursal` and any row open `AW20`. There is no delete — a branch with session history can only be edited. Footer strip states this.
@@ -331,7 +331,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - **Fonts**: Lora and Work Sans from Google Fonts.
 - **Icons**: inline SVG, 24×24 viewBox, `stroke="currentColor"`-style strokes at 1.4–2.1 weight, rendered at 11–22px. Substitute your icon library, matching stroke weight and size.
 - **Images**: none shipped. Promotion thumbnails and the upload preview are `#EFE0DC` placeholder blocks with a photo glyph — real imagery comes from the studio (promotion images should be horizontal, min 1200×675).
-- **Avatars**: initials on `#EFE0DC`/`#D8BDB8`, no photos.
+- **Avatars**: initials on `#EFE0DC`/`#D8BDB8`. The header account avatar («Tu cuenta») is never a photo; only the Client's own profile (`18` summary card, `22`) shows her photo, centre-cropped into the circle, with the initials as fallback (follow-up 67 amends checklist 30 §9).
 
 ## Files
 
