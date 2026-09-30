@@ -156,6 +156,7 @@ written but not yet applied by the external design session, or still to write:
 | 68 (DES-001 comparison: S05/S06 pending invitation as built) | Staff S05, S06 | MOB-021 | ✅ applied: exported 2026-09-30 (`52ac0dd`); app gaps in MOB-021 |
 | 69 (DES-001 comparison: 01 «Confirmar contraseña», one incorrect-credentials message) | Client 01; Staff S01; AW01 | MOB-021 | ✅ applied: exported 2026-09-30 (`2da21e3`); app gaps in MOB-021 (68 and 69 are both exported, so MOB-021 can be built) |
 | 70 (leftovers of the 2026-09-30 exports: 59 §1 tones on the remaining screens, `09` total, `AW02` drawer role, sidebar hover, `18` «Evaluación nutricional» row, Client text-link tone) | Most screens; Client 09, 18; AW02; admin shell; design system | WEB-013 (admin tokens), mobile tokens `textMuted` and text links after the export | 🕓 pending export |
+| 71 (`design/README.md` `AW24` bullet still offers «Restablecer contraseña», found while applying 68) | Handoff README | Design accuracy only (the admin web already has no such action) | 🕓 pending export |
 | 65–66 and prompt `client/24` (BE-007: Client 18 «Cerrar mi cuenta» link, the new Client 24 screen, AW22 «Cerrar cuenta» dialog) | Client 18, 24; AW22, AW21 | BE-007 (the two screens are built after the export) | ✅ applied: exported 2026-09-28 (`a8b629f`) |
 | Image variant sizes and quality (ADR-0073) | Receipts, profile photos, Promotions | UPL-002 | decided in `UPL-002-image-variants.md`; follow-up 60 records the crops taken |
 | Tab-bar unread badge | Client and Staff navigation | MOB-017 gap | not designed |
