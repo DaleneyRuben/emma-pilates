@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S17 · Rol: nutricionista</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Formulario de horario</h1>
-    <p style="margin:0;max-width:740px;font-size:15px;line-height:1.6;color:#8A807C;">Tres campos y nada más: día, hora de inicio y hora de fin. La nutricionista publica el rango; el sistema arma los turnos individuales. El mismo formulario crea y edita; al editar aparece «Eliminar horario» en color de error, al final y sin relleno.</p>
+    <p style="margin:0;max-width:740px;font-size:15px;line-height:1.6;color:#8A807C;">Día, horario en cuartos de hora y desde qué fecha rige; «Sucursal» solo aparece si la nutricionista atiende en más de una. La nutricionista publica el rango; el sistema arma los turnos individuales de 45 min. El mismo formulario crea y edita; al editar aparece «Eliminar horario» en color de error, al final y sin relleno.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
@@ -34,7 +34,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Nuevo horario</div>
-          <div style="font-size:12px;color:#8A807C;">Elige día y horas · «Guardar» se habilita al completar · interactivo</div>
+          <div style="font-size:12px;color:#8A807C;">Elige día y horas en cuartos de hora · «A partir del» empieza hoy · «Guardar» se habilita con al menos un turno de 45 min · interactivo</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -78,6 +78,19 @@
               </sc-if>
             </div>
 
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">A partir del</span>
+              <div style="display:flex;gap:8px;overflow:hidden;margin-right:-20px;">
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;white-space:nowrap;">Hoy</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">Mañana</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">vie 2 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">sáb 3 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">dom 4 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">lun 5 oct</span>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Solo cambian los turnos sin reservar desde ese día.</span>
+            </div>
+
             <button style="flex:none;min-height:52px;width:100%;border:none;border-radius:10px;background:{{ saveBg }};color:{{ saveColor }};font-size:16px;font-weight:500;cursor:{{ saveCursor }};box-shadow:{{ saveShadow }};">Guardar</button>
 
           </div>
@@ -107,7 +120,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Editar horario</div>
-          <div style="font-size:12px;color:#8A807C;">Valores cargados y «Eliminar horario» al final, en color de error</div>
+          <div style="font-size:12px;color:#8A807C;">Valores cargados · «Aplicar cambios desde» · «Eliminar horario» al final, en color de error</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -148,9 +161,255 @@
               </div>
               <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:rgba(216,201,187,0.28);font-size:14px;color:#4A4A4A;">5 turnos de 45 min · 3 ya reservados</div>
             </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Aplicar cambios desde</span>
+              <div style="display:flex;gap:8px;overflow:hidden;margin-right:-20px;">
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">Hoy</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;white-space:nowrap;">Mañana</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">vie 2 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">sáb 3 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">dom 4 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">lun 5 oct</span>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Solo cambian los turnos sin reservar desde ese día.</span>
+            </div>
             <div style="flex:none;display:flex;flex-direction:column;gap:10px;">
               <button style="min-height:52px;width:100%;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">Guardar</button>
               <button style="min-height:48px;width:100%;border:none;border-radius:10px;background:transparent;color:#B25D4B;font-size:15px;font-weight:500;cursor:pointer;">Eliminar horario</button>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Nuevo horario · dos sucursales</div>
+          <div style="font-size:12px;color:#8A807C;">«Sucursal» aparece solo si la nutricionista atiende en más de una; con una sola se usa esa</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="height:100%;min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="flex:none;display:flex;align-items:center;gap:12px;padding:58px 20px 14px;border-bottom:1px solid #EFE7DE;background:#FFFFFF;">
+            <span style="flex:none;width:40px;height:40px;margin-left:-8px;display:flex;align-items:center;justify-content:center;color:#4A4A4A;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </span>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Nuevo horario</span>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:26px 20px 40px;display:flex;flex-direction:column;gap:28px;">
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Día</span>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Lunes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Martes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Miércoles</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;">Jueves</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Viernes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Sábado</span>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Sucursal</span>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">Centro</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;white-space:nowrap;">Urubó</span>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Horario</span>
+              <div style="display:flex;gap:12px;">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+                  <span style="font-size:12px;color:#8A807C;">Hora de inicio</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">14:00</span>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+                  <span style="font-size:12px;color:#8A807C;">Hora de fin</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">17:00</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:9px;padding:2px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;margin-top:2px;"><circle cx="12" cy="12" r="8.5"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><line x1="12" y1="7.8" x2="12" y2="7.9"></line></svg>
+                <span style="font-size:13px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El sistema generará turnos de evaluación individuales dentro de este horario.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:rgba(216,201,187,0.28);font-size:14px;color:#4A4A4A;">4 turnos de 45 min</div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">A partir del</span>
+              <div style="display:flex;gap:8px;overflow:hidden;margin-right:-20px;">
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;white-space:nowrap;">Hoy</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">Mañana</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">vie 2 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">sáb 3 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">dom 4 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">lun 5 oct</span>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Solo cambian los turnos sin reservar desde ese día.</span>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:10px;">
+              <button style="min-height:52px;width:100%;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">Guardar</button>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Guardar con evaluaciones reservadas</div>
+          <div style="font-size:12px;color:#8A807C;">Hoja inferior como S14 · desde qué fecha rige y qué se mantiene</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="position:relative;height:100%;min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="flex:none;display:flex;align-items:center;gap:12px;padding:58px 20px 14px;border-bottom:1px solid #EFE7DE;background:#FFFFFF;">
+            <span style="flex:none;width:40px;height:40px;margin-left:-8px;display:flex;align-items:center;justify-content:center;color:#4A4A4A;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </span>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Editar horario</span>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:26px 20px 40px;display:flex;flex-direction:column;gap:28px;">
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Día</span>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Lunes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;">Martes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Miércoles</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Jueves</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Viernes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Sábado</span>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Horario</span>
+              <div style="display:flex;gap:12px;">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+                  <span style="font-size:12px;color:#8A807C;">Hora de inicio</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">9:00</span>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+                  <span style="font-size:12px;color:#8A807C;">Hora de fin</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">13:00</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:9px;padding:2px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;margin-top:2px;"><circle cx="12" cy="12" r="8.5"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><line x1="12" y1="7.8" x2="12" y2="7.9"></line></svg>
+                <span style="font-size:13px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El sistema generará turnos de evaluación individuales dentro de este horario.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:rgba(216,201,187,0.28);font-size:14px;color:#4A4A4A;">5 turnos de 45 min · 3 ya reservados</div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Aplicar cambios desde</span>
+              <div style="display:flex;gap:8px;overflow:hidden;margin-right:-20px;">
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">Hoy</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;white-space:nowrap;">Mañana</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">vie 2 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">sáb 3 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">dom 4 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">lun 5 oct</span>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Solo cambian los turnos sin reservar desde ese día.</span>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:10px;">
+              <button style="min-height:52px;width:100%;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">Guardar</button>
+              <button style="min-height:48px;width:100%;border:none;border-radius:10px;background:transparent;color:#B25D4B;font-size:15px;font-weight:500;cursor:pointer;">Eliminar horario</button>
+            </div>
+          </div>
+          <div style="position:absolute;inset:0;z-index:10;background:rgba(74,58,48,0.22);"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:#FFFFFF;border-top:1px solid #D8C9BB;border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(74,58,48,0.14);padding:24px 20px 34px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;">¿Aplicar el cambio?</div>
+              <div style="font-size:13px;line-height:1.5;color:#8A807C;">Martes, 9:00 – 13:00</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Aplicar desde el jueves 1 de octubre.</div>
+              <div style="font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Las 3 evaluaciones ya reservadas se mantienen.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px;">
+              <button style="min-height:52px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">Aplicar cambio</button>
+              <button style="min-height:44px;width:100%;border:none;border-radius:8px;background:transparent;color:#8A807C;font-size:15px;font-weight:500;cursor:pointer;" style-hover="color:#4A4A4A;">Volver</button>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Eliminar horario</div>
+          <div style="font-size:12px;color:#8A807C;">Siempre pide confirmar la fecha · si hay reservas, dice que se mantienen</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="position:relative;height:100%;min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="flex:none;display:flex;align-items:center;gap:12px;padding:58px 20px 14px;border-bottom:1px solid #EFE7DE;background:#FFFFFF;">
+            <span style="flex:none;width:40px;height:40px;margin-left:-8px;display:flex;align-items:center;justify-content:center;color:#4A4A4A;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </span>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Editar horario</span>
+          </div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:26px 20px 40px;display:flex;flex-direction:column;gap:28px;">
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Día</span>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;">
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Lunes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;">Martes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Miércoles</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Jueves</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Viernes</span>
+                <span style="min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;">Sábado</span>
+              </div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Horario</span>
+              <div style="display:flex;gap:12px;">
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+                  <span style="font-size:12px;color:#8A807C;">Hora de inicio</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">9:00</span>
+                </div>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px;padding:14px 16px;border:1px solid #D8C9BB;border-radius:12px;background:#FFFFFF;">
+                  <span style="font-size:12px;color:#8A807C;">Hora de fin</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">13:00</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:flex-start;gap:9px;padding:2px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" style="flex:none;margin-top:2px;"><circle cx="12" cy="12" r="8.5"></circle><line x1="12" y1="11" x2="12" y2="16.5"></line><line x1="12" y1="7.8" x2="12" y2="7.9"></line></svg>
+                <span style="font-size:13px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El sistema generará turnos de evaluación individuales dentro de este horario.</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;padding:13px 16px;border-radius:12px;background:rgba(216,201,187,0.28);font-size:14px;color:#4A4A4A;">5 turnos de 45 min · 3 ya reservados</div>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Aplicar cambios desde</span>
+              <div style="display:flex;gap:8px;overflow:hidden;margin-right:-20px;">
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">Hoy</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;white-space:nowrap;">Mañana</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">vie 2 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">sáb 3 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">dom 4 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">lun 5 oct</span>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Solo cambian los turnos sin reservar desde ese día.</span>
+            </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:10px;">
+              <button style="min-height:52px;width:100%;border:none;border-radius:10px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">Guardar</button>
+              <button style="min-height:48px;width:100%;border:none;border-radius:10px;background:transparent;color:#B25D4B;font-size:15px;font-weight:500;cursor:pointer;">Eliminar horario</button>
+            </div>
+          </div>
+          <div style="position:absolute;inset:0;z-index:10;background:rgba(74,58,48,0.22);"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;z-index:11;background:#FFFFFF;border-top:1px solid #D8C9BB;border-radius:16px 16px 0 0;box-shadow:0 -8px 24px rgba(74,58,48,0.14);padding:24px 20px 34px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;">¿Quitar este horario?</div>
+              <div style="font-size:13px;line-height:1.5;color:#8A807C;">Martes, 9:00 – 13:00</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Quitar desde el jueves 1 de octubre.</div>
+              <div style="font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">Las 3 evaluaciones ya reservadas se mantienen.</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px;">
+              <button style="min-height:52px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:transparent;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.08);">Quitar horario</button>
+              <button style="min-height:44px;width:100%;border:none;border-radius:8px;background:transparent;color:#8A807C;font-size:15px;font-weight:500;cursor:pointer;" style-hover="color:#4A4A4A;">Volver</button>
             </div>
           </div>
         </div>
@@ -201,6 +460,18 @@
                 <span style="font-size:13px;line-height:1.55;color:#8A807C;text-wrap:pretty;">El sistema generará turnos de evaluación individuales dentro de este horario.</span>
               </div>
             </div>
+            <div style="flex:none;display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">A partir del</span>
+              <div style="display:flex;gap:8px;overflow:hidden;margin-right:-20px;">
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #B78380;background:#B78380;color:#FFFFFF;font-size:14px;font-weight:500;white-space:nowrap;">Hoy</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">Mañana</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">vie 2 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">sáb 3 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">dom 4 oct</span>
+                <span style="flex:none;min-height:44px;display:inline-flex;align-items:center;padding:0 16px;border-radius:999px;border:1px solid #D8C9BB;background:#FFFFFF;color:#6E6663;font-size:14px;font-weight:500;white-space:nowrap;">lun 5 oct</span>
+              </div>
+              <span style="font-size:12px;line-height:1.5;color:#A79E9A;">Solo cambian los turnos sin reservar desde ese día.</span>
+            </div>
             <button disabled="{{ yes }}" style="flex:none;min-height:52px;width:100%;border:none;border-radius:10px;background:#E7DCD8;color:#B3A9A5;font-size:16px;font-weight:500;cursor:not-allowed;">Guardar</button>
           </div>
         </div>
@@ -213,7 +484,9 @@
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Un día por bloque</span>El día se elige con píldoras, no con desplegable: son siete opciones y se ven todas de una vez.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Turnos automáticos</span>La nutricionista no define cupos uno por uno; la nota lo aclara y el resumen muestra cuántos turnos saldrán del rango.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Guardar deshabilitado</span>Sin día u horas completas el botón queda en gris; nunca se guarda un rango a medias ni con fin antes del inicio.</div>
-    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Eliminar</span>Solo en modo edición, como texto en color de error al final. Si el bloque ya tiene reservas, el sistema pide confirmarlas antes.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Eliminar</span>Solo en modo edición, como texto en color de error al final. Siempre abre la hoja «¿Quitar este horario?» con la fecha desde la que se quita; si hay evaluaciones reservadas, dice que se mantienen.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Desde cuándo rige</span>«A partir del» (al crear) o «Aplicar cambios desde» (al editar): fechas desde hoy, nunca antes. Solo cambian los turnos sin reservar desde ese día; «Guardar» en un bloque con reservas pide confirmar.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sucursal y cuartos de hora</span>Con más de una sucursal asignada aparece «Sucursal» en píldoras. Las horas van cada 15 min y el rango debe dar al menos un turno de 45 min.</div>
   </div>
 
 </div>
@@ -221,16 +494,22 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
 const DAYS = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
-const TIMES = ["8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"];
+const TIMES = [];
+for (let h = 8; h <= 19; h++) {
+  for (const m of ["00", "15", "30", "45"]) {
+    if (h === 19 && m !== "00") break;
+    TIMES.push(h + ":" + m);
+  }
+}
 
-const hour = t => parseInt(t, 10);
+const minutes = t => parseInt(t.split(":")[0], 10) * 60 + parseInt(t.split(":")[1], 10);
 
 class Component extends DCLogic {
   state = { day: -1, start: "", end: "", sheet: null };
   renderVals() {
     const { day, start, end } = this.state;
-    const valid = day >= 0 && start !== "" && end !== "" && hour(end) > hour(start);
-    const slots = valid ? Math.floor(((hour(end) - hour(start)) * 60) / 45) : 0;
+    const valid = day >= 0 && start !== "" && end !== "" && minutes(end) - minutes(start) >= 45;
+    const slots = valid ? Math.floor((minutes(end) - minutes(start)) / 45) : 0;
     return {
       showCaptions: this.props.showCaptions ?? true,
       yes: true,

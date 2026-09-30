@@ -165,13 +165,13 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash) |
 | `11` | Estado del pago | Pending/confirmed/rejected states |
 | `12` | Mi plan | Active plan, sessions left, expiry |
-| `13` | Evaluación nutricional | Book a nutrition assessment |
+| `13` | Evaluación nutricional | Book a nutrition assessment: only days of months not yet used in the next 30 days, the Branch (and Nutritionist) per turno when there are several, turnos close 3 h before they start; used-month state only when no unused month has turnos, and a no-active-plan state with «Ver planes» (`08`) |
 | `14` | Confirmar evaluación | Confirmation step |
-| `15` | Mis evaluaciones | Assessment history |
+| `15` | Mis evaluaciones | Assessment history: one per month, so up to two «Próximas» across a month boundary; «Cancelar» outside the last 3 h («Ya no se puede cancelar» inside), and the sheet says the month is freed |
 | `16` | Mis referidos | Referral code + status |
 | `17` | Mi crédito | Credit balance and movements |
 | `18` | Perfil | Profile and settings; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
-| `19` | Notificaciones | Notification list |
+| `19` | Notificaciones | Notification list — seven types, including the studio-cancelled Evaluation (opens `15`) |
 | `20` | Recuperar contraseña | Request a reset link by email; neutral sent and temporary-limit states |
 | `21` | Crear contraseña | Page opened by an emailed link: Activar cuenta or Restablecer contraseña, plus expired and removed-invitation states |
 | `22` | Editar perfil | Edit name, email, phone |
@@ -196,12 +196,12 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `S12` | Revisar pago | Administration — approve/reject |
 | `S13` | Cancelar una clase | Administration |
 | `S14` | Cancelar sesión | Administration |
-| `S15` | Mi agenda | Nutritionist |
-| `S16` | Mi disponibilidad | Nutritionist |
-| `S17` | Formulario de horario | Nutritionist |
+| `S15` | Mi agenda | Nutritionist; the selected card offers «Cancelar evaluación» (confirmation sheet, «Evaluación cancelada» notice) |
+| `S16` | Mi disponibilidad | Nutritionist; block cards carry «Desde el …» / «Hasta el …» when a block starts later or ends, and the Branch when blocks span Branches |
+| `S17` | Formulario de horario | Nutritionist; Día, «Sucursal» (only with several Branches), 15-minute Horario with at least one 45-minute turno, «A partir del» / «Aplicar cambios desde» (from today); confirmation sheets «¿Aplicar el cambio?» (when bookings exist) and «¿Quitar este horario?» (always), which keep booked Evaluations |
 | `S18` | Recuperar contraseña | All staff — reset link by email |
 | `S19` | Crear contraseña | All staff — Activar cuenta or Restablecer contraseña from an emailed link |
-| `S20` | Notificaciones | All staff — no menu entry; reached from a push, filtered by role |
+| `S20` | Notificaciones | All staff — no menu entry; reached from a push, filtered by role; six types, including the Client-cancelled Evaluation for the Nutritionist (opens `S15`) |
 | `S21` | Reservas de la clienta | Front desk |
 | `S22` | Historial de la clienta | Front desk |
 | `S23` | Perfil | All staff — read-only data, change password, log out |
@@ -272,7 +272,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `S01→S18` via "¿Olvidaste tu contraseña?". Emailed links open `S19`: **Activar cuenta** (from an `AW24` invitation) returns to `S01` without a session; **Restablecer contraseña** lands on the role root (`S02`, `S04`, `S11`, `S15`) with a new session.
 - `S05` sends an activation link instead of a password. While the Client is pending it shows the invitation with «Cambiar correo», «Reenviar enlace», «Cancelar invitación» (confirmation, returns to `S04`) and «Ver resumen de la clienta» (`S06`); it also draws the same-email, self-registered, other-account, and resend-limit states.
 - `S06→S21` (Reservas de la clienta) and `S06→S22` (Historial de la clienta).
-- `S15` cards are selectable, not navigable: tapping highlights a card (border → `#B78380`) so the nutritionist keeps their place down the day. There is no assessment detail screen anywhere — an Evaluation records the appointment, not its content (same reason `AW25` rows are not links).
+- `S15` cards are selectable, not navigable: tapping highlights a card (border → `#B78380`) so the nutritionist keeps their place down the day, and shows «Cancelar evaluación» under it, which opens a confirmation sheet; confirming removes the card and shows «Evaluación cancelada». There is no assessment detail screen anywhere — an Evaluation records the appointment, not its content (same reason `AW25` rows are not links).
 - `S20` has no menu entry — it is reached from a push notification and filtered by role. Every role root (`S02`, `S04`, `S11`, `S15`) carries a 46px circular initials avatar as the **last control on the right** of its header, labelled "Tu cuenta", and it is the only path to `S23` — and therefore to change password and log out. Where the root also has a screen action (`S11` → `S13`, `S15` → `S16`), that action is a 46px rounded square with a 1px `#D8C9BB` border and sits **before** the avatar (10px gap): outlined square = screen action, filled circle with initials = your account.
 
 **Back office (AW19–AW29)**

@@ -25,7 +25,7 @@
   <header style="display:flex;flex-direction:column;gap:10px;">
     <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de cliente · Pantalla 15</div>
     <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Mis evaluaciones</h1>
-    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Lista breve por naturaleza: como máximo hay una evaluación al mes. Una acción de texto por tarjeta y nada más.</p>
+    <p style="margin:0;max-width:680px;font-size:15px;line-height:1.6;color:#8A807C;">Lista breve: una evaluación por mes calendario, así que puede haber dos próximas si están a cada lado de un cambio de mes. Una acción de texto por tarjeta y nada más.</p>
   </header>
 
   <div style="display:flex;flex-wrap:wrap;gap:56px;">
@@ -33,8 +33,8 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
-          <div style="font-size:13px;font-weight:500;">Con evaluación próxima</div>
-          <div style="font-size:12px;color:#8A807C;">Acción de cancelar en texto</div>
+          <div style="font-size:13px;font-weight:500;">Dos próximas</div>
+          <div style="font-size:12px;color:#8A807C;">Una por mes, a cada lado del cambio de mes · la de hoy ya está a menos de 3 horas y no se puede cancelar</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -47,24 +47,44 @@
           </div>
 
           <div style="padding:26px 20px;display:flex;flex-direction:column;gap:16px;">
-            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Próxima</span>
+            <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#8A807C;">Próximas</span>
 
             <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;gap:16px;">
                 <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:56px;flex:none;padding:10px 0;border-radius:12px;background:rgba(216,189,184,0.24);">
-                  <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;color:#8A5F5C;">24</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;color:#8A5F5C;">31</span>
                   <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8A5F5C;">Ago</span>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:5px;min-width:0;">
                   <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">09:30</span>
-                  <span style="font-size:13px;color:#6E6663;">Lunes 24 de agosto · 45 min</span>
+                  <span style="font-size:13px;color:#6E6663;">Lunes 31 de agosto · 45 min</span>
                   <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#6E6663;">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
                     Carla Peña
                   </span>
                 </div>
               </div>
-              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;min-height:59px;">
+                <span style="font-size:13px;line-height:1.4;color:#A79E9A;">Ya no se puede cancelar</span>
+              </div>
+            </div>
+
+            <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:16px;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
+              <div style="display:flex;align-items:flex-start;gap:16px;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:56px;flex:none;padding:10px 0;border-radius:12px;background:rgba(216,189,184,0.24);">
+                  <span style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;color:#8A5F5C;">03</span>
+                  <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#8A5F5C;">Sep</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:5px;min-width:0;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;">16:00</span>
+                  <span style="font-size:13px;color:#6E6663;">Jueves 3 de septiembre · 45 min</span>
+                  <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#6E6663;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                    Carla Peña
+                  </span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:14px;border-top:1px solid #EFE7DE;min-height:59px;">
                 <span style="font-size:12px;line-height:1.4;color:#8A807C;max-width:190px;">Puedes cancelar hasta 3 horas antes.</span>
                 <button style="min-height:44px;padding:0 14px;border:none;border-radius:8px;background:transparent;color:#6E6663;font-size:14px;font-weight:500;cursor:pointer;" style-hover="color:#B25D4B;">Cancelar</button>
               </div>
@@ -206,7 +226,7 @@
               <div style="font-family:Lora,Georgia,serif;font-weight:500;font-size:22px;line-height:1.3;">¿Cancelar esta evaluación?</div>
               <div style="font-size:13px;line-height:1.5;color:#8A807C;">Lunes 24 de agosto, 09:30 · 45 min · Carla Peña</div>
             </div>
-            <div style="font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;">El horario queda libre y otras clientas podrán reservarlo.</div>
+            <div style="display:flex;flex-direction:column;gap:6px;font-size:14px;line-height:1.6;color:#6E6663;text-wrap:pretty;"><span>El horario queda libre y otras clientas podrán reservarlo.</span><span>Podrás reservar otra evaluación para este mes.</span></div>
             <div style="display:flex;flex-direction:column;gap:6px;padding-top:2px;">
               <button style="min-height:52px;width:100%;border:1px solid #B25D4B;border-radius:8px;background:transparent;color:#B25D4B;font-size:16px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.08);">Sí, cancelar evaluación</button>
               <button style="min-height:44px;width:100%;border:none;border-radius:8px;background:transparent;color:#8A807C;font-size:15px;font-weight:500;cursor:pointer;" style-hover="color:#4A4A4A;">Volver</button>
@@ -364,11 +384,11 @@
     <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
         <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Estructura</div>
-        <div><strong style="color:#4A4A4A;font-weight:500;">Próxima:</strong> tarjeta con superficie blanca; como mucho hay una a la vez.</div>
-        <div><strong style="color:#4A4A4A;font-weight:500;">Anteriores:</strong> filas planas, sin acciones, en el mismo tono silencioso que el historial de clases.</div>
-        <div><strong style="color:#4A4A4A;font-weight:500;">Cancelar:</strong> acción de texto, no botón sólido; el rojo semántico aparece solo al interactuar.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Próximas:</strong> tarjetas con superficie blanca; una por mes, así que puede haber dos si cruzan de mes. Una evaluación que cancela el estudio sale de la lista; la clienta se entera por Notificaciones (19).</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Anteriores:</strong> filas planas, sin acciones, en el mismo tono silencioso que el historial de clases. «Realizada» solo dice que la cita ya pasó; no registra asistencia.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Cancelar:</strong> acción de texto, no botón sólido; el rojo semántico aparece solo al interactuar. A menos de 3 horas del inicio se reemplaza por la línea apagada «Ya no se puede cancelar».</div>
         <div><strong style="color:#4A4A4A;font-weight:500;">Recién agendada:</strong> al volver de 14 aparece el mismo aviso pasajero de 05 — tinte Éxito, «Evaluación confirmada» con el día y la hora — y la tarjeta lleva un filo Éxito mientras el aviso está. Sin línea de saldo: la evaluación no cuesta ni descuenta clases.</div>
-        <div><strong style="color:#4A4A4A;font-weight:500;">Confirmación:</strong> abre una hoja inferior sobre la lista atenuada con la cita en una línea y una sola consecuencia: el horario queda libre para otras clientas. Confirmar cierra la hoja y la tarjeta ya no está.</div>
+        <div><strong style="color:#4A4A4A;font-weight:500;">Confirmación:</strong> abre una hoja inferior sobre la lista atenuada con la cita en una línea y dos consecuencias: el horario queda libre para otras clientas y el mes vuelve a quedar disponible. Confirmar cierra la hoja y la tarjeta ya no está.</div>
       </div>
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
         <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#A79E9A;">Estado vacío</div>
