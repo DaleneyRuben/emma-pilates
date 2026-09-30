@@ -177,7 +177,7 @@ Each of these was sent as the next message in the existing design session for th
 | [66](./followups/66-admin-close-client-account.md) | `AW22`'s footer «Cerrar cuenta» action, its consequences dialog, the refused-while-a-transfer-is-pending frame, and `AW21` after closing (BE-007) | ✅ applied |
 | [67](./followups/67-settle-invariant-9-profile-photo.md) | Settles 63: the photo shows only on `18`/`22`, and checklist 30 §9 now reads «the header account avatar is never a photo» | ✅ applied (Claude Design export 2026-09-30, `265d08c`) |
 | [68](./followups/68-assistant-pending-invitation-on-client-overview.md) | Moves the Assistant's pending-invitation box from `S05` to `S06`, as built; `S05` stays a form that opens `S06` | ✅ applied (Claude Design export 2026-09-30, `52ac0dd`) |
-| [69](./followups/69-login-registration-copy-as-built.md) | `01` registration gains «Confirmar contraseña»; one incorrect-credentials message («El correo o la contraseña no son correctos.») on `01`/`S01`/`AW01` | 🕓 pending |
+| [69](./followups/69-login-registration-copy-as-built.md) | `01` registration gains «Confirmar contraseña»; one incorrect-credentials message («El correo o la contraseña no son correctos.») on `01`/`S01`/`AW01` | ✅ applied (Claude Design export 2026-09-30, `2da21e3`) |
 | [70](./followups/70-leftovers-of-the-2026-09-30-exports.md) | Leftovers of the 2026-09-30 exports: 59 §1's text tones on every remaining screen, `09`'s total from the Bs 560 price, `AW02`'s drawer «Administración», the sidebar hover on Hover de fila, `18`'s «Evaluación nutricional» row, and Client text links in Palo de rosa profundo | 🕓 pending |
 
 ## Status
