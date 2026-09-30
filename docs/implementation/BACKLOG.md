@@ -144,7 +144,7 @@ written but not yet applied by the external design session, or still to write:
 | --- | --- | --- | --- |
 | 33–38 (email-only authentication, verification, activation, recovery, throttling) | Client 01/20/21/23; Staff S01/S05/S18/S19/S23; AW01/AW24/AW30/AW32 | DES-001, EML-001, WEB-002 | ✅ applied: exported 2026-09-29 (`4ba4eeb`); app gaps in MOB-021, WEB-012 |
 | 39 (weekly Session Schedule controls, Class Type descriptions, Promotion publication) | Admin web schedule and Promotions | ADM-001, WEB-003, WEB-006, UPL-002 | ✅ applied: exported 2026-09-30 (`76a6f95`) |
-| 40 (Cancellation Window wording) | Invariants checklist | Mobile copy review | 🕓 pending export |
+| 40 (Cancellation Window wording) | Invariants checklist | Mobile copy review | ✅ applied: exported 2026-09-30 (`0c37e5f`); only `design/README.md` contradicted the corrected wording (it now says rescheduling applies inside the 2 h 30 window and that earlier changes are Cancel plus a new Booking); `05`, `06`, `09`, `S14`, `S21` already matched, as does the shipped mobile copy |
 | 41–46 (NUT-001: S15 cancel, S16/S17 dates and Branch picker, Client 13/15 rules, 19/S20 notices) | Client 13–15, 19; Staff S15–S17, S20 | MOB-016 (built from accepted behavior) | 🕓 pending export |
 | 48–51 (BKO-001: AW08 Restock, AW09 archive, AW10 stock limit, AW16 payroll only across all Branches) | Admin web AW08–AW10, AW16 | WEB-007, WEB-009 | 🕓 pending export |
 | 52 (WEB-002: AW33 role label «Administración», row hover) | Admin web AW33 | WEB-002 (built from the corrected behavior) | 🕓 pending export |
