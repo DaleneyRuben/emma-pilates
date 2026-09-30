@@ -217,15 +217,15 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW05` | Formulario de plan | Side panel |
 | `AW06` | Tipos de clase | Catalog table |
 | `AW07` | Formulario de tipo de clase | Side panel; required «Descripción» (one or two sentences shown on the client's session detail) after Nombre; duration/capacity row with fixed suffixes |
-| `AW08` | Insumos | Branch stock table; "Stock bajo" warning pill; three actions (historial de retiros, registrar retiro, nuevo insumo) |
-| `AW09` | Formulario de insumo | Stock editable only on create; read-only + padlock on edit |
-| `AW10` | Registrar retiro | Two-field fast-entry panel; stock shown per option |
+| `AW08` | Insumos | Branch stock table; "Stock bajo" warning pill; four actions (nuevo insumo, registrar retiro, registrar reposición, historial de retiros); «Registrar reposición» opens an `AW10`-style panel |
+| `AW09` | Formulario de insumo | Stock editable only on create; read-only + padlock on edit; «Archivar insumo» (edit only) with a confirmation |
+| `AW10` | Registrar retiro | Two-field fast-entry panel; stock shown per option; «Máximo: N unid.» and the «Solo hay N unid. en stock.» error |
 | `AW11` | Nómina | Salary payments; **not** branch-scoped |
 | `AW12` | Formulario de pago de sueldo | Empleado / Monto / Fecha only |
 | `AW13` | Gastos | Branch expenses; month total in the subtitle |
 | `AW14` | Formulario de gasto | Categoría + inline "+ Nueva categoría" / Monto / Fecha |
 | `AW15` | Categorías de gasto | Plain list, inline add row, delete disabled when in use |
-| `AW16` | Reporte de ingresos y gastos | Own date range + "Todas las sucursales"; 3 stat tiles, bar chart, category breakdown |
+| `AW16` | Reporte de ingresos y gastos | Own date range + "Todas las sucursales"; 3 stat tiles, bar chart, category breakdown; «Nómina» only across all Branches, and a single-Branch frame with its caption |
 | `AW17` | Promociones | Drag-to-reorder card list (order = carousel order); each card shows its derived state: Borrador, Programada, Activa, Finalizada (a deleted Promotion is archived and leaves the list) |
 | `AW18` | Formulario de promoción | Image upload, título, descripción, date range; «Guardar borrador» / «Publicar» (disabled until image, title, description, and both dates exist); a published Promotion offers «Guardar cambios» / «Dejar de publicar», and changing or removing its image unpublishes it on save with a warning |
 | `AW19` | Sucursales | Two-column table (Nombre / Dirección); feeds the top-bar selector; no delete |
@@ -256,7 +256,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - The top-bar user cell opens the `AW33` menu overlay (change-password side panel, log-out confirm) from any shell page.
 - `AW22` → «Cerrar cuenta» opens a confirmation that lists what the closure does to that client; **Volver** / **Cerrar cuenta** (Error outline). A pending transfer keeps the dialog open with a refusal and a link to `AW28`; a completed closure returns to `AW21` with an Éxito line.
 - Read-only pages with no primary action: `AW21`, `AW22`, `AW25`, `AW26`, `AW27`, `AW28`, `AW31`, plus `AW16`.
-- `AW08` has three actions: **Ver historial de retiros** (link → `AW31`), **Registrar retiro** (secondary, outlined — it subtracts stock) and **+ Nuevo insumo** (primary).
+- `AW08` has four actions, in this order: **+ Nuevo insumo** (primary), **Registrar retiro** (outlined — it subtracts stock), **Registrar reposición** (outlined — it adds units, never money; same panel as `AW10` with «Cantidad repuesta») and **Ver historial de retiros** (link → `AW31`).
 
 **Navigation — client app**
 - Four-tab bar: Inicio · Reservar · Mis Reservas · Perfil. Child screens replace the tab bar with a header and a back arrow.
@@ -292,8 +292,8 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 **Forms**
 - One primary "Guardar" per panel, pinned in the footer.
 - Panels state their implicit scope in the subtitle ("Se guarda en Sucursal Equipetrol", "Queda en la nómina general, sin sucursal").
-- `AW09`: `Cantidad en stock` is writable only on create. On edit it is read-only with a padlock and points to withdrawals.
-- `AW10`: the selected supply shows its current stock; each option in the open list shows its stock, low ones with the warning dot; helper text previews the resulting stock ("Quedarán 42 unidades"); the primary button is disabled until a supply is chosen.
+- `AW09`: `Cantidad en stock` is writable only on create. On edit it is read-only with a padlock and points to withdrawals and restocks. The edit frame ends with «Archivar insumo» (Error text), which asks «¿Archivar este insumo?» (Cancelar / Archivar); an archived Supply leaves `AW08` and `AW10`, and its withdrawals stay in `AW31`.
+- `AW10`: the selected supply shows its current stock; each option in the open list shows its stock, low ones with the warning dot; helper text gives the maximum and previews the resulting stock ("Máximo: 48 unid. · Quedarán 42 unidades"); more than the stock puts the field in Error with «Solo hay N unid. en stock.» and disables «Registrar»; the primary button is also disabled until a supply is chosen.
 - `AW14`: `+ Nueva categoría` expands an inline field + "Agregar" inside the panel — no modal, nothing typed is lost. The new category is saved to the `AW15` list and selected.
 - `AW15`: delete is enabled only when no expense references the category; otherwise the icon renders in the disabled tone with `cursor:not-allowed` and the row states the usage count.
 - `AW18`: image first (dashed drop target stating JPG/PNG, min 1200×675). With an image attached: preview, filename + dimensions, "Cambiar imagen" and "Quitar" (Error). Date range = display window only; edit mode reports whether today falls inside it.
@@ -308,7 +308,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 **Report (`AW16`)**
 - Read-only screen. Tiles: Ingresos (Éxito), Gastos (Error), Neto (Plomo cálido — a summary, not a status), each with a 3px top rule in its color, a Lora 32 figure, and a one-line explanation.
 - Bar chart: paired flat bars per month (income `#7C9473`, expenses `#B25D4B`), 3 reference gridlines, linear scale of **3.333px per Bs 1.000** with the axis labels placed on that same scale. No gradients, no per-bar value labels.
-- Breakdown table: rows by expense category; the `Sueldos` row is annotated as coming from Nómina rather than the category list, so the total reconciles.
+- Breakdown table: rows by expense category; with «Todas las sucursales» a `Nómina` row, annotated as coming from Nómina rather than the categories, so the total reconciles. With one Branch there is no `Nómina` row, Gastos are that Branch's Expenses, Ingresos its cash payments, and a line above the tiles says «La nómina y los ingresos por transferencia se ven solo en «Todas las sucursales».»
 
 **Responsive**
 - Every admin screen is drawn at 1440px and at 420px. At 420px: sidebar collapses to a hamburger, tables become stacked cards, actions go full-width, side panels become full-screen sheets, paired date/number fields stack.

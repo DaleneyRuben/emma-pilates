@@ -157,7 +157,7 @@
                   <input type="number" value="6" style="flex:1;min-width:0;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
                   <span style="height:100%;display:flex;align-items:center;padding:0 12px;border-left:1px solid #EFE6DC;background:#FDFAF6;font-size:12px;color:#8A807C;">unid.</span>
                 </div>
-                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Quedarán 42 unidades en Equipetrol.</span>
+                <span style="font-size:11.5px;line-height:1.5;color:#A79E9A;">Máximo: 48 unid. · Quedarán 42 unidades en Equipetrol.</span>
               </label>
             </div>
             <div style="padding:18px 22px;border-top:1px solid #EFE6DC;">
@@ -230,6 +230,48 @@
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Escritorio · Más que el stock</div>
+          <div style="font-size:12px;color:#8A807C;">Error en el campo y «Registrar» deshabilitado hasta bajar la cantidad</div>
+        </div>
+      </sc-if>
+      <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
+        <div style="width:408px;height:420px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+            <div style="display:flex;flex-direction:column;gap:3px;">
+              <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Registrar retiro</h3>
+              <span style="font-size:11.5px;color:#8A807C;">Equipetrol · 14/08/2026 · María Fernanda</span>
+            </div>
+            <button style="width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+            </button>
+          </div>
+          <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:16px;overflow:hidden;">
+            <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Insumo</span>
+              <div style="display:flex;align-items:center;gap:10px;min-width:0;height:44px;padding:0 12px 0 14px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;cursor:pointer;" style-hover="border-color:#B78380;">
+                <span style="flex:1;min-width:0;font-size:14px;color:#4A4A4A;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Alcohol en gel 500 ml</span>
+                <span style="flex:none;padding:4px 10px;border-radius:999px;background:rgba(201,154,78,0.16);color:#9A7434;font-size:11.5px;font-variant-numeric:tabular-nums;">4 en stock</span>
+              </div>
+            </label>
+            <label style="display:flex;flex-direction:column;gap:7px;min-width:0;">
+              <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Cantidad retirada</span>
+              <div style="display:flex;align-items:center;min-width:0;height:44px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;overflow:hidden;box-shadow:0 0 0 3px rgba(178,93,75,0.12);">
+                <input type="number" value="6" aria-invalid="true" style="flex:1;min-width:0;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:14px;outline:none;" />
+                <span style="height:100%;display:flex;align-items:center;padding:0 12px;border-left:1px solid #EFE6DC;background:#FDFAF6;font-size:12px;color:#8A807C;">unid.</span>
+              </div>
+              <span style="font-size:11.5px;line-height:1.5;color:#94493A;">Solo hay 4 unid. en stock.</span>
+            </label>
+          </div>
+          <div style="padding:18px 22px;border-top:1px solid #EFE6DC;display:flex;flex-direction:column;gap:14px;">
+            <button disabled="" style="height:46px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:14.5px;font-weight:500;cursor:not-allowed;opacity:0.45;">Registrar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Navegador angosto · 420 px</div>
           <div style="font-size:12px;color:#8A807C;">Hoja de pantalla completa · dos campos y listo</div>
         </div>
@@ -262,7 +304,7 @@
               <input type="number" value="6" style="flex:1;min-width:0;height:100%;padding:0 14px;border:none;background:transparent;color:#4A4A4A;font-size:15px;outline:none;" />
               <span style="height:100%;display:flex;align-items:center;padding:0 14px;border-left:1px solid #EFE6DC;background:#FDFAF6;font-size:13px;color:#8A807C;">unidades</span>
             </div>
-            <span style="font-size:11.5px;color:#A79E9A;">Quedarán 42 unidades.</span>
+            <span style="font-size:11.5px;color:#A79E9A;">Máximo: 48 unid. · Quedarán 42 unidades.</span>
           </label>
           <button style="height:50px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">Registrar</button>
         </div>
@@ -275,6 +317,7 @@
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Dos campos, sin pasos</span>Insumo y cantidad: se abre, se llena y se registra sin salir de la tabla.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Stock a la vista</span>La opción elegida y cada fila de la lista muestran su stock actual, para no retirar de más.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Resultado antes de guardar</span>El texto de ayuda dice cuánto quedará; si cruza el umbral, la insignia de AW08 se enciende sola.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Nunca bajo cero</span>La ayuda dice el máximo, igual al stock del insumo elegido. Si la cantidad lo supera, el campo pasa a Error con «Solo hay N unid. en stock.» y «Registrar» se deshabilita.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Fecha y responsable implícitos</span>El subtítulo del panel deja claro qué sucursal, qué día y quién queda en el registro.</div>
   </div>
 
