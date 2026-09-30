@@ -119,8 +119,8 @@
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
-        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;justify-content:space-between;gap:36px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:16px;">
+        <div style="min-height:100%;background:#FAF7F2;padding:88px 28px 36px;display:flex;flex-direction:column;justify-content:space-between;gap:28px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px;">
             <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
             <div style="width:36px;height:1px;background:#D8C9BB;"></div>
             <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
@@ -137,6 +137,10 @@
             <label style="display:flex;flex-direction:column;gap:8px;">
               <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
               <input type="password" placeholder="Mínimo 8 caracteres" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+              <input type="password" placeholder="Repite la contraseña" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
             </label>
             <sc-if value="{{ referralClosed }}" hint-placeholder-val="{{ true }}">
               <button onClick="{{ toggleReferral }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:14px;cursor:pointer;text-align:left;">
@@ -168,13 +172,13 @@
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
-        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;justify-content:space-between;gap:32px;">
-          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px;">
+        <div style="min-height:100%;background:#FAF7F2;padding:72px 28px 30px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
             <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
             <div style="width:36px;height:1px;background:#D8C9BB;"></div>
             <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
           </div>
-          <div style="display:flex;flex-direction:column;gap:18px;">
+          <div style="display:flex;flex-direction:column;gap:14px;">
             <label style="display:flex;flex-direction:column;gap:8px;">
               <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
               <input type="text" placeholder="Tu nombre y apellido" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
@@ -186,6 +190,10 @@
             <label style="display:flex;flex-direction:column;gap:8px;">
               <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
               <input type="password" placeholder="Mínimo 8 caracteres" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+              <input type="password" placeholder="Repite la contraseña" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
             </label>
             <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border:1px solid #D8C9BB;border-radius:12px;background:rgba(216,189,184,0.16);">
               <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
@@ -199,6 +207,98 @@
           <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
             <div style="width:100%;height:1px;background:#EFE7DE;"></div>
             <div style="font-size:14px;color:#8A807C;">¿Ya tienes una cuenta? <a href="#" style="color:#B78380;font-weight:500;">Inicia sesión</a></div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Registrarse · no coinciden</div>
+          <div style="font-size:12px;color:#8A807C;">Validación en línea, como en 21 y 23 · nada se envía</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:88px 28px 36px;display:flex;flex-direction:column;justify-content:space-between;gap:28px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:8px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Nombre</span>
+              <input type="text" value="Lucía Mendoza" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+              <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" value="pilates2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Confirmar contraseña</span>
+              <input type="password" value="pilates202" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              <span style="display:flex;align-items:flex-start;gap:8px;font-size:13px;line-height:1.5;color:#8A4433;"><span style="width:6px;height:6px;border-radius:50%;background:#B25D4B;margin-top:6px;flex:none;"></span>Las contraseñas no coinciden.</span>
+            </label>
+            <sc-if value="{{ referralClosed }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ toggleReferral }}" style="display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;min-height:44px;padding:0 2px;border:none;background:transparent;color:#B78380;font-size:14px;cursor:pointer;text-align:left;">
+                ¿Tienes un código de referido?
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="6,9.5 12,15.5 18,9.5"></polyline></svg>
+              </button>
+            </sc-if>
+            <sc-if value="{{ referralOpen }}">
+              <label style="display:flex;flex-direction:column;gap:8px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Código de referido</span>
+                <input type="text" placeholder="Ej. EMMA-2026" style="height:52px;width:100%;padding:0 16px;border:1px solid #D8C9BB;border-radius:8px;background:{{ inputBg }};color:#4A4A4A;font-size:16px;letter-spacing:0.06em;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+              </label>
+            </sc-if>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Crear cuenta</button>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+            <div style="width:100%;height:1px;background:#EFE7DE;"></div>
+            <div style="font-size:14px;color:#8A807C;">¿Ya tienes una cuenta? <a href="#" style="color:#B78380;font-weight:500;">Inicia sesión</a></div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Credenciales incorrectas</div>
+          <div style="font-size:12px;color:#8A807C;">Error a nivel de formulario, sin revelar qué campo falló ni si el correo tiene cuenta</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;padding:96px 28px 44px;display:flex;flex-direction:column;justify-content:space-between;gap:40px;">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding-top:24px;">
+            <div style="font-family:Lora,Georgia,serif;font-size:52px;line-height:1;font-weight:400;letter-spacing:0.01em;">Emma</div>
+            <div style="width:36px;height:1px;background:#D8C9BB;"></div>
+            <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#8A807C;text-align:center;">Movimiento · Equilibrio · Bienestar</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:18px;">
+            <div role="alert" style="display:flex;gap:10px;align-items:flex-start;padding:14px 16px;border:1px solid #B25D4B;border-radius:10px;background:rgba(178,93,75,0.08);">
+              <div style="width:6px;height:6px;border-radius:50%;background:#B25D4B;margin-top:7px;flex:none;"></div>
+              <span style="font-size:13px;line-height:1.5;color:#8A4433;">El correo o la contraseña no son correctos.</span>
+            </div>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Correo electrónico</span>
+              <input type="email" value="lucia.mendoza@correo.com" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <label style="display:flex;flex-direction:column;gap:8px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#8A807C;">Contraseña</span>
+              <input type="password" value="123456789" style="height:52px;width:100%;padding:0 16px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:16px;outline:none;" style-focus="border-color:#B78380;box-shadow:0 0 0 3px rgba(183,131,128,0.15);" />
+            </label>
+            <button style="height:54px;width:100%;margin-top:6px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Iniciar sesión</button>
+            <a href="#" style="align-self:center;font-size:14px;color:#B78380;padding:8px;">¿Olvidaste tu contraseña?</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:16px;align-items:center;">
+            <div style="width:100%;height:1px;background:#EFE7DE;"></div>
+            <div style="font-size:14px;color:#8A807C;">¿No tienes una cuenta? <a href="#" style="color:#B78380;font-weight:500;">Regístrate</a></div>
           </div>
         </div>
       </x-import>
@@ -295,10 +395,12 @@
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Solo correo</span>Se entra, se registra y se recupera la contraseña solo con el correo. El teléfono es un dato de contacto opcional que se agrega después en la pantalla 22.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Biometría</span>Se ofrece solo si el dispositivo la tiene registrada; nunca reemplaza a la contraseña en el primer acceso.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Código de referido</span>Oculto por defecto; el enlace lo despliega. Área táctil de 44 px de alto.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Confirmar contraseña</span>Registrarse pide la contraseña dos veces ("Repite la contraseña"). Si no coinciden, "Las contraseñas no coinciden." aparece bajo el segundo campo, como en 21 y 23, y no se envía nada.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Verificar el correo</span>"Crear cuenta" abre "Revisa tu correo": sin barra de pestañas ni Inicio hasta verificar. El enlace verifica, no inicia sesión; después se entra aquí con correo y contraseña.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Respuesta neutra</span>"Revisa tu correo" se ve igual si la cuenta se creó, se reutilizó o no puede continuar, y también cuando un límite por destinatario suprime el envío.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Tres plazos distintos</span>El enlace de verificación vence en 24 horas. El registro pendiente se elimina a los 7 días sin verificar, corregir ni reenviar; corregir o reenviar reinicia ese plazo.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Demasiados intentos</span>Tras varios intentos fallidos el servidor pide esperar: aviso neutro, botón inactivo hasta que termine la espera indicada. La cuenta nunca se bloquea y no hay CAPTCHA.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Credenciales incorrectas</span>Un correo o una contraseña equivocados muestran siempre "El correo o la contraseña no son correctos." sobre el formulario: nunca dice cuál falló ni si el correo tiene cuenta. Es el mismo mensaje de S01 y AW01.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Después de entrar</span>La app abre en Inicio, con la barra de pestañas de la app de cliente.</div>
   </div>
 
