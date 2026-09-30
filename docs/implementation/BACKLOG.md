@@ -159,7 +159,7 @@ written but not yet applied by the external design session, or still to write:
 | Image variant sizes and quality (ADR-0073) | Receipts, profile photos, Promotions | UPL-002 | decided in `UPL-002-image-variants.md`; follow-up 60 records the crops taken |
 | Tab-bar unread badge | Client and Staff navigation | MOB-017 gap | not designed |
 
-**Handoff (2026-09-30).** Follow-ups 39–63 and 67 are exported and marked applied. The next follow-up to apply is **64**, then 68, 69 (these two unblock MOB-021), and 70. Creating the Claude Design canvas for 64 was refused by this session's permission check, so the next session (or the studio) needs to allow canvas creation, or apply 64 on Claude Design by hand, before it can continue. App comparison results for 64, 68, and 69 are already recorded (64 matches; 68/69 gaps in MOB-021), so each needs only its build, render check, canvas round trip, and commits.
+**Handoff (2026-09-30).** Follow-ups 39–63 and 67 are exported and marked applied. The next follow-up to apply is **64**, then 68, 69 (these two unblock MOB-021), and 70. Creating the Claude Design canvas for 64 was refused by this session's permission check; the user then approved canvas creation for 64, 68, 69, and 70 on the condition that every canvas is deleted once its export is copied (confirm with an empty Artifact list), and asked for the work to continue in a new session. App comparison results for 64, 68, and 69 are already recorded (64 matches; 68/69 gaps in MOB-021), so each needs only its build, render check, canvas round trip, and commits.
 
 ## Production readiness checklist
 
