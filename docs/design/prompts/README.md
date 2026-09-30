@@ -176,6 +176,7 @@ Each of these was sent as the next message in the existing design session for th
 | [65](./followups/65-client-profile-close-account-row.md) | Client `18`'s quiet «Cerrar mi cuenta» link under «Cerrar sesión» and its new entry point into the new screen `24` (BE-007) | ✅ applied |
 | [66](./followups/66-admin-close-client-account.md) | `AW22`'s footer «Cerrar cuenta» action, its consequences dialog, the refused-while-a-transfer-is-pending frame, and `AW21` after closing (BE-007) | ✅ applied |
 | [67](./followups/67-settle-invariant-9-profile-photo.md) | Settles 63: the photo shows only on `18`/`22`, and checklist 30 §9 now reads «the header account avatar is never a photo» | 🕓 pending |
+| [68](./followups/68-assistant-pending-invitation-on-client-overview.md) | Moves the Assistant's pending-invitation box from `S05` to `S06`, as built; `S05` stays a form that opens `S06` | 🕓 pending |
 
 ## Status
 
