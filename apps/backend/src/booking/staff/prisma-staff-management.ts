@@ -190,8 +190,17 @@ export class PrismaStaffManagementUnitOfWork implements StaffManagementUnitOfWor
         ]);
         return sessions + schedules;
       },
-      canIssueActivationEmail: (input) =>
-        accounts.canIssueActivationEmail(input),
+      activationEmailWaitSeconds: (input) =>
+        accounts.activationEmailWaitSeconds(input),
+      setAccountEmail: (input) => accounts.setAccountEmail(input),
+      removePendingStaffMember: async (input) => {
+        await accounts.removePendingStaffMember(input);
+        // The removed member keeps its Branch rows as history, marked removed.
+        await transaction.staffBranchAssignment.updateMany({
+          where: { staffMemberId: input.staffMemberId, deletedAt: null },
+          data: { deletedAt: input.now },
+        });
+      },
       createPendingStaffMember: async (input) => {
         await transaction.staffMember.create({
           data: {

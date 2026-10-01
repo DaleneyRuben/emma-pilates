@@ -250,7 +250,9 @@ describe('administrator staff members (e2e)', () => {
       .send({ email: 'rocio.p@example.com' })
       .expect(200)
       .expect('Cache-Control', 'no-store')
-      .expect(({ body }) => expect(body.email).toBe('rocio.p@example.com'));
+      .expect(({ body }: { body: { email: string } }) =>
+        expect(body.email).toBe('rocio.p@example.com'),
+      );
     expect(operations.correctEmail).toHaveBeenCalledWith(
       { staffMemberId: staffId, email: 'rocio.p@example.com' },
       expect.anything(),
@@ -283,7 +285,10 @@ describe('administrator staff members (e2e)', () => {
       .expect(429)
       .expect('Retry-After', '40');
 
-    operations.create.mockResolvedValueOnce({ ...member, invitationReopened: true });
+    operations.create.mockResolvedValueOnce({
+      ...member,
+      invitationReopened: true,
+    });
     await request(app.getHttpServer())
       .post('/api/v1/administrator/staff-members')
       .set('authorization', bearer)
@@ -294,7 +299,9 @@ describe('administrator staff members (e2e)', () => {
         branchIds: [centro],
       })
       .expect(201)
-      .expect(({ body }) => expect(body.invitationReopened).toBe(true));
+      .expect(({ body }: { body: { invitationReopened?: boolean } }) =>
+        expect(body.invitationReopened).toBe(true),
+      );
   });
 
   it('requires a bearer credential', async () => {

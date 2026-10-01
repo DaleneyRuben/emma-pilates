@@ -66,12 +66,26 @@ describe('correctStaffInvitationEmail (WEB-012 W1, W2)', () => {
     ],
     [
       'an address of another Staff Member',
-      { account: { id: 'x', kind: 'staff', staffMemberId: 'staff-9', pending: false } },
+      {
+        account: {
+          id: 'x',
+          kind: 'staff',
+          staffMemberId: 'staff-9',
+          pending: false,
+        },
+      },
       'email_in_use',
     ],
     [
       'an address of a Client',
-      { account: { id: 'x', kind: 'client', staffMemberId: null, pending: true } },
+      {
+        account: {
+          id: 'x',
+          kind: 'client',
+          staffMemberId: null,
+          pending: true,
+        },
+      },
       'email_belongs_to_client',
     ],
     ['a full recipient lane', { wait: 40 }, 'email_throttled'],
@@ -155,7 +169,7 @@ describe('cancelStaffInvitation (WEB-012 W3)', () => {
   });
 });
 
-describe('createStaffMember with a pending invitation\'s email (W4)', () => {
+describe("createStaffMember with a pending invitation's email (W4)", () => {
   it('reopens it without touching its Role or Branches', async () => {
     const transaction = createTransaction({
       findAccountByEmail: jest.fn().mockResolvedValue({
@@ -187,7 +201,9 @@ describe('createStaffMember with a pending invitation\'s email (W4)', () => {
       expect.objectContaining({ accountId: 'account-1' }),
     );
     expect(transaction.recordAudit).toHaveBeenCalledWith(
-      expect.objectContaining({ actionCode: 'staff_member.invitation_reopened' }),
+      expect.objectContaining({
+        actionCode: 'staff_member.invitation_reopened',
+      }),
     );
   });
 });

@@ -94,12 +94,26 @@ describe('createStaffMember', () => {
     ],
     [
       'an email of another Staff Member',
-      { account: { id: 'other', kind: 'staff', staffMemberId: 'staff-9', pending: false } },
+      {
+        account: {
+          id: 'other',
+          kind: 'staff',
+          staffMemberId: 'staff-9',
+          pending: false,
+        },
+      },
       'email_in_use',
     ],
     [
       'an email of a Client Account',
-      { account: { id: 'other', kind: 'client', staffMemberId: null, pending: false } },
+      {
+        account: {
+          id: 'other',
+          kind: 'client',
+          staffMemberId: null,
+          pending: false,
+        },
+      },
       'email_belongs_to_client',
     ],
     ['no Branch for a Trainer', { branchIds: [] }, 'invalid_branch_assignment'],

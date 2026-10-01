@@ -13,11 +13,14 @@ import {
   Post,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiBody,
   ApiCreatedResponse,
+  ApiNoContentResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -40,9 +43,11 @@ import {
 import {
   ChangeStaffBranchesDto,
   ChangeStaffRoleDto,
+  CorrectStaffEmailDto,
   CreateStaffMemberDto,
   parseChangeStaffBranches,
   parseChangeStaffRole,
+  parseCorrectStaffEmail,
   parseCreateStaffMember,
   parseStaffDirectoryQuery,
   parseStaffMemberId,
@@ -93,6 +98,14 @@ export type StaffManagementOperations = {
     command: { staffMemberId: string },
     principal: Principal,
   ) => Promise<StaffMemberRecord>;
+  correctEmail: (
+    command: { staffMemberId: string; email: string },
+    principal: Principal,
+  ) => Promise<StaffMemberRecord>;
+  cancelInvitation: (
+    command: { staffMemberId: string },
+    principal: Principal,
+  ) => Promise<void>;
 };
 
 const statuses: Record<StaffManagementErrorCode, number> = {
@@ -106,6 +119,8 @@ const statuses: Record<StaffManagementErrorCode, number> = {
   own_staff_member: HttpStatus.CONFLICT,
   staff_member_deactivated: HttpStatus.CONFLICT,
   staff_member_not_pending: HttpStatus.CONFLICT,
+  email_belongs_to_client: HttpStatus.CONFLICT,
+  email_unchanged: HttpStatus.BAD_REQUEST,
 };
 
 const details: Record<StaffManagementErrorCode, string> = {
@@ -121,16 +136,25 @@ const details: Record<StaffManagementErrorCode, string> = {
   own_staff_member: 'Administrators cannot change their own Staff Member',
   staff_member_deactivated: 'The Staff Member is deactivated',
   staff_member_not_pending: 'The Staff Member already activated',
+  email_belongs_to_client: 'Email belongs to a Client Account',
+  email_unchanged: 'The invitation already uses this email',
 };
 
 const invalidRequest = (detail: string) =>
   new BadRequestException({ code: 'invalid_request', detail });
 
-const run = async <Result>(work: () => Promise<Result>): Promise<Result> => {
+// WEB-012 W6: a limited staff email says when it can be retried (ADR-0029).
+const run = async <Result>(
+  work: () => Promise<Result>,
+  response?: Response,
+): Promise<Result> => {
   try {
     return await work();
   } catch (error) {
     if (error instanceof StaffManagementError) {
+      if (error.code === 'email_throttled' && error.retryAfterSeconds > 0) {
+        response?.setHeader('Retry-After', String(error.retryAfterSeconds));
+      }
       throw new HttpException(
         { code: error.code, detail: details[error.code] },
         statuses[error.code],
@@ -197,11 +221,12 @@ export class AdministratorStaffMembersController {
   async create(
     @Headers('authorization') authorization: string | undefined,
     @Body() body: unknown,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<StaffMemberDto> {
     const parsed = parseCreateStaffMember(body);
     if (parsed === null) throw invalidRequest('Invalid Staff Member');
     const principal = await this.authenticate(authorization);
-    return run(() => this.operations.create(parsed, principal));
+    return run(() => this.operations.create(parsed, principal), response);
   }
 
   @Get(':staffMemberId')
@@ -227,11 +252,57 @@ export class AdministratorStaffMembersController {
   async resend(
     @Param('staffMemberId') staffMemberId: string,
     @Headers('authorization') authorization: string | undefined,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<StaffMemberDto> {
     const id = requireStaffMemberId(staffMemberId);
     const principal = await this.authenticate(authorization);
-    return run(() =>
-      this.operations.resendActivation({ staffMemberId: id }, principal),
+    return run(
+      () => this.operations.resendActivation({ staffMemberId: id }, principal),
+      response,
+    );
+  }
+
+  @Post(':staffMemberId/email-corrections')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ operationId: 'correctStaffMemberEmail' })
+  @ApiParam({ name: 'staffMemberId', format: 'uuid' })
+  @ApiBody({ type: CorrectStaffEmailDto })
+  @ApiOkResponse({ type: StaffMemberDto })
+  @Header('Cache-Control', 'no-store')
+  async correctEmail(
+    @Param('staffMemberId') staffMemberId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: unknown,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<StaffMemberDto> {
+    const id = requireStaffMemberId(staffMemberId);
+    const parsed = parseCorrectStaffEmail(body);
+    if (parsed === null) throw invalidRequest('A valid email is required');
+    const principal = await this.authenticate(authorization);
+    return run(
+      () =>
+        this.operations.correctEmail(
+          { staffMemberId: id, email: parsed.email },
+          principal,
+        ),
+      response,
+    );
+  }
+
+  @Post(':staffMemberId/invitation-cancellation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({ operationId: 'cancelStaffMemberInvitation' })
+  @ApiParam({ name: 'staffMemberId', format: 'uuid' })
+  @ApiNoContentResponse()
+  @Header('Cache-Control', 'no-store')
+  async cancelInvitation(
+    @Param('staffMemberId') staffMemberId: string,
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<void> {
+    const id = requireStaffMemberId(staffMemberId);
+    const principal = await this.authenticate(authorization);
+    await run(() =>
+      this.operations.cancelInvitation({ staffMemberId: id }, principal),
     );
   }
 

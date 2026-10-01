@@ -6,6 +6,7 @@ import {
 } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
 import { PrismaClientRegistrationTransaction } from '../registration/prisma-client-registration-unit-of-work';
+import { removePendingAccount } from '../registration/remove-pending-account';
 import type { EncryptedAuthenticationLink } from '../security/authentication-link-cipher';
 import type { IssuedAuthenticationToken } from '../security/authentication-token-service';
 
@@ -66,16 +67,57 @@ export const createStaffAccountOperations = (
   };
 
   return {
-    findAccountByEmail: (email: string) =>
-      transaction.account.findFirst({
+    // WEB-012: whose live Account uses the address, and whether it is pending.
+    findAccountByEmail: async (email: string) => {
+      const account = await transaction.account.findFirst({
         where: { email, deletedAt: null },
-        select: { id: true },
-      }),
+        select: {
+          id: true,
+          clientId: true,
+          staffMemberId: true,
+          activatedAt: true,
+          emailVerifiedAt: true,
+          disabledAt: true,
+        },
+      });
+      if (account === null) return null;
+      return {
+        id: account.id,
+        kind:
+          account.clientId === null ? ('staff' as const) : ('client' as const),
+        staffMemberId: account.staffMemberId,
+        pending:
+          account.activatedAt === null &&
+          account.emailVerifiedAt === null &&
+          account.disabledAt === null,
+      };
+    },
 
-    canIssueActivationEmail: (input: { email: string; now: Date }) =>
-      registration.canIssueAuthenticationEmail({
+    activationEmailWaitSeconds: (input: { email: string; now: Date }) =>
+      registration.authenticationEmailWaitSeconds({
         email: input.email,
         purpose: 'activation',
+        now: input.now,
+      }),
+
+    setAccountEmail: async (input: { accountId: string; email: string }) => {
+      await transaction.account.update({
+        where: { id: input.accountId },
+        data: { email: input.email },
+      });
+    },
+
+    // ADR-0086: «Cancelar invitación» marks the pending Account and Staff
+    // Member removed and invalidates every unused link.
+    removePendingStaffMember: (input: {
+      accountId: string;
+      staffMemberId: string;
+      now: Date;
+    }) =>
+      removePendingAccount(transaction, {
+        accountId: input.accountId,
+        clientId: null,
+        staffMemberId: input.staffMemberId,
         now: input.now,
       }),
 

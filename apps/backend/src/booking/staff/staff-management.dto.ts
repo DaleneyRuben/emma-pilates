@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 import type {
   StaffDirectoryQuery,
@@ -55,6 +55,17 @@ export class StaffMemberDto {
     description: 'Expiry of the current Activation Link while pending',
   })
   activationExpiresAt!: Date | null;
+
+  @ApiPropertyOptional({
+    description:
+      'true when the create reopened a pending invitation with the same email; its Role and Branches did not change',
+  })
+  invitationReopened?: boolean;
+}
+
+export class CorrectStaffEmailDto {
+  @ApiProperty({ format: 'email' })
+  email!: string;
 }
 
 export class StaffMemberPageDto {
@@ -124,6 +135,13 @@ const roleSchema = z.strictObject({
 });
 
 const branchesSchema = z.strictObject({ branchIds: branchIdsSchema });
+
+const emailCorrectionSchema = z.strictObject({ email: z.email() });
+
+export const parseCorrectStaffEmail = (value: unknown) => {
+  const parsed = emailCorrectionSchema.safeParse(value);
+  return parsed.success ? parsed.data : null;
+};
 
 const querySchema = z.strictObject({
   page: z.coerce.number().int().min(1).default(1),

@@ -114,6 +114,10 @@ import {
   resendStaffActivation,
 } from './staff/staff-management';
 import {
+  cancelStaffInvitation,
+  correctStaffInvitationEmail,
+} from './staff/staff-invitations';
+import {
   AdministratorStaffMembersController,
   staffManagementOperations,
   type StaffManagementOperations,
@@ -426,6 +430,10 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
             changeStaffBranches(command, principal, dependencies),
           deactivate: (command, principal) =>
             deactivateStaffMember(command, principal, dependencies),
+          correctEmail: (command, principal) =>
+            correctStaffInvitationEmail(command, principal, dependencies),
+          cancelInvitation: (command, principal) =>
+            cancelStaffInvitation(command, principal, dependencies),
         };
       },
     },
