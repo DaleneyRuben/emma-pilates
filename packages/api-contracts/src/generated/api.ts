@@ -75,6 +75,7 @@ import type {
   ClientOverviewDto,
   ClientProfileDto,
   ClientSubscriptionDto,
+  ClientVerificationEmailDto,
   CloseAccountRequestDto,
   CompleteAccountActivationDto,
   CompleteEmailChangeDto,
@@ -2365,6 +2366,118 @@ export const useResendClientInvitation = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(
     getResendClientInvitationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type sendClientVerificationResponse202 = {
+  data: ClientVerificationEmailDto;
+  status: 202;
+};
+
+export type sendClientVerificationResponseSuccess =
+  sendClientVerificationResponse202 & {
+    headers: Headers;
+  };
+export type sendClientVerificationResponse =
+  sendClientVerificationResponseSuccess;
+
+export const getSendClientVerificationUrl = (clientId: string) => {
+  return `/api/v1/assistant/client-invitations/${clientId}/verification-emails`;
+};
+
+export const sendClientVerification = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<sendClientVerificationResponse> => {
+  const res = await (fetchFn ?? fetch)(getSendClientVerificationUrl(clientId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: sendClientVerificationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as sendClientVerificationResponse;
+};
+
+export const getSendClientVerificationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof sendClientVerification>>,
+    TError,
+    SendClientVerificationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof sendClientVerification>>,
+  TError,
+  SendClientVerificationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["sendClientVerification"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof sendClientVerification>>,
+    SendClientVerificationMutationVariables
+  > = (props) => {
+    const { clientId } = props ?? {};
+
+    return sendClientVerification(clientId, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SendClientVerificationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof sendClientVerification>>
+>;
+
+export type SendClientVerificationMutationError = unknown;
+export type SendClientVerificationMutationVariables = { clientId: string };
+
+export const useSendClientVerification = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof sendClientVerification>>,
+      TError,
+      SendClientVerificationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof sendClientVerification>>,
+  TError,
+  SendClientVerificationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getSendClientVerificationMutationOptions(options),
     queryClient,
   );
 };

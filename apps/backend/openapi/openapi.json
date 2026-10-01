@@ -471,6 +471,43 @@
         ]
       }
     },
+    "/api/v1/assistant/client-invitations/{clientId}/verification-emails": {
+      "post": {
+        "operationId": "sendClientVerification",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientVerificationEmailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClientInvitations"
+        ]
+      }
+    },
     "/api/v1/assistant/client-invitations/{clientId}/cancellation": {
       "post": {
         "operationId": "cancelClientInvitation",
@@ -6565,7 +6602,7 @@
               "invitation_resent",
               "verification_pending"
             ],
-            "description": "invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration and received a fresh verification link"
+            "description": "invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration; nothing was sent, and the verification link is offered separately"
           },
           "clientId": {
             "type": "string",
@@ -6634,6 +6671,23 @@
           }
         },
         "required": [
+          "email"
+        ]
+      },
+      "ClientVerificationEmailDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "clientId",
           "email"
         ]
       },

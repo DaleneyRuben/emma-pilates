@@ -91,6 +91,7 @@ export * from "./clientProfileDto";
 export * from "./clientSubscriptionDto";
 export * from "./clientSubscriptionDtoStatus";
 export * from "./clientSubscriptionSummaryDto";
+export * from "./clientVerificationEmailDto";
 export * from "./closeAccountRequestDto";
 export * from "./completeAccountActivationDto";
 export * from "./completeEmailChangeDto";

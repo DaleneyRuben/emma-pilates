@@ -7,7 +7,7 @@
 import type { ClientInvitationResultDtoStatus } from "./clientInvitationResultDtoStatus";
 
 export interface ClientInvitationResultDto {
-  /** invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration and received a fresh verification link */
+  /** invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration; nothing was sent, and the verification link is offered separately */
   status: ClientInvitationResultDtoStatus;
   clientId: string;
   email: string;

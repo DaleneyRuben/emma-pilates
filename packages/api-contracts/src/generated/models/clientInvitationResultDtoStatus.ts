@@ -6,7 +6,7 @@
  */
 
 /**
- * invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration and received a fresh verification link
+ * invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration; nothing was sent, and the verification link is offered separately
  */
 export type ClientInvitationResultDtoStatus =
   (typeof ClientInvitationResultDtoStatus)[keyof typeof ClientInvitationResultDtoStatus];
