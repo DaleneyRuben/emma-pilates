@@ -1,6 +1,6 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import { act, fireEvent, render } from "@testing-library/react-native";
 
-import type { AuthenticationApi } from "./authentication-api";
+import { AuthenticationApiError, type AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
 
 function createApiMock(
@@ -143,5 +143,66 @@ describe("Client registration (01)", () => {
     expect(
       screen.getByRole("alert", { name: "Revisa el código de referido." }),
     ).toBeOnTheScreen();
+  });
+});
+
+describe("Client registration (01) under the device or network limit", () => {
+  const limited = (seconds: number) =>
+    createApiMock({
+      register: jest
+        .fn()
+        .mockRejectedValue(
+          new AuthenticationApiError(
+            "Client registration failed with 429",
+            429,
+            "authentication_email_throttled",
+            seconds,
+          ),
+        ),
+    });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it("shows the neutral notice with the server wait instead of the generic failure", async () => {
+    const screen = await openRegistration(limited(896));
+
+    await fillForm(screen);
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+
+    expect(
+      screen.getByRole("alert", {
+        name: "Demasiadas solicitudes. Intenta de nuevo en un momento; si ya recibiste un enlace, sigue sirviendo.",
+      }),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Podrás intentarlo en 14:56.")).toBeOnTheScreen();
+    expect(screen.getByTestId("wait-notice-clock")).toBeOnTheScreen();
+    expect(
+      screen.queryByText("No pudimos crear la cuenta. Inténtalo de nuevo."),
+    ).not.toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Crear cuenta" })).toBeDisabled();
+    expect(screen.getByLabelText("Nombre")).toHaveDisplayValue("Lucía Mendoza");
+  });
+
+  it("enables «Crear cuenta» again once the wait ends", async () => {
+    jest.useFakeTimers();
+    const api = limited(2);
+    const screen = await openRegistration(api);
+
+    await fillForm(screen);
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+    expect(screen.getByText("Podrás intentarlo en 0:02.")).toBeOnTheScreen();
+
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+    expect(screen.getByText("Podrás intentarlo en 0:01.")).toBeOnTheScreen();
+    await act(async () => {
+      jest.advanceTimersByTime(1_000);
+    });
+
+    expect(screen.queryByText(/Podrás intentarlo en/)).not.toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Crear cuenta" })).toBeEnabled();
   });
 });
