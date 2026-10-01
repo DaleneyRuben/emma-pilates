@@ -99,6 +99,7 @@ describe("Assistant invitations (S05, S06)", () => {
   });
 
   it("says when a limited verification link can be sent again", async () => {
+    let sends = 0;
     const screen = await openClientSearch({
       ...assistantRoutes(),
       "POST /api/v1/assistant/client-invitations": () =>
@@ -111,12 +112,19 @@ describe("Assistant invitations (S05, S06)", () => {
           201,
         ),
       "POST /api/v1/assistant/client-invitations/client-new/verification-emails":
-        () => limited("email_throttled", 40),
+        () =>
+          (sends += 1) === 1
+            ? jsonResponse({ clientId: "client-new", email: "ana@example.com" }, 202)
+            : limited("email_throttled", 40),
     });
 
     await submitNewClient(screen);
     await fireEvent.press(
       await screen.findByRole("button", { name: "Enviar enlace de verificación" }),
+    );
+    await screen.findByText("Enviamos un enlace de verificación nuevo.");
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Enviar enlace de verificación" }),
     );
 
     expect(
@@ -125,6 +133,9 @@ describe("Assistant invitations (S05, S06)", () => {
       ),
     ).toBeOnTheScreen();
     expect(screen.getByText("Podrás reenviarlo en 0:40.")).toBeOnTheScreen();
+    expect(
+      screen.queryByText("Enviamos un enlace de verificación nuevo."),
+    ).not.toBeOnTheScreen();
   });
 
   it("says nothing changed when the email belongs to another account", async () => {
