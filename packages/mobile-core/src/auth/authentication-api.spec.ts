@@ -1,4 +1,7 @@
-import { createAuthenticationApi } from "./authentication-api";
+import {
+  AuthenticationApiError,
+  createAuthenticationApi,
+} from "./authentication-api";
 
 describe("createAuthenticationApi", () => {
   it("supports the pending Client registration lifecycle", async () => {
@@ -153,5 +156,55 @@ describe("createAuthenticationApi", () => {
       "https://api.example.com/api/v1/email-changes",
       expect.objectContaining({ method: "POST" }),
     );
+  });
+
+  it("keeps the problem code and the server wait of a failed request", async () => {
+    const fetchMock = jest
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ code: "referral_code_invalid", status: 422 }),
+          {
+            headers: { "Content-Type": "application/problem+json" },
+            status: 422,
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({ code: "rate_limit_exceeded", status: 429 }),
+          {
+            headers: {
+              "Content-Type": "application/problem+json",
+              "Retry-After": "52",
+            },
+            status: 429,
+          },
+        ),
+      );
+    const api = createAuthenticationApi({
+      baseUrl: "https://api.example.com/api/v1",
+      fetch: fetchMock,
+    });
+
+    await expect(
+      api.register({
+        email: "ana@example.com",
+        name: "Ana Clienta",
+        password: "local password",
+        referralCode: "NADIE",
+      }),
+    ).rejects.toMatchObject({ code: "referral_code_invalid", status: 422 });
+
+    const limited = await api
+      .requestPasswordRecovery("ana@example.com")
+      .catch((error: unknown) => error);
+
+    expect(limited).toBeInstanceOf(AuthenticationApiError);
+    expect(limited).toMatchObject({
+      code: "rate_limit_exceeded",
+      retryAfterSeconds: 52,
+      status: 429,
+    });
   });
 });
