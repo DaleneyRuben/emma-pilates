@@ -16,9 +16,12 @@ import {
   type LoginValues,
 } from "./login-screen";
 import {
-  RegistrationScreen,
+  CheckEmailScreen,
+  CorrectEmailScreen,
+  restartPendingWindow,
   type PendingRegistration,
-} from "./registration-screen";
+} from "./pending-registration-screens";
+import { RegistrationScreen } from "./registration-screen";
 
 type AuthenticationRoute =
   | "activate"
@@ -55,111 +58,6 @@ function routeForIntent(
     default:
       return "login";
   }
-}
-
-function CheckEmailScreen({
-  api,
-  onCancel,
-  onCorrect,
-  pending,
-}: {
-  api: AuthenticationApi;
-  onCancel: () => void;
-  onCorrect: () => void;
-  pending: PendingRegistration;
-}) {
-  const [notice, setNotice] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  async function resend() {
-    setSubmitting(true);
-    await api.resendRegistrationVerification(
-      pending.registrationContinuation,
-    );
-    setNotice("Si el envío está disponible, recibirás un nuevo correo.");
-    setSubmitting(false);
-  }
-
-  async function cancel() {
-    setSubmitting(true);
-    await api.cancelRegistration(pending.registrationContinuation);
-    onCancel();
-  }
-
-  return (
-    <AuthenticationScreen title="Revisa tu correo">
-      <BodyText>
-        Enviamos un enlace de verificación a:
-      </BodyText>
-      <BodyText style={styles.emphasized}>{pending.email}</BodyText>
-      <BodyText>
-        Abre el enlace para verificar tu cuenta. No iniciaremos sesión
-        automáticamente.
-      </BodyText>
-      {notice === null ? null : <BodyText>{notice}</BodyText>}
-      <TextButton
-        disabled={submitting}
-        label="Cambiar correo"
-        onPress={onCorrect}
-      />
-      <TextButton
-        disabled={submitting}
-        label="Reenviar correo"
-        onPress={resend}
-      />
-      <TextButton
-        disabled={submitting}
-        label="Cancelar registro"
-        onPress={cancel}
-      />
-    </AuthenticationScreen>
-  );
-}
-
-function CorrectEmailScreen({
-  api,
-  onBack,
-  onCorrected,
-  pending,
-}: {
-  api: AuthenticationApi;
-  onBack: () => void;
-  onCorrected: (pending: PendingRegistration) => void;
-  pending: PendingRegistration;
-}) {
-  const [email, setEmail] = useState(pending.email);
-  const [submitting, setSubmitting] = useState(false);
-
-  async function submit() {
-    if (!email.includes("@")) {
-      return;
-    }
-
-    setSubmitting(true);
-    const result = await api.correctRegistrationEmail({
-      email: email.trim(),
-      registrationContinuation: pending.registrationContinuation,
-    });
-    onCorrected({ ...pending, email: result.email });
-  }
-
-  return (
-    <AuthenticationScreen title="Cambiar correo">
-      <FormField
-        autoCapitalize="none"
-        keyboardType="email-address"
-        label="Correo electrónico"
-        onChangeText={setEmail}
-        value={email}
-      />
-      <PrimaryButton
-        disabled={submitting}
-        label="Guardar correo"
-        onPress={submit}
-      />
-      <TextButton label="Volver" onPress={onBack} />
-    </AuthenticationScreen>
-  );
 }
 
 function RecoveryRequestScreen({
@@ -440,8 +338,17 @@ export function AuthenticationFlow({
     return (
       <CheckEmailScreen
         api={api}
-        onCancel={showLogin}
+        onBack={showLogin}
+        onCancelled={() => {
+          setPending(null);
+          showLogin();
+        }}
         onCorrect={() => setRoute("correct-email")}
+        onRegisterAgain={() => {
+          setPending(null);
+          setRoute("register");
+        }}
+        onResent={() => setPending(restartPendingWindow(pending))}
         pending={pending}
       />
     );

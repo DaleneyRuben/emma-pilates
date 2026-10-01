@@ -38,6 +38,67 @@ export function WaitNotice({
   );
 }
 
+/** An outlined action under the primary one, such as «Reenviar correo». */
+export function SecondaryButton({
+  disabled = false,
+  label,
+  onPress,
+  tone = "neutral",
+}: {
+  disabled?: boolean;
+  label: string;
+  onPress: () => void;
+  tone?: "error" | "neutral";
+}) {
+  return (
+    <Pressable
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      onPress={onPress}
+      style={[styles.secondary, tone === "error" && styles.secondaryError]}
+    >
+      <Text
+        style={[
+          styles.secondaryLabel,
+          tone === "error" && styles.secondaryLabelError,
+          disabled && styles.disabledLabel,
+        ]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+/** A discreet action in the muted tone, such as «Cancelar registro». */
+export function QuietButton({
+  disabled = false,
+  label,
+  onPress,
+}: {
+  disabled?: boolean;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      accessibilityLabel={label}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+      disabled={disabled}
+      hitSlop={spacing.sm}
+      onPress={onPress}
+      style={styles.quiet}
+    >
+      <Text style={[styles.quietLabel, disabled && styles.disabledLabel]}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 /** The quiet line under a form that switches mode, such as «¿No tienes una cuenta? Regístrate». */
 export function FooterPrompt({
   action,
@@ -67,6 +128,40 @@ export function FooterPrompt({
 }
 
 const styles = StyleSheet.create({
+  disabledLabel: {
+    color: colors.disabledText,
+  },
+  quiet: {
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 44,
+    paddingHorizontal: spacing.sm,
+  },
+  quietLabel: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.body,
+    fontSize: 14,
+  },
+  secondary: {
+    alignItems: "center",
+    alignSelf: "stretch",
+    borderColor: colors.borderStrong,
+    borderRadius: 8,
+    borderWidth: 1,
+    justifyContent: "center",
+    minHeight: 52,
+  },
+  secondaryError: {
+    borderColor: colors.error,
+  },
+  secondaryLabel: {
+    color: colors.text,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.body,
+  },
+  secondaryLabelError: {
+    color: colors.errorText,
+  },
   footer: {
     alignItems: "center",
     gap: spacing.lg,

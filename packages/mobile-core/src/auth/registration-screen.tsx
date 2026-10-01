@@ -8,11 +8,10 @@ import { colors, spacing } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
 import { FooterPrompt, FormAlert } from "./auth-parts";
 import type { AuthenticationApi } from "./authentication-api";
-
-export type PendingRegistration = {
-  email: string;
-  registrationContinuation: string;
-};
+import {
+  restartPendingWindow,
+  type PendingRegistration,
+} from "./pending-registration-screens";
 
 export const minimumPasswordLength = 8;
 
@@ -85,7 +84,7 @@ export function RegistrationScreen({
         password,
         ...(referralOpen && code !== "" ? { referralCode: code } : {}),
       });
-      onRegistered(result);
+      onRegistered(restartPendingWindow(result));
     } catch (failure) {
       if (referralProblems.has(problemCode(failure) ?? "")) {
         setReferralError(true);

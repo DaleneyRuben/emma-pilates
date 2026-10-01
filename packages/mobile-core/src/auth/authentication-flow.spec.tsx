@@ -156,6 +156,9 @@ describe("AuthenticationFlow", () => {
     await fireEvent.press(
       screen.getByRole("button", { name: "Cancelar registro" }),
     );
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Sí, cancelar registro" }),
+    );
     expect(cancelRegistration).toHaveBeenCalledWith("continuation");
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
   });

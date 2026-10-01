@@ -31,12 +31,15 @@ export function BrandHeader({ tagline = false }: { tagline?: boolean }) {
 
 /** A pre-session page: no tabs, the brand on top, and a centred panel. */
 export function AuthenticationScreen({
+  brand = true,
   children,
   eyebrow,
   footer,
   tagline = false,
   title,
 }: PropsWithChildren<{
+  /** «Revisa tu correo» and its siblings draw no wordmark. */
+  brand?: boolean;
   /** A small uppercase line over the title, such as «Activar cuenta». */
   eyebrow?: string;
   footer?: ReactNode;
@@ -53,7 +56,7 @@ export function AuthenticationScreen({
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          <BrandHeader tagline={tagline} />
+          {brand ? <BrandHeader tagline={tagline} /> : null}
           <View style={styles.panel}>
             {eyebrow === undefined ? null : (
               <Text style={styles.eyebrow}>{eyebrow}</Text>
