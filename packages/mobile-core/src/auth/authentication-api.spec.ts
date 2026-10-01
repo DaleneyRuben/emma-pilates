@@ -207,4 +207,43 @@ describe("createAuthenticationApi", () => {
       status: 429,
     });
   });
+  it("identifies the installation on every request that may send an email", async () => {
+    const fetchMock = jest.fn(() =>
+      Promise.resolve(
+        new Response(JSON.stringify({ status: "verification_required" }), {
+          status: 202,
+        }),
+      ),
+    );
+    const api = createAuthenticationApi({
+      baseUrl: "https://api.example.com/api/v1",
+      clientIdentifier: () => Promise.resolve("installation-1"),
+      fetch: fetchMock,
+    });
+
+    await api.register({
+      email: "ana@example.com",
+      name: "Ana Clienta",
+      password: "local password",
+    });
+    await api.correctRegistrationEmail({
+      email: "ana.corrected@example.com",
+      registrationContinuation: "continuation",
+    });
+    await api.resendRegistrationVerification("continuation");
+    await api.requestPasswordRecovery("ana@example.com");
+
+    expect(
+      fetchMock.mock.calls.map(([, init]) =>
+        new Headers((init as RequestInit | undefined)?.headers).get(
+          "x-client-identifier",
+        ),
+      ),
+    ).toEqual([
+      "installation-1",
+      "installation-1",
+      "installation-1",
+      "installation-1",
+    ]);
+  });
 });
