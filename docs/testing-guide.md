@@ -679,13 +679,16 @@ endpoints; Trainers and Clients get `403`.
 | `POST /api/v1/assistant/client-invitations` `{ name, email, phone? }` | `201 invited` with the new `clientId`; the worker queues the 7-day activation email           |
 | `GET /api/v1/assistant/client-invitations/{clientId}`      | The pending invitation with `pendingExpiresAt` (30 days), `activationExpiresAt`, and `cancellable`       |
 | `POST …/client-invitations/{clientId}/email-corrections` `{ email }` | New email, old links invalidated, fresh link sent                                              |
-| `POST …/client-invitations/{clientId}/resends`             | A fresh link; a second send within a minute answers `429 email_throttled`                                |
-| `POST …/client-invitations/{clientId}/cancellation`        | `204`; afterwards the invitation, Account, and Client are gone (`404 client_invitation_not_found`)       |
+| `POST …/client-invitations/{clientId}/resends`             | A fresh link; a second send within a minute answers `429 email_throttled` with `Retry-After` (seconds)   |
+| `POST …/client-invitations/{clientId}/verification-emails` | `202 { clientId, email }`: a fresh 24-hour verification link for a Client who registered herself; `404` for a staff invitation |
+| `POST …/client-invitations/{clientId}/cancellation`        | `204`; afterwards the invitation, Account, and Client are marked removed (`404 client_invitation_not_found`) |
 
 Inviting an email that already has a pending invitation answers `201
 invitation_resent`; a pending self-registration answers `201
-verification_pending` with a fresh 24-hour verification link; an active Client
-or a Staff Member answers `409 email_in_use`. Booking for a Client uses the
+verification_pending` and sends nothing (the Assistant offers the link with
+`…/verification-emails`); an active Client or a Staff Member answers `409
+email_in_use`. Every limited invitation email answers `429 email_throttled`
+with `Retry-After`. Booking for a Client uses the
 existing `POST /api/v1/sessions/{id}/bookings` with `clientId` in the body, and
 cancelling, rescheduling, or leaving the Waitlist uses the same endpoints as the
 Client — all of them only for Sessions at your assigned Branch. A cash Payment
@@ -1376,7 +1379,17 @@ shows how to log in and authorize):
    email. An Administrator is created without Branches (they hold every
    Branch); every other Role needs at least one active Branch.
 3. `POST …/{id}/activation-link` sends a new link while the person is still
-   pending (at most one per minute per email).
+   pending (at most one per minute per email; a limited send answers `429
+   email_throttled` with `Retry-After` in seconds). While pending,
+   `POST …/{id}/email-corrections` `{ email }` moves the invitation to a new
+   address (old links stop working, a fresh 7-day link and 30-day window;
+   `400 email_unchanged` for the same address) and
+   `POST …/{id}/invitation-cancellation` answers `204` and marks the Account,
+   the Staff Member, and its Branch rows removed (both answer `409
+   staff_member_not_pending` once activated). Creating a member with a pending
+   member's email reopens that invitation (`201` with `invitationReopened:
+   true`, Role and Branches unchanged); a Client's email answers `409
+   email_belongs_to_client` and another Staff Member's `409 email_in_use`.
 4. `PUT …/{id}/role` and `PUT …/{id}/branches` change the Role or the
    Branches. A Nutritionist's Availability Blocks end from today when her Role
    changes or she loses a Branch (booked Evaluations stay). A Trainer who still
@@ -2334,7 +2347,10 @@ The same directory holds registration verification (`verification`),
 activation (`activation`), and recovery (`password_recovery`) emails, so
 Tests 4 and 6 can be completed with real tokens through
 `POST /api/v1/client-email-verifications`, `POST /api/v1/account-activations`,
-and `POST /api/v1/password-recoveries`. The directory is ignored by Git and
+and `POST /api/v1/password-recoveries`. `POST /api/v1/authentication-links/inspection`
+tells a captured activation or recovery link apart: `current`, `expired`, or
+`removed` (Test 6A); the admin web's link page opens the same tokens
+(Test 24, step 8). The directory is ignored by Git and
 safe to delete.
 
 Since EML-001 each file is the real message: `subject`, `text` (plain text),
@@ -2346,8 +2362,7 @@ nuevo» (24 horas), and, for the current address of an email change, «Alguien
 pidió cambiar el correo de tu cuenta» (no link). Links start with
 `AUTHENTICATION_LINK_BASE_URL` (`https://links.emmapilates.test` locally; the
 real domain comes with LNK-001). Open the `html` value in a browser to see
-the card; the copy comes from design follow-ups 33–38 and the IDN-008 rule
-while the DES-001 export stays pending.
+the card; the copy comes from design follow-ups 33–38 and the IDN-008 rule.
 
 ## Test 35: close a Client Account
 
