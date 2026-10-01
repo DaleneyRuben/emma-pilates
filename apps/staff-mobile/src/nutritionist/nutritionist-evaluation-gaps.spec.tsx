@@ -94,4 +94,22 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
       { timeout: 10_000 },
     );
   });
+
+  it("marks the field's current time in the S17 time sheet (follow-up 74)", async () => {
+    const screen = await openAvailability(routeFetcher(routes()));
+    await fireEvent.press(screen.getAllByRole("button", { name: "Nuevo horario" })[0]!);
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Martes" })).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Hora de inicio: Elegir" }));
+    await fireEvent.press(screen.getByRole("button", { name: "10:00" }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Hora de inicio: 10:00/ }));
+
+    expect(screen.getByRole("button", { name: "10:00" })).toBeSelected();
+    expect(screen.getByRole("button", { name: "10:15" })).not.toBeSelected();
+    expect(screen.getByText("10:00")).toHaveStyle({ color: "#8A5D59" });
+    expect(
+      screen.getByTestId("picker-check-10:00", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+  });
 });

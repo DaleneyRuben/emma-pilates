@@ -192,4 +192,27 @@ describe("Client Browse Sessions", () => {
     });
     expect(screen.getByRole("button", { name: "Reservar" })).toBeOnTheScreen();
   });
+
+  it("marks the selected Branch in «Elige una sucursal» (follow-up 74)", async () => {
+    const screen = await openBrowse({
+      ...baseRoutes(),
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+        () => jsonResponse([]),
+    });
+
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Sucursal: Centro" }),
+    );
+
+    expect(screen.getByRole("button", { name: "Centro" })).toBeSelected();
+    expect(screen.getByText("Centro")).toHaveStyle({ color: "#8A5D59" });
+    expect(
+      screen.getByTestId("picker-check-branch-centro", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
+    expect(
+      screen.queryByTestId(`picker-check-${branches[1]!.id}`, {
+        includeHiddenElements: true,
+      }),
+    ).not.toBeOnTheScreen();
+  });
 });
