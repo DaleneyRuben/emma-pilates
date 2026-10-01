@@ -603,6 +603,59 @@ drop it afterwards), because the budgets apply to everyone on your machine.
    psql -d pilates_test_limits -c "update system.authentication_throttle_events set deleted_at = now() where event_kind = 'email_requested' and deleted_at is null"
    ```
 
+### H. See the staff email limit
+
+Every staff command that can email an activation or verification link also
+counts against a budget of the signed-in staff Account (BE-013): the
+Assistant's **Crear cuenta** (S05), **Reenviar enlace**, **Cambiar correo**,
+and **Enviar enlace de verificación** (S06), and the Administrator's
+**Guardar** on a new member, **Reenviar enlace**, and **Cambiar correo**
+(AW24). They share **20 requests in 15 minutes and 100 in 24 hours per
+Account**, in the Staff app and the admin web together. Every signed-in
+request counts, whether or not an email goes out; a request without a valid
+sign-in gets `401` and counts nothing. The budget is separate from the device
+and network lanes of G: staff requests never use them up.
+
+A full budget answers `429` with code `staff_email_throttled`, the detail
+"Too many emails were requested from this Account. Try again later", and
+`Retry-After` in seconds. Nothing is created or sent and no link changes. The
+per-address limit still answers `email_throttled` as before. Use a disposable
+copy of your database, as in G.
+
+1. **From a terminal.** Sign in as `camila.rojas@example.com` (`POST
+   /api/v1/authentication-sessions`, keep the `credential`), then send 20
+   invitations to new addresses:
+
+   ```sh
+   for i in $(seq 21); do curl -s -o /dev/null -w "%{http_code} " -X POST \
+     http://127.0.0.1:3100/api/v1/assistant/client-invitations \
+     -H "Authorization: Bearer $CREDENTIAL" -H 'content-type: application/json' \
+     -d "{\"name\":\"Prueba $i\",\"email\":\"prueba.limite$i@example.com\"}"; done
+   ```
+
+   The first twenty print `201`, the twenty-first `429` (add `-D -` to see
+   `Retry-After: 900`). Paola, the Administrator, still creates a Staff Member
+   (`201`): each Account has its own budget.
+2. **In the apps.** With Camila's budget full, **+ Nuevo cliente** shows
+   "Enviaste muchos correos en poco tiempo. Espera un momento para enviar
+   otro; los enlaces que ya enviaste siguen sirviendo." after a clock icon,
+   above the fields, with "Podrás intentarlo en m:ss." and **Crear cuenta**
+   disabled; the fields keep what you typed. A pending Client's overview
+   shows the same notice in the invitation card with "Podrás enviarlo en
+   m:ss." when you tap **Reenviar enlace**, **Guardar correo**, or **Enviar
+   enlace de verificación**, and the button stays disabled. In the admin web,
+   fill Paola's budget the same way (20 `POST
+   /api/v1/administrator/staff-members/{id}/activation-link`), then
+   **Personal** › a pending member › **Reenviar enlace** shows the notice in
+   the pending card with "Podrás enviarlo en m:ss.", and **Nuevo miembro** ›
+   **Guardar** shows it at the top of the form with "Podrás intentarlo en
+   m:ss." and **Guardar** disabled.
+3. **Reset.** Mark the staff events deleted (rows are never removed):
+
+   ```sh
+   psql -d pilates_test_limits -c "update system.authentication_throttle_events set deleted_at = now() where event_kind = 'staff_email_requested' and deleted_at is null"
+   ```
+
 ## Test 6: try Account security
 
 Keep the backend running and use Swagger. For the signed-in step, complete
@@ -1286,7 +1339,8 @@ address), **Reenviar enlace**, and **Cancelar invitación** (confirmed with
 "¿Cancelar la invitación de …?", then back to **Buscar cliente**). A second
 send within a minute answers "Ya enviamos un correo a esa dirección hace poco.
 El enlace vigente sigue sirviendo." with "Podrás reenviarlo en 0:59." counting
-down from the server. Creating her again with the same email reopens the
+down from the server. Too many emails from your own Account in a short
+time show "Enviaste muchos correos en poco tiempo…" instead (Test 5 H). Creating her again with the same email reopens the
 invitation: her overview starts with "Ana ya estaba pendiente de activación.
 Le enviamos un enlace nuevo y conservamos sus datos.". An email of another
 account answers "Este correo ya pertenece a otra cuenta. No se creó ni se
