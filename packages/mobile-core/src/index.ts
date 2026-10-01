@@ -7,6 +7,7 @@ export * from "./api/private-image";
 export * from "./application";
 export * from "./auth/authentication-api";
 export * from "./auth/authentication-flow";
+export * from "./auth/countdown";
 export * from "./auth/credential-store";
 export * from "./auth/identity-provider";
 export * from "./auth/login-screen";

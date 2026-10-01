@@ -6,7 +6,7 @@ import type { ConfirmedBooking } from "./assistant-session-detail-screen";
 // On tablets the Client Overview, her Bookings, and her history live in a
 // detail panel beside Client Search instead of being pushed as screens.
 export type ClientPanel =
-  | { view: "overview"; clientId: string }
+  | { view: "overview"; clientId: string; reopened?: boolean }
   | {
       view: "bookings";
       clientId: string;

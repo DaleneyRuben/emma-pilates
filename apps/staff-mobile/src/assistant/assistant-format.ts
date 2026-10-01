@@ -32,3 +32,7 @@ export function describeContact(
 ): string {
   return phone ? `${phone} · ${email}` : email;
 }
+
+// S06 «Reenvío limitado»: the recipient lane is full; the current link still works.
+export const limitedEmailMessage =
+  "Ya enviamos un correo a esa dirección hace poco. El enlace vigente sigue sirviendo.";

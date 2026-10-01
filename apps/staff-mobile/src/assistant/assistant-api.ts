@@ -9,6 +9,7 @@ import {
   recordAssistantCashPayment,
   rescheduleBooking,
   resendClientInvitation,
+  sendClientVerification,
   type AssistantCashPaymentDto,
   type ClientInvitationDto,
   type ClientInvitationResultDto,
@@ -20,6 +21,8 @@ export class AssistantApiError extends Error {
   constructor(
     readonly status: number,
     readonly code: string | null,
+    /** The server wait of a limited email (Retry-After), 0 when none. */
+    readonly retryAfterSeconds = 0,
   ) {
     super(`The Assistant request failed with ${status}`);
   }
@@ -49,6 +52,7 @@ export type AssistantApi = {
     targetSessionId: string,
   ) => Promise<{ id: string }>;
   resendInvitation: (clientId: string) => Promise<ClientInvitationDto>;
+  sendVerification: (clientId: string) => Promise<void>;
   waitlistForClient: (
     sessionId: string,
     clientId: string,
@@ -64,9 +68,22 @@ function problemCode(body: unknown): string | null {
   return typeof code === "string" ? code : null;
 }
 
-function requireSuccess<Body>(response: { status: number; data: Body }): Body {
+function retryAfter(headers: Headers | undefined): number {
+  const seconds = Number(headers?.get("Retry-After") ?? "0");
+  return Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
+}
+
+function requireSuccess<Body>(response: {
+  status: number;
+  data: Body;
+  headers?: Headers;
+}): Body {
   if (response.status < 200 || response.status >= 300) {
-    throw new AssistantApiError(response.status, problemCode(response.data));
+    throw new AssistantApiError(
+      response.status,
+      problemCode(response.data),
+      retryAfter(response.headers),
+    );
   }
   return response.data;
 }
@@ -126,6 +143,9 @@ export function createAssistantApi(
     async resendInvitation(clientId) {
       const response = await resendClientInvitation(clientId, undefined, fetcher);
       return requireSuccess(response) as ClientInvitationDto;
+    },
+    async sendVerification(clientId) {
+      requireSuccess(await sendClientVerification(clientId, undefined, fetcher));
     },
     async waitlistForClient(sessionId, clientId) {
       const response = await joinSessionWaitlist(
