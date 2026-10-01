@@ -17,6 +17,39 @@ import {
 
 import { createApiFetcher } from "../api/fetcher";
 
+// Failures keep the stable Problem Details code and any server wait
+// (Retry-After), so screens word them without reading human text.
+export class AuthenticationApiError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+    readonly code: string | null,
+    readonly retryAfterSeconds: number,
+  ) {
+    super(message);
+  }
+}
+
+type ApiResponse = { data: unknown; headers: Headers; status: number };
+
+function failure(label: string, response: ApiResponse): AuthenticationApiError {
+  const body = response.data;
+  const code =
+    typeof body === "object" &&
+    body !== null &&
+    typeof (body as { code?: unknown }).code === "string"
+      ? (body as { code: string }).code
+      : null;
+  const retryAfter = Number(response.headers.get("Retry-After") ?? "0");
+
+  return new AuthenticationApiError(
+    `${label} failed with ${response.status}`,
+    response.status,
+    code,
+    Number.isFinite(retryAfter) ? Math.max(0, Math.floor(retryAfter)) : 0,
+  );
+}
+
 type AuthenticationApiOptions = {
   baseUrl: string;
   fetch?: typeof globalThis.fetch;
@@ -41,7 +74,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 200) {
-        throw new Error(`Account activation failed with ${response.status}`);
+        throw failure("Account activation", response);
       }
 
       return response.data;
@@ -54,9 +87,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 204) {
-        throw new Error(
-          `Registration cancellation failed with ${response.status}`,
-        );
+        throw failure("Registration cancellation", response);
       }
     },
     async completeEmailChange(token: string) {
@@ -67,7 +98,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 200) {
-        throw new Error(`Email change completion failed with ${response.status}`);
+        throw failure("Email change completion", response);
       }
 
       return response.data;
@@ -80,7 +111,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 201) {
-        throw new Error(`Password recovery failed with ${response.status}`);
+        throw failure("Password recovery", response);
       }
 
       return response.data;
@@ -93,7 +124,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 202) {
-        throw new Error(`Email correction failed with ${response.status}`);
+        throw failure("Email correction", response);
       }
 
       return response.data;
@@ -106,7 +137,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 200) {
-        throw new Error(`Link inspection failed with ${response.status}`);
+        throw failure("Link inspection", response);
       }
 
       return response.data;
@@ -115,7 +146,7 @@ export function createAuthenticationApi({
       const response = await registerClient(values, undefined, fetcher);
 
       if (response.status !== 202) {
-        throw new Error(`Client registration failed with ${response.status}`);
+        throw failure("Client registration", response);
       }
 
       return response.data;
@@ -128,9 +159,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 202) {
-        throw new Error(
-          `Password recovery request failed with ${response.status}`,
-        );
+        throw failure("Password recovery request", response);
       }
 
       return response.data;
@@ -145,7 +174,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 202) {
-        throw new Error(`Verification resend failed with ${response.status}`);
+        throw failure("Verification resend", response);
       }
 
       return response.data;
@@ -158,7 +187,7 @@ export function createAuthenticationApi({
       );
 
       if (response.status !== 200) {
-        throw new Error(`Email verification failed with ${response.status}`);
+        throw failure("Email verification", response);
       }
 
       return response.data;
