@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import { http } from "msw";
-import { apiUrl, jsonResponse } from "../../test/msw";
+import { apiUrl, jsonResponse } from "./msw";
 import {
   emma,
   paolaMember,
@@ -8,8 +8,8 @@ import {
   staffMembersPath,
   staffPage,
   valentina,
-} from "../../test/people-fixtures";
-import { renderAdmin } from "../../test/render-admin";
+} from "./people-fixtures";
+import { renderAdmin } from "./render-admin";
 
 // Shared AW24 «Editar miembro» helpers: the recorded requests, the Personal
 // list, and opening a member's panel.

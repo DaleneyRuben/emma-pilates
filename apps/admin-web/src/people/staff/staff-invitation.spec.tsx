@@ -20,7 +20,7 @@ import {
   openMember,
   record,
   sent,
-} from "./staff-spec-support";
+} from "../../test/staff-panel-support";
 
 // WEB-012: AW24's pending invitation (follow-ups 35–36).
 describe("AW24 pending invitation", () => {
@@ -72,7 +72,7 @@ describe("AW24 pending invitation", () => {
     ).toBeVisible();
     expect(sent).toContainEqual({
       method: "POST",
-      path: `/api/v1${memberPath(valentina.id)}/email-corrections`,
+      path: `${memberPath(valentina.id)}/email-corrections`,
       body: { email: "valentina.soria@emmapilates.bo" },
     });
   });
@@ -109,7 +109,7 @@ describe("AW24 pending invitation", () => {
       await screen.findByText("Cancelamos la invitación de Valentina Soria."),
     ).toBeVisible();
     expect(sent.map(({ path }) => path)).toContain(
-      `/api/v1${memberPath(valentina.id)}/invitation-cancellation`,
+      `${memberPath(valentina.id)}/invitation-cancellation`,
     );
   });
 

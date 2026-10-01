@@ -56,7 +56,7 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
   const submit = form.handleSubmit(async (values) => {
     setFailure(null);
     try {
-      await change.mutateAsync({
+      const created = await change.mutateAsync({
         kind: "create",
         input: {
           ...values,
@@ -64,7 +64,9 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
         },
       });
       onDone(
-        `Invitación enviada a ${values.email}: tiene 7 días para activar su cuenta.`,
+        created.invitationReopened === true
+          ? `${created.name} ya tenía una invitación pendiente. La abrimos y enviamos un enlace nuevo; su rol y sus sucursales no cambiaron.`
+          : `Invitación enviada a ${values.email}: tiene 7 días para activar su cuenta.`,
       );
     } catch (error) {
       const problem = staffProblem(error);

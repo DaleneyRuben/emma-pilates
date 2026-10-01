@@ -19,17 +19,13 @@ import { CreatePasswordForm } from "./create-password-form";
 
 type Purpose = "activation" | "password_recovery";
 type LinkState =
-  { status: "invalid" } | { status: "expired" | "current"; purpose: Purpose };
+  | { status: "invalid" }
+  | { status: "expired" | "current" | "removed"; purpose: Purpose };
 
-// `removed` (a 30-day-old invitation) reads as expired until AW32 draws its
-// own page (WEB-012).
 const toLinkState = (inspection: AuthenticationLinkInspectionDto): LinkState =>
   inspection.status === "invalid" || inspection.purpose === undefined
     ? { status: "invalid" }
-    : {
-        status: inspection.status === "removed" ? "expired" : inspection.status,
-        purpose: inspection.purpose,
-      };
+    : { status: inspection.status, purpose: inspection.purpose };
 
 const copy: Record<Purpose, { title: string; line: string }> = {
   activation: {
@@ -195,6 +191,14 @@ export function CreatePasswordPage({ token }: { token: string | undefined }) {
       ) : null}
       {typeof state === "object" && state.status === "expired" ? (
         <ExpiredLink purpose={state.purpose} />
+      ) : null}
+      {typeof state === "object" && state.status === "removed" ? (
+        // Follow-up 35: the 30-day cleanup removed the invitation.
+        <Message title="Esta invitación ya no está activa">
+          Pasaron 30 días sin activarla, así que se eliminó. Para tener una
+          cuenta, una administradora tiene que crear una invitación nueva en
+          Personal.
+        </Message>
       ) : null}
       {typeof state === "object" && state.status === "current" ? (
         <>

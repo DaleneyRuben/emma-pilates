@@ -1,6 +1,8 @@
 import {
+  cancelStaffMemberInvitation,
   changeStaffMemberBranches,
   changeStaffMemberRole,
+  correctStaffMemberEmail,
   createStaffMember,
   deactivateStaffMember,
   getListStaffMembersQueryKey,
@@ -41,7 +43,9 @@ type StaffChange =
   | { kind: "resend"; staffMemberId: string }
   | { kind: "role"; staffMemberId: string; input: ChangeStaffRoleDto }
   | { kind: "branches"; staffMemberId: string; branchIds: string[] }
-  | { kind: "deactivate"; staffMemberId: string };
+  | { kind: "deactivate"; staffMemberId: string }
+  | { kind: "correctEmail"; staffMemberId: string; email: string }
+  | { kind: "cancelInvitation"; staffMemberId: string };
 
 const send = async (change: StaffChange) => {
   switch (change.kind) {
@@ -69,6 +73,19 @@ const send = async (change: StaffChange) => {
       );
     case "deactivate":
       return deactivateStaffMember(change.staffMemberId, undefined, adminFetch);
+    case "correctEmail":
+      return correctStaffMemberEmail(
+        change.staffMemberId,
+        { email: change.email },
+        undefined,
+        adminFetch,
+      );
+    case "cancelInvitation":
+      return cancelStaffMemberInvitation(
+        change.staffMemberId,
+        undefined,
+        adminFetch,
+      );
   }
 };
 

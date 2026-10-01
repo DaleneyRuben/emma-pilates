@@ -11,7 +11,11 @@ import {
 import { Button } from "../../components/ui/button";
 import { activeBranchesQueryOptions } from "../../shell/branch/branch-queries";
 import type { StaffRole } from "../people-search";
-import { DeactivateAction, PendingActivation } from "./staff-account-actions";
+import { DeactivateAction } from "./staff-account-actions";
+import {
+  CancelInvitationAction,
+  PendingInvitation,
+} from "./staff-pending-invitation";
 import {
   staffFormSchema,
   type StaffFormInput,
@@ -100,7 +104,7 @@ export function StaffEditForm({
         <SidePanelBody>
           <StaffContact member={member} />
           {member.status === "pending" ? (
-            <PendingActivation member={member} />
+            <PendingInvitation member={member} />
           ) : null}
           <StaffRoleFields
             control={form.control}
@@ -121,11 +125,19 @@ export function StaffEditForm({
           <Button type="submit" size="lg" disabled={change.isPending}>
             Guardar
           </Button>
-          <DeactivateAction
-            member={member}
-            onDone={onDone}
-            onFailure={setFailure}
-          />
+          {member.status === "pending" ? (
+            <CancelInvitationAction
+              member={member}
+              onDone={onDone}
+              onFailure={setFailure}
+            />
+          ) : (
+            <DeactivateAction
+              member={member}
+              onDone={onDone}
+              onFailure={setFailure}
+            />
+          )}
         </SidePanelFooter>
       </form>
     </Form>

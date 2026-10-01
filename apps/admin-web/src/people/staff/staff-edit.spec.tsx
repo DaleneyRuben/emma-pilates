@@ -23,7 +23,7 @@ import {
   openMember,
   record,
   sent,
-} from "./staff-spec-support";
+} from "../../test/staff-panel-support";
 import { signedInHandlers } from "../../test/session-handlers";
 
 const trainersKey = getListStaffMembersQueryKey({
@@ -214,7 +214,7 @@ describe("AW24 Editar miembro", () => {
     ).toBeVisible();
     expect(
       within(panel).getByText(
-        "Si no activa su cuenta en 30 días desde el último envío, la invitación se elimina.",
+        "Si no activa su cuenta en 30 días desde el último envío o cambio, la invitación se elimina. Es distinto de los 7 días de cada enlace.",
       ),
     ).toBeVisible();
 
@@ -235,7 +235,7 @@ describe("AW24 Editar miembro", () => {
     );
     expect(
       await within(panel).findByText(
-        "Ya enviamos un correo a esa dirección hace poco. Inténtalo de nuevo en un momento.",
+        "Ya enviamos un correo a esa dirección hace poco. El enlace vigente sigue sirviendo.",
       ),
     ).toBeVisible();
     expect(resends).toBe(2);

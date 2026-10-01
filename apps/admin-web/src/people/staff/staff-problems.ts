@@ -11,6 +11,15 @@ const problems: Record<string, Problem> = {
     field: "email",
     message: "Este correo ya pertenece a otra cuenta.",
   },
+  email_belongs_to_client: {
+    field: "email",
+    message:
+      "Este correo pertenece a una cuenta de clienta. No se creó ni se cambió nada; usa otro correo.",
+  },
+  email_unchanged: {
+    field: "email",
+    message: "La invitación ya usa este correo.",
+  },
   invalid_branch_assignment: {
     field: "branchIds",
     message: "Elige sucursales activas; administración no lleva sucursales.",
