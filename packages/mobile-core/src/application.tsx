@@ -13,6 +13,7 @@ import {
   useMobileIdentity,
 } from "./auth/identity-provider";
 import type { LoginSubmissionResult, LoginValues } from "./auth/login-screen";
+import type { PendingRegistrationStore } from "./auth/pending-registration-store";
 import { createSessionApi, type SessionLoginResult } from "./auth/session-api";
 import {
   createSessionManager,
@@ -42,6 +43,7 @@ export type MobileRuntime = {
   authenticationApi: AuthenticationApi;
   linkSource?: LinkSource;
   login: (values: LoginValues) => Promise<SessionLoginResult>;
+  pendingRegistrationStore?: PendingRegistrationStore;
   sessionManager: SessionManager;
 };
 
@@ -54,6 +56,8 @@ export type MobileNavigationProps = {
   onBiometricUnlock?: () => void;
   onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
   onRecoveryCredential: (credential: string) => Promise<void>;
+  /** The Client app keeps «Revisa tu correo» across launches (MOB-028). */
+  pendingRegistrationStore?: PendingRegistrationStore;
   role?: AppRole;
   /** The login screen's one-time notice, such as after closing the Account. */
   signOutNotice?: string | null;
@@ -62,11 +66,13 @@ export type MobileNavigationProps = {
 export function createDefaultMobileRuntime({
   acceptedIdentityKind,
   credentialStore,
+  pendingRegistrationStore,
 }: {
   acceptedIdentityKind: "client" | "staff";
   credentialStore: Parameters<
     typeof createSessionManager
   >[0]["credentialStore"];
+  pendingRegistrationStore?: PendingRegistrationStore;
 }): MobileRuntime {
   const apiBaseUrl = getMobileApiBaseUrl(
     { EXPO_PUBLIC_API_URL: process.env.EXPO_PUBLIC_API_URL },
@@ -95,6 +101,7 @@ export function createDefaultMobileRuntime({
 
       return sessionApi.login({ clientIdentifier, email, password });
     },
+    pendingRegistrationStore,
     sessionManager: createSessionManager({
       acceptedIdentityKind,
       clearAccountCache,
@@ -111,12 +118,14 @@ function IdentityNavigation({
   apiBaseUrl,
   apiFetcher,
   login,
+  pendingRegistrationStore,
 }: {
   Navigation: ComponentType<MobileNavigationProps>;
   authenticationApi: AuthenticationApi;
   apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
   login: MobileRuntime["login"];
+  pendingRegistrationStore?: PendingRegistrationStore;
 }) {
   const identity = useMobileIdentity();
   const { intent } = useVerifiedLinkIntent();
@@ -152,6 +161,7 @@ function IdentityNavigation({
       }
       onLogin={handleLogin}
       onRecoveryCredential={identity.start}
+      pendingRegistrationStore={pendingRegistrationStore}
       role={identity.session?.role}
       signOutNotice={identity.signOutNotice}
     />
@@ -186,6 +196,7 @@ export function MobileApplication({
               apiBaseUrl={mobileRuntime.apiBaseUrl}
               apiFetcher={mobileRuntime.apiFetcher}
               login={mobileRuntime.login}
+              pendingRegistrationStore={mobileRuntime.pendingRegistrationStore}
             />
           </MobileIdentityProvider>
         </VerifiedLinkProvider>

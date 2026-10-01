@@ -9,6 +9,7 @@ export * from "./auth/authentication-api";
 export * from "./auth/authentication-flow";
 export * from "./auth/countdown";
 export * from "./auth/credential-store";
+export * from "./auth/pending-registration-store";
 export * from "./auth/identity-provider";
 export * from "./auth/login-screen";
 export * from "./auth/session-api";

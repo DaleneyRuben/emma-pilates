@@ -19,11 +19,12 @@ import {
   CheckEmailScreen,
   CorrectEmailScreen,
   restartPendingWindow,
-  type PendingRegistration,
 } from "./pending-registration-screens";
+import type { PendingRegistrationStore } from "./pending-registration-store";
 import { PasswordLinkScreen } from "./password-link-screen";
 import { RecoveryRequestScreen } from "./recovery-request-screen";
 import { RegistrationScreen } from "./registration-screen";
+import { usePendingRegistration } from "./use-pending-registration";
 
 type AuthenticationRoute =
   | "activate"
@@ -45,6 +46,8 @@ type AuthenticationFlowProps = {
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
   onRecoveryCredential?: (credential: string) => Promise<void> | void;
+  /** Keeps «Revisa tu correo» across launches (Client app, MOB-028). */
+  pendingRegistrationStore?: PendingRegistrationStore;
 };
 
 function routeForIntent(
@@ -65,10 +68,12 @@ function routeForIntent(
 function VerifyEmailScreen({
   api,
   onBack,
+  onVerified,
   token,
 }: {
   api: AuthenticationApi;
   onBack: () => void;
+  onVerified: () => void;
   token: string;
 }) {
   const [status, setStatus] = useState<"loading" | "verified" | "invalid">(
@@ -81,6 +86,7 @@ function VerifyEmailScreen({
     void api.verifyClientEmail(token).then((result) => {
       if (active) {
         setStatus(result.status === "verified" ? "verified" : "invalid");
+        if (result.status === "verified") onVerified();
       }
     });
 
@@ -129,11 +135,16 @@ export function AuthenticationFlow({
   onBiometricUnlock,
   onLogin,
   onRecoveryCredential = () => undefined,
+  pendingRegistrationStore,
 }: AuthenticationFlowProps) {
   const [route, setRoute] = useState<AuthenticationRoute>(() =>
     routeForIntent(intent),
   );
-  const [pending, setPending] = useState<PendingRegistration | null>(null);
+  const { pending, restoring, setPending } = usePendingRegistration({
+    onRestored: () => setRoute("check-email"),
+    restore: intent === null || intent === undefined,
+    store: pendingRegistrationStore,
+  });
 
   useEffect(() => {
     if (intent !== null && intent !== undefined) {
@@ -144,6 +155,15 @@ export function AuthenticationFlow({
   function showLogin() {
     setRoute("login");
   }
+
+  // A signed-in Client no longer has a registration to continue.
+  const login = async (values: LoginValues) => {
+    const result = await onLogin?.(values);
+    if (result === undefined) setPending(null);
+    return result;
+  };
+
+  if (restoring) return null;
 
   if (route === "register") {
     return (
@@ -204,7 +224,12 @@ export function AuthenticationFlow({
 
   if (route === "verify-email" && intent?.type === "verify-email") {
     return (
-      <VerifyEmailScreen api={api} onBack={showLogin} token={intent.token} />
+      <VerifyEmailScreen
+        api={api}
+        onBack={showLogin}
+        onVerified={() => setPending(null)}
+        token={intent.token}
+      />
     );
   }
 
@@ -232,7 +257,7 @@ export function AuthenticationFlow({
       onRegister={
         allowClientRegistration ? () => setRoute("register") : undefined
       }
-      onSubmit={onLogin}
+      onSubmit={onLogin === undefined ? undefined : login}
       teamAccess={!allowClientRegistration}
     />
   );
