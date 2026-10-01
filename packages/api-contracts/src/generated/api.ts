@@ -1816,10 +1816,20 @@ export type inviteClientResponse201 = {
   status: 201;
 };
 
+export type inviteClientResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type inviteClientResponseSuccess = inviteClientResponse201 & {
   headers: Headers;
 };
-export type inviteClientResponse = inviteClientResponseSuccess;
+export type inviteClientResponseError = inviteClientResponse429 & {
+  headers: Headers;
+};
+
+export type inviteClientResponse =
+  inviteClientResponseSuccess | inviteClientResponseError;
 
 export const getInviteClientUrl = () => {
   return `/api/v1/assistant/client-invitations`;
@@ -1859,7 +1869,7 @@ export const inviteClient = async (
 };
 
 export const getInviteClientMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -1905,10 +1915,10 @@ export type InviteClientMutationResult = NonNullable<
   Awaited<ReturnType<typeof inviteClient>>
 >;
 export type InviteClientMutationBody = InviteClientDto;
-export type InviteClientMutationError = unknown;
+export type InviteClientMutationError = void;
 export type InviteClientMutationVariables = { data: InviteClientDto };
 
-export const useInviteClient = <TError = unknown, TContext = unknown>(
+export const useInviteClient = <TError = void, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof inviteClient>>,
@@ -2130,12 +2140,23 @@ export type correctClientInvitationEmailResponse200 = {
   status: 200;
 };
 
+export type correctClientInvitationEmailResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type correctClientInvitationEmailResponseSuccess =
   correctClientInvitationEmailResponse200 & {
     headers: Headers;
   };
+export type correctClientInvitationEmailResponseError =
+  correctClientInvitationEmailResponse429 & {
+    headers: Headers;
+  };
+
 export type correctClientInvitationEmailResponse =
-  correctClientInvitationEmailResponseSuccess;
+  | correctClientInvitationEmailResponseSuccess
+  | correctClientInvitationEmailResponseError;
 
 export const getCorrectClientInvitationEmailUrl = (clientId: string) => {
   return `/api/v1/assistant/client-invitations/${clientId}/email-corrections`;
@@ -2181,7 +2202,7 @@ export const correctClientInvitationEmail = async (
 };
 
 export const getCorrectClientInvitationEmailMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2233,14 +2254,14 @@ export type CorrectClientInvitationEmailMutationResult = NonNullable<
 >;
 export type CorrectClientInvitationEmailMutationBody =
   CorrectInvitationEmailDto;
-export type CorrectClientInvitationEmailMutationError = unknown;
+export type CorrectClientInvitationEmailMutationError = void;
 export type CorrectClientInvitationEmailMutationVariables = {
   clientId: string;
   data: CorrectInvitationEmailDto;
 };
 
 export const useCorrectClientInvitationEmail = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(
   options?: {
@@ -2271,12 +2292,22 @@ export type resendClientInvitationResponse200 = {
   status: 200;
 };
 
+export type resendClientInvitationResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type resendClientInvitationResponseSuccess =
   resendClientInvitationResponse200 & {
     headers: Headers;
   };
+export type resendClientInvitationResponseError =
+  resendClientInvitationResponse429 & {
+    headers: Headers;
+  };
+
 export type resendClientInvitationResponse =
-  resendClientInvitationResponseSuccess;
+  resendClientInvitationResponseSuccess | resendClientInvitationResponseError;
 
 export const getResendClientInvitationUrl = (clientId: string) => {
   return `/api/v1/assistant/client-invitations/${clientId}/resends`;
@@ -2305,7 +2336,7 @@ export const resendClientInvitation = async (
 };
 
 export const getResendClientInvitationMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2351,10 +2382,10 @@ export type ResendClientInvitationMutationResult = NonNullable<
   Awaited<ReturnType<typeof resendClientInvitation>>
 >;
 
-export type ResendClientInvitationMutationError = unknown;
+export type ResendClientInvitationMutationError = void;
 export type ResendClientInvitationMutationVariables = { clientId: string };
 
-export const useResendClientInvitation = <TError = unknown, TContext = unknown>(
+export const useResendClientInvitation = <TError = void, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof resendClientInvitation>>,
@@ -2383,12 +2414,22 @@ export type sendClientVerificationResponse202 = {
   status: 202;
 };
 
+export type sendClientVerificationResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type sendClientVerificationResponseSuccess =
   sendClientVerificationResponse202 & {
     headers: Headers;
   };
+export type sendClientVerificationResponseError =
+  sendClientVerificationResponse429 & {
+    headers: Headers;
+  };
+
 export type sendClientVerificationResponse =
-  sendClientVerificationResponseSuccess;
+  sendClientVerificationResponseSuccess | sendClientVerificationResponseError;
 
 export const getSendClientVerificationUrl = (clientId: string) => {
   return `/api/v1/assistant/client-invitations/${clientId}/verification-emails`;
@@ -2417,7 +2458,7 @@ export const sendClientVerification = async (
 };
 
 export const getSendClientVerificationMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -2463,10 +2504,10 @@ export type SendClientVerificationMutationResult = NonNullable<
   Awaited<ReturnType<typeof sendClientVerification>>
 >;
 
-export type SendClientVerificationMutationError = unknown;
+export type SendClientVerificationMutationError = void;
 export type SendClientVerificationMutationVariables = { clientId: string };
 
-export const useSendClientVerification = <TError = unknown, TContext = unknown>(
+export const useSendClientVerification = <TError = void, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof sendClientVerification>>,
@@ -7738,10 +7779,20 @@ export type createStaffMemberResponse201 = {
   status: 201;
 };
 
+export type createStaffMemberResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type createStaffMemberResponseSuccess = createStaffMemberResponse201 & {
   headers: Headers;
 };
-export type createStaffMemberResponse = createStaffMemberResponseSuccess;
+export type createStaffMemberResponseError = createStaffMemberResponse429 & {
+  headers: Headers;
+};
+
+export type createStaffMemberResponse =
+  createStaffMemberResponseSuccess | createStaffMemberResponseError;
 
 export const getCreateStaffMemberUrl = () => {
   return `/api/v1/administrator/staff-members`;
@@ -7781,7 +7832,7 @@ export const createStaffMember = async (
 };
 
 export const getCreateStaffMemberMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -7827,10 +7878,10 @@ export type CreateStaffMemberMutationResult = NonNullable<
   Awaited<ReturnType<typeof createStaffMember>>
 >;
 export type CreateStaffMemberMutationBody = CreateStaffMemberDto;
-export type CreateStaffMemberMutationError = unknown;
+export type CreateStaffMemberMutationError = void;
 export type CreateStaffMemberMutationVariables = { data: CreateStaffMemberDto };
 
-export const useCreateStaffMember = <TError = unknown, TContext = unknown>(
+export const useCreateStaffMember = <TError = void, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof createStaffMember>>,
@@ -8028,12 +8079,23 @@ export type resendStaffMemberActivationResponse200 = {
   status: 200;
 };
 
+export type resendStaffMemberActivationResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type resendStaffMemberActivationResponseSuccess =
   resendStaffMemberActivationResponse200 & {
     headers: Headers;
   };
+export type resendStaffMemberActivationResponseError =
+  resendStaffMemberActivationResponse429 & {
+    headers: Headers;
+  };
+
 export type resendStaffMemberActivationResponse =
-  resendStaffMemberActivationResponseSuccess;
+  | resendStaffMemberActivationResponseSuccess
+  | resendStaffMemberActivationResponseError;
 
 export const getResendStaffMemberActivationUrl = (staffMemberId: string) => {
   return `/api/v1/administrator/staff-members/${staffMemberId}/activation-link`;
@@ -8065,7 +8127,7 @@ export const resendStaffMemberActivation = async (
 };
 
 export const getResendStaffMemberActivationMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -8111,13 +8173,13 @@ export type ResendStaffMemberActivationMutationResult = NonNullable<
   Awaited<ReturnType<typeof resendStaffMemberActivation>>
 >;
 
-export type ResendStaffMemberActivationMutationError = unknown;
+export type ResendStaffMemberActivationMutationError = void;
 export type ResendStaffMemberActivationMutationVariables = {
   staffMemberId: string;
 };
 
 export const useResendStaffMemberActivation = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(
   options?: {
@@ -8148,12 +8210,22 @@ export type correctStaffMemberEmailResponse200 = {
   status: 200;
 };
 
+export type correctStaffMemberEmailResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type correctStaffMemberEmailResponseSuccess =
   correctStaffMemberEmailResponse200 & {
     headers: Headers;
   };
+export type correctStaffMemberEmailResponseError =
+  correctStaffMemberEmailResponse429 & {
+    headers: Headers;
+  };
+
 export type correctStaffMemberEmailResponse =
-  correctStaffMemberEmailResponseSuccess;
+  correctStaffMemberEmailResponseSuccess | correctStaffMemberEmailResponseError;
 
 export const getCorrectStaffMemberEmailUrl = (staffMemberId: string) => {
   return `/api/v1/administrator/staff-members/${staffMemberId}/email-corrections`;
@@ -8199,7 +8271,7 @@ export const correctStaffMemberEmail = async (
 };
 
 export const getCorrectStaffMemberEmailMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -8250,16 +8322,13 @@ export type CorrectStaffMemberEmailMutationResult = NonNullable<
   Awaited<ReturnType<typeof correctStaffMemberEmail>>
 >;
 export type CorrectStaffMemberEmailMutationBody = CorrectStaffEmailDto;
-export type CorrectStaffMemberEmailMutationError = unknown;
+export type CorrectStaffMemberEmailMutationError = void;
 export type CorrectStaffMemberEmailMutationVariables = {
   staffMemberId: string;
   data: CorrectStaffEmailDto;
 };
 
-export const useCorrectStaffMemberEmail = <
-  TError = unknown,
-  TContext = unknown,
->(
+export const useCorrectStaffMemberEmail = <TError = void, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof correctStaffMemberEmail>>,

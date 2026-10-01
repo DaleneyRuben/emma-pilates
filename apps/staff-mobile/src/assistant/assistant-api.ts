@@ -73,11 +73,12 @@ function retryAfter(headers: Headers | undefined): number {
   return Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
 }
 
-function requireSuccess<Body>(response: {
+// The body type is the caller's: a documented 429 carries no schema.
+function requireSuccess(response: {
   status: number;
-  data: Body;
+  data: unknown;
   headers?: Headers;
-}): Body {
+}): unknown {
   if (response.status < 200 || response.status >= 300) {
     throw new AssistantApiError(
       response.status,

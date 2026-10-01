@@ -358,6 +358,17 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many emails were requested from this Account (staff_email_throttled), or the recipient was emailed recently (email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the request may be made again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -442,6 +453,17 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many emails were requested from this Account (staff_email_throttled), or the recipient was emailed recently (email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the request may be made again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -479,6 +501,17 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many emails were requested from this Account (staff_email_throttled), or the recipient was emailed recently (email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the request may be made again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -513,6 +546,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ClientVerificationEmailDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many emails were requested from this Account (staff_email_throttled), or the recipient was emailed recently (email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the request may be made again",
+                "schema": {
+                  "type": "integer"
                 }
               }
             }
@@ -1819,6 +1863,17 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many emails were requested from this Account (staff_email_throttled), or the recipient was emailed recently (email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the request may be made again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1893,6 +1948,17 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many emails were requested from this Account (staff_email_throttled), or the recipient was emailed recently (email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the request may be made again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -1937,6 +2003,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StaffMemberDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many emails were requested from this Account (staff_email_throttled), or the recipient was emailed recently (email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the request may be made again",
+                "schema": {
+                  "type": "integer"
                 }
               }
             }
