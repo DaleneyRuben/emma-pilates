@@ -41,7 +41,7 @@ describe('admitEmailRequest (BE-012)', () => {
       networkDigest: Buffer.from('digest:network:198.51.100.7'),
       now,
       expiresAt: new Date('2026-10-02T15:00:00.000Z'),
-      waitSeconds: expect.any(Function),
+      waitSeconds: expect.any(Function) as unknown,
     });
   });
 
