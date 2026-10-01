@@ -21,6 +21,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { ProfileRowIcon, type ProfileRowIconName } from "./profile-row-icons";
 import { subscriptionBadge } from "../home/home-format";
 import { formatBolivianos } from "../plans/plan-format";
 import { ClientAvatar } from "./client-avatar";
@@ -43,11 +44,13 @@ type ProfileNavigation = {
 
 function MenuRow({
   badge,
+  icon,
   label,
   onPress,
   value,
 }: {
   badge?: number;
+  icon: ProfileRowIconName;
   label: string;
   onPress: () => void;
   value?: string;
@@ -59,6 +62,7 @@ function MenuRow({
       onPress={onPress}
       style={styles.row}
     >
+      <ProfileRowIcon name={icon} />
       <Text style={styles.rowLabel}>{label}</Text>
       <View style={styles.rowTrailing}>
         {value === undefined ? null : (
@@ -135,6 +139,7 @@ export function ProfileScreen() {
         </View>
         <View style={styles.menu}>
           <MenuRow
+            icon="plan"
             label="Mi plan"
             onPress={() => navigation.navigate("Subscription")}
             value={
@@ -144,18 +149,22 @@ export function ProfileScreen() {
             }
           />
           <MenuRow
+            icon="evaluation"
             label="Evaluación nutricional"
             onPress={() => navigation.navigate("EvaluationAvailability")}
           />
           <MenuRow
+            icon="evaluations"
             label="Mis evaluaciones"
             onPress={() => navigation.navigate("MyEvaluations")}
           />
           <MenuRow
+            icon="referrals"
             label="Mis referidos"
             onPress={() => navigation.navigate("Referrals")}
           />
           <MenuRow
+            icon="credit"
             label="Mi crédito"
             onPress={() => navigation.navigate("Credit")}
             value={
@@ -166,10 +175,12 @@ export function ProfileScreen() {
           />
           <MenuRow
             badge={unreadCount}
+            icon="notifications"
             label="Notificaciones"
             onPress={() => navigation.navigate("Notifications")}
           />
           <MenuRow
+            icon="password"
             label="Cambiar contraseña"
             onPress={() => navigation.navigate("ChangePassword")}
           />
@@ -256,11 +267,11 @@ const styles = StyleSheet.create({
   row: {
     alignItems: "center",
     flexDirection: "row",
-    justifyContent: "space-between",
-    minHeight: 56,
+    gap: spacing.mdLg,
+    minHeight: 60,
     paddingHorizontal: spacing.lg,
   },
-  rowLabel: { color: colors.text, fontSize: typography.body },
+  rowLabel: { color: colors.text, flex: 1, fontSize: 16 },
   rowTrailing: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
   rowValue: { color: colors.textMuted },
   screen: { gap: spacing.lg },

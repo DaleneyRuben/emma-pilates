@@ -58,7 +58,9 @@ describe("Client Profile", () => {
       "notifications",
       "password",
     ]) {
-      expect(screen.getByTestId(`profile-row-icon-${row}`)).toBeOnTheScreen();
+      expect(
+        screen.getByTestId(`profile-row-icon-${row}`, { includeHiddenElements: true }),
+      ).toBeOnTheScreen();
     }
   });
 
