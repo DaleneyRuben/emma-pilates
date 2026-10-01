@@ -215,4 +215,20 @@ describe("Client Browse Sessions", () => {
       }),
     ).not.toBeOnTheScreen();
   });
+  it("keeps the day and class type strips at their own height while the Branch list is open", async () => {
+    const screen = await openBrowse({
+      ...baseRoutes(),
+      [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
+        () => jsonResponse([]),
+    });
+
+    await fireEvent.press(
+      await screen.findByRole("button", { name: "Sucursal: Centro" }),
+    );
+
+    // Spare tablet height must not stretch them, nor an open list squash them.
+    for (const strip of ["browse-day-strip", "browse-class-type-strip"]) {
+      expect(screen.getByTestId(strip)).toHaveStyle({ flexGrow: 0, flexShrink: 0 });
+    }
+  });
 });
