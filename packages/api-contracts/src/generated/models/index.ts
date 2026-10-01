@@ -98,6 +98,7 @@ export * from "./completeEmailChangeDto";
 export * from "./completePasswordRecoveryDto";
 export * from "./correctInvitationEmailDto";
 export * from "./correctPendingClientEmailDto";
+export * from "./correctStaffEmailDto";
 export * from "./createAuthenticationSessionDto";
 export * from "./createBookingDto";
 export * from "./createdBookingDto";

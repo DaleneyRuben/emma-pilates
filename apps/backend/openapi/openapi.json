@@ -1822,6 +1822,83 @@
         ]
       }
     },
+    "/api/v1/administrator/staff-members/{staffMemberId}/email-corrections": {
+      "post": {
+        "operationId": "correctStaffMemberEmail",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectStaffEmailDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffMemberDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStaffMembers"
+        ]
+      }
+    },
+    "/api/v1/administrator/staff-members/{staffMemberId}/invitation-cancellation": {
+      "post": {
+        "operationId": "cancelStaffMemberInvitation",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorStaffMembers"
+        ]
+      }
+    },
     "/api/v1/administrator/staff-members/{staffMemberId}/role": {
       "put": {
         "operationId": "changeStaffMemberRole",
@@ -7619,6 +7696,10 @@
             "format": "date-time",
             "nullable": true,
             "description": "Expiry of the current Activation Link while pending"
+          },
+          "invitationReopened": {
+            "type": "boolean",
+            "description": "true when the create reopened a pending invitation with the same email; its Role and Branches did not change"
           }
         },
         "required": [
@@ -7701,6 +7782,18 @@
           "email",
           "role",
           "branchIds"
+        ]
+      },
+      "CorrectStaffEmailDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email"
+          }
+        },
+        "required": [
+          "email"
         ]
       },
       "ChangeStaffRoleDto": {

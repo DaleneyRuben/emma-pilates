@@ -23,4 +23,6 @@ export interface StaffMemberDto {
    * @nullable
    */
   activationExpiresAt: string | null;
+  /** true when the create reopened a pending invitation with the same email; its Role and Branches did not change */
+  invitationReopened?: boolean;
 }
