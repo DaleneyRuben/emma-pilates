@@ -11,8 +11,9 @@ alongside this follow-up; it finishes 70 §6, which named only text links
 70 §6 moved Client and Staff text links to Palo de rosa profundo `#8A5D59`
 because Palo de rosa `#B78380` is 2.99:1 on Crema `#FAF7F2`. The same tone
 still labels the outlined (secondary) buttons and two accent labels on these
-screens. The shipped apps draw no text in `#B78380`: the outlined button in
-`mobile-core` has a `#B78380` border and a `#8A5D59` label.
+screens. The shipped apps draw no text in `#B78380`: their outlined buttons
+(for example `outlinedLabel` in the Client session detail and the Staff client
+overview) have a `#B78380` border and a `#8A5D59` label.
 
 ## 1. Outlined buttons
 
