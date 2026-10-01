@@ -210,7 +210,9 @@ describe("AW22 Cerrar cuenta", () => {
     await user.click(
       await screen.findByRole("button", { name: "Lucía Fernández" }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Lucía Fernández" });
+    const panel = await screen.findByRole("dialog", {
+      name: "Lucía Fernández",
+    });
     await user.click(
       await within(panel).findByRole("button", { name: "Cerrar cuenta" }),
     );

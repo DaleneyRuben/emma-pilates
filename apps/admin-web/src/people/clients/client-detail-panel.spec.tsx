@@ -164,7 +164,9 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
     );
     const { panel } = await openLucia();
 
-    expect(await within(panel).findByText("Cuenta desactivada")).toBeInTheDocument();
+    expect(
+      await within(panel).findByText("Cuenta desactivada"),
+    ).toBeInTheDocument();
     expect(
       within(panel).queryByRole("button", { name: "Cerrar cuenta" }),
     ).not.toBeInTheDocument();
