@@ -141,7 +141,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">iOS · Confirmar cancelación</div>
-          <div style="font-size:12px;color:#766D69;">Misma hoja inferior que en 05 · sin pantalla nueva · al confirmar, la tarjeta desaparece</div>
+          <div style="font-size:12px;color:#766D69;">Misma hoja inferior que en 05 · sin pantalla nueva · al confirmar, la tarjeta desaparece · "para este mes" o "para septiembre", según el mes de la evaluación</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -336,7 +336,7 @@
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
         <div style="display:flex;flex-direction:column;gap:3px;">
           <div style="font-size:13px;font-weight:500;">Sin evaluaciones próximas</div>
-          <div style="font-size:12px;color:#766D69;">Acceso directo a la disponibilidad</div>
+          <div style="font-size:12px;color:#766D69;">Acceso directo a la disponibilidad · la evaluación de este mes aún no se usó</div>
         </div>
       </sc-if>
       <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
@@ -381,6 +381,71 @@
       </x-import>
     </div>
 
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Sin próximas · ya usada este mes</div>
+          <div style="font-size:12px;color:#766D69;">La evaluación de este mes ya pasó · ofrece la del mes siguiente</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:10px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mis evaluaciones</span>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:28px;padding:44px 20px 32px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:22px;padding:0 12px;text-align:center;">
+            <div style="width:170px;height:140px;border-radius:16px;background:repeating-linear-gradient(135deg,#EFE4DC 0 10px,#E7DAD3 10px 20px);display:flex;align-items:center;justify-content:center;">
+              <span style="font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#766D69;">ilustración</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div style="font-family:Lora,Georgia,serif;font-size:22px;font-weight:500;">No tienes evaluaciones próximas.</div>
+              <p style="margin:0;font-size:14px;line-height:1.6;color:#766D69;max-width:270px;text-wrap:pretty;">Ya usaste tu evaluación de este mes. Puedes reservar la de septiembre, también gratuita.</p>
+            </div>
+            <button style="height:54px;width:100%;max-width:290px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:16px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;" style-active="background:#9C6764;">Reservar evaluación</button>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:12px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Anteriores</span>
+              <div style="display:flex;align-items:center;gap:16px;padding:14px 0;">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:1px;width:38px;flex:none;">
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#766D69;">04</span>
+                  <span style="font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#7A716D;">Ago</span>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:2px;">
+                  <span style="font-size:15px;color:#6E6663;">09:30 · Carla Peña</span>
+                  <span style="font-size:12px;color:#7A716D;">Realizada</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:auto;position:sticky;bottom:0;background:#FFFFFF;border-top:1px solid #D8C9BB;display:grid;grid-template-columns:repeat(4,1fr);padding:10px 0 30px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 10.5 12 4l8.5 6.5V20H3.5z"></path></svg>
+              <span style="font-size:11px;">Inicio</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><line x1="8" y1="3.5" x2="8" y2="7"></line><line x1="16" y1="3.5" x2="16" y2="7"></line></svg>
+              <span style="font-size:11px;">Reservar</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"></circle><path d="M12 7.5V12l3.5 2"></path></svg>
+              <span style="font-size:11px;">Mis Reservas</span>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#B78380;">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="font-size:11px;font-weight:500;">Perfil</span>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
     <div style="flex:1;min-width:300px;display:flex;flex-direction:column;gap:20px;">
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
         <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Estructura</div>
@@ -392,7 +457,7 @@
       </div>
       <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:12px;font-size:14px;line-height:1.6;color:#6E6663;">
         <div style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Estado vacío</div>
-        <div>Aquí sí hay llamada a la acción, porque agendar es posible: lleva directo a la disponibilidad (pantalla 13). Si el cupo del mes ya se usó, esa pantalla explica cuándo vuelve.</div>
+        <div>Aquí sí hay llamada a la acción, porque agendar es posible: lleva directo a la disponibilidad (pantalla 13). Si el cupo del mes ya se usó, esa pantalla explica cuándo vuelve. Si la evaluación de este mes ya pasó, ofrece la del mes siguiente, también gratuita.</div>
       </div>
     </div>
 
