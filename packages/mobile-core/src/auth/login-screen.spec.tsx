@@ -45,12 +45,44 @@ describe("LoginScreen", () => {
 
     expect(
       screen.getByRole("alert", {
-        name: "Demasiados intentos. Inténtalo de nuevo en 30 segundos.",
+        name: "Demasiados intentos. Intenta de nuevo en un momento.",
       }),
     ).toBeOnTheScreen();
+    expect(screen.getByText("Podrás intentarlo en 0:30.")).toBeOnTheScreen();
     expect(
       screen.getByRole("button", { name: "Iniciar sesión" }),
     ).toBeDisabled();
+  });
+
+  it("formats a long server wait as minutes and seconds", async () => {
+    const screen = await submitLogin(
+      jest.fn().mockResolvedValue({
+        retryAfterSeconds: 252,
+        status: "throttled",
+      }),
+    );
+
+    expect(screen.getByText("Podrás intentarlo en 4:12.")).toBeOnTheScreen();
+  });
+
+  it("offers recovery and registration with the designed wording", async () => {
+    const onForgotPassword = jest.fn();
+    const onRegister = jest.fn();
+    const screen = await render(
+      <LoginScreen
+        onForgotPassword={onForgotPassword}
+        onRegister={onRegister}
+      />,
+    );
+
+    await fireEvent.press(
+      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
+    );
+    expect(screen.getByText("¿No tienes una cuenta?")).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
+
+    expect(onForgotPassword).toHaveBeenCalled();
+    expect(onRegister).toHaveBeenCalled();
   });
 
   it("shows the notice left by a closed Account", async () => {
