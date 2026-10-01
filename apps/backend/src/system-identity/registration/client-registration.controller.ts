@@ -26,6 +26,7 @@ import {
   parseStartClientRegistration,
   StartClientRegistrationDto,
 } from './client-registration.dto';
+import { EmailSourceBudget } from '../email-source-budget/email-source-budget.guard';
 import { CorrectPendingClientEmail } from './correct-pending-client-email';
 import { RegisterClient } from './register-client';
 import { ResendPendingClientVerification } from './resend-pending-client-verification';
@@ -64,6 +65,7 @@ export class ClientRegistrationController {
   @Post('verification-resends')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ operationId: 'resendPendingClientVerification' })
+  @EmailSourceBudget('verification')
   @ApiAcceptedResponse({ type: PendingVerificationResendDto })
   async resendVerification(
     @Body() body: PendingRegistrationContinuationDto,
@@ -82,6 +84,7 @@ export class ClientRegistrationController {
   @Post('email-corrections')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ operationId: 'correctPendingClientEmail' })
+  @EmailSourceBudget('verification')
   @ApiAcceptedResponse({ type: PendingEmailCorrectionDto })
   async correctEmail(
     @Body() body: CorrectPendingClientEmailDto,
@@ -103,6 +106,7 @@ export class ClientRegistrationController {
   @Post()
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ operationId: 'registerClient' })
+  @EmailSourceBudget('verification')
   @ApiAcceptedResponse({ type: PendingClientRegistrationDto })
   async register(
     @Body() body: StartClientRegistrationDto,

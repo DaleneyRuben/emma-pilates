@@ -38,6 +38,7 @@ import {
 } from './account-security.dto';
 import { authenticatedPrincipalResolver } from '../authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
+import { EmailSourceBudget } from '../email-source-budget/email-source-budget.guard';
 import {
   authenticateBearer,
   type PrincipalResolver,
@@ -119,6 +120,7 @@ export class AccountSecurityController {
   @Post('password-recovery-requests')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ operationId: 'requestPasswordRecovery' })
+  @EmailSourceBudget('password_recovery')
   @ApiAcceptedResponse({ type: PasswordRecoveryRequestResultDto })
   async requestPasswordRecovery(
     @Body() body: RequestPasswordRecoveryDto,

@@ -11,6 +11,7 @@ import type request from 'supertest';
 import type { App } from 'supertest/types';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
+import { emailSourceAdmission } from '../src/system-identity/email-source-budget/email-source-budget.guard';
 import {
   AccountSecurityController,
   accountActivation,
@@ -81,6 +82,7 @@ export const changePassword: jest.Mock<ChangePasswordFunction> =
     { provide: passwordRecoveryRequest, useValue: jest.fn() },
     { provide: passwordRecoveryCompletion, useValue: jest.fn() },
     { provide: currentPasswordChange, useValue: changePassword },
+    { provide: emailSourceAdmission, useValue: () => Promise.resolve() },
     { provide: APP_FILTER, useClass: ProblemDetailsFilter },
   ],
 })

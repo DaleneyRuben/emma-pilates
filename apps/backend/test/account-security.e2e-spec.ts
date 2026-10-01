@@ -6,6 +6,7 @@ import request from 'supertest';
 import type { App } from 'supertest/types';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
+import { emailSourceAdmission } from '../src/system-identity/email-source-budget/email-source-budget.guard';
 import {
   AccountSecurityController,
   accountActivation,
@@ -56,6 +57,7 @@ describe('Account security (e2e)', () => {
         { provide: passwordRecoveryCompletion, useValue: completeRecovery },
         { provide: currentPasswordChange, useValue: changeCurrentPassword },
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
+        { provide: emailSourceAdmission, useValue: () => Promise.resolve() },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();

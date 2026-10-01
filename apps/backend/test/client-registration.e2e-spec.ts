@@ -7,6 +7,7 @@ import { App } from 'supertest/types';
 import { PaymentRuleError } from '../src/booking/payments/payment-errors';
 import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
+import { emailSourceAdmission } from '../src/system-identity/email-source-budget/email-source-budget.guard';
 import { CancelPendingClientRegistration } from '../src/system-identity/registration/cancel-pending-client-registration';
 import { ClientEmailVerificationController } from '../src/system-identity/registration/client-email-verification.controller';
 import { ClientRegistrationController } from '../src/system-identity/registration/client-registration.controller';
@@ -57,6 +58,7 @@ describe('client registration (e2e)', () => {
           useValue: { execute: resendVerification },
         },
         { provide: VerifyClientEmail, useValue: { execute: verifyEmail } },
+        { provide: emailSourceAdmission, useValue: () => Promise.resolve() },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
