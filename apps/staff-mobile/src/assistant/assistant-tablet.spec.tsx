@@ -238,4 +238,52 @@ describe("Assistant flows on a tablet", () => {
       expect(screen.getByText(emptyPanel)).toBeOnTheScreen();
     });
   });
+
+  it("refreshes the panel when the same email reopens the invitation already beside the search", async () => {
+    let invites = 0;
+    const screen = await openClientSearch({
+      ...assistantRoutes(),
+      "POST /api/v1/assistant/client-invitations": () =>
+        jsonResponse(
+          {
+            status: (invites += 1) === 1 ? "invited" : "invitation_resent",
+            clientId: "client-new",
+            email: "ana@example.com",
+          },
+          201,
+        ),
+      "/api/v1/assistant/clients/client-new": () =>
+        jsonResponse({
+          client: newClient,
+          subscription: { status: "none", subscription: null },
+          nextBooking: null,
+          recentHistory: [],
+          creditAvailableCentavos: 0,
+        }),
+      "/api/v1/assistant/client-invitations/client-new": () =>
+        jsonResponse(invitation),
+    });
+
+    for (let round = 0; round < 2; round += 1) {
+      await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
+      await waitFor(() => {
+        expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
+      });
+      await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
+      await fireEvent.changeText(
+        screen.getByLabelText("Correo electrónico"),
+        "ana@example.com",
+      );
+      await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+      await waitFor(() => {
+        expect(screen.getByText("Cuenta pendiente de activación")).toBeOnTheScreen();
+      });
+    }
+
+    expect(
+      screen.getByText(
+        "Ana ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.",
+      ),
+    ).toBeOnTheScreen();
+  });
 });
