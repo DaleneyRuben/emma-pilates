@@ -79,6 +79,8 @@ export function createDefaultMobileRuntime({
     __DEV__,
   );
   const sessionApi = createSessionApi({ baseUrl: apiBaseUrl });
+  const installationIdentifier = () =>
+    getOrCreateInstallationIdentifier(AsyncStorage, randomUUID);
 
   async function clearAccountCache(accountId: string): Promise<void> {
     clearMobileQueryCache();
@@ -92,12 +94,12 @@ export function createDefaultMobileRuntime({
       baseUrl: apiBaseUrl,
       getCredential: credentialStore.load,
     }),
-    authenticationApi: createAuthenticationApi({ baseUrl: apiBaseUrl }),
+    authenticationApi: createAuthenticationApi({
+      baseUrl: apiBaseUrl,
+      clientIdentifier: installationIdentifier,
+    }),
     async login({ email, password }) {
-      const clientIdentifier = await getOrCreateInstallationIdentifier(
-        AsyncStorage,
-        randomUUID,
-      );
+      const clientIdentifier = await installationIdentifier();
 
       return sessionApi.login({ clientIdentifier, email, password });
     },

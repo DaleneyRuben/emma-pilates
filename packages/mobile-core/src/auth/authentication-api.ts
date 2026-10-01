@@ -59,11 +59,14 @@ function failure(label: string, response: ApiResponse): AuthenticationApiError {
 
 type AuthenticationApiOptions = {
   baseUrl: string;
+  /** The installation identifier Login sends, for the device email budget. */
+  clientIdentifier?: () => Promise<string>;
   fetch?: typeof globalThis.fetch;
 };
 
 export function createAuthenticationApi({
   baseUrl,
+  clientIdentifier,
   fetch,
 }: AuthenticationApiOptions) {
   const fetcher = createApiFetcher({
@@ -71,6 +74,12 @@ export function createAuthenticationApi({
     fetch,
     getCredential: async () => null,
   });
+  // Requests that may send an email count against a per-device budget;
+  // without the identifier they would count against the network alone.
+  const identified = async (): Promise<RequestInit | undefined> =>
+    clientIdentifier === undefined
+      ? undefined
+      : { headers: { "x-client-identifier": await clientIdentifier() } };
 
   return {
     async activateAccount(values: CompleteAccountActivationDto) {
@@ -126,7 +135,7 @@ export function createAuthenticationApi({
     async correctRegistrationEmail(values: CorrectPendingClientEmailDto) {
       const response = await correctPendingClientEmail(
         values,
-        undefined,
+        await identified(),
         fetcher,
       );
 
@@ -150,7 +159,7 @@ export function createAuthenticationApi({
       return response.data;
     },
     async register(values: StartClientRegistrationDto) {
-      const response = await registerClient(values, undefined, fetcher);
+      const response = await registerClient(values, await identified(), fetcher);
 
       if (response.status !== 202) {
         throw failure("Client registration", response);
@@ -161,7 +170,7 @@ export function createAuthenticationApi({
     async requestPasswordRecovery(email: string) {
       const response = await requestPasswordRecoveryRequest(
         { email },
-        undefined,
+        await identified(),
         fetcher,
       );
 
@@ -176,7 +185,7 @@ export function createAuthenticationApi({
     ) {
       const response = await resendPendingClientVerification(
         { registrationContinuation },
-        undefined,
+        await identified(),
         fetcher,
       );
 

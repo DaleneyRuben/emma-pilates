@@ -207,8 +207,12 @@ describe("createAuthenticationApi", () => {
       status: 429,
     });
   });
+
   it("identifies the installation on every request that may send an email", async () => {
-    const fetchMock = jest.fn(() =>
+    const fetchMock = jest.fn<
+      Promise<Response>,
+      [RequestInfo | URL, RequestInit?]
+    >(() =>
       Promise.resolve(
         new Response(JSON.stringify({ status: "verification_required" }), {
           status: 202,
@@ -235,7 +239,7 @@ describe("createAuthenticationApi", () => {
 
     expect(
       fetchMock.mock.calls.map(([, init]) =>
-        new Headers((init as RequestInit | undefined)?.headers).get(
+        new Headers(init?.headers).get(
           "x-client-identifier",
         ),
       ),
