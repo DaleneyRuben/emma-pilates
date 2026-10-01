@@ -16,7 +16,7 @@ import {
 const now = new Date('2026-10-01T15:00:00.000Z');
 const ago = (minutes: number) => new Date(now.getTime() - minutes * 60_000);
 const day = 24 * 60 * 60_000;
-const digest = () => randomBytes(32);
+const digest = () => new Uint8Array(randomBytes(32));
 
 describe('Email source budget persistence (BE-012)', () => {
   let context: DatabaseTestContext;
@@ -38,8 +38,8 @@ describe('Email source budget persistence (BE-012)', () => {
 
   const requestEvent = (input: {
     purpose?: AuthenticationThrottlePurpose;
-    clientDigest?: Uint8Array | null;
-    networkDigest: Uint8Array;
+    clientDigest?: Uint8Array<ArrayBuffer> | null;
+    networkDigest: Uint8Array<ArrayBuffer>;
     occurredAt: Date;
     deletedAt?: Date;
   }) =>
@@ -55,7 +55,7 @@ describe('Email source budget persistence (BE-012)', () => {
       },
     });
 
-  const eventsFor = (networkDigest: Uint8Array) =>
+  const eventsFor = (networkDigest: Uint8Array<ArrayBuffer>) =>
     prisma.authenticationThrottleEvent.findMany({
       where: { networkDigest, deletedAt: null },
       orderBy: { occurredAt: 'asc' },
