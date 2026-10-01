@@ -1,3 +1,4 @@
+import { colors } from "@pilates/mobile-core";
 import { fireEvent, render } from "@testing-library/react-native";
 
 import { ClientNavigation } from "./navigation";
@@ -65,6 +66,21 @@ describe("ClientNavigation", () => {
 
     expect(screen.getByLabelText("Inicio")).toBeOnTheScreen();
     expect(screen.queryByLabelText("Iniciar sesión")).not.toBeOnTheScreen();
+  });
+
+  it("draws 02's line icons, tinting the focused tab Palo de rosa", async () => {
+    const screen = await render(
+      <ClientNavigation {...defaultProps} role="client" />,
+    );
+    const icon = (name: string) =>
+      screen.getByTestId(`client-tab-icon-${name}`, { includeHiddenElements: true });
+
+    expect(icon("home")).toHaveProp("stroke", colors.primary);
+    for (const name of ["booking", "bookings", "profile"]) {
+      expect(icon(name)).toHaveProp("stroke", colors.textSubtle);
+    }
+    expect(screen.getByText("Inicio")).toHaveStyle({ color: colors.primary });
+    expect(screen.getByText("Reservar")).toHaveStyle({ color: colors.textSubtle });
   });
 
   it("does not render Staff navigation for a Staff identity", async () => {
