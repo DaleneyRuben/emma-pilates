@@ -173,6 +173,7 @@ export function ClientNavigation({
   onBiometricUnlock,
   onLogin,
   onRecoveryCredential,
+  pendingRegistrationStore,
   role,
   signOutNotice,
 }: MobileNavigationProps) {
@@ -221,6 +222,7 @@ export function ClientNavigation({
       onBiometricUnlock={onBiometricUnlock}
       onLogin={onLogin}
       onRecoveryCredential={onRecoveryCredential}
+      pendingRegistrationStore={pendingRegistrationStore}
     />
   );
 }

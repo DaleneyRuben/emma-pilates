@@ -1,6 +1,7 @@
 import {
   createDefaultMobileRuntime,
   createNativeCredentialStore,
+  createNativePendingRegistrationStore,
   MobileApplication,
   type MobileRuntime,
 } from "@pilates/mobile-core";
@@ -15,6 +16,7 @@ export default function App({ runtime }: { runtime?: MobileRuntime }) {
       createDefaultMobileRuntime({
         acceptedIdentityKind: "client",
         credentialStore: createNativeCredentialStore("client"),
+        pendingRegistrationStore: createNativePendingRegistrationStore("client"),
       }),
     [runtime],
   );
