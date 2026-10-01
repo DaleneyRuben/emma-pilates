@@ -45,7 +45,7 @@ const createTransaction = (
 ): jest.Mocked<ClientInvitationTransaction> => ({
   findAccountByEmail: jest.fn().mockResolvedValue(null),
   findInvitation: jest.fn().mockResolvedValue(invitation),
-  canIssueAuthenticationEmail: jest.fn().mockResolvedValue(true),
+  authenticationEmailWaitSeconds: jest.fn().mockResolvedValue(0),
   recordIssuedAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
   createInvitation: jest.fn().mockResolvedValue(undefined),
   replaceStaffInvitationActivation: jest.fn().mockResolvedValue(undefined),
@@ -221,12 +221,17 @@ describe('inviteClient', () => {
 
   it('refuses to send when the recipient throttle is exhausted', async () => {
     const transaction = createTransaction({
-      canIssueAuthenticationEmail: jest.fn().mockResolvedValue(false),
+      authenticationEmailWaitSeconds: jest.fn().mockResolvedValue(40),
     });
 
     await expect(
       inviteClient(command, assistant, dependencies(transaction)),
-    ).rejects.toBeInstanceOf(InvitationEmailThrottledError);
+    ).rejects.toEqual(
+      expect.objectContaining({
+        constructor: InvitationEmailThrottledError,
+        retryAfterSeconds: 40,
+      }),
+    );
     expect(transaction.createInvitation).not.toHaveBeenCalled();
   });
 
@@ -358,7 +363,7 @@ describe('pending invitation management', () => {
     );
 
     const throttled = createTransaction({
-      canIssueAuthenticationEmail: jest.fn().mockResolvedValue(false),
+      authenticationEmailWaitSeconds: jest.fn().mockResolvedValue(40),
     });
     await expect(
       resendClientInvitation(
