@@ -18,6 +18,7 @@ you are starting with no project knowledge.
 | Email verification           | Confirm that an unknown token returns `invalid`; complete a real verification with the token from `.data/email-capture` (Test 34) | The link is a URL the Simulator cannot open yet (LNK-001)                                                                                                    |
 | Login and logout             | Log in from the mobile app, restore the protected credential at startup, inspect identity in Swagger, and revoke it             | Log out from Perfil with a confirmation in both apps (Test 9)                                                                                                  |
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
+| Email request limits         | Fill the device or network budget for registration, resend, email correction, and recovery: the API answers `429` `authentication_email_throttled` with `Retry-After`, and the apps and admin web show «Demasiadas solicitudes…» with the wait (Test 5 G) | Every admitted request counts, even one for an unknown address or a suppressed email; reset by marking your local `email_requested` rows deleted |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
@@ -310,7 +311,10 @@ Expected response code: `202`, with:
 ```
 
 The response is intentionally neutral. For privacy and abuse prevention, it
-does not reveal whether an email was queued or temporarily rate-limited.
+does not reveal whether an email was queued or temporarily rate-limited for
+that address. Only the device or network budget (Test 5 G) answers otherwise:
+`429` `authentication_email_throttled` with `Retry-After`, the same for every
+address. Registration and email correction share that budget.
 
 ### D. Test an invalid verification token
 
@@ -479,8 +483,10 @@ reciente."), **Volver a iniciar sesión**, the 7-day cleanup note, and a quiet
 **Cancelar registro** that asks "¿Cancelar tu registro?" first. **Cambiar
 correo** explains that the links sent to the old address stop working. The
 device/network limit frames ("Demasiadas solicitudes…" with "Podrás reenviarlo
-en m:ss.") are built but the backend does not produce them yet (BE-012), so
-only the automated tests show them.
+en m:ss.") appear once the API answers `429`; Test 5 G shows how to reach them.
+The registration form itself still answers that `429` with the generic «No
+pudimos crear la cuenta. Inténtalo de nuevo.» (MOB-032 waits on a design for
+it).
 
 The pending registration stays on the device (in SecureStore) until it is
 finished: close the app from the app switcher (or Expo Go) and open it again,
@@ -531,6 +537,59 @@ That request should return `429`, stable code `login_throttled`, and a
 `Retry-After` header. The response does not reveal whether the email belongs to
 an Account.
 
+### G. See the device and network email limits
+
+Registration, verification resend, email correction, and password recovery
+share two budgets besides the per-address one (BE-012). Every request the
+budgets admit counts, whether or not an email goes out, so they reveal nothing
+about an address:
+
+| Lane | Registration, resend, and correction (shared) | Recovery |
+| ---- | --------------------------------------------- | -------- |
+| Device (`x-client-identifier`, or the admin web's client cookie) | 10 in 15 minutes, 30 in 24 hours | 5 in 15 minutes, 10 in 24 hours |
+| Network (the connection address) | 50 in 15 minutes, 200 in 24 hours | 25 in 15 minutes, 100 in 24 hours |
+
+A full lane answers `429` with code `authentication_email_throttled`, the
+neutral detail "Too many requests from this device or network. Try again
+later", and `Retry-After` in seconds; nothing is sent and no link changes. A
+missing or malformed identifier counts against the network lane only, and a
+`X-Forwarded-For` header you send is ignored. Use a disposable copy of your
+database (`createdb -T pilates_dev_sim pilates_test_limits`, run the API on it,
+drop it afterwards), because the budgets apply to everyone on your machine.
+
+1. **Device lane.** From a terminal, send eleven resends with the same
+   identifier (the continuation does not need to be real):
+
+   ```sh
+   for i in $(seq 11); do curl -s -o /dev/null -w "%{http_code} " -X POST \
+     http://127.0.0.1:3100/api/v1/client-registrations/verification-resends \
+     -H 'content-type: application/json' -H 'x-client-identifier: my-test-device-0001' \
+     -d '{"registrationContinuation":"not-a-real-continuation"}'; done
+   ```
+
+   The first ten print `202`, the eleventh `429` (add `-D -` to see
+   `Retry-After: 900`). A recovery request from the same identifier still
+   answers `202`: recovery has its own budget.
+2. **Network lane in the apps.** The Simulator shares your Mac's address, so
+   requests from the terminal fill the same network lane. Register in the
+   Client app until it shows **Revisa tu correo**, then send 49 more resends
+   without the header (the loop above with `seq 49` and no
+   `x-client-identifier`). **Reenviar correo** now shows "Demasiadas
+   solicitudes. Intenta de nuevo en un momento; el enlace que ya tienes sigue
+   sirviendo." with "Podrás reenviarlo en 14:59." counting down and the button
+   disabled; **Cambiar correo** shows the same notice with "Podrás intentarlo
+   en m:ss.". For recovery, send 25 requests to
+   `/api/v1/password-recovery-requests` (any email), then use **¿Olvidaste tu
+   contraseña?** in the Client app (20), the Staff app (S18), or the admin web
+   (AW30): each shows "Demasiadas solicitudes. Intenta de nuevo en un momento;
+   si ya recibiste un enlace, sigue sirviendo." with "Podrás pedirlo en m:ss.".
+3. **Reset.** The budgets forget events after 15 minutes and 24 hours. To
+   start over on your local copy, mark them deleted (rows are never removed):
+
+   ```sh
+   psql -d pilates_test_limits -c "update system.authentication_throttle_events set deleted_at = now() where event_kind = 'email_requested' and deleted_at is null"
+   ```
+
 ## Test 6: try Account security
 
 Keep the backend running and use Swagger. For the signed-in step, complete
@@ -573,6 +632,9 @@ Expected response code: `202`, with:
 
 The same response is returned when the address is unknown or temporarily
 rate-limited. This prevents the endpoint from revealing who has an Account.
+After 5 requests in 15 minutes from one device, or 25 from one network, it
+answers `429` `authentication_email_throttled` with `Retry-After` instead,
+whatever the address (Test 5 G).
 
 ### C. Change the signed-in Account password
 
@@ -1700,7 +1762,11 @@ pnpm dev:admin
    countdown from the server (0:30 at first) and a disabled button.
 7. **Recovery.** **¿Olvidaste tu contraseña?** opens **Recuperar contraseña**.
    Any email gives the same "Revisa tu correo" state ("El enlace vence en 30
-   minutos.") whether or not it belongs to an Account.
+   minutos.") whether or not it belongs to an Account. Once the device or
+   network budget is full (Test 5 G), a note with a clock above the field
+   reads "Demasiadas solicitudes. Intenta de nuevo en un momento; si ya
+   recibiste un enlace, sigue sirviendo." with "Podrás pedirlo en m:ss." and
+   **Enviar enlace** stays disabled.
 8. **Links.** Open
    [http://localhost:5173/crear-contrasena?token=not-a-real-link-secret](http://localhost:5173/crear-contrasena?token=not-a-real-link-secret):
    "Este enlace no es válido". With the worker running, real links are in
@@ -2284,8 +2350,8 @@ The following are not ready for manual product testing:
   admin web's link page (Test 24), but the Simulator cannot open them until
   LNK-001, so the mobile link pages (activation, recovery, and their
   expired and removed states) are covered by the automated tests;
-- the device and network limits on registration, resend, and recovery
-  emails, which the apps already draw (BE-012);
+- the registration form's own device or network limit, which still shows the
+  generic failure until a design for it exists (MOB-032);
 - «El registro venció» on a device, which needs seven days to pass after the
   registration (the automated tests show it);
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
