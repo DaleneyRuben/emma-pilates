@@ -8,6 +8,7 @@ export * from "./application";
 export * from "./auth/authentication-api";
 export * from "./auth/authentication-flow";
 export * from "./auth/countdown";
+export { WaitNotice } from "./auth/auth-parts";
 export * from "./auth/credential-store";
 export * from "./auth/pending-registration-store";
 export * from "./auth/identity-provider";

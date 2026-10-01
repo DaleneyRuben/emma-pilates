@@ -72,7 +72,9 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
       await screen.findByRole("alert", { name: accountLimit }),
     ).toBeOnTheScreen();
     expect(screen.getByText("Podrás intentarlo en 14:52.")).toBeOnTheScreen();
-    expect(screen.getByTestId("wait-notice-clock")).toBeOnTheScreen();
+    expect(
+      screen.getByTestId("wait-notice-clock", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Crear cuenta" })).toBeDisabled();
     expect(screen.getByLabelText("Correo electrónico")).toHaveDisplayValue(
       "ana@example.com",

@@ -10,6 +10,7 @@ import {
   spacing,
   typography,
   useCountdown,
+  WaitNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -18,7 +19,11 @@ import { ScrollView, StyleSheet } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { CenteredCard } from "./assistant-layout";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import { limitedEmailMessage } from "./assistant-format";
+import {
+  accountEmailLimitCode,
+  accountEmailLimitMessage,
+  limitedEmailMessage,
+} from "./assistant-format";
 import { useAssistantWorkspace } from "./assistant-workspace";
 import { SelfRegisteredNotice } from "./self-registered-notice";
 
@@ -48,6 +53,7 @@ export function NewClientScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [emailInUse, setEmailInUse] = useState(false);
+  const [accountLimited, setAccountLimited] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
   const [selfRegistered, setSelfRegistered] = useState<{
     clientId: string;
@@ -76,6 +82,7 @@ export function NewClientScreen() {
     setSubmitted(true);
     setFailure(null);
     setEmailInUse(false);
+    setAccountLimited(false);
     if (name.trim().length === 0 || !emailPattern.test(email.trim())) return;
     setSubmitting(true);
     try {
@@ -93,6 +100,9 @@ export function NewClientScreen() {
       const problem = problemOf(error);
       if (problem?.code === "email_in_use") {
         setEmailInUse(true);
+      } else if (problem?.code === accountEmailLimitCode) {
+        startWait(problem.retryAfterSeconds);
+        setAccountLimited(true);
       } else if (problem?.code === "email_throttled") {
         startWait(problem.retryAfterSeconds);
         setFailure(limitedEmailMessage);
@@ -118,6 +128,13 @@ export function NewClientScreen() {
           />
         ) : (
           <>
+            {accountLimited && waitSeconds > 0 ? (
+              <WaitNotice
+                message={accountEmailLimitMessage}
+                remainingSeconds={waitSeconds}
+                waitLabel="Podrás intentarlo en"
+              />
+            ) : null}
             <FormField
               autoCapitalize="words"
               error={nameError}
@@ -157,7 +174,7 @@ export function NewClientScreen() {
                 {failure}
               </BodyText>
             ) : null}
-            {waitSeconds > 0 ? (
+            {waitSeconds > 0 && !accountLimited ? (
               <BodyText style={styles.note}>
                 {`Podrás intentarlo en ${formatCountdown(waitSeconds)}.`}
               </BodyText>

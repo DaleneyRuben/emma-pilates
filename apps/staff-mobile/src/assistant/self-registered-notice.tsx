@@ -7,13 +7,18 @@ import {
   TextButton,
   typography,
   useCountdown,
+  WaitNotice,
 } from "@pilates/mobile-core";
 import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import { limitedEmailMessage } from "./assistant-format";
+import {
+  accountEmailLimitCode,
+  accountEmailLimitMessage,
+  limitedEmailMessage,
+} from "./assistant-format";
 
 const problemOf = (error: unknown) =>
   error instanceof AssistantApiError ? error : null;
@@ -38,6 +43,7 @@ export function SelfRegisteredNotice({
   const [sent, setSent] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [limited, setLimited] = useState(false);
+  const [accountLimited, setAccountLimited] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
 
   const send = async () => {
@@ -45,12 +51,16 @@ export function SelfRegisteredNotice({
     setSent(false);
     setFailure(null);
     setLimited(false);
+    setAccountLimited(false);
     try {
       await api.sendVerification(clientId);
       setSent(true);
     } catch (error) {
       const problem = problemOf(error);
-      if (problem?.code === "email_throttled") {
+      if (problem?.code === accountEmailLimitCode) {
+        startWait(problem.retryAfterSeconds);
+        setAccountLimited(true);
+      } else if (problem?.code === "email_throttled") {
         startWait(problem.retryAfterSeconds);
         setLimited(true);
       } else {
@@ -79,7 +89,14 @@ export function SelfRegisteredNotice({
       ) : null}
       {failure !== null ? <BodyText style={styles.failure}>{failure}</BodyText> : null}
       {limited ? <BodyText>{limitedEmailMessage}</BodyText> : null}
-      {waitSeconds > 0 ? (
+      {accountLimited && waitSeconds > 0 ? (
+        <WaitNotice
+          message={accountEmailLimitMessage}
+          remainingSeconds={waitSeconds}
+          waitLabel="Podrás enviarlo en"
+        />
+      ) : null}
+      {waitSeconds > 0 && !accountLimited ? (
         <BodyText style={styles.note}>
           {`Podrás reenviarlo en ${formatCountdown(waitSeconds)}.`}
         </BodyText>

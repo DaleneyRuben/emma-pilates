@@ -36,3 +36,8 @@ export function describeContact(
 // S06 «Reenvío limitado»: the recipient lane is full; the current link still works.
 export const limitedEmailMessage =
   "Ya enviamos un correo a esa dirección hace poco. El enlace vigente sigue sirviendo.";
+
+// Follow-up 78: the signed-in staff Account's own email budget is full (BE-013).
+export const accountEmailLimitCode = "staff_email_throttled";
+export const accountEmailLimitMessage =
+  "Enviaste muchos correos en poco tiempo. Espera un momento para enviar otro; los enlaces que ya enviaste siguen sirviendo.";

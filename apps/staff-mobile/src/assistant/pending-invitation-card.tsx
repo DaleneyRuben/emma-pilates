@@ -14,6 +14,7 @@ import {
   TextButton,
   typography,
   useCountdown,
+  WaitNotice,
 } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -21,7 +22,12 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import { formatInstantDate, limitedEmailMessage } from "./assistant-format";
+import {
+  accountEmailLimitCode,
+  accountEmailLimitMessage,
+  formatInstantDate,
+  limitedEmailMessage,
+} from "./assistant-format";
 import { OutlinedButton } from "./outlined-button";
 import { SelfRegisteredNotice } from "./self-registered-notice";
 
@@ -65,7 +71,9 @@ export function PendingInvitationCard({
   const [showReopened, setShowReopened] = useState(reopened);
   const [notice, setNotice] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  const [accountLimited, setAccountLimited] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
+  const accountWaiting = accountLimited && waitSeconds > 0;
 
   // The generated read only types its 200; a problem arrives as data too.
   const answer = invitation.data as { status: number; data: unknown } | undefined;
@@ -96,10 +104,16 @@ export function PendingInvitationCard({
     setFailure(null);
     setNotice(null);
     setShowReopened(false);
+    setAccountLimited(false);
     try {
       await work();
     } catch (error) {
       const problem = error instanceof AssistantApiError ? error : null;
+      if (problem?.code === accountEmailLimitCode) {
+        startWait(problem.retryAfterSeconds);
+        setAccountLimited(true);
+        return;
+      }
       if (problem?.code === "email_throttled") {
         startWait(problem.retryAfterSeconds);
       }
@@ -170,7 +184,14 @@ export function PendingInvitationCard({
           {failure}
         </BodyText>
       ) : null}
-      {waitSeconds > 0 ? (
+      {accountWaiting ? (
+        <WaitNotice
+          message={accountEmailLimitMessage}
+          remainingSeconds={waitSeconds}
+          waitLabel="Podrás enviarlo en"
+        />
+      ) : null}
+      {waitSeconds > 0 && !accountLimited ? (
         <BodyText style={styles.muted}>
           {`Podrás reenviarlo en ${formatCountdown(waitSeconds)}.`}
         </BodyText>
@@ -186,7 +207,7 @@ export function PendingInvitationCard({
             value={email}
           />
           <PrimaryButton
-            disabled={busy}
+            disabled={busy || accountWaiting}
             label="Guardar correo"
             onPress={() => void changeEmail()}
           />
