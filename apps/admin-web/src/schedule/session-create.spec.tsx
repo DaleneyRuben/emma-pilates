@@ -77,7 +77,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
         "Reformer Pilates",
       ]),
     );
-    const trainer = within(panel).getByLabelText("Entrenador");
+    const trainer = within(panel).getByLabelText("Entrenadora");
     await waitFor(() =>
       expect(optionsOf(trainer)).toEqual([
         "Elige una entrenadora",
@@ -140,7 +140,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
       mat.id,
     );
     await user.selectOptions(
-      within(panel).getByLabelText("Entrenador"),
+      within(panel).getByLabelText("Entrenadora"),
       daniela.id,
     );
     await user.selectOptions(
@@ -206,7 +206,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
       reformer.id,
     );
     await user.selectOptions(
-      within(panel).getByLabelText("Entrenador"),
+      within(panel).getByLabelText("Entrenadora"),
       valeria.id,
     );
     await user.type(within(panel).getByLabelText("Fecha"), dayOfNextWeek(0));
@@ -222,7 +222,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
     await waitFor(() =>
       expect(
-        within(panel).getByLabelText("Entrenador"),
+        within(panel).getByLabelText("Entrenadora"),
       ).toHaveAccessibleDescription(
         expect.stringContaining(
           "Esta entrenadora ya no puede dar clases en esta sucursal.",

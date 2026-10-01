@@ -75,7 +75,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
     );
 
     await user.selectOptions(
-      await within(panel).findByLabelText("Entrenador"),
+      await within(panel).findByLabelText("Entrenadora"),
       daniela.id,
     );
     await user.clear(within(panel).getByLabelText("Hora"));

@@ -221,14 +221,14 @@ describe("AW09 Supply form on a desktop browser", () => {
     );
   });
 
-  it("goes back from the archive confirmation with Cancelar", async () => {
+  it("goes back from the archive confirmation with Volver (59 §8)", async () => {
     server.use(supplyTable());
     const { panel, user } = await openEdit();
     await user.click(
       within(panel).getByRole("button", { name: "Archivar insumo" }),
     );
     const dialog = await screen.findByRole("alertdialog");
-    await user.click(within(dialog).getByRole("button", { name: "Cancelar" }));
+    await user.click(within(dialog).getByRole("button", { name: "Volver" }));
 
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: "Editar insumo" })).toBeVisible();

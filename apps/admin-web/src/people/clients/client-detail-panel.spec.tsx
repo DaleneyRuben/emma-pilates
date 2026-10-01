@@ -154,6 +154,22 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
     ).toBeInTheDocument();
   });
 
+  it("offers no «Cerrar cuenta» on a deactivated account (AW22)", async () => {
+    server.use(
+      ...handlers(() =>
+        jsonResponse(
+          withPlan(luciaDetail.subscription, { accountStatus: "disabled" }),
+        ),
+      ),
+    );
+    const { panel } = await openLucia();
+
+    expect(await within(panel).findByText("Cuenta desactivada")).toBeInTheDocument();
+    expect(
+      within(panel).queryByRole("button", { name: "Cerrar cuenta" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("says when the Client no longer exists and when the summary cannot load", async () => {
     server.use(...handlers(() => problemResponse(404, "client_not_found")));
     const { panel, user } = await openLucia();
