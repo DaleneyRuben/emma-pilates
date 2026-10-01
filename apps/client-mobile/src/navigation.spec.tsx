@@ -30,7 +30,7 @@ describe("ClientNavigation", () => {
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
     expect(
-      screen.getByRole("button", { name: "Crear cuenta" }),
+      screen.getByRole("button", { name: "Regístrate" }),
     ).toBeOnTheScreen();
   });
 

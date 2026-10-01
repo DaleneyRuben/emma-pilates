@@ -47,10 +47,10 @@ describe("StaffNavigation", () => {
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
     expect(
-      screen.queryByRole("button", { name: "Crear cuenta" }),
+      screen.queryByRole("button", { name: "Regístrate" }),
     ).not.toBeOnTheScreen();
     expect(
-      screen.getByRole("button", { name: "Olvidé mi contraseña" }),
+      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
     ).toBeOnTheScreen();
   });
 

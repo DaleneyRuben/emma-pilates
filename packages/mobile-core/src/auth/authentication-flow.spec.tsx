@@ -30,10 +30,10 @@ describe("AuthenticationFlow", () => {
     );
 
     expect(
-      screen.queryByRole("button", { name: "Crear cuenta" }),
+      screen.queryByRole("button", { name: "Regístrate" }),
     ).not.toBeOnTheScreen();
     expect(
-      screen.getByRole("button", { name: "Olvidé mi contraseña" }),
+      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
     ).toBeOnTheScreen();
   });
 
@@ -48,7 +48,7 @@ describe("AuthenticationFlow", () => {
     );
 
     await fireEvent.press(
-      screen.getByRole("button", { name: "Crear cuenta" }),
+      screen.getByRole("button", { name: "Regístrate" }),
     );
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Clienta");
     await fireEvent.changeText(
@@ -111,7 +111,7 @@ describe("AuthenticationFlow", () => {
     );
 
     await fireEvent.press(
-      screen.getByRole("button", { name: "Crear cuenta" }),
+      screen.getByRole("button", { name: "Regístrate" }),
     );
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Clienta");
     await fireEvent.changeText(
@@ -171,7 +171,7 @@ describe("AuthenticationFlow", () => {
     );
 
     await fireEvent.press(
-      screen.getByRole("button", { name: "Olvidé mi contraseña" }),
+      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
     );
     await fireEvent.changeText(
       screen.getByLabelText("Correo electrónico"),

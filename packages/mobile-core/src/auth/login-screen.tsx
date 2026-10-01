@@ -8,9 +8,11 @@ import {
   Text,
   View,
 } from "react-native";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { z } from "zod";
 
+import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
+import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
 import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
@@ -50,7 +52,7 @@ export function LoginScreen({
   onSubmit = () => undefined,
 }: LoginScreenProps) {
   const [rejected, setRejected] = useState(false);
-  const [retryAfterSeconds, setRetryAfterSeconds] = useState(0);
+  const [retryAfterSeconds, startRetryWait] = useCountdown();
   const {
     control,
     formState: { errors, isSubmitting },
@@ -68,21 +70,9 @@ export function LoginScreen({
     }
 
     if (result?.status === "throttled") {
-      setRetryAfterSeconds(result.retryAfterSeconds);
+      startRetryWait(result.retryAfterSeconds);
     }
   });
-
-  useEffect(() => {
-    if (retryAfterSeconds <= 0) {
-      return undefined;
-    }
-
-    const timer = setTimeout(() => {
-      setRetryAfterSeconds((current) => Math.max(0, current - 1));
-    }, 1_000);
-
-    return () => clearTimeout(timer);
-  }, [retryAfterSeconds]);
 
   return (
     <Screen style={styles.screen}>
@@ -108,6 +98,16 @@ export function LoginScreen({
           </View>
 
           <View style={styles.form}>
+            {rejected ? (
+              <FormAlert>El correo o la contraseña no son correctos.</FormAlert>
+            ) : null}
+            {retryAfterSeconds > 0 ? (
+              <WaitNotice
+                message="Demasiados intentos. Intenta de nuevo en un momento."
+                remainingSeconds={retryAfterSeconds}
+                waitLabel="Podrás intentarlo en"
+              />
+            ) : null}
             <Controller
               control={control}
               name="email"
@@ -146,30 +146,23 @@ export function LoginScreen({
               label="Iniciar sesión"
               onPress={submitLogin}
             />
-            {rejected ? (
-              <Text accessibilityRole="alert" style={styles.error}>
-                El correo o la contraseña no son correctos.
-              </Text>
-            ) : null}
-            {retryAfterSeconds > 0 ? (
-              <Text accessibilityRole="alert" style={styles.error}>
-                Demasiados intentos. Inténtalo de nuevo en{" "}
-                {retryAfterSeconds} segundos.
-              </Text>
-            ) : null}
             {onBiometricUnlock === undefined ? null : (
               <BiometricLoginButton onPress={onBiometricUnlock} />
             )}
             {onForgotPassword === undefined ? null : (
               <TextButton
-                label="Olvidé mi contraseña"
+                label="¿Olvidaste tu contraseña?"
                 onPress={onForgotPassword}
               />
             )}
-            {onRegister === undefined ? null : (
-              <TextButton label="Crear cuenta" onPress={onRegister} />
-            )}
           </View>
+          {onRegister === undefined ? null : (
+            <FooterPrompt
+              action="Regístrate"
+              onPress={onRegister}
+              prompt="¿No tienes una cuenta?"
+            />
+          )}
         </ScrollView>
       </KeyboardAvoidingView>
     </Screen>
@@ -205,16 +198,8 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
-  error: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 20,
-    textAlign: "center",
-  },
   form: {
     gap: spacing.lgXl,
-    paddingBottom: spacing.xxxl,
   },
   screen: {
     backgroundColor: colors.surface,

@@ -48,7 +48,7 @@ describe("Staff App", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
       expect(
-        screen.queryByRole("button", { name: "Crear cuenta" }),
+        screen.queryByRole("button", { name: "Regístrate" }),
       ).not.toBeOnTheScreen();
     });
   });
