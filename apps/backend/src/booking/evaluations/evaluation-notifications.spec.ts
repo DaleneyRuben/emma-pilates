@@ -10,17 +10,13 @@ const notice = (startsAt: string, occurredAt: string) =>
 
 describe('evaluationCancelledByStudioNotice (19)', () => {
   it('frees «este mes» when the Evaluation was this month', () => {
-    expect(
-      notice('2026-09-28T14:30:00.000Z', '2026-09-20T15:00:00.000Z'),
-    ).toBe(
+    expect(notice('2026-09-28T14:30:00.000Z', '2026-09-20T15:00:00.000Z')).toBe(
       'El estudio canceló tu evaluación nutricional del lunes 28 de septiembre, 10:30. Ya puedes reservar otra este mes.',
     );
   });
 
   it('names the month when the Evaluation was a later one (MOB-022)', () => {
-    expect(
-      notice('2026-10-05T14:30:00.000Z', '2026-09-30T15:00:00.000Z'),
-    ).toBe(
+    expect(notice('2026-10-05T14:30:00.000Z', '2026-09-30T15:00:00.000Z')).toBe(
       'El estudio canceló tu evaluación nutricional del lunes 5 de octubre, 10:30. Ya puedes reservar otra para octubre.',
     );
   });

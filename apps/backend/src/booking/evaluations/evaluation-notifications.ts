@@ -68,6 +68,16 @@ export const formatEvaluationMoment = (instant: Date): string => {
   return `${parts.weekday} ${parts.day} de ${parts.month}, ${parts.hour}:${parts.minute}`;
 };
 
+// «este mes» when the Evaluation is in the month the notice is sent, else
+// «para octubre»: an Evaluation can be booked for the next month (MOB-022).
+const freedMonth = (startsAt: Date, occurredAt: Date): string => {
+  const evaluationMonth = momentParts(startsAt).month;
+  const noticeMonth = momentParts(occurredAt).month;
+  return evaluationMonth === noticeMonth
+    ? 'este mes'
+    : `para ${evaluationMonth}`;
+};
+
 type EvaluationFacts = {
   evaluationId: string;
   startsAt: Date;
@@ -108,7 +118,7 @@ export const evaluationCancelledByStudioNotice = (
   type: 'evaluation_cancelled_by_studio',
   businessEventKey: `evaluation-cancelled:${facts.evaluationId}`,
   title: 'Evaluación cancelada',
-  message: `El estudio canceló tu evaluación nutricional del ${formatEvaluationMoment(facts.startsAt)}. Ya puedes reservar otra este mes.`,
+  message: `El estudio canceló tu evaluación nutricional del ${formatEvaluationMoment(facts.startsAt)}. Ya puedes reservar otra ${freedMonth(facts.startsAt, facts.occurredAt)}.`,
   destination: { type: 'evaluation', id: facts.evaluationId },
   occurredAt: facts.occurredAt,
 });
