@@ -46,6 +46,22 @@ describe("Client Profile", () => {
     clearMobileQueryCache();
   });
 
+  it("draws 18's line icon on every Perfil row (follow-up 70)", async () => {
+    const screen = await openProfile();
+
+    for (const row of [
+      "plan",
+      "evaluation",
+      "evaluations",
+      "referrals",
+      "credit",
+      "notifications",
+      "password",
+    ]) {
+      expect(screen.getByTestId(`profile-row-icon-${row}`)).toBeOnTheScreen();
+    }
+  });
+
   it("shows the account summary and the Plan status row", async () => {
     const screen = await openProfile();
 
