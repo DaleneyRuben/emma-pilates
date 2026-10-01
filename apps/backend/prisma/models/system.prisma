@@ -40,6 +40,7 @@ enum AuthenticationThrottleEventKind {
   FAILED_CREDENTIAL_CHECK @map("failed_credential_check")
   MESSAGE_ISSUED          @map("message_issued")
   EMAIL_REQUESTED         @map("email_requested")
+  STAFF_EMAIL_REQUESTED   @map("staff_email_requested")
 
   @@schema("system")
 }
@@ -169,6 +170,7 @@ model Account {
   authenticationTokens      AuthenticationToken[]
   authenticationSessions    AuthenticationSession[]
   emailChanges              AccountEmailChange[]
+  staffEmailRequests        AuthenticationThrottleEvent[]
   emailSuppressionsResolved EmailSuppression[]      @relation("EmailSuppressionResolver")
   auditRecords              AuditRecord[]           @relation("AuditActor")
   cancelledSessions         Session[]
@@ -268,14 +270,17 @@ model AuthenticationThrottleEvent {
   loginLaneDigest Bytes?                          @map("login_lane_digest") @db.ByteA
   clientDigest    Bytes?                          @map("client_digest") @db.ByteA
   networkDigest   Bytes?                          @map("network_digest") @db.ByteA
+  accountId       String?                         @map("account_id") @db.Uuid
   occurredAt      DateTime                        @default(now()) @map("occurred_at") @db.Timestamptz(3)
   expiresAt       DateTime                        @map("expires_at") @db.Timestamptz(3)
   deletedAt       DateTime?                       @map("deleted_at") @db.Timestamptz(3)
+  account         Account?                        @relation(fields: [accountId], references: [id], onDelete: Restrict)
 
   @@index([purpose, recipientDigest, occurredAt])
   @@index([loginLaneDigest, occurredAt])
   @@index([clientDigest, occurredAt])
   @@index([networkDigest, occurredAt])
+  @@index([accountId, occurredAt])
   @@index([expiresAt])
   @@map("authentication_throttle_events")
   @@schema("system")
