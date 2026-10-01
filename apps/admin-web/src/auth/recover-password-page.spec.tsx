@@ -86,9 +86,18 @@ describe("AW30 Recuperar contraseña", () => {
 
     await request(user);
 
-    expect(await screen.findByRole("alert")).toHaveTextContent(
-      "Demasiados intentos. Intenta de nuevo en un momento. Podrás intentarlo en 1:30.",
+    // AW30: a neutral notice above the field, never an error.
+    const notice = await screen.findByRole("status");
+    expect(notice).toHaveTextContent(
+      "Demasiadas solicitudes. Intenta de nuevo en un momento; si ya recibiste un enlace, sigue sirviendo.",
     );
+    expect(notice).toHaveTextContent("Podrás pedirlo en 1:30.");
+    expect(
+      notice.compareDocumentPosition(
+        screen.getByRole("textbox", { name: "Correo electrónico" }),
+      ) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Enviar enlace" }),
     ).toBeDisabled();
