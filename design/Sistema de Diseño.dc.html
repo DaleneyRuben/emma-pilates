@@ -348,11 +348,12 @@
               <span style="font-size:11px;letter-spacing:0.02em;">Mis Reservas</span>
             </div>
             <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:#7A716D;">
-              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+              <span style="position:relative;display:flex;"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg><span aria-hidden="true" style="position:absolute;top:-4px;right:-9px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:#8A5D59;color:#FFFFFF;box-shadow:0 0 0 2px #FFFFFF;font-size:11px;font-weight:600;line-height:18px;text-align:center;font-variant-numeric:tabular-nums;">2</span></span>
               <span style="font-size:11px;letter-spacing:0.02em;">Perfil</span>
             </div>
           </div>
         </div>
+        <div style="font-size:13px;line-height:1.5;color:#766D69;text-wrap:pretty;">Perfil cuenta los avisos sin leer; desde 10 dice 9+ y sin avisos no se dibuja.</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;">
         <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">App de staff · cabecera con retorno · 56 px</div>
@@ -464,6 +465,20 @@
           </div>
           <div style="font-size:13px;line-height:1.5;color:#766D69;text-wrap:pretty;">El ícono de acción va a la izquierda del avatar, con 10 px de separación.</div>
         </div>
+
+        <div style="display:flex;flex-direction:column;gap:9px;">
+          <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Avatar con avisos sin leer</div>
+          <div style="border:1px solid #D8C9BB;border-radius:16px;overflow:hidden;background:#FFFFFF;">
+            <div style="padding:18px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;background:#FAF7F2;">
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Entrenadora</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:26px;font-weight:400;line-height:1.15;">Hola, Camila</span>
+              </div>
+              <div style="position:relative;flex:none;width:46px;height:46px;border-radius:999px;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;">CR<span aria-hidden="true" style="position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#8A5D59;box-shadow:0 0 0 2px #FAF7F2;"></span></div>
+            </div>
+          </div>
+          <div style="font-size:13px;line-height:1.5;color:#766D69;text-wrap:pretty;">El punto avisa que hay notificaciones sin leer; no es un borde y no lleva número.</div>
+        </div>
       </div>
 
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;padding:20px 22px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;font-size:14px;line-height:1.6;color:#6E6663;">
@@ -472,7 +487,7 @@
         <div style="display:flex;flex-direction:column;gap:5px;"><span style="color:#4A4A4A;font-weight:500;">Panel web</span>Dentro de la celda de usuario de la barra superior (26 px, junto al nombre completo), que abre el menú de AW33.</div>
       </div>
 
-      <div style="font-size:14px;line-height:1.6;color:#766D69;max-width:720px;text-wrap:pretty;">La forma distingue las dos cosas: <strong style="color:#4A4A4A;font-weight:500;">cuadrado redondeado con contorno #D8C9BB sobre blanco = acción de la pantalla; círculo relleno con iniciales = tu cuenta.</strong> El avatar nunca va dentro de un cuadrado ni lleva borde.</div>
+      <div style="font-size:14px;line-height:1.6;color:#766D69;max-width:720px;text-wrap:pretty;">La forma distingue las dos cosas: <strong style="color:#4A4A4A;font-weight:500;">cuadrado redondeado con contorno #D8C9BB sobre blanco = acción de la pantalla; círculo relleno con iniciales = tu cuenta.</strong> El avatar nunca va dentro de un cuadrado ni lleva borde. El punto de avisos sin leer no cambia la forma: el avatar sigue sin borde.</div>
 
       <div style="display:flex;gap:12px;padding:16px 18px;background:rgba(201,154,78,0.10);border:1px solid rgba(201,154,78,0.32);border-radius:12px;max-width:720px;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9A7434" stroke-width="1.5" stroke-linecap="round" style="flex:none;margin-top:2px;"><circle cx="12" cy="12" r="9"></circle><line x1="12" y1="8" x2="12" y2="13"></line><line x1="12" y1="16.5" x2="12" y2="16.5"></line></svg>

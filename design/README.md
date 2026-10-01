@@ -109,6 +109,13 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - **One solid button per view.**
 - Mobile hit targets never below 44px.
 
+### Unread badges (Client and Staff)
+
+- Count badge: 18px tall pill, min-width 18px, padding 0 5px, `#8A5D59` fill, white Work Sans 11px weight 600 tabular (5.54:1); «9+» above nine; not drawn at zero. On the Client Perfil tab icon it overlaps the top-right corner (top −4px, right −9px) with a 2px white ring; screen readers hear «Perfil, 2 notificaciones sin leer».
+- Row count: the «Notificaciones» rows of `18` and `S23` show the same pill at 22px (min-width 22px, padding 0 6px, 12px text), no ring, right before the chevron.
+- Dot: 12px `#8A5D59` circle, no number, 2px ring in the header background, on the top-right edge of the staff «Tu cuenta» avatar (`S02`, `S04`, `S11`, `S15`). Staff roles have no tab bar, so the dot is their equivalent of the tab badge.
+- Never Error red: red marks rejected receipts and cancelled classes on `19`/`S20`.
+
 ---
 
 ## Admin web — shell (shared by AW02–AW29, AW31, AW33)
@@ -171,7 +178,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `15` | Mis evaluaciones | Assessment history: one per month, so up to two «Próximas» across a month boundary; «Cancelar» outside the last 3 h («Ya no se puede cancelar» inside), and the sheet says the month is freed |
 | `16` | Mis referidos | Referral code + status |
 | `17` | Mi crédito | Credit balance and movements |
-| `18` | Perfil | Profile and settings; «Evaluación nutricional» (opens `13`) sits between «Mi plan» and «Mis evaluaciones»; the summary card's 56 px circle shows the Client's photo (centre crop) or her initials; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
+| `18` | Perfil | Profile and settings; «Evaluación nutricional» (opens `13`) sits between «Mi plan» and «Mis evaluaciones»; the «Notificaciones» row shows the unread count before its chevron; the summary card's 56 px circle shows the Client's photo (centre crop) or her initials; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
 | `19` | Notificaciones | Notification list — seven types, including the studio-cancelled Evaluation (opens `15`) |
 | `20` | Recuperar contraseña | Request a reset link by email; neutral sent and temporary-limit states |
 | `21` | Crear contraseña | Page opened by an emailed link: Activar cuenta or Restablecer contraseña, plus expired and removed-invitation states |
@@ -202,10 +209,10 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `S17` | Formulario de horario | Nutritionist; Día, «Sucursal» (only with several Branches), 15-minute Horario with at least one 45-minute turno, «A partir del» / «Aplicar cambios desde» (from today); confirmation sheets «¿Aplicar el cambio?» (when bookings exist) and «¿Quitar este horario?» (always), which keep booked Evaluations |
 | `S18` | Recuperar contraseña | All staff — reset link by email |
 | `S19` | Crear contraseña | All staff — Activar cuenta or Restablecer contraseña from an emailed link |
-| `S20` | Notificaciones | All staff — no menu entry; reached from a push, filtered by role; six types, including the Client-cancelled Evaluation for the Nutritionist (opens `S15`) |
+| `S20` | Notificaciones | All staff — reached from `S23`'s «Notificaciones» row and from a push, filtered by role; six types, including the Client-cancelled Evaluation for the Nutritionist (opens `S15`) |
 | `S21` | Reservas de la clienta | Front desk |
 | `S22` | Historial de la clienta | Front desk |
-| `S23` | Perfil | All staff — read-only data, change password, log out |
+| `S23` | Perfil | All staff — read-only data, «Notificaciones» (opens `S20`, with the unread count), change password, log out |
 
 ### Admin web (desktop)
 
@@ -261,6 +268,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 **Navigation — client app**
 - Four-tab bar: Inicio · Reservar · Mis Reservas · Perfil. Child screens replace the tab bar with a header and a back arrow.
+- With unread notifications, the Perfil tab carries the unread count badge on its icon on every screen that draws the tab bar, whichever tab is active (`02` and `18` draw it with 2; the other frames show the zero state). `02`'s header avatar has no dot.
 - `01→20` via "¿Olvidaste tu contraseña?". Email is the only login, registration, and recovery identifier; phone is optional contact data added later in `22`. Registration asks for the password twice and shows «Las contraseñas no coinciden.» under «Confirmar contraseña», as `21` and `23` do.
 - A wrong email or password reads «El correo o la contraseña no son correctos.» on `01`, `S01`, and `AW01`: one form-level message that never names the field or says whether the email has an Account.
 - `01` registration → «Revisa tu correo» (no tab bar, no route to `02`): the submitted address with «Cambiar correo», «Reenviar correo», «Volver a iniciar sesión», and a quiet «Cancelar registro» with confirmation. The link expires in 24 hours; the pending registration is removed after 7 days without verification, correction, or resend, after which «El registro venció» sends the person back to register. Opening the link verifies the email but does not sign in.
@@ -276,7 +284,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `S06` manages a pending invitation on every visit (after `S05` or from `S04`): a card above the plan with the email and «Cambiar correo» («Nuevo correo», «Guardar correo», «Cancelar»), the 7-day link expiry and the 30-day removal as separate lines, «Reenviar enlace» (a limited resend shows the server-provided wait and keeps the current link), and a quiet «Cancelar invitación» that confirms in a sheet and returns to `S04`; a Client with payments or bookings shows «La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.» instead. The card disappears once the Client activates.
 - `S06→S21` (Reservas de la clienta) and `S06→S22` (Historial de la clienta).
 - `S15` cards are selectable, not navigable: tapping highlights a card (border → `#B78380`) so the nutritionist keeps their place down the day, and shows «Cancelar evaluación» under it, which opens a confirmation sheet; confirming removes the card and shows «Evaluación cancelada». There is no assessment detail screen anywhere — an Evaluation records the appointment, not its content (same reason `AW25` rows are not links).
-- `S20` has no menu entry — it is reached from a push notification and filtered by role. Every role root (`S02`, `S04`, `S11`, `S15`) carries a 46px circular initials avatar (never a photo) as the **last control on the right** of its header, labelled "Tu cuenta", and it is the only path to `S23` — and therefore to change password and log out. Where the root also has a screen action (`S11` → `S13`, `S15` → `S16`), that action is a 46px rounded square with a 1px `#D8C9BB` border and sits **before** the avatar (10px gap): outlined square = screen action, filled circle with initials = your account.
+- `S20` is reached from `S23`'s «Notificaciones» row (which shows the unread count) and from a push notification, and is filtered by role. Every role root (`S02`, `S04`, `S11`, `S15`) carries a 46px circular initials avatar (never a photo) as the **last control on the right** of its header, labelled "Tu cuenta", and it is the only path to `S23` — and therefore to change password and log out. Where the root also has a screen action (`S11` → `S13`, `S15` → `S16`), that action is a 46px rounded square with a 1px `#D8C9BB` border and sits **before** the avatar (10px gap): outlined square = screen action, filled circle with initials = your account. With unread notifications the avatar carries the unread dot on its top-right edge (drawn on the first frame of each root); its label stays «Tu cuenta» and screen readers hear «Tu cuenta, notificaciones sin leer».
 
 **Back office (AW19–AW29)**
 - `AW19`: `+ Nueva sucursal` and any row open `AW20`. There is no delete — a branch with session history can only be edited. Footer strip states this.
@@ -334,7 +342,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - **Fonts**: Lora and Work Sans from Google Fonts.
 - **Icons**: inline SVG, 24×24 viewBox, `stroke="currentColor"`-style strokes at 1.4–2.1 weight, rendered at 11–22px. Substitute your icon library, matching stroke weight and size.
 - **Images**: none shipped. Promotion thumbnails and the upload preview are `#EFE0DC` placeholder blocks with a photo glyph — real imagery comes from the studio (promotion images should be horizontal, min 1200×675).
-- **Avatars**: initials on `#EFE0DC`/`#D8BDB8`. The header account avatar («Tu cuenta») is never a photo; only the Client's own profile (`18` summary card, `22`) shows her photo, centre-cropped into the circle, with the initials as fallback (follow-up 67 amends checklist 30 §9).
+- **Avatars**: initials on `#EFE0DC`/`#D8BDB8`. The header account avatar («Tu cuenta») is never a photo; only the Client's own profile (`18` summary card, `22`) shows her photo, centre-cropped into the circle, with the initials as fallback (follow-up 67 amends checklist 30 §9). The unread dot on the staff header avatar is a state mark, not a border (follow-up 73 amends §9).
 
 ## Files
 
