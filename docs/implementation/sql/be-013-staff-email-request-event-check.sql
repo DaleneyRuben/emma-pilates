@@ -18,4 +18,8 @@ ALTER TABLE "system"."authentication_throttle_events"
         ("event_kind" = 'staff_email_requested' AND "purpose" IN ('verification', 'activation')
             AND "account_id" IS NOT NULL AND "recipient_digest" IS NULL AND "login_lane_digest" IS NULL
             AND "client_digest" IS NULL AND "network_digest" IS NULL)
-    );
+    ),
+    -- Every event still needs a key; the Account is the staff event's.
+    DROP CONSTRAINT "authentication_throttle_events_has_digest_check",
+    ADD CONSTRAINT "authentication_throttle_events_has_digest_check"
+    CHECK (num_nonnulls("recipient_digest", "login_lane_digest", "client_digest", "network_digest", "account_id") > 0);

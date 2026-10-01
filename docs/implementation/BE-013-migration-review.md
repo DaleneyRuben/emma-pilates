@@ -19,7 +19,10 @@ review was committed), following the
   `apps/backend/prisma/migrations/20261001000300_authentication_staff_email_request_event_check/migration.sql`.
   Hand-written, because Prisma does not model check constraints. A separate
   migration because a new enum value cannot be used in the transaction that
-  adds it (as BE-012's two migrations).
+  adds it (as BE-012's two migrations). The first verification run showed that
+  the foundation schema's `authentication_throttle_events_has_digest_check`
+  (at least one of the four digests) refuses a staff event, which has none, so
+  this migration replaces it too, with `account_id` as a fifth key.
 
 The Prisma model change: `AuthenticationThrottleEventKind` gains
 `STAFF_EMAIL_REQUESTED @map("staff_email_requested")`;
@@ -36,6 +39,7 @@ AuthenticationThrottleEvent[]`.
 | `system.AuthenticationThrottleEventKind` | `ADD VALUE 'staff_email_requested'` | One row per staff request admitted by the Account budget, with `purpose` `activation` or `verification` (T5, T8) |
 | `system.authentication_throttle_events.account_id` | new nullable `uuid`, foreign key to `system.accounts(id)` `ON DELETE RESTRICT ON UPDATE CASCADE` | The budget's key: the signed-in Account (T1). Nullable because no other event kind has one. Accounts are never physically deleted (ADR-0086), so `RESTRICT` never fires |
 | index `authentication_throttle_events_account_id_occurred_at_idx` on `(account_id, occurred_at)` | new | Serves the budget read (one Account, the last 24 hours) |
+| `authentication_throttle_events_has_digest_check` | replaced: `num_nonnulls(recipient_digest, login_lane_digest, client_digest, network_digest, account_id) > 0` | Every event still needs a key; the Account is the staff event's |
 | `authentication_throttle_events_kind_purpose_check` | replaced: the three existing branches each gain `account_id IS NULL`; a fourth admits `staff_email_requested` with purpose `verification` or `activation`, an `account_id`, and no recipient, Login-lane, client, or network digest | A staff event must never count against a recipient, Login, device, or network lane, and no other event may carry an Account |
 
 No table, trigger, or data change. The retention sweep already soft-deletes
@@ -43,19 +47,22 @@ every throttle event 30 days after `expires_at`, so it covers the new kind.
 
 ## Verification before commit
 
-Run on a disposable `pilates_test_be013` database after both migrations
-(then dropped):
+Run on a disposable `pilates_test_be013` database after both migrations:
 
 ```text
 select 'staff_email_requested'::system."AuthenticationThrottleEventKind"   → ok
 insert (purpose 'activation', kind 'staff_email_requested', account_id <fixture Assistant>) → ok
 the same with purpose 'verification'                                       → ok
 the same with purpose 'login' or 'password_recovery'                       → check violation
-the same without account_id, or with a client, network, or recipient digest → check violation
+the same without account_id (has-digest check), or with a client, network, or recipient digest → check violation
 the same with an account_id that does not exist                             → foreign key violation
 an email_requested, message_issued, and failed_credential_check row as before → ok
 any of those three with an account_id                                       → check violation
+a message_issued row with no key at all                                     → check violation
 ```
+
+Ran on `pilates_test_be013` (a copy of `pilates_dev_sim`) on 2026-10-01: every
+line answered as listed, after the has-digest fix above.
 
 ## Rollout and rollback
 
