@@ -254,21 +254,27 @@ describe("AuthenticationFlow", () => {
 
     await waitFor(() => {
       expect(inspectLink).toHaveBeenCalledWith("recovery-token");
-      expect(screen.getByLabelText("Nueva contraseña")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Contraseña nueva")).toBeOnTheScreen();
     });
 
     await fireEvent.changeText(
-      screen.getByLabelText("Nueva contraseña"),
+      screen.getByLabelText("Contraseña nueva"),
       "replacement password",
     );
     await fireEvent.changeText(
       screen.getByLabelText("Confirmar contraseña"),
       "replacement password",
     );
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Guardar contraseña" }),
+      ).not.toBeDisabled(),
+    );
     await fireEvent.press(
-      screen.getByRole("button", { name: "Restablecer contraseña" }),
+      screen.getByRole("button", { name: "Guardar contraseña" }),
     );
 
+    await waitFor(() => expect(startRecoveredSession).toHaveBeenCalled());
     expect(completePasswordRecovery).toHaveBeenCalledWith({
       password: "replacement password",
       token: "recovery-token",
@@ -297,26 +303,35 @@ describe("AuthenticationFlow", () => {
 
     await waitFor(() => {
       expect(inspectLink).toHaveBeenCalledWith("activation-token");
-      expect(screen.getByLabelText("Nueva contraseña")).toBeOnTheScreen();
+      expect(screen.getByLabelText("Contraseña nueva")).toBeOnTheScreen();
     });
 
     await fireEvent.changeText(
-      screen.getByLabelText("Nueva contraseña"),
+      screen.getByLabelText("Contraseña nueva"),
       "new password",
     );
     await fireEvent.changeText(
       screen.getByLabelText("Confirmar contraseña"),
       "new password",
     );
+    await waitFor(() =>
+      expect(
+        screen.getByRole("button", { name: "Activar cuenta" }),
+      ).not.toBeDisabled(),
+    );
     await fireEvent.press(
       screen.getByRole("button", { name: "Activar cuenta" }),
     );
 
+    expect(await screen.findByText("Tu cuenta está activa")).toBeOnTheScreen();
     expect(activateAccount).toHaveBeenCalledWith({
       password: "new password",
       token: "activation-token",
     });
     expect(startRecoveredSession).not.toHaveBeenCalled();
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Ir a iniciar sesión" }),
+    );
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
   });
 
@@ -331,8 +346,8 @@ describe("AuthenticationFlow", () => {
 
     await waitFor(() => {
       expect(inspectLink).toHaveBeenCalledWith("expired-token");
-      expect(screen.getByText("Enlace no válido")).toBeOnTheScreen();
+      expect(screen.getByText("Este enlace ya no es válido")).toBeOnTheScreen();
     });
-    expect(screen.queryByLabelText("Nueva contraseña")).not.toBeOnTheScreen();
+    expect(screen.queryByLabelText("Contraseña nueva")).not.toBeOnTheScreen();
   });
 });

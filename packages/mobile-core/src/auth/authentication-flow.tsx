@@ -21,6 +21,7 @@ import {
   restartPendingWindow,
   type PendingRegistration,
 } from "./pending-registration-screens";
+import { PasswordLinkScreen } from "./password-link-screen";
 import { RecoveryRequestScreen } from "./recovery-request-screen";
 import { RegistrationScreen } from "./registration-screen";
 
@@ -59,128 +60,6 @@ function routeForIntent(
     default:
       return "login";
   }
-}
-
-function PasswordLinkScreen({
-  api,
-  intent,
-  onActivated,
-  onRecovered,
-}: {
-  api: AuthenticationApi;
-  intent: AuthenticationLinkIntent;
-  onActivated: () => void;
-  onRecovered: (credential: string) => Promise<void> | void;
-}) {
-  const [password, setPassword] = useState("");
-  const [confirmation, setConfirmation] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [inspection, setInspection] = useState<
-    "current" | "invalid" | "loading"
-  >("loading");
-  const [submitting, setSubmitting] = useState(false);
-  const activation = intent.type === "activate-account";
-  const title = activation ? "Activar cuenta" : "Restablecer contraseña";
-
-  useEffect(() => {
-    let active = true;
-    const expectedPurpose = activation ? "activation" : "password_recovery";
-
-    void api
-      .inspectLink(intent.token)
-      .then((result) => {
-        if (active) {
-          setInspection(
-            result.status === "current" &&
-              result.purpose === expectedPurpose
-              ? "current"
-              : "invalid",
-          );
-        }
-      })
-      .catch(() => {
-        if (active) {
-          setInspection("invalid");
-        }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [activation, api, intent.token]);
-
-  async function submit() {
-    if (password === "" || password !== confirmation) {
-      setError("Las contraseñas deben ser iguales.");
-      return;
-    }
-
-    setSubmitting(true);
-    setError(null);
-
-    if (activation) {
-      const result = await api.activateAccount({
-        password,
-        token: intent.token,
-      });
-
-      if (result.status === "activated") {
-        onActivated();
-        return;
-      }
-    } else {
-      const result = await api.completePasswordRecovery({
-        password,
-        token: intent.token,
-      });
-
-      if (result.status === "recovered" && result.credential !== undefined) {
-        await onRecovered(result.credential);
-        return;
-      }
-    }
-
-    setError("Este enlace ya no es válido.");
-    setSubmitting(false);
-  }
-
-  if (inspection !== "current") {
-    return (
-      <AuthenticationScreen
-        title={
-          inspection === "loading" ? "Comprobando enlace" : "Enlace no válido"
-        }
-      >
-        <BodyText>
-          {inspection === "loading"
-            ? "Estamos comprobando tu enlace seguro."
-            : "Este enlace venció o ya fue utilizado."}
-        </BodyText>
-        {inspection === "invalid" ? (
-          <PrimaryButton label="Ir a iniciar sesión" onPress={onActivated} />
-        ) : null}
-      </AuthenticationScreen>
-    );
-  }
-
-  return (
-    <AuthenticationScreen title={title}>
-      <FormField
-        label="Nueva contraseña"
-        onChangeText={setPassword}
-        secureTextEntry
-        value={password}
-      />
-      <FormField
-        label="Confirmar contraseña"
-        onChangeText={setConfirmation}
-        secureTextEntry
-        value={confirmation}
-      />
-      {error === null ? null : <ErrorMessage>{error}</ErrorMessage>}
-      <PrimaryButton disabled={submitting} label={title} onPress={submit} />
-    </AuthenticationScreen>
-  );
 }
 
 function VerifyEmailScreen({
@@ -336,9 +215,11 @@ export function AuthenticationFlow({
     return (
       <PasswordLinkScreen
         api={api}
+        audience={allowClientRegistration ? "client" : "staff"}
         intent={intent}
-        onActivated={showLogin}
+        onLogin={showLogin}
         onRecovered={onRecoveryCredential}
+        onRequestRecovery={() => setRoute("recovery-request")}
       />
     );
   }
