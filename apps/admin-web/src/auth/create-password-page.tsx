@@ -21,10 +21,15 @@ type Purpose = "activation" | "password_recovery";
 type LinkState =
   { status: "invalid" } | { status: "expired" | "current"; purpose: Purpose };
 
+// `removed` (a 30-day-old invitation) reads as expired until AW32 draws its
+// own page (WEB-012).
 const toLinkState = (inspection: AuthenticationLinkInspectionDto): LinkState =>
   inspection.status === "invalid" || inspection.purpose === undefined
     ? { status: "invalid" }
-    : { status: inspection.status, purpose: inspection.purpose };
+    : {
+        status: inspection.status === "removed" ? "expired" : inspection.status,
+        purpose: inspection.purpose,
+      };
 
 const copy: Record<Purpose, { title: string; line: string }> = {
   activation: {
