@@ -102,7 +102,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 ### Buttons
 
 - Primary: `#B78380` fill, white text, radius 8, min-height 52 mobile / 38–46 desktop, weight 500, shadow above; hover `#A87370`, active `#9C6764`, disabled `#E7DCD8`/`#B3A9A5`.
-- Secondary: 1px `#B78380` border, transparent fill, `#B78380` text; hover tint `#F6EDEB`.
+- Secondary: 1px `#B78380` border, transparent fill, `#8A5D59` label on Client and Staff screens (`#B78380` on the admin web); hover tint `#F6EDEB`.
 - Tertiary/link: text only. Client and Staff screens use `#8A5D59` (hover `#7A4F4B`), and `#7A4F4B` on Palo de rosa tinte; the admin web keeps `#B78380` (hover `#9C6764`).
 - Compact neutral: 1px `#D8C9BB`, `#FAF7F2` fill, `#4A4A4A` text, height 30–38; hover border `#B78380`.
 - Destructive: Error `#B25D4B` text/border, hover text `#94493A`, hover tint `rgba(178,93,75,0.10)`.
