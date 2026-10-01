@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 
 ## Before you begin
 
@@ -80,12 +80,19 @@ You should see:
 - the **Emma** wordmark in Lora;
 - email and password fields;
 - the **Iniciar sesión** button; and
-- **Olvidé mi contraseña** and **Crear cuenta** actions.
+- **¿Olvidaste tu contraseña?** and, at the bottom, "¿No tienes una cuenta?
+  **Regístrate**".
 
-Tap **Crear cuenta**. Confirm that the form asks only for name, email,
-password, and password confirmation. It must not ask for a phone number. Return
-to Login, tap **Olvidé mi contraseña**, and confirm that recovery asks only for
-email. These navigation checks do not need the backend.
+Tap **Regístrate**. Confirm that the form asks only for name, email,
+password, and password confirmation («Repite la contraseña»), plus a collapsed
+**¿Tienes un código de referido?** that opens a **Código de referido** field.
+It must not ask for a phone number. Two different passwords show "Las
+contraseñas no coinciden." under the second field and send nothing; fewer than
+8 characters show "Mínimo 8 caracteres.". The button reads **Crear cuenta** and
+"¿Ya tienes una cuenta? **Inicia sesión**" returns to Login. Tap **¿Olvidaste tu
+contraseña?** and confirm that recovery asks only for email. These navigation
+checks do not need the backend. On an iPad the pre-session screens sit in a
+centred phone-width column.
 
 ### B. Open the Staff app
 
@@ -98,8 +105,9 @@ pnpm --filter @pilates/staff-mobile ios
 
 Expo Go displays one project at a time, so the Simulator switches from the
 Client project to the Staff project. Both development servers may remain
-running. You should see the same approved Login styling, **Iniciar sesión**, and
-**Olvidé mi contraseña**, but you must not see **Crear cuenta**. Staff Accounts
+running. You should see the same approved Login styling with an **Acceso del
+equipo** pill under the tagline, **Iniciar sesión**, and **¿Olvidaste tu
+contraseña?**, but you must not see **Regístrate**. Staff Accounts
 are created by authorized Staff workflows, never through Client registration.
 
 The two projects also have different native application identifiers, so Client
@@ -423,10 +431,12 @@ From Home, **Ver detalle** opens **Mi plan** and **Comprar un plan** opens
 **Elige tu plan**; tapping a Plan shows its detail with the price breakdown
 (Test 10 walks through the payment). The **Perfil** tab shows the Account
 summary, a **Mi plan** row, and **Cerrar sesión**; **Editar** lets you change
-the name and phone (the email stays read-only) and saves through the API.
+the name and phone and saves through the API (changing the email is Test 34).
 
 The **Reservar** tab lists the fixture Sessions for the selected Branch, day,
 and Class Type (past Sessions of today are hidden; full ones show **Lleno**).
+The **Sucursal:** chip opens «Elige una sucursal» with the current Branch's
+name in Palo de rosa profundo and a check on its right.
 Tapping a Session opens its detail; **Reservar** creates a real Booking and
 lands on **Mis reservas** with a "Reserva confirmada" notice and the updated
 class balance. A full Session offers **Unirme a la lista de espera**, and a
@@ -446,10 +456,23 @@ That Client Account must not authenticate in the Staff app. Use a Staff fixture
 such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
 by the Client app.
 
-For an incorrect password, the mobile app must show the same neutral message
-regardless of whether the Account exists. After the backend returns `429`, the
-button is disabled and the app counts down using the server's `Retry-After`
-value.
+For an incorrect password, the mobile app shows "El correo o la contraseña no
+son correctos." in a box above the fields, whether or not the Account exists.
+After the backend returns `429` (six failures with the same made-up email),
+the box reads "Demasiados intentos. Intenta de nuevo en un momento." with
+"Podrás intentarlo en 0:30." counting down from the server's `Retry-After`,
+and **Iniciar sesión** stays disabled until it ends.
+
+After **Crear cuenta** the app shows **Revisa tu correo**: the address with a
+**Cambiar correo** link, "El enlace vence en 24 horas; el correo indica la
+fecha y hora exactas.", **Reenviar correo** (always answered "Si el envío está
+disponible, recibirás un correo nuevo. Solo funciona el enlace más
+reciente."), **Volver a iniciar sesión**, the 7-day cleanup note, and a quiet
+**Cancelar registro** that asks "¿Cancelar tu registro?" first. **Cambiar
+correo** explains that the links sent to the old address stop working. The
+device/network limit frames ("Demasiadas solicitudes…" with "Podrás reenviarlo
+en m:ss.") and «El registro venció» are built but the backend does not produce
+them yet (BE-012, MOB-028), so only the automated tests show them.
 
 ### C. Log in through Swagger
 
@@ -511,7 +534,9 @@ Expected response code: `200`, with:
 ```
 
 The response deliberately contains no Account ID, email, Client, or Staff
-Member information.
+Member information. A real link answers `current` or `expired` with its
+`purpose`; an activation link whose invitation the 30-day cleanup removed
+answers `removed` (an invitation cancelled by staff still reads `expired`).
 
 ### B. Request password recovery
 
@@ -868,10 +893,13 @@ Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
 ### A. Client Perfil
 
 Log in as `sofia@example.com` and open the **Perfil** tab. Below the summary
-card you should see the rows **Mi plan**, **Notificaciones**, and **Cambiar
-contraseña**, an outlined **Cerrar sesión** button, and the footer
-"Emma Pilates Studio · versión 1.0". The Notificaciones row shows a small badge
-with the unread count when it is greater than zero.
+card you should see the rows **Mi plan**, **Evaluación nutricional**, **Mis
+evaluaciones**, **Mis referidos**, **Mi crédito**, **Notificaciones**, and
+**Cambiar contraseña**, each with its line icon in Palo de rosa, an outlined
+**Cerrar sesión** button, and the footer "Emma Pilates Studio · versión 1.0".
+With unread notifications the Notificaciones row shows the count in a Palo de
+rosa profundo pill («9+» above nine), and so does the **Perfil** tab itself
+from every screen (VoiceOver reads "Perfil, 2 notificaciones sin leer").
 
 **Profile photo (MOB-020).** The summary card's circle shows two initials
 until a photo is attached. Put an image into the Simulator's library first
@@ -913,7 +941,8 @@ Pull the Perfil tab again: the badge shows `1`, and **Notificaciones** lists the
 row under **Sin leer** with a dot and a relative time such as "Hace 40 minutos"
 (yesterday's rows read "Ayer, 18:05", older ones "Hace 2 días"). Tap **Marcar
 leídas**: the action disappears, everything moves under **Anteriores**, and the
-badge is gone when you go back. Tapping a single row also marks it read.
+row and tab badges are gone when you go back. Tapping a single row also marks
+it read.
 
 ### C. Change the signed-in password from the app
 
@@ -935,10 +964,13 @@ you signed in and **Cerrar sesión** returns to Login.
 Start the Staff app on port 8082 (`pnpm --filter @pilates/staff-mobile start`)
 and open `exp://127.0.0.1:8082` in Expo Go. Log in as
 `emma.vargas@example.com`. Every role root shows a circular avatar with two
-initials at the top right (accessibility label "Tu cuenta"); tap it to open
+initials at the top right (accessibility label "Tu cuenta"; with unread
+notifications it carries a Palo de rosa profundo dot and reads "Tu cuenta,
+notificaciones sin leer"); tap it to open
 **Perfil**. The screen is read-only: name, email, "Tus datos los actualiza
 administración.", **Rol** (`Entrenadora`), **Sucursales** (`Centro, Equipetrol,
-Urubó`), the **Notificaciones** and **Cambiar contraseña** rows, the outlined
+Urubó`), the **Notificaciones** row (with the unread count) and the
+**Cambiar contraseña** row, the outlined
 **Cerrar sesión** button, and the version footer. Log in as
 `paola.mendoza@example.com` to see **Administración** with "Todas las
 sucursales". The staff inbox uses the empty-state line "Te avisaremos aquí
@@ -1062,8 +1094,12 @@ From **Pagos pendientes** tap **Cancelar una clase**. Pick the Branch
 ones, with time, Class Type, Trainer, "N reservas", and "Llena" or "N cupos".
 No match reads "No hay clases con estos filtros." / "Prueba otro día, otra
 sucursal u otro tipo de clase.". Tap a card: **Cancelar sesión** repeats the
-Session, "N clientes afectados", and the warning "Esto no se puede deshacer"
-above the red **Sí, cancelar sesión** and the plain **Cancelar**. Confirming
+Session, "N clientes afectados", and an amber warning "Esto no se puede
+deshacer" with the live counts ("Se cancelarán las 2 reservas de esta clase,
+se reembolsará una clase a cada cliente afectado — incluso si ya no podían
+cancelar por su cuenta — y se les notificará.", plus "También se notificará a
+las N en lista de espera." when someone waits) above the red **Sí, cancelar
+sesión** and the plain **Cancelar**. Confirming
 shows **Sesión cancelada** with "Se notificó a los N clientes afectados." ("Se
 notificó al cliente afectado." for one) and "Se reembolsó una clase a cada
 cliente."; **Volver** returns to the search.
@@ -1147,14 +1183,23 @@ electrónico**, and optionally **Teléfono (opcional)**; the form explains
 cuenta** creates the pending Client, queues the activation email (the worker
 delivers it to the local capture), and opens her overview with the card
 **Cuenta pendiente de activación**: the email, "El enlace de activación vence
-el …", the 30-day removal note, **Cambiar correo**, **Reenviar enlace**, and
-**Cancelar invitación** (confirmed with "¿Cancelar la invitación de …?", then
-back to **Buscar cliente**). A second send within a minute answers "Ya
-enviamos un correo a esa dirección hace poco…". An email already in use
-answers "Este correo ya pertenece a otra cuenta."; a pending self-registration
-explains that verification is pending and offers **Ver cliente**. Once the
-pending Client has a Payment or Booking, **Cancelar invitación** disappears
-and the account stays pending until she activates it.
+el …", the 30-day removal note, **Cambiar correo** (a link beside the
+address), **Reenviar enlace**, and **Cancelar invitación** (confirmed with
+"¿Cancelar la invitación de …?", then back to **Buscar cliente**). A second
+send within a minute answers "Ya enviamos un correo a esa dirección hace poco.
+El enlace vigente sigue sirviendo." with "Podrás reenviarlo en 0:59." counting
+down from the server. Creating her again with the same email reopens the
+invitation: her overview starts with "Ana ya estaba pendiente de activación.
+Le enviamos un enlace nuevo y conservamos sus datos.". An email of another
+account answers "Este correo ya pertenece a otra cuenta. No se creó ni se
+cambió nada." under the field. A Client who registered herself from the app is
+not sent anything: the form says her email waits for verification and offers
+**Enviar enlace de verificación** (24 hours, `POST
+/api/v1/assistant/client-invitations/{clientId}/verification-emails`) and **Ver
+cliente**. Once the pending Client has a Payment or Booking, **Cancelar
+invitación** is replaced by "La cuenta ya tiene pagos o reservas, así que la
+invitación se mantiene." and the account stays pending until she activates
+it.
 
 ### F. Tablet layout
 
@@ -1168,7 +1213,8 @@ to the overview. **Reservar clase**, **Registrar pago en efectivo**, and
 **+ Nuevo cliente** open full-screen: the classes and the Plans show as a
 two-column grid, and the Session detail, the cash confirmation, and the new
 Client form sit in a centered card. Finishing a booking, a cash Payment, or a
-new Client returns to the split with that Client in the panel. Cancelling an
+new Client returns to the split with that Client in the panel (also when the
+same email reopened her invitation, with its notice). Cancelling an
 invitation clears the panel.
 
 Client search ignores accents and case: "lucia" finds Lucía Fernández and
@@ -1268,27 +1314,37 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
    appear; each turno is 45 minutes and disappears 3 hours before it starts.
    With more than one Branch, each turno names its Branch.
 2. Tap a time, check the summary on **Confirmar evaluación** ("Es gratuita —
-   no usa clases de tu plan."), and tap **Confirmar**. You land on **Mis
+   no usa clases de tu plan." and "…puedes cancelarla desde Mis evaluaciones
+   hasta 3 horas antes."), and tap **Confirmar**. You land on **Mis
    evaluaciones** with "Evaluación confirmada".
-3. Tap **Cancelar** and confirm: the sheet says the turno is freed and the
-   month becomes available again. Inside 3 hours of the start the card shows
-   "Ya no se puede cancelar" instead.
+3. Tap **Cancelar** and confirm: the sheet says the turno is freed and "Podrás
+   reservar otra evaluación para este mes." (or "para noviembre" when the
+   Evaluation is next month's). Inside 3 hours of the start the card shows
+   "Ya no se puede cancelar" instead. With nothing upcoming the list says this
+   month's Evaluation is still free, or, once it took place, "Ya usaste tu
+   evaluación de este mes. Puedes reservar la de noviembre, también gratuita."
 4. Book one again and open **Evaluación nutricional**: days in that month
    disappear. When no unused month has open turnos, the screen shows "Ya usaste
-   tu evaluación de este mes." A Client without an active plan sees "Necesitas
-   un plan activo…" with **Ver planes**.
+   tu evaluación de este mes." (naming the month when the used one is a later
+   month). A Client without an active plan sees "Necesitas un plan activo…"
+   with **Ver planes**. A studio cancellation reaches the inbox as "…Ya puedes
+   reservar otra este mes." (or "…otra para octubre.").
 
 **In the Staff app** as `gabriela.flores@example.com`:
 
 1. **Mi agenda** groups upcoming Evaluations by day ("Hoy", "Mañana") with
    "Primera evaluación" or "Seguimiento". Tap a card, then **Cancelar
-   evaluación**, and confirm: the Client is notified and the turno is freed.
+   evaluación**, and confirm: the Client is notified, the turno is freed, and
+   the "Evaluación cancelada" strip fades after 8 seconds. An Evaluation that
+   already started offers no **Cancelar evaluación**.
 2. **Mi disponibilidad** lists the weekly blocks from Monday to Sunday with
    their turnos and bookings, and "Desde…"/"Hasta…" when a block starts later
    or ends.
 3. **+ Nuevo horario**: pick a day, a start and end on the 15-minute grid, and
-   the date it starts ("A partir del", today by default). A Nutritionist with
-   two Branches also picks the Branch. An overlapping block is refused with "Se
+   the date it starts ("A partir del", today by default). The preview counts the
+   turnos ("1 turno de 45 min", "3 turnos de 45 min"), and reopening a time
+   sheet marks the current time in Palo de rosa profundo with a check. A
+   Nutritionist with two Branches also picks the Branch. An overlapping block is refused with "Se
    superpone con otro de tus horarios."
 4. Tap a block to edit it ("Aplicar cambios desde") or **Eliminar horario**.
    When it already has bookings, a sheet confirms that those Evaluations stay.
@@ -1610,10 +1666,14 @@ pnpm dev:admin
    minutos.") whether or not it belongs to an Account.
 8. **Links.** Open
    [http://localhost:5173/crear-contrasena?token=not-a-real-link-secret](http://localhost:5173/crear-contrasena?token=not-a-real-link-secret):
-   "Este enlace no es válido". Valid activation and recovery links still cannot
-   be read from the local email capture (it lives inside the worker process
-   with no inbox), so the current, expired, and used states and a successful
-   activation or reset are covered by the automated tests only.
+   "Este enlace no es válido". With the worker running, real links are in
+   `apps/backend/.data/email-capture/` (Test 34): paste a captured activation
+   or recovery link's `token` after `?token=` to see the form, or a used or
+   superseded one for "Este enlace ya no es válido". An activation link whose
+   invitation the 30-day cleanup removed (to fake one locally, set that
+   pending Account's `pending_expires_at` to the past in `pilates_dev_sim`)
+   shows "Esta invitación ya no está activa" with **Volver a iniciar
+   sesión**.
 9. **Narrow browser.** At a phone width the top bar keeps only the avatar, the
    menu opens from the bottom, and **Cambiar contraseña** fills the screen.
 
@@ -1640,7 +1700,7 @@ Bolivia time, whatever time zone your computer uses.
    grid for it without leaving the page: "Cargando el horario…" first, then
    that Branch's Sessions, never the previous Branch's under the new name.
 2. **Nueva sesión.** **+ Nueva sesión** opens the 408 px side panel. **Una sola
-   vez** asks for Tipo de clase, Entrenador (only Trainers assigned to the
+   vez** asks for Tipo de clase, Entrenadora (only Trainers assigned to the
    Branch), Fecha, Hora, and Capacidad (filled from the Class Type). **Cada
    semana** swaps Fecha for **Día de la semana** and **Vigente desde** and
    creates the weekly schedule; the page then says how many Sessions it
@@ -1705,7 +1765,9 @@ the admin web, exactly as Test 24 describes, and log in as
    Clients she referred, and her referral code. Without an active Plan the
    block reads "Sin plan activo", plus "Último plan vencido el dd/mm/aaaa." if
    she had one. A Client invited from the Staff app who has not created her
-   password yet shows **Pendiente de activación**. Nothing here is editable.
+   password yet shows **Pendiente de activación**. Nothing here is editable;
+   the only action is «Cerrar cuenta» in the footer (Test 35), which a
+   deactivated account does not offer.
 4. **Personal.** Back Office → **Personal** lists every Staff Member with the
    Role as a plain label (Entrenador, Asistente, Administrador, Nutricionista),
    the contact, the Branches ("Todas" for an Administrator), and **Activo**,
@@ -1716,9 +1778,16 @@ the admin web, exactly as Test 24 describes, and log in as
    Vence en 7 días."), Teléfono (opcional), the four Roles as a 2×2 choice, and
    the Branches as chips. Choosing **Administrador** replaces the chips with
    "Todas las sucursales (implícito por el rol)". **Guardar** with empty fields
-   marks each one; an email that already has an Account is marked on its
-   field. Saving closes the panel and says "Invitación enviada a …: tiene 7
-   días para activar su cuenta."; there is never a temporary password.
+   marks each one; an email of another Staff Member is marked on its field,
+   and a Client's email says "Este correo pertenece a una cuenta de clienta. No
+   se creó ni se cambió nada; usa otro correo.". Saving closes the panel and
+   says "Invitación enviada a …: tiene 7 días para activar su cuenta."; there
+   is never a temporary password. The email of a member still pending reopens
+   that invitation instead (a new link, Role and Branches unchanged) and the
+   page says "… ya tenía una invitación pendiente. La abrimos y enviamos un
+   enlace nuevo; su rol y sus sucursales no cambiaron." (within a minute of
+   the last email it answers "Ya enviamos un correo a esa dirección hace
+   poco…" instead).
 6. **Editar miembro.** Click a Staff Member. The name, email, and phone are
    read-only. Change the Role or the Branches and **Guardar**: the page says
    "Guardamos los cambios de …". The chips list the active Branches; a
@@ -1726,17 +1795,28 @@ the admin web, exactly as Test 24 describes, and log in as
    ones, and saving sends only those (the archived assignment is dropped
    rather than refused). A Trainer who still leads upcoming Sessions
    (Emma Vargas) keeps her Branch and the panel explains to swap her in
-   Horario first. A pending member shows when the link expires and
-   **Reenviar enlace**; a second resend within a minute says it is too soon.
-   **Desactivar cuenta** asks first and then signs the person out everywhere.
-   Your own account and a deactivated one open read-only.
+   Horario first. A pending member shows **Pendiente de activación** with the
+   address and **Cambiar correo** (Nuevo correo, "Los enlaces enviados a …
+   dejarán de funcionar; enviaremos uno nuevo de 7 días.", **Guardar correo**),
+   when the link expires, "Si no activa su cuenta en 30 días desde el último
+   envío o cambio, la invitación se elimina. Es distinto de los 7 días de cada
+   enlace.", and **Reenviar enlace**; a second email within a minute answers
+   "Ya enviamos un correo a esa dirección hace poco. El enlace vigente sigue
+   sirviendo." and "Podrás reenviarlo en 0:59." from the server's wait. Its
+   footer offers **Cancelar invitación** ("¿Cancelar la invitación de …?"):
+   the links stop working, the email is freed, and the member leaves Personal
+   (marked removed, never deleted). An active member's footer offers
+   **Desactivar cuenta** instead, which asks first and then signs the person
+   out everywhere. Your own account and a deactivated one open read-only.
 7. **Horario follows.** After a Staff change, **+ Nueva sesión** in Horario
    offers the updated list of Trainers for the selected Branch.
 
 Every change stays in `pilates_dev_sim`; the fixtures command restores the
-fixture Accounts but does not delete Staff Members you created. The activation
-email goes to the worker's local capture, so the new person cannot activate
-from this test yet (see "What you cannot test yet").
+fixture Accounts but does not delete Staff Members you created. With the
+worker running, the activation email lands in the local capture (Test 34):
+paste its `token` into the admin web's link page (Test 24, step 8) to activate
+the new person. Cancelled invitations and removed members stay as rows marked
+removed.
 
 ## Test 27: review transfer Payments in the admin web
 
@@ -1812,7 +1892,8 @@ time zone your computer uses; money is written `Bs 1.050,00`.
    refused on its field. Saving says "Insumo «…» creado con N unid.".
 3. **Editar insumo.** Click a Supply: the stock is read-only ("Cambia solo con
    «Registrar retiro» y «Registrar reposición»."); the name and threshold can
-   change. **Archivar insumo** asks first ("¿Archivar este insumo?") and the
+   change. **Archivar insumo** asks first ("¿Archivar este insumo?", with
+   **Volver** and **Archivar**) and the
    Supply leaves Insumos and Registrar retiro; its Withdrawals stay in the
    history. There is no delete.
 4. **Registrar retiro.** Choose an Insumo (each option shows its stock, "(6
@@ -2161,11 +2242,15 @@ worker refused waits under `pending/` for the 24-hour cleanup (Test 13).
 
 The following are not ready for manual product testing:
 
-- receiving or viewing the locally captured verification email;
-- opening a real verification link and completing successful verification;
-- automatic cleanup of expired pending accounts through a running worker;
-- retrieving a valid activation or password-recovery link from a local inbox;
-- completing successful activation or password recovery manually;
+- opening an emailed link in the mobile apps: the captured links under
+  `apps/backend/.data/email-capture/` (Test 34) work through Swagger and the
+  admin web's link page (Test 24), but the Simulator cannot open them until
+  LNK-001, so the mobile link pages (activation, recovery, and their
+  expired and removed states) are covered by the automated tests;
+- the device and network limits on registration, resend, and recovery
+  emails, which the apps already draw (BE-012);
+- a pending registration surviving an app restart, so «Revisa tu correo» and
+  «El registro venció» last only while the app stays open (MOB-028);
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
@@ -2173,7 +2258,6 @@ The following are not ready for manual product testing:
   works, see Test 10; the Promotion API works through Swagger, see Test 32,
   the admin web manages Promotions, see Test 33, and the Client app shows
   them, see Test 18);
-- profile photos in any app (the variants are built, no screen uploads one);
 - the admin web on a real Vercel preview or production origin, so the proxy,
   cookies, and trusted origins of ADR-0084 are only proven locally (EXT-003);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
