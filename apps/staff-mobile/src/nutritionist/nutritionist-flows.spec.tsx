@@ -1,101 +1,23 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-  within,
-} from "@testing-library/react-native";
-import { boliviaCivilDate, clearMobileQueryCache } from "@pilates/mobile-core";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
+import { clearMobileQueryCache } from "@pilates/mobile-core";
 
-import App from "../../App";
-import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
+import { jsonResponse, routeFetcher } from "../test-support";
+import {
+  block,
+  centro,
+  day,
+  entry,
+  inDays,
+  openApp,
+  openAvailability,
+  page,
+  profile,
+  routes,
+  today,
+  urubo,
+} from "./nutritionist-test-support";
 
 jest.setTimeout(30_000);
-
-const hour = 60 * 60 * 1_000;
-const day = 24 * hour;
-const today = boliviaCivilDate(new Date());
-const inDays = (days: number) => boliviaCivilDate(new Date(Date.now() + days * day));
-
-const centro = { id: "branch-centro", name: "Centro" };
-const urubo = { id: "branch-urubo", name: "Urubó" };
-
-const profile = (branches = [centro]) => ({
-  id: "staff-gabriela",
-  name: "Gabriela Rojas",
-  email: "gabriela.rojas@example.com",
-  phone: null,
-  role: "nutritionist",
-  branches,
-});
-
-const at = (civilDate: string, time: string) =>
-  new Date(`${civilDate}T${time}:00.000-04:00`).toISOString();
-
-const entry = (
-  evaluationId: string,
-  civilDate: string,
-  time: string,
-  clientName: string,
-  kind: "first" | "follow_up",
-) => ({
-  evaluationId,
-  clientName,
-  startsAt: at(civilDate, time),
-  endsAt: new Date(new Date(at(civilDate, time)).getTime() + 45 * 60_000).toISOString(),
-  durationMinutes: 45,
-  branchId: centro.id,
-  branchName: centro.name,
-  kind,
-});
-
-const block = (overrides: Record<string, unknown> = {}) => ({
-  id: "block-monday",
-  branchId: centro.id,
-  branchName: centro.name,
-  weekday: 1,
-  startsAtLocal: "09:00",
-  endsAtLocal: "13:00",
-  effectiveFrom: "2026-09-01",
-  effectiveUntil: null,
-  slotsPerWeek: 5,
-  upcomingBookedCount: 2,
-  ...overrides,
-});
-
-const page = (items: unknown[]) => ({ items, hasMore: false, nextCursor: null });
-
-function routes(overrides: Parameters<typeof routeFetcher>[0] = {}) {
-  return {
-    "/api/v1/staff-members/current": () => jsonResponse(profile()),
-    "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
-    "/api/v1/nutritionist/evaluations": () => jsonResponse(page([])),
-    "/api/v1/nutritionist/availability-blocks": () => jsonResponse([]),
-    ...overrides,
-  };
-}
-
-async function openApp(fetcher: typeof globalThis.fetch) {
-  const screen = await render(
-    <App runtime={createStaffRuntime(fetcher, "nutritionist")} />,
-  );
-  await waitFor(
-    () => {
-      expect(screen.getByRole("button", { name: "Mi disponibilidad" })).toBeOnTheScreen();
-    },
-    { timeout: 10_000 },
-  );
-  return screen;
-}
-
-async function openAvailability(fetcher: typeof globalThis.fetch) {
-  const screen = await openApp(fetcher);
-  await fireEvent.press(screen.getByRole("button", { name: "Mi disponibilidad" }));
-  await waitFor(() => {
-    expect(screen.getAllByRole("button", { name: "Nuevo horario" })[0]).toBeOnTheScreen();
-  });
-  return screen;
-}
 
 describe("Nutritionist agenda and availability", () => {
   afterEach(() => {
