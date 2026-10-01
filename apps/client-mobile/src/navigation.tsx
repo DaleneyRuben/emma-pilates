@@ -1,8 +1,10 @@
 import {
   AuthenticationFlow,
+  colors,
   EmailChangeLinkScreen,
   MobileQueryProvider,
   type MobileNavigationProps,
+  typography,
 } from "@pilates/mobile-core";
 import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
@@ -17,6 +19,7 @@ import { ClassHistoryScreen } from "./booking/class-history-screen";
 import { RescheduleScreen } from "./booking/reschedule-screen";
 import { SessionDetailScreen } from "./booking/session-detail-screen";
 import { ClientApiBaseUrlContext, ClientFetcherContext } from "./client-fetcher";
+import { ClientTabIcon, type ClientTabIconName } from "./client-tab-icon";
 import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
 import { MyEvaluationsScreen } from "./evaluations/my-evaluations-screen";
@@ -93,19 +96,39 @@ const ProfileStack = createNativeStackNavigator({
   },
 });
 
+const tabOptions = (title: string, icon: ClientTabIconName) => ({
+  tabBarIcon: ({ color }: { color: string }) => (
+    <ClientTabIcon color={color} name={icon} />
+  ),
+  title,
+});
+
 const ClientTabs = createBottomTabNavigator({
   // Labels stay under the icons on a tablet too, so the Perfil count sits on
   // its icon (follow-up 73) instead of over the label.
-  screenOptions: { headerShown: false, tabBarLabelPosition: "below-icon" },
+  screenOptions: {
+    headerShown: false,
+    tabBarActiveTintColor: colors.primary,
+    tabBarInactiveTintColor: colors.textSubtle,
+    tabBarLabelPosition: "below-icon",
+    tabBarLabelStyle: { fontSize: typography.tabLabel },
+    tabBarStyle: {
+      backgroundColor: colors.white,
+      borderTopColor: colors.borderStrong,
+    },
+  },
   screens: {
-    HomeTab: { screen: HomeStack, options: { title: "Inicio" } },
-    Booking: { screen: BookingStack, options: { title: "Reservar" } },
-    Bookings: { screen: BookingsStack, options: { title: "Mis Reservas" } },
+    HomeTab: { screen: HomeStack, options: tabOptions("Inicio", "home") },
+    Booking: { screen: BookingStack, options: tabOptions("Reservar", "booking") },
+    Bookings: {
+      screen: BookingsStack,
+      options: tabOptions("Mis Reservas", "bookings"),
+    },
     ProfileTab: {
       screen: ProfileStack,
       options: {
+        ...tabOptions("Perfil", "profile"),
         tabBarButton: (props) => <ProfileTabButton {...props} />,
-        title: "Perfil",
       },
     },
   },
