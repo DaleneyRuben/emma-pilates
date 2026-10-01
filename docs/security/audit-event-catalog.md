@@ -30,6 +30,7 @@ beyond what the table below names.
 | `client_invitation.resent` | System Identity | The invitation's Activation Link is reissued | Staff Account and Role | `account` | — | — |
 | `client_invitation.email_corrected` | System Identity | The pending invitation's email is corrected | Staff Account and Role | `account` | — | `previousEmail` |
 | `client_invitation.cancelled` | System Identity | A pending invitation without activity is removed | Staff Account and Role | `account` | — | `email` (the removed Account no longer exists) |
+| `client_invitation.verification_sent` | System Identity | An Assistant or Administrator sends a self-registered pending Client a new Verification Link from S05 «Enviar enlace de verificación» (MOB-021); older verification links stop working and the 7-day pending window restarts | Staff Account and Role | `account` | — | — |
 | `administrator_bootstrap.created` | System Identity | The bootstrap command creates the first, pending Administrator | `bootstrap` | `account` | — | — |
 | `administrator_bootstrap.activation_resent` | System Identity | The bootstrap command reissues the pending Administrator's link | `bootstrap` | `account` | — | — |
 | `client.photo_changed` | Booking & Membership | A Client attaches or replaces their own profile photo (Client 22); a replaced photo's variants are released at once (ADR-0076) | Client Account | `client` | — | `replaced` |
@@ -40,6 +41,9 @@ beyond what the table below names.
 | `staff_member.role_changed` | Booking & Membership | An Administrator changes a Staff Member's Role | Administrator | `account` | — | `previousRole`, `role` |
 | `staff_member.branches_changed` | Booking & Membership | An Administrator assigns or removes Branches | Administrator | `account` | — | `added`, `removed` |
 | `staff_member.deactivated` | Booking & Membership | An Administrator deactivates a Staff Member (Account disabled, sessions revoked) | Administrator | `account` | — | `role` |
+| `staff_member.email_corrected` | Booking & Membership | An Administrator corrects a pending Staff Member's email from AW24 «Cambiar correo»; the Activation Link is reissued to the new address (WEB-012 W1, W2, W7) | Administrator | `account` | — | `previousEmail` |
+| `staff_member.invitation_cancelled` | Booking & Membership | An Administrator cancels a pending Staff Member's invitation from AW24 «Cancelar invitación»; the pending Account and Staff Member are marked removed, never deleted (WEB-012 W3, W7; ADR-0086) | Administrator | `account` | — | `email` (the address is free for a new invitation) |
+| `staff_member.invitation_reopened` | Booking & Membership | An Administrator enters a pending Staff Member's email again in «Nuevo miembro»: the existing invitation's Activation Link is reissued instead of creating a second member (WEB-012 W4, W7) | Administrator | `account` | — | — |
 | `plan.created` | Booking & Membership | An Administrator creates a Plan | Administrator | `plan` | — | `priceCentavos` |
 | `plan.updated` | Booking & Membership | An Administrator edits a Plan | Administrator | `plan` | — | `previousPriceCentavos`, `priceCentavos` |
 | `plan.visibility_changed` | Booking & Membership | An Administrator hides or shows a Plan | Administrator | `plan` | — | `visible` |
@@ -100,8 +104,9 @@ G1 and G7; ADR-0055 reserved it there):
   rules out physical deletion anyway. Indefinite retention already covers any
   Bolivian tax or accounting period, so no per-code period is set.
 - **Nothing in the metadata is redacted or anonymized**, including when an
-  Account is closed. The three codes that carry an email
+  Account is closed. The five codes that carry an email
   (`client_invitation.email_corrected`, `client_invitation.cancelled`,
+  `staff_member.email_corrected`, `staff_member.invitation_cancelled`,
   `account.email_changed`) keep it, and `account.closed` records the closure
   without copying any personal data. A closed Account keeps its name, email,
   phone, and history in the database, hidden from every screen and endpoint
