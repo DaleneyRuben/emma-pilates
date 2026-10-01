@@ -72,6 +72,9 @@ describe("Client email change", () => {
     await waitFor(() => {
       expect(screen.getByText("Revisa tu correo nuevo")).toBeOnTheScreen();
     });
+    // Follow-up 70: the pending card's title and links read on the tint.
+    expect(screen.getByText("Revisa tu correo nuevo")).toHaveStyle({ color: "#7A4F4B" });
+    expect(screen.getByText("Reenviar correo")).toHaveStyle({ color: "#7A4F4B" });
     // The card sits under the fields: the keyboard must not hide it.
     expect(dismiss).toHaveBeenCalled();
     dismiss.mockRestore();
