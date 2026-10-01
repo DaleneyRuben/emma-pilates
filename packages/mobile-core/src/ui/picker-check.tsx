@@ -1,6 +1,7 @@
 import { View } from "react-native";
-import Svg, { Polyline } from "react-native-svg";
+import { Polyline } from "react-native-svg";
 
+import { LineIcon } from "./line-icon";
 import { colors } from "./tokens";
 
 /**
@@ -11,20 +12,8 @@ export function PickerCheck({ selected, testID }: { selected: boolean; testID?: 
   if (!selected) return <View style={{ height: 20, width: 20 }} />;
 
   return (
-    <Svg
-      accessibilityElementsHidden
-      fill="none"
-      height={20}
-      importantForAccessibility="no-hide-descendants"
-      stroke={colors.primary}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={1.4}
-      testID={testID}
-      viewBox="0 0 24 24"
-      width={20}
-    >
+    <LineIcon color={colors.primary} size={20} strokeWidth={1.4} testID={testID}>
       <Polyline points="4.5,12.5 9.5,17.5 19.5,7" />
-    </Svg>
+    </LineIcon>
   );
 }

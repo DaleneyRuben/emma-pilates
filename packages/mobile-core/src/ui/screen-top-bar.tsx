@@ -1,7 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import Svg, { Polyline } from "react-native-svg";
+import { Polyline } from "react-native-svg";
 
 import { fontFamilies } from "./fonts";
+import { LineIcon } from "./line-icon";
 import { colors, radii, spacing } from "./tokens";
 
 /** The export's screen bar: a back chevron and the screen's title over a rule. */
@@ -20,20 +21,9 @@ export function ScreenTopBar({
         onPress={onBack}
         style={({ pressed }) => [styles.back, pressed && styles.backPressed]}
       >
-        <Svg
-          accessibilityElementsHidden
-          fill="none"
-          height={22}
-          importantForAccessibility="no-hide-descendants"
-          stroke={colors.text}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={1.3}
-          viewBox="0 0 24 24"
-          width={22}
-        >
+        <LineIcon color={colors.text} size={22} strokeWidth={1.3}>
           <Polyline points="14.5,5 7.5,12 14.5,19" />
-        </Svg>
+        </LineIcon>
       </Pressable>
       <Text accessibilityRole="header" numberOfLines={1} style={styles.title}>
         {title}
