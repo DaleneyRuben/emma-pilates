@@ -180,6 +180,7 @@ Each of these was sent as the next message in the existing design session for th
 | [69](./followups/69-login-registration-copy-as-built.md) | `01` registration gains «Confirmar contraseña»; one incorrect-credentials message («El correo o la contraseña no son correctos.») on `01`/`S01`/`AW01` | ✅ applied (Claude Design export 2026-09-30, `2da21e3`) |
 | [70](./followups/70-leftovers-of-the-2026-09-30-exports.md) | Leftovers of the 2026-09-30 exports: 59 §1's text tones on every remaining screen, `09`'s total from the Bs 560 price, `AW02`'s drawer «Administración», the sidebar hover on Hover de fila, `18`'s «Evaluación nutricional» row, and Client text links in Palo de rosa profundo | ✅ applied (Claude Design export 2026-09-30, `542f68f`) |
 | [71](./followups/71-readme-aw24-password-reset-leftover.md) | `design/README.md`'s `AW24` flow bullet still offers «Restablecer contraseña», which 54 removed from the screen (checklist 30 §11, ADR-0029) | 🕓 pending |
+| [72](./followups/72-app-outlined-button-labels.md) | Finishes 70 §6: outlined-button labels on Client and Staff screens and the accent labels on `03`/`10` in Palo de rosa profundo, as the apps ship; README «Secondary» | 🕓 pending |
 
 ## Status
 
