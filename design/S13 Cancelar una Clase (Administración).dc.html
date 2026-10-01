@@ -306,7 +306,7 @@ class Component extends DCLogic {
       branches: BRANCHES.map((b, i) => ({
         name: b === "Todas" ? "Todas las sucursales" : "Sucursal " + b,
         selected: i === this.state.branch,
-        color: i === this.state.branch ? "#B78380" : "#4A4A4A",
+        color: i === this.state.branch ? "#8A5D59" : "#4A4A4A",
         onClick: () => this.setState({ branch: i, sheet: false })
       })),
       days: DAYS.map((d, i) => {

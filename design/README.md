@@ -116,6 +116,12 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - Dot: 12px `#8A5D59` circle, no number, 2px ring in the header background, on the top-right edge of the staff «Tu cuenta» avatar (`S02`, `S04`, `S11`, `S15`). Staff roles have no tab bar, so the dot is their equivalent of the tab badge.
 - Never Error red: red marks rejected receipts and cancelled classes on `19`/`S20`.
 
+### Picker sheets (Client and Staff)
+
+- A bottom sheet that picks one value (`03` and `S13` «Elige una sucursal», `S17` «Hora de inicio» / «Hora de fin») lists every option as a row.
+- The selected row carries its label in `#8A5D59` (5.54:1 on white), same family, size and weight as the other rows, and a `#B78380` check on its right; other rows are `#4A4A4A` with no check (`03` keeps the empty check slot so names do not shift).
+- Tapping a row picks it and closes the sheet; screen readers hear the row as selected.
+
 ---
 
 ## Admin web — shell (shared by AW02–AW29, AW31, AW33)

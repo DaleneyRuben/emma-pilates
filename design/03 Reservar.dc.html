@@ -344,7 +344,7 @@ class Component extends DCLogic {
     ].map(b => ({
       name: b.name,
       address: b.address,
-      color: b.name === this.state.branch ? "#B78380" : "#4A4A4A",
+      color: b.name === this.state.branch ? "#8A5D59" : "#4A4A4A",
       checkColor: b.name === this.state.branch ? "#B78380" : "transparent",
       onClick: () => this.setState({ branch: b.name, sheet: false })
     }));
