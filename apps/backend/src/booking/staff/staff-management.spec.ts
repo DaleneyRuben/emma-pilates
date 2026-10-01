@@ -1,4 +1,3 @@
-import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
   changeStaffBranches,
   changeStaffRole,
@@ -7,85 +6,20 @@ import {
   listStaffMembers,
   readStaffMember,
   resendStaffActivation,
-  StaffManagementError,
-  type StaffManagementTransaction,
-  type StaffMemberRecord,
 } from './staff-management';
+import {
+  administrator,
+  createTransaction,
+  day,
+  dependencies,
+  now,
+  principal,
+  record,
+  rejectsWith,
+  resetIds,
+} from './staff-management-test-support';
 
-const now = new Date('2026-09-23T15:00:00.000Z');
-const day = 24 * 60 * 60 * 1_000;
-
-const principal = (
-  role:
-    | 'administrator'
-    | 'assistant'
-    | 'trainer'
-    | 'nutritionist' = 'administrator',
-  staffMemberId = 'admin-staff',
-): AuthenticatedPrincipal => ({
-  accountId: 'admin-account',
-  authenticationSessionId: 'session',
-  identity: { kind: 'staff', staffMemberId, role, branchIds: [] },
-});
-const administrator = principal();
-
-const record = (
-  overrides: Partial<StaffMemberRecord> = {},
-): StaffMemberRecord => ({
-  id: 'staff-1',
-  accountId: 'account-1',
-  name: 'Daniela Ortiz',
-  email: 'daniela@example.com',
-  phone: null,
-  role: 'trainer',
-  branchIds: ['centro', 'urubo'],
-  status: 'active',
-  activationExpiresAt: null,
-  ...overrides,
-});
-
-const createTransaction = (
-  overrides: Partial<jest.Mocked<StaffManagementTransaction>> = {},
-): jest.Mocked<StaffManagementTransaction> => ({
-  findAccountByEmail: jest.fn().mockResolvedValue(null),
-  findStaffMember: jest.fn().mockResolvedValue(record()),
-  findUsableBranchIds: jest
-    .fn()
-    .mockImplementation((ids: string[]) =>
-      Promise.resolve(ids.filter((id) => id !== 'archived')),
-    ),
-  countActiveAdministrators: jest.fn().mockResolvedValue(2),
-  countTrainerCommitments: jest.fn().mockResolvedValue(0),
-  canIssueActivationEmail: jest.fn().mockResolvedValue(true),
-  createPendingStaffMember: jest.fn().mockResolvedValue(undefined),
-  reissueActivation: jest.fn().mockResolvedValue(undefined),
-  setRole: jest.fn().mockResolvedValue(undefined),
-  replaceBranches: jest.fn().mockResolvedValue(undefined),
-  endNutritionistAvailability: jest.fn().mockResolvedValue(undefined),
-  disableAccount: jest.fn().mockResolvedValue(undefined),
-  recordAudit: jest.fn().mockResolvedValue(undefined),
-  ...overrides,
-});
-
-let ids = 0;
-const dependencies = (transaction: StaffManagementTransaction) => ({
-  unitOfWork: {
-    execute: <Result>(
-      work: (tx: StaffManagementTransaction) => Promise<Result>,
-    ) => work(transaction),
-  },
-  now: () => now,
-  newId: () => `id-${(ids += 1)}`,
-});
-
-const rejectsWith = async (promise: Promise<unknown>, code: string) => {
-  await expect(promise).rejects.toBeInstanceOf(StaffManagementError);
-  await expect(promise).rejects.toMatchObject({ code });
-};
-
-beforeEach(() => {
-  ids = 0;
-});
+beforeEach(resetIds);
 
 describe('createStaffMember', () => {
   const command = {
@@ -158,7 +92,16 @@ describe('createStaffMember', () => {
       { principal: principal('assistant') },
       'staff_access_denied',
     ],
-    ['an email already in use', { account: { id: 'other' } }, 'email_in_use'],
+    [
+      'an email of another Staff Member',
+      { account: { id: 'other', kind: 'staff', staffMemberId: 'staff-9', pending: false } },
+      'email_in_use',
+    ],
+    [
+      'an email of a Client Account',
+      { account: { id: 'other', kind: 'client', staffMemberId: null, pending: false } },
+      'email_belongs_to_client',
+    ],
     ['no Branch for a Trainer', { branchIds: [] }, 'invalid_branch_assignment'],
     [
       'an archived or unknown Branch',
@@ -171,9 +114,9 @@ describe('createStaffMember', () => {
       findAccountByEmail: jest
         .fn()
         .mockResolvedValue('account' in setup ? setup.account : null),
-      canIssueActivationEmail: jest
+      activationEmailWaitSeconds: jest
         .fn()
-        .mockResolvedValue(!('throttled' in setup)),
+        .mockResolvedValue('throttled' in setup ? 40 : 0),
     });
 
     await rejectsWith(

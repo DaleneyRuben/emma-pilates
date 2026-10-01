@@ -46,6 +46,8 @@ describe('administrator staff members (e2e)', () => {
     changeRole: jest.fn<() => Promise<unknown>>(),
     changeBranches: jest.fn<() => Promise<unknown>>(),
     deactivate: jest.fn<() => Promise<unknown>>(),
+    correctEmail: jest.fn<() => Promise<unknown>>(),
+    cancelInvitation: jest.fn<() => Promise<void>>(),
   };
 
   beforeEach(async () => {
@@ -74,6 +76,11 @@ describe('administrator staff members (e2e)', () => {
       ...member,
       status: 'deactivated',
     });
+    operations.correctEmail.mockResolvedValue({
+      ...member,
+      email: 'rocio.p@example.com',
+    });
+    operations.cancelInvitation.mockResolvedValue(undefined);
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [AdministratorStaffMembersController],
@@ -179,6 +186,8 @@ describe('administrator staff members (e2e)', () => {
       ['staff_member_not_pending', 409],
       ['invalid_branch_assignment', 400],
       ['email_throttled', 429],
+      ['email_belongs_to_client', 409],
+      ['email_unchanged', 400],
     ];
     for (const [code, status] of cases) {
       operations.deactivate.mockRejectedValueOnce(
@@ -232,6 +241,60 @@ describe('administrator staff members (e2e)', () => {
       .get('/api/v1/administrator/staff-members/not-a-uuid')
       .set('authorization', bearer)
       .expect(400);
+  });
+
+  it('corrects and cancels a pending invitation (WEB-012)', async () => {
+    await request(app.getHttpServer())
+      .post(`/api/v1/administrator/staff-members/${staffId}/email-corrections`)
+      .set('authorization', bearer)
+      .send({ email: 'rocio.p@example.com' })
+      .expect(200)
+      .expect('Cache-Control', 'no-store')
+      .expect(({ body }) => expect(body.email).toBe('rocio.p@example.com'));
+    expect(operations.correctEmail).toHaveBeenCalledWith(
+      { staffMemberId: staffId, email: 'rocio.p@example.com' },
+      expect.anything(),
+    );
+    await request(app.getHttpServer())
+      .post(`/api/v1/administrator/staff-members/${staffId}/email-corrections`)
+      .set('authorization', bearer)
+      .send({ email: 'not-an-email' })
+      .expect(400);
+
+    await request(app.getHttpServer())
+      .post(
+        `/api/v1/administrator/staff-members/${staffId}/invitation-cancellation`,
+      )
+      .set('authorization', bearer)
+      .expect(204);
+    expect(operations.cancelInvitation).toHaveBeenCalledWith(
+      { staffMemberId: staffId },
+      expect.anything(),
+    );
+  });
+
+  it('says when a limited email can be sent again and when an invitation reopened', async () => {
+    operations.resendActivation.mockRejectedValueOnce(
+      new StaffManagementError('email_throttled', 40),
+    );
+    await request(app.getHttpServer())
+      .post(`/api/v1/administrator/staff-members/${staffId}/activation-link`)
+      .set('authorization', bearer)
+      .expect(429)
+      .expect('Retry-After', '40');
+
+    operations.create.mockResolvedValueOnce({ ...member, invitationReopened: true });
+    await request(app.getHttpServer())
+      .post('/api/v1/administrator/staff-members')
+      .set('authorization', bearer)
+      .send({
+        name: 'Rocío Paz',
+        email: 'rocio.paz@example.com',
+        role: 'trainer',
+        branchIds: [centro],
+      })
+      .expect(201)
+      .expect(({ body }) => expect(body.invitationReopened).toBe(true));
   });
 
   it('requires a bearer credential', async () => {
