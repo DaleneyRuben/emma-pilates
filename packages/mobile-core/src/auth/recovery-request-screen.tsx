@@ -8,6 +8,7 @@ import { AuthenticationScreen, authStyles } from "./auth-layout";
 import { WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useCountdown } from "./countdown";
+import { limitKeepsAnyLink } from "./request-limit-copy";
 
 /** 20 and S18: asks only for the link; the new password is set where it opens. */
 export function RecoveryRequestScreen({
@@ -80,7 +81,7 @@ export function RecoveryRequestScreen({
       <BodyText>Te enviaremos un enlace para restablecer tu contraseña.</BodyText>
       {limited ? (
         <WaitNotice
-          message="Demasiadas solicitudes. Intenta de nuevo en un momento; si ya recibiste un enlace, sigue sirviendo."
+          message={limitKeepsAnyLink}
           remainingSeconds={waitSeconds}
           waitLabel="Podrás pedirlo en"
         />

@@ -11,6 +11,7 @@ import { AuthenticationScreen, authStyles } from "./auth-layout";
 import { QuietButton, SecondaryButton, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useCountdown } from "./countdown";
+import { limitKeepsCurrentLink } from "./request-limit-copy";
 
 // ADR-0029: the pending registration is removed after 7 days without a
 // verification, correction, or resend; each correction or resend restarts it.
@@ -143,7 +144,7 @@ export function CheckEmailScreen({
       )}
       {waitSeconds > 0 ? (
         <WaitNotice
-          message="Demasiadas solicitudes. Intenta de nuevo en un momento; el enlace que ya tienes sigue sirviendo."
+          message={limitKeepsCurrentLink}
           remainingSeconds={waitSeconds}
           waitLabel="Podrás reenviarlo en"
         />
@@ -261,7 +262,7 @@ export function CorrectEmailScreen({
       )}
       {waitSeconds > 0 ? (
         <WaitNotice
-          message="Demasiadas solicitudes. Intenta de nuevo en un momento; el enlace que ya tienes sigue sirviendo."
+          message={limitKeepsCurrentLink}
           remainingSeconds={waitSeconds}
           waitLabel="Podrás intentarlo en"
         />

@@ -13,6 +13,7 @@ import {
   restartPendingWindow,
   type PendingRegistration,
 } from "./pending-registration-screens";
+import { limitKeepsAnyLink } from "./request-limit-copy";
 
 export const minimumPasswordLength = 8;
 
@@ -116,7 +117,7 @@ export function RegistrationScreen({
       {error === null ? null : <FormAlert>{error}</FormAlert>}
       {waitSeconds > 0 ? (
         <WaitNotice
-          message="Demasiadas solicitudes. Intenta de nuevo en un momento; si ya recibiste un enlace, sigue sirviendo."
+          message={limitKeepsAnyLink}
           remainingSeconds={waitSeconds}
           waitLabel="Podrás intentarlo en"
         />
