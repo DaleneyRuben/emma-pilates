@@ -1,21 +1,21 @@
 # BE-013 — Staff email request events migration review
 
-Status: **awaiting approval** (written 2026-10-01), following the
+Status: **approved by the user 2026-10-01** (asked in the session after the
+review was committed), following the
 [BE-013 proposal](./BE-013-staff-email-budgets-proposal.md) (decision T8).
-No migration is created or applied until it is approved.
 
 ## Reviewed artifacts
 
 - [Enum, column, and index migration SQL](./sql/be-013-staff-email-request-events.sql)
-  — to be committed byte for byte as
+  — committed byte for byte as
   `apps/backend/prisma/migrations/20261001000200_authentication_staff_email_request_events/migration.sql`.
   Generated with `prisma migrate diff --from-config-datasource --to-schema
   <prisma with the T8 model change> --script` against the migrated
   `pilates_dev_sim`; the `DropForeignKey` lines the diff lists for the raw
   composite keys of earlier migrations are drift and were stripped (as in
   every migration since NUT-002), and the header comment was added.
-- [Check migration SQL](./sql/be-013-staff-email-request-event-check.sql) — to
-  be committed byte for byte as
+- [Check migration SQL](./sql/be-013-staff-email-request-event-check.sql) —
+  committed byte for byte as
   `apps/backend/prisma/migrations/20261001000300_authentication_staff_email_request_event_check/migration.sql`.
   Hand-written, because Prisma does not model check constraints. A separate
   migration because a new enum value cannot be used in the transaction that
