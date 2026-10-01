@@ -1,4 +1,4 @@
-import { createHmac, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import {
   type MiddlewareConsumer,
   Module,
@@ -70,6 +70,7 @@ import { emailChangeWiring } from './email-change/email-change-wiring';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { argon2PasswordHasher } from './security/argon2-password-hasher';
+import { authenticationDigest } from './security/authentication-digest';
 import { AuthenticationLinkCipher } from './security/authentication-link-cipher';
 import { authenticationTokens } from './security/authentication-token-service';
 import {
@@ -157,13 +158,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         new PrismaClientRegistrationUnitOfWork({
           prisma,
           boss,
-          digestEmail: (email) =>
-            createHmac(
-              'sha256',
-              config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
-            )
-              .update(email)
-              .digest(),
+          digestEmail: authenticationDigest(config),
         }),
     },
     {
@@ -182,13 +177,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
       ) =>
         new PrismaAccountSecurityGateway(prisma, {
           boss,
-          digestEmail: (email) =>
-            createHmac(
-              'sha256',
-              config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
-            )
-              .update(email)
-              .digest(),
+          digestEmail: authenticationDigest(config),
         }),
     },
     {
@@ -325,13 +314,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
           unitOfWork: new PrismaClientInvitationUnitOfWork({
             prisma,
             boss,
-            digestEmail: (email) =>
-              createHmac(
-                'sha256',
-                config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
-              )
-                .update(email)
-                .digest(),
+            digestEmail: authenticationDigest(config),
           }),
           tokenIssuer: authenticationTokens,
           linkCipher,
@@ -432,13 +415,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         linkCipher: AuthenticationLinkCipher,
       ): StaffAccountRuntime => ({
         boss,
-        digestEmail: (email) =>
-          createHmac(
-            'sha256',
-            config.getOrThrow('AUTHENTICATION_EMAIL_DIGEST_KEY'),
-          )
-            .update(email)
-            .digest(),
+        digestEmail: authenticationDigest(config),
         linkCipher,
         tokenIssuer: authenticationTokens,
       }),
