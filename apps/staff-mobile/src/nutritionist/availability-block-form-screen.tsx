@@ -36,6 +36,7 @@ import {
   minutesOf,
   quarterHours,
   slotMinutes,
+  countLabel,
   turnosIn,
   weekdayNames,
 } from "./nutritionist-format";
@@ -279,9 +280,9 @@ export function AvailabilityBlockFormScreen({
         {turnos > 0 ? (
           <Text style={styles.preview}>
             {[
-              `${turnos} turnos de 45 min`,
+              `${countLabel(turnos, "turno", "turnos")} de 45 min`,
               ...(booked > 0
-                ? [booked === 1 ? "1 ya reservado" : `${booked} ya reservados`]
+                ? [countLabel(booked, "ya reservado", "ya reservados")]
                 : []),
             ].join(" · ")}
           </Text>

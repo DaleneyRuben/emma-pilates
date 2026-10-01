@@ -18,7 +18,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -35,6 +35,7 @@ import {
 type AgendaNavigation = { navigate: (screen: "Availability") => void };
 
 const agendaPageSize = 50;
+const noticeVisibleMs = 8_000;
 
 const kindLabel: Record<NutritionistAgendaEntryDto["kind"], string> = {
   first: "Primera evaluación",
@@ -82,6 +83,13 @@ export function NutritionistAgendaScreen() {
   );
   const [notice, setNotice] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+
+  // The «Evaluación cancelada» strip fades like 15's confirmation.
+  useEffect(() => {
+    if (notice === null) return undefined;
+    const timer = setTimeout(() => setNotice(null), noticeVisibleMs);
+    return () => clearTimeout(timer);
+  }, [notice]);
 
   const firstName =
     profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
@@ -177,6 +185,8 @@ export function NutritionistAgendaScreen() {
               </View>
               {group.entries.map((entry) => {
                 const selected = entry.evaluationId === selectedId;
+                // A started Evaluation can no longer be cancelled (evaluation_started).
+                const cancellable = new Date(entry.startsAt).getTime() > Date.now();
                 return (
                   <View key={entry.evaluationId}>
                     <Pressable
@@ -195,7 +205,7 @@ export function NutritionistAgendaScreen() {
                         <BodyText style={styles.muted}>{kindLabel[entry.kind]}</BodyText>
                       </View>
                     </Pressable>
-                    {selected ? (
+                    {selected && cancellable ? (
                       <Pressable
                         accessibilityLabel="Cancelar evaluación"
                         accessibilityRole="button"
