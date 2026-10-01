@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
     width: 56,
   },
   avatarText: {
-    color: colors.primaryDeep,
+    color: colors.primaryOnTint,
     fontSize: typography.bodyLarge,
     fontWeight: "600",
   },

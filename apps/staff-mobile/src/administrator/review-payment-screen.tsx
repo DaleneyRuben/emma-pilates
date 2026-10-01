@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 48,
   },
-  avatarText: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "600" },
+  avatarText: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "600" },
   badge: {
     backgroundColor: "rgba(201, 154, 78, 0.16)",
     borderRadius: radii.pill,

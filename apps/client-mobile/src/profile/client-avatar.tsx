@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   avatarText: {
-    color: colors.primaryDeep,
+    color: colors.primaryOnTint,
     fontSize: typography.bodyLarge,
     fontWeight: "600",
   },

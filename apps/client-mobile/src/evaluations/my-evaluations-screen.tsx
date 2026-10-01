@@ -276,8 +276,8 @@ const styles = StyleSheet.create({
     minWidth: 48,
     paddingVertical: spacing.sm,
   },
-  badgeDay: { color: colors.primaryDeep, fontSize: typography.bodyLarge, fontWeight: "600" },
-  badgeMonth: { color: colors.primaryDeep, fontSize: typography.label },
+  badgeDay: { color: colors.primaryOnTint, fontSize: typography.bodyLarge, fontWeight: "600" },
+  badgeMonth: { color: colors.primaryOnTint, fontSize: typography.label },
   cancel: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
   cancelText: { color: colors.errorText, fontSize: typography.body, fontWeight: "500" },
   card: {

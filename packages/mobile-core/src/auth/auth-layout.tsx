@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   teamBadgeLabel: {
-    color: colors.primaryDeep,
+    color: colors.primaryOnTint,
     fontFamily: fontFamilies.body,
     fontSize: 10,
     letterSpacing: 1.8,

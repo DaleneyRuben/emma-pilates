@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 48,
   },
-  avatarText: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "600" },
+  avatarText: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "600" },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   day: {
     alignItems: "center",

@@ -23,5 +23,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },
-  text: { color: colors.primaryDeep, fontSize: typography.note, fontWeight: "600" },
+  text: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "600" },
 });

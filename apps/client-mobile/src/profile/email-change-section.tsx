@@ -62,8 +62,8 @@ export function EmailChangeSection() {
         confirmar el cambio; hasta entonces sigues entrando con tu correo actual.
       </BodyText>
       <View style={styles.actions}>
-        <TextButton disabled={busy} label="Reenviar correo" onPress={() => void resend()} />
-        <TextButton disabled={busy} label="Cancelar cambio" onPress={() => void cancel()} />
+        <TextButton disabled={busy} label="Reenviar correo" onPress={() => void resend()} tone="onTint" />
+        <TextButton disabled={busy} label="Cancelar cambio" onPress={() => void cancel()} tone="onTint" />
       </View>
       {notice === null ? null : <BodyText style={styles.notice}>{notice}</BodyText>}
     </View>
@@ -82,5 +82,5 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   notice: { color: colors.textMuted, fontSize: typography.note },
-  title: { color: colors.primaryDeep, fontSize: typography.bodyLarge, fontWeight: "500" },
+  title: { color: colors.primaryOnTint, fontSize: typography.bodyLarge, fontWeight: "500" },
 });

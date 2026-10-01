@@ -218,6 +218,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 44,
   },
-  tagText: { color: colors.primaryDeep, fontSize: typography.note, fontWeight: "600" },
+  tagText: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "600" },
   title: { flex: 1 },
 });

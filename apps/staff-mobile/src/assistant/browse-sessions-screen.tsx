@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   tagFull: { backgroundColor: colors.disabledBackground },
-  tagLabel: { color: colors.primaryDeep, fontSize: typography.note, fontWeight: "500" },
+  tagLabel: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "500" },
   tagLabelFull: { color: colors.textSecondary },
   time: { color: colors.primaryDeep, fontWeight: "600" },
   trainer: { color: colors.textSecondary, fontSize: typography.body, fontWeight: "500" },

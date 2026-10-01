@@ -7,12 +7,15 @@ type TextButtonProps = {
   disabled?: boolean;
   label: string;
   onPress: () => void;
+  /** «onTint» for a link on Palo de rosa tinte, such as a pending card's. */
+  tone?: "default" | "onTint";
 };
 
 export function TextButton({
   disabled = false,
   label,
   onPress,
+  tone = "default",
 }: TextButtonProps) {
   return (
     <Pressable
@@ -24,7 +27,15 @@ export function TextButton({
       onPress={onPress}
       style={styles.button}
     >
-      <Text style={[styles.label, disabled && styles.disabled]}>{label}</Text>
+      <Text
+        style={[
+          styles.label,
+          tone === "onTint" && styles.onTint,
+          disabled && styles.disabled,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   );
 }
@@ -38,6 +49,9 @@ const styles = StyleSheet.create({
   },
   disabled: {
     color: colors.disabledText,
+  },
+  onTint: {
+    color: colors.primaryOnTint,
   },
   label: {
     color: colors.primaryDeep,

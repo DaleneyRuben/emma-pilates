@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 40,
   },
-  avatarText: { color: colors.primaryDeep, fontSize: typography.note, fontWeight: "600" },
+  avatarText: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "600" },
   capacity: {
     backgroundColor: colors.surface,
     borderRadius: radii.card,
