@@ -195,6 +195,8 @@ export function BrowseSessionsScreen() {
         contentContainerStyle={styles.chipRow}
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.strip}
+        testID="browse-day-strip"
       >
         {dates.map((date) => {
           const label = dayChipLabel(date);
@@ -222,6 +224,8 @@ export function BrowseSessionsScreen() {
         contentContainerStyle={styles.chipRow}
         horizontal
         showsHorizontalScrollIndicator={false}
+        style={styles.strip}
+        testID="browse-class-type-strip"
       >
         <Chip
           label="Todas"
@@ -327,6 +331,9 @@ const styles = StyleSheet.create({
   chipLabelSelected: { color: colors.white },
   chipRow: { gap: spacing.sm, paddingVertical: spacing.xs },
   chipSelected: { backgroundColor: colors.primary, borderColor: colors.primary },
+  // Horizontal strips keep their natural height: spare tablet height would
+  // stretch them and an open Branch list would squash them.
+  strip: { flexGrow: 0, flexShrink: 0 },
   dayChip: {
     alignItems: "center",
     backgroundColor: colors.white,
