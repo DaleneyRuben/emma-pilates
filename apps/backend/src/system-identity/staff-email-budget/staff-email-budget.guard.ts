@@ -2,8 +2,6 @@ import {
   applyDecorators,
   type CanActivate,
   type ExecutionContext,
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
   SetMetadata,
@@ -18,6 +16,7 @@ import {
   authenticateBearer,
   type PrincipalResolver,
 } from '../authentication/bearer-principal';
+import { tooManyRequests } from '../security/too-many-requests';
 import { StaffEmailThrottledError } from './admit-staff-email-request';
 import type { StaffEmailPurpose } from './staff-email-budget-policy';
 
@@ -66,16 +65,14 @@ export class StaffEmailBudgetGuard implements CanActivate {
       if (!(error instanceof StaffEmailThrottledError)) {
         throw error;
       }
-      http
-        .getResponse<Response>()
-        .setHeader('Retry-After', String(error.retryAfterSeconds));
-      throw new HttpException(
+      throw tooManyRequests(
+        http.getResponse<Response>(),
+        error.retryAfterSeconds,
         {
           code: 'staff_email_throttled',
           detail:
             'Too many emails were requested from this Account. Try again later',
         },
-        HttpStatus.TOO_MANY_REQUESTS,
       );
     }
 

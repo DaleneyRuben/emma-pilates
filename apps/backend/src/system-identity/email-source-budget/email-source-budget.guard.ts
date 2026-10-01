@@ -2,8 +2,6 @@ import {
   applyDecorators,
   type CanActivate,
   type ExecutionContext,
-  HttpException,
-  HttpStatus,
   Inject,
   Injectable,
   SetMetadata,
@@ -21,6 +19,7 @@ import {
   type RequestSource,
   requestNetworkAddress,
 } from '../security/request-source';
+import { tooManyRequests } from '../security/too-many-requests';
 import { EmailSourceThrottledError } from './admit-email-request';
 import type { EmailBudgetGroup } from './email-source-budget-policy';
 
@@ -63,16 +62,14 @@ export class EmailSourceBudgetGuard implements CanActivate {
       if (!(error instanceof EmailSourceThrottledError)) {
         throw error;
       }
-      http
-        .getResponse<Response>()
-        .setHeader('Retry-After', String(error.retryAfterSeconds));
-      throw new HttpException(
+      throw tooManyRequests(
+        http.getResponse<Response>(),
+        error.retryAfterSeconds,
         {
           code: 'authentication_email_throttled',
           detail:
             'Too many requests from this device or network. Try again later',
         },
-        HttpStatus.TOO_MANY_REQUESTS,
       );
     }
 
