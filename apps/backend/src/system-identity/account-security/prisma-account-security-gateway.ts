@@ -144,11 +144,17 @@ export class PrismaAccountSecurityGateway
         ? 'activation'
         : 'password_recovery';
 
+    if (isCurrentToken(token, input.inspectedAt, purpose)) {
+      return { purpose, state: 'current' };
+    }
+
     return {
       purpose,
-      state: isCurrentToken(token, input.inspectedAt, purpose)
-        ? 'current'
-        : 'expired',
+      state:
+        purpose === 'activation' &&
+        isRemovedInvitation(token.account, input.inspectedAt)
+          ? 'removed'
+          : 'expired',
     };
   }
 
@@ -269,7 +275,7 @@ export class PrismaAccountSecurityGateway
       return 'invalid';
     }
 
-    return link.state;
+    return link.state === 'current' ? 'current' : 'expired';
   }
 
   completeRecovery(
@@ -375,6 +381,17 @@ const isCurrentToken = (
       token.account.passwordHash === null &&
       token.account.pendingExpiresAt !== null &&
       token.account.pendingExpiresAt > now);
+
+// ADR-0029: an invitation left untouched for 30 days is removed. The cleanup
+// removes it after its pending window; a staff cancellation removes it
+// before, and only the first reads as «Esta invitación ya no está activa».
+const isRemovedInvitation = (
+  account: StoredToken['account'],
+  now: Date,
+): boolean =>
+  account.activatedAt === null &&
+  account.pendingExpiresAt !== null &&
+  account.pendingExpiresAt <= (account.deletedAt ?? now);
 
 // IDN-008 E11: taking the Account back also drops a pending email change.
 const cancelPendingEmailChange = async (

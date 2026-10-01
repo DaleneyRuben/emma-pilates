@@ -1,5 +1,6 @@
 export type AuthenticationLinkPurpose = 'activation' | 'password_recovery';
-export type AuthenticationLinkState = 'current' | 'expired';
+// `removed`: an activation link whose invitation the 30-day cleanup removed.
+export type AuthenticationLinkState = 'current' | 'expired' | 'removed';
 
 export type AuthenticationLinkGateway = {
   inspectLink(input: { tokenDigest: Uint8Array; inspectedAt: Date }): Promise<{
@@ -56,7 +57,7 @@ export const activateAccount = async (
     return { status: 'invalid' };
   }
 
-  if (link.state === 'expired') {
+  if (link.state !== 'current') {
     return { status: 'expired' };
   }
 

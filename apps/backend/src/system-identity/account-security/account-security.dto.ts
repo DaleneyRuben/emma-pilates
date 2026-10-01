@@ -8,8 +8,8 @@ export class AuthenticationLinkTokenDto {
 }
 
 export class AuthenticationLinkInspectionDto {
-  @ApiProperty({ enum: ['current', 'expired', 'invalid'] })
-  status!: 'current' | 'expired' | 'invalid';
+  @ApiProperty({ enum: ['current', 'expired', 'removed', 'invalid'] })
+  status!: 'current' | 'expired' | 'removed' | 'invalid';
 
   @ApiPropertyOptional({ enum: ['activation', 'password_recovery'] })
   purpose?: 'activation' | 'password_recovery';
