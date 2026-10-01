@@ -193,9 +193,13 @@ const styles = StyleSheet.create({
     height: 1,
     width: 36,
   },
+  // A phone-width column, centred on a tablet instead of stretched.
   content: {
+    alignSelf: "center",
     flexGrow: 1,
     gap: spacing.xxxl,
+    maxWidth: 480,
+    width: "100%",
     justifyContent: "space-between",
     paddingBottom: spacing.xl,
     paddingTop: spacing.xxxl,
