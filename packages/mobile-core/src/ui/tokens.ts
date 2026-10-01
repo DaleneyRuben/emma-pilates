@@ -66,6 +66,7 @@ export const typography = {
   body: 15,
   label: 12,
   note: 13,
+  tabLabel: 11,
 } as const;
 
 export const shadows = {
