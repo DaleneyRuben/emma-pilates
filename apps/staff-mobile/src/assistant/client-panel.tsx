@@ -28,7 +28,7 @@ const panelViews: Record<string, ClientPanel["view"]> = {
 // everything else goes to the Assistant stack as a full screen.
 export function ClientDetailPanel() {
   const parent = useNavigation<NavigationProp<ParamListBase>>();
-  const { panel, show } = useAssistantWorkspace();
+  const { opened, panel, show } = useAssistantWorkspace();
 
   const navigation = useMemo(() => {
     const navigate = (name: string, params?: Record<string, unknown>) => {
@@ -64,7 +64,9 @@ export function ClientDetailPanel() {
     );
   }
 
-  const key = `${panel.view}:${panel.clientId}`;
+  // A reopened invitation (S05, same email) remounts the overview already shown.
+  const reopened = panel.view === "overview" && panel.reopened === true;
+  const key = `${panel.view}:${panel.clientId}${reopened ? `:${opened}` : ""}`;
   return (
     <InClientPanel value>
       <NavigationContext.Provider value={navigation}>
