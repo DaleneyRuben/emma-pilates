@@ -94,7 +94,9 @@ const ProfileStack = createNativeStackNavigator({
 });
 
 const ClientTabs = createBottomTabNavigator({
-  screenOptions: { headerShown: false },
+  // Labels stay under the icons on a tablet too, so the Perfil count sits on
+  // its icon (follow-up 73) instead of over the label.
+  screenOptions: { headerShown: false, tabBarLabelPosition: "below-icon" },
   screens: {
     HomeTab: { screen: HomeStack, options: { title: "Inicio" } },
     Booking: { screen: BookingStack, options: { title: "Reservar" } },
