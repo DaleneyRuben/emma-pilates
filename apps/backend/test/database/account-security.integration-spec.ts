@@ -150,6 +150,69 @@ describe('Account security persistence', () => {
     ]);
   });
 
+  it('tells a removed invitation apart from an expired activation link', async () => {
+    const inspectedAt = new Date('2026-10-02T18:00:00.000Z');
+    const gateway = new PrismaAccountSecurityGateway(prisma);
+    const activationLink = async (account: {
+      pendingExpiresAt: Date;
+      deletedAt: Date | null;
+      tokenExpiresAt: Date;
+    }): Promise<Buffer> => {
+      const accountId = await createClientAccount(prisma, false);
+      const tokenDigest = Buffer.from(randomUUID());
+      await prisma.authenticationToken.create({
+        data: {
+          accountId,
+          purpose: 'ACTIVATION',
+          tokenDigest,
+          issuedAt: new Date('2026-08-31T17:00:00.000Z'),
+          expiresAt: account.tokenExpiresAt,
+          invalidatedAt: account.deletedAt,
+        },
+      });
+      await prisma.account.update({
+        where: { id: accountId },
+        data: {
+          pendingExpiresAt: account.pendingExpiresAt,
+          deletedAt: account.deletedAt,
+        },
+      });
+      return tokenDigest;
+    };
+
+    const swept = await activationLink({
+      pendingExpiresAt: new Date('2026-09-30T18:00:00.000Z'),
+      deletedAt: new Date('2026-09-30T19:00:00.000Z'),
+      tokenExpiresAt: new Date('2026-09-07T17:00:00.000Z'),
+    });
+    const unswept = await activationLink({
+      pendingExpiresAt: new Date('2026-10-01T18:00:00.000Z'),
+      deletedAt: null,
+      tokenExpiresAt: new Date('2026-09-07T17:00:00.000Z'),
+    });
+    const cancelled = await activationLink({
+      pendingExpiresAt: new Date('2026-10-30T18:00:00.000Z'),
+      deletedAt: new Date('2026-09-02T18:00:00.000Z'),
+      tokenExpiresAt: new Date('2026-09-07T17:00:00.000Z'),
+    });
+    const lapsed = await activationLink({
+      pendingExpiresAt: new Date('2026-10-30T18:00:00.000Z'),
+      deletedAt: null,
+      tokenExpiresAt: new Date('2026-10-01T17:00:00.000Z'),
+    });
+
+    for (const [tokenDigest, state] of [
+      [swept, 'removed'],
+      [unswept, 'removed'],
+      [cancelled, 'expired'],
+      [lapsed, 'expired'],
+    ] as const) {
+      await expect(
+        gateway.inspectLink({ tokenDigest, inspectedAt }),
+      ).resolves.toEqual({ purpose: 'activation', state });
+    }
+  });
+
   it('recovers a password while revoking old sessions and creating one replacement', async () => {
     const completedAt = new Date('2026-08-31T18:00:00.000Z');
     const accountId = await createClientAccount(prisma, true);
