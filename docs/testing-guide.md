@@ -489,9 +489,11 @@ correo** opens under a top bar titled **Cambiar correo** whose chevron returns
 to **Revisa tu correo**, and explains that the links sent to the old address
 stop working. The device/network limit frames ("Demasiadas solicitudes…" after
 the same clock, with "Podrás reenviarlo en m:ss.") appear once the API answers `429`; Test 5 G shows how to reach them.
-The registration form itself still answers that `429` with the generic «No
-pudimos crear la cuenta. Inténtalo de nuevo.» (MOB-032 waits on a design for
-it).
+The registration form itself answers that `429` with the same clock notice
+above the fields: "Demasiadas solicitudes. Intenta de nuevo en un momento; si
+ya recibiste un enlace, sigue sirviendo." with "Podrás intentarlo en m:ss."
+counting down, the fields keep what you typed, and **Crear cuenta** stays
+disabled until the wait ends (MOB-032).
 
 The pending registration stays on the device (in SecureStore) until it is
 finished: close the app from the app switcher (or Expo Go) and open it again,
@@ -583,7 +585,11 @@ drop it afterwards), because the budgets apply to everyone on your machine.
    solicitudes. Intenta de nuevo en un momento; el enlace que ya tienes sigue
    sirviendo." with "Podrás reenviarlo en 14:59." counting down and the button
    disabled; **Cambiar correo** shows the same notice with "Podrás intentarlo
-   en m:ss.". For recovery, send 25 requests to
+   en m:ss.". Go back to Login, tap **Regístrate**, and submit the form with
+   a new address: it shows "Demasiadas solicitudes. Intenta de nuevo en un
+   momento; si ya recibiste un enlace, sigue sirviendo." above the fields with
+   "Podrás intentarlo en m:ss." and **Crear cuenta** disabled, and no Account
+   is created. For recovery, send 25 requests to
    `/api/v1/password-recovery-requests` (any email), then use **¿Olvidaste tu
    contraseña?** in the Client app (20), the Staff app (S18), or the admin web
    (AW30): each shows "Demasiadas solicitudes. Intenta de nuevo en un momento;
@@ -2357,8 +2363,6 @@ The following are not ready for manual product testing:
   admin web's link page (Test 24), but the Simulator cannot open them until
   LNK-001, so the mobile link pages (activation, recovery, and their
   expired and removed states) are covered by the automated tests;
-- the registration form's own device or network limit, which still shows the
-  generic failure until a design for it exists (MOB-032);
 - «El registro venció» on a device, which needs seven days to pass after the
   registration (the automated tests show it);
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
