@@ -427,6 +427,12 @@ paid-through date, and an enabled **Reservar una clase** action. Log in as
 booking action instead. Close and reopen the app; startup Session restoration
 should return to **Inicio** without asking for the password again.
 
+The tab bar at the bottom is white with a thin sand line above it and four
+line icons (a house, a calendar, a clock, a person) over **Inicio**,
+**Reservar**, **Mis Reservas**, and **Perfil**. The current tab's icon and label
+are Palo de rosa; the others are a soft grey. On an iPad the labels stay under
+the icons.
+
 From Home, **Ver detalle** opens **Mi plan** and **Comprar un plan** opens
 **Elige tu plan**; tapping a Plan shows its detail with the price breakdown
 (Test 10 walks through the payment). The **Perfil** tab shows the Account
