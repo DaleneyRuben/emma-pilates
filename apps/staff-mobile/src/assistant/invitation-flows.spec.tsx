@@ -98,6 +98,51 @@ describe("Assistant invitations (S05, S06)", () => {
     expect(await screen.findByLabelText("Ana Nueva")).toBeOnTheScreen();
   });
 
+  it("offers S05's verification link on S06 for a Client who registered herself", async () => {
+    const sent = jest.fn();
+    const screen = await openClientSearch({
+      ...assistantRoutes(),
+      ...overviewRoutes(),
+      "/api/v1/assistant/client-invitations/client-new": () =>
+        new Response(
+          JSON.stringify({ code: "client_verification_pending", status: 404 }),
+          { headers: { "Content-Type": "application/problem+json" }, status: 404 },
+        ),
+      "POST /api/v1/assistant/client-invitations": () =>
+        jsonResponse(
+          { status: "verification_pending", clientId: "client-new", email: "ana@example.com" },
+          201,
+        ),
+      "POST /api/v1/assistant/client-invitations/client-new/verification-emails":
+        () => {
+          sent();
+          return jsonResponse({ clientId: "client-new", email: "ana@example.com" }, 202);
+        },
+    });
+
+    await submitNewClient(screen);
+    await fireEvent.press(await screen.findByRole("button", { name: "Ver cliente" }));
+
+    expect(await screen.findByLabelText("Ana Nueva")).toBeOnTheScreen();
+    expect(
+      await screen.findByText(
+        "Este correo ya se registró desde la app y espera verificación. No cambiamos sus datos ni su contraseña.",
+      ),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText("Cuenta pendiente de activación")).toBeNull();
+    expect(screen.queryByRole("button", { name: "Reenviar enlace" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Ver cliente" })).toBeNull();
+
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Enviar enlace de verificación" }),
+    );
+
+    expect(
+      await screen.findByText("Enviamos un enlace de verificación nuevo."),
+    ).toBeOnTheScreen();
+    expect(sent).toHaveBeenCalledTimes(1);
+  });
+
   it("says when a limited verification link can be sent again", async () => {
     let sends = 0;
     const screen = await openClientSearch({
