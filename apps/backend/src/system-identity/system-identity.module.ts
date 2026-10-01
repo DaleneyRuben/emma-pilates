@@ -65,6 +65,7 @@ import {
   type ClientInvitationOperations,
 } from './invitations/client-invitations.controller';
 import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-invitation-unit-of-work';
+import { sendClientVerification } from './invitations/client-verification-resend';
 import { emailChangeWiring } from './email-change/email-change-wiring';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
 import { VerifyClientEmail } from './registration/verify-client-email';
@@ -347,6 +348,8 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
             correctClientInvitationEmail(command, principal, dependencies),
           resend: (command, principal) =>
             resendClientInvitation(command, principal, dependencies),
+          sendVerification: (command, principal) =>
+            sendClientVerification(command, principal, dependencies),
           cancel: (command, principal) =>
             cancelClientInvitation(command, principal, dependencies),
         };

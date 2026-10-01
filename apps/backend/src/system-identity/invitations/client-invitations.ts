@@ -6,11 +6,9 @@ import type { IssuedAuthenticationToken } from '../security/authentication-token
 // ADR-0029: an invited Account activates through a 7-day link and the
 // invitation itself stays pending for 30 days after the last update or
 // resend; a self-registered pending Account keeps its 24-hour verification
-// link and its 7-day pending window instead.
+// link and its 7-day pending window instead (client-verification-resend.ts).
 const activationLifetimeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
 const pendingInvitationLifetimeMilliseconds = 30 * 24 * 60 * 60 * 1_000;
-const verificationLifetimeMilliseconds = 24 * 60 * 60 * 1_000;
-const pendingRegistrationLifetimeMilliseconds = 7 * 24 * 60 * 60 * 1_000;
 
 export class InvitationAccessDeniedError extends Error {
   constructor() {
@@ -73,6 +71,7 @@ export type InvitationAudit = {
     | 'client_invitation.created'
     | 'client_invitation.resent'
     | 'client_invitation.email_corrected'
+    | 'client_invitation.verification_sent'
     | 'client_invitation.cancelled';
   actorAccountId: string;
   actorRole: 'assistant' | 'administrator';
@@ -162,7 +161,7 @@ export type InviteClientResult = {
 
 type Actor = { accountId: string; role: 'assistant' | 'administrator' };
 
-const requireAssistant = (principal: AuthenticatedPrincipal): Actor => {
+export const requireAssistant = (principal: AuthenticatedPrincipal): Actor => {
   if (
     principal.identity.kind !== 'staff' ||
     (principal.identity.role !== 'assistant' &&
@@ -187,7 +186,10 @@ const toView = (record: ClientInvitationRecord): ClientInvitationView => ({
 
 // One link issue: a fresh token, its encrypted link, and the queued email,
 // all recorded against the recipient throttle inside the transaction.
-const issueLink = (dependencies: ClientInvitationDependencies, now: Date) => {
+export const issueLink = (
+  dependencies: ClientInvitationDependencies,
+  now: Date,
+) => {
   const token = dependencies.tokenIssuer.issue();
   const tokenId = dependencies.newId();
   const link = dependencies.linkCipher.encrypt(token.secret);
@@ -219,7 +221,7 @@ const issueLink = (dependencies: ClientInvitationDependencies, now: Date) => {
   };
 };
 
-const requireThrottleRoom = async (
+export const requireThrottleRoom = async (
   transaction: ClientInvitationTransaction,
   input: { email: string; purpose: EmailPurpose; now: Date },
 ): Promise<void> => {
@@ -229,7 +231,7 @@ const requireThrottleRoom = async (
   }
 };
 
-const requireInvitation = async (
+export const requireInvitation = async (
   transaction: ClientInvitationTransaction,
   clientId: string,
 ): Promise<ClientInvitationRecord> => {
@@ -238,7 +240,7 @@ const requireInvitation = async (
   return invitation;
 };
 
-const audit = (
+export const audit = (
   actor: Actor,
   dependencies: ClientInvitationDependencies,
   input: {
@@ -354,25 +356,8 @@ export const inviteClient = async (
       };
     }
 
+    // S05 offers the 24-hour verification link instead of sending it.
     if (existing.pendingFlow === 'self_registration') {
-      await requireThrottleRoom(transaction, {
-        email,
-        purpose: 'verification',
-        now,
-      });
-      const link = issueLink(dependencies, now);
-      await transaction.replaceSelfRegistrationVerification({
-        accountId: existing.id,
-        pendingExpiresAt: new Date(
-          now.getTime() + pendingRegistrationLifetimeMilliseconds,
-        ),
-        verificationToken: link.stored(verificationLifetimeMilliseconds),
-      });
-      await link.send(transaction, {
-        accountId: existing.id,
-        email,
-        purpose: 'verification',
-      });
       return {
         status: 'verification_pending',
         clientId: existing.clientId,

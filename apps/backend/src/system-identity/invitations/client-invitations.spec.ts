@@ -133,7 +133,9 @@ describe('inviteClient', () => {
       clientId: 'client-2',
       email: 'ana@example.com',
     });
-    expect(transaction.replaceSelfRegistrationVerification).not.toHaveBeenCalled();
+    expect(
+      transaction.replaceSelfRegistrationVerification,
+    ).not.toHaveBeenCalled();
     expect(transaction.scheduleAuthenticationEmail).not.toHaveBeenCalled();
     expect(transaction.recordAudit).not.toHaveBeenCalled();
   });

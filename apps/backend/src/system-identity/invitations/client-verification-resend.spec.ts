@@ -49,7 +49,10 @@ describe('sendClientVerification (S05 «Enviar enlace de verificación»)', () =
       verificationToken: { expiresAt: new Date(now.getTime() + day) },
     });
     expect(transaction.scheduleAuthenticationEmail).toHaveBeenCalledWith(
-      expect.objectContaining({ accountId: 'account-1', purpose: 'verification' }),
+      expect.objectContaining({
+        accountId: 'account-1',
+        purpose: 'verification',
+      }),
     );
     expect(transaction.recordAudit).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -62,10 +62,18 @@ export class ClientInvitationResultDto {
   @ApiProperty({
     enum: inviteClientStatuses,
     description:
-      'invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration and received a fresh verification link',
+      'invited: new pending Client; invitation_resent: the email already had a pending invitation and received a fresh link; verification_pending: the email belongs to a pending self-registration; nothing was sent, and the verification link is offered separately',
   })
   status!: (typeof inviteClientStatuses)[number];
 
+  @ApiProperty({ format: 'uuid' })
+  clientId!: string;
+
+  @ApiProperty({ format: 'email' })
+  email!: string;
+}
+
+export class ClientVerificationEmailDto {
   @ApiProperty({ format: 'uuid' })
   clientId!: string;
 

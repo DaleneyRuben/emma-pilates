@@ -17,6 +17,7 @@ import type { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiBody,
+  ApiAcceptedResponse,
   ApiCreatedResponse,
   ApiNoContentResponse,
   ApiOkResponse,
@@ -42,6 +43,7 @@ import {
 import {
   ClientInvitationDto,
   ClientInvitationResultDto,
+  ClientVerificationEmailDto,
   CorrectInvitationEmailDto,
   InviteClientDto,
   parseCorrectInvitationEmail,
@@ -67,6 +69,10 @@ export type ClientInvitationOperations = {
     command: { clientId: string },
     principal: AuthenticatedPrincipal,
   ) => Promise<ClientInvitationView>;
+  sendVerification: (
+    command: { clientId: string },
+    principal: AuthenticatedPrincipal,
+  ) => Promise<{ clientId: string; email: string }>;
   cancel: (
     command: { clientId: string },
     principal: AuthenticatedPrincipal,
@@ -216,6 +222,25 @@ export class AssistantClientInvitationsController {
     const principal = await this.authenticate(authorization);
     return run(
       () => this.operations.resend({ clientId: id }, principal),
+      response,
+    );
+  }
+
+  @Post(':clientId/verification-emails')
+  @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ operationId: 'sendClientVerification' })
+  @ApiParam({ name: 'clientId', format: 'uuid' })
+  @ApiAcceptedResponse({ type: ClientVerificationEmailDto })
+  @Header('Cache-Control', 'no-store')
+  async sendVerification(
+    @Param('clientId') clientId: string,
+    @Headers('authorization') authorization: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<ClientVerificationEmailDto> {
+    const id = requireClientId(clientId);
+    const principal = await this.authenticate(authorization);
+    return run(
+      () => this.operations.sendVerification({ clientId: id }, principal),
       response,
     );
   }
