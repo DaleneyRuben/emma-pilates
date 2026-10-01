@@ -129,7 +129,7 @@ export function OccurrenceForm({
             name="trainerStaffMemberId"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Entrenador</FormLabel>
+                <FormLabel>Entrenadora</FormLabel>
                 <FormControl>
                   <Select {...field}>
                     <TrainerOptions trainers={trainers.data ?? []} />

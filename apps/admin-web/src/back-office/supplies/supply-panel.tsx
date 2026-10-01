@@ -209,7 +209,7 @@ export function SupplyPanelForm({
           onOpenChange={setConfirming}
           title="¿Archivar este insumo?"
           confirmLabel="Archivar"
-          cancelLabel="Cancelar"
+          cancelLabel="Volver"
           pending={change.isPending}
           onConfirm={() => void archive()}
         >

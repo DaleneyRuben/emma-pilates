@@ -160,7 +160,9 @@ export function ClientDetailPanel({
           <ClientSummary client={query.data} />
         )}
       </SidePanelBody>
-      {query.data === undefined ? null : (
+      {/* AW22: a deactivated account has nothing left to close. */}
+      {query.data === undefined ||
+      query.data.accountStatus === "disabled" ? null : (
         <SidePanelFooter>
           <CloseClientAccountAction client={query.data} onClosed={onClosed} />
         </SidePanelFooter>
