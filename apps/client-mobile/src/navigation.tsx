@@ -32,6 +32,7 @@ import { CloseAccountScreen } from "./profile/close-account-screen";
 import { EditProfileScreen } from "./profile/edit-profile-screen";
 import { ClientNotificationsScreen } from "./profile/notifications-screen";
 import { ProfileScreen } from "./profile/profile-screen";
+import { ProfileTabButton } from "./profile/profile-tab-button";
 import { SubscriptionScreen } from "./subscription/subscription-screen";
 
 const unavailableFetcher: typeof globalThis.fetch = async () => {
@@ -98,7 +99,13 @@ const ClientTabs = createBottomTabNavigator({
     HomeTab: { screen: HomeStack, options: { title: "Inicio" } },
     Booking: { screen: BookingStack, options: { title: "Reservar" } },
     Bookings: { screen: BookingsStack, options: { title: "Mis Reservas" } },
-    ProfileTab: { screen: ProfileStack, options: { title: "Perfil" } },
+    ProfileTab: {
+      screen: ProfileStack,
+      options: {
+        tabBarButton: (props) => <ProfileTabButton {...props} />,
+        title: "Perfil",
+      },
+    },
   },
 });
 

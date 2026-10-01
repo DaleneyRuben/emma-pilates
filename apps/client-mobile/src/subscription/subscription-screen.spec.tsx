@@ -119,9 +119,9 @@ describe("Refreshed Mi plan (Client 12)", () => {
     });
     const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Perfil, tab/ })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Perfil, .*tab/ })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: /Perfil, tab/ }));
+    fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Mi plan/ })).toBeOnTheScreen();
     });

@@ -124,11 +124,11 @@ export async function openProfileRow(
   const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: /Perfil, tab/ })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Perfil, .*tab/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
-  await fireEvent.press(screen.getByRole("button", { name: /Perfil, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
   await waitFor(() => {
     expect(screen.getByRole("button", { name: row })).toBeOnTheScreen();
   });

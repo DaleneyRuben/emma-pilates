@@ -14,6 +14,7 @@ import {
   Screen,
   spacing,
   TextButton,
+  UnreadCountPill,
   typography,
   useMobileIdentity,
 } from "@pilates/mobile-core";
@@ -68,11 +69,7 @@ function MenuRow({
         {value === undefined ? null : (
           <BodyText style={styles.rowValue}>{value}</BodyText>
         )}
-        {badge === undefined || badge === 0 ? null : (
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>{String(badge)}</Text>
-          </View>
-        )}
+        <UnreadCountPill count={badge ?? 0} testID="notifications-row-badge" />
         <Text style={styles.chevron}>›</Text>
       </View>
     </Pressable>
@@ -215,16 +212,6 @@ export function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  badge: {
-    alignItems: "center",
-    backgroundColor: colors.primary,
-    borderRadius: radii.pill,
-    justifyContent: "center",
-    minWidth: 22,
-    paddingHorizontal: spacing.smd,
-    paddingVertical: spacing.xxs,
-  },
-  badgeText: { color: colors.white, fontSize: typography.note, fontWeight: "600" },
   chevron: { color: colors.textSubtle, fontSize: typography.titleSecondary },
   closeAccount: {
     alignSelf: "center",

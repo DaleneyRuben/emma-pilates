@@ -24,14 +24,16 @@ export function AccountAvatar() {
 
   return (
     <Pressable
-      accessibilityLabel="Tu cuenta"
+      accessibilityLabel={
+        unreadCount > 0 ? "Tu cuenta, notificaciones sin leer" : "Tu cuenta"
+      }
       accessibilityRole="button"
       hitSlop={spacing.xs}
       onPress={() => navigation.navigate("Profile")}
       style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}
     >
       <Text style={styles.initials}>{initials(name)}</Text>
-      {unreadCount > 0 ? <View style={styles.dot} /> : null}
+      {unreadCount > 0 ? <View style={styles.dot} testID="account-avatar-dot" /> : null}
     </Pressable>
   );
 }
@@ -45,8 +47,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 46,
   },
+  // Follow-up 73: unread is Palo de rosa profundo, never Error red, with a
+  // 2 px ring in the header background.
   dot: {
-    backgroundColor: colors.error,
+    backgroundColor: colors.primaryDeep,
     borderColor: colors.background,
     borderRadius: radii.pill,
     borderWidth: 2,

@@ -170,7 +170,7 @@ describe("Client Home quick actions and notification destinations", () => {
 
   it("opens Mis evaluaciones and Mis reservas from their notifications", async () => {
     const screen = await openApp(routeFetcher(routes()));
-    fireEvent.press(screen.getByRole("button", { name: /Perfil, tab/ }));
+    fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
     });

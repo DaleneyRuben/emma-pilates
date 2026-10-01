@@ -122,8 +122,9 @@ describe("Client Profile", () => {
       createClientRuntime(routeFetcher({ ...readRoutes, ...notificationRoutes })),
     );
 
+    // The row and the Perfil tab both carry the count (follow-up 73).
     await waitFor(() => {
-      expect(screen.getByText("2")).toBeOnTheScreen();
+      expect(screen.getByTestId("notifications-row-badge")).toHaveTextContent("2");
     });
     expect(
       screen.getByText("Emma Pilates Studio · versión 1.0"),

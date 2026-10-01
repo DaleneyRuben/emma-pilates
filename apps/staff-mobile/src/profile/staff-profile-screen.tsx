@@ -1,4 +1,7 @@
-import { useGetCurrentStaffMemberProfile } from "@pilates/api-contracts";
+import {
+  useGetCurrentStaffMemberProfile,
+  useGetUnreadNotificationCount,
+} from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
@@ -11,6 +14,7 @@ import {
   spacing,
   typography,
   useMobileIdentity,
+  UnreadCountPill,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -32,7 +36,15 @@ function ValueRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function MenuRow({ label, onPress }: { label: string; onPress: () => void }) {
+function MenuRow({
+  badge = 0,
+  label,
+  onPress,
+}: {
+  badge?: number;
+  label: string;
+  onPress: () => void;
+}) {
   return (
     <Pressable
       accessibilityLabel={label}
@@ -41,7 +53,10 @@ function MenuRow({ label, onPress }: { label: string; onPress: () => void }) {
       style={styles.row}
     >
       <Text style={styles.rowLabel}>{label}</Text>
-      <Text style={styles.chevron}>›</Text>
+      <View style={styles.rowTrailing}>
+        <UnreadCountPill count={badge} testID="notifications-row-badge" />
+        <Text style={styles.chevron}>›</Text>
+      </View>
     </Pressable>
   );
 }
@@ -54,6 +69,12 @@ export function StaffProfileScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
+
+  const unread = useGetUnreadNotificationCount({
+    fetcher,
+    query: { refetchOnMount: "always" },
+  });
+  const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : 0;
 
   const header = (
     <>
@@ -115,6 +136,7 @@ export function StaffProfileScreen() {
         </View>
         <View style={styles.group}>
           <MenuRow
+            badge={unreadCount}
             label="Notificaciones"
             onPress={() => navigation.navigate("Notifications")}
           />
@@ -196,6 +218,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   rowLabel: { color: colors.text, fontSize: typography.body },
+  rowTrailing: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
   rowValue: { color: colors.textMuted },
   screen: { gap: spacing.lg },
   summary: {

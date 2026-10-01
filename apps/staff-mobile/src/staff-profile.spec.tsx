@@ -50,14 +50,14 @@ async function openProfile(
 
   await waitFor(
     () => {
-      expect(screen.getByRole("button", { name: "Tu cuenta" })).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
   await waitFor(() => {
     expect(screen.getByText("EV")).toBeOnTheScreen();
   });
-  fireEvent.press(screen.getByRole("button", { name: "Tu cuenta" }));
+  fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
   await waitFor(() => {
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
   });
@@ -116,7 +116,7 @@ describe("Staff Perfil", () => {
       },
       { timeout: 10_000 },
     );
-    fireEvent.press(screen.getByRole("button", { name: "Tu cuenta" }));
+    fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
 
     await waitFor(() => {
       expect(screen.getByText("Administración")).toBeOnTheScreen();

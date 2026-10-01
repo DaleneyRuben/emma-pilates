@@ -54,10 +54,10 @@ async function openNoticeAndTap(
   });
   const screen = await render(<App runtime={createStaffRuntime(fetcher, role)} />);
   await waitFor(
-    () => expect(screen.getByRole("button", { name: "Tu cuenta" })).toBeOnTheScreen(),
+    () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: "Tu cuenta" }));
+  fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
   await waitFor(() =>
     expect(screen.getByRole("button", { name: /Notificaciones/ })).toBeOnTheScreen(),
   );
