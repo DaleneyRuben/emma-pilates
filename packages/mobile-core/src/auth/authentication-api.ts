@@ -30,6 +30,13 @@ export class AuthenticationApiError extends Error {
   }
 }
 
+/** The server wait of a device or network limit (429), or null for any other failure. */
+export function serverWaitSeconds(error: unknown): number | null {
+  return error instanceof AuthenticationApiError && error.status === 429
+    ? error.retryAfterSeconds
+    : null;
+}
+
 type ApiResponse = { data: unknown; headers: Headers; status: number };
 
 function failure(label: string, response: ApiResponse): AuthenticationApiError {

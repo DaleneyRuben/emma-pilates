@@ -21,6 +21,7 @@ import {
   restartPendingWindow,
   type PendingRegistration,
 } from "./pending-registration-screens";
+import { RecoveryRequestScreen } from "./recovery-request-screen";
 import { RegistrationScreen } from "./registration-screen";
 
 type AuthenticationRoute =
@@ -58,62 +59,6 @@ function routeForIntent(
     default:
       return "login";
   }
-}
-
-function RecoveryRequestScreen({
-  api,
-  onBack,
-}: {
-  api: AuthenticationApi;
-  onBack: () => void;
-}) {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-
-  async function submit() {
-    if (!email.includes("@")) {
-      return;
-    }
-
-    setSubmitting(true);
-    await api.requestPasswordRecovery(email.trim());
-    setSent(true);
-    setSubmitting(false);
-  }
-
-  if (sent) {
-    return (
-      <AuthenticationScreen title="Revisa tu correo">
-        <BodyText>
-          Si existe una cuenta con ese correo, recibirás un enlace para
-          restablecer la contraseña. El enlace dura 30 minutos.
-        </BodyText>
-        <TextButton label="Volver a iniciar sesión" onPress={onBack} />
-      </AuthenticationScreen>
-    );
-  }
-
-  return (
-    <AuthenticationScreen title="Recuperar contraseña">
-      <BodyText>
-        Escribe tu correo y te enviaremos un enlace seguro.
-      </BodyText>
-      <FormField
-        autoCapitalize="none"
-        keyboardType="email-address"
-        label="Correo electrónico"
-        onChangeText={setEmail}
-        value={email}
-      />
-      <PrimaryButton
-        disabled={submitting}
-        label="Enviar enlace"
-        onPress={submit}
-      />
-      <TextButton label="Volver a iniciar sesión" onPress={onBack} />
-    </AuthenticationScreen>
-  );
 }
 
 function PasswordLinkScreen({
@@ -369,7 +314,13 @@ export function AuthenticationFlow({
   }
 
   if (route === "recovery-request") {
-    return <RecoveryRequestScreen api={api} onBack={showLogin} />;
+    return (
+      <RecoveryRequestScreen
+        api={api}
+        onBack={showLogin}
+        teamAccess={!allowClientRegistration}
+      />
+    );
   }
 
   if (route === "verify-email" && intent?.type === "verify-email") {
@@ -401,6 +352,7 @@ export function AuthenticationFlow({
         allowClientRegistration ? () => setRoute("register") : undefined
       }
       onSubmit={onLogin}
+      teamAccess={!allowClientRegistration}
     />
   );
 }

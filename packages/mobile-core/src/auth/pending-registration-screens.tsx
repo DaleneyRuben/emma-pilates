@@ -9,7 +9,7 @@ import { TextButton } from "../ui/text-button";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 import { AuthenticationScreen, authStyles } from "./auth-layout";
 import { QuietButton, SecondaryButton, WaitNotice } from "./auth-parts";
-import type { AuthenticationApi } from "./authentication-api";
+import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useCountdown } from "./countdown";
 
 // ADR-0029: the pending registration is removed after 7 days without a
@@ -22,13 +22,6 @@ export type PendingRegistration = {
   pendingExpiresAt: number;
   registrationContinuation: string;
 };
-
-function serverWait(error: unknown): number | null {
-  const failure = error as { retryAfterSeconds?: unknown; status?: unknown };
-  return failure?.status === 429 && typeof failure.retryAfterSeconds === "number"
-    ? failure.retryAfterSeconds
-    : null;
-}
 
 export function restartPendingWindow(
   pending: Omit<PendingRegistration, "pendingExpiresAt">,
@@ -98,7 +91,7 @@ export function CheckEmailScreen({
       );
       onResent();
     } catch (error) {
-      const wait = serverWait(error);
+      const wait = serverWaitSeconds(error);
 
       if (wait === null) {
         setFailure("No pudimos reenviar el correo. Inténtalo de nuevo.");
@@ -234,7 +227,7 @@ export function CorrectEmailScreen({
       });
       onCorrected(restartPendingWindow({ ...pending, email: result.email }));
     } catch (failed) {
-      const wait = serverWait(failed);
+      const wait = serverWaitSeconds(failed);
 
       if (wait === null) {
         setFailure("No pudimos cambiar el correo. Inténtalo de nuevo.");

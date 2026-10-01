@@ -12,10 +12,25 @@ import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
 import { Heading } from "../ui/heading";
 import { Screen } from "../ui/screen";
-import { colors, spacing, typography } from "../ui/tokens";
+import { colors, radii, spacing, typography } from "../ui/tokens";
+
+/** The pill under the Staff wordmark (S01, S18): this is the team's entrance. */
+export function TeamAccessBadge() {
+  return (
+    <View style={styles.teamBadge}>
+      <Text style={styles.teamBadgeLabel}>Acceso del equipo</Text>
+    </View>
+  );
+}
 
 /** The Emma wordmark over its rule, with the tagline on the form screens. */
-export function BrandHeader({ tagline = false }: { tagline?: boolean }) {
+export function BrandHeader({
+  tagline = false,
+  teamAccess = false,
+}: {
+  tagline?: boolean;
+  teamAccess?: boolean;
+}) {
   return (
     <View style={styles.brand}>
       <Text style={styles.wordmark}>Emma</Text>
@@ -25,6 +40,7 @@ export function BrandHeader({ tagline = false }: { tagline?: boolean }) {
           Movimiento · Equilibrio · Bienestar
         </BodyText>
       ) : null}
+      {teamAccess ? <TeamAccessBadge /> : null}
     </View>
   );
 }
@@ -35,7 +51,9 @@ export function AuthenticationScreen({
   children,
   eyebrow,
   footer,
+  header,
   tagline = false,
+  teamAccess = false,
   title,
 }: PropsWithChildren<{
   /** «Revisa tu correo» and its siblings draw no wordmark. */
@@ -43,7 +61,10 @@ export function AuthenticationScreen({
   /** A small uppercase line over the title, such as «Activar cuenta». */
   eyebrow?: string;
   footer?: ReactNode;
+  /** Sits above the brand, such as the recovery screen's way back. */
+  header?: ReactNode;
   tagline?: boolean;
+  teamAccess?: boolean;
   title?: string;
 }>) {
   return (
@@ -56,7 +77,10 @@ export function AuthenticationScreen({
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          {brand ? <BrandHeader tagline={tagline} /> : null}
+          {header}
+          {brand ? (
+            <BrandHeader tagline={tagline} teamAccess={teamAccess} />
+          ) : null}
           <View style={styles.panel}>
             {eyebrow === undefined ? null : (
               <Text style={styles.eyebrow}>{eyebrow}</Text>
@@ -119,6 +143,21 @@ const styles = StyleSheet.create({
     fontSize: typography.label,
     letterSpacing: 2,
     textAlign: "center",
+    textTransform: "uppercase",
+  },
+  teamBadge: {
+    backgroundColor: colors.secondaryTint,
+    borderColor: colors.borderStrong,
+    borderRadius: radii.pill,
+    borderWidth: 1,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: 5,
+  },
+  teamBadgeLabel: {
+    color: colors.primaryDeep,
+    fontFamily: fontFamilies.body,
+    fontSize: 10,
+    letterSpacing: 1.8,
     textTransform: "uppercase",
   },
   wordmark: {

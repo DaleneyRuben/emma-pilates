@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { z } from "zod";
 
+import { TeamAccessBadge } from "./auth-layout";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
@@ -39,6 +40,8 @@ type LoginScreenProps = {
   onBiometricUnlock?: () => void;
   onForgotPassword?: () => void;
   onRegister?: () => void;
+  /** The Staff app marks its Login as the team's entrance (S01). */
+  teamAccess?: boolean;
   onSubmit?: (
     values: LoginValues,
   ) => Promise<LoginSubmissionResult | void> | LoginSubmissionResult | void;
@@ -50,6 +53,7 @@ export function LoginScreen({
   onForgotPassword,
   onRegister,
   onSubmit = () => undefined,
+  teamAccess = false,
 }: LoginScreenProps) {
   const [rejected, setRejected] = useState(false);
   const [retryAfterSeconds, startRetryWait] = useCountdown();
@@ -95,6 +99,7 @@ export function LoginScreen({
             <BodyText style={styles.tagline}>
               Movimiento · Equilibrio · Bienestar
             </BodyText>
+            {teamAccess ? <TeamAccessBadge /> : null}
           </View>
 
           <View style={styles.form}>

@@ -186,7 +186,7 @@ describe("AuthenticationFlow", () => {
 
     expect(screen.getByText("Revisa tu correo")).toBeOnTheScreen();
     expect(
-      screen.getByText(/Si existe una cuenta con ese correo/),
+      screen.getByText(/Si hay una cuenta con ana@example.com/),
     ).toBeOnTheScreen();
   });
 
