@@ -98,8 +98,9 @@ The other frames show the zero state.
   «Notificaciones» row and from a push. It is not «no menu entry»: `S23`
   draws that row (prompt `staff/23`). The root avatars carry the unread dot
   (§4), and the `S23` row says it lists the «Notificaciones» count.
-- Components: add the count badge and the dot (§1) next to the admin counter
-  badges, and say under Avatars that the dot is not a border.
+- Components: add an «Unread badges» subsection right after Buttons with the
+  count badge and the dot (§1), apart from the admin counter badges, and say
+  under Avatars that the dot is not a border.
 
 ## Preserve everything else
 
