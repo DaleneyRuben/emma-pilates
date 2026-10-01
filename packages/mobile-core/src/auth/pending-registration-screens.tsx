@@ -239,7 +239,10 @@ export function CorrectEmailScreen({
   }
 
   return (
-    <AuthenticationScreen brand={false} title="Cambiar correo">
+    <AuthenticationScreen
+      brand={false}
+      topBar={{ onBack, title: "Cambiar correo" }}
+    >
       <BodyText>
         {`Escribe el correo correcto. Te enviaremos un enlace nuevo de 24 horas y los enlaces enviados a ${pending.email} dejarán de funcionar.`}
       </BodyText>

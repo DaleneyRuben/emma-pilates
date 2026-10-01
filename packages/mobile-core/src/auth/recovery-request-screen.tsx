@@ -1,6 +1,5 @@
 import { useState } from "react";
 
-import { BackLink } from "../ui/back-link";
 import { BodyText } from "../ui/body-text";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
@@ -55,11 +54,11 @@ export function RecoveryRequestScreen({
     }
   }
 
-  const header = <BackLink onPress={onBack} />;
+  const topBar = { onBack, title: "Recuperar contraseña" };
 
   if (sentTo !== null) {
     return (
-      <AuthenticationScreen brand={false} header={header} title="Revisa tu correo">
+      <AuthenticationScreen brand={false} title="Revisa tu correo" topBar={topBar}>
         <BodyText>
           {`Si hay una cuenta con ${sentTo}, te enviamos un enlace para restablecer tu contraseña.`}
         </BodyText>
@@ -74,9 +73,9 @@ export function RecoveryRequestScreen({
   return (
     <AuthenticationScreen
       brand={!limited}
-      header={header}
       tagline={!teamAccess}
       teamAccess={teamAccess}
+      topBar={topBar}
     >
       <BodyText>Te enviaremos un enlace para restablecer tu contraseña.</BodyText>
       {limited ? (

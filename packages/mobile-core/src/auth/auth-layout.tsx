@@ -12,6 +12,7 @@ import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
 import { Heading } from "../ui/heading";
 import { Screen } from "../ui/screen";
+import { ScreenTopBar } from "../ui/screen-top-bar";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 
 /** The pill under the Staff wordmark (S01, S18): this is the team's entrance. */
@@ -51,33 +52,35 @@ export function AuthenticationScreen({
   children,
   eyebrow,
   footer,
-  header,
   tagline = false,
   teamAccess = false,
   title,
+  topBar,
 }: PropsWithChildren<{
   /** «Revisa tu correo» and its siblings draw no wordmark. */
   brand?: boolean;
   /** A small uppercase line over the title, such as «Activar cuenta». */
   eyebrow?: string;
   footer?: ReactNode;
-  /** Sits above the brand, such as the recovery screen's way back. */
-  header?: ReactNode;
   tagline?: boolean;
   teamAccess?: boolean;
   title?: string;
+  /** The full-width bar of 20, S18, and «Cambiar correo», with the way back. */
+  topBar?: { onBack: () => void; title: string };
 }>) {
   return (
-    <Screen style={styles.screen}>
+    <Screen style={[styles.screen, topBar !== undefined && styles.screenWithBar]}>
+      {topBar === undefined ? null : (
+        <ScreenTopBar onBack={topBar.onBack} title={topBar.title} />
+      )}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.flex}
+        style={[styles.flex, topBar !== undefined && styles.inset]}
       >
         <ScrollView
           contentContainerStyle={styles.content}
           keyboardShouldPersistTaps="handled"
         >
-          {header}
           {brand ? (
             <BrandHeader tagline={tagline} teamAccess={teamAccess} />
           ) : null}
@@ -135,12 +138,20 @@ const styles = StyleSheet.create({
   flex: {
     flex: 1,
   },
+  inset: {
+    paddingHorizontal: spacing.xlLg,
+  },
   panel: {
     gap: spacing.lgXl,
   },
   screen: {
     backgroundColor: colors.surface,
     paddingHorizontal: spacing.xlLg,
+  },
+  // The bar spans the screen, so the column takes the side padding instead.
+  screenWithBar: {
+    paddingHorizontal: 0,
+    paddingTop: 0,
   },
   tagline: {
     color: colors.textMuted,

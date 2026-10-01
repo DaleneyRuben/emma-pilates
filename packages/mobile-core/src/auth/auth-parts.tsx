@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { ClockIcon } from "../ui/clock-icon";
 import { fontFamilies } from "../ui/fonts";
 import { colors, spacing, typography } from "../ui/tokens";
 import { formatCountdown } from "./countdown";
@@ -28,12 +29,15 @@ export function WaitNotice({
 }) {
   return (
     <View style={styles.notice}>
-      <Text accessibilityRole="alert" style={styles.noticeText}>
-        {message}
-      </Text>
-      <Text style={styles.noticeWait}>
-        {`${waitLabel} ${formatCountdown(remainingSeconds)}.`}
-      </Text>
+      <ClockIcon testID="wait-notice-clock" />
+      <View style={styles.noticeBody}>
+        <Text accessibilityRole="alert" style={styles.noticeText}>
+          {message}
+        </Text>
+        <Text style={styles.noticeWait}>
+          {`${waitLabel} ${formatCountdown(remainingSeconds)}.`}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -215,13 +219,19 @@ const styles = StyleSheet.create({
     width: 6,
   },
   notice: {
+    alignItems: "flex-start",
     backgroundColor: colors.secondaryTint,
     borderColor: colors.borderStrong,
     borderRadius: 10,
     borderWidth: 1,
-    gap: 3,
+    flexDirection: "row",
+    gap: spacing.md,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
+  },
+  noticeBody: {
+    flex: 1,
+    gap: 3,
   },
   noticeText: {
     color: colors.text,
