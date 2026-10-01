@@ -29,6 +29,7 @@ env:
     visible: "Es gratuita — no usa clases de tu plan."
     timeout: 10000
 - assertVisible: "Te avisaremos un día antes y una hora antes de tu cita."
+- assertVisible: "Si necesitas cambiarla, puedes cancelarla desde Mis evaluaciones hasta 3 horas antes."
 - takeScreenshot: client-evaluation-3-confirmar
 - tapOn: "Confirmar"
 - extendedWaitUntil:
@@ -40,7 +41,8 @@ env:
 - extendedWaitUntil:
     visible: "¿Cancelar esta evaluación?"
     timeout: 10000
-- assertVisible: "Podrás reservar otra evaluación para este mes."
+# «este mes», or the month's name for next month's Evaluation (MOB-022).
+- assertVisible: "Podrás reservar otra evaluación para .*"
 - takeScreenshot: client-evaluation-5-cancelar
 - tapOn: "Sí, cancelar evaluación"
 - extendedWaitUntil:
