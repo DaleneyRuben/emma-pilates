@@ -4,7 +4,7 @@ import {
   ClientInvitationNotFoundError,
   issueLink,
   requireAssistant,
-  requireInvitation,
+  requirePendingAccount,
   requireThrottleRoom,
   type ClientInvitationDependencies,
 } from './client-invitations';
@@ -28,9 +28,8 @@ export const sendClientVerification = async (
   const now = dependencies.now();
 
   return dependencies.unitOfWork.execute(async (transaction) => {
-    const pending = await requireInvitation(transaction, command.clientId);
-    const account = await transaction.findAccountByEmail(pending.email);
-    if (account?.pendingFlow !== 'self_registration') {
+    const pending = await requirePendingAccount(transaction, command.clientId);
+    if (pending.pendingFlow !== 'self_registration') {
       throw new ClientInvitationNotFoundError();
     }
 

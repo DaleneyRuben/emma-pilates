@@ -22,6 +22,13 @@ export class ClientInvitationNotFoundError extends Error {
   }
 }
 
+// The pending Account registered herself: S06 offers the verification link.
+export class ClientVerificationPendingError extends Error {
+  constructor() {
+    super('Client verification pending');
+  }
+}
+
 export class InvitationEmailInUseError extends Error {
   constructor() {
     super('Email already belongs to another Account');
@@ -64,6 +71,7 @@ export type ClientInvitationRecord = {
   pendingExpiresAt: Date;
   activationExpiresAt: Date | null;
   hasActivity: boolean;
+  pendingFlow: 'staff_invitation' | 'self_registration';
 };
 
 export type InvitationAudit = {
@@ -83,6 +91,7 @@ export type InvitationAudit = {
 
 export interface ClientInvitationTransaction {
   findAccountByEmail: (email: string) => Promise<ExistingAccount | null>;
+  /** The Client's pending Account, from a staff invitation or her own registration. */
   findInvitation: (clientId: string) => Promise<ClientInvitationRecord | null>;
   /** Seconds until the recipient lane has room again, 0 when it has. */
   authenticationEmailWaitSeconds: (input: {
@@ -231,12 +240,25 @@ export const requireThrottleRoom = async (
   }
 };
 
+export const requirePendingAccount = async (
+  transaction: ClientInvitationTransaction,
+  clientId: string,
+): Promise<ClientInvitationRecord> => {
+  const pending = await transaction.findInvitation(clientId);
+  if (pending === null) throw new ClientInvitationNotFoundError();
+  return pending;
+};
+
+// A self-registered Account already has a password, so an activation link
+// would never work for it.
 export const requireInvitation = async (
   transaction: ClientInvitationTransaction,
   clientId: string,
 ): Promise<ClientInvitationRecord> => {
-  const invitation = await transaction.findInvitation(clientId);
-  if (invitation === null) throw new ClientInvitationNotFoundError();
+  const invitation = await requirePendingAccount(transaction, clientId);
+  if (invitation.pendingFlow === 'self_registration') {
+    throw new ClientVerificationPendingError();
+  }
   return invitation;
 };
 

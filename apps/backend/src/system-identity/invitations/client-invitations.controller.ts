@@ -33,6 +33,7 @@ import {
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 import {
   ClientInvitationNotFoundError,
+  ClientVerificationPendingError,
   InvitationAccessDeniedError,
   InvitationEmailInUseError,
   InvitationEmailThrottledError,
@@ -96,6 +97,11 @@ const problems: [new (...args: never[]) => Error, string, HttpStatus][] = [
   [
     ClientInvitationNotFoundError,
     'client_invitation_not_found',
+    HttpStatus.NOT_FOUND,
+  ],
+  [
+    ClientVerificationPendingError,
+    'client_verification_pending',
     HttpStatus.NOT_FOUND,
   ],
   [InvitationEmailInUseError, 'email_in_use', HttpStatus.CONFLICT],

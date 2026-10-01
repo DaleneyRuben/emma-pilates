@@ -10,6 +10,7 @@ import { authenticatedPrincipalResolver } from '../src/system-identity/authentic
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
 import {
   ClientInvitationNotFoundError,
+  ClientVerificationPendingError,
   InvitationAccessDeniedError,
   InvitationEmailInUseError,
   InvitationEmailThrottledError,
@@ -233,6 +234,17 @@ describe('assistant client invitations (e2e)', () => {
       .expect(404)
       .expect(({ body }) =>
         expect(body).toMatchObject({ code: 'client_invitation_not_found' }),
+      );
+
+    operations.resend.mockRejectedValueOnce(
+      new ClientVerificationPendingError(),
+    );
+    await request(app.getHttpServer())
+      .post(`/api/v1/assistant/client-invitations/${clientId}/resends`)
+      .set('authorization', bearer)
+      .expect(404)
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'client_verification_pending' }),
       );
 
     operations.cancel.mockRejectedValueOnce(new InvitationHasActivityError());

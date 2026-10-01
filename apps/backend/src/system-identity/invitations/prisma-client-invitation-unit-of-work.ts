@@ -94,6 +94,18 @@ const createInvitationTransaction = (
               take: 1,
               select: { expiresAt: true },
             },
+            // Only a self-registration holds a continuation token, the
+            // rule registration's findAccountByEmail applies too.
+            _count: {
+              select: {
+                authenticationTokens: {
+                  where: {
+                    purpose:
+                      AuthenticationTokenPurpose.REGISTRATION_CONTINUATION,
+                  },
+                },
+              },
+            },
           },
         },
         _count: {
@@ -126,6 +138,10 @@ const createInvitationTransaction = (
           client._count.payments +
           client._count.bookings >
         0,
+      pendingFlow:
+        account._count.authenticationTokens > 0
+          ? 'self_registration'
+          : 'staff_invitation',
     };
   },
   authenticationEmailWaitSeconds: (input) =>

@@ -26,6 +26,7 @@ export const invitation = {
   pendingExpiresAt: new Date('2026-10-10T00:00:00.000Z'),
   activationExpiresAt: new Date('2026-09-25T00:00:00.000Z'),
   hasActivity: false,
+  pendingFlow: 'staff_invitation' as const,
 };
 
 export const createTransaction = (

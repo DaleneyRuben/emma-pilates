@@ -16,9 +16,7 @@ import {
 import { sendClientVerification } from './client-verification-resend';
 
 const selfRegistered = {
-  id: 'account-1',
-  clientId: 'client-1',
-  domainIdentity: 'client',
+  ...invitation,
   pendingFlow: 'self_registration',
 } as const;
 
@@ -27,7 +25,7 @@ beforeEach(resetIds);
 describe('sendClientVerification (S05 «Enviar enlace de verificación»)', () => {
   it('sends a fresh 24-hour verification link to a self-registered Client without touching her data', async () => {
     const transaction = createTransaction({
-      findAccountByEmail: jest.fn().mockResolvedValue(selfRegistered),
+      findInvitation: jest.fn().mockResolvedValue(selfRegistered),
     });
 
     await expect(
@@ -38,9 +36,7 @@ describe('sendClientVerification (S05 «Enviar enlace de verificación»)', () =
       ),
     ).resolves.toEqual({ clientId: 'client-1', email: 'ana@example.com' });
 
-    expect(transaction.findAccountByEmail).toHaveBeenCalledWith(
-      invitation.email,
-    );
+    expect(transaction.findInvitation).toHaveBeenCalledWith('client-1');
     expect(
       transaction.replaceSelfRegistrationVerification.mock.calls[0]?.[0],
     ).toMatchObject({
@@ -65,7 +61,7 @@ describe('sendClientVerification (S05 «Enviar enlace de verificación»)', () =
 
   it('reports the recipient wait instead of sending', async () => {
     const transaction = createTransaction({
-      findAccountByEmail: jest.fn().mockResolvedValue(selfRegistered),
+      findInvitation: jest.fn().mockResolvedValue(selfRegistered),
       authenticationEmailWaitSeconds: jest.fn().mockResolvedValue(40),
     });
 
@@ -86,7 +82,7 @@ describe('sendClientVerification (S05 «Enviar enlace de verificación»)', () =
 
   it('only serves a pending self-registration', async () => {
     const transaction = createTransaction({
-      findAccountByEmail: jest.fn().mockResolvedValue({
+      findInvitation: jest.fn().mockResolvedValue({
         ...selfRegistered,
         pendingFlow: 'staff_invitation',
       }),
