@@ -18,7 +18,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAdministratorApi } from "./administrator-api";
-import { describeCount } from "./administrator-format";
+import { describeCount, describeSessionCancellation } from "./administrator-format";
 import type { CancellableSession } from "./cancel-class-screen";
 
 type CancelSessionNavigation = { goBack: () => void };
@@ -91,8 +91,7 @@ export function CancelSessionScreen({
       <View style={styles.warning}>
         <Text style={styles.warningTitle}>Esto no se puede deshacer</Text>
         <BodyText style={styles.warningText}>
-          Se cancelará la clase, se reembolsará una clase a cada reserva y se
-          avisará a los clientes y a la entrenadora.
+          {describeSessionCancellation(session)}
         </BodyText>
       </View>
       {failure === null ? null : (
