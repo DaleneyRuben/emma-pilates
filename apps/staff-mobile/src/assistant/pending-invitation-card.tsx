@@ -23,6 +23,7 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { formatInstantDate, limitedEmailMessage } from "./assistant-format";
 import { OutlinedButton } from "./outlined-button";
+import { SelfRegisteredNotice } from "./self-registered-notice";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -38,11 +39,13 @@ const firstName = (name: string) => name.trim().split(/\s+/)[0] ?? name;
 /** S06's invitation card, above the plan while the Account is pending. */
 export function PendingInvitationCard({
   clientId,
+  clientEmail,
   clientName,
   onCancelled,
   reopened = false,
 }: {
   clientId: string;
+  clientEmail: string;
   clientName: string;
   onCancelled: () => void;
   /** S05 reopened this pending invitation with the same email. */
@@ -64,6 +67,17 @@ export function PendingInvitationCard({
   const [failure, setFailure] = useState<string | null>(null);
   const [waitSeconds, startWait] = useCountdown();
 
+  // The generated read only types its 200; a problem arrives as data too.
+  const answer = invitation.data as { status: number; data: unknown } | undefined;
+  if (answer !== undefined && answer.status !== 200) {
+    const code = (answer.data as { code?: unknown } | null)?.code;
+    // MOB-027: she registered herself, so S05's verification offer applies.
+    return code === "client_verification_pending" ? (
+      <View style={styles.pendingCard}>
+        <SelfRegisteredNotice clientId={clientId} email={clientEmail} />
+      </View>
+    ) : null;
+  }
   if (invitation.data?.status !== 200) return null;
   const pending = invitation.data.data;
 

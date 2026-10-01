@@ -135,6 +135,7 @@ export function ClientOverviewScreen({
         </BodyText>
         {client.accountStatus === "pending" ? (
           <PendingInvitationCard
+            clientEmail={client.email}
             clientId={client.id}
             clientName={client.name}
             onCancelled={() => navigation.popToTop()}
