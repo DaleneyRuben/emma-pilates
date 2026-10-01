@@ -68,6 +68,8 @@ import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-in
 import { sendClientVerification } from './invitations/client-verification-resend';
 import { emailChangeWiring } from './email-change/email-change-wiring';
 import { emailSourceBudgetProviders } from './email-source-budget/email-source-budget-providers';
+import { staffEmailBudgetProviders } from './staff-email-budget/staff-email-budget-providers';
+import { staffEmailAdmission } from './staff-email-budget/staff-email-budget.guard';
 import { ResendPendingClientVerification } from './registration/resend-pending-client-verification';
 import { VerifyClientEmail } from './registration/verify-client-email';
 import { argon2PasswordHasher } from './security/argon2-password-hasher';
@@ -117,6 +119,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
   providers: [
     ...emailChangeWiring.providers(systemIdentityPrisma),
     ...emailSourceBudgetProviders(systemIdentityPrisma),
+    ...staffEmailBudgetProviders(systemIdentityPrisma),
     {
       provide: systemIdentityPrisma,
       inject: [ConfigService],
@@ -429,7 +432,11 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         new SystemIdentityRuntimeCleanup(prisma, boss),
     },
   ],
-  exports: [authenticatedPrincipalResolver, staffAccountRuntime],
+  exports: [
+    authenticatedPrincipalResolver,
+    staffAccountRuntime,
+    staffEmailAdmission,
+  ],
 })
 export class SystemIdentityModule implements NestModule {
   constructor(private readonly config: ConfigService<Environment, true>) {}

@@ -13,6 +13,7 @@ import { configureApplication } from '../src/http/configure-application';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
+import { staffEmailAdmission } from '../src/system-identity/staff-email-budget/staff-email-budget.guard';
 
 const bearer = `Bearer ${'a'.repeat(43)}`;
 const staffId = '66666666-6666-4666-8666-666666666666';
@@ -87,6 +88,8 @@ describe('administrator staff members (e2e)', () => {
       providers: [
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
         { provide: staffManagementOperations, useValue: operations },
+        // BE-013's Account budget admits everything here.
+        { provide: staffEmailAdmission, useValue: () => Promise.resolve() },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();

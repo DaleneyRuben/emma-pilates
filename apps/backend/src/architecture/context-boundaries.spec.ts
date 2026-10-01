@@ -38,6 +38,9 @@ const sharedContextSlices = [
   // Closing a Client's Account revokes its sessions and marks the Account
   // removed inside the Booking & Membership closure transaction (BE-007).
   'system-identity/account-closure',
+  // Staff management's email commands carry the staff email budget guard
+  // (BE-013).
+  'system-identity/staff-email-budget',
 ];
 // Shared kernel folders may depend on each other but never on a context.
 const sharedKernel = [

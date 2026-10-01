@@ -32,6 +32,7 @@ import {
   type PrincipalResolver,
 } from '../../system-identity/authentication/bearer-principal';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { StaffEmailBudget } from '../../system-identity/staff-email-budget/staff-email-budget.guard';
 import {
   StaffManagementError,
   type StaffDirectoryPage,
@@ -215,6 +216,7 @@ export class AdministratorStaffMembersController {
 
   @Post()
   @ApiOperation({ operationId: 'createStaffMember' })
+  @StaffEmailBudget('activation')
   @ApiBody({ type: CreateStaffMemberDto })
   @ApiCreatedResponse({ type: StaffMemberDto })
   @Header('Cache-Control', 'no-store')
@@ -246,6 +248,7 @@ export class AdministratorStaffMembersController {
   @Post(':staffMemberId/activation-link')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ operationId: 'resendStaffMemberActivation' })
+  @StaffEmailBudget('activation')
   @ApiParam({ name: 'staffMemberId', format: 'uuid' })
   @ApiOkResponse({ type: StaffMemberDto })
   @Header('Cache-Control', 'no-store')
@@ -265,6 +268,7 @@ export class AdministratorStaffMembersController {
   @Post(':staffMemberId/email-corrections')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ operationId: 'correctStaffMemberEmail' })
+  @StaffEmailBudget('activation')
   @ApiParam({ name: 'staffMemberId', format: 'uuid' })
   @ApiBody({ type: CorrectStaffEmailDto })
   @ApiOkResponse({ type: StaffMemberDto })

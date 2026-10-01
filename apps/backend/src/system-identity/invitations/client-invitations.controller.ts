@@ -41,6 +41,7 @@ import {
   type ClientInvitationView,
   type InviteClientResult,
 } from './client-invitations';
+import { StaffEmailBudget } from '../staff-email-budget/staff-email-budget.guard';
 import {
   ClientInvitationDto,
   ClientInvitationResultDto,
@@ -154,6 +155,7 @@ export class AssistantClientInvitationsController {
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ operationId: 'inviteClient' })
+  @StaffEmailBudget('activation')
   @ApiBody({ type: InviteClientDto })
   @ApiCreatedResponse({ type: ClientInvitationResultDto })
   @Header('Cache-Control', 'no-store')
@@ -189,6 +191,7 @@ export class AssistantClientInvitationsController {
   @Post(':clientId/email-corrections')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ operationId: 'correctClientInvitationEmail' })
+  @StaffEmailBudget('activation')
   @ApiParam({ name: 'clientId', format: 'uuid' })
   @ApiBody({ type: CorrectInvitationEmailDto })
   @ApiOkResponse({ type: ClientInvitationDto })
@@ -216,6 +219,7 @@ export class AssistantClientInvitationsController {
   @Post(':clientId/resends')
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ operationId: 'resendClientInvitation' })
+  @StaffEmailBudget('activation')
   @ApiParam({ name: 'clientId', format: 'uuid' })
   @ApiOkResponse({ type: ClientInvitationDto })
   @Header('Cache-Control', 'no-store')
@@ -235,6 +239,7 @@ export class AssistantClientInvitationsController {
   @Post(':clientId/verification-emails')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiOperation({ operationId: 'sendClientVerification' })
+  @StaffEmailBudget('verification')
   @ApiParam({ name: 'clientId', format: 'uuid' })
   @ApiAcceptedResponse({ type: ClientVerificationEmailDto })
   @Header('Cache-Control', 'no-store')

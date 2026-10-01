@@ -20,6 +20,7 @@ import {
   AssistantClientInvitationsController,
   clientInvitationOperations,
 } from '../src/system-identity/invitations/client-invitations.controller';
+import { staffEmailAdmission } from '../src/system-identity/staff-email-budget/staff-email-budget.guard';
 
 const bearer = `Bearer ${'a'.repeat(43)}`;
 const clientId = '11111111-1111-4111-8111-111111111111';
@@ -90,6 +91,8 @@ describe('assistant client invitations (e2e)', () => {
       providers: [
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
         { provide: clientInvitationOperations, useValue: operations },
+        // BE-013's Account budget admits everything here.
+        { provide: staffEmailAdmission, useValue: () => Promise.resolve() },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();
