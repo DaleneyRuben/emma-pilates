@@ -1,4 +1,3 @@
-import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 import {
   cancelClientInvitation,
   ClientInvitationNotFoundError,
@@ -10,77 +9,20 @@ import {
   inviteClient,
   readClientInvitation,
   resendClientInvitation,
-  type ClientInvitationTransaction,
 } from './client-invitations';
+import {
+  assistant,
+  client,
+  createTransaction,
+  day,
+  dependencies,
+  invitation,
+  now,
+  resetIds,
+  staff,
+} from './client-invitations-test-support';
 
-const now = new Date('2026-09-22T15:00:00.000Z');
-const day = 24 * 60 * 60 * 1_000;
-const staff = (
-  role: 'assistant' | 'administrator' | 'trainer',
-): AuthenticatedPrincipal => ({
-  accountId: 'assistant-account',
-  authenticationSessionId: 'session',
-  identity: { kind: 'staff', staffMemberId: 'staff-id', role, branchIds: [] },
-});
-const assistant = staff('assistant');
-const client: AuthenticatedPrincipal = {
-  accountId: 'client-account',
-  authenticationSessionId: 'session',
-  identity: { kind: 'client', clientId: 'client-id' },
-};
-
-const invitation = {
-  accountId: 'account-1',
-  clientId: 'client-1',
-  name: 'Ana Nueva',
-  email: 'ana@example.com',
-  phone: '+591 70000000',
-  pendingExpiresAt: new Date('2026-10-10T00:00:00.000Z'),
-  activationExpiresAt: new Date('2026-09-25T00:00:00.000Z'),
-  hasActivity: false,
-};
-
-const createTransaction = (
-  overrides: Partial<jest.Mocked<ClientInvitationTransaction>> = {},
-): jest.Mocked<ClientInvitationTransaction> => ({
-  findAccountByEmail: jest.fn().mockResolvedValue(null),
-  findInvitation: jest.fn().mockResolvedValue(invitation),
-  authenticationEmailWaitSeconds: jest.fn().mockResolvedValue(0),
-  recordIssuedAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
-  createInvitation: jest.fn().mockResolvedValue(undefined),
-  replaceStaffInvitationActivation: jest.fn().mockResolvedValue(undefined),
-  replaceSelfRegistrationVerification: jest.fn().mockResolvedValue(undefined),
-  changeInvitationEmail: jest.fn().mockResolvedValue(undefined),
-  removeInvitation: jest.fn().mockResolvedValue(undefined),
-  scheduleAuthenticationEmail: jest.fn().mockResolvedValue(undefined),
-  recordAudit: jest.fn().mockResolvedValue(undefined),
-  ...overrides,
-});
-
-let ids = 0;
-const dependencies = (transaction: ClientInvitationTransaction) => ({
-  unitOfWork: {
-    execute: <Result>(
-      work: (tx: ClientInvitationTransaction) => Promise<Result>,
-    ) => work(transaction),
-  },
-  tokenIssuer: {
-    issue: () => ({ secret: 'link-secret', digest: Buffer.from('digest') }),
-  },
-  linkCipher: {
-    encrypt: () => ({
-      encryptedLinkSecret: 'encrypted',
-      encryptionKeyId: 'key-1',
-    }),
-  },
-  now: () => now,
-  newId: () => `id-${(ids += 1)}`,
-  newReferralCode: () => 'REF-NEW',
-});
-
-beforeEach(() => {
-  ids = 0;
-});
+beforeEach(resetIds);
 
 describe('inviteClient', () => {
   const command = {
@@ -174,7 +116,7 @@ describe('inviteClient', () => {
     );
   });
 
-  it('offers a fresh 24-hour verification link when the email is a pending self-registration', async () => {
+  it('only reports a pending self-registration, leaving the link to the Assistant', async () => {
     const transaction = createTransaction({
       findAccountByEmail: jest.fn().mockResolvedValue({
         id: 'account-2',
@@ -191,16 +133,8 @@ describe('inviteClient', () => {
       clientId: 'client-2',
       email: 'ana@example.com',
     });
-    expect(
-      transaction.replaceSelfRegistrationVerification.mock.calls[0]?.[0],
-    ).toMatchObject({
-      accountId: 'account-2',
-      pendingExpiresAt: new Date(now.getTime() + 7 * day),
-      verificationToken: { expiresAt: new Date(now.getTime() + day) },
-    });
-    expect(transaction.scheduleAuthenticationEmail).toHaveBeenCalledWith(
-      expect.objectContaining({ purpose: 'verification' }),
-    );
+    expect(transaction.replaceSelfRegistrationVerification).not.toHaveBeenCalled();
+    expect(transaction.scheduleAuthenticationEmail).not.toHaveBeenCalled();
     expect(transaction.recordAudit).not.toHaveBeenCalled();
   });
 

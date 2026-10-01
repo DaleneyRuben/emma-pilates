@@ -61,6 +61,7 @@ describe('assistant client invitations (e2e)', () => {
     read: jest.fn<() => Promise<unknown>>(),
     correctEmail: jest.fn<() => Promise<unknown>>(),
     resend: jest.fn<() => Promise<unknown>>(),
+    sendVerification: jest.fn<() => Promise<unknown>>(),
     cancel: jest.fn<() => Promise<void>>(),
   };
 
@@ -78,6 +79,10 @@ describe('assistant client invitations (e2e)', () => {
     });
     operations.resend.mockResolvedValue(invitation);
     operations.cancel.mockResolvedValue(undefined);
+    operations.sendVerification.mockResolvedValue({
+      clientId,
+      email: 'ana@example.com',
+    });
 
     const moduleFixture: TestingModule = await Test.createTestingModule({
       controllers: [AssistantClientInvitationsController],
@@ -169,6 +174,32 @@ describe('assistant client invitations (e2e)', () => {
       .set('authorization', bearer)
       .expect(204);
     expect(operations.cancel).toHaveBeenCalledWith({ clientId }, assistant);
+  });
+
+  it('sends a self-registered Client a new verification link', async () => {
+    await request(app.getHttpServer())
+      .post(
+        `/api/v1/assistant/client-invitations/${clientId}/verification-emails`,
+      )
+      .set('authorization', bearer)
+      .expect(202)
+      .expect('Cache-Control', 'no-store')
+      .expect({ clientId, email: 'ana@example.com' });
+    expect(operations.sendVerification).toHaveBeenCalledWith(
+      { clientId },
+      assistant,
+    );
+
+    operations.sendVerification.mockRejectedValueOnce(
+      new InvitationEmailThrottledError(35),
+    );
+    await request(app.getHttpServer())
+      .post(
+        `/api/v1/assistant/client-invitations/${clientId}/verification-emails`,
+      )
+      .set('authorization', bearer)
+      .expect(429)
+      .expect('Retry-After', '35');
   });
 
   it('maps invitation outcomes to Problem Details', async () => {
