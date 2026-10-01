@@ -22,7 +22,14 @@ const limitedMessage =
  * «Cambiar correo», the two lifetimes apart, «Reenviar enlace», and the
  * server's wait when the recipient lane is full.
  */
-export function PendingInvitation({ member }: { member: StaffMemberDto }) {
+export function PendingInvitation({
+  member,
+  onEmailChanged,
+}: {
+  member: StaffMemberDto;
+  /** The contact row above follows a corrected address. */
+  onEmailChanged?: (email: string) => void;
+}) {
   const change = useStaffChange();
   const fieldId = useId();
   const [email, setEmail] = useState(member.email);
@@ -39,7 +46,10 @@ export function PendingInvitation({ member }: { member: StaffMemberDto }) {
     setResult(null);
     try {
       const updated = await work();
+      // A new address has its own recipient lane: the old wait no longer applies.
+      startWait(0);
       setEmail(updated.email);
+      onEmailChanged?.(updated.email);
       setExpiresAt(updated.activationExpiresAt);
       setEditing(false);
       setResult({

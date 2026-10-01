@@ -41,6 +41,7 @@ export function StaffEditForm({
   const change = useStaffChange();
   const branches = useQuery(activeBranchesQueryOptions());
   const [failure, setFailure] = useState<string | null>(null);
+  const [email, setEmail] = useState(member.email);
   const form = useForm<StaffFormInput, unknown, StaffFormOutput>({
     resolver: zodResolver(staffFormSchema),
     defaultValues: {
@@ -102,9 +103,9 @@ export function StaffEditForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
-          <StaffContact member={member} />
+          <StaffContact member={{ ...member, email }} />
           {member.status === "pending" ? (
-            <PendingInvitation member={member} />
+            <PendingInvitation member={member} onEmailChanged={setEmail} />
           ) : null}
           <StaffRoleFields
             control={form.control}
