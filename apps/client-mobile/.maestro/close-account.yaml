@@ -7,7 +7,7 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - tapOn:
-    text: "Perfil, tab.*"
+    text: "Perfil, .*tab.*"
 - extendedWaitUntil:
     visible: "Cerrar sesión"
     timeout: 15000

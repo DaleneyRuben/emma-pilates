@@ -5,7 +5,7 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
-    visible: "Tu cuenta"
+    visible: "Tu cuenta.*"
     timeout: 30000
 - swipe:
     start: "88%,10%"

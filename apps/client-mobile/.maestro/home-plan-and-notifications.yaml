@@ -57,7 +57,7 @@ env:
     timeout: 15000
 - takeScreenshot: client-home-4-evaluacion
 - tapOn:
-    text: "Perfil, tab.*"
+    text: "Perfil, .*tab.*"
 - extendedWaitUntil:
     visible: "Cerrar sesión"
     timeout: 15000

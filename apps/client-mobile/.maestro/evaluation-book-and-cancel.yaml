@@ -6,10 +6,10 @@ env:
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
     visible:
-      text: "Perfil, tab.*"
+      text: "Perfil, .*tab.*"
     timeout: 30000
 - tapOn:
-    text: "Perfil, tab.*"
+    text: "Perfil, .*tab.*"
 - extendedWaitUntil:
     visible: "Evaluación nutricional"
     timeout: 15000
