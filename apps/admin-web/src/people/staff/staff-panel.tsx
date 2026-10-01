@@ -18,6 +18,8 @@ import {
 } from "../../components/panel/side-panel";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { WaitNotice } from "../../auth/request-limit-notice";
+import { useCountdown } from "../../auth/use-countdown";
 import { currentSessionQueryOptions } from "../../session/session-queries";
 import { StaffEditForm } from "./staff-edit-form";
 import {
@@ -26,7 +28,11 @@ import {
   type StaffFormInput,
   type StaffFormOutput,
 } from "./staff-form-schema";
-import { staffProblem } from "./staff-problems";
+import {
+  accountEmailLimitMessage,
+  isAccountEmailLimit,
+  staffProblem,
+} from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 import { StaffReadOnly } from "./staff-read-only";
 import { StaffRoleFields } from "./staff-role-fields";
@@ -47,6 +53,7 @@ const helpers: Partial<Record<keyof StaffFormInput, string>> = {
 function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
   const change = useStaffChange();
   const [failure, setFailure] = useState<string | null>(null);
+  const [accountWait, startAccountWait] = useCountdown();
   const form = useForm<StaffFormInput, unknown, StaffFormOutput>({
     resolver: zodResolver(staffFormSchema),
     defaultValues: emptyStaffForm(),
@@ -69,6 +76,10 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
           : `Invitación enviada a ${values.email}: tiene 7 días para activar su cuenta.`,
       );
     } catch (error) {
+      if (isAccountEmailLimit(error)) {
+        startAccountWait(error.problem.retryAfterSeconds ?? 0);
+        return;
+      }
       const problem = staffProblem(error);
       if (problem.field === undefined) {
         setFailure(problem.message);
@@ -82,6 +93,13 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
+          {accountWait > 0 ? (
+            <WaitNotice
+              message={accountEmailLimitMessage}
+              seconds={accountWait}
+              waitLabel="Podrás intentarlo en"
+            />
+          ) : null}
           {contactFields.map(([name, label, type, autoComplete]) => (
             <FormField
               key={name}
@@ -107,7 +125,11 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" disabled={change.isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            disabled={change.isPending || accountWait > 0}
+          >
             Guardar
           </Button>
         </SidePanelFooter>

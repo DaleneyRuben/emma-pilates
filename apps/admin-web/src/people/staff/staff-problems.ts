@@ -1,4 +1,4 @@
-import { isApiError } from "../../api/problem";
+import { type ApiError, isApiError } from "../../api/problem";
 
 export type StaffField = "email" | "branchIds";
 
@@ -56,6 +56,15 @@ const problems: Record<string, Problem> = {
     message: "Revisa los datos: hay un valor que no es válido.",
   },
 };
+
+// Follow-up 78: the signed-in Administrator's own email budget is full
+// (BE-013), whatever the address.
+export const accountEmailLimitCode = "staff_email_throttled";
+export const accountEmailLimitMessage =
+  "Enviaste muchos correos en poco tiempo. Espera un momento para enviar otro; los enlaces que ya enviaste siguen sirviendo.";
+
+export const isAccountEmailLimit = (error: unknown): error is ApiError =>
+  isApiError(error) && error.code === accountEmailLimitCode;
 
 export function staffProblem(error: unknown): Problem {
   if (isApiError(error)) {

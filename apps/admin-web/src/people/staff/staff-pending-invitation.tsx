@@ -1,6 +1,7 @@
 import type { StaffMemberDto } from "@pilates/api-contracts";
 import { useId, useState } from "react";
 import { isApiError } from "../../api/problem";
+import { WaitNotice } from "../../auth/request-limit-notice";
 import { formatWait, useCountdown } from "../../auth/use-countdown";
 import { Button } from "../../components/ui/button";
 import { ConfirmDialog } from "../../components/ui/confirm-dialog";
@@ -8,7 +9,11 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { StatusPill } from "../../components/ui/status-pill";
 import { boliviaParts, formatCivilDate } from "../../lib/bolivia-time";
-import { staffProblem } from "./staff-problems";
+import {
+  accountEmailLimitMessage,
+  isAccountEmailLimit,
+  staffProblem,
+} from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 
 type Result = { ok: true; message: string } | { ok: false; message: string };
@@ -38,12 +43,15 @@ export function PendingInvitation({
   const [draft, setDraft] = useState(member.email);
   const [result, setResult] = useState<Result | null>(null);
   const [waitSeconds, startWait] = useCountdown();
+  const [accountLimited, setAccountLimited] = useState(false);
+  const accountWaiting = accountLimited && waitSeconds > 0;
 
   const run = async (
     work: () => Promise<StaffMemberDto>,
     sentTo: (updated: StaffMemberDto) => string,
   ) => {
     setResult(null);
+    setAccountLimited(false);
     try {
       const updated = await work();
       // A new address has its own recipient lane: the old wait no longer applies.
@@ -57,6 +65,11 @@ export function PendingInvitation({
         message: `Enviamos un enlace nuevo a ${sentTo(updated)}.`,
       });
     } catch (error) {
+      if (isAccountEmailLimit(error)) {
+        startWait(error.problem.retryAfterSeconds ?? 0);
+        setAccountLimited(true);
+        return;
+      }
       if (isApiError(error) && error.code === "email_throttled") {
         startWait(error.problem.retryAfterSeconds ?? 0);
         setResult({ ok: false, message: limitedMessage });
@@ -85,6 +98,13 @@ export function PendingInvitation({
 
   return (
     <section className="flex flex-col items-start gap-2 rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-3">
+      {accountWaiting ? (
+        <WaitNotice
+          message={accountEmailLimitMessage}
+          seconds={waitSeconds}
+          waitLabel="Podrás enviarlo en"
+        />
+      ) : null}
       <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
       {editing ? (
         <div className="flex w-full flex-col gap-2">
@@ -103,7 +123,7 @@ export function PendingInvitation({
             <Button
               variant="secondary"
               size="sm"
-              disabled={change.isPending}
+              disabled={change.isPending || accountWaiting}
               onClick={() => void correct()}
             >
               Guardar correo
@@ -164,7 +184,7 @@ export function PendingInvitation({
           {result.message}
         </p>
       )}
-      {waitSeconds > 0 ? (
+      {waitSeconds > 0 && !accountLimited ? (
         <p className="text-ayuda tabular text-texto-secundario">
           {`Podrás reenviarlo en ${formatWait(waitSeconds)}.`}
         </p>

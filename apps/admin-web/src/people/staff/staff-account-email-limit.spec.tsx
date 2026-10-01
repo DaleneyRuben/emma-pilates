@@ -82,7 +82,9 @@ describe("AW24 under the Administrator's email limit", () => {
 
   it("keeps the new member form and disables «Guardar» until the wait ends", async () => {
     server.use(
-      http.get(apiUrl(staffMembersPath), () => Response.json(staffPage([emma]))),
+      http.get(apiUrl(staffMembersPath), () =>
+        Response.json(staffPage([emma])),
+      ),
       http.post(apiUrl(staffMembersPath), accountLimited),
     );
     const { user } = renderAdmin("/back-office/personal");
@@ -101,8 +103,12 @@ describe("AW24 under the Administrator's email limit", () => {
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     expect(await within(panel).findByText(accountLimit)).toBeVisible();
-    expect(within(panel).getByText("Podrás intentarlo en 14:52.")).toBeVisible();
-    expect(within(panel).getByRole("button", { name: "Guardar" })).toBeDisabled();
+    expect(
+      within(panel).getByText("Podrás intentarlo en 14:52."),
+    ).toBeVisible();
+    expect(
+      within(panel).getByRole("button", { name: "Guardar" }),
+    ).toBeDisabled();
     expect(within(panel).getByLabelText("Correo electrónico")).toHaveValue(
       "sara@emmapilates.bo",
     );
