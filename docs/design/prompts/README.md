@@ -181,6 +181,7 @@ Each of these was sent as the next message in the existing design session for th
 | [70](./followups/70-leftovers-of-the-2026-09-30-exports.md) | Leftovers of the 2026-09-30 exports: 59 §1's text tones on every remaining screen, `09`'s total from the Bs 560 price, `AW02`'s drawer «Administración», the sidebar hover on Hover de fila, `18`'s «Evaluación nutricional» row, and Client text links in Palo de rosa profundo | ✅ applied (Claude Design export 2026-09-30, `542f68f`) |
 | [71](./followups/71-readme-aw24-password-reset-leftover.md) | `design/README.md`'s `AW24` flow bullet still offers «Restablecer contraseña», which 54 removed from the screen (checklist 30 §11, ADR-0029) | ✅ applied (Claude Design export 2026-09-30, `c0abb6d`) |
 | [72](./followups/72-app-outlined-button-labels.md) | Finishes 70 §6: outlined-button labels on Client and Staff screens and the accent labels on `03`/`10` in Palo de rosa profundo, as the apps ship; README «Secondary» | ✅ applied (Claude Design export 2026-09-30, `785df78`) |
+| [73](./followups/73-unread-notifications-badge.md) | Unread notifications (MOB-017 gap): a `#8A5D59` count badge on the Client Perfil tab and on the «Notificaciones» rows of `18`/`S23`, a dot on the Staff «Tu cuenta» avatar of `S02`/`S04`/`S11`/`S15` (amends checklist 30 §9: the dot is not a border), design system and README | 🕓 pending |
 
 ## Status
 
