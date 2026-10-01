@@ -64,7 +64,7 @@ describe("AuthenticationFlow", () => {
       "local password",
     );
     await fireEvent.press(
-      screen.getByRole("button", { name: "Registrar cuenta" }),
+      screen.getByRole("button", { name: "Crear cuenta" }),
     );
 
     expect(register).toHaveBeenCalledWith({
@@ -124,7 +124,7 @@ describe("AuthenticationFlow", () => {
       "password",
     );
     await fireEvent.press(
-      screen.getByRole("button", { name: "Registrar cuenta" }),
+      screen.getByRole("button", { name: "Crear cuenta" }),
     );
     await fireEvent.press(
       screen.getByRole("button", { name: "Cambiar correo" }),

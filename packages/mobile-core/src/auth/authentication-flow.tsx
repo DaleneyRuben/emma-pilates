@@ -1,33 +1,24 @@
 import { useEffect, useState, type PropsWithChildren } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 import type { AuthenticationLinkIntent } from "../ingress/verified-link";
 import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
-import { Heading } from "../ui/heading";
 import { PrimaryButton } from "../ui/primary-button";
-import { Screen } from "../ui/screen";
 import { TextButton } from "../ui/text-button";
 import { colors, spacing, typography } from "../ui/tokens";
+import { AuthenticationScreen } from "./auth-layout";
 import type { AuthenticationApi } from "./authentication-api";
 import {
   LoginScreen,
   type LoginSubmissionResult,
   type LoginValues,
 } from "./login-screen";
-
-type PendingRegistration = {
-  email: string;
-  registrationContinuation: string;
-};
+import {
+  RegistrationScreen,
+  type PendingRegistration,
+} from "./registration-screen";
 
 type AuthenticationRoute =
   | "activate"
@@ -64,111 +55,6 @@ function routeForIntent(
     default:
       return "login";
   }
-}
-
-function AuthenticationScreen({
-  children,
-  title,
-}: PropsWithChildren<{ title: string }>) {
-  return (
-    <Screen style={styles.screen}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.flex}
-      >
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View style={styles.brand}>
-            <Text style={styles.wordmark}>Emma</Text>
-            <View style={styles.brandRule} />
-          </View>
-          <View style={styles.panel}>
-            <Heading>{title}</Heading>
-            {children}
-          </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </Screen>
-  );
-}
-
-function RegistrationScreen({
-  api,
-  onBack,
-  onRegistered,
-}: {
-  api: AuthenticationApi;
-  onBack: () => void;
-  onRegistered: (registration: PendingRegistration) => void;
-}) {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmation, setConfirmation] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  async function submit() {
-    if (
-      name.trim() === "" ||
-      !email.includes("@") ||
-      password === "" ||
-      password !== confirmation
-    ) {
-      setError("Revisa los datos y confirma la misma contraseña.");
-      return;
-    }
-
-    setSubmitting(true);
-    setError(null);
-
-    try {
-      const result = await api.register({
-        email: email.trim(),
-        name: name.trim(),
-        password,
-      });
-      onRegistered(result);
-    } catch {
-      setError("No pudimos crear la cuenta. Inténtalo de nuevo.");
-    } finally {
-      setSubmitting(false);
-    }
-  }
-
-  return (
-    <AuthenticationScreen title="Crear cuenta">
-      <FormField label="Nombre" onChangeText={setName} value={name} />
-      <FormField
-        autoCapitalize="none"
-        keyboardType="email-address"
-        label="Correo electrónico"
-        onChangeText={setEmail}
-        value={email}
-      />
-      <FormField
-        label="Contraseña"
-        onChangeText={setPassword}
-        secureTextEntry
-        value={password}
-      />
-      <FormField
-        label="Confirmar contraseña"
-        onChangeText={setConfirmation}
-        secureTextEntry
-        value={confirmation}
-      />
-      {error === null ? null : <ErrorMessage>{error}</ErrorMessage>}
-      <PrimaryButton
-        disabled={submitting}
-        label="Registrar cuenta"
-        onPress={submit}
-      />
-      <TextButton label="Volver a iniciar sesión" onPress={onBack} />
-    </AuthenticationScreen>
-  );
 }
 
 function CheckEmailScreen({
@@ -613,21 +499,6 @@ export function AuthenticationFlow({
 }
 
 const styles = StyleSheet.create({
-  brand: {
-    alignItems: "center",
-    gap: spacing.md,
-  },
-  brandRule: {
-    backgroundColor: colors.borderStrong,
-    height: 1,
-    width: 36,
-  },
-  content: {
-    flexGrow: 1,
-    gap: spacing.xxl,
-    paddingBottom: spacing.xl,
-    paddingTop: spacing.xxl,
-  },
   emphasized: {
     color: colors.text,
     fontWeight: "600",
@@ -637,21 +508,5 @@ const styles = StyleSheet.create({
     fontFamily: fontFamilies.body,
     fontSize: typography.note,
     lineHeight: 20,
-  },
-  flex: {
-    flex: 1,
-  },
-  panel: {
-    gap: spacing.lgXl,
-  },
-  screen: {
-    backgroundColor: colors.surface,
-    paddingHorizontal: spacing.xlLg,
-  },
-  wordmark: {
-    color: colors.text,
-    fontFamily: fontFamilies.display,
-    fontSize: 44,
-    lineHeight: 50,
   },
 });
