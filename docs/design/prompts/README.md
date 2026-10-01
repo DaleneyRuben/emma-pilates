@@ -183,6 +183,7 @@ Each of these was sent as the next message in the existing design session for th
 | [72](./followups/72-app-outlined-button-labels.md) | Finishes 70 §6: outlined-button labels on Client and Staff screens and the accent labels on `03`/`10` in Palo de rosa profundo, as the apps ship; README «Secondary» | ✅ applied (Claude Design export 2026-09-30, `785df78`) |
 | [73](./followups/73-unread-notifications-badge.md) | Unread notifications (MOB-017 gap): a `#8A5D59` count badge on the Client Perfil tab and on the «Notificaciones» rows of `18`/`S23`, a dot on the Staff «Tu cuenta» avatar of `S02`/`S04`/`S11`/`S15` (amends checklist 30 §9: the dot is not a border), design system and README | ✅ applied (Claude Design export 2026-09-30, `c9bd14a`) |
 | [74](./followups/74-picker-sheet-selected-row.md) | Picker sheets: the selected row's label in Palo de rosa profundo on `03`'s and `S13`'s «Elige una sucursal» and `S17`'s time sheet, the `#B78380` check kept; README «Picker sheets» | ✅ applied (Claude Design export 2026-09-30, `5ef85ae`) |
+| [75](./followups/75-evaluation-month-copy-as-built.md) | Evaluation copy names its month (MOB-022 as built): `13`'s used-month title rule, `14` «desde Mis evaluaciones», `15`'s new «ya usada este mes» empty frame and the cancel sheet's month, `19`'s freed-month sentence; README rows | 🕓 pending |
 
 ## Status
 
