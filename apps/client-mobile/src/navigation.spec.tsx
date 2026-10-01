@@ -1,5 +1,6 @@
 import { colors } from "@pilates/mobile-core";
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent, render, within } from "@testing-library/react-native";
+import { StyleSheet } from "react-native";
 
 import { ClientNavigation } from "./navigation";
 
@@ -72,15 +73,22 @@ describe("ClientNavigation", () => {
     const screen = await render(
       <ClientNavigation {...defaultProps} role="client" />,
     );
+    // React Navigation cross-fades an active and an idle copy of each icon.
     const icon = (name: string) =>
-      screen.getByTestId(`client-tab-icon-${name}`, { includeHiddenElements: true });
+      screen
+        .getAllByTestId(`client-tab-icon-${name}`, { includeHiddenElements: true })
+        .find((copy) => StyleSheet.flatten(copy.parent?.props.style)?.opacity === 1);
 
     expect(icon("home")).toHaveProp("stroke", colors.primary);
     for (const name of ["booking", "bookings", "profile"]) {
       expect(icon(name)).toHaveProp("stroke", colors.textSubtle);
     }
-    expect(screen.getByText("Inicio")).toHaveStyle({ color: colors.primary });
-    expect(screen.getByText("Reservar")).toHaveStyle({ color: colors.textSubtle });
+    const tabLabel = (name: string) =>
+      within(screen.getByRole("button", { name: new RegExp(`^${name}, tab`) })).getByText(
+        name,
+      );
+    expect(tabLabel("Inicio")).toHaveStyle({ color: colors.primary });
+    expect(tabLabel("Reservar")).toHaveStyle({ color: colors.textSubtle });
   });
 
   it("does not render Staff navigation for a Staff identity", async () => {
