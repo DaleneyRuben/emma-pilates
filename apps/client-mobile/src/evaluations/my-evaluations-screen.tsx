@@ -26,9 +26,13 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 
 import { useClientFetcher } from "../client-fetcher";
 import {
+  boliviaMonth,
   clockTime,
   evaluationBadge,
   evaluationDate,
+  followingMonth,
+  monthName,
+  monthPhrase,
 } from "./evaluation-format";
 
 const noticeVisibleMs = 8_000;
@@ -188,7 +192,11 @@ export function MyEvaluationsScreen({
         {items.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>No tienes evaluaciones próximas.</Text>
-            <BodyText>Tu evaluación de este mes sigue disponible y es gratuita.</BodyText>
+            <BodyText>
+              {pastItems.some((evaluation) => boliviaMonth(evaluation.startsAt) === boliviaMonth())
+                ? `Ya usaste tu evaluación de este mes. Puedes reservar la de ${monthName(followingMonth(boliviaMonth()))}, también gratuita.`
+                : "Tu evaluación de este mes sigue disponible y es gratuita."}
+            </BodyText>
             <PrimaryButton
               label="Reservar evaluación"
               onPress={() => navigation.navigate("EvaluationAvailability")}
@@ -237,7 +245,11 @@ export function MyEvaluationsScreen({
               </BodyText>
             ) : null}
             <BodyText>El horario queda libre y otras clientas podrán reservarlo.</BodyText>
-            <BodyText>Podrás reservar otra evaluación para este mes.</BodyText>
+            {cancelling !== null ? (
+              <BodyText>
+                {`Podrás reservar otra evaluación para ${monthPhrase(boliviaMonth(cancelling.startsAt))}.`}
+              </BodyText>
+            ) : null}
             <Pressable
               accessibilityLabel="Sí, cancelar evaluación"
               accessibilityRole="button"

@@ -30,6 +30,7 @@ import {
   evaluationDayAndTime,
   followingMonth,
   monthName,
+  monthPhrase,
 } from "./evaluation-format";
 
 type AvailabilityNavigation = {
@@ -88,13 +89,16 @@ function NutritionistCard({ name }: { name: string }) {
 
 function UsedMonth({ availability }: { availability: EvaluationAvailabilityDto }) {
   const next = nextUnusedMonth(availability.months);
+  const usedMonth = availability.months.find((month) => month.status === "used");
   const last = [...availability.months]
     .reverse()
     .find((month) => month.evaluation !== null)?.evaluation;
 
   return (
     <View style={styles.used}>
-      <Text style={styles.usedTitle}>Ya usaste tu evaluación de este mes.</Text>
+      <Text style={styles.usedTitle}>
+        {`Ya usaste tu evaluación de ${usedMonth === undefined ? "este mes" : monthPhrase(usedMonth.month)}.`}
+      </Text>
       {next !== null ? (
         <BodyText>
           {`Podrás agendar la de ${monthName(next)} desde el 1 de ${monthName(next)}.`}

@@ -124,7 +124,7 @@ export function BookEvaluationScreen({
           <BodyText>Te avisaremos un día antes y una hora antes de tu cita.</BodyText>
         </View>
         <BodyText style={styles.muted}>
-          Si necesitas cambiarla, puedes cancelarla desde Perfil hasta 3 horas antes.
+          Si necesitas cambiarla, puedes cancelarla desde Mis evaluaciones hasta 3 horas antes.
         </BodyText>
         {message !== null ? (
           <BodyText accessibilityRole="alert" style={styles.failure}>

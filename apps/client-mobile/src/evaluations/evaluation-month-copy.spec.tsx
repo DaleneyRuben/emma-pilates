@@ -62,7 +62,8 @@ describe("Evaluation month copy (13, 14, 15)", () => {
   });
 
   it("does not call this month's Evaluation available on 15 once it took place", async () => {
-    const earlier = new Date(Date.now() - 2 * 60 * 60 * 1_000);
+    // Early on the 1st, «two hours ago» is still last month.
+    const earlier = boliviaInstant(monthOfToday(0), "00:01");
     const fetcher = routeFetcher(
       baseRoutes({
         "/api/v1/evaluations?scope=past": () =>

@@ -1,3 +1,5 @@
+import { boliviaCivilDate } from "@pilates/mobile-core";
+
 const timeZone = "America/La_Paz";
 
 const clockFormatter = new Intl.DateTimeFormat("es-BO", {
@@ -69,4 +71,15 @@ export function followingMonth(month: string): string {
   const date = new Date(`${month}T12:00:00.000Z`);
   date.setUTCMonth(date.getUTCMonth() + 1, 1);
   return date.toISOString().slice(0, 10);
+}
+
+// The Bolivia month ("2026-10-01") an instant falls in; today's by default.
+export function boliviaMonth(instant: Date | string = new Date()): string {
+  return `${boliviaCivilDate(new Date(instant)).slice(0, 7)}-01`;
+}
+
+// «este mes» for today's month, otherwise its name: the Evaluation's month
+// can be the next one (MOB-022).
+export function monthPhrase(month: string): string {
+  return month === boliviaMonth() ? "este mes" : monthName(month);
 }
