@@ -180,6 +180,26 @@ describe("AW32 Crear contraseña", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("says a 30-day-old invitation was removed (WEB-012 W8)", async () => {
+    server.use(inspected({ status: "removed", purpose: "activation" }));
+    renderAdmin("/crear-contrasena?token=activation-secret");
+
+    const card = await screen.findByRole("main");
+    expect(
+      await within(card).findByRole("heading", {
+        name: "Esta invitación ya no está activa",
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(card).getByText(
+        "Pasaron 30 días sin activarla, así que se eliminó. Para tener una cuenta, una administradora tiene que crear una invitación nueva en Personal.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      within(card).getByRole("link", { name: "Volver a iniciar sesión" }),
+    ).toBeInTheDocument();
+  });
+
   it("shows only a generic invalid-link state for an unknown or missing token", async () => {
     server.use(inspected({ status: "invalid" }));
     renderAdmin("/crear-contrasena?token=not-a-real-secret");

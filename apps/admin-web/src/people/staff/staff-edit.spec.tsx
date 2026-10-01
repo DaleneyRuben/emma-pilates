@@ -13,41 +13,18 @@ import {
   allBranchesHandler,
   emma,
   paolaMember,
-  rita,
   staffMembersPath,
   staffPage,
   valentina,
 } from "../../test/people-fixtures";
-import { renderAdmin } from "../../test/render-admin";
+import {
+  list,
+  memberPath,
+  openMember,
+  record,
+  sent,
+} from "./staff-spec-support";
 import { signedInHandlers } from "../../test/session-handlers";
-
-const sent: { method: string; path: string; body: unknown }[] = [];
-const memberPath = (id: string) => `${staffMembersPath}/${id}`;
-const record =
-  (respond: () => Response) =>
-  async ({ request }: { request: Request }) => {
-    const text = await request.text();
-    sent.push({
-      method: request.method,
-      path: new URL(request.url).pathname,
-      body: text === "" ? null : (JSON.parse(text) as unknown),
-    });
-    return respond();
-  };
-
-const list = () =>
-  http.get(apiUrl(staffMembersPath), () =>
-    jsonResponse(staffPage([emma, paolaMember, rita, valentina])),
-  );
-
-const openMember = async (name: string) => {
-  const rendered = renderAdmin("/back-office/personal");
-  await rendered.user.click(await screen.findByRole("button", { name }));
-  return {
-    ...rendered,
-    panel: await screen.findByRole("dialog", { name: "Editar miembro" }),
-  };
-};
 
 const trainersKey = getListStaffMembersQueryKey({
   role: "trainer",
