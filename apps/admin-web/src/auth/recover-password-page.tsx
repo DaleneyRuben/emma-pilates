@@ -20,7 +20,7 @@ import { Input } from "../components/ui/input";
 import { emailField } from "./auth-fields";
 import { AuthLayout } from "./auth-layout";
 import { BackToLoginLink } from "./back-to-login-link";
-import { ThrottledNotice } from "./throttled-notice";
+import { RequestLimitNotice } from "./request-limit-notice";
 import { useCountdown } from "./use-countdown";
 
 const recoverySchema = z.object({ email: emailField });
@@ -92,6 +92,7 @@ export function RecoverPasswordPage() {
       </p>
       <Form {...form}>
         <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+          {throttled ? <RequestLimitNotice seconds={waitSeconds} /> : null}
           <FormField
             control={form.control}
             name="email"
@@ -110,7 +111,6 @@ export function RecoverPasswordPage() {
               </FormItem>
             )}
           />
-          {throttled ? <ThrottledNotice seconds={waitSeconds} /> : null}
           {!throttled && failed ? (
             <p role="alert" className="text-nota text-error-texto">
               No pudimos enviar el enlace. Inténtalo de nuevo en unos minutos.
