@@ -11,5 +11,6 @@ export type AuthenticationLinkInspectionDtoStatus =
 export const AuthenticationLinkInspectionDtoStatus = {
   current: "current",
   expired: "expired",
+  removed: "removed",
   invalid: "invalid",
 } as const;

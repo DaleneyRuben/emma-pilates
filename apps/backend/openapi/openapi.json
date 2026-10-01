@@ -6274,6 +6274,7 @@
             "enum": [
               "current",
               "expired",
+              "removed",
               "invalid"
             ]
           },
