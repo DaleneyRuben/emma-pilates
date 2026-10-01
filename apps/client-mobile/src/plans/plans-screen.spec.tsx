@@ -69,10 +69,11 @@ describe("Client Plans", () => {
       screen.getByRole("button", { name: "Trimestral 36 clases" }),
     );
 
+    // The loading state shares the «Detalle del plan» heading, so wait for the Plan itself.
     await waitFor(() => {
-      expect(screen.getByText("Detalle del plan")).toBeOnTheScreen();
+      expect(screen.getByText("Válido por 3 meses")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Válido por 3 meses")).toBeOnTheScreen();
+    expect(screen.getByText("Detalle del plan")).toBeOnTheScreen();
     expect(
       screen.getByText("36 clases en cualquier sucursal del estudio."),
     ).toBeOnTheScreen();
