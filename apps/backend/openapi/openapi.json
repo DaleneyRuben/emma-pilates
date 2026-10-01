@@ -113,7 +113,17 @@
     "/api/v1/password-recovery-requests": {
       "post": {
         "operationId": "requestPasswordRecovery",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "x-client-identifier",
+            "in": "header",
+            "description": "Random first-party app installation identifier",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -131,6 +141,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PasswordRecoveryRequestResultDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this device or network (authentication_email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the source may try again",
+                "schema": {
+                  "type": "integer"
                 }
               }
             }
@@ -824,7 +845,17 @@
     "/api/v1/client-registrations/verification-resends": {
       "post": {
         "operationId": "resendPendingClientVerification",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "x-client-identifier",
+            "in": "header",
+            "description": "Random first-party app installation identifier",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -845,6 +876,17 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many requests from this device or network (authentication_email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the source may try again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         },
         "summary": "",
@@ -856,7 +898,17 @@
     "/api/v1/client-registrations/email-corrections": {
       "post": {
         "operationId": "correctPendingClientEmail",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "x-client-identifier",
+            "in": "header",
+            "description": "Random first-party app installation identifier",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -877,6 +929,17 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many requests from this device or network (authentication_email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the source may try again",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
           }
         },
         "summary": "",
@@ -888,7 +951,17 @@
     "/api/v1/client-registrations": {
       "post": {
         "operationId": "registerClient",
-        "parameters": [],
+        "parameters": [
+          {
+            "name": "x-client-identifier",
+            "in": "header",
+            "description": "Random first-party app installation identifier",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "required": true,
           "content": {
@@ -906,6 +979,17 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/PendingClientRegistrationDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many requests from this device or network (authentication_email_throttled)",
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds until the source may try again",
+                "schema": {
+                  "type": "integer"
                 }
               }
             }

@@ -845,12 +845,22 @@ export type requestPasswordRecoveryResponse202 = {
   status: 202;
 };
 
+export type requestPasswordRecoveryResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type requestPasswordRecoveryResponseSuccess =
   requestPasswordRecoveryResponse202 & {
     headers: Headers;
   };
+export type requestPasswordRecoveryResponseError =
+  requestPasswordRecoveryResponse429 & {
+    headers: Headers;
+  };
+
 export type requestPasswordRecoveryResponse =
-  requestPasswordRecoveryResponseSuccess;
+  requestPasswordRecoveryResponseSuccess | requestPasswordRecoveryResponseError;
 
 export const getRequestPasswordRecoveryUrl = () => {
   return `/api/v1/password-recovery-requests`;
@@ -892,7 +902,7 @@ export const requestPasswordRecovery = async (
 };
 
 export const getRequestPasswordRecoveryMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -938,15 +948,12 @@ export type RequestPasswordRecoveryMutationResult = NonNullable<
   Awaited<ReturnType<typeof requestPasswordRecovery>>
 >;
 export type RequestPasswordRecoveryMutationBody = RequestPasswordRecoveryDto;
-export type RequestPasswordRecoveryMutationError = unknown;
+export type RequestPasswordRecoveryMutationError = void;
 export type RequestPasswordRecoveryMutationVariables = {
   data: RequestPasswordRecoveryDto;
 };
 
-export const useRequestPasswordRecovery = <
-  TError = unknown,
-  TContext = unknown,
->(
+export const useRequestPasswordRecovery = <TError = void, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof requestPasswordRecovery>>,
@@ -3959,12 +3966,23 @@ export type resendPendingClientVerificationResponse202 = {
   status: 202;
 };
 
+export type resendPendingClientVerificationResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type resendPendingClientVerificationResponseSuccess =
   resendPendingClientVerificationResponse202 & {
     headers: Headers;
   };
+export type resendPendingClientVerificationResponseError =
+  resendPendingClientVerificationResponse429 & {
+    headers: Headers;
+  };
+
 export type resendPendingClientVerificationResponse =
-  resendPendingClientVerificationResponseSuccess;
+  | resendPendingClientVerificationResponseSuccess
+  | resendPendingClientVerificationResponseError;
 
 export const getResendPendingClientVerificationUrl = () => {
   return `/api/v1/client-registrations/verification-resends`;
@@ -4009,7 +4027,7 @@ export const resendPendingClientVerification = async (
 };
 
 export const getResendPendingClientVerificationMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4056,13 +4074,13 @@ export type ResendPendingClientVerificationMutationResult = NonNullable<
 >;
 export type ResendPendingClientVerificationMutationBody =
   PendingRegistrationContinuationDto;
-export type ResendPendingClientVerificationMutationError = unknown;
+export type ResendPendingClientVerificationMutationError = void;
 export type ResendPendingClientVerificationMutationVariables = {
   data: PendingRegistrationContinuationDto;
 };
 
 export const useResendPendingClientVerification = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(
   options?: {
@@ -4093,12 +4111,23 @@ export type correctPendingClientEmailResponse202 = {
   status: 202;
 };
 
+export type correctPendingClientEmailResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type correctPendingClientEmailResponseSuccess =
   correctPendingClientEmailResponse202 & {
     headers: Headers;
   };
+export type correctPendingClientEmailResponseError =
+  correctPendingClientEmailResponse429 & {
+    headers: Headers;
+  };
+
 export type correctPendingClientEmailResponse =
-  correctPendingClientEmailResponseSuccess;
+  | correctPendingClientEmailResponseSuccess
+  | correctPendingClientEmailResponseError;
 
 export const getCorrectPendingClientEmailUrl = () => {
   return `/api/v1/client-registrations/email-corrections`;
@@ -4140,7 +4169,7 @@ export const correctPendingClientEmail = async (
 };
 
 export const getCorrectPendingClientEmailMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4187,15 +4216,12 @@ export type CorrectPendingClientEmailMutationResult = NonNullable<
 >;
 export type CorrectPendingClientEmailMutationBody =
   CorrectPendingClientEmailDto;
-export type CorrectPendingClientEmailMutationError = unknown;
+export type CorrectPendingClientEmailMutationError = void;
 export type CorrectPendingClientEmailMutationVariables = {
   data: CorrectPendingClientEmailDto;
 };
 
-export const useCorrectPendingClientEmail = <
-  TError = unknown,
-  TContext = unknown,
->(
+export const useCorrectPendingClientEmail = <TError = void, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof correctPendingClientEmail>>,
@@ -4224,10 +4250,20 @@ export type registerClientResponse202 = {
   status: 202;
 };
 
+export type registerClientResponse429 = {
+  data: void;
+  status: 429;
+};
+
 export type registerClientResponseSuccess = registerClientResponse202 & {
   headers: Headers;
 };
-export type registerClientResponse = registerClientResponseSuccess;
+export type registerClientResponseError = registerClientResponse429 & {
+  headers: Headers;
+};
+
+export type registerClientResponse =
+  registerClientResponseSuccess | registerClientResponseError;
 
 export const getRegisterClientUrl = () => {
   return `/api/v1/client-registrations`;
@@ -4267,7 +4303,7 @@ export const registerClient = async (
 };
 
 export const getRegisterClientMutationOptions = <
-  TError = unknown,
+  TError = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
@@ -4313,12 +4349,12 @@ export type RegisterClientMutationResult = NonNullable<
   Awaited<ReturnType<typeof registerClient>>
 >;
 export type RegisterClientMutationBody = StartClientRegistrationDto;
-export type RegisterClientMutationError = unknown;
+export type RegisterClientMutationError = void;
 export type RegisterClientMutationVariables = {
   data: StartClientRegistrationDto;
 };
 
-export const useRegisterClient = <TError = unknown, TContext = unknown>(
+export const useRegisterClient = <TError = void, TContext = unknown>(
   options?: {
     mutation?: UseMutationOptions<
       Awaited<ReturnType<typeof registerClient>>,
