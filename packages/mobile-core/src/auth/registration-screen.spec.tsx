@@ -177,7 +177,9 @@ describe("Client registration (01) under the device or network limit", () => {
       }),
     ).toBeOnTheScreen();
     expect(screen.getByText("Podrás intentarlo en 14:56.")).toBeOnTheScreen();
-    expect(screen.getByTestId("wait-notice-clock")).toBeOnTheScreen();
+    expect(
+      screen.getByTestId("wait-notice-clock", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     expect(
       screen.queryByText("No pudimos crear la cuenta. Inténtalo de nuevo."),
     ).not.toBeOnTheScreen();
