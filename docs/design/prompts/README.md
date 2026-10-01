@@ -182,6 +182,7 @@ Each of these was sent as the next message in the existing design session for th
 | [71](./followups/71-readme-aw24-password-reset-leftover.md) | `design/README.md`'s `AW24` flow bullet still offers «Restablecer contraseña», which 54 removed from the screen (checklist 30 §11, ADR-0029) | ✅ applied (Claude Design export 2026-09-30, `c0abb6d`) |
 | [72](./followups/72-app-outlined-button-labels.md) | Finishes 70 §6: outlined-button labels on Client and Staff screens and the accent labels on `03`/`10` in Palo de rosa profundo, as the apps ship; README «Secondary» | ✅ applied (Claude Design export 2026-09-30, `785df78`) |
 | [73](./followups/73-unread-notifications-badge.md) | Unread notifications (MOB-017 gap): a `#8A5D59` count badge on the Client Perfil tab and on the «Notificaciones» rows of `18`/`S23`, a dot on the Staff «Tu cuenta» avatar of `S02`/`S04`/`S11`/`S15` (amends checklist 30 §9: the dot is not a border), design system and README | ✅ applied (Claude Design export 2026-09-30, `c9bd14a`) |
+| [74](./followups/74-picker-sheet-selected-row.md) | Picker sheets: the selected row's label in Palo de rosa profundo on `03`'s and `S13`'s «Elige una sucursal» and `S17`'s time sheet, the `#B78380` check kept; README «Picker sheets» | 🕓 pending |
 
 ## Status
 
