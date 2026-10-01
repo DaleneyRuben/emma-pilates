@@ -91,7 +91,10 @@ It must not ask for a phone number. Two different passwords show "Las
 contraseñas no coinciden." under the second field and send nothing; fewer than
 8 characters show "Mínimo 8 caracteres.". The button reads **Crear cuenta** and
 "¿Ya tienes una cuenta? **Inicia sesión**" returns to Login. Tap **¿Olvidaste tu
-contraseña?** and confirm that recovery asks only for email. These navigation
+contraseña?** and confirm that recovery asks only for email, under a top bar
+with a back chevron and the title **Recuperar contraseña** (the chevron, read
+as "Volver", returns to Login; the bar stays after sending and on the limit
+notice). These navigation
 checks do not need the backend. On an iPad the pre-session screens sit in a
 centred phone-width column.
 
@@ -471,7 +474,8 @@ by the Client app.
 For an incorrect password, the mobile app shows "El correo o la contraseña no
 son correctos." in a box above the fields, whether or not the Account exists.
 After the backend returns `429` (six failures with the same made-up email),
-the box reads "Demasiados intentos. Intenta de nuevo en un momento." with
+a neutral box with a Palo de rosa clock reads "Demasiados intentos. Intenta
+de nuevo en un momento." with
 "Podrás intentarlo en 0:30." counting down from the server's `Retry-After`,
 and **Iniciar sesión** stays disabled until it ends.
 
@@ -481,9 +485,10 @@ fecha y hora exactas.", **Reenviar correo** (always answered "Si el envío está
 disponible, recibirás un correo nuevo. Solo funciona el enlace más
 reciente."), **Volver a iniciar sesión**, the 7-day cleanup note, and a quiet
 **Cancelar registro** that asks "¿Cancelar tu registro?" first. **Cambiar
-correo** explains that the links sent to the old address stop working. The
-device/network limit frames ("Demasiadas solicitudes…" with "Podrás reenviarlo
-en m:ss.") appear once the API answers `429`; Test 5 G shows how to reach them.
+correo** opens under a top bar titled **Cambiar correo** whose chevron returns
+to **Revisa tu correo**, and explains that the links sent to the old address
+stop working. The device/network limit frames ("Demasiadas solicitudes…" after
+the same clock, with "Podrás reenviarlo en m:ss.") appear once the API answers `429`; Test 5 G shows how to reach them.
 The registration form itself still answers that `429` with the generic «No
 pudimos crear la cuenta. Inténtalo de nuevo.» (MOB-032 waits on a design for
 it).
@@ -582,7 +587,9 @@ drop it afterwards), because the budgets apply to everyone on your machine.
    `/api/v1/password-recovery-requests` (any email), then use **¿Olvidaste tu
    contraseña?** in the Client app (20), the Staff app (S18), or the admin web
    (AW30): each shows "Demasiadas solicitudes. Intenta de nuevo en un momento;
-   si ya recibiste un enlace, sigue sirviendo." with "Podrás pedirlo en m:ss.".
+   si ya recibiste un enlace, sigue sirviendo." after a clock icon, with
+   "Podrás pedirlo en m:ss.", under the **Recuperar contraseña** top bar in
+   the apps.
 3. **Reset.** The budgets forget events after 15 minutes and 24 hours. To
    start over on your local copy, mark them deleted (rows are never removed):
 
