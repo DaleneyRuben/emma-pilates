@@ -167,7 +167,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 | File | Screen | Purpose |
 |---|---|---|
-| `01` | Iniciar sesión | Email + password login, registration with «Confirmar contraseña», «Revisa tu correo» verification states, incorrect-credentials and throttled login |
+| `01` | Iniciar sesión | Email + password login, registration with «Confirmar contraseña», «Revisa tu correo» verification states, incorrect-credentials and throttled login, and the registration form's temporary device or network limit |
 | `02` | Inicio | Promotions carousel, next class, plan status; one full-width 16:9 card per page with position dots, a loading placeholder, the section hidden without published Promotions, a 720 px card on tablet |
 | `03` | Reservar | Browse sessions by day |
 | `04` | Detalle de sesión | Session detail + book |
@@ -275,7 +275,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 **Navigation — client app**
 - Four-tab bar: Inicio · Reservar · Mis Reservas · Perfil. Child screens replace the tab bar with a header and a back arrow.
 - With unread notifications, the Perfil tab carries the unread count badge on its icon on every screen that draws the tab bar, whichever tab is active (`02` and `18` draw it with 2; the other frames show the zero state). `02`'s header avatar has no dot.
-- `01→20` via "¿Olvidaste tu contraseña?". Email is the only login, registration, and recovery identifier; phone is optional contact data added later in `22`. Registration asks for the password twice and shows «Las contraseñas no coinciden.» under «Confirmar contraseña», as `21` and `23` do.
+- `01→20` via "¿Olvidaste tu contraseña?". Email is the only login, registration, and recovery identifier; phone is optional contact data added later in `22`. Registration asks for the password twice and shows «Las contraseñas no coinciden.» under «Confirmar contraseña», as `21` and `23` do. When the device or network request limit is full, the registration form shows the neutral clock notice above the fields («Demasiadas solicitudes. Intenta de nuevo en un momento; si ya recibiste un enlace, sigue sirviendo.», «Podrás intentarlo en m:ss.») and keeps «Crear cuenta» disabled until the wait ends; nothing is sent and the address is never named.
 - A wrong email or password reads «El correo o la contraseña no son correctos.» on `01`, `S01`, and `AW01`: one form-level message that never names the field or says whether the email has an Account.
 - `01` registration → «Revisa tu correo» (no tab bar, no route to `02`): the submitted address with «Cambiar correo», «Reenviar correo», «Volver a iniciar sesión», and a quiet «Cancelar registro» with confirmation. The link expires in 24 hours; the pending registration is removed after 7 days without verification, correction, or resend, after which «El registro venció» sends the person back to register. Opening the link verifies the email but does not sign in.
 - Emailed links open `21`: **Activar cuenta** (from an `S05` invitation, 7-day links, removed after 30 days of inactivity) returns to `01` without a session; **Restablecer contraseña** (from `20`, 30-minute links) lands on `02` with a new session. Expired recovery links return to `20`.
