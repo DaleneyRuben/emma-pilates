@@ -442,7 +442,9 @@ the name and phone and saves through the API (changing the email is Test 34).
 The **Reservar** tab lists the fixture Sessions for the selected Branch, day,
 and Class Type (past Sessions of today are hidden; full ones show **Lleno**).
 The **Sucursal:** chip opens «Elige una sucursal» with the current Branch's
-name in Palo de rosa profundo and a check on its right.
+name in Palo de rosa profundo and a check on its right. The day and Class Type
+chip rows keep their height whether the Branch list is open or the day has no
+classes, on the iPhone and the iPad alike.
 Tapping a Session opens its detail; **Reservar** creates a real Booking and
 lands on **Mis reservas** with a "Reserva confirmada" notice and the updated
 class balance. A full Session offers **Unirme a la lista de espera**, and a
