@@ -183,13 +183,14 @@ describe('assistant client invitations (e2e)', () => {
       );
 
     operations.invite.mockRejectedValueOnce(
-      new InvitationEmailThrottledError(),
+      new InvitationEmailThrottledError(40),
     );
     await request(app.getHttpServer())
       .post('/api/v1/assistant/client-invitations')
       .set('authorization', bearer)
       .send({ name: 'Ana', email: 'ana@example.com' })
       .expect(429)
+      .expect('Retry-After', '40')
       .expect(({ body }) =>
         expect(body).toMatchObject({ code: 'email_throttled' }),
       );

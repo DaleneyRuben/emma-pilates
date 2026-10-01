@@ -11,7 +11,9 @@ import {
   Inject,
   Param,
   Post,
+  Res,
 } from '@nestjs/common';
+import type { Response } from 'express';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -83,7 +85,7 @@ const requireClientId = (value: string): string => {
 };
 
 // Every invitation rule has a stable code; the status follows the rule.
-const problems: [new () => Error, string, HttpStatus][] = [
+const problems: [new (...args: never[]) => Error, string, HttpStatus][] = [
   [InvitationAccessDeniedError, 'access_denied', HttpStatus.FORBIDDEN],
   [
     ClientInvitationNotFoundError,
@@ -99,10 +101,17 @@ const problems: [new () => Error, string, HttpStatus][] = [
   [InvitationHasActivityError, 'invitation_has_activity', HttpStatus.CONFLICT],
 ];
 
-const run = async <Result>(work: () => Promise<Result>): Promise<Result> => {
+// ADR-0029: a staff interface may say when a limited resend can be retried.
+const run = async <Result>(
+  work: () => Promise<Result>,
+  response?: Response,
+): Promise<Result> => {
   try {
     return await work();
   } catch (error) {
+    if (error instanceof InvitationEmailThrottledError) {
+      response?.setHeader('Retry-After', String(error.retryAfterSeconds));
+    }
     const match = problems.find(([type]) => error instanceof type);
     if (match !== undefined && error instanceof Error) {
       throw new HttpException(
@@ -139,6 +148,7 @@ export class AssistantClientInvitationsController {
   async invite(
     @Headers('authorization') authorization: string | undefined,
     @Body() body: unknown,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<ClientInvitationResultDto> {
     const parsed = parseInviteClient(body);
     if (parsed === null) {
@@ -147,7 +157,7 @@ export class AssistantClientInvitationsController {
       );
     }
     const principal = await this.authenticate(authorization);
-    return run(() => this.operations.invite(parsed, principal));
+    return run(() => this.operations.invite(parsed, principal), response);
   }
 
   @Get(':clientId')
@@ -175,16 +185,19 @@ export class AssistantClientInvitationsController {
     @Param('clientId') clientId: string,
     @Headers('authorization') authorization: string | undefined,
     @Body() body: unknown,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<ClientInvitationDto> {
     const id = requireClientId(clientId);
     const parsed = parseCorrectInvitationEmail(body);
     if (parsed === null) throw invalidRequest('A valid email is required');
     const principal = await this.authenticate(authorization);
-    return run(() =>
-      this.operations.correctEmail(
-        { clientId: id, email: parsed.email },
-        principal,
-      ),
+    return run(
+      () =>
+        this.operations.correctEmail(
+          { clientId: id, email: parsed.email },
+          principal,
+        ),
+      response,
     );
   }
 
@@ -197,10 +210,14 @@ export class AssistantClientInvitationsController {
   async resend(
     @Param('clientId') clientId: string,
     @Headers('authorization') authorization: string | undefined,
+    @Res({ passthrough: true }) response: Response,
   ): Promise<ClientInvitationDto> {
     const id = requireClientId(clientId);
     const principal = await this.authenticate(authorization);
-    return run(() => this.operations.resend({ clientId: id }, principal));
+    return run(
+      () => this.operations.resend({ clientId: id }, principal),
+      response,
+    );
   }
 
   @Post(':clientId/cancellation')

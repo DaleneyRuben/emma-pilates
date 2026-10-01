@@ -20,6 +20,7 @@ import type {
   PendingClientRegistrationCancellationStatus,
 } from './cancel-pending-client-registration';
 import type { ExpiredPendingAccountCleanup } from './cleanup-expired-pending-accounts';
+import { authenticationEmailWaitSeconds } from '../security/authentication-email-throttle';
 import type {
   PendingEmailCorrection,
   PendingEmailCorrectionStatus,
@@ -477,6 +478,14 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
     purpose: 'verification' | 'activation';
     now: Date;
   }): Promise<boolean> {
+    return (await this.authenticationEmailWaitSeconds(input)) === 0;
+  }
+
+  async authenticationEmailWaitSeconds(input: {
+    email: string;
+    purpose: 'verification' | 'activation';
+    now: Date;
+  }): Promise<number> {
     const events = await this.transaction.authenticationThrottleEvent.findMany({
       where: {
         purpose: mapThrottlePurpose(input.purpose),
@@ -486,16 +495,8 @@ export class PrismaClientRegistrationTransaction implements ClientRegistrationTr
       },
       select: { occurredAt: true },
     });
-    const inLastMinute = events.some(
-      ({ occurredAt }) =>
-        occurredAt >= new Date(input.now.getTime() - 60 * 1_000),
-    );
-    const inLastHour = events.filter(
-      ({ occurredAt }) =>
-        occurredAt >= new Date(input.now.getTime() - hourMilliseconds),
-    ).length;
 
-    return !inLastMinute && inLastHour < 5 && events.length < 10;
+    return authenticationEmailWaitSeconds(events, input.now);
   }
 
   async recordIssuedAuthenticationEmail(input: {

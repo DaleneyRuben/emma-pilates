@@ -31,7 +31,7 @@ export class InvitationEmailInUseError extends Error {
 }
 
 export class InvitationEmailThrottledError extends Error {
-  constructor() {
+  constructor(readonly retryAfterSeconds: number) {
     super('Too many emails were sent to this recipient');
   }
 }
@@ -85,11 +85,12 @@ export type InvitationAudit = {
 export interface ClientInvitationTransaction {
   findAccountByEmail: (email: string) => Promise<ExistingAccount | null>;
   findInvitation: (clientId: string) => Promise<ClientInvitationRecord | null>;
-  canIssueAuthenticationEmail: (input: {
+  /** Seconds until the recipient lane has room again, 0 when it has. */
+  authenticationEmailWaitSeconds: (input: {
     email: string;
     purpose: EmailPurpose;
     now: Date;
-  }) => Promise<boolean>;
+  }) => Promise<number>;
   recordIssuedAuthenticationEmail: (input: {
     email: string;
     purpose: EmailPurpose;
@@ -222,8 +223,9 @@ const requireThrottleRoom = async (
   transaction: ClientInvitationTransaction,
   input: { email: string; purpose: EmailPurpose; now: Date },
 ): Promise<void> => {
-  if (!(await transaction.canIssueAuthenticationEmail(input))) {
-    throw new InvitationEmailThrottledError();
+  const waitSeconds = await transaction.authenticationEmailWaitSeconds(input);
+  if (waitSeconds > 0) {
+    throw new InvitationEmailThrottledError(waitSeconds);
   }
 };
 

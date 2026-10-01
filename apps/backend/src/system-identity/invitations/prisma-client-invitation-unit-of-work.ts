@@ -128,8 +128,8 @@ const createInvitationTransaction = (
         0,
     };
   },
-  canIssueAuthenticationEmail: (input) =>
-    registration.canIssueAuthenticationEmail(input),
+  authenticationEmailWaitSeconds: (input) =>
+    registration.authenticationEmailWaitSeconds(input),
   recordIssuedAuthenticationEmail: (input) =>
     registration.recordIssuedAuthenticationEmail(input),
   createInvitation: async (invitation) => {
