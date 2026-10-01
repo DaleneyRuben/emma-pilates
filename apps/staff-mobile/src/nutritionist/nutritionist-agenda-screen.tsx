@@ -108,16 +108,15 @@ export function NutritionistAgendaScreen() {
     const target = cancelling;
     setFailure(null);
     setNotice(null);
+    let cancelled = false;
     try {
       const response = await cancelNutritionistEvaluation(
         target.evaluationId,
         undefined,
         fetcher,
       );
-      if (response.status === 204) {
-        setNotice(`${target.clientName} · ${clockTime(target.startsAt)}`);
-        setSelectedId(null);
-      } else {
+      cancelled = response.status === 204;
+      if (!cancelled) {
         setFailure("No pudimos cancelar la evaluación. Inténtalo de nuevo.");
       }
     } catch {
@@ -127,6 +126,11 @@ export function NutritionistAgendaScreen() {
       await queryClient.invalidateQueries({
         queryKey: getListNutritionistAgendaQueryKey({ limit: agendaPageSize }),
       });
+    }
+    // Announce the cancellation only once the refreshed agenda no longer lists it.
+    if (cancelled) {
+      setNotice(`${target.clientName} · ${clockTime(target.startsAt)}`);
+      setSelectedId(null);
     }
   };
 
