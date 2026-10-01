@@ -8,6 +8,7 @@ import {
   createAuthenticationSession,
   type NewAuthenticationSession,
 } from './create-authentication-session';
+import { sourceDigests } from '../security/request-source';
 import { getLoginThrottle } from './login-throttle-policy';
 
 export class LoginThrottledError extends Error {
@@ -70,13 +71,7 @@ const createThrottleDigests = (
     loginLaneDigest: dependencies.digestSignal(
       `login-lane:${normalizedEmail}\0client:${clientSignal}\0network:${command.networkAddress}`,
     ),
-    clientDigest:
-      command.clientIdentifier === null
-        ? null
-        : dependencies.digestSignal(`client:${command.clientIdentifier}`),
-    networkDigest: dependencies.digestSignal(
-      `network:${command.networkAddress}`,
-    ),
+    ...sourceDigests(command, dependencies.digestSignal),
   };
 };
 

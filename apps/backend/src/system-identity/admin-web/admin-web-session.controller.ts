@@ -48,6 +48,7 @@ import {
   clearSessionCookie,
   setSessionCookie,
 } from './admin-web-cookies';
+import { requestNetworkAddress } from '../security/request-source';
 import { AdminWebPasswordRecoveryResultDto } from './admin-web-session.dto';
 
 export const adminWebLogin = Symbol('adminWebLogin');
@@ -111,7 +112,7 @@ export class AdminWebSessionController {
           request.headers.cookie,
           response,
         ),
-        networkAddress: request.ip ?? request.socket.remoteAddress ?? 'unknown',
+        networkAddress: requestNetworkAddress(request),
         surface: 'admin_web',
       }));
     } catch (error) {

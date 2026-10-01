@@ -35,6 +35,10 @@ import type { LoginCommand } from './login';
 import { toLoginProblem } from './login-problems';
 import type { AuthenticatedPrincipal } from './resolve-authenticated-principal';
 import { AuthenticationRequiredError } from './resolve-authenticated-principal';
+import {
+  parseClientIdentifier,
+  requestNetworkAddress,
+} from '../security/request-source';
 
 export const mobileLogin = Symbol('mobileLogin');
 export const authenticatedPrincipalResolver = Symbol(
@@ -50,13 +54,6 @@ type PrincipalResolver = (
   meaningfulActivity: boolean,
 ) => Promise<AuthenticatedPrincipal>;
 type LogoutHandler = (authenticationSessionId: string) => Promise<void>;
-
-const clientIdentifierPattern = /^[A-Za-z0-9_-]{16,128}$/;
-
-const parseClientIdentifier = (value: unknown): string | null =>
-  typeof value === 'string' && clientIdentifierPattern.test(value)
-    ? value
-    : null;
 
 const parseBearerCredential = (authorization: string | undefined): string => {
   const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
@@ -102,7 +99,7 @@ export class AuthenticationController {
       return await this.loginHandler({
         ...credentials,
         clientIdentifier: parseClientIdentifier(clientIdentifier),
-        networkAddress: request.ip ?? request.socket.remoteAddress ?? 'unknown',
+        networkAddress: requestNetworkAddress(request),
       });
     } catch (error) {
       throw toLoginProblem(error, response);
