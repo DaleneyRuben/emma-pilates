@@ -13,7 +13,7 @@ you are starting with no project knowledge.
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
-| Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions                                  | The worker writes every captured email under `apps/backend/.data/email-capture/` (Test 34); the link opens nothing on the Simulator until LNK-001 wires universal links, so paste its token into Swagger |
+| Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions; in the app «Revisa tu correo» survives a restart until you verify, cancel, or log in (Test 5) | The worker writes every captured email under `apps/backend/.data/email-capture/` (Test 34); the link opens nothing on the Simulator until LNK-001 wires universal links, so paste its token into Swagger |
 | Pending registration actions | Correct the email, request another verification email, or cancel using the continuation returned by registration                | Resend deliberately gives the same neutral response whether it sends or suppresses an email                                                                   |
 | Email verification           | Confirm that an unknown token returns `invalid`; complete a real verification with the token from `.data/email-capture` (Test 34) | The link is a URL the Simulator cannot open yet (LNK-001)                                                                                                    |
 | Login and logout             | Log in from the mobile app, restore the protected credential at startup, inspect identity in Swagger, and revoke it             | Log out from Perfil with a confirmation in both apps (Test 9)                                                                                                  |
@@ -479,8 +479,18 @@ reciente."), **Volver a iniciar sesión**, the 7-day cleanup note, and a quiet
 **Cancelar registro** that asks "¿Cancelar tu registro?" first. **Cambiar
 correo** explains that the links sent to the old address stop working. The
 device/network limit frames ("Demasiadas solicitudes…" with "Podrás reenviarlo
-en m:ss.") and «El registro venció» are built but the backend does not produce
-them yet (BE-012, MOB-028), so only the automated tests show them.
+en m:ss.") are built but the backend does not produce them yet (BE-012), so
+only the automated tests show them.
+
+The pending registration stays on the device (in SecureStore) until it is
+finished: close the app from the app switcher (or Expo Go) and open it again,
+and it starts on **Revisa tu correo** with the same address instead of Login.
+It is forgotten when you verify the email from a link on this device, cancel
+the registration, register again, or log in to any Client Account; after a
+cancellation or a login, the next launch opens Login. Seven days after the
+last registration, correction, or resend, the next launch shows «El registro
+venció» once (with **Registrarme de nuevo**) and then forgets it. You cannot
+wait seven days by hand, so the automated tests cover that frame.
 
 ### C. Log in through Swagger
 
@@ -2276,8 +2286,8 @@ The following are not ready for manual product testing:
   expired and removed states) are covered by the automated tests;
 - the device and network limits on registration, resend, and recovery
   emails, which the apps already draw (BE-012);
-- a pending registration surviving an app restart, so «Revisa tu correo» and
-  «El registro venció» last only while the app stays open (MOB-028);
+- «El registro venció» on a device, which needs seven days to pass after the
+  registration (the automated tests show it);
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
 - opening a production Universal Link or Android App Link before the public
   mobile-link domain and native association files are configured;
