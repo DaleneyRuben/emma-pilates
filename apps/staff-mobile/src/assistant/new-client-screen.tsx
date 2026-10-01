@@ -52,11 +52,14 @@ function SelfRegisteredNotice({
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
+  const [limited, setLimited] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
 
   const send = async () => {
     setSending(true);
+    setSent(false);
     setFailure(null);
+    setLimited(false);
     try {
       await api.sendVerification(clientId);
       setSent(true);
@@ -64,7 +67,7 @@ function SelfRegisteredNotice({
       const problem = problemOf(error);
       if (problem?.code === "email_throttled") {
         startWait(problem.retryAfterSeconds);
-        setFailure(limitedEmailMessage);
+        setLimited(true);
       } else {
         setFailure("No pudimos enviar el enlace. Inténtalo de nuevo.");
       }
@@ -90,6 +93,7 @@ function SelfRegisteredNotice({
         </BodyText>
       ) : null}
       {failure !== null ? <BodyText style={styles.failure}>{failure}</BodyText> : null}
+      {limited ? <BodyText>{limitedEmailMessage}</BodyText> : null}
       {waitSeconds > 0 ? (
         <BodyText style={styles.note}>
           {`Podrás reenviarlo en ${formatCountdown(waitSeconds)}.`}
@@ -218,7 +222,10 @@ export function NewClientScreen() {
               Enviaremos un enlace de activación al correo. Vence en 7 días.
             </BodyText>
             {failure !== null ? (
-              <BodyText accessibilityRole="alert" style={styles.failure}>
+              <BodyText
+                accessibilityRole="alert"
+                style={failure === limitedEmailMessage ? undefined : styles.failure}
+              >
                 {failure}
               </BodyText>
             ) : null}

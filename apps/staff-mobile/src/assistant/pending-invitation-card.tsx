@@ -59,11 +59,8 @@ export function PendingInvitationCard({
   const [email, setEmail] = useState("");
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [notice, setNotice] = useState<string | null>(
-    reopened
-      ? `${firstName(clientName)} ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.`
-      : null,
-  );
+  const [showReopened, setShowReopened] = useState(reopened);
+  const [notice, setNotice] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const [waitSeconds, startWait] = useCountdown();
 
@@ -84,6 +81,7 @@ export function PendingInvitationCard({
     setBusy(true);
     setFailure(null);
     setNotice(null);
+    setShowReopened(false);
     try {
       await work();
     } catch (error) {
@@ -128,6 +126,11 @@ export function PendingInvitationCard({
 
   return (
     <View style={styles.pendingCard}>
+      {showReopened ? (
+        <BodyText style={styles.success}>
+          {`${firstName(clientName)} ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.`}
+        </BodyText>
+      ) : null}
       <Text style={styles.cardTitle}>Cuenta pendiente de activación</Text>
       <View style={styles.emailLine}>
         <BodyText style={styles.email}>{pending.email}</BodyText>
@@ -146,7 +149,10 @@ export function PendingInvitationCard({
       </BodyText>
       {notice !== null ? <BodyText style={styles.success}>{notice}</BodyText> : null}
       {failure !== null ? (
-        <BodyText accessibilityRole="alert" style={styles.failure}>
+        <BodyText
+          accessibilityRole="alert"
+          style={failure === limitedEmailMessage ? undefined : styles.failure}
+        >
           {failure}
         </BodyText>
       ) : null}
