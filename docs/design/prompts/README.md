@@ -185,6 +185,7 @@ Each of these was sent as the next message in the existing design session for th
 | [74](./followups/74-picker-sheet-selected-row.md) | Picker sheets: the selected row's label in Palo de rosa profundo on `03`'s and `S13`'s «Elige una sucursal» and `S17`'s time sheet, the `#B78380` check kept; README «Picker sheets» | ✅ applied (Claude Design export 2026-09-30, `5ef85ae`) |
 | [75](./followups/75-evaluation-month-copy-as-built.md) | Evaluation copy names its month (MOB-022 as built): `13`'s used-month title rule, `14` «desde Mis evaluaciones», `15`'s new «ya usada este mes» empty frame and the cancel sheet's month, `19`'s freed-month sentence; README rows | 🕓 pending |
 | [76](./followups/76-assistant-self-registered-pending-client.md) | `S06` for a pending Client who registered herself (MOB-027 as built): the verification card with `S05`'s copy and «Enviar enlace de verificación» in three phone frames (sent, limited) and a tablet frame, a notes card; `S05`'s «Ver cliente» caption; README | 🕓 pending |
+| [77](./followups/77-registration-form-request-limit.md) | `01`'s registration form under the device or network request limit (BE-012): the neutral clock notice above the fields with the server wait and «Crear cuenta» disabled until it ends, instead of the generic failure; README | 🕓 pending |
 
 ## Status
 
