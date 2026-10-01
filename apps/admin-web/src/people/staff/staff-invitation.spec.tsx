@@ -70,6 +70,11 @@ describe("AW24 pending invitation", () => {
         "Enviamos un enlace nuevo a valentina.soria@emmapilates.bo.",
       ),
     ).toBeVisible();
+    // The contact row follows the corrected address.
+    expect(
+      within(panel).getAllByText("valentina.soria@emmapilates.bo").length,
+    ).toBeGreaterThanOrEqual(2);
+    expect(within(panel).queryByText("valentina@emmapilates.bo")).toBeNull();
     expect(sent).toContainEqual({
       method: "POST",
       path: `${memberPath(valentina.id)}/email-corrections`,
