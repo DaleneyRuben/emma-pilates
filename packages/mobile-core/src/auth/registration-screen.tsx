@@ -6,8 +6,9 @@ import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { colors, spacing } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
-import { FooterPrompt, FormAlert } from "./auth-parts";
-import type { AuthenticationApi } from "./authentication-api";
+import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
+import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
+import { useCountdown } from "./countdown";
 import {
   restartPendingWindow,
   type PendingRegistration,
@@ -44,6 +45,7 @@ export function RegistrationScreen({
   const [referralError, setReferralError] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [waitSeconds, startWait] = useCountdown();
 
   const nameError =
     submitted && name.trim() === "" ? "Escribe tu nombre." : undefined;
@@ -86,7 +88,11 @@ export function RegistrationScreen({
       });
       onRegistered(restartPendingWindow(result));
     } catch (failure) {
-      if (referralProblems.has(problemCode(failure) ?? "")) {
+      const wait = serverWaitSeconds(failure);
+
+      if (wait !== null) {
+        startWait(wait);
+      } else if (referralProblems.has(problemCode(failure) ?? "")) {
         setReferralError(true);
       } else {
         setError("No pudimos crear la cuenta. Inténtalo de nuevo.");
@@ -108,6 +114,13 @@ export function RegistrationScreen({
       tagline
     >
       {error === null ? null : <FormAlert>{error}</FormAlert>}
+      {waitSeconds > 0 ? (
+        <WaitNotice
+          message="Demasiadas solicitudes. Intenta de nuevo en un momento; si ya recibiste un enlace, sigue sirviendo."
+          remainingSeconds={waitSeconds}
+          waitLabel="Podrás intentarlo en"
+        />
+      ) : null}
       <FormField
         autoCapitalize="words"
         error={nameError}
@@ -166,7 +179,7 @@ export function RegistrationScreen({
         </Pressable>
       )}
       <PrimaryButton
-        disabled={submitting}
+        disabled={submitting || waitSeconds > 0}
         label="Crear cuenta"
         onPress={submit}
       />
