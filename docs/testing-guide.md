@@ -677,7 +677,7 @@ endpoints; Trainers and Clients get `403`.
 | `GET …/clients/{clientId}/plan-quotes`                     | Every Plan with `creditAppliedCentavos` and the cash `amountDueCentavos` for this Client                 |
 | `POST …/clients/{clientId}/cash-payments` `{ planId, branchId }` | `201` with the confirmed cash Payment and the new Subscription; needs an `idempotency-key` UUID     |
 | `POST /api/v1/assistant/client-invitations` `{ name, email, phone? }` | `201 invited` with the new `clientId`; the worker queues the 7-day activation email           |
-| `GET /api/v1/assistant/client-invitations/{clientId}`      | The pending invitation with `pendingExpiresAt` (30 days), `activationExpiresAt`, and `cancellable`       |
+| `GET /api/v1/assistant/client-invitations/{clientId}`      | The pending invitation with `pendingExpiresAt` (30 days), `activationExpiresAt`, and `cancellable`; a Client who registered herself answers `404 client_verification_pending` |
 | `POST …/client-invitations/{clientId}/email-corrections` `{ email }` | New email, old links invalidated, fresh link sent                                              |
 | `POST …/client-invitations/{clientId}/resends`             | A fresh link; a second send within a minute answers `429 email_throttled` with `Retry-After` (seconds)   |
 | `POST …/client-invitations/{clientId}/verification-emails` | `202 { clientId, email }`: a fresh 24-hour verification link for a Client who registered herself; `404` for a staff invitation |
@@ -687,7 +687,9 @@ Inviting an email that already has a pending invitation answers `201
 invitation_resent`; a pending self-registration answers `201
 verification_pending` and sends nothing (the Assistant offers the link with
 `…/verification-emails`); an active Client or a Staff Member answers `409
-email_in_use`. Every limited invitation email answers `429 email_throttled`
+email_in_use`. A self-registration is never managed as an invitation: reading,
+resending, correcting, or cancelling it answers `404
+client_verification_pending`, and no activation link is issued for her. Every limited invitation email answers `429 email_throttled`
 with `Retry-After`. Booking for a Client uses the
 existing `POST /api/v1/sessions/{id}/bookings` with `clientId` in the body, and
 cancelling, rescheduling, or leaving the Waitlist uses the same endpoints as the
@@ -1199,7 +1201,11 @@ cambió nada." under the field. A Client who registered herself from the app is
 not sent anything: the form says her email waits for verification and offers
 **Enviar enlace de verificación** (24 hours, `POST
 /api/v1/assistant/client-invitations/{clientId}/verification-emails`) and **Ver
-cliente**. Once the pending Client has a Payment or Booking, **Cancelar
+cliente**. Her overview, from **Ver cliente** or from the search, shows the
+same offer in place of the invitation card: no **Cuenta pendiente de
+activación**, **Cambiar correo**, **Reenviar enlace**, or **Cancelar
+invitación**, because she already chose a password. To create one, register
+from the Client app (Test 4) and search for her by email. Once the pending Client has a Payment or Booking, **Cancelar
 invitación** is replaced by "La cuenta ya tiene pagos o reservas, así que la
 invitación se mantiene." and the account stays pending until she activates
 it.
