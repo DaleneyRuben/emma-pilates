@@ -39,6 +39,7 @@ enum AuthenticationThrottlePurpose {
 enum AuthenticationThrottleEventKind {
   FAILED_CREDENTIAL_CHECK @map("failed_credential_check")
   MESSAGE_ISSUED          @map("message_issued")
+  EMAIL_REQUESTED         @map("email_requested")
 
   @@schema("system")
 }
