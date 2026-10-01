@@ -19,6 +19,7 @@ import {
   spacing,
   TextButton,
   typography,
+  PickerCheck,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -320,10 +321,14 @@ export function AvailabilityBlockFormScreen({
               {picking === "start" ? "Hora de inicio" : "Hora de fin"}
             </Text>
             <ScrollView contentContainerStyle={styles.timeOptions}>
-              {quarterHours.map((time) => (
+              {quarterHours.map((time) => {
+                const selected =
+                  time === (picking === "start" ? startsAtLocal : endsAtLocal);
+                return (
                 <Pressable
                   accessibilityLabel={displayTime(time)}
                   accessibilityRole="button"
+                  accessibilityState={{ selected }}
                   key={time}
                   onPress={() => {
                     if (picking === "start") setStartsAtLocal(time);
@@ -332,9 +337,18 @@ export function AvailabilityBlockFormScreen({
                   }}
                   style={styles.timeOption}
                 >
-                  <Text style={styles.timeOptionText}>{displayTime(time)}</Text>
+                  <Text
+                    style={[
+                      styles.timeOptionText,
+                      selected && styles.timeOptionTextSelected,
+                    ]}
+                  >
+                    {displayTime(time)}
+                  </Text>
+                  <PickerCheck selected={selected} testID={`picker-check-${time}`} />
                 </Pressable>
-              ))}
+                );
+              })}
             </ScrollView>
             <TextButton label="Volver" onPress={() => setPicking(null)} />
           </View>
@@ -439,6 +453,8 @@ const styles = StyleSheet.create({
   timeLabel: { color: colors.textMuted, fontSize: typography.label },
   timeOption: {
     alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.xs,
     borderColor: colors.border,
     borderRadius: radii.control,
     borderWidth: 1,
@@ -447,6 +463,7 @@ const styles = StyleSheet.create({
     width: "23%",
   },
   timeOptionText: { color: colors.text, fontSize: typography.body },
+  timeOptionTextSelected: { color: colors.primaryDeep, fontWeight: "500" },
   timeOptions: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
   timePlaceholder: { color: colors.textSubtle },
   timeSheet: { maxHeight: "70%" },

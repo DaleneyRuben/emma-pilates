@@ -107,7 +107,9 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
 
     expect(screen.getByRole("button", { name: "10:00" })).toBeSelected();
     expect(screen.getByRole("button", { name: "10:15" })).not.toBeSelected();
-    expect(screen.getByText("10:00")).toHaveStyle({ color: "#8A5D59" });
+    expect(
+      within(screen.getByRole("button", { name: "10:00" })).getByText("10:00"),
+    ).toHaveStyle({ color: "#8A5D59" });
     expect(
       screen.getByTestId("picker-check-10:00", { includeHiddenElements: true }),
     ).toBeOnTheScreen();

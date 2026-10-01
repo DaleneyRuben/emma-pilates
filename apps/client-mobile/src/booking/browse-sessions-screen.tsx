@@ -14,6 +14,7 @@ import {
   shadows,
   spacing,
   typography,
+  PickerCheck,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -171,8 +172,21 @@ export function BrowseSessionsScreen() {
               }}
               style={styles.branchRow}
             >
-              <Text style={styles.branchName}>{branch.name}</Text>
-              <BodyText style={styles.branchAddress}>{branch.address}</BodyText>
+              <View style={styles.branchText}>
+                <Text
+                  style={[
+                    styles.branchName,
+                    branch.id === branchId && styles.branchNameSelected,
+                  ]}
+                >
+                  {branch.name}
+                </Text>
+                <BodyText style={styles.branchAddress}>{branch.address}</BodyText>
+              </View>
+              <PickerCheck
+                selected={branch.id === branchId}
+                testID={`picker-check-${branch.id}`}
+              />
             </Pressable>
           ))}
         </View>
@@ -271,7 +285,15 @@ const styles = StyleSheet.create({
   },
   branchChipLabel: { color: colors.text, fontSize: typography.body },
   branchName: { color: colors.text, fontSize: typography.body },
-  branchRow: { gap: spacing.xxs, paddingVertical: spacing.sm },
+  branchNameSelected: { color: colors.primaryDeep },
+  branchRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.md,
+    justifyContent: "space-between",
+    paddingVertical: spacing.sm,
+  },
+  branchText: { flex: 1, gap: spacing.xxs },
   branchSheet: {
     backgroundColor: colors.surface,
     borderRadius: radii.card,
