@@ -145,12 +145,20 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   title: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
+  // S14 draws the consequences as a warning, not an error; the destructive
+  // button alone carries the error colour.
   warning: {
-    backgroundColor: "rgba(178, 93, 75, 0.10)",
-    borderRadius: radii.card,
-    gap: spacing.xs,
-    padding: spacing.lg,
+    backgroundColor: colors.warningTint,
+    borderColor: colors.warning,
+    borderRadius: radii.frame,
+    borderWidth: 1,
+    gap: spacing.smLg,
+    padding: spacing.xlSm,
   },
-  warningText: { color: colors.errorText },
-  warningTitle: { color: colors.errorText, fontSize: typography.body, fontWeight: "600" },
+  warningText: { color: colors.text, fontSize: 14, lineHeight: 23 },
+  warningTitle: {
+    color: colors.warningText,
+    fontFamily: "Lora_500Medium",
+    fontSize: typography.bodyLarge,
+  },
 });
