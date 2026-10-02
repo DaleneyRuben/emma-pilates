@@ -110,8 +110,10 @@ pnpm --filter @pilates/staff-mobile ios
 Expo Go displays one project at a time, so the Simulator switches from the
 Client project to the Staff project. Both development servers may remain
 running. You should see the same approved Login styling with an **Acceso del
-equipo** pill under the tagline, **Iniciar sesión**, and **¿Olvidaste tu
-contraseña?**, but you must not see **Regístrate**. Staff Accounts
+equipo** pill under the tagline, the email placeholder "tu@emmapilates.bo"
+(the Client app shows "tu@correo.com"; recovery follows the same rule),
+**Iniciar sesión**, and **¿Olvidaste tu contraseña?**, but you must not see
+**Regístrate**. Staff Accounts
 are created by authorized Staff workflows, never through Client registration.
 
 The two projects also have different native application identifiers, so Client
