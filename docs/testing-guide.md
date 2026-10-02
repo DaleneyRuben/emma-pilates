@@ -94,8 +94,13 @@ contraseñas no coinciden." under the second field and send nothing; fewer than
 contraseña?** and confirm that recovery asks only for email, under a top bar
 with a back chevron and the title **Recuperar contraseña** (the chevron, read
 as "Volver", returns to Login; the bar stays after sending and on the limit
-notice). These navigation
-checks do not need the backend. On an iPad the pre-session screens sit in a
+notice). After sending, **Revisa tu correo** sits centred under a sage circle
+with a check. The other outcome screens use the same layout under the Emma
+wordmark: **Tu cuenta está activa** (21, S19) and **Tu correo cambió** (22)
+with the sage check, and a dead or unusable link with a Palo de rosa circle
+(a clock for an expired, used, or removed link, an envelope while 22
+confirms, a struck circle for an invalid email-change link, an at sign for an
+address already in use). These navigation checks do not need the backend. On an iPad the pre-session screens sit in a
 centred phone-width column.
 
 ### B. Open the Staff app
