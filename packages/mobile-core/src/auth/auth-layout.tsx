@@ -11,6 +11,7 @@ import {
 import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
 import { Heading } from "../ui/heading";
+import { OutcomeBadge, type OutcomeBadgeProps } from "../ui/outcome-badge";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
 import { colors, radii, spacing, typography } from "../ui/tokens";
@@ -48,6 +49,7 @@ export function BrandHeader({
 
 /** A pre-session page: no tabs, the brand on top, and a centred panel. */
 export function AuthenticationScreen({
+  badge,
   brand = true,
   children,
   eyebrow,
@@ -57,6 +59,8 @@ export function AuthenticationScreen({
   title,
   topBar,
 }: PropsWithChildren<{
+  /** A confirmation's outcome: the badge over a centred title (MOB-035). */
+  badge?: OutcomeBadgeProps;
   /** «Revisa tu correo» and its siblings draw no wordmark. */
   brand?: boolean;
   /** A small uppercase line over the title, such as «Activar cuenta». */
@@ -88,7 +92,12 @@ export function AuthenticationScreen({
             {eyebrow === undefined ? null : (
               <Text style={styles.eyebrow}>{eyebrow}</Text>
             )}
-            {title === undefined ? null : <Heading>{title}</Heading>}
+            {badge === undefined ? null : <OutcomeBadge {...badge} />}
+            {title === undefined ? null : (
+              <Heading style={badge === undefined ? undefined : authStyles.centered}>
+                {title}
+              </Heading>
+            )}
             {children}
           </View>
           {footer}
@@ -99,6 +108,9 @@ export function AuthenticationScreen({
 }
 
 export const authStyles = StyleSheet.create({
+  centered: {
+    textAlign: "center",
+  },
   emphasized: {
     color: colors.text,
     fontWeight: "600",

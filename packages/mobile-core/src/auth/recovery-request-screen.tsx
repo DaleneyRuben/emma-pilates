@@ -59,11 +59,16 @@ export function RecoveryRequestScreen({
 
   if (sentTo !== null) {
     return (
-      <AuthenticationScreen brand={false} title="Revisa tu correo" topBar={topBar}>
-        <BodyText>
+      <AuthenticationScreen
+        badge={{ icon: "check", tone: "success" }}
+        brand={false}
+        title="Revisa tu correo"
+        topBar={topBar}
+      >
+        <BodyText style={authStyles.centered}>
           {`Si hay una cuenta con ${sentTo}, te enviamos un enlace para restablecer tu contraseña.`}
         </BodyText>
-        <BodyText style={authStyles.muted}>
+        <BodyText style={[authStyles.muted, authStyles.centered]}>
           El enlace vence en 30 minutos. Si no llega, revisa tu carpeta de spam.
         </BodyText>
         <TextButton label="Volver a iniciar sesión" onPress={onBack} />

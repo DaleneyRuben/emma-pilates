@@ -8,7 +8,7 @@ import { BodyText } from "../ui/body-text";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
-import { AuthenticationScreen } from "./auth-layout";
+import { AuthenticationScreen, authStyles } from "./auth-layout";
 import { FormAlert } from "./auth-parts";
 import type { AuthenticationApi } from "./authentication-api";
 
@@ -32,6 +32,9 @@ const passwordSchema = z
 type PasswordValues = z.infer<typeof passwordSchema>;
 
 // The Client app sends people to the studio; the Staff app to administración.
+// 21/S19: an expired, used, or removed link draws the Palo de rosa clock.
+const deadLinkBadge = { icon: "clock", tone: "primary" } as const;
+
 const deadLinkCopy = {
   client: {
     expired:
@@ -138,8 +141,11 @@ export function PasswordLinkScreen({
 
   if (state === "activated") {
     return (
-      <AuthenticationScreen title="Tu cuenta está activa">
-        <BodyText>
+      <AuthenticationScreen
+        badge={{ icon: "check", tone: "success" }}
+        title="Tu cuenta está activa"
+      >
+        <BodyText style={authStyles.centered}>
           Tu correo quedó verificado. Inicia sesión con tu correo y la
           contraseña que acabas de crear.
         </BodyText>
@@ -150,8 +156,13 @@ export function PasswordLinkScreen({
 
   if (state === "removed") {
     return (
-      <AuthenticationScreen title="Esta invitación ya no está activa">
-        <BodyText>{deadLinkCopy[audience].removed}</BodyText>
+      <AuthenticationScreen
+        badge={deadLinkBadge}
+        title="Esta invitación ya no está activa"
+      >
+        <BodyText style={authStyles.centered}>
+          {deadLinkCopy[audience].removed}
+        </BodyText>
         <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />
       </AuthenticationScreen>
     );
@@ -159,15 +170,17 @@ export function PasswordLinkScreen({
 
   if (state === "expired") {
     return (
-      <AuthenticationScreen title="Este enlace ya no es válido">
+      <AuthenticationScreen badge={deadLinkBadge} title="Este enlace ya no es válido">
         {activation ? (
           <>
-            <BodyText>{deadLinkCopy[audience].expired}</BodyText>
+            <BodyText style={authStyles.centered}>
+              {deadLinkCopy[audience].expired}
+            </BodyText>
             <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />
           </>
         ) : (
           <>
-            <BodyText>
+            <BodyText style={authStyles.centered}>
               Los enlaces para restablecer la contraseña vencen a los 30
               minutos y sirven una sola vez. Pide uno nuevo.
             </BodyText>

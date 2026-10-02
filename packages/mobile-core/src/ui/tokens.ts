@@ -8,6 +8,8 @@ export const colors = {
   primaryHover: "#A87370",
   primaryPressed: "#9C6764",
   primaryTint: "#EFE0DC",
+  // The outcome badge's circle on a link that did not work (MOB-035).
+  primaryWash: "rgba(183,131,128,0.14)",
   // Text on Palo de rosa tinte: badges, initials, and pending cards (follow-up 70).
   primaryOnTint: "#7A4F4B",
   primaryDeep: "#8A5D59",
