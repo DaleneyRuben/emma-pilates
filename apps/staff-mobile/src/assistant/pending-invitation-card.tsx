@@ -6,7 +6,6 @@ import {
 import {
   BodyText,
   colors,
-  formatCountdown,
   FormField,
   PrimaryButton,
   radii,
@@ -35,7 +34,6 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const invitationProblems: Record<string, string> = {
   email_in_use: "Este correo ya pertenece a otra cuenta.",
-  email_throttled: limitedEmailMessage,
   invitation_has_activity:
     "La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.",
 };
@@ -81,8 +79,8 @@ export function PendingInvitationCard({
     const code = (answer.data as { code?: unknown } | null)?.code;
     // MOB-027: she registered herself, so S05's verification offer applies.
     return code === "client_verification_pending" ? (
-      <View style={styles.pendingCard}>
-        <SelfRegisteredNotice clientId={clientId} email={clientEmail} />
+      <View style={styles.pendingCard} testID="pending-card">
+        <SelfRegisteredNotice clientId={clientId} email={clientEmail} surface="card" />
       </View>
     ) : null;
   }
@@ -115,7 +113,9 @@ export function PendingInvitationCard({
         return;
       }
       if (problem?.code === "email_throttled") {
+        // S06 «Reenvío limitado»: the clock notice replaces a failure line.
         startWait(problem.retryAfterSeconds);
+        return;
       }
       setFailure(
         (problem?.code ? invitationProblems[problem.code] : undefined) ?? fallback,
@@ -153,7 +153,7 @@ export function PendingInvitationCard({
     }, "No pudimos cancelar la invitación. Inténtalo de nuevo.");
 
   return (
-    <View style={styles.pendingCard}>
+    <View style={styles.pendingCard} testID="pending-card">
       {showReopened ? (
         <BodyText style={styles.success}>
           {`${firstName(clientName)} ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.`}
@@ -171,30 +171,23 @@ export function PendingInvitationCard({
           {`El enlace de activación vence el ${formatInstantDate(pending.activationExpiresAt)}.`}
         </BodyText>
       ) : null}
-      <BodyText style={styles.muted}>
+      <BodyText style={[styles.muted, styles.ruled]}>
         La invitación se elimina a los 30 días sin activación, cambio de correo
         o reenvío.
       </BodyText>
       {notice !== null ? <BodyText style={styles.success}>{notice}</BodyText> : null}
       {failure !== null ? (
-        <BodyText
-          accessibilityRole="alert"
-          style={failure === limitedEmailMessage ? undefined : styles.failure}
-        >
+        <BodyText accessibilityRole="alert" style={styles.failure}>
           {failure}
         </BodyText>
       ) : null}
-      {accountWaiting ? (
+      {waitSeconds > 0 ? (
         <WaitNotice
-          message={accountEmailLimitMessage}
+          message={accountLimited ? accountEmailLimitMessage : limitedEmailMessage}
           remainingSeconds={waitSeconds}
-          waitLabel="Podrás enviarlo en"
+          surface="card"
+          waitLabel={accountLimited ? "Podrás enviarlo en" : "Podrás reenviarlo en"}
         />
-      ) : null}
-      {waitSeconds > 0 && !accountLimited ? (
-        <BodyText style={styles.muted}>
-          {`Podrás reenviarlo en ${formatCountdown(waitSeconds)}.`}
-        </BodyText>
       ) : null}
       {editingEmail ? (
         <>
@@ -260,22 +253,22 @@ export function PendingInvitationCard({
 }
 
 const styles = StyleSheet.create({
-  cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  cardTitle: { color: colors.text, fontFamily: "Lora_500Medium", fontSize: 19 },
   email: { color: colors.text, flexShrink: 1 },
-  emailLine: {
-    alignItems: "center",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: spacing.sm,
-  },
+  emailLine: { alignItems: "flex-start" },
   failure: { color: colors.errorText },
   muted: { color: colors.textMuted, fontSize: typography.note },
-  pendingActions: { gap: spacing.sm },
+  pendingActions: { gap: spacing.smd, paddingTop: spacing.xs },
   pendingCard: {
     backgroundColor: colors.warningTint,
-    borderRadius: radii.card,
-    gap: spacing.sm,
-    padding: spacing.lg,
+    borderRadius: radii.frame,
+    gap: spacing.md,
+    padding: 18,
+  },
+  ruled: {
+    borderTopColor: colors.warningRule,
+    borderTopWidth: 1,
+    paddingTop: 10,
   },
   sheet: {
     backgroundColor: colors.white,

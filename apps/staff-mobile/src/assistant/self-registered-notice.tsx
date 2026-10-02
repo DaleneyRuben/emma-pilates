@@ -1,7 +1,6 @@
 import {
   BodyText,
   colors,
-  formatCountdown,
   PrimaryButton,
   spacing,
   TextButton,
@@ -31,11 +30,14 @@ export function SelfRegisteredNotice({
   clientId,
   email,
   onOpen,
+  surface = "screen",
 }: {
   clientId: string;
   email: string;
   /** S05's «Ver cliente»; S06 already shows her. */
   onOpen?: () => void;
+  /** «card» inside S06's pending card, «screen» on S05's form. */
+  surface?: "card" | "screen";
 }) {
   const fetcher = useStaffFetcher();
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
@@ -88,23 +90,19 @@ export function SelfRegisteredNotice({
         </BodyText>
       ) : null}
       {failure !== null ? <BodyText style={styles.failure}>{failure}</BodyText> : null}
-      {limited ? <BodyText>{limitedEmailMessage}</BodyText> : null}
-      {accountLimited && waitSeconds > 0 ? (
+      {(limited || accountLimited) && waitSeconds > 0 ? (
         <WaitNotice
-          message={accountEmailLimitMessage}
+          message={accountLimited ? accountEmailLimitMessage : limitedEmailMessage}
           remainingSeconds={waitSeconds}
-          waitLabel="Podrás enviarlo en"
+          surface={surface}
+          waitLabel={accountLimited ? "Podrás enviarlo en" : "Podrás reenviarlo en"}
         />
-      ) : null}
-      {waitSeconds > 0 && !accountLimited ? (
-        <BodyText style={styles.note}>
-          {`Podrás reenviarlo en ${formatCountdown(waitSeconds)}.`}
-        </BodyText>
       ) : null}
       <PrimaryButton
         disabled={sending || waitSeconds > 0}
         label="Enviar enlace de verificación"
         onPress={() => void send()}
+        size={surface === "card" ? "compact" : "regular"}
       />
       {onOpen ? <TextButton label="Ver cliente" onPress={onOpen} /> : null}
     </View>
@@ -112,7 +110,7 @@ export function SelfRegisteredNotice({
 }
 
 const styles = StyleSheet.create({
-  email: { color: colors.text, fontWeight: "600" },
+  email: { color: colors.text, fontWeight: "500" },
   failure: { color: colors.errorText },
   note: { color: colors.textMuted, fontSize: typography.note },
   notice: { gap: spacing.md },

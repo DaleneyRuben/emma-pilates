@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache, colors, fontFamilies } from "@pilates/mobile-core";
+import { clearMobileQueryCache, colors } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
 import {
@@ -170,6 +170,6 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
       gap: 12,
       padding: 18,
     });
-    expect(title).toHaveStyle({ fontFamily: fontFamilies.heading, fontSize: 19 });
+    expect(title).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 19 });
   });
 });
