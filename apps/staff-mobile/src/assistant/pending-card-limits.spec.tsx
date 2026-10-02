@@ -84,7 +84,9 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
 
     expect(await screen.findByRole("alert", { name: recipientLimit })).toBeOnTheScreen();
     expectCardNotice(screen, "Podrás reenviarlo en 0:40.");
-    expect(screen.getByRole("button", { name: "Reenviar enlace" })).toBeDisabled();
+    const resend = screen.getByRole("button", { name: "Reenviar enlace" });
+    expect(resend).toBeDisabled();
+    expect(resend).toHaveStyle({ borderColor: colors.border });
   });
 
   it("draws «Verificación limitada» on S06 as the card's clock notice with a 48 pt button", async () => {
