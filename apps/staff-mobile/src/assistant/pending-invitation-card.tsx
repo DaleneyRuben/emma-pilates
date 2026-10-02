@@ -23,9 +23,8 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import {
   accountEmailLimitCode,
-  accountEmailLimitMessage,
   formatInstantDate,
-  limitedEmailMessage,
+  resendLimitNotice,
 } from "./assistant-format";
 import { OutlinedButton } from "./outlined-button";
 import { SelfRegisteredNotice } from "./self-registered-notice";
@@ -183,10 +182,9 @@ export function PendingInvitationCard({
       ) : null}
       {waitSeconds > 0 ? (
         <WaitNotice
-          message={accountLimited ? accountEmailLimitMessage : limitedEmailMessage}
+          {...resendLimitNotice(accountLimited)}
           remainingSeconds={waitSeconds}
           surface="card"
-          waitLabel={accountLimited ? "Podrás enviarlo en" : "Podrás reenviarlo en"}
         />
       ) : null}
       {editingEmail ? (

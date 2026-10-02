@@ -15,8 +15,7 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import {
   accountEmailLimitCode,
-  accountEmailLimitMessage,
-  limitedEmailMessage,
+  resendLimitNotice,
 } from "./assistant-format";
 
 const problemOf = (error: unknown) =>
@@ -92,10 +91,9 @@ export function SelfRegisteredNotice({
       {failure !== null ? <BodyText style={styles.failure}>{failure}</BodyText> : null}
       {(limited || accountLimited) && waitSeconds > 0 ? (
         <WaitNotice
-          message={accountLimited ? accountEmailLimitMessage : limitedEmailMessage}
+          {...resendLimitNotice(accountLimited)}
           remainingSeconds={waitSeconds}
           surface={surface}
-          waitLabel={accountLimited ? "Podrás enviarlo en" : "Podrás reenviarlo en"}
         />
       ) : null}
       <PrimaryButton

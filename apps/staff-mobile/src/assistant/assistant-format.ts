@@ -41,3 +41,9 @@ export const limitedEmailMessage =
 export const accountEmailLimitCode = "staff_email_throttled";
 export const accountEmailLimitMessage =
   "Enviaste muchos correos en poco tiempo. Espera un momento para enviar otro; los enlaces que ya enviaste siguen sirviendo.";
+
+/** The re-send notice for whichever email lane is full, as S06's cards draw it. */
+export const resendLimitNotice = (accountLimited: boolean) =>
+  accountLimited
+    ? { message: accountEmailLimitMessage, waitLabel: "Podrás enviarlo en" }
+    : { message: limitedEmailMessage, waitLabel: "Podrás reenviarlo en" };
