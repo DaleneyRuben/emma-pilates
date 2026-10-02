@@ -71,6 +71,11 @@ describe("Trainer agenda and attendance", () => {
         screen.getByRole("button", { name: "Ana Pérez: Asistió" }),
       ).toHaveProp("accessibilityState", { selected: true }),
     );
+    // S03 (MOB-034): the chevron above the large title, not «← Volver».
+    expect(screen.queryByText("← Volver")).toBeNull();
+    expect(
+      screen.getByTestId("back-chevron", { includeHiddenElements: true }),
+    ).toBeOnTheScreen();
     fireEvent.press(
       screen.getByRole("button", { name: "Luis Flores: Asistió" }),
     );
