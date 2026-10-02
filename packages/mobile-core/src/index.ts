@@ -32,5 +32,6 @@ export * from "./ui/heading";
 export * from "./ui/offline-banner";
 export * from "./ui/picker-check";
 export * from "./ui/screen";
+export * from "./ui/screen-top-bar";
 export * from "./ui/tokens";
 export * from "./ui/unread-count-pill";
