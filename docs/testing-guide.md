@@ -1334,12 +1334,13 @@ electrónico**, and optionally **Teléfono (opcional)**; the form explains
 cuenta** creates the pending Client, queues the activation email (the worker
 delivers it to the local capture), and opens her overview with the card
 **Cuenta pendiente de activación**: the email, "El enlace de activación vence
-el …", the 30-day removal note, **Cambiar correo** (a link beside the
+el …", the 30-day removal note under a thin rule, **Cambiar correo** (a link under the
 address), **Reenviar enlace**, and **Cancelar invitación** (confirmed with
 "¿Cancelar la invitación de …?", then back to **Buscar cliente**). A second
-send within a minute answers "Ya enviamos un correo a esa dirección hace poco.
-El enlace vigente sigue sirviendo." with "Podrás reenviarlo en 0:59." counting
-down from the server. Too many emails from your own Account in a short
+send within a minute shows, inside the card, a white box with a clock: "Ya
+enviamos un correo a esa dirección hace poco. El enlace vigente sigue
+sirviendo." with "Podrás reenviarlo en 0:59." counting down from the server,
+and **Reenviar enlace** disabled with a plain border. Too many emails from your own Account in a short
 time show "Enviaste muchos correos en poco tiempo…" instead (Test 5 H). Creating her again with the same email reopens the
 invitation: her overview starts with "Ana ya estaba pendiente de activación.
 Le enviamos un enlace nuevo y conservamos sus datos.". An email of another
@@ -1351,7 +1352,9 @@ not sent anything: the form says her email waits for verification and offers
 cliente**. Her overview, from **Ver cliente** or from the search, shows the
 same offer in place of the invitation card: no **Cuenta pendiente de
 activación**, **Cambiar correo**, **Reenviar enlace**, or **Cancelar
-invitación**, because she already chose a password. To create one, register
+invitación**, because she already chose a password; its button is the card's
+48 pt one, and a second send within a minute shows the same white clock box
+as **Reenviar enlace**. To create one, register
 from the Client app (Test 4) and search for her by email. Once the pending Client has a Payment or Booking, **Cancelar
 invitación** is replaced by "La cuenta ya tiene pagos o reservas, así que la
 invitación se mantiene." and the account stays pending until she activates
