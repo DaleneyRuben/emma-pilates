@@ -70,10 +70,10 @@ describe("AW24 pending invitation", () => {
         "Enviamos un enlace nuevo a valentina.soria@emmapilates.bo.",
       ),
     ).toBeVisible();
-    // The contact row follows the corrected address.
+    // AW24 shows a pending address only in the pending card (WEB-014).
     expect(
-      within(panel).getAllByText("valentina.soria@emmapilates.bo").length,
-    ).toBeGreaterThanOrEqual(2);
+      within(panel).getByText("valentina.soria@emmapilates.bo"),
+    ).toBeVisible();
     expect(within(panel).queryByText("valentina@emmapilates.bo")).toBeNull();
     expect(sent).toContainEqual({
       method: "POST",

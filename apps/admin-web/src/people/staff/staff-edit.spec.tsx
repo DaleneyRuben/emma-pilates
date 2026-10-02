@@ -202,7 +202,9 @@ describe("AW24 Editar miembro", () => {
                 ...valentina,
                 activationExpiresAt: "2026-10-02T15:00:00.000Z",
               })
-            : problemResponse(429, "email_throttled");
+            : problemResponse(429, "email_throttled", {
+                headers: { "Retry-After": "60" },
+              });
         }),
       ),
     );

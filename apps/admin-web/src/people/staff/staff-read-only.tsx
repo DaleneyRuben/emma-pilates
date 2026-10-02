@@ -6,13 +6,23 @@ import { namesById } from "../../lib/named";
 import type { StaffRole } from "../people-search";
 import { branchNames, roleLabels } from "./staff-format";
 
+type ContactRow = "name" | "email" | "phone";
+
 // The contact a Staff Member was invited with; no command edits it yet.
-export function StaffContact({ member }: { member: StaffMemberDto }) {
-  const rows = [
-    ["Nombre", member.name],
-    ["Correo", member.email],
-    ["Teléfono", member.phone ?? "Sin teléfono"],
-  ] as const;
+// AW24 splits it around a pending card, which shows the address itself.
+export function StaffContact({
+  member,
+  only = ["name", "email", "phone"],
+}: {
+  member: StaffMemberDto;
+  only?: readonly ContactRow[];
+}) {
+  const all = {
+    name: ["Nombre", member.name],
+    email: ["Correo", member.email],
+    phone: ["Teléfono", member.phone ?? "Sin teléfono"],
+  } as const;
+  const rows = only.map((row) => all[row]);
   return (
     <dl className="flex flex-col divide-y divide-divisor rounded-control border border-divisor bg-superficie">
       {rows.map(([label, value]) => (

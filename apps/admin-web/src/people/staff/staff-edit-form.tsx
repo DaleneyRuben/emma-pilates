@@ -12,6 +12,8 @@ import { Button } from "../../components/ui/button";
 import { activeBranchesQueryOptions } from "../../shell/branch/branch-queries";
 import type { StaffRole } from "../people-search";
 import { DeactivateAction } from "./staff-account-actions";
+import { EmailLimitNotice } from "./staff-email-limit";
+import { useEmailLimit } from "./use-email-limit";
 import {
   CancelInvitationAction,
   PendingInvitation,
@@ -41,7 +43,7 @@ export function StaffEditForm({
   const change = useStaffChange();
   const branches = useQuery(activeBranchesQueryOptions());
   const [failure, setFailure] = useState<string | null>(null);
-  const [email, setEmail] = useState(member.email);
+  const limit = useEmailLimit();
   const form = useForm<StaffFormInput, unknown, StaffFormOutput>({
     resolver: zodResolver(staffFormSchema),
     defaultValues: {
@@ -103,10 +105,16 @@ export function StaffEditForm({
     <Form {...form}>
       <form onSubmit={submit} noValidate className="flex flex-1 flex-col">
         <SidePanelBody>
-          <StaffContact member={{ ...member, email }} />
           {member.status === "pending" ? (
-            <PendingInvitation member={member} onEmailChanged={setEmail} />
-          ) : null}
+            <>
+              <EmailLimitNotice limit={limit} />
+              <StaffContact member={member} only={["name"]} />
+              <PendingInvitation limit={limit} member={member} />
+              <StaffContact member={member} only={["phone"]} />
+            </>
+          ) : (
+            <StaffContact member={member} />
+          )}
           <StaffRoleFields
             control={form.control}
             role={role}
