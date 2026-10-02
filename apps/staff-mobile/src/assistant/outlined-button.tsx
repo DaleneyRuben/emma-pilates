@@ -19,7 +19,11 @@ export function OutlinedButton({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={[styles.outlined, tone === "error" && styles.outlinedError]}
+      style={[
+        styles.outlined,
+        tone === "error" && styles.outlinedError,
+        disabled && styles.outlinedDisabled,
+      ]}
     >
       <Text
         style={[
@@ -44,6 +48,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 48,
   },
+  outlinedDisabled: { borderColor: colors.border },
   outlinedError: { borderColor: colors.error },
   outlinedLabel: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "500" },
   outlinedLabelError: { color: colors.errorText },
