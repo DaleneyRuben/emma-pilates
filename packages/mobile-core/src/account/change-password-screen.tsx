@@ -5,20 +5,18 @@ import { Controller, useForm } from "react-hook-form";
 import {
   KeyboardAvoidingView,
   Platform,
-  Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
 import { z } from "zod";
 
 import { BodyText } from "../ui/body-text";
 import { FormField } from "../ui/form-field";
-import { Heading } from "../ui/heading";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
-import { colors, spacing, typography } from "../ui/tokens";
+import { ScreenTopBar } from "../ui/screen-top-bar";
+import { colors, spacing } from "../ui/tokens";
 
 const passwordSchema = z
   .object({
@@ -89,15 +87,7 @@ export function ChangePasswordScreen({
 
   return (
     <Screen style={styles.screen}>
-      <Pressable
-        accessibilityLabel="Volver"
-        accessibilityRole="button"
-        onPress={onBack}
-        style={styles.back}
-      >
-        <Text style={styles.backLabel}>← Volver</Text>
-      </Pressable>
-      <Heading accessibilityLabel="Cambiar contraseña">Cambiar contraseña</Heading>
+      <ScreenTopBar fullBleed onBack={onBack} title="Cambiar contraseña" />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         keyboardVerticalOffset={spacing.xxl}
@@ -177,8 +167,6 @@ export function ChangePasswordScreen({
 }
 
 const styles = StyleSheet.create({
-  back: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
-  backLabel: { color: colors.primaryDeep, fontSize: typography.body },
   failure: { color: colors.errorText },
   flex: { flex: 1 },
   footer: { paddingTop: spacing.md },

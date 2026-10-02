@@ -7,12 +7,13 @@ import {
   type NotificationDto,
 } from "@pilates/api-contracts";
 import { useQueryClient } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
-import { Heading } from "../ui/heading";
 import { QueryFailure } from "../ui/query-failure";
 import { Screen } from "../ui/screen";
+import { ScreenTopBar } from "../ui/screen-top-bar";
 import { TextButton } from "../ui/text-button";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 import { formatNotificationTime } from "./notification-time";
@@ -88,24 +89,14 @@ export function NotificationsScreen({
     mutation: { onSuccess: () => void invalidate() },
   });
 
-  const header = (
-    <>
-      <Pressable
-        accessibilityLabel="Volver"
-        accessibilityRole="button"
-        onPress={onBack}
-        style={styles.back}
-      >
-        <Text style={styles.backLabel}>← Volver</Text>
-      </Pressable>
-      <Heading accessibilityLabel="Notificaciones">Notificaciones</Heading>
-    </>
+  const header = (action?: ReactNode) => (
+    <ScreenTopBar action={action} fullBleed onBack={onBack} title="Notificaciones" />
   );
 
   if (notifications.isPending) {
     return (
       <Screen style={styles.screen}>
-        {header}
+        {header()}
         <BodyText accessibilityLabel="Cargando notificaciones">
           Cargando…
         </BodyText>
@@ -116,7 +107,7 @@ export function NotificationsScreen({
   if (notifications.isError || notifications.data.status !== 200) {
     return (
       <Screen style={styles.screen}>
-        {header}
+        {header()}
         <QueryFailure
           label="No pudimos cargar tus notificaciones."
           onRetry={() => void notifications.refetch()}
@@ -140,7 +131,7 @@ export function NotificationsScreen({
   if (items.length === 0) {
     return (
       <Screen style={styles.screen}>
-        {header}
+        {header()}
         <View style={styles.empty}>
           <Text style={styles.emptyTitle}>No tienes notificaciones.</Text>
           <BodyText style={styles.emptySupport}>{emptySupport}</BodyText>
@@ -151,18 +142,19 @@ export function NotificationsScreen({
 
   return (
     <Screen style={styles.screen}>
-      {header}
+      {header(
+        unread.length > 0 ? (
+          <TextButton
+            disabled={markAllRead.isPending}
+            label="Marcar leídas"
+            onPress={() => markAllRead.mutate()}
+          />
+        ) : undefined,
+      )}
       <ScrollView contentContainerStyle={styles.content}>
         {unread.length > 0 ? (
           <>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Sin leer</Text>
-              <TextButton
-                disabled={markAllRead.isPending}
-                label="Marcar leídas"
-                onPress={() => markAllRead.mutate()}
-              />
-            </View>
+            <Text style={styles.sectionTitle}>Sin leer</Text>
             {unread.map((item) => (
               <NotificationRow
                 key={item.id}
@@ -192,8 +184,6 @@ export function NotificationsScreen({
 }
 
 const styles = StyleSheet.create({
-  back: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
-  backLabel: { color: colors.primaryDeep, fontSize: typography.body },
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
   dot: {
     backgroundColor: colors.primary,
@@ -234,11 +224,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   screen: { gap: spacing.lg },
-  sectionHeader: {
-    alignItems: "center",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
   sectionTitle: {
     color: colors.textMuted,
     fontSize: 11,
