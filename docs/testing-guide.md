@@ -646,8 +646,9 @@ copy of your database, as in G.
    enlace de verificación**, and the button stays disabled. In the admin web,
    fill Paola's budget the same way (20 `POST
    /api/v1/administrator/staff-members/{id}/activation-link`), then
-   **Personal** › a pending member › **Reenviar enlace** shows the notice in
-   the pending card with "Podrás enviarlo en m:ss.", and **Nuevo miembro** ›
+   **Personal** › a pending member › **Reenviar enlace** shows the notice at
+   the top of the panel, above the Nombre row, with "Podrás enviarlo en
+   m:ss.", and **Nuevo miembro** ›
    **Guardar** shows it at the top of the form with "Podrás intentarlo en
    m:ss." and **Guardar** disabled.
 3. **Reset.** Mark the staff events deleted (rows are never removed):
@@ -1968,14 +1969,17 @@ the admin web, exactly as Test 24 describes, and log in as
    ones, and saving sends only those (the archived assignment is dropped
    rather than refused). A Trainer who still leads upcoming Sessions
    (Emma Vargas) keeps her Branch and the panel explains to swap her in
-   Horario first. A pending member shows **Pendiente de activación** with the
+   Horario first. A pending member shows **Pendiente de activación** between
+   the Nombre and Teléfono rows (there is no separate Correo row), with the
    address and **Cambiar correo** (Nuevo correo, "Los enlaces enviados a …
    dejarán de funcionar; enviaremos uno nuevo de 7 días.", **Guardar correo**),
    when the link expires, "Si no activa su cuenta en 30 días desde el último
    envío o cambio, la invitación se elimina. Es distinto de los 7 días de cada
-   enlace.", and **Reenviar enlace**; a second email within a minute answers
-   "Ya enviamos un correo a esa dirección hace poco. El enlace vigente sigue
-   sirviendo." and "Podrás reenviarlo en 0:59." from the server's wait. Its
+   enlace.", and **Reenviar enlace**; a second email within a minute shows,
+   after a clock icon at the top of the panel above the Nombre row, "Ya
+   enviamos un correo a esa dirección hace poco. El enlace vigente sigue
+   sirviendo." and "Podrás reenviarlo en 0:59." from the server's wait, with
+   **Reenviar enlace** disabled. Its
    footer offers **Cancelar invitación** ("¿Cancelar la invitación de …?"):
    the links stop working, the email is freed, and the member leaves Personal
    (marked removed, never deleted). An active member's footer offers
