@@ -87,15 +87,23 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
     expect(screen.getByRole("button", { name: "Reenviar enlace" })).toBeDisabled();
   });
 
-  it("draws «Verificación limitada» as the clock notice with a 48 pt button", async () => {
+  it("draws «Verificación limitada» on S06 as the card's clock notice with a 48 pt button", async () => {
     const screen = await openClientSearch({
       ...assistantRoutes(),
+      ...overviewRoutes,
+      "/api/v1/assistant/client-invitations/client-new": () =>
+        new Response(
+          JSON.stringify({ code: "client_verification_pending", status: 404 }),
+          { headers: { "Content-Type": "application/problem+json" }, status: 404 },
+        ),
       "POST /api/v1/assistant/client-invitations": createdAs("verification_pending"),
       "POST /api/v1/assistant/client-invitations/client-new/verification-emails": () =>
         limited("email_throttled", 40),
     });
 
     await submitNewClient(screen);
+    await fireEvent.press(await screen.findByRole("button", { name: "Ver cliente" }));
+    await screen.findByLabelText("Ana Nueva");
     const send = await screen.findByRole("button", {
       name: "Enviar enlace de verificación",
     });
@@ -107,6 +115,28 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
     expect(
       screen.getByRole("button", { name: "Enviar enlace de verificación" }),
     ).toBeDisabled();
+  });
+
+  it("keeps S05's verification offer on the screen's tinted notice and full button", async () => {
+    const screen = await openClientSearch({
+      ...assistantRoutes(),
+      "POST /api/v1/assistant/client-invitations": createdAs("verification_pending"),
+      "POST /api/v1/assistant/client-invitations/client-new/verification-emails": () =>
+        limited("email_throttled", 40),
+    });
+
+    await submitNewClient(screen);
+    const send = await screen.findByRole("button", {
+      name: "Enviar enlace de verificación",
+    });
+    expect(send).toHaveStyle({ minHeight: 52 });
+    await fireEvent.press(send);
+
+    expect(await screen.findByRole("alert", { name: recipientLimit })).toBeOnTheScreen();
+    expect(screen.getByTestId("wait-notice")).toHaveStyle({
+      backgroundColor: colors.secondaryTint,
+    });
+    expect(screen.getByText("Podrás reenviarlo en 0:40.")).toBeOnTheScreen();
   });
 
   it("draws the Account limit on the card's white box too", async () => {
