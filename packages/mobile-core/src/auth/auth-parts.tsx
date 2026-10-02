@@ -20,15 +20,21 @@ export function FormAlert({ children }: PropsWithChildren) {
 export function WaitNotice({
   message,
   remainingSeconds,
+  surface = "screen",
   waitLabel,
 }: {
   message: string;
   remainingSeconds: number;
+  /** «card» for a white box on a pending card's tint, as S06 draws it. */
+  surface?: "card" | "screen";
   /** The start of the countdown line, such as «Podrás intentarlo en». */
   waitLabel: string;
 }) {
   return (
-    <View style={styles.notice}>
+    <View
+      style={[styles.notice, surface === "card" && styles.noticeOnCard]}
+      testID="wait-notice"
+    >
       <ClockIcon testID="wait-notice-clock" />
       <View style={styles.noticeBody}>
         <Text accessibilityRole="alert" style={styles.noticeText}>
@@ -228,6 +234,12 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.mdLg,
+  },
+  noticeOnCard: {
+    backgroundColor: colors.white,
+    gap: 10,
+    paddingHorizontal: spacing.mdLg,
+    paddingVertical: spacing.md,
   },
   noticeBody: {
     flex: 1,

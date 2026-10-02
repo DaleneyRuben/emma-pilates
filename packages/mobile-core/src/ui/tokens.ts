@@ -28,6 +28,8 @@ export const colors = {
   errorText: "#94493A",
   successTint: "rgba(124,148,115,0.14)",
   warningTint: "rgba(201,154,78,0.12)",
+  // The rule between a pending card's notes (S06).
+  warningRule: "rgba(201,154,78,0.28)",
   errorTint: "rgba(178,93,75,0.08)",
   disabledBackground: "#E7DCD8",
   disabledText: "#B3A9A5",

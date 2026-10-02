@@ -11,12 +11,15 @@ type PrimaryButtonProps = {
   label: string;
   onPress?: (event: GestureResponderEvent) => void;
   disabled?: boolean;
+  /** «compact» for the 48 pt action inside a card. */
+  size?: "compact" | "regular";
 };
 
 export function PrimaryButton({
   label,
   onPress,
   disabled = false,
+  size = "regular",
 }: PrimaryButtonProps) {
   return (
     <Pressable
@@ -25,7 +28,11 @@ export function PrimaryButton({
       accessibilityState={{ disabled }}
       disabled={disabled}
       onPress={onPress}
-      style={[styles.button, disabled && styles.disabledButton]}
+      style={[
+        styles.button,
+        size === "compact" && styles.compact,
+        disabled && styles.disabledButton,
+      ]}
     >
       <Text style={[styles.label, disabled && styles.disabledLabel]}>
         {label}
@@ -42,6 +49,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 52,
     paddingHorizontal: spacing.lg,
+  },
+  compact: {
+    minHeight: 48,
   },
   disabledButton: {
     backgroundColor: colors.disabledBackground,
