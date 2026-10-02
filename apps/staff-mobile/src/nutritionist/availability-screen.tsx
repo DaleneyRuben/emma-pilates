@@ -3,14 +3,13 @@ import {
   type AvailabilityBlockDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   shadows,
   spacing,
   typography,
@@ -68,12 +67,8 @@ export function AvailabilityScreen() {
   });
 
   const header = (
-    <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <View style={styles.header}>
-        <Heading accessibilityLabel="Mi disponibilidad" style={styles.title}>
-          Mi disponibilidad
-        </Heading>
+    <ScreenTopBar
+      action={
         <Pressable
           accessibilityLabel="Nuevo horario"
           accessibilityRole="button"
@@ -82,8 +77,11 @@ export function AvailabilityScreen() {
         >
           <Text style={styles.newButtonText}>+ Nuevo horario</Text>
         </Pressable>
-      </View>
-    </>
+      }
+      fullBleed
+      onBack={() => navigation.goBack()}
+      title="Mi disponibilidad"
+    />
   );
 
   if (blocks.isPending) {
@@ -189,7 +187,6 @@ const styles = StyleSheet.create({
   dates: { color: colors.primaryDeep, fontSize: typography.note },
   empty: { gap: spacing.lg, paddingTop: spacing.xl },
   emptyTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  header: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   label: {
     color: colors.textMuted,
     fontSize: typography.label,
@@ -219,5 +216,4 @@ const styles = StyleSheet.create({
     width: 44,
   },
   tagText: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "600" },
-  title: { flex: 1 },
 });

@@ -344,7 +344,10 @@ describe("Administrator payments and Session cancellation", () => {
     expect(screen.getByText("Se notificó a los 6 clientes afectados.")).toBeOnTheScreen();
     expect(screen.getByText("Se reembolsó una clase a cada cliente.")).toBeOnTheScreen();
 
-    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    // S14's result has the bar's chevron and the «Volver» button under it (MOB-034).
+    const backs = screen.getAllByRole("button", { name: "Volver" });
+    expect(backs).toHaveLength(2);
+    await fireEvent.press(backs[1]);
     await waitFor(() => {
       expect(screen.getByText("No hay clases con estos filtros.")).toBeOnTheScreen();
     });

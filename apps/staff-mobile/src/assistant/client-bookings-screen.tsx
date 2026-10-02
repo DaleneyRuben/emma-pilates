@@ -5,17 +5,16 @@ import {
   type AssistantClientBookingDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
   formatSessionDate,
   formatTimeRange,
-  Heading,
   isInsideCancellationWindow,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   TextButton,
   typography,
@@ -195,8 +194,7 @@ export function ClientBookingsScreen({
 
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Reservas de la clienta">Reservas de la clienta</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reservas de la clienta" />
       <ClientBanner action="Viendo reservas de" clientName={clientName} />
       {notice !== null ? (
         <View style={styles.notice}>

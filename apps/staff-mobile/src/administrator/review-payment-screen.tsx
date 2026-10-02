@@ -1,6 +1,5 @@
 import { useGetPaymentReview } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
   formatBolivianos,
@@ -11,6 +10,7 @@ import {
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   TextButton,
   typography,
@@ -81,7 +81,9 @@ export function ReviewPaymentScreen({
     };
   }, [api, receiptUrl]);
 
-  const header = <BackLink onPress={() => navigation.goBack()} />;
+  const header = (
+    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Revisar pago" />
+  );
 
   if (review.isPending) {
     return (

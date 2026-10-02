@@ -1,5 +1,6 @@
 import {
   AuthenticationFlow,
+  BackLink,
   BodyText,
   colors,
   Heading,
@@ -9,9 +10,9 @@ import {
   radii,
   Screen,
   spacing,
-  typography,
   type AppRole,
   type MobileNavigationProps,
+  typography,
 } from "@pilates/mobile-core";
 import {
   useGetTrainerSessionRoster,
@@ -262,13 +263,7 @@ function TrainerRosterScreen({
 
   return (
     <Screen style={styles.screen}>
-      <Pressable
-        accessibilityLabel="Volver"
-        accessibilityRole="button"
-        onPress={() => navigation.goBack()}
-      >
-        <Text style={styles.back}>← Volver</Text>
-      </Pressable>
+      <BackLink onPress={() => navigation.goBack()} />
       <Heading accessibilityLabel={session.classTypeName}>
         {session.classTypeName}
       </Heading>
@@ -437,11 +432,6 @@ export function StaffNavigation({
 }
 
 const styles = StyleSheet.create({
-  back: {
-    color: colors.primaryDeep,
-    fontSize: typography.body,
-    marginBottom: spacing.md,
-  },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radii.card,

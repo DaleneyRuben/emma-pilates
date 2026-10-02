@@ -9,17 +9,16 @@ import {
   type AvailabilityBlockInputDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
-  Heading,
+  PickerCheck,
   PrimaryButton,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   TextButton,
   typography,
-  PickerCheck,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -217,10 +216,7 @@ export function AvailabilityBlockFormScreen({
 
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel={editing ? "Editar horario" : "Nuevo horario"}>
-        {editing ? "Editar horario" : "Nuevo horario"}
-      </Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title={editing ? "Editar horario" : "Nuevo horario"} />
       <ScrollView contentContainerStyle={styles.content}>
         <SectionLabel>Día</SectionLabel>
         <View style={styles.pills}>

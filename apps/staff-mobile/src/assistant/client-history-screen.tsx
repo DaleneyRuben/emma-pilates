@@ -3,15 +3,14 @@ import {
   type ClassHistoryEntryDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
   formatMonthHeading,
   formatSessionDate,
-  Heading,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -49,8 +48,7 @@ export function ClientHistoryScreen({ route }: { route: { params: ClientContext 
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Historial de clases">Historial de clases</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Historial de clases" />
       <ClientBanner action="Viendo historial de" clientName={clientName} />
     </>
   );

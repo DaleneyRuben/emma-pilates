@@ -6,15 +6,15 @@ import {
   BodyText,
   colors,
   confirmLogout,
-  Heading,
   initials,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
-  useMobileIdentity,
   UnreadCountPill,
+  useMobileIdentity,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -77,17 +77,7 @@ export function StaffProfileScreen() {
   const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : 0;
 
   const header = (
-    <>
-      <Pressable
-        accessibilityLabel="Volver"
-        accessibilityRole="button"
-        onPress={() => navigation.goBack()}
-        style={styles.back}
-      >
-        <Text style={styles.backLabel}>← Volver</Text>
-      </Pressable>
-      <Heading accessibilityLabel="Perfil">Perfil</Heading>
-    </>
+    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Perfil" />
   );
 
   if (profile.isPending) {
@@ -179,8 +169,6 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyLarge,
     fontWeight: "600",
   },
-  back: { alignSelf: "flex-start", minHeight: 44, justifyContent: "center" },
-  backLabel: { color: colors.primaryDeep, fontSize: typography.body },
   chevron: { color: colors.textSubtle, fontSize: typography.titleSecondary },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   footer: {

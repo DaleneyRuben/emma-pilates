@@ -1,12 +1,11 @@
 import {
-  BackLink,
   BodyText,
   colors,
   formatSessionDate,
   formatTimeRange,
-  Heading,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   TextButton,
   typography,
@@ -56,7 +55,7 @@ export function CancelSessionScreen({
   if (affected !== null) {
     return (
       <Screen style={styles.screen}>
-        <Heading accessibilityLabel="Sesión cancelada">Sesión cancelada</Heading>
+        <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Sesión cancelada" />
         <View style={styles.summary}>
           <BodyText>{when}</BodyText>
           <Text style={styles.title}>{session.classTypeName}</Text>
@@ -77,8 +76,7 @@ export function CancelSessionScreen({
 
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Cancelar sesión">Cancelar sesión</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Cancelar sesión" />
       <View style={styles.summary}>
         <BodyText>{when}</BodyText>
         <Text style={styles.title}>{session.classTypeName}</Text>

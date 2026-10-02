@@ -6,7 +6,6 @@ import {
   type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   boliviaCivilDate,
   civilDateRange,
@@ -14,10 +13,10 @@ import {
   dayChipLabel,
   formatSessionDate,
   formatTimeRange,
-  Heading,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
   upcomingCivilDates,
@@ -107,8 +106,7 @@ export function CancelClassScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Cancelar una clase">Cancelar una clase</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Cancelar una clase" />
     </>
   );
 

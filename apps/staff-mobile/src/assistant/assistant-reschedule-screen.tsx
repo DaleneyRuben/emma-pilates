@@ -4,17 +4,16 @@ import {
   type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   boliviaCivilDate,
   civilDateRange,
   colors,
   formatTimeRange,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -109,8 +108,7 @@ export function AssistantRescheduleScreen({
 
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Reprogramar clase">Reprogramar clase</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reprogramar clase" />
       <ClientBanner action="Viendo reservas de" clientName={clientName} />
       <View style={styles.current}>
         <BodyText style={styles.currentLabel}>Reserva actual</BodyText>
