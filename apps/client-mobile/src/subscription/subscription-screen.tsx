@@ -2,11 +2,11 @@ import { useGetCurrentClientSubscription } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -20,7 +20,6 @@ import {
   formatCivilDateWithYear,
   subscriptionBadge,
 } from "../home/home-format";
-import { BackLink } from "@pilates/mobile-core";
 
 type SubscriptionNavigation = {
   goBack: () => void;
@@ -53,8 +52,7 @@ export function SubscriptionScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Mi plan">Mi plan</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mi plan" />
     </>
   );
 

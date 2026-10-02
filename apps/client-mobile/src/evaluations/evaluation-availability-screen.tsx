@@ -5,16 +5,15 @@ import {
   type EvaluationSlotDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
   dayChipLabel,
-  Heading,
   initials,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   shadows,
   spacing,
   typography,
@@ -130,10 +129,7 @@ export function EvaluationAvailabilityScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Evaluación nutricional">
-        Evaluación nutricional
-      </Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Evaluación nutricional" />
     </>
   );
 

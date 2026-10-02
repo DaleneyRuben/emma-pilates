@@ -6,14 +6,13 @@ import {
   type ClientEvaluationDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   shadows,
   spacing,
   TextButton,
@@ -143,8 +142,7 @@ export function MyEvaluationsScreen({
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Mis evaluaciones">Mis evaluaciones</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mis evaluaciones" />
     </>
   );
 

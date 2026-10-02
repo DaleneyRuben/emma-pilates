@@ -5,10 +5,10 @@ import {
 import {
   BodyText,
   colors,
-  Heading,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -16,7 +16,6 @@ import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "@pilates/mobile-core";
 import { formatMonthHeading, formatSessionDate } from "@pilates/mobile-core";
 
 function groupByMonth(
@@ -45,8 +44,7 @@ export function ClassHistoryScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Historial de clases">Historial de clases</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Historial de clases" />
     </>
   );
 

@@ -23,6 +23,12 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ goBack: jest.fn(), navigate: jest.fn(), popTo: jest.fn() }),
 }));
 
+// 24 reads the signed-in identity only to end the session after closing.
+jest.mock("@pilates/mobile-core", () => ({
+  ...jest.requireActual("@pilates/mobile-core"),
+  useMobileIdentity: () => ({ endSession: jest.fn() }),
+}));
+
 // Every request stays pending, so each screen shows its loading state.
 const pending = (() => new Promise<Response>(() => undefined)) as typeof globalThis.fetch;
 

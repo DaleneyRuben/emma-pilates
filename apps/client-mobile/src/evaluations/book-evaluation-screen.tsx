@@ -6,14 +6,13 @@ import {
   type EvaluationSlotDto,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
-  Heading,
   initials,
   PrimaryButton,
   radii,
   Screen,
+  ScreenTopBar,
   shadows,
   spacing,
   typography,
@@ -98,8 +97,7 @@ export function BookEvaluationScreen({
 
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Confirmar evaluación">Confirmar evaluación</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Confirmar evaluación" />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.summary}>
           <BodyText>{evaluationDate(slot.startsAt)}</BodyText>

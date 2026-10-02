@@ -9,11 +9,11 @@ import {
 import {
   BodyText,
   colors,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -25,7 +25,6 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatBolivianos } from "../plans/plan-format";
-import { BackLink } from "@pilates/mobile-core";
 import { encodeBase64 } from "@pilates/mobile-core";
 import { pickReceipt, uploadReceipt, type AttachedReceipt } from "./receipt-upload";
 
@@ -79,10 +78,7 @@ export function PaymentScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Pago por transferencia">
-        Pago por transferencia
-      </Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Pago por transferencia" />
     </>
   );
 

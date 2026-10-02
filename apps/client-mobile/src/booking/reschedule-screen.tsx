@@ -8,11 +8,11 @@ import {
 import {
   BodyText,
   colors,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -22,7 +22,6 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "@pilates/mobile-core";
 import type { ConfirmedBooking } from "./session-detail-screen";
 import {
   boliviaCivilDate,
@@ -123,8 +122,7 @@ export function RescheduleScreen({
 
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Reprogramar clase">Reprogramar clase</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Reprogramar clase" />
       <View style={styles.current}>
         <BodyText style={styles.currentLabel}>Reserva actual</BodyText>
         <Text style={styles.currentTitle}>{booking.classTypeName}</Text>

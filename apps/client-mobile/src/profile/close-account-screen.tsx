@@ -7,15 +7,14 @@ import {
   useListUpcomingBookings,
 } from "@pilates/api-contracts";
 import {
-  BackLink,
   BodyText,
   colors,
   FormField,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   TextButton,
   typography,
@@ -93,8 +92,7 @@ export function CloseAccountScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Cerrar mi cuenta">Cerrar mi cuenta</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Cerrar mi cuenta" />
     </>
   );
   const queries = [bookings, evaluations, subscription, credit, payment];

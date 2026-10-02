@@ -3,6 +3,7 @@ import {
   fireEvent,
   render,
   waitFor,
+  within,
 } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
@@ -73,7 +74,10 @@ describe("Client Plans", () => {
     await waitFor(() => {
       expect(screen.getByText("Válido por 3 meses")).toBeOnTheScreen();
     });
-    expect(screen.getByText("Detalle del plan")).toBeOnTheScreen();
+    // 09's bar names the Plan once it loads (MOB-034).
+    expect(
+      within(screen.getByTestId("screen-top-bar")).getByLabelText("Trimestral 36 clases"),
+    ).toBeOnTheScreen();
     expect(
       screen.getByText("36 clases en cualquier sucursal del estudio."),
     ).toBeOnTheScreen();

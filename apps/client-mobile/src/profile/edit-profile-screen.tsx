@@ -11,10 +11,10 @@ import {
   BodyText,
   colors,
   FormField,
-  Heading,
   PrimaryButton,
   QueryFailure,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -33,7 +33,6 @@ import {
 import { z } from "zod";
 
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "@pilates/mobile-core";
 import { EmailChangeSection, normalizeEmail } from "./email-change-section";
 import { ProfilePhotoSection } from "./profile-photo-section";
 
@@ -186,8 +185,7 @@ export function EditProfileScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Editar perfil">Editar perfil</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Editar perfil" />
     </>
   );
 

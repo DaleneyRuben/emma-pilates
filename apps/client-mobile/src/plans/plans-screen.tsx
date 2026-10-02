@@ -2,10 +2,10 @@ import { useListPlans, type PlanDto } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
-  Heading,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   shadows,
   spacing,
   typography,
@@ -14,7 +14,6 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "@pilates/mobile-core";
 import { describePlanTerms, formatBolivianos } from "./plan-format";
 
 type PlansNavigation = {
@@ -51,8 +50,7 @@ export function PlansScreen() {
 
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Elige tu plan">Elige tu plan</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Elige tu plan" />
       {plans.isPending ? (
         <BodyText accessibilityLabel="Cargando planes">Cargando…</BodyText>
       ) : plans.isError || plans.data.status !== 200 ? (

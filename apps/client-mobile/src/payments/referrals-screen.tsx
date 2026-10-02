@@ -6,12 +6,12 @@ import {
 import {
   BodyText,
   colors,
-  Heading,
   initials,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -20,7 +20,6 @@ import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-nati
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatBolivianos } from "../plans/plan-format";
-import { BackLink } from "@pilates/mobile-core";
 import { formatReferralDate } from "./referral-format";
 
 type ReferralsNavigation = {
@@ -74,8 +73,7 @@ export function ReferralsScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Mis referidos">Mis referidos</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mis referidos" />
     </>
   );
 

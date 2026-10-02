@@ -12,11 +12,11 @@ import {
 import {
   BodyText,
   colors,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   typography,
 } from "@pilates/mobile-core";
@@ -27,7 +27,6 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "@pilates/mobile-core";
 import { describeValidity, formatBolivianos } from "./plan-format";
 
 type PlanDetailNavigation = {
@@ -76,8 +75,7 @@ export function PlanDetailScreen({
   if (plan.isPending) {
     return (
       <Screen style={styles.screen}>
-        <BackLink onPress={() => navigation.goBack()} />
-        <Heading accessibilityLabel="Detalle del plan">Detalle del plan</Heading>
+        <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Detalle del plan" />
         <BodyText accessibilityLabel="Cargando plan">Cargando…</BodyText>
       </Screen>
     );
@@ -86,8 +84,7 @@ export function PlanDetailScreen({
   if (plan.isError || plan.data.status !== 200) {
     return (
       <Screen style={styles.screen}>
-        <BackLink onPress={() => navigation.goBack()} />
-        <Heading accessibilityLabel="Detalle del plan">Detalle del plan</Heading>
+        <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Detalle del plan" />
         <QueryFailure
           label="No pudimos cargar el plan."
           onRetry={() => void plan.refetch()}
@@ -165,8 +162,7 @@ export function PlanDetailScreen({
 
   return (
     <Screen style={styles.screen}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Detalle del plan">Detalle del plan</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title={detail.name} />
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <Text style={styles.planName}>{detail.name}</Text>

@@ -5,11 +5,11 @@ import {
 import {
   BodyText,
   colors,
-  Heading,
   PrimaryButton,
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   TextButton,
   typography,
@@ -19,7 +19,6 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatBolivianos } from "../plans/plan-format";
-import { BackLink } from "@pilates/mobile-core";
 import { formatReferralDate } from "./referral-format";
 
 type CreditNavigation = {
@@ -36,8 +35,7 @@ export function CreditScreen() {
 
   const header = (
     <>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Mi crédito">Mi crédito</Heading>
+      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Mi crédito" />
     </>
   );
 

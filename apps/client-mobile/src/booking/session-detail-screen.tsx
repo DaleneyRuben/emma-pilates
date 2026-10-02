@@ -14,6 +14,7 @@ import {
   QueryFailure,
   radii,
   Screen,
+  ScreenTopBar,
   spacing,
   TextButton,
   typography,
@@ -25,7 +26,6 @@ import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { BackLink } from "@pilates/mobile-core";
 import { formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
 
 export type ConfirmedBooking = {
@@ -78,7 +78,15 @@ export function SessionDetailScreen({
   const [forcedFull, setForcedFull] = useState(false);
   const [waitlisted, setWaitlisted] = useState(false);
 
-  const header = <BackLink onPress={() => navigation.goBack()} />;
+  // 04 names where it was opened from, the Reservar tab, instead of a title.
+  const header = (
+    <ScreenTopBar
+      fullBleed
+      onBack={() => navigation.goBack()}
+      title="Reservar una clase"
+      tone="context"
+    />
+  );
 
   if (session.isPending) {
     return (
