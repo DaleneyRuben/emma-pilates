@@ -100,7 +100,19 @@ wordmark: **Tu cuenta está activa** (21, S19) and **Tu correo cambió** (22)
 with the sage check, and a dead or unusable link with a Palo de rosa circle
 (a clock for an expired, used, or removed link, an envelope while 22
 confirms, a struck circle for an invalid email-change link, an at sign for an
-address already in use). These navigation checks do not need the backend. On an iPad the pre-session screens sit in a
+address already in use). These navigation checks do not need the backend.
+Once signed in, every screen opened from a tab or a list (Mi plan, Mi crédito,
+Notificaciones, Editar perfil, Cambiar contraseña, a Plan, and the rest) opens
+under the same top bar, the chevron (read as "Volver") and the screen's title
+over a thin rule. A Plan's bar shows the Plan's name, a class opened from
+Reservar shows a small grey "Reservar una clase" instead of a title, and
+Notificaciones keeps **Marcar leídas** at the end of the bar. In the Staff
+app, the Assistant's client overview, the class list, the class detail, the
+plan picker, the cash payment, and the Trainer's attendance list keep their
+large title under a chevron; the other screens (Perfil, Notificaciones,
+Reservas de la clienta, Historial de clases, Revisar pago, Cancelar una
+clase, Mi disponibilidad with **+ Nuevo horario** in the bar, and the
+schedule form) use the bar. On an iPad the pre-session screens sit in a
 centred phone-width column.
 
 ### B. Open the Staff app
