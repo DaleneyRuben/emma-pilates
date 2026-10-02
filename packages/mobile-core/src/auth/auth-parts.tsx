@@ -6,6 +6,10 @@ import { fontFamilies } from "../ui/fonts";
 import { colors, spacing, typography } from "../ui/tokens";
 import { formatCountdown } from "./countdown";
 
+/** S01/S18 suggest the studio's own domain to the team (MOB-036). */
+export const emailPlaceholder = (teamAccess: boolean) =>
+  teamAccess ? "tu@emmapilates.bo" : "tu@correo.com";
+
 /** A form-level failure above the fields: never says which field failed. */
 export function FormAlert({ children }: PropsWithChildren) {
   return (

@@ -5,7 +5,7 @@ import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { TextButton } from "../ui/text-button";
 import { AuthenticationScreen, authStyles } from "./auth-layout";
-import { WaitNotice } from "./auth-parts";
+import { emailPlaceholder, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useCountdown } from "./countdown";
 import { limitKeepsAnyLink } from "./request-limit-copy";
@@ -93,7 +93,7 @@ export function RecoveryRequestScreen({
         keyboardType="email-address"
         label="Correo electrónico"
         onChangeText={setEmail}
-        placeholder="tu@correo.com"
+        placeholder={emailPlaceholder(teamAccess)}
         value={email}
       />
       {failure === null ? null : (

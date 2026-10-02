@@ -12,7 +12,7 @@ import { useState } from "react";
 import { z } from "zod";
 
 import { TeamAccessBadge } from "./auth-layout";
-import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
+import { emailPlaceholder, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
 import { BodyText } from "../ui/body-text";
@@ -125,7 +125,7 @@ export function LoginScreen({
                   label="Correo electrónico"
                   onBlur={onBlur}
                   onChangeText={onChange}
-                  placeholder="tu@correo.com"
+                  placeholder={emailPlaceholder(teamAccess)}
                   value={value}
                 />
               )}
