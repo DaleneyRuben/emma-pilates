@@ -1084,7 +1084,8 @@ Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
 Log in as `sofia@example.com` and open the **Perfil** tab. Below the summary
 card you should see the rows **Mi plan**, **Evaluación nutricional**, **Mis
 evaluaciones**, **Mis referidos**, **Mi crédito**, **Notificaciones**, and
-**Cambiar contraseña**, each with its line icon in Palo de rosa, an outlined
+**Cambiar contraseña**, each with its line icon in Palo de rosa and a quiet
+19 pt chevron (Icono tenue, MOB-041) at its right end, an outlined
 **Cerrar sesión** button, and the footer "Emma Pilates Studio · versión 1.0".
 With unread notifications the Notificaciones row shows the count in a Palo de
 rosa profundo pill («9+» above nine), and so does the **Perfil** tab itself
@@ -1112,9 +1113,11 @@ and `DELETE /api/v1/clients/current/photo`.
 
 ### B. The notification inbox
 
-Sofia has no notifications by default, so the inbox shows "No tienes
-notificaciones." with its supporting line. To see the full screen, create a few
-rows for her Account with `psql` (development database only):
+Sofia has no notifications by default, so the inbox centres the bare empty
+state of frame 19 (MOB-041): a quiet 34 pt bell, "No tienes notificaciones."
+in Lora 21, and the muted supporting line, with no box behind them. To see
+the full screen, create a few rows for her Account with `psql` (development
+database only):
 
 ```sql
 insert into system.notifications
@@ -1159,11 +1162,12 @@ notificaciones sin leer"); tap it to open
 **Perfil**. The screen is read-only: name, email, "Tus datos los actualiza
 administración.", **Rol** (`Entrenadora`), **Sucursales** (`Centro, Equipetrol,
 Urubó`), the **Notificaciones** row (with the unread count) and the
-**Cambiar contraseña** row, the outlined
-**Cerrar sesión** button, and the version footer. Log in as
+**Cambiar contraseña** row, both ending in the quiet chevron of 18, the
+outlined **Cerrar sesión** button, and the version footer. Log in as
 `paola.mendoza@example.com` to see **Administración** with "Todas las
-sucursales". The staff inbox uses the empty-state line "Te avisaremos aquí
-cuando haya algo que necesite tu atención."
+sucursales". The staff inbox draws the same bare empty state as the Client's
+(quiet bell, Lora title) with the line "Te avisaremos aquí cuando haya algo
+que necesite tu atención."
 
 ### F. Offline behaviour
 
@@ -1333,8 +1337,11 @@ reservation outside the 2 h 30 window, **No cancelable** plus **Reprogramar**
 inside it, **En lista de espera** plus **Salir de la lista de espera**. Items
 at a Branch you are not assigned to keep their action disabled with "Solo en
 tus sucursales". Cancelling asks "¿Cancelar esta reserva de Lucía Fernández?"
-first. With nothing upcoming the screen reads "Esta clienta no tiene reservas
-próximas." and offers **Reservar una clase**. **Ver historial completo** opens
+first. With nothing upcoming the screen centres a quiet calendar, "Esta
+clienta no tiene reservas próximas." in Lora 21, the line "Puedes reservarle
+una clase desde el horario del estudio.", and **Reservar una clase** under
+them (MOB-041; `lucia@example.com` has a Plan and no upcoming Booking in the
+fixtures). **Ver historial completo** opens
 **Historial de clases** under "Viendo historial de: …", drawn exactly like the
 Client's own (Test 5 B): «Ha asistido a» over «N clases desde <mes>», then
 month groups ("Septiembre 2026" with its count) of rows between thin rules
@@ -1414,7 +1421,8 @@ a circle, "Selecciona un cliente para ver sus detalles", and "Busca por
 nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin
 perder la lista.". Tapping a result highlights it and shows her
 overview in the right panel without navigating away; **Ver reservas** and
-**Ver historial completo** also open in that panel, with **Volver** returning
+**Ver historial completo** also open in that panel (the empty reservations
+state centres in the panel with its button), with **Volver** returning
 to the overview. **Reservar clase**, **Registrar pago en efectivo**, and
 **+ Nuevo cliente** open full-screen: the classes and the Plans show as a
 two-column grid, and the Session detail, the cash confirmation, and the new
@@ -1620,7 +1628,8 @@ In the Client app as `lucia@example.com`:
    admin web (Test 33, **Dejar de publicar**) and pull Inicio down to
    refresh: the section is gone. On an iPad the card stops at 720 pt and the
    next one peeks on the right.
-1. **Inicio** shows three quick actions: **Reservar una clase**, **Evaluación
+1. **Inicio** shows three quick actions: **Reservar una clase** (ending in a
+   Palo de rosa chevron, or a quiet lock while no Plan is active), **Evaluación
    nutricional** ("Próxima: …" when one is booked, otherwise "Agenda tu cita
    del mes"; it opens Mis evaluaciones or the availability), and **Mis
    referidos** ("N amigas invitadas" or "Invita amigas y gana crédito").
