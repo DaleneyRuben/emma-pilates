@@ -1453,14 +1453,17 @@ Client search ignores accents and case: "lucia" finds Lucía Fernández and
 Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
 1B) and log in as `emma.vargas@example.com` with `emma-local-2026`.
 
-1. **Mi agenda** greets you and lists today's Sessions you lead. Each card
-   ends in a Palo de rosa chevron beside the time and the Class Type in Lora,
+1. **Mi agenda** greets you by name ("Hola, Emma", MOB-043) and lists today's
+   Sessions you lead. Each card
+   ends in a Palo de rosa chevron beside the 24-hour time ("07:00 – 07:50",
+   as the Client's list writes it) and the Class Type in Lora,
    names the Branch after a small pin, and closes with "N de M reservados"
    after a person icon and a **Completa** (green) or **Con cupos** (neutral)
    pill under a thin rule (MOB-042). Book a class for today as
    `lucia@example.com` in the Client app (or through Swagger) first if the
    list is empty.
-2. Tap a Session to open its roster: every booked Client with **Asistió** and
+2. Tap a Session to open its roster ("Centro · 07:00 – 07:50" under the
+   title): every booked Client with **Asistió** and
    **No asistió** choices, or "No hay reservas para esta sesión."
 3. Mark every Client and tap **Guardar asistencia** (enabled only once every
    Client has an outcome). "Asistió" classes then appear in the Client's
