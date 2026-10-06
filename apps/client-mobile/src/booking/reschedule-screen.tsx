@@ -28,6 +28,7 @@ import {
   boliviaCivilDate,
   civilDateRange,
   formatTimeRange,
+  hasStarted,
 } from "@pilates/mobile-core";
 
 type RescheduleNavigation = {
@@ -44,7 +45,7 @@ async function loadSameDayAlternatives(
   booking: UpcomingBookingDto,
 ): Promise<SessionAvailabilityDto[]> {
   const { from, until } = civilDateRange(boliviaCivilDate(new Date(booking.startsAt)));
-  const now = Date.now();
+  const now = new Date();
   const lists = await Promise.all(
     branchIds.map((branchId) =>
       listSessionAvailability({ branchId, from, until, limit: 100 }, undefined, fetcher),
@@ -57,7 +58,7 @@ async function loadSameDayAlternatives(
       (session) =>
         session.id !== booking.sessionId &&
         session.availableSeats > 0 &&
-        new Date(session.startsAt).getTime() > now,
+        !hasStarted(session.startsAt, now),
     )
     .sort((left, right) => left.startsAt.localeCompare(right.startsAt));
 }

@@ -9,6 +9,7 @@ import {
   civilDateRange,
   colors,
   formatTimeRange,
+  hasStarted,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -42,7 +43,7 @@ async function loadSameDayAlternatives(
   booking: AssistantClientBookingDto,
 ): Promise<SessionAvailabilityDto[]> {
   const { from, until } = civilDateRange(boliviaCivilDate(new Date(booking.startsAt)));
-  const now = Date.now();
+  const now = new Date();
   const response = await listSessionAvailability(
     { branchId: booking.branchId, from, until, limit: 100 },
     undefined,
@@ -53,7 +54,7 @@ async function loadSameDayAlternatives(
       (session) =>
         session.id !== booking.sessionId &&
         session.availableSeats > 0 &&
-        new Date(session.startsAt).getTime() > now,
+        !hasStarted(session.startsAt, now),
     )
     .sort((left, right) => left.startsAt.localeCompare(right.startsAt));
 }

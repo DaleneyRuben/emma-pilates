@@ -27,6 +27,7 @@ import {
   civilDateRange,
   dayChipLabel,
   formatTimeRange,
+  hasStarted,
   upcomingCivilDates,
 } from "@pilates/mobile-core";
 
@@ -104,12 +105,12 @@ export function BrowseSessionsScreen() {
   const classTypeList =
     classTypes.data?.status === 200 ? classTypes.data.data : [];
   const selectedBranch = branchList.find((branch) => branch.id === branchId);
-  const now = Date.now();
+  const now = new Date();
   const visibleSessions =
     sessions.data?.status === 200
       ? sessions.data.data.filter(
           (session) =>
-            new Date(session.startsAt).getTime() > now &&
+            !hasStarted(session.startsAt, now) &&
             (classTypeId === allClassTypes ||
               session.classTypeId === classTypeId),
         )
