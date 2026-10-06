@@ -4,6 +4,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  Chevron,
   colors,
   PrimaryButton,
   QueryFailure,
@@ -159,7 +160,7 @@ export function AvailabilityScreen() {
                     <BodyText style={styles.dates}>{dates}</BodyText>
                   )}
                 </View>
-                <Text style={styles.chevron}>›</Text>
+                <Chevron />
               </Pressable>
             );
           })}
@@ -181,7 +182,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   cardBody: { flex: 1, gap: spacing.xxs },
-  chevron: { color: colors.textMuted, fontSize: typography.bodyLarge },
   dates: { color: colors.primaryDeep, fontSize: typography.note },
   empty: { gap: spacing.lg, paddingTop: spacing.xl },
   emptyTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },

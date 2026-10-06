@@ -7,6 +7,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  Chevron,
   boliviaCivilDate,
   civilDateRange,
   colors,
@@ -152,7 +153,12 @@ export function CancelClassScreen() {
       >
         <BodyText style={styles.branchLabel}>Sucursal:</BodyText>
         <Text style={styles.branchName}>{branchLabel}</Text>
-        <Text style={styles.chevron}>{choosingBranch ? "▴" : "▾"}</Text>
+        <Chevron
+          direction={choosingBranch ? "up" : "down"}
+          size={16}
+          testID="branch-picker-chevron"
+          tone="muted"
+        />
       </Pressable>
       {choosingBranch ? (
         <View style={styles.branchList}>
@@ -312,7 +318,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   centered: { textAlign: "center" },
-  chevron: { color: colors.textSubtle, fontSize: typography.body },
   chip: {
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,

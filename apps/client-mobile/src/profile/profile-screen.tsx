@@ -6,6 +6,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  Chevron,
   colors,
   confirmLogout,
   Heading,
@@ -71,7 +72,7 @@ function MenuRow({
           <BodyText style={styles.rowValue}>{value}</BodyText>
         )}
         <UnreadCountPill count={badge ?? 0} testID="notifications-row-badge" />
-        <Text style={styles.chevron}>›</Text>
+        <Chevron tone="quiet" />
       </View>
     </Pressable>
   );
@@ -213,7 +214,6 @@ export function ProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  chevron: { color: colors.textSubtle, fontSize: typography.titleSecondary },
   closeAccount: {
     alignSelf: "center",
     justifyContent: "center",

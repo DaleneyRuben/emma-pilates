@@ -4,6 +4,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  Chevron,
   colors,
   confirmLogout,
   initials,
@@ -56,7 +57,7 @@ function MenuRow({
       <Text style={styles.rowLabel}>{label}</Text>
       <View style={styles.rowTrailing}>
         <UnreadCountPill count={badge} testID="notifications-row-badge" />
-        <Text style={styles.chevron}>›</Text>
+        <Chevron tone="quiet" />
       </View>
     </Pressable>
   );
@@ -170,7 +171,6 @@ const styles = StyleSheet.create({
     fontSize: typography.bodyLarge,
     fontWeight: "600",
   },
-  chevron: { color: colors.textSubtle, fontSize: typography.titleSecondary },
   content: { gap: spacing.xl, paddingBottom: spacing.xxl },
   footer: {
     color: colors.textSubtle,

@@ -7,6 +7,7 @@ import {
 import {
   BackLink,
   BodyText,
+  Chevron,
   boliviaCivilDate,
   civilDateRange,
   colors,
@@ -149,7 +150,12 @@ export function BrowseSessionsScreen({
       >
         <BodyText style={styles.branchLabel}>Sucursal:</BodyText>
         <Text style={styles.branchName}>{branch.name}</Text>
-        <Text style={styles.chevron}>{choosingBranch ? "▴" : "▾"}</Text>
+        <Chevron
+          direction={choosingBranch ? "up" : "down"}
+          size={16}
+          testID="branch-picker-chevron"
+          tone="muted"
+        />
       </Pressable>
       {choosingBranch ? (
         <View style={styles.branchList}>
@@ -289,7 +295,6 @@ const styles = StyleSheet.create({
   cardBody: { flex: 1, gap: spacing.xxs },
   cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   centered: { textAlign: "center" },
-  chevron: { color: colors.textSubtle, fontSize: typography.body },
   chip: {
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,

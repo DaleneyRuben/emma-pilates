@@ -8,8 +8,10 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  Chevron,
   colors,
   Heading,
+  LineIcon,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -28,6 +30,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { Path, Rect } from "react-native-svg";
 
 import { useClientFetcher } from "../client-fetcher";
 import {
@@ -153,16 +156,29 @@ function QuickAction({
       onPress={onPress}
       style={[styles.action, disabled && styles.actionDisabled]}
     >
-      <Text style={[styles.actionLabel, disabled && styles.actionLabelDisabled]}>
-        {label}
-      </Text>
-      {disabled && note !== undefined ? (
-        <BodyText style={styles.actionNote}>{note}</BodyText>
-      ) : null}
-      {summary !== undefined ? (
-        <BodyText style={styles.actionNote}>{summary}</BodyText>
-      ) : null}
+      <View style={styles.actionBody}>
+        <Text style={[styles.actionLabel, disabled && styles.actionLabelDisabled]}>
+          {label}
+        </Text>
+        {disabled && note !== undefined ? (
+          <BodyText style={styles.actionNote}>{note}</BodyText>
+        ) : null}
+        {summary !== undefined ? (
+          <BodyText style={styles.actionNote}>{summary}</BodyText>
+        ) : null}
+      </View>
+      {disabled ? <ShortcutLock /> : <Chevron />}
     </Pressable>
+  );
+}
+
+// 02's disabled shortcut ends in a quiet lock where the others end in the chevron (MOB-041).
+function ShortcutLock() {
+  return (
+    <LineIcon color={colors.iconQuiet} size={19} strokeWidth={1.3} testID="shortcut-lock">
+      <Rect height={9.5} rx={2.5} width={14} x={5} y={10.5} />
+      <Path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
+    </LineIcon>
   );
 }
 
@@ -284,9 +300,12 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   action: {
     ...surfaces.card,
-    gap: spacing.xs,
+    alignItems: "center",
+    flexDirection: "row",
+    gap: spacing.mdLg,
     padding: spacing.lg,
   },
+  actionBody: { flex: 1, gap: spacing.xs },
   actionDisabled: { backgroundColor: colors.disabledBackground },
   actionLabel: {
     color: colors.text,

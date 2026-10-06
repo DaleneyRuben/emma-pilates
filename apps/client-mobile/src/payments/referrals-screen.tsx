@@ -5,6 +5,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  Chevron,
   colors,
   initials,
   PrimaryButton,
@@ -128,7 +129,7 @@ export function ReferralsScreen() {
           <Text style={styles.creditLabel}>Tu crédito</Text>
           <View style={styles.creditTrailing}>
             <Text style={styles.creditValue}>{creditValue}</Text>
-            <Text style={styles.chevron}>›</Text>
+            <Chevron />
           </View>
         </Pressable>
         {referred.length === 0 ? (
@@ -172,7 +173,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xxs,
   },
   badgeText: { fontSize: typography.label, fontWeight: "500" },
-  chevron: { color: colors.textSubtle, fontSize: typography.titleSecondary },
   code: {
     color: colors.text,
     fontFamily: "Lora_500Medium",

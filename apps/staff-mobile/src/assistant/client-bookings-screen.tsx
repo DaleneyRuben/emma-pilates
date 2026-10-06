@@ -7,6 +7,7 @@ import {
 import {
   BodyText,
   colors,
+  EmptyState,
   formatSessionDate,
   formatTimeRange,
   isInsideCancellationWindow,
@@ -218,13 +219,18 @@ export function ClientBookingsScreen({
           onRetry={() => void upcoming.refetch()}
         />
       ) : items.length === 0 ? (
-        <View style={styles.empty}>
-          <BodyText>Esta clienta no tiene reservas próximas.</BodyText>
-          <PrimaryButton
-            label="Reservar una clase"
-            onPress={() => navigation.navigate("BrowseSessions", context)}
-          />
-        </View>
+        <EmptyState
+          action={
+            <PrimaryButton
+              label="Reservar una clase"
+              onPress={() => navigation.navigate("BrowseSessions", context)}
+            />
+          }
+          icon="calendar"
+          message="Puedes reservarle una clase desde el horario del estudio."
+          title="Esta clienta no tiene reservas próximas."
+          variant="plain"
+        />
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
           {items.map((item) => (
@@ -301,7 +307,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  empty: { gap: spacing.lg, paddingTop: spacing.xl },
   failure: { color: colors.errorText },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
   lockedNote: { color: colors.textMuted, fontSize: typography.label, textAlign: "center" },
