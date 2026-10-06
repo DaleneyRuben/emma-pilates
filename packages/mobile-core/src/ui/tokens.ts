@@ -37,6 +37,8 @@ export const colors = {
   errorTint: "rgba(178,93,75,0.08)",
   // The dashed empty-state box on Superficie (S06 «Sin plan activo»).
   neutralTint: "rgba(216,201,187,0.14)",
+  // The circle behind an empty panel's icon (S04's tablet split view).
+  neutralWash: "rgba(216,201,187,0.18)",
   disabledBackground: "#E7DCD8",
   disabledText: "#B3A9A5",
 } as const;
@@ -58,9 +60,12 @@ export const spacing = {
   xxxl: 40,
 } as const;
 
+// The frames round cards at 16 (MOB-039); chips, tinted notices, insets,
+// and sheets keep 12.
 export const radii = {
   control: 8,
-  card: 12,
+  inset: 12,
+  card: 16,
   frame: 16,
   pill: 999,
 } as const;
@@ -70,6 +75,7 @@ export const typography = {
   title: 30,
   titleSecondary: 22,
   price: 26,
+  titleSmall: 19,
   bodyLarge: 17,
   body: 15,
   label: 12,
@@ -85,11 +91,27 @@ export const shadows = {
     shadowOpacity: 0.22,
     shadowRadius: 6,
   },
+  // The frames' `0 2px 8px rgba(74,74,74,0.05)` under most cards (MOB-039).
   card: {
-    elevation: 3,
-    shadowColor: "#4A3A30",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.1,
-    shadowRadius: 16,
+    elevation: 1,
+    shadowColor: "#4A4A4A",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
   },
+} as const;
+
+const cardBox = {
+  backgroundColor: colors.white,
+  borderColor: colors.borderStrong,
+  borderRadius: radii.card,
+  borderWidth: 1,
+} as const;
+
+/** The mobile frames' card: Blanco, 1 px Borde fuerte, radius 16 (MOB-039). */
+export const surfaces = {
+  card: { ...cardBox, ...shadows.card },
+  // Cards the frames draw without the shadow: 12's dates, 17's origin, S03's
+  // roster, S06's history, S12's receipt, S23's groups.
+  flatCard: cardBox,
 } as const;

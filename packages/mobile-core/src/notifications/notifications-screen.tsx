@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   messageRead: { color: colors.textSecondary },
   row: {
     alignItems: "flex-start",
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 60,

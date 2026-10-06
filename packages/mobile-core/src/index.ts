@@ -24,6 +24,7 @@ export * from "./query/provider";
 export * from "./time/session-format";
 export * from "./ui/back-link";
 export * from "./ui/body-text";
+export * from "./ui/empty-state";
 export * from "./ui/form-field";
 export * from "./ui/text-button";
 export * from "./ui/primary-button";

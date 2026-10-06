@@ -3,6 +3,8 @@ import { StyleSheet } from "react-native";
 
 import { EmptyState } from "./empty-state";
 
+const hidden = { includeHiddenElements: true };
+
 // MOB-039: S06's «Sin plan activo» and the tablet's empty panel, as the
 // frames draw them.
 describe("EmptyState", () => {
@@ -29,7 +31,7 @@ describe("EmptyState", () => {
       borderStyle: "dashed",
       borderWidth: 1,
     });
-    expect(screen.getByTestId("empty-state-icon-card")).toHaveProp("stroke", "#B78380");
+    expect(screen.getByTestId("empty-state-icon-card", hidden)).toHaveProp("stroke", "#B78380");
     expect(screen.getByText("Esta clienta no tiene clases disponibles.")).toHaveStyle({
       color: "#766D69",
       fontSize: 13,
@@ -58,7 +60,7 @@ describe("EmptyState", () => {
       height: 64,
       width: 64,
     });
-    expect(screen.getByTestId("empty-state-icon-person")).toHaveProp("stroke", "#B78380");
+    expect(screen.getByTestId("empty-state-icon-person", hidden)).toHaveProp("stroke", "#B78380");
     expect(
       screen.getByText("Busca por nombre, teléfono o correo en el panel izquierdo."),
     ).toHaveStyle({ fontSize: 14, maxWidth: 340 });
