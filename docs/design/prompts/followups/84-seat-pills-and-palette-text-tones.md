@@ -1,7 +1,7 @@
 # Follow-up — One seat-pill rule and the text tones outside the closed palette
 
 Targets: **Client `03`, `05`, `06`, `08`, `09`, `15`, `16`, `19`, `01`,
-`21`, `22`**; **Staff `S02`, `S03`, `S04`, `S06`, `S07`, `S08`, `S09`, `S10`,
+`18`, `21`, `22`**; **Staff `S02`, `S03`, `S04`, `S06`, `S07`, `S08`, `S09`, `S10`,
 `S11`, `S12`, `S13`, `S16`, `S20`, `S21`, `S22`, `S01`, `S05`, `S19`**;
 **Admin web `AW01`, `AW03`, `AW24`**; **generated handoff
 `design/README.md`** (a new «Seat pills» section after «Branch picker pill
@@ -42,10 +42,11 @@ own scripts):
 3. The same three off-palette text tones remain outside the seat pills:
    `#5E7256` on the «Asistió» segments of `S03` and the «Activa»/«Asistió»
    pills of `S06` and `S10`; `#8A4433` on the «No asistió» segment of `S03`,
-   the «Vencida»/«No asistió» pills and the expired line of `S06`, and the
-   field error text of `01`, `21`, `22`, `S01`, `S05`, `S19`, `AW01`,
-   `AW03`, and `AW24`. The apps draw `successText` `#5F7457` and
-   `errorText` `#94493A` there.
+   the «Vencida»/«No asistió» pills and the expired line of `S06`, the
+   hover of `18`'s «Cerrar mi cuenta» link (the README's destructive hover
+   text is `#94493A`), and the field error text of `01`, `21`, `22`, `S01`,
+   `S05`, `S19`, `AW01`, `AW03`, and `AW24`. The apps draw `successText`
+   `#5F7457` and `errorText` `#94493A` there.
 
 ## 1. One seat-pill rule (`03`, `06`, `S02`, `S07`, `S08`, `S13`)
 
