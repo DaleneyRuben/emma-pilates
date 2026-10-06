@@ -12,6 +12,7 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -123,11 +124,8 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
 
 const styles = StyleSheet.create({
   card: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderColor: colors.border,
-    borderRadius: radii.card,
-    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,
@@ -135,7 +133,7 @@ const styles = StyleSheet.create({
   cardBody: { flex: 1, gap: spacing.xs },
   credit: {
     backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     padding: spacing.md,
   },
   creditText: { color: colors.successText, fontSize: typography.note, fontWeight: "600" },

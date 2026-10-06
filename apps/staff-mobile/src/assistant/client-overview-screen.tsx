@@ -6,6 +6,7 @@ import {
   BackLink,
   BodyText,
   colors,
+  EmptyState,
   formatSessionDate,
   formatTimeRange,
   Heading,
@@ -14,6 +15,7 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -50,12 +52,11 @@ function SubscriptionCard({
   const subscription = view.subscription;
   if (subscription === null || subscription === undefined) {
     return (
-      <View style={[styles.card, styles.noPlan]}>
-        <Text style={styles.cardTitle}>Sin plan activo</Text>
-        <BodyText style={styles.muted}>
-          Registra un pago en efectivo para activar un plan.
-        </BodyText>
-      </View>
+      <EmptyState
+        icon="card"
+        message="Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar."
+        title="Sin plan activo"
+      />
     );
   }
   const active = view.status === "active" || view.status === "expiring_soon";
@@ -169,7 +170,7 @@ export function ClientOverviewScreen({
             />
           ) : null}
         </View>
-        <View style={styles.card}>
+        <View style={styles.historyCard}>
           <View style={styles.cardHeader}>
             <Text style={styles.cardTitle}>Historial</Text>
             <TextButton
@@ -209,8 +210,7 @@ const styles = StyleSheet.create({
   badgeLabelActive: { color: colors.successText },
   badgeLabelExpired: { color: colors.errorText },
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },
@@ -222,15 +222,11 @@ const styles = StyleSheet.create({
   },
   cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
+  // The frames draw the history card without the shadow.
+  historyCard: { ...surfaces.flatCard, gap: spacing.xs, padding: spacing.lg },
   historyRow: { gap: spacing.xxs, paddingTop: spacing.sm },
   historyTitle: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   label: { color: colors.textMuted, fontSize: typography.label, textTransform: "uppercase" },
   muted: { color: colors.textMuted, fontSize: typography.note },
-  noPlan: {
-    backgroundColor: colors.neutralTint,
-    borderColor: colors.borderStrong,
-    borderStyle: "dashed",
-    borderWidth: 1,
-  },
   screen: { gap: spacing.md },
 });

@@ -14,10 +14,10 @@ import {
   colors,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -219,8 +219,7 @@ export function PlanDetailScreen({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },

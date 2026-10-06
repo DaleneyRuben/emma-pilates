@@ -16,6 +16,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -341,8 +342,7 @@ const styles = StyleSheet.create({
   },
   avatarText: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "600" },
   capacity: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.sm,
     padding: spacing.lg,
   },
@@ -360,8 +360,7 @@ const styles = StyleSheet.create({
   factRow: { flexDirection: "row", justifyContent: "space-between" },
   factValue: { color: colors.text, fontSize: typography.body },
   facts: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.md,
     padding: spacing.lg,
   },

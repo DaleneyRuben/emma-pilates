@@ -10,8 +10,8 @@ import {
   radii,
   Screen,
   ScreenTopBar,
-  shadows,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -174,13 +174,11 @@ export function AvailabilityScreen() {
 
 const styles = StyleSheet.create({
   card: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,
-    ...shadows.card,
   },
   cardBody: { flex: 1, gap: spacing.xxs },
   chevron: { color: colors.textMuted, fontSize: typography.bodyLarge },

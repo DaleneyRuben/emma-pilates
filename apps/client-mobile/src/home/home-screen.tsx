@@ -14,8 +14,8 @@ import {
   QueryFailure,
   radii,
   Screen,
-  shadows,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -283,11 +283,9 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   action: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.lg,
-    ...shadows.card,
   },
   actionDisabled: { backgroundColor: colors.disabledBackground },
   actionLabel: {
@@ -305,11 +303,9 @@ const styles = StyleSheet.create({
   },
   badgeText: { fontSize: typography.label, fontWeight: "600" },
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.sm,
     padding: spacing.lg,
-    ...shadows.card,
   },
   cardHeader: {
     alignItems: "center",
@@ -342,7 +338,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   purchaseBody: { color: colors.white },
-  purchaseCard: { backgroundColor: colors.primary },
+  purchaseCard: { backgroundColor: colors.primary, borderColor: colors.primary },
   purchaseTitle: {
     color: colors.white,
     fontSize: typography.titleSecondary,

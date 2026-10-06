@@ -8,10 +8,10 @@ import {
   formatMonthHeading,
   formatSessionDate,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -104,8 +104,7 @@ export function ClientHistoryScreen({ route }: { route: { params: ClientContext 
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.flatCard,
     gap: spacing.xxs,
     padding: spacing.lg,
   },

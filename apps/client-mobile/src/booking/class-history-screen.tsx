@@ -6,10 +6,10 @@ import {
   BodyText,
   colors,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -105,8 +105,7 @@ export function ClassHistoryScreen() {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.flatCard,
     gap: spacing.xxs,
     padding: spacing.lg,
   },

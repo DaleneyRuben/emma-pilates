@@ -13,8 +13,8 @@ import {
   radii,
   Screen,
   ScreenTopBar,
-  shadows,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -153,15 +153,14 @@ const styles = StyleSheet.create({
   failure: { color: colors.errorText },
   free: {
     backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     padding: spacing.lg,
   },
   freeText: { color: colors.successText, fontSize: typography.body, fontWeight: "500" },
   muted: { color: colors.textMuted, fontSize: typography.note },
   name: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   note: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.flatCard,
     padding: spacing.lg,
   },
   nutritionist: {
@@ -175,11 +174,9 @@ const styles = StyleSheet.create({
   },
   screen: { gap: spacing.lg },
   summary: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.xl,
-    ...shadows.card,
   },
   time: { color: colors.text, fontSize: typography.display, fontWeight: "400" },
 });

@@ -12,6 +12,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -275,9 +276,8 @@ const styles = StyleSheet.create({
     fontSize: typography.display,
   },
   amountCard: {
+    ...surfaces.flatCard,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },
@@ -324,8 +324,7 @@ const styles = StyleSheet.create({
   name: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   reasonInput: { minHeight: 96, paddingTop: spacing.md, textAlignVertical: "top" },
   receipt: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.flatCard,
     height: 320,
     width: "100%",
   },

@@ -18,6 +18,7 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   typography,
   upcomingCivilDates,
 } from "@pilates/mobile-core";
@@ -279,9 +280,8 @@ const styles = StyleSheet.create({
   branchName: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   branchRow: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
   card: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,
@@ -304,7 +304,7 @@ const styles = StyleSheet.create({
   dayChip: {
     alignItems: "center",
     borderColor: colors.borderStrong,
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     borderWidth: 1,
     minWidth: 52,
     paddingHorizontal: spacing.sm,

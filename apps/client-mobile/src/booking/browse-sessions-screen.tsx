@@ -8,13 +8,13 @@ import {
   BodyText,
   colors,
   Heading,
+  PickerCheck,
   QueryFailure,
   radii,
   Screen,
-  shadows,
   spacing,
+  surfaces,
   typography,
-  PickerCheck,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -300,18 +300,16 @@ const styles = StyleSheet.create({
   branchText: { flex: 1, gap: spacing.xxs },
   branchSheet: {
     backgroundColor: colors.white,
-    borderRadius: radii.card,
+    borderRadius: radii.frame,
     gap: spacing.xs,
     padding: spacing.lg,
   },
   card: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,
-    ...shadows.card,
   },
   cardBody: { flex: 1, gap: spacing.xxs },
   cardTitle: {
@@ -338,7 +336,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.white,
     borderColor: colors.borderStrong,
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     borderWidth: 1,
     minWidth: 56,
     paddingHorizontal: spacing.sm,

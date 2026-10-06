@@ -19,7 +19,7 @@ export function ClientBanner({
 const styles = StyleSheet.create({
   banner: {
     backgroundColor: colors.primaryTint,
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.sm,
   },

@@ -1,4 +1,4 @@
-import { BodyText, colors, spacing, typography } from "@pilates/mobile-core";
+import { EmptyState, spacing } from "@pilates/mobile-core";
 import {
   NavigationContext,
   useNavigation,
@@ -57,9 +57,12 @@ export function ClientDetailPanel() {
   if (panel === null) {
     return (
       <View style={styles.empty}>
-        <BodyText style={styles.emptyText}>
-          Selecciona un cliente para ver sus detalles
-        </BodyText>
+        <EmptyState
+          icon="person"
+          message="Busca por nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin perder la lista."
+          title="Selecciona un cliente para ver sus detalles"
+          variant="panel"
+        />
       </View>
     );
   }
@@ -90,5 +93,4 @@ const styles = StyleSheet.create({
     margin: spacing.lg,
     padding: spacing.xl,
   },
-  emptyText: { color: colors.textMuted, fontSize: typography.bodyLarge, textAlign: "center" },
 });

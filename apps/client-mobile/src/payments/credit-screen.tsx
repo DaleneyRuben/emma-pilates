@@ -7,10 +7,10 @@ import {
   colors,
   PrimaryButton,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -144,8 +144,7 @@ const styles = StyleSheet.create({
   centered: { textAlign: "center" },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   origin: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.flatCard,
     gap: spacing.sm,
     padding: spacing.lg,
   },

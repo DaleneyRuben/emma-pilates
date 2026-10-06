@@ -13,6 +13,7 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -171,8 +172,7 @@ const styles = StyleSheet.create({
   },
   badgeIcon: { color: colors.white, fontSize: typography.title },
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },

@@ -13,6 +13,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -179,9 +180,8 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
   },
   codeCard: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.xl,
   },
@@ -194,9 +194,8 @@ const styles = StyleSheet.create({
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   creditLabel: { color: colors.text, fontSize: typography.body },
   creditRow: {
+    ...surfaces.flatCard,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     justifyContent: "space-between",
     minHeight: 56,
@@ -217,9 +216,8 @@ const styles = StyleSheet.create({
   pending: { backgroundColor: warningTint },
   pendingText: { color: colors.warningText },
   row: {
+    ...surfaces.flatCard,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     minHeight: 64,

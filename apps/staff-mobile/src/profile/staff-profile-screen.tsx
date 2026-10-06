@@ -12,6 +12,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
   UnreadCountPill,
   useMobileIdentity,
@@ -177,8 +178,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   group: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.flatCard,
     overflow: "hidden",
   },
   logout: {
@@ -210,9 +210,8 @@ const styles = StyleSheet.create({
   rowValue: { color: colors.textMuted },
   screen: { gap: spacing.lg },
   summary: {
+    ...surfaces.card,
     alignItems: "flex-start",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,

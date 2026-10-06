@@ -7,6 +7,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -130,15 +131,13 @@ const styles = StyleSheet.create({
   destructiveLabel: { color: colors.white, fontSize: typography.body, fontWeight: "500" },
   failure: { color: colors.errorText },
   receipt: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.sm,
     padding: spacing.lg,
   },
   screen: { gap: spacing.lg },
   summary: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },

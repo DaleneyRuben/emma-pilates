@@ -15,6 +15,7 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -220,8 +221,7 @@ export function ConfirmCashPaymentScreen({
 const styles = StyleSheet.create({
   branches: { gap: spacing.sm },
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.sm,
     padding: spacing.lg,
   },

@@ -6,6 +6,7 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -193,9 +194,8 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   row: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,

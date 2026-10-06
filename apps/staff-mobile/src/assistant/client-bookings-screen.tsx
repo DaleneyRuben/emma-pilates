@@ -16,6 +16,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -289,8 +290,7 @@ const styles = StyleSheet.create({
   },
   badgeText: { color: colors.warningText, fontSize: typography.label, fontWeight: "600" },
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
   lockedNote: { color: colors.textMuted, fontSize: typography.label, textAlign: "center" },
   notice: {
     backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     gap: spacing.xs,
     padding: spacing.lg,
   },

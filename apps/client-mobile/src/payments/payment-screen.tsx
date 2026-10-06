@@ -15,6 +15,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -228,9 +229,8 @@ const styles = StyleSheet.create({
     fontSize: typography.display,
   },
   amountCard: {
+    ...surfaces.flatCard,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },
@@ -242,9 +242,8 @@ const styles = StyleSheet.create({
   instructions: { alignItems: "center", gap: spacing.xxs },
   qr: { height: 220, width: 220 },
   qrCard: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.lg,
   },
@@ -259,7 +258,7 @@ const styles = StyleSheet.create({
   upload: {
     alignItems: "center",
     borderColor: colors.borderStrong,
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     borderStyle: "dashed",
     borderWidth: 1.5,
     gap: spacing.sm,

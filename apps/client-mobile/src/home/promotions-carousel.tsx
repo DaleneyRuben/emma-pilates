@@ -4,8 +4,8 @@ import {
   colors,
   Heading,
   radii,
-  shadows,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useState } from "react";
@@ -155,12 +155,8 @@ export function PromotionsCarousel({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.white,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.frame,
-    borderWidth: 1,
+    ...surfaces.card,
     overflow: "hidden",
-    ...shadows.card,
   },
   copy: { gap: spacing.smd, padding: spacing.lg },
   description: { fontSize: typography.note, lineHeight: 20 },

@@ -4,7 +4,14 @@ import {
   resendCurrentAccountEmailChange,
   useGetCurrentAccountEmailChange,
 } from "@pilates/api-contracts";
-import { BodyText, colors, radii, spacing, TextButton, typography } from "@pilates/mobile-core";
+import {
+  BodyText,
+  colors,
+  radii,
+  spacing,
+  TextButton,
+  typography,
+} from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -77,7 +84,7 @@ const styles = StyleSheet.create({
   actions: { flexDirection: "row", gap: spacing.md },
   card: {
     backgroundColor: colors.primaryTint,
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     gap: spacing.sm,
     padding: spacing.lg,
   },

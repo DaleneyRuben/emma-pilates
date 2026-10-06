@@ -13,9 +13,10 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   TextButton,
-  UnreadCountPill,
   typography,
+  UnreadCountPill,
   useMobileIdentity,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -242,8 +243,7 @@ const styles = StyleSheet.create({
   logoutText: { color: colors.textSecondary, fontSize: typography.body },
   logoutTextPressed: { color: colors.errorText },
   menu: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     overflow: "hidden",
   },
   name: {
@@ -263,9 +263,8 @@ const styles = StyleSheet.create({
   rowValue: { color: colors.textMuted },
   screen: { gap: spacing.lg },
   summary: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,

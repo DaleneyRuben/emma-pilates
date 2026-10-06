@@ -14,6 +14,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -186,18 +187,15 @@ export function RescheduleScreen({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.white,
-    borderColor: colors.border,
-    borderRadius: radii.card,
-    borderWidth: 2,
+    ...surfaces.card,
     gap: spacing.xxs,
     padding: spacing.lg,
   },
-  cardSelected: { borderColor: colors.primary },
+  cardSelected: { borderColor: colors.primary, borderWidth: 2 },
   cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   current: {
     backgroundColor: colors.divider,
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     gap: spacing.xxs,
     opacity: 0.85,
     padding: spacing.lg,

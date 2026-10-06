@@ -8,6 +8,7 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -196,8 +197,7 @@ const styles = StyleSheet.create({
   },
   badgeText: { fontSize: typography.label, fontWeight: "600" },
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.sm,
     padding: spacing.lg,
   },
@@ -216,8 +216,7 @@ const styles = StyleSheet.create({
   purchase: { gap: spacing.sm },
   warningNote: { color: colors.warningText, fontSize: typography.note },
   dates: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.flatCard,
     gap: spacing.md,
     padding: spacing.lg,
   },
@@ -238,7 +237,7 @@ const styles = StyleSheet.create({
   screen: { gap: spacing.lg },
   warning: {
     backgroundColor: "rgba(201,154,78,0.16)",
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     gap: spacing.xs,
     padding: spacing.lg,
   },

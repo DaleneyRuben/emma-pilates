@@ -15,8 +15,8 @@ import {
   QueryFailure,
   radii,
   Screen,
-  shadows,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -298,11 +298,9 @@ const styles = StyleSheet.create({
   badgeText: { color: colors.warningText, fontSize: typography.label, fontWeight: "600" },
   balance: { color: colors.textMuted, fontSize: typography.note },
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.lg,
-    ...shadows.card,
   },
   cardHeader: {
     alignItems: "center",
@@ -317,7 +315,7 @@ const styles = StyleSheet.create({
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
   notice: {
     backgroundColor: "rgba(124,148,115,0.14)",
-    borderRadius: radii.card,
+    borderRadius: radii.inset,
     gap: spacing.xs,
     padding: spacing.lg,
   },

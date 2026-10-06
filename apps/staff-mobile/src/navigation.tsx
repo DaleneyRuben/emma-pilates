@@ -10,6 +10,7 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   type AppRole,
   type MobileNavigationProps,
   typography,
@@ -433,8 +434,7 @@ export function StaffNavigation({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },
@@ -466,8 +466,7 @@ const styles = StyleSheet.create({
   datePicker: { gap: spacing.sm, paddingVertical: spacing.lg },
   list: { gap: spacing.md, paddingBottom: spacing.lg },
   rosterRow: {
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
+    ...surfaces.flatCard,
     gap: spacing.md,
     padding: spacing.lg,
   },

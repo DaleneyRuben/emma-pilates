@@ -9,6 +9,7 @@ import {
   radii,
   Screen,
   spacing,
+  surfaces,
   TextButton,
   typography,
 } from "@pilates/mobile-core";
@@ -173,9 +174,8 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   card: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,

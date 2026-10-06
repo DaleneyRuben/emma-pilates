@@ -3,11 +3,10 @@ import {
   BodyText,
   colors,
   QueryFailure,
-  radii,
   Screen,
   ScreenTopBar,
-  shadows,
   spacing,
+  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -83,15 +82,11 @@ export function PlansScreen() {
 
 const styles = StyleSheet.create({
   card: {
+    ...surfaces.card,
     alignItems: "center",
-    backgroundColor: colors.white,
-    borderColor: colors.border,
-    borderRadius: radii.card,
-    borderWidth: 1,
     flexDirection: "row",
     gap: spacing.md,
     padding: spacing.lg,
-    ...shadows.card,
   },
   cardBody: { flex: 1, gap: spacing.xs },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
