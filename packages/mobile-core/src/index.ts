@@ -16,6 +16,8 @@ export * from "./auth/login-screen";
 export * from "./auth/session-api";
 export * from "./auth/session-manager";
 export * from "./encoding/base64";
+export * from "./history/class-history-groups";
+export * from "./history/class-history-list";
 export * from "./ingress/verified-link";
 export * from "./money/bolivianos";
 export * from "./notifications/notification-time";

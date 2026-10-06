@@ -41,6 +41,9 @@ export const colors = {
   neutralWash: "rgba(216,201,187,0.18)",
   disabledBackground: "#E7DCD8",
   disabledText: "#B3A9A5",
+  // The frames' quiet icon: the 34 pt empty-state glyphs of 07, 19, S20,
+  // S21, and S22 and the row chevrons of 02, 18, and S23 (MOB-040).
+  iconQuiet: "#C4BAB6",
 } as const;
 
 export const spacing = {
