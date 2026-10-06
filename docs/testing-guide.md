@@ -478,9 +478,14 @@ the name and phone and saves through the API (changing the email is Test 34).
 
 The **Reservar** tab lists the fixture Sessions for the selected Branch, day,
 and Class Type (past Sessions of today are hidden; full ones show **Lleno**).
-The **Sucursal:** chip opens «Elige una sucursal» with the current Branch's
-name in Palo de rosa profundo and a check on its right. The day and Class Type
-chip rows keep their height whether the Branch list is open or the day has no
+Each Session is a white card: the time in small spaced capitals over the Class
+Type in Lora, the seat pill on the right, and under a thin rule the Trainer
+after a small person icon with a Palo de rosa chevron on the right (full
+classes keep the chevron too; MOB-042). The **Sucursal:** pill (a pin, the
+Branch name in bold, and a small grey chevron pointing down, up while the
+list is open) opens «Elige una sucursal» with the current Branch's name in
+Palo de rosa profundo and a check on its right. The day and Class Type chip
+rows keep their height whether the Branch list is open or the day has no
 classes, on the iPhone and the iPad alike.
 Tapping a Session opens its detail; **Reservar** creates a real Booking and
 lands on **Mis reservas** with a "Reserva confirmada" notice and the updated
@@ -1252,9 +1257,11 @@ reopens the same Intent (the API answers `409 purchase_intent_open_exists`).
 
 Start the Staff app (Test 9E) and log in as `paola.mendoza@example.com`. The
 Administrator root is **Pagos pendientes**: a **Por confirmar** line with the
-count and "Bs 500 en total", then one card per transfer, oldest first, with the
-Client's initials, name, Plan, amount, and how long ago it was sent ("Hace 3
-minutos", "Ayer, 19:40"). With nothing to review the screen reads "No hay
+count and "Bs 500 en total", then one card per transfer, oldest first: the
+Client's first letter in a tinted circle, her name in Lora over the Plan, a
+Palo de rosa chevron on the right, and under a thin rule the amount in Lora
+and an amber clock with how long ago it was sent ("Hace 3 minutos", "Ayer,
+19:40") (MOB-042). With nothing to review the screen reads "No hay
 pagos pendientes." and "Todo al día. Te avisaremos cuando llegue una
 transferencia nueva.".
 
@@ -1281,10 +1288,13 @@ for the same Plan.
 
 ### E. Cancel a Session as the Administrator
 
-From **Pagos pendientes** tap **Cancelar una clase**. Pick the Branch
-(**Sucursal:** row, then a Branch chip), a day chip, and a Class Type chip
-(**Todas** by default); the list shows every Session of that day including full
-ones, with time, Class Type, Trainer, "N reservas", and "Llena" or "N cupos".
+From **Pagos pendientes** tap **Cancelar una clase**. Pick the Branch (the
+**Sucursal:** pill with its pin and down chevron, then a Branch chip), a day
+chip, and a Class Type chip (**Todas** by default); the list shows every
+Session of that day including full ones. Each card ends in a Palo de rosa
+chevron beside the time and the Class Type in Lora, names the Trainer after a
+person icon and «Sucursal …» after a pin, and closes with "N reservas" and
+"Llena" or "N cupos" under a thin rule (MOB-042).
 No match reads "No hay clases con estos filtros." / "Prueba otro día, otra
 sucursal u otro tipo de clase.". Tap a card: **Cancelar sesión** repeats the
 Session, "N clientes afectados", and an amber warning "Esto no se puede
@@ -1317,8 +1327,10 @@ the worker command from Test 5) and log in as `camila.rojas@example.com`
 ### A. Find a Client and read her overview
 
 Type at least two characters in **Buscar por nombre, teléfono o correo**
-("luc", "7001", or "lucia@"). Each result shows the name, phone, and email; a
-still-pending Client carries a **Pendiente** tag. With no match the screen
+("luc", "7001", or "lucia@"). Each result is a white row with the Client's
+first letter in a tinted circle, her name over «phone · email», and a Palo de
+rosa chevron (MOB-042); a still-pending Client carries a **Pendiente** tag
+before the chevron. With no match the screen
 reads "No se encontró ningún cliente." and keeps **+ Nuevo cliente** as the
 next step. Tap Lucía: the overview shows her Plan card ("Paquete de 8 clases",
 "N clases restantes", "Vence el …", **Activa**), her next reservation, the
@@ -1352,8 +1364,10 @@ under the quiet clock, with no supporting line.
 ### C. Book a class for her
 
 **Reservar clase** opens **Reservar una clase** with the banner "Reservando
-para: Lucía Fernández", the Branch row, the seven day chips, and the Class Type
-chips. Tap a Session: the detail shows Trainer, Branch, date, time, duration,
+para: Lucía Fernández", the **Sucursal:** pill, the seven day chips, and the
+Class Type chips; the Session cards look exactly like the Client's (Test 5 B:
+the time and the Lora Class Type, the seat pill, the Trainer after a person
+icon, the chevron). Tap a Session: the detail shows Trainer, Branch, date, time, duration,
 and "X de Y cupos disponibles". **Reservar** books it for the Client and lands
 on **Reservas de la clienta** with the "Reserva confirmada" notice. A full
 class offers **Unirme a la lista de espera** ("Clase llena. Se avisará al
@@ -1424,8 +1438,8 @@ overview in the right panel without navigating away; **Ver reservas** and
 **Ver historial completo** also open in that panel (the empty reservations
 state centres in the panel with its button), with **Volver** returning
 to the overview. **Reservar clase**, **Registrar pago en efectivo**, and
-**+ Nuevo cliente** open full-screen: the classes and the Plans show as a
-two-column grid, and the Session detail, the cash confirmation, and the new
+**+ Nuevo cliente** open full-screen: the classes (each card with its Trainer
+line and chevron) and the Plans show as a two-column grid, and the Session detail, the cash confirmation, and the new
 Client form sit in a centered card. Finishing a booking, a cash Payment, or a
 new Client returns to the split with that Client in the panel (also when the
 same email reopened her invitation, with its notice). Cancelling an
@@ -1439,9 +1453,12 @@ Client search ignores accents and case: "lucia" finds Lucía Fernández and
 Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
 1B) and log in as `emma.vargas@example.com` with `emma-local-2026`.
 
-1. **Mi agenda** greets you and lists today's Sessions you lead, each with
-   Branch, time, Class Type, and "N de M reservados". Book a class for today
-   as `lucia@example.com` in the Client app (or through Swagger) first if the
+1. **Mi agenda** greets you and lists today's Sessions you lead. Each card
+   ends in a Palo de rosa chevron beside the time and the Class Type in Lora,
+   names the Branch after a small pin, and closes with "N de M reservados"
+   after a person icon and a **Completa** (green) or **Con cupos** (neutral)
+   pill under a thin rule (MOB-042). Book a class for today as
+   `lucia@example.com` in the Client app (or through Swagger) first if the
    list is empty.
 2. Tap a Session to open its roster: every booked Client with **Asistió** and
    **No asistió** choices, or "No hay reservas para esta sesión."
@@ -1546,8 +1563,10 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
 
 **In the Staff app** as `gabriela.flores@example.com`:
 
-1. **Mi agenda** groups upcoming Evaluations by day ("Hoy", "Mañana") with
-   "Primera evaluación" or "Seguimiento". Tap a card, then **Cancelar
+1. **Mi agenda** groups upcoming Evaluations by day ("Hoy", "Mañana"). Each
+   row shows the time in Lora over "45 min", a thin vertical divider, the
+   Client over "Primera evaluación" or "Seguimiento", and a Palo de rosa
+   chevron (MOB-042). Tap a card, then **Cancelar
    evaluación**, and confirm: the Client is notified, the turno is freed, and
    the "Evaluación cancelada" strip fades after 8 seconds. An Evaluation that
    already started offers no **Cancelar evaluación**.
@@ -1628,11 +1647,16 @@ In the Client app as `lucia@example.com`:
    admin web (Test 33, **Dejar de publicar**) and pull Inicio down to
    refresh: the section is gone. On an iPad the card stops at 720 pt and the
    next one peeks on the right.
-1. **Inicio** shows three quick actions: **Reservar una clase** (ending in a
-   Palo de rosa chevron, or a quiet lock while no Plan is active), **Evaluación
-   nutricional** ("Próxima: …" when one is booked, otherwise "Agenda tu cita
-   del mes"; it opens Mis evaluaciones or the availability), and **Mis
-   referidos** ("N amigas invitadas" or "Invita amigas y gana crédito").
+1. **Inicio** shows the shortcuts under an **Accesos rápidos** eyebrow
+   (MOB-042): a full-width **Reservar una clase** card with a calendar in a
+   tinted tile, the title in Lora, "Horarios de esta semana", and a Palo de
+   rosa chevron (without an active Plan the card turns Arena with a grey
+   calendar and title, "Necesitas un plan activo para reservar", and a quiet
+   lock instead of the chevron), over two half-width tiles with no chevron:
+   **Evaluación nutricional** (a trend icon; "Próxima: …" when one is booked,
+   otherwise "Agenda tu cita del mes"; it opens Mis evaluaciones or the
+   availability) and **Mis referidos** (a person icon; "N amigas invitadas" or
+   "Invita amigas y gana crédito").
 2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with dates such as
    "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
    termine."; while expiring, an amber banner; once expired, "Último plan",
