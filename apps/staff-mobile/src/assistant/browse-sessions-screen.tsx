@@ -7,7 +7,7 @@ import {
 import {
   BackLink,
   BodyText,
-  Chevron,
+  BranchPickerPill,
   boliviaCivilDate,
   civilDateRange,
   colors,
@@ -18,8 +18,8 @@ import {
   QueryFailure,
   radii,
   Screen,
+  SessionCard,
   spacing,
-  surfaces,
   typography,
   upcomingCivilDates,
 } from "@pilates/mobile-core";
@@ -142,21 +142,11 @@ export function BrowseSessionsScreen({
   return (
     <Screen style={styles.screen}>
       {header}
-      <Pressable
-        accessibilityLabel={`Sucursal: ${branch.name}`}
-        accessibilityRole="button"
+      <BranchPickerPill
+        name={branch.name}
         onPress={() => setChoosingBranch((current) => !current)}
-        style={styles.branchRow}
-      >
-        <BodyText style={styles.branchLabel}>Sucursal:</BodyText>
-        <Text style={styles.branchName}>{branch.name}</Text>
-        <Chevron
-          direction={choosingBranch ? "up" : "down"}
-          size={16}
-          testID="branch-picker-chevron"
-          tone="muted"
-        />
-      </Pressable>
+        open={choosingBranch}
+      />
       {choosingBranch ? (
         <View style={styles.branchList}>
           {branchList.map((candidate) => (
@@ -245,9 +235,8 @@ export function BrowseSessionsScreen({
           {visible.map((session) => {
             const full = session.availableSeats === 0;
             return (
-              <Pressable
+              <SessionCard
                 accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
-                accessibilityRole="button"
                 key={session.id}
                 onPress={() =>
                   navigation.navigate("SessionDetail", {
@@ -256,21 +245,17 @@ export function BrowseSessionsScreen({
                     sessionId: session.id,
                   })
                 }
-                style={styles.card}
-              >
-                <View style={styles.cardBody}>
-                  <Text style={styles.time}>
-                    {formatTimeRange(session.startsAt, session.endsAt)}
-                  </Text>
-                  <Text style={styles.cardTitle}>{session.classTypeName}</Text>
-                  <Text style={styles.trainer}>{session.trainerName}</Text>
-                </View>
-                <View style={[styles.tag, full && styles.tagFull]}>
-                  <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
-                    {seatsTag(session)}
-                  </Text>
-                </View>
-              </Pressable>
+                tag={
+                  <View style={[styles.tag, full && styles.tagFull]}>
+                    <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
+                      {seatsTag(session)}
+                    </Text>
+                  </View>
+                }
+                time={formatTimeRange(session.startsAt, session.endsAt)}
+                title={session.classTypeName}
+                trainerName={session.trainerName}
+              />
             );
           })}
           </TabletGrid>
@@ -281,19 +266,7 @@ export function BrowseSessionsScreen({
 }
 
 const styles = StyleSheet.create({
-  branchLabel: { color: colors.textMuted },
   branchList: { flexDirection: "row", flexWrap: "wrap", gap: spacing.sm },
-  branchName: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
-  branchRow: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  card: {
-    ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  cardBody: { flex: 1, gap: spacing.xxs },
-  cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   centered: { textAlign: "center" },
   chip: {
     borderColor: colors.borderStrong,
@@ -338,6 +311,4 @@ const styles = StyleSheet.create({
   tagFull: { backgroundColor: colors.disabledBackground },
   tagLabel: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "500" },
   tagLabelFull: { color: colors.textSecondary },
-  time: { color: colors.primaryDeep, fontWeight: "600" },
-  trainer: { color: colors.textSecondary, fontSize: typography.body, fontWeight: "500" },
 });

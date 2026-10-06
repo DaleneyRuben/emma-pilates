@@ -23,6 +23,18 @@ describe("DetailLine", () => {
     expect(icon).toHaveProp("width", 17);
     expect(icon).toHaveProp("stroke", "#B78380");
   });
+
+  it("takes another icon colour for S11's amber clock", async () => {
+    const screen = await render(
+      <DetailLine icon="clock" iconColor="#C99A4E" iconSize={15}>
+        Hace 20 minutos
+      </DetailLine>,
+    );
+
+    const icon = screen.getByTestId("glyph-clock", hidden);
+    expect(icon).toHaveProp("stroke", "#C99A4E");
+    expect(icon).toHaveProp("width", 15);
+  });
 });
 
 describe("CardFooter", () => {

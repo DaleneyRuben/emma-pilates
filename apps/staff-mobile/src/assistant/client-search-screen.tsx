@@ -1,7 +1,10 @@
 import { useSearchAssistantClients } from "@pilates/api-contracts";
 import {
+  AvatarCircle,
   BodyText,
+  Chevron,
   colors,
+  fontFamilies,
   QueryFailure,
   radii,
   Screen,
@@ -124,17 +127,19 @@ export function ClientSearchScreen() {
               onPress={() => open(client.id)}
               style={[styles.row, client.id === selectedId && styles.rowSelected]}
             >
+              <AvatarCircle fontSize={16} name={client.name} size={42} />
               <View style={styles.rowBody}>
                 <Text style={styles.name}>{client.name}</Text>
-                <BodyText style={styles.contact}>
+                <Text style={styles.contact}>
                   {describeContact(client.phone, client.email)}
-                </BodyText>
+                </Text>
               </View>
               {client.accountStatus === "pending" ? (
                 <View style={styles.pendingTag}>
                   <Text style={styles.pendingLabel}>Pendiente</Text>
                 </View>
               ) : null}
+              <Chevron />
             </Pressable>
           ))}
         </ScrollView>
@@ -156,7 +161,7 @@ export function ClientSearchScreen() {
 }
 
 const styles = StyleSheet.create({
-  contact: { color: colors.textSecondary, fontSize: typography.note },
+  contact: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   empty: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xl },
   emptyTitle: {
     color: colors.text,
@@ -176,7 +181,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
   },
   list: { gap: spacing.sm, paddingBottom: spacing.xxl },
-  name: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
+  name: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
   newClient: {
     alignItems: "center",
     borderColor: colors.primary,
@@ -193,14 +198,16 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.smLg,
     paddingVertical: spacing.xs,
   },
+  // S04's result row (MOB-042): the avatar, the name over the contact, the chevron.
   row: {
     ...surfaces.card,
     alignItems: "center",
     flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
+    gap: spacing.mdLg,
+    paddingHorizontal: spacing.lgXl,
+    paddingVertical: spacing.lg,
   },
-  rowBody: { flex: 1, gap: spacing.xxs },
+  rowBody: { flex: 1, gap: 3 },
   rowSelected: { borderColor: colors.primary, borderWidth: 2 },
   screen: { gap: spacing.md },
   detailPanel: {

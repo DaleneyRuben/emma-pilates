@@ -7,7 +7,9 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  Chevron,
   colors,
+  fontFamilies,
   QueryFailure,
   radii,
   Screen,
@@ -202,12 +204,14 @@ export function NutritionistAgendaScreen() {
                     >
                       <View style={styles.timeColumn}>
                         <Text style={styles.time}>{clockTime(entry.startsAt)}</Text>
-                        <BodyText style={styles.muted}>{`${entry.durationMinutes} min`}</BodyText>
+                        <Text style={styles.duration}>{`${entry.durationMinutes} min`}</Text>
                       </View>
+                      <View style={styles.divider} testID="agenda-row-divider" />
                       <View style={styles.cardBody}>
                         <Text style={styles.client}>{entry.clientName}</Text>
-                        <BodyText style={styles.muted}>{kindLabel[entry.kind]}</BodyText>
+                        <Text style={styles.kind}>{kindLabel[entry.kind]}</Text>
                       </View>
+                      <Chevron />
                     </Pressable>
                     {selected && cancellable ? (
                       <Pressable
@@ -265,15 +269,20 @@ export function NutritionistAgendaScreen() {
 const styles = StyleSheet.create({
   cancel: { alignSelf: "flex-end", minHeight: 44, justifyContent: "center" },
   cancelText: { color: colors.errorText, fontSize: typography.body, fontWeight: "500" },
+  // S15's row (MOB-042): a Lora time column, a thin divider, the Client over the kind, the chevron.
   card: {
     ...surfaces.card,
+    alignItems: "center",
     flexDirection: "row",
     gap: spacing.lg,
-    padding: spacing.lg,
+    padding: spacing.lgXl,
   },
-  cardBody: { flex: 1, gap: spacing.xxs, justifyContent: "center" },
+  cardBody: { flex: 1, gap: 3 },
   cardSelected: { borderColor: colors.primary },
-  client: { color: colors.text, fontSize: typography.bodyLarge },
+  client: { color: colors.text, fontFamily: fontFamilies.body, fontSize: typography.bodyMedium },
+  divider: { backgroundColor: colors.rule, height: 38, width: 1 },
+  duration: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.label },
+  kind: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   destructive: {
     alignItems: "center",
     borderColor: colors.error,
@@ -329,9 +338,9 @@ const styles = StyleSheet.create({
   sheetTitle: { color: colors.text, fontSize: typography.titleSecondary, fontWeight: "500" },
   time: {
     color: colors.text,
-    fontSize: typography.bodyLarge,
+    fontFamily: fontFamilies.heading,
+    fontSize: typography.titleSmall,
     fontVariant: ["tabular-nums"],
-    fontWeight: "600",
   },
-  timeColumn: { minWidth: 56 },
+  timeColumn: { gap: spacing.xxs, minWidth: 62 },
 });

@@ -6,14 +6,15 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BranchPickerPill,
   colors,
   Heading,
   PickerCheck,
   QueryFailure,
   radii,
   Screen,
+  SessionCard,
   spacing,
-  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -64,34 +65,14 @@ function Chip({
   );
 }
 
-function SessionCard({
-  session,
-  onPress,
-}: {
-  session: SessionAvailabilityDto;
-  onPress: () => void;
-}) {
-  const full = session.availableSeats === 0;
+function SeatTag({ availableSeats }: { availableSeats: number }) {
+  const full = availableSeats === 0;
   return (
-    <Pressable
-      accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
-      accessibilityRole="button"
-      onPress={onPress}
-      style={styles.card}
-    >
-      <View style={styles.cardBody}>
-        <Text style={styles.time}>
-          {formatTimeRange(session.startsAt, session.endsAt)}
-        </Text>
-        <Text style={styles.cardTitle}>{session.classTypeName}</Text>
-        <BodyText>{session.trainerName}</BodyText>
-      </View>
-      <View style={[styles.tag, full && styles.tagFull]}>
-        <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
-          {seatsTag(session.availableSeats)}
-        </Text>
-      </View>
-    </Pressable>
+    <View style={[styles.tag, full && styles.tagFull]}>
+      <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
+        {seatsTag(availableSeats)}
+      </Text>
+    </View>
   );
 }
 
@@ -146,16 +127,11 @@ export function BrowseSessionsScreen() {
     <Screen style={styles.screen}>
       <Heading accessibilityLabel="Reservar">Reservar una clase</Heading>
       {selectedBranch ? (
-        <Pressable
-          accessibilityLabel={`Sucursal: ${selectedBranch.name}`}
-          accessibilityRole="button"
+        <BranchPickerPill
+          name={selectedBranch.name}
           onPress={() => setChoosingBranch((open) => !open)}
-          style={styles.branchChip}
-        >
-          <Text style={styles.branchChipLabel}>
-            {`Sucursal: ${selectedBranch.name}`}
-          </Text>
-        </Pressable>
+          open={choosingBranch}
+        />
       ) : null}
       {choosingBranch ? (
         <View style={styles.branchSheet}>
@@ -263,11 +239,15 @@ export function BrowseSessionsScreen() {
         <ScrollView contentContainerStyle={styles.list}>
           {visibleSessions.map((session) => (
             <SessionCard
+              accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
               key={session.id}
               onPress={() =>
                 navigation.navigate("SessionDetail", { sessionId: session.id })
               }
-              session={session}
+              tag={<SeatTag availableSeats={session.availableSeats} />}
+              time={formatTimeRange(session.startsAt, session.endsAt)}
+              title={session.classTypeName}
+              trainerName={session.trainerName}
             />
           ))}
         </ScrollView>
@@ -278,16 +258,6 @@ export function BrowseSessionsScreen() {
 
 const styles = StyleSheet.create({
   branchAddress: { fontSize: typography.note },
-  branchChip: {
-    alignSelf: "flex-start",
-    backgroundColor: colors.white,
-    borderColor: colors.borderStrong,
-    borderRadius: radii.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-  },
-  branchChipLabel: { color: colors.text, fontSize: typography.body },
   branchName: { color: colors.text, fontSize: typography.body },
   branchNameSelected: { color: colors.primaryDeep },
   branchRow: {
@@ -303,19 +273,6 @@ const styles = StyleSheet.create({
     borderRadius: radii.frame,
     gap: spacing.xs,
     padding: spacing.lg,
-  },
-  card: {
-    ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  cardBody: { flex: 1, gap: spacing.xxs },
-  cardTitle: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
   },
   chip: {
     backgroundColor: colors.white,
@@ -349,7 +306,7 @@ const styles = StyleSheet.create({
   screen: { gap: spacing.md },
   sheetTitle: { color: colors.textMuted, fontSize: typography.label },
   tag: {
-    backgroundColor: "rgba(216,189,184,0.28)",
+    backgroundColor: colors.accentTint,
     borderRadius: radii.pill,
     paddingHorizontal: spacing.smLg,
     paddingVertical: spacing.xs,
@@ -357,5 +314,4 @@ const styles = StyleSheet.create({
   tagFull: { backgroundColor: "rgba(74,74,74,0.07)" },
   tagLabel: { color: colors.primaryDeep, fontSize: typography.label, fontWeight: "600" },
   tagLabelFull: { color: colors.textSecondary },
-  time: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "600" },
 });

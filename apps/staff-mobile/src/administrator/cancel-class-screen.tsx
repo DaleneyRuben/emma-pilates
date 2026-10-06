@@ -7,11 +7,15 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  BranchPickerPill,
+  CardFooter,
   Chevron,
   boliviaCivilDate,
   civilDateRange,
   colors,
   dayChipLabel,
+  DetailLine,
+  fontFamilies,
   formatSessionDate,
   formatTimeRange,
   QueryFailure,
@@ -145,21 +149,11 @@ export function CancelClassScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      <Pressable
-        accessibilityLabel={`Sucursal: ${branchLabel}`}
-        accessibilityRole="button"
+      <BranchPickerPill
+        name={branchLabel}
         onPress={() => setChoosingBranch((current) => !current)}
-        style={styles.branchRow}
-      >
-        <BodyText style={styles.branchLabel}>Sucursal:</BodyText>
-        <Text style={styles.branchName}>{branchLabel}</Text>
-        <Chevron
-          direction={choosingBranch ? "up" : "down"}
-          size={16}
-          testID="branch-picker-chevron"
-          tone="muted"
-        />
-      </Pressable>
+        open={choosingBranch}
+      />
       {choosingBranch ? (
         <View style={styles.branchList}>
           <BodyText>Elige una sucursal</BodyText>
@@ -269,25 +263,33 @@ export function CancelClassScreen() {
                 }
                 style={styles.card}
               >
-                <View style={styles.cardBody}>
-                  <Text style={styles.time}>
-                    {formatTimeRange(session.startsAt, session.endsAt)}
-                  </Text>
-                  <Text style={styles.cardTitle}>{session.classTypeName}</Text>
-                  <Text style={styles.trainer}>
-                    {allBranches
-                      ? `${session.trainerName} · ${session.branchName}`
-                      : session.trainerName}
-                  </Text>
-                  <BodyText>
+                <View style={styles.cardHeader}>
+                  <View style={styles.cardTitles}>
+                    <Text style={styles.time}>
+                      {formatTimeRange(session.startsAt, session.endsAt)}
+                    </Text>
+                    <Text style={styles.cardTitle}>{session.classTypeName}</Text>
+                  </View>
+                  <Chevron />
+                </View>
+                <View style={styles.details}>
+                  <DetailLine icon="person" iconSize={16} style={styles.trainer}>
+                    {session.trainerName}
+                  </DetailLine>
+                  <DetailLine icon="pin" iconSize={15} style={styles.branch}>
+                    {`Sucursal ${allBranches ? session.branchName : branch.name}`}
+                  </DetailLine>
+                </View>
+                <CardFooter paddingTop={13}>
+                  <Text style={styles.booked}>
                     {describeCount(session.bookedCount, "reserva", "reservas")}
-                  </BodyText>
-                </View>
-                <View style={[styles.tag, full && styles.tagFull]}>
-                  <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
-                    {seatsTag(session)}
                   </Text>
-                </View>
+                  <View style={[styles.tag, full && styles.tagFull]}>
+                    <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
+                      {seatsTag(session)}
+                    </Text>
+                  </View>
+                </CardFooter>
               </Pressable>
             );
           })}
@@ -300,23 +302,34 @@ export function CancelClassScreen() {
 const styles = StyleSheet.create({
   // Horizontal strips keep their natural height when the list below is long.
   strip: { flexGrow: 0, flexShrink: 0 },
-  branchLabel: { color: colors.textMuted },
-  branchList: { gap: spacing.sm },
-  branchName: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
-  branchRow: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
-  card: {
-    ...surfaces.card,
-    alignItems: "center",
+  booked: { color: colors.textSecondary, fontSize: 14, fontVariant: ["tabular-nums"] },
+  branch: { color: colors.textMuted, fontSize: typography.note },
+  // S13's card (MOB-042): the chevron beside the time and title, the Trainer
+  // and Branch lines, then the booked count and the seat pill under a rule.
+  card: { ...surfaces.card, gap: 13, padding: spacing.lgXl },
+  cardHeader: {
+    alignItems: "flex-start",
     flexDirection: "row",
     gap: spacing.md,
-    padding: spacing.lg,
+    justifyContent: "space-between",
   },
-  cardBody: { flex: 1, gap: spacing.xxs },
   cardTitle: {
     color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
+    fontFamily: fontFamilies.heading,
+    fontSize: typography.titleCard,
   },
+  cardTitles: { flexShrink: 1, gap: spacing.smd },
+  details: { gap: 7 },
+  time: {
+    color: colors.textMuted,
+    fontFamily: fontFamilies.bodyMedium,
+    fontSize: typography.note,
+    fontVariant: ["tabular-nums"],
+    fontWeight: "500",
+    letterSpacing: 0.78,
+  },
+  trainer: { color: colors.text, fontSize: 14 },
+  branchList: { gap: spacing.sm },
   centered: { textAlign: "center" },
   chip: {
     borderColor: colors.borderStrong,
@@ -368,6 +381,4 @@ const styles = StyleSheet.create({
   tagFull: { backgroundColor: colors.disabledBackground },
   tagLabel: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "500" },
   tagLabelFull: { color: colors.textSecondary },
-  time: { color: colors.primaryDeep, fontWeight: "600" },
-  trainer: { color: colors.textSecondary, fontSize: typography.body, fontWeight: "500" },
 });

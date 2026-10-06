@@ -11,17 +11,19 @@ import { colors, spacing, typography } from "./tokens";
 export function DetailLine({
   children,
   icon,
+  iconColor,
   iconSize = 17,
   style,
 }: {
   children: string;
   icon: GlyphName;
+  iconColor?: string;
   iconSize?: number;
   style?: StyleProp<TextStyle>;
 }) {
   return (
     <View style={styles.line}>
-      <Glyph name={icon} size={iconSize} />
+      <Glyph color={iconColor} name={icon} size={iconSize} />
       <Text style={[styles.text, style]}>{children}</Text>
     </View>
   );

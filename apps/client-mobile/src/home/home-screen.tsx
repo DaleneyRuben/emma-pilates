@@ -8,10 +8,8 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
-  Chevron,
   colors,
   Heading,
-  LineIcon,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -30,8 +28,6 @@ import {
   Text,
   View,
 } from "react-native";
-import { Path, Rect } from "react-native-svg";
-
 import { useClientFetcher } from "../client-fetcher";
 import {
   describeAllowance,
@@ -41,6 +37,7 @@ import {
   referralShortcut,
   subscriptionBadge,
 } from "./home-format";
+import { ShortcutRow, ShortcutSection, ShortcutTile, ShortcutTiles } from "./home-shortcuts";
 import { PromotionsCarousel } from "./promotions-carousel";
 
 type HomeNavigation = {
@@ -134,57 +131,6 @@ function PurchaseCard({ onPurchase }: { onPurchase: () => void }) {
   );
 }
 
-function QuickAction({
-  chevron = false,
-  disabled = false,
-  label,
-  note,
-  onPress,
-  summary,
-}: {
-  /** 02's full-width shortcut ends in a chevron (a lock while disabled); its tiles do not. */
-  chevron?: boolean;
-  disabled?: boolean;
-  label: string;
-  note?: string;
-  onPress: () => void;
-  summary?: string;
-}) {
-  return (
-    <Pressable
-      accessibilityLabel={summary === undefined ? label : `${label}: ${summary}`}
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
-      onPress={onPress}
-      style={[styles.action, disabled && styles.actionDisabled]}
-    >
-      <View style={styles.actionBody}>
-        <Text style={[styles.actionLabel, disabled && styles.actionLabelDisabled]}>
-          {label}
-        </Text>
-        {disabled && note !== undefined ? (
-          <BodyText style={styles.actionNote}>{note}</BodyText>
-        ) : null}
-        {summary !== undefined ? (
-          <BodyText style={styles.actionNote}>{summary}</BodyText>
-        ) : null}
-      </View>
-      {!chevron ? null : disabled ? <ShortcutLock /> : <Chevron />}
-    </Pressable>
-  );
-}
-
-// 02's disabled shortcut ends in a quiet lock where the others end in the chevron (MOB-041).
-function ShortcutLock() {
-  return (
-    <LineIcon color={colors.iconQuiet} size={19} strokeWidth={1.3} testID="shortcut-lock">
-      <Rect height={9.5} rx={2.5} width={14} x={5} y={10.5} />
-      <Path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" />
-    </LineIcon>
-  );
-}
-
 export function HomeScreen() {
   const navigation = useNavigation<HomeNavigation>();
   const fetcher = useClientFetcher();
@@ -273,52 +219,39 @@ export function HomeScreen() {
         ) : (
           <PurchaseCard onPurchase={() => navigation.navigate("Plans")} />
         )}
-        <View style={styles.actions}>
-          <QuickAction
-            chevron
+        <ShortcutSection>
+          <ShortcutRow
             disabled={!hasActivePlan}
+            disabledNote="Necesitas un plan activo para reservar"
             label="Reservar una clase"
-            note="Necesitas un plan activo para reservar"
+            note="Horarios de esta semana"
             onPress={() => navigation.navigate("Booking")}
           />
-          <QuickAction
-            label="Evaluación nutricional"
-            onPress={() =>
-              navigation.navigate(
-                nextEvaluation === undefined ? "EvaluationAvailability" : "MyEvaluations",
-              )
-            }
-            summary={evaluationShortcut(nextEvaluation?.startsAt)}
-          />
-          <QuickAction
-            label="Mis referidos"
-            onPress={() => navigation.navigate("Referrals")}
-            summary={referralShortcut(referralCount)}
-          />
-        </View>
+          <ShortcutTiles>
+            <ShortcutTile
+              icon="trend"
+              label="Evaluación nutricional"
+              onPress={() =>
+                navigation.navigate(
+                  nextEvaluation === undefined ? "EvaluationAvailability" : "MyEvaluations",
+                )
+              }
+              summary={evaluationShortcut(nextEvaluation?.startsAt)}
+            />
+            <ShortcutTile
+              icon="person"
+              label="Mis referidos"
+              onPress={() => navigation.navigate("Referrals")}
+              summary={referralShortcut(referralCount)}
+            />
+          </ShortcutTiles>
+        </ShortcutSection>
       </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  action: {
-    ...surfaces.card,
-    alignItems: "center",
-    flexDirection: "row",
-    gap: spacing.mdLg,
-    padding: spacing.lg,
-  },
-  actionBody: { flex: 1, gap: spacing.xs },
-  actionDisabled: { backgroundColor: colors.disabledBackground },
-  actionLabel: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-  },
-  actionLabelDisabled: { color: colors.disabledText },
-  actionNote: { color: colors.textMuted, fontSize: typography.note },
-  actions: { gap: spacing.md },
   badge: {
     borderRadius: radii.pill,
     paddingHorizontal: spacing.smLg,

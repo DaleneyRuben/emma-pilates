@@ -1,10 +1,14 @@
 import { useListPendingPayments } from "@pilates/api-contracts";
 import {
+  AvatarCircle,
   BodyText,
+  CardFooter,
+  Chevron,
   colors,
+  DetailLine,
+  fontFamilies,
   formatBolivianos,
   formatNotificationTime,
-  initials,
   QueryFailure,
   radii,
   Screen,
@@ -125,21 +129,24 @@ export function PendingPaymentsScreen({
                 }
                 style={styles.card}
               >
-                <View style={styles.avatar}>
-                  <Text style={styles.avatarText}>{initials(payment.clientName)}</Text>
+                <View style={styles.cardHeader}>
+                  <View style={styles.identity}>
+                    <AvatarCircle fontSize={17} name={payment.clientName} size={44} />
+                    <View style={styles.cardBody}>
+                      <Text style={styles.name}>{payment.clientName}</Text>
+                      <Text style={styles.plan}>{payment.planName}</Text>
+                    </View>
+                  </View>
+                  <Chevron />
                 </View>
-                <View style={styles.cardBody}>
-                  <Text style={styles.name}>{payment.clientName}</Text>
-                  <BodyText>{payment.planName}</BodyText>
-                </View>
-                <View style={styles.cardTrailing}>
+                <CardFooter paddingTop={13}>
                   <Text style={styles.amount}>
                     {formatBolivianos(payment.amountDueCentavos)}
                   </Text>
-                  <BodyText style={styles.ago}>
+                  <DetailLine icon="clock" iconColor={colors.warning} iconSize={15} style={styles.ago}>
                     {formatNotificationTime(payment.submittedAt, now)}
-                  </BodyText>
-                </View>
+                  </DetailLine>
+                </CardFooter>
               </Pressable>
             ))}
           </>
@@ -157,31 +164,23 @@ const styles = StyleSheet.create({
   ago: { color: colors.textMuted, fontSize: typography.note },
   amount: {
     color: colors.text,
-    fontFamily: "Lora_500Medium",
-    fontSize: typography.bodyLarge,
+    fontFamily: fontFamilies.heading,
+    fontSize: typography.titleCard,
+    fontVariant: ["tabular-nums"],
   },
-  avatar: {
-    alignItems: "center",
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    height: 40,
-    justifyContent: "center",
-    width: 40,
-  },
-  avatarText: {
-    color: colors.primaryOnTint,
-    fontSize: typography.note,
-    fontWeight: "600",
-  },
-  card: {
-    ...surfaces.card,
-    alignItems: "center",
+  // S11's payment card (MOB-042): the avatar and the Lora name beside the
+  // chevron, then the amount and the amber clock under a rule.
+  card: { ...surfaces.card, gap: spacing.mdLg, padding: spacing.lgXl },
+  cardBody: { flexShrink: 1, gap: spacing.xs },
+  cardHeader: {
+    alignItems: "flex-start",
     flexDirection: "row",
     gap: spacing.md,
-    padding: spacing.lg,
+    justifyContent: "space-between",
   },
-  cardBody: { flex: 1, gap: spacing.xxs },
-  cardTrailing: { alignItems: "flex-end", gap: spacing.xxs },
+  identity: { alignItems: "center", flexDirection: "row", flexShrink: 1, gap: 13 },
+  name: { color: colors.text, fontFamily: fontFamilies.heading, fontSize: typography.titleSmall },
+  plan: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   centered: { textAlign: "center" },
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
   countBadge: {
@@ -201,7 +200,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
   },
-  name: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   notice: {
     alignItems: "center",
     backgroundColor: colors.success,
