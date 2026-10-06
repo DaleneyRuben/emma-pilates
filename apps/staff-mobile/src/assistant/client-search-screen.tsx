@@ -130,7 +130,7 @@ export function ClientSearchScreen() {
               <AvatarCircle fontSize={16} name={client.name} size={42} />
               <View style={styles.rowBody}>
                 <Text style={styles.name}>{client.name}</Text>
-                <Text style={styles.contact}>
+                <Text ellipsizeMode="tail" numberOfLines={1} style={styles.contact}>
                   {describeContact(client.phone, client.email)}
                 </Text>
               </View>
@@ -199,6 +199,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   // S04's result row (MOB-042): the avatar, the name over the contact, the chevron.
+  // The split view's column (MOB-046) gives the row the frame's 344 pt: the
+  // 360 pt panel minus the screen's 16 pt gutter, as the frame's 392 px panel
+  // minus its 24 px padding on each side.
   row: {
     ...surfaces.card,
     alignItems: "center",
