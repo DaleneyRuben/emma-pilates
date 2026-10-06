@@ -1329,7 +1329,8 @@ the worker command from Test 5) and log in as `camila.rojas@example.com`
 
 Type at least two characters in **Buscar por nombre, teléfono o correo**
 ("luc", "7001", or "lucia@"). Each result is a white row with the Client's
-first letter in a tinted circle, her name over «phone · email», and a Palo de
+first letter in a tinted circle, her name over «phone · email» (one line,
+trimmed with an ellipsis when the row is narrower, MOB-046), and a Palo de
 rosa chevron (MOB-042); a still-pending Client carries a **Pendiente** tag
 before the chevron. With no match the screen
 reads "No se encontró ningún cliente." and keeps **+ Nuevo cliente** as the
@@ -1435,7 +1436,8 @@ with Expo Go installed. **Buscar cliente** becomes a split view: the search
 and results sit in a left column and the right panel shows a person icon in
 a circle, "Selecciona un cliente para ver sus detalles", and "Busca por
 nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin
-perder la lista.". Tapping a result highlights it and shows her
+perder la lista.". A result row keeps «phone · email» on one trimmed line in
+the 360 pt column (MOB-046). Tapping a result highlights it and shows her
 overview in the right panel without navigating away; **Ver reservas** and
 **Ver historial completo** also open in that panel (the empty reservations
 state centres in the panel with its button), with **Volver** returning
