@@ -146,7 +146,7 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
                   <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;font-variant-numeric:tabular-nums;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>8 de 8 reservados</span>
-                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Completa</span>
+                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(216,201,187,0.34);color:#6E6663;">Completa</span>
                 </div>
               </div>
 
@@ -161,7 +161,7 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
                   <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;font-variant-numeric:tabular-nums;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>6 de 10 reservados</span>
-                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(216,201,187,0.34);color:#6E6663;">Con cupos</span>
+                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:#EFE0DC;color:#7A4F4B;">Con cupos</span>
                 </div>
               </div>
 
@@ -176,7 +176,7 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
                   <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;font-variant-numeric:tabular-nums;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>3 de 8 reservados</span>
-                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(216,201,187,0.34);color:#6E6663;">Con cupos</span>
+                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:#EFE0DC;color:#7A4F4B;">Con cupos</span>
                 </div>
               </div>
             </div>
@@ -304,8 +304,8 @@ class Component extends DCLogic {
           time: s.time, type: s.type, branch: s.branch,
           booked: s.booked + " de " + s.cap + " reservados",
           tagLabel: full ? "Completa" : "Con cupos",
-          tagBg: full ? "rgba(124,148,115,0.16)" : "rgba(216,201,187,0.34)",
-          tagColor: full ? "#5E7256" : "#6E6663"
+          tagBg: full ? "rgba(216,201,187,0.34)" : "#EFE0DC",
+          tagColor: full ? "#6E6663" : "#7A4F4B"
         };
       })
     };

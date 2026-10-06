@@ -190,7 +190,7 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
                   <span style="font-size:14px;color:#6E6663;font-variant-numeric:tabular-nums;">8 reservas</span>
-                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(124,148,115,0.16);color:#5E7256;">Llena</span>
+                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(216,201,187,0.34);color:#6E6663;">Llena</span>
                 </div>
               </div>
 
@@ -208,7 +208,7 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
                   <span style="font-size:14px;color:#6E6663;font-variant-numeric:tabular-nums;">6 reservas</span>
-                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(216,201,187,0.34);color:#6E6663;">4 cupos</span>
+                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:#EFE0DC;color:#7A4F4B;">4 cupos</span>
                 </div>
               </div>
 
@@ -226,7 +226,7 @@
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:13px;border-top:1px solid #EFE7DE;">
                   <span style="font-size:14px;color:#6E6663;font-variant-numeric:tabular-nums;">10 reservas</span>
-                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(216,201,187,0.34);color:#6E6663;">2 cupos</span>
+                  <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:#EFE0DC;color:#7A4F4B;">2 cupos</span>
                 </div>
               </div>
             </div>
@@ -339,8 +339,8 @@ class Component extends DCLogic {
           branch: "Sucursal " + s.branch,
           booked: s.booked === 1 ? "1 reserva" : s.booked + " reservas",
           tagLabel: full ? "Llena" : (s.cap - s.booked) + " cupos",
-          tagBg: full ? "rgba(124,148,115,0.16)" : "rgba(216,201,187,0.34)",
-          tagColor: full ? "#5E7256" : "#6E6663"
+          tagBg: full ? "rgba(216,201,187,0.34)" : "#EFE0DC",
+          tagColor: full ? "#6E6663" : "#7A4F4B"
         };
       })
     };

@@ -155,6 +155,11 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 
 - A 44px pill (1px `#D8C9BB`, Blanco, padding 0 16, gap 10, radius 999) with a 17px `#B78380` pin, «Sucursal: » and the Branch name in 14px `#4A4A4A` (the name at weight 500), and the 16px `#766D69` chevron pointing down; it opens the picker sheet above. `S13` offers «Todas las sucursales» as a name.
 
+### Seat pills (`03`, `06`, `S02`, `S07`, `S08`, `S13`)
+
+- The pill on a Session row or detail says how many places remain or that none does; the number or word carries the state, so it takes no dot.
+- Seats remain («N cupos», «Con cupos»): Palo de rosa tinte `#EFE0DC` behind Palo de rosa oscuro `#7A4F4B`, the badge pair of the palette table. Full («Lleno», «Completa», «Llena»): `rgba(216,201,187,0.34)` behind Texto secundario `#6E6663`, never Error red and never Éxito green. 12px, weight 500, fully rounded.
+
 ---
 
 ## Admin web — shell (shared by AW02–AW29, AW31, AW33)

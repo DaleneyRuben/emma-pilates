@@ -185,7 +185,7 @@
                     <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">07:00 – 07:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
-                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:rgba(74,74,74,0.07);color:#6E6663;font-size:12px;font-weight:500;white-space:nowrap;">Lleno</span>
+                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:rgba(216,201,187,0.34);color:#6E6663;font-size:12px;font-weight:500;white-space:nowrap;">Lleno</span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
                   <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;">
@@ -201,7 +201,7 @@
                     <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">09:00 – 09:50</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
-                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:rgba(216,189,184,0.28);color:#8A5F5C;font-size:12px;font-weight:500;white-space:nowrap;">2 cupos</span>
+                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;font-size:12px;font-weight:500;white-space:nowrap;">2 cupos</span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
                   <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;">
@@ -217,7 +217,7 @@
                     <span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">18:30 – 19:20</span>
                     <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Reformer Pilates</span>
                   </div>
-                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:rgba(216,189,184,0.28);color:#8A5F5C;font-size:12px;font-weight:500;white-space:nowrap;">6 cupos</span>
+                  <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;font-size:12px;font-weight:500;white-space:nowrap;">6 cupos</span>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
                   <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;">
@@ -333,8 +333,8 @@ class Component extends DCLogic {
       type: s.type,
       trainer: s.trainer,
       tagLabel: s.spots === 0 ? "Lleno" : s.spots + (s.spots === 1 ? " cupo" : " cupos"),
-      tagBg: s.spots === 0 ? "rgba(74,74,74,0.07)" : "rgba(216,189,184,0.28)",
-      tagColor: s.spots === 0 ? "#6E6663" : "#8A5F5C"
+      tagBg: s.spots === 0 ? "rgba(216,201,187,0.34)" : "#EFE0DC",
+      tagColor: s.spots === 0 ? "#6E6663" : "#7A4F4B"
     }));
 
     const branches = [
