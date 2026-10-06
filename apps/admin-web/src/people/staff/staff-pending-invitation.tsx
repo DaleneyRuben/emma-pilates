@@ -105,23 +105,6 @@ export function PendingInvitation({
           <p className="text-ayuda text-texto-muy-tenue">
             {`Los enlaces enviados a ${email} dejarán de funcionar; enviaremos uno nuevo de 7 días.`}
           </p>
-          <div className="flex gap-2">
-            <Button
-              variant="neutral"
-              className={cn(cardButton, "flex-1")}
-              disabled={change.isPending || accountWaiting}
-              onClick={() => void correct()}
-            >
-              Guardar correo
-            </Button>
-            <Button
-              variant="neutral"
-              className={cn(cardButton, "flex-1")}
-              onClick={() => setEditing(false)}
-            >
-              Cancelar
-            </Button>
-          </div>
         </div>
       ) : (
         <div className="flex items-center justify-between gap-2.5">
@@ -148,7 +131,25 @@ export function PendingInvitation({
         Si no activa su cuenta en 30 días desde el último envío o cambio, la
         invitación se elimina. Es distinto de los 7 días de cada enlace.
       </p>
-      {editing ? null : (
+      {editing ? (
+        <div className="flex gap-2">
+          <Button
+            variant="neutral"
+            className={cn(cardButton, "flex-1")}
+            disabled={change.isPending || accountWaiting}
+            onClick={() => void correct()}
+          >
+            Guardar correo
+          </Button>
+          <Button
+            variant="neutral"
+            className={cn(cardButton, "flex-1")}
+            onClick={() => setEditing(false)}
+          >
+            Cancelar
+          </Button>
+        </div>
+      ) : (
         <Button
           variant="neutral"
           className={cardButton}
