@@ -220,7 +220,7 @@ export function ConfirmCashPaymentScreen({
 const styles = StyleSheet.create({
   branches: { gap: spacing.sm },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.sm,
     padding: spacing.lg,

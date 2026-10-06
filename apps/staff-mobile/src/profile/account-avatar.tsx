@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
   // 2 px ring in the header background.
   dot: {
     backgroundColor: colors.primaryDeep,
-    borderColor: colors.background,
+    borderColor: colors.surface,
     borderRadius: radii.pill,
     borderWidth: 2,
     height: 12,

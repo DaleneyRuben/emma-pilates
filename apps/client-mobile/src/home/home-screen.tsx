@@ -283,7 +283,7 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   action: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,
@@ -305,7 +305,7 @@ const styles = StyleSheet.create({
   },
   badgeText: { fontSize: typography.label, fontWeight: "600" },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.sm,
     padding: spacing.lg,

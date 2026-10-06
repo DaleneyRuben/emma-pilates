@@ -186,7 +186,7 @@ export function RescheduleScreen({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderColor: colors.border,
     borderRadius: radii.card,
     borderWidth: 2,

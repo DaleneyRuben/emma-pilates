@@ -433,7 +433,7 @@ export function StaffNavigation({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,
@@ -466,7 +466,7 @@ const styles = StyleSheet.create({
   datePicker: { gap: spacing.sm, paddingVertical: spacing.lg },
   list: { gap: spacing.md, paddingBottom: spacing.lg },
   rosterRow: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.lg,

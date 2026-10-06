@@ -180,7 +180,7 @@ const styles = StyleSheet.create({
   },
   codeCard: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.xl,
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
   creditLabel: { color: colors.text, fontSize: typography.body },
   creditRow: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     flexDirection: "row",
     justifyContent: "space-between",
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   pendingText: { color: colors.warningText },
   row: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,

@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
   },
   badgeText: { color: colors.warningText, fontSize: typography.label, fontWeight: "600" },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,

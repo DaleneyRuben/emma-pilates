@@ -1,4 +1,4 @@
-import { BodyText, colors, radii, spacing, typography } from "@pilates/mobile-core";
+import { BodyText, colors, spacing, typography } from "@pilates/mobile-core";
 import {
   NavigationContext,
   useNavigation,
@@ -85,8 +85,6 @@ export function ClientDetailPanel() {
 const styles = StyleSheet.create({
   empty: {
     alignItems: "center",
-    backgroundColor: colors.surface,
-    borderRadius: radii.card,
     flex: 1,
     justifyContent: "center",
     margin: spacing.lg,

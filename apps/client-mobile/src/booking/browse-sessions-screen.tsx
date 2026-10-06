@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
   branchAddress: { fontSize: typography.note },
   branchChip: {
     alignSelf: "flex-start",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderColor: colors.borderStrong,
     borderRadius: radii.pill,
     borderWidth: 1,
@@ -299,14 +299,14 @@ const styles = StyleSheet.create({
   },
   branchText: { flex: 1, gap: spacing.xxs },
   branchSheet: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,
   },
   card: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,

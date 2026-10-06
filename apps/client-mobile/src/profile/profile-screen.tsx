@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   logoutText: { color: colors.textSecondary, fontSize: typography.body },
   logoutTextPressed: { color: colors.errorText },
   menu: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     overflow: "hidden",
   },
@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
   screen: { gap: spacing.lg },
   summary: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,

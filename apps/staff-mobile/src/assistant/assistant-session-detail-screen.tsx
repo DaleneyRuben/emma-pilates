@@ -276,7 +276,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
   },
   capacity: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.sm,
     padding: spacing.lg,
@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   factRow: { flexDirection: "row", justifyContent: "space-between" },
   factValue: { color: colors.text, fontSize: typography.body },
   facts: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.lg,

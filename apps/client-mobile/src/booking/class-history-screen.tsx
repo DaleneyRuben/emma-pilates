@@ -105,7 +105,7 @@ export function ClassHistoryScreen() {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xxs,
     padding: spacing.lg,

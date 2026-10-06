@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
   branchRow: { alignItems: "center", flexDirection: "row", gap: spacing.sm },
   card: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,

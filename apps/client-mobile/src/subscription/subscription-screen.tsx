@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
   },
   badgeText: { fontSize: typography.label, fontWeight: "600" },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.sm,
     padding: spacing.lg,
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
   purchase: { gap: spacing.sm },
   warningNote: { color: colors.warningText, fontSize: typography.note },
   dates: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.md,
     padding: spacing.lg,

@@ -12,7 +12,7 @@ export function Screen({ style, ...props }: SafeAreaViewProps) {
 
 const styles = StyleSheet.create({
   screen: {
-    backgroundColor: colors.background,
+    backgroundColor: colors.surface,
     flex: 1,
     padding: spacing.lg,
   },

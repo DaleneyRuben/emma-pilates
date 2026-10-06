@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   },
   bar: {
     alignItems: "center",
-    borderBottomColor: colors.divider,
+    borderBottomColor: colors.rule,
     borderBottomWidth: 1,
     flexDirection: "row",
     gap: spacing.smd,

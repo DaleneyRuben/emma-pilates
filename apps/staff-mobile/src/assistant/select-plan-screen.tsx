@@ -124,7 +124,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
 const styles = StyleSheet.create({
   card: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderColor: colors.border,
     borderRadius: radii.card,
     borderWidth: 1,

@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   group: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     overflow: "hidden",
   },
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   screen: { gap: spacing.lg },
   summary: {
     alignItems: "flex-start",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     flexDirection: "row",
     gap: spacing.md,

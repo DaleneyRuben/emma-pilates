@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   day: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderColor: colors.border,
     borderRadius: radii.card,
     borderWidth: 1,

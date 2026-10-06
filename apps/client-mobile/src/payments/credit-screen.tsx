@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   centered: { textAlign: "center" },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   origin: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.sm,
     padding: spacing.lg,

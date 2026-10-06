@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   },
   badgeIcon: { color: colors.white, fontSize: typography.title },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,

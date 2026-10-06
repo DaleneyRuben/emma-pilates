@@ -22,6 +22,8 @@ export const colors = {
   borderStrong: "#D8C9BB",
   border: "#E4D8CC",
   divider: "#F2EBE2",
+  // The rule under a screen's header in the mobile frames (MOB-038).
+  rule: "#EFE7DE",
   success: "#7C9473",
   successText: "#5F7457",
   warning: "#C99A4E",
@@ -33,6 +35,8 @@ export const colors = {
   // The rule between a pending card's notes (S06).
   warningRule: "rgba(201,154,78,0.28)",
   errorTint: "rgba(178,93,75,0.08)",
+  // The dashed empty-state box on Superficie (S06 «Sin plan activo»).
+  neutralTint: "rgba(216,201,187,0.14)",
   disabledBackground: "#E7DCD8",
   disabledText: "#B3A9A5",
 } as const;

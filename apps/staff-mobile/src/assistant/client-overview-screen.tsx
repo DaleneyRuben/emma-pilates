@@ -50,7 +50,7 @@ function SubscriptionCard({
   const subscription = view.subscription;
   if (subscription === null || subscription === undefined) {
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, styles.noPlan]}>
         <Text style={styles.cardTitle}>Sin plan activo</Text>
         <BodyText style={styles.muted}>
           Registra un pago en efectivo para activar un plan.
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
   badgeLabelActive: { color: colors.successText },
   badgeLabelExpired: { color: colors.errorText },
   card: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,
@@ -226,5 +226,11 @@ const styles = StyleSheet.create({
   historyTitle: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   label: { color: colors.textMuted, fontSize: typography.label, textTransform: "uppercase" },
   muted: { color: colors.textMuted, fontSize: typography.note },
+  noPlan: {
+    backgroundColor: colors.neutralTint,
+    borderColor: colors.borderStrong,
+    borderStyle: "dashed",
+    borderWidth: 1,
+  },
   screen: { gap: spacing.md },
 });

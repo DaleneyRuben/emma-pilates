@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
   },
   amountCard: {
     alignItems: "center",
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,

@@ -130,14 +130,14 @@ const styles = StyleSheet.create({
   destructiveLabel: { color: colors.white, fontSize: typography.body, fontWeight: "500" },
   failure: { color: colors.errorText },
   receipt: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.sm,
     padding: spacing.lg,
   },
   screen: { gap: spacing.lg },
   summary: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.white,
     borderRadius: radii.card,
     gap: spacing.xs,
     padding: spacing.lg,
