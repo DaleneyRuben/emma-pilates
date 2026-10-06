@@ -84,5 +84,11 @@ describe("AW24's pending card surface", () => {
         "flex-1",
       );
     }
+    // Where «Reenviar enlace» sits: after the two lifetimes.
+    const note = card.getByText(/^Si no activa su cuenta/);
+    const save = card.getByRole("button", { name: "Guardar correo" });
+    expect(
+      note.compareDocumentPosition(save) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).not.toBe(0);
   });
 });
