@@ -7,11 +7,17 @@ import { Input } from "../../components/ui/input";
 import { Label } from "../../components/ui/label";
 import { StatusPill } from "../../components/ui/status-pill";
 import { boliviaParts, formatCivilDate } from "../../lib/bolivia-time";
+import { cn } from "../../lib/cn";
 import type { EmailLimit } from "./use-email-limit";
 import { isAccountEmailLimit, staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 
 type Result = { ok: true; message: string } | { ok: false; message: string };
+
+// AW24 draws the card's actions as full-width 40 px white buttons whose
+// disabled state keeps the white fill under a disabled-tone border.
+const cardButton =
+  "h-10 w-full bg-blanco text-fila-menu hover:text-primario disabled:border-deshabilitado disabled:bg-blanco";
 
 /**
  * AW24's pending invitation (follow-ups 35–36, WEB-012): the address with
@@ -82,8 +88,10 @@ export function PendingInvitation({
     );
 
   return (
-    <section className="flex flex-col items-start gap-2 rounded-control border border-advertencia/40 bg-advertencia/10 px-3 py-3">
-      <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
+    <section className="flex flex-col gap-2.5 rounded-panel border border-borde bg-superficie-sutil p-3.5">
+      <div>
+        <StatusPill tone="advertencia">Pendiente de activación</StatusPill>
+      </div>
       {editing ? (
         <div className="flex w-full flex-col gap-2">
           <Label htmlFor={fieldId}>Nuevo correo</Label>
@@ -94,26 +102,30 @@ export function PendingInvitation({
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
           />
-          <p className="text-ayuda text-texto-tenue">
+          <p className="text-ayuda text-texto-muy-tenue">
             {`Los enlaces enviados a ${email} dejarán de funcionar; enviaremos uno nuevo de 7 días.`}
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex gap-2">
             <Button
-              variant="secondary"
-              size="sm"
+              variant="neutral"
+              className={cn(cardButton, "flex-1")}
               disabled={change.isPending || accountWaiting}
               onClick={() => void correct()}
             >
               Guardar correo
             </Button>
-            <Button variant="link" size="sm" onClick={() => setEditing(false)}>
+            <Button
+              variant="neutral"
+              className={cn(cardButton, "flex-1")}
+              onClick={() => setEditing(false)}
+            >
               Cancelar
             </Button>
           </div>
         </div>
       ) : (
-        <p className="flex flex-wrap items-baseline gap-x-3 text-nota text-texto">
-          {email}
+        <div className="flex items-center justify-between gap-2.5">
+          <span className="break-all text-fila-menu text-texto">{email}</span>
           <Button
             variant="link"
             size="sm"
@@ -125,21 +137,21 @@ export function PendingInvitation({
           >
             Cambiar correo
           </Button>
-        </p>
+        </div>
       )}
-      <p className="text-ayuda text-advertencia-texto">
+      <p className="text-[12.5px] leading-normal text-texto-secundario">
         {expiresAt === null || expiresAt === undefined
           ? "El último enlace ya no es válido; envía uno nuevo."
           : `El enlace vence el ${formatCivilDate(boliviaParts(expiresAt).date)}.`}
       </p>
-      <p className="text-ayuda text-texto-tenue">
+      <p className="text-ayuda text-texto-muy-tenue">
         Si no activa su cuenta en 30 días desde el último envío o cambio, la
         invitación se elimina. Es distinto de los 7 días de cada enlace.
       </p>
       {editing ? null : (
         <Button
-          variant="secondary"
-          size="sm"
+          variant="neutral"
+          className={cardButton}
           disabled={change.isPending || waiting}
           onClick={() => void resend()}
         >
