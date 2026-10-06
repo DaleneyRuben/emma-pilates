@@ -2,7 +2,7 @@
 
 Targets: **Staff `S13`** (the «Incluye clases llenas» note in the notes card
 only). Send [30](./30-invariants-checklist.md) alongside this follow-up;
-like [71](./71-aw24-reset-password-bullet.md) it corrects a sentence the
+like [71](./71-readme-aw24-password-reset-leftover.md) it corrects a sentence the
 design makes about its own behaviour.
 
 ---

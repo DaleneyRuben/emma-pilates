@@ -6,7 +6,7 @@ Targets: **Client `03`, `05`, `06`, `08`, `09`, `15`, `16`, `19`, `01`,
 **Admin web `AW01`, `AW03`, `AW24`**; **generated handoff
 `design/README.md`** (a new «Seat pills» section after «Branch picker pill
 (`03`, `S07`, `S13`)»). Send [30](./30-invariants-checklist.md) alongside
-this follow-up; like [72](./72-outlined-button-label-tone.md) it is a
+this follow-up; like [72](./72-app-outlined-button-labels.md) it is a
 colour-only sweep that settles one value where the frames disagree with the
 README's closed palette and with each other. Colours change; no size,
 spacing, copy, or structure does.
