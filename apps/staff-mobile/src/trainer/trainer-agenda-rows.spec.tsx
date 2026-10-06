@@ -1,4 +1,4 @@
-import { cleanup, render, waitFor } from "@testing-library/react-native";
+import { cleanup, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -69,11 +69,23 @@ describe("Trainer agenda rows", () => {
     expect(screen.getByText("6 de 8 reservados")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
     expect(screen.getAllByTestId("glyph-person", hidden)[0]).toHaveProp("width", 17);
     expect(screen.getAllByTestId("card-footer")[0]).toHaveStyle({ paddingTop: 13 });
-    expect(screen.getByText("Con cupos")).toHaveStyle({ color: "#6E6663" });
-    expect(screen.getByText("Con cupos").parent).toHaveStyle({
+    // MOB-047: follow-up 84's seat pill — «Con cupos» on Palo de rosa tinte,
+    // «Completa» on the neutral pill (never Éxito green), 12 pt weight 500.
+    const open = within(screen.getByRole("button", { name: "Reformer Pilates" }));
+    expect(open.getByTestId("seat-pill")).toHaveStyle({
+      backgroundColor: "#EFE0DC",
+      borderRadius: 999,
+    });
+    expect(open.getByText("Con cupos")).toHaveStyle({
+      color: "#7A4F4B",
+      fontSize: 12,
+      fontWeight: "500",
+    });
+    const full = within(screen.getByRole("button", { name: "Mat Pilates" }));
+    expect(full.getByTestId("seat-pill")).toHaveStyle({
       backgroundColor: "rgba(216,201,187,0.34)",
     });
-    expect(screen.getByText("Completa")).toHaveStyle({ color: "#5F7457" });
+    expect(full.getByText("Completa")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
     const chevrons = screen.getAllByTestId("chevron", hidden);
     expect(chevrons).toHaveLength(2);
     expect(chevrons[0]).toHaveProp("stroke", "#B78380");

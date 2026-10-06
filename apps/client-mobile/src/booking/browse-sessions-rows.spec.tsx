@@ -52,7 +52,7 @@ describe("Client class list rows", () => {
     clearMobileQueryCache();
   });
 
-  it("draws the picker pill and the Session cards as the frame does", async () => {
+  async function openClassList() {
     const screen = await render(
       <App
         runtime={createClientRuntime(
@@ -79,14 +79,6 @@ describe("Client class list rows", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
     });
-
-    const pill = screen.getByRole("button", { name: "Sucursal: Centro" });
-    expect(pill).toHaveStyle({ borderRadius: 999, minHeight: 44 });
-    expect(screen.getByTestId("glyph-pin", hidden)).toHaveProp("width", 17);
-    const picker = screen.getByTestId("branch-picker-chevron", hidden);
-    expect(picker).toHaveProp("stroke", "#766D69");
-    expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
-
     await waitFor(() => {
       expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })).toHaveLength(2);
     });
@@ -95,6 +87,19 @@ describe("Client class list rows", () => {
     const cards = screen
       .getAllByRole("button", { name: /^Reformer Pilates \d/ })
       .map((card) => within(card));
+    return { cards, screen };
+  }
+
+  it("draws the picker pill and the Session cards as the frame does", async () => {
+    const { cards, screen } = await openClassList();
+
+    const pill = screen.getByRole("button", { name: "Sucursal: Centro" });
+    expect(pill).toHaveStyle({ borderRadius: 999, minHeight: 44 });
+    expect(screen.getByTestId("glyph-pin", hidden)).toHaveProp("width", 17);
+    const picker = screen.getByTestId("branch-picker-chevron", hidden);
+    expect(picker).toHaveProp("stroke", "#766D69");
+    expect(screen.getByTestId("branch-picker-chevron-down", hidden)).toBeOnTheScreen();
+
     expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({
       fontFamily: "Lora_500Medium",
       fontSize: 19,
@@ -107,5 +112,25 @@ describe("Client class list rows", () => {
       expect(chevron).toHaveProp("stroke", "#B78380");
       expect(chevron).toHaveProp("width", 19);
     }
+  });
+
+  // MOB-047: follow-up 84's seat pill — the seats on Palo de rosa tinte, a
+  // full class on the neutral pill, 12 pt weight 500, never red, no dot.
+  it("draws the seat pills as follow-up 84 settles them", async () => {
+    const { cards } = await openClassList();
+
+    expect(cards[0].getByTestId("seat-pill")).toHaveStyle({
+      backgroundColor: "#EFE0DC",
+      borderRadius: 999,
+    });
+    expect(cards[0].getByText("3 cupos")).toHaveStyle({
+      color: "#7A4F4B",
+      fontSize: 12,
+      fontWeight: "500",
+    });
+    expect(cards[1].getByTestId("seat-pill")).toHaveStyle({
+      backgroundColor: "rgba(216,201,187,0.34)",
+    });
+    expect(cards[1].getByText("Lleno")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
   });
 });

@@ -44,7 +44,7 @@ const session = {
   waitlistCount: 0,
 };
 
-async function openPayments() {
+async function openPayments(sessions = [session]) {
   const screen = await render(
     <App
       runtime={createStaffRuntime(
@@ -59,7 +59,7 @@ async function openPayments() {
               { id: "class-reformer", name: "Reformer Pilates", description: "", durationMinutes: 50 },
             ]),
           [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
-            () => jsonResponse([session]),
+            () => jsonResponse(sessions),
         }),
         "administrator",
       )}
@@ -136,5 +136,33 @@ describe("Administrator rows", () => {
     const chevron = card.getByTestId("chevron", hidden);
     expect(chevron).toHaveProp("stroke", "#B78380");
     expect(chevron).toHaveProp("width", 19);
+  });
+
+  // MOB-047: follow-up 84's seat pill — the seats on Palo de rosa tinte, a
+  // full class on the neutral pill, 12 pt weight 500, never red, no dot.
+  it("draws the seat pills as follow-up 84 settles them", async () => {
+    const full = { ...session, id: "session-full", bookedCount: 12, availableSeats: 0 };
+    const screen = await openPayments([session, full]);
+
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
+    await waitFor(() => {
+      expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })).toHaveLength(2);
+    });
+    const cards = screen
+      .getAllByRole("button", { name: /^Reformer Pilates \d/ })
+      .map((card) => within(card));
+    expect(cards[0].getByTestId("seat-pill")).toHaveStyle({
+      backgroundColor: "#EFE0DC",
+      borderRadius: 999,
+    });
+    expect(cards[0].getByText("6 cupos")).toHaveStyle({
+      color: "#7A4F4B",
+      fontSize: 12,
+      fontWeight: "500",
+    });
+    expect(cards[1].getByTestId("seat-pill")).toHaveStyle({
+      backgroundColor: "rgba(216,201,187,0.34)",
+    });
+    expect(cards[1].getByText("Llena")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
   });
 });
