@@ -12,10 +12,11 @@ const pendingCard = (panel: HTMLElement) => {
   return card;
 };
 
-// The full-width, 40 px white button of AW24's pending card, with the frame's
-// disabled border instead of the filled disabled button.
+// The full-width, 40 px white button of AW24's pending card (in px: the root
+// is 15 px, so 2.5rem draws 37.5), with the frame's disabled border instead
+// of the filled disabled button.
 const cardButton = [
-  "h-10",
+  "h-[40px]",
   "w-full",
   "bg-blanco",
   "border-borde-fuerte",
