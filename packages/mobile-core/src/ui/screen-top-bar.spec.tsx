@@ -21,6 +21,16 @@ describe("ScreenTopBar on an app screen", () => {
     expect(onBack).toHaveBeenCalled();
   });
 
+  // MOB-038: the frames' header rule, which reads on Superficie.
+  it("draws its bottom rule in the frames' header rule tone", async () => {
+    const screen = await render(<ScreenTopBar onBack={jest.fn()} title="Mi crédito" />);
+
+    expect(screen.getByTestId("screen-top-bar")).toHaveStyle({
+      borderBottomColor: "#EFE7DE",
+      borderBottomWidth: 1,
+    });
+  });
+
   it("draws 04's muted context label instead of a title", async () => {
     const screen = await render(
       <ScreenTopBar fullBleed onBack={jest.fn()} title="Reservar una clase" tone="context" />,

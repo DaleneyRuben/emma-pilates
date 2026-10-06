@@ -27,11 +27,12 @@ describe("mobile UI primitives", () => {
     });
   });
 
-  it("uses the design background for application screens", async () => {
+  // MOB-038: every Client and Staff frame draws its screen on Superficie.
+  it("draws application screens on Superficie, as the mobile frames do", async () => {
     const screen = await render(<Screen testID="app-screen" />);
 
     expect(screen.getByTestId("app-screen")).toHaveStyle({
-      backgroundColor: "#F2ECE5",
+      backgroundColor: "#FAF7F2",
     });
   });
 
