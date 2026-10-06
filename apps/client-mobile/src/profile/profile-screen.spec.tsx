@@ -68,10 +68,12 @@ describe("Client Profile", () => {
   it("ends every Perfil row in the quiet chevron", async () => {
     const screen = await openProfile();
 
-    const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
+    // The Inicio tab is mounted too, so count the quiet ones only.
+    const chevrons = screen
+      .getAllByTestId("chevron", { includeHiddenElements: true })
+      .filter((chevron) => chevron.props.stroke === "#C4BAB6");
     expect(chevrons).toHaveLength(7);
     for (const chevron of chevrons) {
-      expect(chevron).toHaveProp("stroke", "#C4BAB6");
       expect(chevron).toHaveProp("width", 19);
     }
     expect(screen.queryByText("›")).toBeNull();

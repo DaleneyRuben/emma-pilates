@@ -108,10 +108,12 @@ describe("Referrals and Credit", () => {
     expect(screen.getByText("Tu crédito")).toBeOnTheScreen();
     expect(screen.getByText("Bs 60")).toBeOnTheScreen();
     // MOB-041: 16's «Tu crédito» row ends in the 19 pt Palo de rosa chevron.
-    expect(screen.getByTestId("chevron", { includeHiddenElements: true })).toHaveProp(
-      "stroke",
-      "#B78380",
-    );
+    expect(
+      screen
+        .getAllByTestId("chevron", { includeHiddenElements: true })
+        .map((chevron) => chevron.props.stroke),
+    ).toContain("#B78380");
+    expect(screen.queryByText("›")).toBeNull();
     expect(screen.getByText("Tus invitaciones")).toBeOnTheScreen();
     expect(screen.getByText("Sofía G.")).toBeOnTheScreen();
     expect(screen.getByText("Primer pago el 12 de septiembre")).toBeOnTheScreen();
