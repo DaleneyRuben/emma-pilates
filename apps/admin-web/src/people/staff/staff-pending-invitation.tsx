@@ -17,7 +17,7 @@ type Result = { ok: true; message: string } | { ok: false; message: string };
 // AW24 draws the card's actions as full-width 40 px white buttons whose
 // disabled state keeps the white fill under a disabled-tone border.
 const cardButton =
-  "h-10 w-full bg-blanco text-fila-menu hover:text-primario disabled:border-deshabilitado disabled:bg-blanco";
+  "h-[40px] w-full bg-blanco text-fila-menu hover:text-primario disabled:border-deshabilitado disabled:bg-blanco";
 
 /**
  * AW24's pending invitation (follow-ups 35–36, WEB-012): the address with
