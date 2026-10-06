@@ -65,6 +65,8 @@ Do not introduce colors outside this list. Tints are the semantic color at low a
 | Borde fuerte | `#D8C9BB` | Frame borders, input borders, Client and Staff card borders |
 | Borde | `#E4D8CC` | Admin-web card and table borders |
 | Divisor | `#F2EBE2` | Row separators inside cards |
+| Regla | `#EFE7DE` | The rule under a Client or Staff header bar, between list rows drawn on Superficie, and under a card's footer line |
+| Icono tenue | `#C4BAB6` | Quiet line icons: the 34px empty-state glyphs and the 19px row chevrons on Client and Staff screens |
 | Éxito | `#7C9473` (texto `#5F7457`) | Confirmed, active, attended, income |
 | Advertencia | `#C99A4E` (texto `#9A7434`) | Pending, low stock |
 | Error | `#B25D4B` (texto `#94493A`) | Cancelled, overdue, no-show, destructive, expenses |
@@ -128,6 +130,13 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - A selectable card marks selection by its border alone: 2px `#B78380` (`06`'s and `08`'s options) or 1px `#B78380` (`S15`).
 - Chips and day pickers round at 12, notices at 10, inputs at 8; none of them is a card.
 - An empty state is a dashed 1px `#D8C9BB` box, radius 16, on `rgba(216,201,187,0.14)`, centred: a 26px `#B78380` line icon, a Lora 19 weight-500 title, and a 13px `#766D69` note (`03`, `06`, `16`, `S04`'s search miss, `S06`). The tablet's empty right panel (`S04`) draws no box: the person icon in a 64px circle (1px `#D8C9BB` on `rgba(216,201,187,0.18)`), a Lora 22 weight-400 title, and a 14px `#766D69` helper line up to 340px wide.
+
+### Lists between rules (Client and Staff)
+
+- A read-only list drawn directly on Superficie (`07`, `S22`) puts each item in a row with 16px vertical padding and a 1px `#EFE7DE` rule under every row but the last of its group; no card, no shadow, no chevron.
+- The history row: a 38px day column (Lora 20 weight-500 day of the month, zero-padded, over the 10px uppercase `0.1em` `#7A716D` weekday), then the Class Type in Lora 17 weight-500 over «Entrenadora · Sucursal» in 13px `#766D69`, 16px apart.
+- Groups: an 11px uppercase `0.16em` `#766D69` heading with a 12px `#7A716D` count on the right («6 clases»), over a 1px `#D8C9BB` rule, 6px above the first row; 30px between groups. The screen opens with «Has asistido a» (`07`) or «Ha asistido a» (`S22`) in 13px `#766D69` over «N clases desde <mes>» in Lora 26 weight-500. The whole record is listed at once; nothing loads on scroll.
+- An empty list on the screen (`07`, `19`, `S20`, `S21`, `S22`) centres a 34px `#C4BAB6` line icon (stroke 1.1), a Lora 21 weight-500 title, and, when the prompt asks for one, a 14px `#766D69` note up to 260px wide, with no box behind them.
 
 ---
 
