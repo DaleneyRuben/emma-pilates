@@ -113,7 +113,13 @@ large title under a chevron; the other screens (Perfil, Notificaciones,
 Reservas de la clienta, Historial de clases, Revisar pago, Cancelar una
 clase, Mi disponibilidad with **+ Nuevo horario** in the bar, and the
 schedule form) use the bar. On an iPad the pre-session screens sit in a
-centred phone-width column.
+centred phone-width column. Every screen in both apps sits on the same light
+warm Superficie as Login, and its cards (the plan, the Perfil groups, the
+class cards, the Branch picker) are white, so the top bar's thin rule is
+visible against the screen. In the Staff app, a Client without a Plan shows
+«Sin plan activo» in a dashed, lightly tinted box, and on the iPad the empty
+right panel («Selecciona un cliente para ver sus detalles») has no card
+behind it.
 
 ### B. Open the Staff app
 
