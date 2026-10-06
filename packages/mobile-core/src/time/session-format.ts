@@ -61,6 +61,12 @@ export function formatTimeRange(startsAt: string, endsAt: string): string {
   return `${timeFormatter.format(new Date(startsAt))} – ${timeFormatter.format(new Date(endsAt))}`;
 }
 
+// A Session that has started takes no Booking and cannot be cancelled, so
+// the lists that lead to either leave it out (03, S07, S13).
+export function hasStarted(startsAt: string, now: Date): boolean {
+  return new Date(startsAt).getTime() <= now.getTime();
+}
+
 const cancellationWindowMs = 2.5 * 60 * 60 * 1_000;
 
 export function isInsideCancellationWindow(

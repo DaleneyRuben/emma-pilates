@@ -14,6 +14,7 @@ import {
   dayChipLabel,
   formatSessionDate,
   formatTimeRange,
+  hasStarted,
   Heading,
   QueryFailure,
   radii,
@@ -132,11 +133,13 @@ export function BrowseSessionsScreen({
 
   const classTypeList =
     classTypes.data?.status === 200 ? classTypes.data.data : [];
+  const now = new Date();
   const visible = (
     sessions.data?.status === 200 ? sessions.data.data : []
   ).filter(
     (session) =>
-      classTypeId === allClassTypes || session.classTypeId === classTypeId,
+      !hasStarted(session.startsAt, now) &&
+      (classTypeId === allClassTypes || session.classTypeId === classTypeId),
   );
 
   return (

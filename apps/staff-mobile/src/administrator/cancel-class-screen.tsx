@@ -7,10 +7,10 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  boliviaCivilDate,
   BranchPickerPill,
   CardFooter,
   Chevron,
-  boliviaCivilDate,
   civilDateRange,
   colors,
   dayChipLabel,
@@ -18,6 +18,7 @@ import {
   fontFamilies,
   formatSessionDate,
   formatTimeRange,
+  hasStarted,
   QueryFailure,
   radii,
   Screen,
@@ -138,11 +139,13 @@ export function CancelClassScreen() {
 
   const classTypeList =
     classTypes.data?.status === 200 ? classTypes.data.data : [];
+  const now = new Date();
   const visible = (
     sessions.data?.status === 200 ? sessions.data.data : []
   ).filter(
     (session) =>
-      classTypeId === allClassTypes || session.classTypeId === classTypeId,
+      !hasStarted(session.startsAt, now) &&
+      (classTypeId === allClassTypes || session.classTypeId === classTypeId),
   );
   const dayTitle = formatSessionDate(`${selectedDate}T12:00:00.000Z`);
 
