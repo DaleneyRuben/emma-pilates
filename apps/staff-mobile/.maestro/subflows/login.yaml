@@ -24,7 +24,7 @@ appId: ${APP_ID}
 - extendedWaitUntil:
     visible: "Iniciar sesión"
     timeout: 90000
-- tapOn: "tu@correo.com"
+- tapOn: "tu@emmapilates.bo"
 - inputText: ${EMAIL}
 - tapOn: "••••••••"
 - inputText: ${PASSWORD}
