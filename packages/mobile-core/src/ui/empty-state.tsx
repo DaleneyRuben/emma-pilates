@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Circle, Line, Path, Rect } from "react-native-svg";
 
@@ -6,6 +7,20 @@ import { LineIcon } from "./line-icon";
 import { colors, radii, spacing, typography } from "./tokens";
 
 const icons = {
+  bell: (
+    <>
+      <Path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z" />
+      <Path d="M10.5 18.5a2 2 0 0 0 3 0" />
+    </>
+  ),
+  calendar: (
+    <>
+      <Rect height={15} rx={2.5} width={17} x={3.5} y={5.5} />
+      <Line x1={3.5} x2={20.5} y1={10} y2={10} />
+      <Line x1={8} x2={8} y1={3.5} y2={7} />
+      <Line x1={16} x2={16} y1={3.5} y2={7} />
+    </>
+  ),
   card: (
     <>
       <Rect height={15} rx={2.5} width={17} x={3.5} y={5.5} />
@@ -37,6 +52,8 @@ export type EmptyStateProps =
       variant?: "framed" | "panel";
     }
   | {
+      /** S21's «Reservar una clase», 6 pt under the note (MOB-041). */
+      action?: ReactNode;
       /** The quiet 34 pt glyph of 07's and S22's empty history; S22 may omit it. */
       icon?: IconName;
       message?: string;
@@ -46,7 +63,9 @@ export type EmptyStateProps =
     };
 
 /** A centred icon, Lora title, and muted note (MOB-039, MOB-040). */
-export function EmptyState({ icon, message, title, variant = "framed" }: EmptyStateProps) {
+export function EmptyState(props: EmptyStateProps) {
+  const { icon, message, title, variant = "framed" } = props;
+  const action = props.variant === "plain" ? props.action : undefined;
   const glyph =
     icon === undefined ? null : variant === "plain" ? (
       <LineIcon
@@ -74,6 +93,11 @@ export function EmptyState({ icon, message, title, variant = "framed" }: EmptySt
       )}
       <Text style={look.title}>{title}</Text>
       {message === undefined ? null : <Text style={look.message}>{message}</Text>}
+      {action === undefined ? null : (
+        <View style={styles.plainAction} testID="empty-state-action">
+          {action}
+        </View>
+      )}
     </View>
   );
 }
@@ -128,6 +152,7 @@ const styles = StyleSheet.create({
     fontSize: typography.titleSecondary,
     textAlign: "center",
   },
+  plainAction: { marginTop: spacing.smd, minWidth: 220 },
   plain: {
     alignItems: "center",
     flex: 1,

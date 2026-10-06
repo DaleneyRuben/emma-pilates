@@ -11,6 +11,7 @@ import type { ReactNode } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
+import { EmptyState } from "../ui/empty-state";
 import { QueryFailure } from "../ui/query-failure";
 import { Screen } from "../ui/screen";
 import { ScreenTopBar } from "../ui/screen-top-bar";
@@ -132,10 +133,12 @@ export function NotificationsScreen({
     return (
       <Screen style={styles.screen}>
         {header()}
-        <View style={styles.empty}>
-          <Text style={styles.emptyTitle}>No tienes notificaciones.</Text>
-          <BodyText style={styles.emptySupport}>{emptySupport}</BodyText>
-        </View>
+        <EmptyState
+          icon="bell"
+          message={emptySupport}
+          title="No tienes notificaciones."
+          variant="plain"
+        />
       </Screen>
     );
   }
@@ -193,20 +196,6 @@ const styles = StyleSheet.create({
     width: 8,
   },
   dotSpace: { width: 8 },
-  empty: {
-    alignItems: "center",
-    flex: 1,
-    gap: spacing.sm,
-    justifyContent: "center",
-    paddingHorizontal: spacing.xl,
-  },
-  emptySupport: { textAlign: "center" },
-  emptyTitle: {
-    color: colors.text,
-    fontSize: typography.bodyLarge,
-    fontWeight: "500",
-    textAlign: "center",
-  },
   message: { color: colors.text, fontSize: typography.body, lineHeight: 22 },
   messageRead: { color: colors.textSecondary },
   row: {
