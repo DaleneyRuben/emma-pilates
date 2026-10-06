@@ -115,11 +115,16 @@ clase, Mi disponibilidad with **+ Nuevo horario** in the bar, and the
 schedule form) use the bar. On an iPad the pre-session screens sit in a
 centred phone-width column. Every screen in both apps sits on the same light
 warm Superficie as Login, and its cards (the plan, the Perfil groups, the
-class cards, the Branch picker) are white, so the top bar's thin rule is
-visible against the screen. In the Staff app, a Client without a Plan shows
-«Sin plan activo» in a dashed, lightly tinted box, and on the iPad the empty
-right panel («Selecciona un cliente para ver sus detalles») has no card
-behind it.
+class cards, the Branch picker) are white with a thin warm-beige border and
+16-point rounded corners (most also carry a barely visible shadow), so the
+top bar's thin rule is visible against the screen. In the Staff app, a Client
+without a Plan shows «Sin plan activo» centred in a dashed, lightly tinted
+box under a Palo de rosa card icon, with «Esta clienta no tiene clases
+disponibles. Registra un pago para activar un plan y poder reservar.» below
+it; on the iPad the empty right panel shows a person icon in a 64-point
+circle, «Selecciona un cliente para ver sus detalles» in Lora, and «Busca por
+nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin
+perder la lista.», with no card behind it.
 
 ### B. Open the Staff app
 
@@ -1309,7 +1314,9 @@ next step. Tap Lucía: the overview shows her Plan card ("Paquete de 8 clases",
 **Reservar clase** and **Registrar pago en efectivo** actions, **Ver
 reservas** (only while a Plan is active), and the **Historial** card with her
 last two classes and **Ver historial completo**. A Client without a Plan reads
-"Sin plan activo" with **Reservar clase** disabled.
+"Sin plan activo" under a card icon, with "Esta clienta no tiene clases
+disponibles. Registra un pago para activar un plan y poder reservar." and
+**Reservar clase** disabled.
 
 ### B. Bookings, cancellation, and history
 
@@ -1390,8 +1397,10 @@ it.
 
 Open the same Metro URL in an iPad Simulator (for example iPad Pro 11-inch)
 with Expo Go installed. **Buscar cliente** becomes a split view: the search
-and results sit in a left column and the right panel reads "Selecciona un
-cliente para ver sus detalles". Tapping a result highlights it and shows her
+and results sit in a left column and the right panel shows a person icon in
+a circle, "Selecciona un cliente para ver sus detalles", and "Busca por
+nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin
+perder la lista.". Tapping a result highlights it and shows her
 overview in the right panel without navigating away; **Ver reservas** and
 **Ver historial completo** also open in that panel, with **Volver** returning
 to the overview. **Reservar clase**, **Registrar pago en efectivo**, and
