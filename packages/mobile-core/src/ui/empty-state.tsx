@@ -1,47 +1,10 @@
 import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
-import { Circle, Line, Path, Rect } from "react-native-svg";
-
 import { fontFamilies } from "./fonts";
-import { LineIcon } from "./line-icon";
+import { Glyph, type GlyphName } from "./glyph";
 import { colors, radii, spacing, typography } from "./tokens";
 
-const icons = {
-  bell: (
-    <>
-      <Path d="M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z" />
-      <Path d="M10.5 18.5a2 2 0 0 0 3 0" />
-    </>
-  ),
-  calendar: (
-    <>
-      <Rect height={15} rx={2.5} width={17} x={3.5} y={5.5} />
-      <Line x1={3.5} x2={20.5} y1={10} y2={10} />
-      <Line x1={8} x2={8} y1={3.5} y2={7} />
-      <Line x1={16} x2={16} y1={3.5} y2={7} />
-    </>
-  ),
-  card: (
-    <>
-      <Rect height={15} rx={2.5} width={17} x={3.5} y={5.5} />
-      <Line x1={3.5} x2={20.5} y1={10} y2={10} />
-    </>
-  ),
-  clock: (
-    <>
-      <Circle cx={12} cy={12} r={8.5} />
-      <Path d="M12 7.5V12l3.5 2" />
-    </>
-  ),
-  person: (
-    <>
-      <Circle cx={12} cy={8} r={4} />
-      <Path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5" />
-    </>
-  ),
-} as const;
-
-type IconName = keyof typeof icons;
+type IconName = GlyphName;
 
 export type EmptyStateProps =
   | {
@@ -68,18 +31,15 @@ export function EmptyState(props: EmptyStateProps) {
   const action = props.variant === "plain" ? props.action : undefined;
   const glyph =
     icon === undefined ? null : variant === "plain" ? (
-      <LineIcon
+      <Glyph
         color={colors.iconQuiet}
+        name={icon}
         size={34}
         strokeWidth={1.1}
         testID={`empty-state-icon-${icon}`}
-      >
-        {icons[icon]}
-      </LineIcon>
+      />
     ) : (
-      <LineIcon color={colors.primary} size={26} strokeWidth={1.2} testID={`empty-state-icon-${icon}`}>
-        {icons[icon]}
-      </LineIcon>
+      <Glyph name={icon} size={26} strokeWidth={1.2} testID={`empty-state-icon-${icon}`} />
     );
   const look = looks[variant];
   return (
