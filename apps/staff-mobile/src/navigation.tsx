@@ -3,6 +3,7 @@ import {
   BackLink,
   BodyText,
   colors,
+  formatTimeRange,
   Heading,
   MobileQueryProvider,
   PrimaryButton,
@@ -44,7 +45,7 @@ import { NutritionistAgendaScreen } from "./nutritionist/nutritionist-agenda-scr
 import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
-import { formatTrainerTimeRange, TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
+import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
 import {
   StaffFetcherContext,
   unavailableFetcher,
@@ -136,7 +137,7 @@ function TrainerRosterScreen({
       <Heading accessibilityLabel={session.classTypeName}>
         {session.classTypeName}
       </Heading>
-      <BodyText>{`${session.branchName} · ${formatTrainerTimeRange(session.startsAt, session.endsAt)}`}</BodyText>
+      <BodyText>{`${session.branchName} · ${formatTimeRange(session.startsAt, session.endsAt)}`}</BodyText>
       <ScrollView contentContainerStyle={styles.list}>
         {session.bookings.length === 0 ? (
           <BodyText>No hay reservas para esta sesión.</BodyText>

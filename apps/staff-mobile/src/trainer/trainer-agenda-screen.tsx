@@ -1,4 +1,7 @@
-import { useListTrainerSchedule } from "@pilates/api-contracts";
+import {
+  useGetCurrentStaffMemberProfile,
+  useListTrainerSchedule,
+} from "@pilates/api-contracts";
 import {
   BodyText,
   CardFooter,
@@ -6,6 +9,7 @@ import {
   colors,
   DetailLine,
   fontFamilies,
+  formatTimeRange,
   QueryFailure,
   radii,
   Screen,
@@ -45,15 +49,6 @@ function addDays(date: string, amount: number): string {
   return result.toISOString().slice(0, 10);
 }
 
-export function formatTrainerTimeRange(startsAt: string, endsAt: string): string {
-  const formatter = new Intl.DateTimeFormat("es-BO", {
-    hour: "2-digit",
-    minute: "2-digit",
-    timeZone: "America/La_Paz",
-  });
-  return `${formatter.format(new Date(startsAt))}–${formatter.format(new Date(endsAt))}`;
-}
-
 // S02's agenda card (MOB-042): the chevron beside the time and title, the
 // Branch after a pin, then the booked count and a «Completa»/«Con cupos» pill.
 function AgendaCard({
@@ -81,7 +76,7 @@ function AgendaCard({
       <View style={styles.header}>
         <View style={styles.titles}>
           <Text style={styles.time}>
-            {formatTrainerTimeRange(session.startsAt, session.endsAt)}
+            {formatTimeRange(session.startsAt, session.endsAt)}
           </Text>
           <Text style={styles.cardTitle}>{session.classTypeName}</Text>
           <DetailLine icon="pin" iconSize={15} style={styles.branch}>
@@ -107,6 +102,7 @@ function AgendaCard({
 export function TrainerAgendaScreen() {
   const navigation = useNavigation<TrainerAgendaNavigation>();
   const fetcher = useStaffFetcher();
+  const profile = useGetCurrentStaffMemberProfile({ fetcher });
   const [selectedDate, setSelectedDate] = useState(boliviaDate);
   const schedule = useListTrainerSchedule(
     { on: selectedDate },
@@ -117,17 +113,23 @@ export function TrainerAgendaScreen() {
     [selectedDate],
   );
 
+  const firstName =
+    profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
+  const header = (
+    <RootHeader label="Mi agenda" title={firstName === undefined ? "Hola" : `Hola, ${firstName}`} />
+  );
+
   if (schedule.isPending)
     return (
       <Screen style={styles.centered}>
-        <RootHeader label="Mi agenda" title="Hola" />
+        {header}
         <BodyText accessibilityLabel="Cargando agenda">Cargando agenda…</BodyText>
       </Screen>
     );
   if (schedule.isError)
     return (
       <Screen>
-        <RootHeader label="Mi agenda" title="Hola" />
+        {header}
         <QueryFailure
           label="No pudimos cargar tu agenda."
           onRetry={() => void schedule.refetch()}
@@ -138,7 +140,7 @@ export function TrainerAgendaScreen() {
   const sessions = schedule.data?.data ?? [];
   return (
     <Screen style={styles.screen}>
-      <RootHeader label="Mi agenda" title="Hola" />
+      {header}
       <ScrollView
         horizontal
         contentContainerStyle={styles.datePicker}
