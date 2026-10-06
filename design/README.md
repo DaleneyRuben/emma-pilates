@@ -62,8 +62,8 @@ Do not introduce colors outside this list. Tints are the semantic color at low a
 | Texto secundario | `#6E6663` | Body text, table secondary cells |
 | Texto tenue | `#766D69` | Subtitles, labels, helper text |
 | Texto muy tenue | `#7A716D` | Placeholders, meta, footnotes |
-| Borde fuerte | `#D8C9BB` | Frame borders, input borders |
-| Borde | `#E4D8CC` | Card and table borders |
+| Borde fuerte | `#D8C9BB` | Frame borders, input borders, Client and Staff card borders |
+| Borde | `#E4D8CC` | Admin-web card and table borders |
 | Divisor | `#F2EBE2` | Row separators inside cards |
 | Éxito | `#7C9473` (texto `#5F7457`) | Confirmed, active, attended, income |
 | Advertencia | `#C99A4E` (texto `#9A7434`) | Pending, low stock |
@@ -94,8 +94,8 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 ### Spacing, radius, shadow
 
 - Spacing scale in use: 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 24, 26, 32, 40 px.
-- Radius: 8px controls, 10–12px cards and panels, 14–16px outer frames, 999px pills.
-- Shadows: primary button `0 2px 6px rgba(183,131,128,0.22)`; card hover `0 6px 16px rgba(74,58,48,0.10)`; side panel `-14px 0 34px rgba(74,58,48,0.14)`; dragged card `0 16px 32px rgba(74,58,48,0.20)`; popover `0 12px 28px rgba(74,58,48,0.14)`.
+- Radius: 8px controls, 10–12px admin-web cards and panels, 16px Client and Staff cards and empty states, 14–16px outer frames, 999px pills.
+- Shadows: primary button `0 2px 6px rgba(183,131,128,0.22)`; Client and Staff card `0 2px 8px rgba(74,74,74,0.05)`; card hover `0 6px 16px rgba(74,58,48,0.10)`; side panel `-14px 0 34px rgba(74,58,48,0.14)`; dragged card `0 16px 32px rgba(74,58,48,0.20)`; popover `0 12px 28px rgba(74,58,48,0.14)`.
 - Focus ring on inputs: `border-color:#B78380; box-shadow:0 0 0 3px rgba(183,131,128,0.15)`.
 - Scrim behind side panels/modals: `rgba(74,58,48,0.22)`.
 
@@ -121,6 +121,13 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - A bottom sheet that picks one value (`03` and `S13` «Elige una sucursal», `S17` «Hora de inicio» / «Hora de fin») lists every option as a row.
 - The selected row carries its label in `#8A5D59` (5.54:1 on white), same family, size and weight as the other rows, and a `#B78380` check on its right; other rows are `#4A4A4A` with no check (`03` keeps the empty check slot so names do not shift).
 - Tapping a row picks it and closes the sheet; screen readers hear the row as selected.
+
+### Cards (Client and Staff)
+
+- A card is Blanco, 1px `#D8C9BB`, radius 16, padding 18–20px, with the shadow `0 2px 8px rgba(74,74,74,0.05)`. The cards drawn without the shadow stay flat: `12`'s dates, `17`'s origin, `S03`'s roster, `S05`'s pending card, `S06`'s history, `S12`'s receipt and summary, and `S23`'s groups.
+- A selectable card marks selection by its border alone: 2px `#B78380` (`06`'s and `08`'s options) or 1px `#B78380` (`S15`).
+- Chips and day pickers round at 12, notices at 10, inputs at 8; none of them is a card.
+- An empty state is a dashed 1px `#D8C9BB` box, radius 16, on `rgba(216,201,187,0.14)`, centred: a 26px `#B78380` line icon, a Lora 19 weight-500 title, and a 13px `#766D69` note (`03`, `06`, `16`, `S04`'s search miss, `S06`). The tablet's empty right panel (`S04`) draws no box: the person icon in a 64px circle (1px `#D8C9BB` on `rgba(216,201,187,0.18)`), a Lora 22 weight-400 title, and a 14px `#766D69` helper line up to 340px wide.
 
 ---
 
