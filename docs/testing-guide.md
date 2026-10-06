@@ -1995,12 +1995,15 @@ the admin web, exactly as Test 24 describes, and log in as
    rather than refused). A Trainer who still leads upcoming Sessions
    (Emma Vargas) keeps her Branch and the panel explains to swap her in
    Horario first. A pending member shows **Pendiente de activación** between
-   the Nombre and Teléfono rows (there is no separate Correo row), with the
-   address and **Cambiar correo** (Nuevo correo, "Los enlaces enviados a …
-   dejarán de funcionar; enviaremos uno nuevo de 7 días.", **Guardar correo**),
-   when the link expires, "Si no activa su cuenta en 30 días desde el último
-   envío o cambio, la invitación se elimina. Es distinto de los 7 días de cada
-   enlace.", and **Reenviar enlace**; a second email within a minute shows,
+   the Nombre and Teléfono rows (there is no separate Correo row), in a pale
+   card with a thin beige border: the address with **Cambiar correo** at the
+   end of the same line (Nuevo correo, "Los enlaces enviados a … dejarán de
+   funcionar; enviaremos uno nuevo de 7 días.", then **Guardar correo** and
+   **Cancelar** side by side at the bottom of the card), when the link
+   expires, "Si no activa su cuenta en 30 días desde el último envío o
+   cambio, la invitación se elimina. Es distinto de los 7 días de cada
+   enlace.", and a full-width white **Reenviar enlace** (greyed text and
+   border while it waits); a second email within a minute shows,
    after a clock icon at the top of the panel above the Nombre row, "Ya
    enviamos un correo a esa dirección hace poco. El enlace vigente sigue
    sirviendo." and "Podrás reenviarlo en 0:59." from the server's wait, with
