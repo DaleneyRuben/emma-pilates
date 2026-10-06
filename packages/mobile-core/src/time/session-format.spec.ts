@@ -5,6 +5,7 @@ import {
   formatMonthHeading,
   formatSessionDate,
   formatTimeRange,
+  hasStarted,
   isInsideCancellationWindow,
   upcomingCivilDates,
 } from "./session-format";
@@ -16,6 +17,14 @@ describe("Session formatting", () => {
     expect(isInsideCancellationWindow("2026-09-21T14:30:00.000Z", now)).toBe(true);
     expect(isInsideCancellationWindow("2026-09-21T14:30:00.001Z", now)).toBe(false);
     expect(isInsideCancellationWindow("2026-09-21T11:00:00.000Z", now)).toBe(true);
+  });
+
+  // MOB-044: a Session that has started can no longer be booked or cancelled.
+  it("tells a started Session from an upcoming one", () => {
+    const now = new Date("2026-09-21T12:00:00.000Z");
+    expect(hasStarted("2026-09-21T12:00:00.000Z", now)).toBe(true);
+    expect(hasStarted("2026-09-21T11:00:00.000Z", now)).toBe(true);
+    expect(hasStarted("2026-09-21T12:00:00.001Z", now)).toBe(false);
   });
 
   it("derives the Bolivia civil date from an instant", () => {
