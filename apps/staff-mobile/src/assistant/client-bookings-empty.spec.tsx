@@ -41,8 +41,10 @@ describe("Assistant Client Bookings empty state", () => {
     expect(action).toHaveStyle({ marginTop: 6, minWidth: 220 });
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
+    // The banner shows while the Branches load; the pill follows them.
     await waitFor(() => {
       expect(screen.getByText("Reservando para: Lucía Fernández")).toBeOnTheScreen();
+      expect(screen.getByTestId("branch-picker-chevron", hidden)).toBeOnTheScreen();
     });
     const picker = screen.getByTestId("branch-picker-chevron", hidden);
     expect(picker).toHaveProp("stroke", "#766D69");
