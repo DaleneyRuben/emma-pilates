@@ -9,23 +9,16 @@ import {
   BodyText,
   boliviaCivilDate,
   BranchPickerPill,
-  CardFooter,
-  Chevron,
   civilDateRange,
   colors,
   dayChipLabel,
-  DetailLine,
-  fontFamilies,
   formatSessionDate,
-  formatTimeRange,
   hasStarted,
   QueryFailure,
   radii,
   Screen,
   ScreenTopBar,
-  SeatPill,
   spacing,
-  surfaces,
   typography,
   upcomingCivilDates,
 } from "@pilates/mobile-core";
@@ -35,6 +28,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { describeCount } from "./administrator-format";
+import { CancelClassCard } from "./cancel-class-card";
 
 export type CancellableSession = SessionAvailabilityDto & { branchName: string };
 
@@ -67,11 +61,6 @@ function Chip({
       </Text>
     </Pressable>
   );
-}
-
-function seatsTag(session: SessionAvailabilityDto): string {
-  if (session.availableSeats === 0) return "Llena";
-  return describeCount(session.availableSeats, "cupo", "cupos");
 }
 
 const everyBranch = "every-branch";
@@ -250,46 +239,22 @@ export function CancelClassScreen() {
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
-          {visible.map((session) => (
-              <Pressable
-                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}${allBranches ? ` · ${session.branchName}` : ""}`}
-                accessibilityRole="button"
+          {visible.map((session) => {
+            const branchName = allBranches ? session.branchName : branch.name;
+            return (
+              <CancelClassCard
+                branchName={branchName}
                 key={session.id}
+                labelBranch={allBranches}
                 onPress={() =>
                   navigation.navigate("CancelSession", {
-                    session: {
-                      ...session,
-                      branchName: allBranches ? session.branchName : branch.name,
-                    },
+                    session: { ...session, branchName },
                   })
                 }
-                style={styles.card}
-              >
-                <View style={styles.cardHeader}>
-                  <View style={styles.cardTitles}>
-                    <Text style={styles.time}>
-                      {formatTimeRange(session.startsAt, session.endsAt)}
-                    </Text>
-                    <Text style={styles.cardTitle}>{session.classTypeName}</Text>
-                  </View>
-                  <Chevron />
-                </View>
-                <View style={styles.details}>
-                  <DetailLine icon="person" iconSize={16} style={styles.trainer}>
-                    {session.trainerName}
-                  </DetailLine>
-                  <DetailLine icon="pin" iconSize={15} style={styles.branch}>
-                    {`Sucursal ${allBranches ? session.branchName : branch.name}`}
-                  </DetailLine>
-                </View>
-                <CardFooter paddingTop={13}>
-                  <Text style={styles.booked}>
-                    {describeCount(session.bookedCount, "reserva", "reservas")}
-                  </Text>
-                  <SeatPill full={session.availableSeats === 0}>{seatsTag(session)}</SeatPill>
-                </CardFooter>
-              </Pressable>
-          ))}
+                session={session}
+              />
+            );
+          })}
         </ScrollView>
       )}
     </Screen>
@@ -299,33 +264,6 @@ export function CancelClassScreen() {
 const styles = StyleSheet.create({
   // Horizontal strips keep their natural height when the list below is long.
   strip: { flexGrow: 0, flexShrink: 0 },
-  booked: { color: colors.textSecondary, fontSize: 14, fontVariant: ["tabular-nums"] },
-  branch: { color: colors.textMuted, fontSize: typography.note },
-  // S13's card (MOB-042): the chevron beside the time and title, the Trainer
-  // and Branch lines, then the booked count and the seat pill under a rule.
-  card: { ...surfaces.card, gap: 13, padding: spacing.lgXl },
-  cardHeader: {
-    alignItems: "flex-start",
-    flexDirection: "row",
-    gap: spacing.md,
-    justifyContent: "space-between",
-  },
-  cardTitle: {
-    color: colors.text,
-    fontFamily: fontFamilies.heading,
-    fontSize: typography.titleCard,
-  },
-  cardTitles: { flexShrink: 1, gap: spacing.smd },
-  details: { gap: 7 },
-  time: {
-    color: colors.textMuted,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.note,
-    fontVariant: ["tabular-nums"],
-    fontWeight: "500",
-    letterSpacing: 0.78,
-  },
-  trainer: { color: colors.text, fontSize: 14 },
   branchList: { gap: spacing.sm },
   centered: { textAlign: "center" },
   chip: {
