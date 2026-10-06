@@ -2,6 +2,7 @@ import { render } from "@testing-library/react-native";
 import { StyleSheet } from "react-native";
 
 import { EmptyState } from "./empty-state";
+import { PrimaryButton } from "./primary-button";
 
 const hidden = { includeHiddenElements: true };
 
@@ -103,5 +104,51 @@ describe("EmptyState plain variant", () => {
       fontSize: 21,
     });
     expect(screen.queryByTestId("empty-state-icon-clock", hidden)).toBeNull();
+  });
+
+  // MOB-041: 19 and S20 draw the bell, S21 the calendar, all in the quiet tone.
+  it("draws the bell and the calendar in the same quiet tone", async () => {
+    const screen = await render(
+      <>
+        <EmptyState icon="bell" title="No tienes notificaciones." variant="plain" />
+        <EmptyState
+          icon="calendar"
+          title="Esta clienta no tiene reservas próximas."
+          variant="plain"
+        />
+      </>,
+    );
+
+    for (const name of ["bell", "calendar"]) {
+      const icon = screen.getByTestId(`empty-state-icon-${name}`, hidden);
+      expect(icon).toHaveProp("stroke", "#C4BAB6");
+      expect(icon).toHaveProp("strokeWidth", 1.1);
+      expect(icon).toHaveProp("width", 34);
+    }
+    const bell = screen.getByTestId("empty-state-icon-bell", hidden);
+    expect(
+      bell.findAllByProps({ d: "M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z" }),
+    ).not.toHaveLength(0);
+    const calendar = screen.getByTestId("empty-state-icon-calendar", hidden);
+    expect(calendar.findAllByProps({ x1: 8, y1: 3.5 })).not.toHaveLength(0);
+  });
+
+  // MOB-041: S21 puts «Reservar una clase» 6 pt under the note, 220 pt wide.
+  it("places the action under the note", async () => {
+    const screen = await render(
+      <EmptyState
+        action={<PrimaryButton label="Reservar una clase" onPress={jest.fn()} />}
+        icon="calendar"
+        message="Puedes reservarle una clase desde el horario del estudio."
+        title="Esta clienta no tiene reservas próximas."
+        variant="plain"
+      />,
+    );
+
+    const action = screen.getByTestId("empty-state-action");
+    expect(action).toHaveStyle({ marginTop: 6, minWidth: 220 });
+    expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeOnTheScreen();
+    const block = screen.getByText("Esta clienta no tiene reservas próximas.").parent;
+    expect(block?.children.indexOf(action)).toBe(block!.children.length - 1);
   });
 });

@@ -192,11 +192,21 @@ describe("NotificationsScreen", () => {
     await waitFor(() => {
       expect(screen.getByText("No tienes notificaciones.")).toBeOnTheScreen();
     });
+    // MOB-041: 19's and S20's bare empty state, a quiet bell over Lora 21.
+    expect(screen.getByText("No tienes notificaciones.")).toHaveStyle({
+      fontFamily: "Lora_500Medium",
+      fontSize: 21,
+    });
+    const bell = screen.getByTestId("empty-state-icon-bell", {
+      includeHiddenElements: true,
+    });
+    expect(bell).toHaveProp("stroke", "#C4BAB6");
+    expect(bell).toHaveProp("width", 34);
     expect(
       screen.getByText(
         "Aquí te avisaremos sobre tus clases, pagos y evaluaciones.",
       ),
-    ).toBeOnTheScreen();
+    ).toHaveStyle({ color: "#766D69", fontSize: 14 });
     expect(
       screen.queryByRole("button", { name: "Marcar leídas" }),
     ).not.toBeOnTheScreen();
