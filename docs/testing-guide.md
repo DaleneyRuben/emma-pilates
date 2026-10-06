@@ -479,9 +479,11 @@ the name and phone and saves through the API (changing the email is Test 34).
 The **Reservar** tab lists the fixture Sessions for the selected Branch, day,
 and Class Type (past Sessions of today are hidden; full ones show **Lleno**).
 Each Session is a white card: the time in small spaced capitals over the Class
-Type in Lora, the seat pill on the right, and under a thin rule the Trainer
-after a small person icon with a Palo de rosa chevron on the right (full
-classes keep the chevron too; MOB-042). The **Sucursal:** pill (a pin, the
+Type in Lora, the seat pill on the right («N cupos» in Palo de rosa oscuro on
+Palo de rosa tinte; a full class reads **Lleno** in grey on a neutral sand
+pill, never red; MOB-047), and under a thin rule the Trainer after a small
+person icon with a Palo de rosa chevron on the right (full classes keep the
+chevron too; MOB-042). The **Sucursal:** pill (a pin, the
 Branch name in bold, and a small grey chevron pointing down, up while the
 list is open) opens «Elige una sucursal» with the current Branch's name in
 Palo de rosa profundo and a check on its right. The day and Class Type chip
@@ -1295,7 +1297,9 @@ Session of that day including full ones, except the ones that already
 started (the backend refuses to cancel those, MOB-044). Each card ends in a Palo de rosa
 chevron beside the time and the Class Type in Lora, names the Trainer after a
 person icon and «Sucursal …» after a pin, and closes with "N reservas" and
-"Llena" or "N cupos" under a thin rule (MOB-042).
+the seat pill under a thin rule: "N cupos" in Palo de rosa oscuro on Palo de
+rosa tinte, "Llena" in grey on a neutral sand pill, never red (MOB-042,
+MOB-047).
 No match reads "No hay clases con estos filtros." / "Prueba otro día, otra
 sucursal u otro tipo de clase.". Tap a card: **Cancelar sesión** repeats the
 Session, "N clientes afectados", and an amber warning "Esto no se puede
@@ -1368,8 +1372,9 @@ under the quiet clock, with no supporting line.
 **Reservar clase** opens **Reservar una clase** with the banner "Reservando
 para: Lucía Fernández", the **Sucursal:** pill, the seven day chips, and the
 Class Type chips; the Session cards look exactly like the Client's (Test 5 B:
-the time and the Lora Class Type, the seat pill, the Trainer after a person
-icon, the chevron), and like the Client's list it leaves out today's Sessions
+the time and the Lora Class Type, the seat pill in the same tones with
+**Llena** for a full class, the Trainer after a person icon, the chevron), and
+like the Client's list it leaves out today's Sessions
 that already started (a Client cannot be booked into one, MOB-044). Tap a Session: the detail shows Trainer, Branch, date, time, duration,
 and "X de Y cupos disponibles". **Reservar** books it for the Client and lands
 on **Reservas de la clienta** with the "Reserva confirmada" notice. A full
@@ -1463,8 +1468,9 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    ends in a Palo de rosa chevron beside the 24-hour time ("07:00 – 07:50",
    as the Client's list writes it) and the Class Type in Lora,
    names the Branch after a small pin, and closes with "N de M reservados"
-   after a person icon and a **Completa** (green) or **Con cupos** (neutral)
-   pill under a thin rule (MOB-042). Book a class for today as
+   after a person icon and a **Con cupos** pill (Palo de rosa oscuro on Palo
+   de rosa tinte) or a **Completa** pill (grey on a neutral sand pill, never
+   green) under a thin rule (MOB-042, MOB-047). Book a class for today as
    `lucia@example.com` in the Client app (or through Swagger) first if the
    list is empty.
 2. Tap a Session to open its roster ("Centro · 07:00 – 07:50" under the
