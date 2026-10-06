@@ -145,6 +145,16 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - The «Sucursal:» picker of `03`, `S07`, and `S13` ends in a 16px `#766D69` chevron pointing down (`6,9.5 12,15.5 18,9.5`); `02`'s disabled shortcut ends in a 19px `#C4BAB6` lock instead of the chevron.
 - Rows between rules (`07`, `S22`) and the notification rows of `19` and `S20` carry no chevron.
 
+### Home shortcuts (`02`)
+
+- Under an 11px uppercase `0.16em` `#766D69` «Accesos rápidos» eyebrow, a full-width «Reservar una clase» card (padding 18, gap 14) holds a 44px tile on `rgba(216,189,184,0.28)` at radius 12 with a 22px `#B78380` calendar (stroke 1.3), the title in Lora 17 weight 500 over a 13px `#766D69` note, and the 19px chevron.
+- Under it, two half-width cards in a 12px grid («Evaluación nutricional», «Mis referidos»): a column (padding 18, gap 10) with a 22px `#B78380` icon, a Lora 16 weight-500 title, and a 12px `#766D69` note; no chevron.
+- Without an active Plan the full-width card is disabled: Arena `#F2ECE5` with a 1px `#E7DCD8` border at the same radius 16, the tile on `rgba(74,74,74,0.05)`, the icon and title in `#B3A9A5`, the note unchanged, and the 19px `#C4BAB6` lock in place of the chevron.
+
+### Branch picker pill (`03`, `S07`, `S13`)
+
+- A 44px pill (1px `#D8C9BB`, Blanco, padding 0 16, gap 10, radius 999) with a 17px `#B78380` pin, «Sucursal: » and the Branch name in 14px `#4A4A4A` (the name at weight 500), and the 16px `#766D69` chevron pointing down; it opens the picker sheet above. `S13` offers «Todas las sucursales» as a name.
+
 ---
 
 ## Admin web — shell (shared by AW02–AW29, AW31, AW33)
