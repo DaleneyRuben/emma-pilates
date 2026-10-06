@@ -61,3 +61,64 @@ describe("Assistant surfaces on Superficie", () => {
     });
   });
 });
+
+const hidden = { includeHiddenElements: true };
+
+// MOB-039: the cards take the frames' border and radius, and the two empty
+// states their icon, Lora title, and copy.
+describe("Assistant cards and empty states (MOB-039)", () => {
+  afterEach(() => {
+    cleanup();
+    clearMobileQueryCache();
+    jest.restoreAllMocks();
+  });
+
+  it("draws S06's cards on Blanco with a 1 pt Borde fuerte and radius 16", async () => {
+    const screen = await openLucia(assistantRoutes());
+
+    expect(screen.getByText("Historial").parent?.parent).toHaveStyle({
+      backgroundColor: "#FFFFFF",
+      borderColor: "#D8C9BB",
+      borderRadius: 16,
+      borderWidth: 1,
+    });
+  });
+
+  it("centres S06's «Sin plan activo» with the card icon and the frame's copy", async () => {
+    const screen = await openLucia(withoutPlan());
+
+    expect(screen.getByTestId("empty-state-icon-card", hidden)).toBeOnTheScreen();
+    expect(screen.getByText("Sin plan activo")).toHaveStyle({
+      fontFamily: "Lora_500Medium",
+      fontSize: 19,
+      textAlign: "center",
+    });
+    expect(
+      screen.getByText(
+        "Esta clienta no tiene clases disponibles. Registra un pago para activar un plan y poder reservar.",
+      ),
+    ).toBeOnTheScreen();
+    expect(
+      screen.queryByText("Registra un pago en efectivo para activar un plan."),
+    ).not.toBeOnTheScreen();
+  });
+
+  it("draws the tablet's empty panel with the person circle, a Lora 22 title, and its helper", async () => {
+    jest
+      .spyOn(Dimensions, "get")
+      .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
+    const screen = await openClientSearch(assistantRoutes());
+
+    expect(screen.getByTestId("empty-state-circle")).toHaveStyle({ height: 64, width: 64 });
+    expect(screen.getByTestId("empty-state-icon-person", hidden)).toBeOnTheScreen();
+    expect(screen.getByText("Selecciona un cliente para ver sus detalles")).toHaveStyle({
+      fontFamily: "Lora_400Regular",
+      fontSize: 22,
+    });
+    expect(
+      screen.getByText(
+        "Busca por nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin perder la lista.",
+      ),
+    ).toBeOnTheScreen();
+  });
+});

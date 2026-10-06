@@ -28,3 +28,22 @@ describe("screen surfaces", () => {
     expect(offenders).toEqual([]);
   });
 });
+
+// MOB-039: the frames draw every card the same way (Blanco, 1 px Borde fuerte,
+// radius 16), so a card comes from mobile-core's `surfaces`, never from a
+// screen's own white box.
+describe("card surfaces", () => {
+  it("draws every white card through the shared card surface", () => {
+    const offenders = sourceFiles(__dirname).filter((path) =>
+      readFileSync(path, "utf8")
+        .split("\n  },")
+        .some(
+          (block) =>
+            /backgroundColor: colors\.white\b/.test(block) &&
+            /borderRadius: radii\.card\b/.test(block),
+        ),
+    );
+
+    expect(offenders.map((path) => path.slice(__dirname.length + 1))).toEqual([]);
+  });
+});
