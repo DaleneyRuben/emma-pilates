@@ -125,6 +125,11 @@ describe("Nutritionist agenda and availability", () => {
     expect(screen.getByText("4 cupos de 45 min · 1 reservado")).toBeOnTheScreen();
     expect(screen.getByText("4 cupos de 45 min · sin reservas")).toBeOnTheScreen();
     expect(screen.getByText("Desde el jueves 1 de octubre")).toBeOnTheScreen();
+    // MOB-041: S16 ends each block row in the 19 pt Palo de rosa chevron.
+    const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
+    expect(chevrons).toHaveLength(3);
+    expect(chevrons[0]).toHaveProp("stroke", "#B78380");
+    expect(screen.queryByText("›")).toBeNull();
   });
 
   it("shows the empty availability state", async () => {

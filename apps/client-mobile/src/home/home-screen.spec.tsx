@@ -57,6 +57,14 @@ describe("Client Home", () => {
     expect(
       screen.getByRole("button", { name: "Reservar una clase" }),
     ).toHaveProp("accessibilityState", { disabled: false });
+    // MOB-041: 02 ends each shortcut in a Palo de rosa chevron.
+    const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
+    expect(chevrons).toHaveLength(3);
+    for (const chevron of chevrons) {
+      expect(chevron).toHaveProp("stroke", "#B78380");
+      expect(chevron).toHaveProp("width", 19);
+    }
+    expect(screen.queryByTestId("shortcut-lock", { includeHiddenElements: true })).toBeNull();
   });
 
   it("warns when the Subscription is about to expire", async () => {
@@ -92,6 +100,11 @@ describe("Client Home", () => {
       screen.getByRole("button", { name: "Reservar una clase" }),
     ).toHaveProp("accessibilityState", { disabled: true });
     expect(screen.queryByText("Activa")).not.toBeOnTheScreen();
+    // MOB-041: the disabled shortcut ends in the quiet lock instead of the chevron.
+    const lock = screen.getByTestId("shortcut-lock", { includeHiddenElements: true });
+    expect(lock).toHaveProp("stroke", "#C4BAB6");
+    expect(lock).toHaveProp("width", 19);
+    expect(screen.getAllByTestId("chevron", { includeHiddenElements: true })).toHaveLength(2);
   });
 
   it("recovers from a failed load with a retry", async () => {

@@ -64,6 +64,19 @@ describe("Client Profile", () => {
     }
   });
 
+  // MOB-041: 18 ends every menu row in the 19 pt Icono tenue chevron.
+  it("ends every Perfil row in the quiet chevron", async () => {
+    const screen = await openProfile();
+
+    const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
+    expect(chevrons).toHaveLength(7);
+    for (const chevron of chevrons) {
+      expect(chevron).toHaveProp("stroke", "#C4BAB6");
+      expect(chevron).toHaveProp("width", 19);
+    }
+    expect(screen.queryByText("›")).toBeNull();
+  });
+
   it("shows the account summary and the Plan status row", async () => {
     const screen = await openProfile();
 
