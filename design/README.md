@@ -160,6 +160,11 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - The pill on a Session row or detail says how many places remain or that none does; the number or word carries the state, so it takes no dot.
 - Seats remain («N cupos», «Con cupos»): Palo de rosa tinte `#EFE0DC` behind Palo de rosa oscuro `#7A4F4B`, the badge pair of the palette table. Full («Lleno», «Completa», «Llena»): `rgba(216,201,187,0.34)` behind Texto secundario `#6E6663`, never Error red and never Éxito green. 12px, weight 500, fully rounded.
 
+### Search result rows (`S04`)
+
+- A result row (padding 16px 18px, gap 14) is a 42px circle on `rgba(216,189,184,0.4)` with the Client's first letter in Lora 16 `#8A5D59`, the name in 16px `#4A4A4A` over «phone · email» in 13px `#766D69`, a «Pendiente» tag while the account is pending, and the 19px `#B78380` chevron. The contact stays on one line and is trimmed with an ellipsis when the row is narrower than it.
+- On the tablet the rows sit in the fixed 392px left panel (24px padding, 344px of rows) beside the detail panel; the phone draws them at the screen's width.
+
 ---
 
 ## Admin web — shell (shared by AW02–AW29, AW31, AW33)
