@@ -66,7 +66,7 @@ Do not introduce colors outside this list. Tints are the semantic color at low a
 | Borde | `#E4D8CC` | Admin-web card and table borders |
 | Divisor | `#F2EBE2` | Row separators inside cards |
 | Regla | `#EFE7DE` | The rule under a Client or Staff header bar, between list rows drawn on Superficie, and under a card's footer line |
-| Icono tenue | `#C4BAB6` | Quiet line icons: the 34px empty-state glyphs and the 19px row chevrons on Client and Staff screens |
+| Icono tenue | `#C4BAB6` | Quiet line icons: the 34px empty-state glyphs, the 19px chevrons of the Perfil menu rows (`18`, `S23`), and the 19px lock on `02`'s disabled shortcut |
 | Éxito | `#7C9473` (texto `#5F7457`) | Confirmed, active, attended, income |
 | Advertencia | `#C99A4E` (texto `#9A7434`) | Pending, low stock |
 | Error | `#B25D4B` (texto `#94493A`) | Cancelled, overdue, no-show, destructive, expenses |
@@ -137,6 +137,13 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - The history row: a 38px day column (Lora 20 weight-500 day of the month, zero-padded, over the 10px uppercase `0.1em` `#7A716D` weekday), then the Class Type in Lora 17 weight-500 over «Entrenadora · Sucursal» in 13px `#766D69`, 16px apart.
 - Groups: an 11px uppercase `0.16em` `#766D69` heading with a 12px `#7A716D` count on the right («6 clases»), over a 1px `#D8C9BB` rule, 6px above the first row; 30px between groups. The screen opens with «Has asistido a» (`07`) or «Ha asistido a» (`S22`) in 13px `#766D69` over «N clases desde <mes>» in Lora 26 weight-500. The whole record is listed at once; nothing loads on scroll.
 - An empty list on the screen (`07`, `19`, `S20`, `S21`, `S22`) centres a 34px `#C4BAB6` line icon (stroke 1.1), a Lora 21 weight-500 title, and, when the prompt asks for one, a 14px `#766D69` note up to 260px wide, with no box behind them.
+
+### Row chevrons (Client and Staff)
+
+- A tappable card or list row ends in a 19px `#B78380` chevron (stroke 1.3, polyline `9.5,5 16.5,12 9.5,19`), vertically centred after the row's text or value: `02`'s full-width «Reservar una clase» shortcut, the Session rows of `03`, `S07`, and `S13`, `16`'s «Tu crédito», the agenda rows of `S02` and `S15`, `S04`'s results, `S11`'s payments, `S16`'s blocks. `02`'s two half-width tiles carry none.
+- The Perfil menu rows of `18` and `S23` end in the same chevron in `#C4BAB6`, after the row's value or unread count.
+- The «Sucursal:» picker of `03`, `S07`, and `S13` ends in a 16px `#766D69` chevron pointing down (`6,9.5 12,15.5 18,9.5`); `02`'s disabled shortcut ends in a 19px `#C4BAB6` lock instead of the chevron.
+- Rows between rules (`07`, `S22`) and the notification rows of `19` and `S20` carry no chevron.
 
 ---
 
