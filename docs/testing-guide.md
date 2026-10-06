@@ -1291,7 +1291,8 @@ for the same Plan.
 From **Pagos pendientes** tap **Cancelar una clase**. Pick the Branch (the
 **Sucursal:** pill with its pin and down chevron, then a Branch chip), a day
 chip, and a Class Type chip (**Todas** by default); the list shows every
-Session of that day including full ones. Each card ends in a Palo de rosa
+Session of that day including full ones, except the ones that already
+started (the backend refuses to cancel those, MOB-044). Each card ends in a Palo de rosa
 chevron beside the time and the Class Type in Lora, names the Trainer after a
 person icon and «Sucursal …» after a pin, and closes with "N reservas" and
 "Llena" or "N cupos" under a thin rule (MOB-042).
@@ -1367,7 +1368,8 @@ under the quiet clock, with no supporting line.
 para: Lucía Fernández", the **Sucursal:** pill, the seven day chips, and the
 Class Type chips; the Session cards look exactly like the Client's (Test 5 B:
 the time and the Lora Class Type, the seat pill, the Trainer after a person
-icon, the chevron). Tap a Session: the detail shows Trainer, Branch, date, time, duration,
+icon, the chevron), and like the Client's list it leaves out today's Sessions
+that already started (a Client cannot be booked into one, MOB-044). Tap a Session: the detail shows Trainer, Branch, date, time, duration,
 and "X de Y cupos disponibles". **Reservar** books it for the Client and lands
 on **Reservas de la clienta** with the "Reserva confirmada" notice. A full
 class offers **Unirme a la lista de espera** ("Clase llena. Se avisará al
@@ -1454,7 +1456,8 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
 1B) and log in as `emma.vargas@example.com` with `emma-local-2026`.
 
 1. **Mi agenda** greets you by name ("Hola, Emma", MOB-043) and lists today's
-   Sessions you lead. Each card
+   Sessions you lead, the ones that already started included (attendance is
+   recorded after the class ends, MOB-044). Each card
    ends in a Palo de rosa chevron beside the 24-hour time ("07:00 – 07:50",
    as the Client's list writes it) and the Class Type in Lora,
    names the Branch after a small pin, and closes with "N de M reservados"
