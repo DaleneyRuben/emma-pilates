@@ -40,7 +40,8 @@ describe("Assistant Client history (S22)", () => {
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
     expect(screen.getByText("1 clase")).toBeOnTheScreen();
     expect(screen.getByText("15")).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 20 });
-    expect(screen.getByText("mar")).toBeOnTheScreen();
+    // 15 and 8 September are both Tuesdays.
+    expect(screen.getAllByText("mar")).toHaveLength(2);
 
     const rows = screen.getAllByTestId("class-history-row");
     expect(rows).toHaveLength(3);
