@@ -4,6 +4,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  boliviaCivilDate,
   CardFooter,
   Chevron,
   colors,
@@ -27,21 +28,6 @@ import { RootHeader } from "../ui/root-header";
 type TrainerAgendaNavigation = {
   navigate: (screen: "Roster", params: { sessionId: string }) => void;
 };
-
-function boliviaDate(now = new Date()): string {
-  const parts = new Intl.DateTimeFormat("en-CA", {
-    day: "2-digit",
-    month: "2-digit",
-    timeZone: "America/La_Paz",
-    year: "numeric",
-  })
-    .formatToParts(now)
-    .reduce<Record<string, string>>((values, part) => {
-      if (part.type !== "literal") values[part.type] = part.value;
-      return values;
-    }, {});
-  return `${parts.year}-${parts.month}-${parts.day}`;
-}
 
 function addDays(date: string, amount: number): string {
   const result = new Date(`${date}T12:00:00.000Z`);
@@ -103,7 +89,7 @@ export function TrainerAgendaScreen() {
   const navigation = useNavigation<TrainerAgendaNavigation>();
   const fetcher = useStaffFetcher();
   const profile = useGetCurrentStaffMemberProfile({ fetcher });
-  const [selectedDate, setSelectedDate] = useState(boliviaDate);
+  const [selectedDate, setSelectedDate] = useState(() => boliviaCivilDate(new Date()));
   const schedule = useListTrainerSchedule(
     { on: selectedDate },
     { fetcher, query: { refetchOnMount: "always" } },
