@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -120,18 +120,20 @@ describe("Administrator rows", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    expect(screen.getByText("Reformer Pilates")).toHaveStyle({
+    const card = within(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+    expect(card.getByText("Reformer Pilates")).toHaveStyle({
       fontFamily: "Lora_500Medium",
       fontSize: 20,
     });
-    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#4A4A4A", fontSize: 14 });
-    expect(screen.getByTestId("glyph-person", hidden)).toHaveProp("width", 16);
-    expect(screen.getByText("Sucursal Centro")).toHaveStyle({ color: "#766D69", fontSize: 13 });
-    expect(screen.getAllByTestId("glyph-pin", hidden)[1]).toHaveProp("width", 15);
-    expect(screen.getByTestId("card-footer")).toHaveStyle({ paddingTop: 13 });
-    expect(screen.getByText("6 reservas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
-    expect(screen.getByText("6 cupos")).toBeOnTheScreen();
-    const chevron = screen.getByTestId("chevron", hidden);
+    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#4A4A4A", fontSize: 14 });
+    expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 16);
+    expect(card.getByText("Sucursal Centro")).toHaveStyle({ color: "#766D69", fontSize: 13 });
+    expect(card.getByTestId("glyph-pin", hidden)).toHaveProp("width", 15);
+    expect(card.getByTestId("card-footer")).toHaveStyle({ paddingTop: 13 });
+    expect(card.getByText("6 reservas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(card.getByText("6 cupos")).toBeOnTheScreen();
+    // S11's payment card stays mounted under S13, so the chevron is read inside the card.
+    const chevron = card.getByTestId("chevron", hidden);
     expect(chevron).toHaveProp("stroke", "#B78380");
     expect(chevron).toHaveProp("width", 19);
   });

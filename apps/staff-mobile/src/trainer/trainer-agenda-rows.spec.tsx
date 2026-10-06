@@ -59,7 +59,7 @@ describe("Trainer agenda rows", () => {
       fontFamily: "Lora_500Medium",
       fontSize: 20,
     });
-    expect(screen.getAllByText(/^\d\d:\d\d–\d\d:\d\d$/)[0]).toHaveStyle({
+    expect(screen.getAllByText(/^10:00/)[0]).toHaveStyle({
       color: "#766D69",
       fontSize: 13,
       fontWeight: "500",

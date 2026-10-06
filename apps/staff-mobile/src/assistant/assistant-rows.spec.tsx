@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { assistantRoutes, openClientSearch, openLucia } from "./assistant-fixtures";
@@ -45,8 +45,9 @@ describe("Assistant rows", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Reservar clase" }));
     await waitFor(() => {
-      expect(screen.getByText("Reservando para: Lucía Fernández")).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
     });
+    expect(screen.getByText("Reservando para: Lucía Fernández")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toHaveStyle({
       borderRadius: 999,
       minHeight: 44,
@@ -56,14 +57,16 @@ describe("Assistant rows", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    expect(screen.getByText("Reformer Pilates")).toHaveStyle({
+    const card = within(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+    expect(card.getByText("Reformer Pilates")).toHaveStyle({
       fontFamily: "Lora_500Medium",
       fontSize: 19,
     });
-    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
-    expect(screen.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
-    expect(screen.getByText("6 cupos")).toBeOnTheScreen();
-    const chevron = screen.getByTestId("chevron", hidden);
+    expect(card.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(card.getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
+    expect(card.getByText("6 cupos")).toBeOnTheScreen();
+    // S04's result row stays mounted under S07, so the chevron is read inside the card.
+    const chevron = card.getByTestId("chevron", hidden);
     expect(chevron).toHaveProp("stroke", "#B78380");
     expect(chevron).toHaveProp("width", 19);
   });

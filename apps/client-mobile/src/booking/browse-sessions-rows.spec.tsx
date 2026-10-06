@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -90,16 +90,22 @@ describe("Client class list rows", () => {
     await waitFor(() => {
       expect(screen.getAllByRole("button", { name: /^Reformer Pilates \d/ })).toHaveLength(2);
     });
-    expect(screen.getAllByText("Reformer Pilates")[0]).toHaveStyle({
+    // The Inicio tab stays mounted with its own person glyph and chevron, so
+    // the assertions stay inside each card.
+    const cards = screen
+      .getAllByRole("button", { name: /^Reformer Pilates \d/ })
+      .map((card) => within(card));
+    expect(cards[0].getByText("Reformer Pilates")).toHaveStyle({
       fontFamily: "Lora_500Medium",
       fontSize: 19,
     });
-    expect(screen.getAllByText("Emma Vargas")[0]).toHaveStyle({ color: "#6E6663", fontSize: 14 });
-    expect(screen.getAllByTestId("glyph-person", hidden)).toHaveLength(2);
-    expect(screen.getByText("Lleno")).toBeOnTheScreen();
-    const chevrons = screen.getAllByTestId("chevron", hidden);
-    expect(chevrons).toHaveLength(2);
-    expect(chevrons[1]).toHaveProp("stroke", "#B78380");
-    expect(chevrons[1]).toHaveProp("width", 19);
+    expect(cards[0].getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+    expect(cards[0].getByTestId("glyph-person", hidden)).toHaveProp("width", 17);
+    expect(cards[1].getByText("Lleno")).toBeOnTheScreen();
+    for (const card of cards) {
+      const chevron = card.getByTestId("chevron", hidden);
+      expect(chevron).toHaveProp("stroke", "#B78380");
+      expect(chevron).toHaveProp("width", 19);
+    }
   });
 });

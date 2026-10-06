@@ -3,6 +3,7 @@ import {
   fireEvent,
   render,
   waitFor,
+  within,
 } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
@@ -205,7 +206,10 @@ describe("Client Browse Sessions", () => {
     );
 
     expect(screen.getByRole("button", { name: "Centro" })).toBeSelected();
-    expect(screen.getByText("Centro")).toHaveStyle({ color: "#8A5D59" });
+    // The picker pill names the Branch too (MOB-042), so read the sheet row's label.
+    expect(
+      within(screen.getByRole("button", { name: "Centro" })).getByText("Centro"),
+    ).toHaveStyle({ color: "#8A5D59" });
     expect(
       screen.getByTestId("picker-check-branch-centro", { includeHiddenElements: true }),
     ).toBeOnTheScreen();
