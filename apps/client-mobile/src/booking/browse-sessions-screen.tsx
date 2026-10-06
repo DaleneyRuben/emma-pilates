@@ -13,6 +13,7 @@ import {
   QueryFailure,
   radii,
   Screen,
+  SeatPill,
   SessionCard,
   spacing,
   typography,
@@ -63,17 +64,6 @@ function Chip({
         {label}
       </Text>
     </Pressable>
-  );
-}
-
-function SeatTag({ availableSeats }: { availableSeats: number }) {
-  const full = availableSeats === 0;
-  return (
-    <View style={[styles.tag, full && styles.tagFull]}>
-      <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
-        {seatsTag(availableSeats)}
-      </Text>
-    </View>
   );
 }
 
@@ -245,7 +235,11 @@ export function BrowseSessionsScreen() {
               onPress={() =>
                 navigation.navigate("SessionDetail", { sessionId: session.id })
               }
-              tag={<SeatTag availableSeats={session.availableSeats} />}
+              tag={
+                <SeatPill full={session.availableSeats === 0}>
+                  {seatsTag(session.availableSeats)}
+                </SeatPill>
+              }
               time={formatTimeRange(session.startsAt, session.endsAt)}
               title={session.classTypeName}
               trainerName={session.trainerName}
@@ -306,13 +300,4 @@ const styles = StyleSheet.create({
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
   screen: { gap: spacing.md },
   sheetTitle: { color: colors.textMuted, fontSize: typography.label },
-  tag: {
-    backgroundColor: colors.accentTint,
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.smLg,
-    paddingVertical: spacing.xs,
-  },
-  tagFull: { backgroundColor: "rgba(74,74,74,0.07)" },
-  tagLabel: { color: colors.primaryDeep, fontSize: typography.label, fontWeight: "600" },
-  tagLabelFull: { color: colors.textSecondary },
 });

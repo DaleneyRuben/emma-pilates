@@ -23,6 +23,7 @@ import {
   radii,
   Screen,
   ScreenTopBar,
+  SeatPill,
   spacing,
   surfaces,
   typography,
@@ -249,9 +250,7 @@ export function CancelClassScreen() {
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
-          {visible.map((session) => {
-            const full = session.availableSeats === 0;
-            return (
+          {visible.map((session) => (
               <Pressable
                 accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}${allBranches ? ` · ${session.branchName}` : ""}`}
                 accessibilityRole="button"
@@ -287,15 +286,10 @@ export function CancelClassScreen() {
                   <Text style={styles.booked}>
                     {describeCount(session.bookedCount, "reserva", "reservas")}
                   </Text>
-                  <View style={[styles.tag, full && styles.tagFull]}>
-                    <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
-                      {seatsTag(session)}
-                    </Text>
-                  </View>
+                  <SeatPill full={session.availableSeats === 0}>{seatsTag(session)}</SeatPill>
                 </CardFooter>
               </Pressable>
-            );
-          })}
+          ))}
         </ScrollView>
       )}
     </Screen>
@@ -375,13 +369,4 @@ const styles = StyleSheet.create({
   },
   list: { gap: spacing.md, paddingBottom: spacing.xxl },
   screen: { gap: spacing.md },
-  tag: {
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  tagFull: { backgroundColor: colors.disabledBackground },
-  tagLabel: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "500" },
-  tagLabelFull: { color: colors.textSecondary },
 });

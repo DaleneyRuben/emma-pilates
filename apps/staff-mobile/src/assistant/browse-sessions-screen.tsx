@@ -19,6 +19,7 @@ import {
   QueryFailure,
   radii,
   Screen,
+  SeatPill,
   SessionCard,
   spacing,
   typography,
@@ -235,32 +236,25 @@ export function BrowseSessionsScreen({
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
           <TabletGrid testID="assistant-session-grid">
-          {visible.map((session) => {
-            const full = session.availableSeats === 0;
-            return (
-              <SessionCard
-                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
-                key={session.id}
-                onPress={() =>
-                  navigation.navigate("SessionDetail", {
-                    clientId,
-                    clientName,
-                    sessionId: session.id,
-                  })
-                }
-                tag={
-                  <View style={[styles.tag, full && styles.tagFull]}>
-                    <Text style={[styles.tagLabel, full && styles.tagLabelFull]}>
-                      {seatsTag(session)}
-                    </Text>
-                  </View>
-                }
-                time={formatTimeRange(session.startsAt, session.endsAt)}
-                title={session.classTypeName}
-                trainerName={session.trainerName}
-              />
-            );
-          })}
+          {visible.map((session) => (
+            <SessionCard
+              accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
+              key={session.id}
+              onPress={() =>
+                navigation.navigate("SessionDetail", {
+                  clientId,
+                  clientName,
+                  sessionId: session.id,
+                })
+              }
+              tag={
+                <SeatPill full={session.availableSeats === 0}>{seatsTag(session)}</SeatPill>
+              }
+              time={formatTimeRange(session.startsAt, session.endsAt)}
+              title={session.classTypeName}
+              trainerName={session.trainerName}
+            />
+          ))}
           </TabletGrid>
         </ScrollView>
       )}
@@ -305,13 +299,4 @@ const styles = StyleSheet.create({
   screen: { gap: spacing.md },
   // Horizontal strips would otherwise stretch into spare tablet height.
   strip: { flexGrow: 0 },
-  tag: {
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-  },
-  tagFull: { backgroundColor: colors.disabledBackground },
-  tagLabel: { color: colors.primaryOnTint, fontSize: typography.note, fontWeight: "500" },
-  tagLabelFull: { color: colors.textSecondary },
 });

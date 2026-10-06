@@ -14,6 +14,7 @@ import {
   QueryFailure,
   radii,
   Screen,
+  SeatPill,
   spacing,
   surfaces,
   typography,
@@ -75,11 +76,7 @@ function AgendaCard({
         <DetailLine icon="person" style={styles.booked}>
           {`${session.bookedCount} de ${session.capacity} reservados`}
         </DetailLine>
-        <View style={[styles.pill, full && styles.pillFull]}>
-          <Text style={[styles.pillLabel, full && styles.pillLabelFull]}>
-            {full ? "Completa" : "Con cupos"}
-          </Text>
-        </View>
+        <SeatPill full={full}>{full ? "Completa" : "Con cupos"}</SeatPill>
       </CardFooter>
     </Pressable>
   );
@@ -194,20 +191,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   list: { gap: spacing.md, paddingBottom: spacing.lg },
-  pill: {
-    backgroundColor: colors.neutralPill,
-    borderRadius: radii.pill,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.smd,
-  },
-  pillFull: { backgroundColor: colors.successTint },
-  pillLabel: {
-    color: colors.textSecondary,
-    fontFamily: fontFamilies.bodyMedium,
-    fontSize: typography.label,
-    fontWeight: "500",
-  },
-  pillLabelFull: { color: colors.successText },
   screen: { gap: spacing.md },
   // The date strip keeps its height when the list below is long.
   strip: { flexGrow: 0, flexShrink: 0 },
