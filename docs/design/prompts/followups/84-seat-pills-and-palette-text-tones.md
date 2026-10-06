@@ -1,7 +1,7 @@
 # Follow-up — One seat-pill rule and the text tones outside the closed palette
 
-Targets: **Client `03`, `06`, `08`, `09`, `15`, `16`, `19`, `01`, `21`,
-`22`**; **Staff `S02`, `S03`, `S04`, `S06`, `S07`, `S08`, `S09`, `S10`,
+Targets: **Client `03`, `05`, `06`, `08`, `09`, `15`, `16`, `19`, `01`,
+`21`, `22`**; **Staff `S02`, `S03`, `S04`, `S06`, `S07`, `S08`, `S09`, `S10`,
 `S11`, `S12`, `S13`, `S16`, `S20`, `S21`, `S22`, `S01`, `S05`, `S19`**;
 **Admin web `AW01`, `AW03`, `AW24`**; **generated handoff
 `design/README.md`** (a new «Seat pills» section after «Branch picker pill
@@ -87,8 +87,8 @@ Change:
 
 ## 2. `#8A5F5C` → `#8A5D59`
 
-Replace every `#8A5F5C` with `#8A5D59` in the 21 files of §1 above, the
-script of `03` included. Nothing else about those elements changes.
+Replace every `#8A5F5C` with `#8A5D59` in the 21 files of point 1 above,
+the script of `03` included. Nothing else about those elements changes.
 
 ## 3. The remaining Éxito, Advertencia, and Error text tones
 
