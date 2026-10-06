@@ -16,10 +16,7 @@ describe("Chevron", () => {
     expect(icon).toHaveProp("strokeWidth", 1.3);
     expect(icon).toHaveProp("width", 19);
     expect(icon).toHaveProp("height", 19);
-    expect(screen.getByTestId("chevron-right", hidden)).toHaveProp(
-      "points",
-      "9.5,5 16.5,12 9.5,19",
-    );
+    expect(screen.getByTestId("chevron-right", hidden)).toHaveProp("d", "M9.5 5 16.5 12 9.5 19");
   });
 
   it("takes the quiet tone of the Perfil menu rows", async () => {
@@ -39,14 +36,8 @@ describe("Chevron", () => {
     const closed = screen.getByTestId("closed", hidden);
     expect(closed).toHaveProp("stroke", "#766D69");
     expect(closed).toHaveProp("width", 16);
-    expect(screen.getByTestId("closed-down", hidden)).toHaveProp(
-      "points",
-      "6,9.5 12,15.5 18,9.5",
-    );
-    expect(screen.getByTestId("open-up", hidden)).toHaveProp(
-      "points",
-      "6,14.5 12,8.5 18,14.5",
-    );
+    expect(screen.getByTestId("closed-down", hidden)).toHaveProp("d", "M6 9.5 12 15.5 18 9.5");
+    expect(screen.getByTestId("open-up", hidden)).toHaveProp("d", "M6 14.5 12 8.5 18 14.5");
   });
 
   it("stays hidden from screen readers", async () => {

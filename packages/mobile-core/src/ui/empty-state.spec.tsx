@@ -6,6 +6,15 @@ import { PrimaryButton } from "./primary-button";
 
 const hidden = { includeHiddenElements: true };
 
+type Instance = { children: (Instance | string)[]; props: Record<string, unknown> };
+
+/** The props of every shape drawn inside an SVG, as Jest renders them. */
+function svgShapes(instance: Instance): Record<string, unknown>[] {
+  return instance.children.flatMap((child) =>
+    typeof child === "string" ? [] : [child.props, ...svgShapes(child)],
+  );
+}
+
 // MOB-039: S06's «Sin plan activo» and the tablet's empty panel, as the
 // frames draw them.
 describe("EmptyState", () => {
@@ -125,12 +134,12 @@ describe("EmptyState plain variant", () => {
       expect(icon).toHaveProp("strokeWidth", 1.1);
       expect(icon).toHaveProp("width", 34);
     }
-    const bell = screen.getByTestId("empty-state-icon-bell", hidden);
-    expect(
-      bell.findAllByProps({ d: "M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z" }),
-    ).not.toHaveLength(0);
-    const calendar = screen.getByTestId("empty-state-icon-calendar", hidden);
-    expect(calendar.findAllByProps({ x1: 8, y1: 3.5 })).not.toHaveLength(0);
+    expect(svgShapes(screen.getByTestId("empty-state-icon-bell", hidden))).toContainEqual(
+      expect.objectContaining({ d: "M6 10a6 6 0 0 1 12 0c0 4 1.5 5.5 1.5 5.5h-15S6 14 6 10z" }),
+    );
+    expect(svgShapes(screen.getByTestId("empty-state-icon-calendar", hidden))).toContainEqual(
+      expect.objectContaining({ x1: 8, y1: 3.5 }),
+    );
   });
 
   // MOB-041: S21 puts «Reservar una clase» 6 pt under the note, 220 pt wide.
