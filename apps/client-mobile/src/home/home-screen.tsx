@@ -135,12 +135,15 @@ function PurchaseCard({ onPurchase }: { onPurchase: () => void }) {
 }
 
 function QuickAction({
+  chevron = false,
   disabled = false,
   label,
   note,
   onPress,
   summary,
 }: {
+  /** 02's full-width shortcut ends in a chevron (a lock while disabled); its tiles do not. */
+  chevron?: boolean;
   disabled?: boolean;
   label: string;
   note?: string;
@@ -167,7 +170,7 @@ function QuickAction({
           <BodyText style={styles.actionNote}>{summary}</BodyText>
         ) : null}
       </View>
-      {disabled ? <ShortcutLock /> : <Chevron />}
+      {!chevron ? null : disabled ? <ShortcutLock /> : <Chevron />}
     </Pressable>
   );
 }
@@ -272,6 +275,7 @@ export function HomeScreen() {
         )}
         <View style={styles.actions}>
           <QuickAction
+            chevron
             disabled={!hasActivePlan}
             label="Reservar una clase"
             note="Necesitas un plan activo para reservar"
