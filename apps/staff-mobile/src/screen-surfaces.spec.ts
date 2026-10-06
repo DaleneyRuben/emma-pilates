@@ -1,9 +1,17 @@
-import { readdirSync, readFileSync } from "fs";
-import { join, relative } from "path";
+// The app's TypeScript setup has no Node types, so the spec types the two
+// file-system calls it needs; Jest runs on Node and provides both.
+declare const __dirname: string;
+const { readdirSync, readFileSync } = jest.requireActual<{
+  readdirSync(
+    path: string,
+    options: { withFileTypes: true },
+  ): { isDirectory(): boolean; name: string }[];
+  readFileSync(path: string, encoding: "utf8"): string;
+}>("fs");
 
 function sourceFiles(directory: string): string[] {
   return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
-    const path = join(directory, entry.name);
+    const path = `${directory}/${entry.name}`;
     if (entry.isDirectory()) return sourceFiles(path);
     return /\.tsx?$/.test(entry.name) && !/\.spec\.tsx?$/.test(entry.name) ? [path] : [];
   });
@@ -15,7 +23,7 @@ describe("screen surfaces", () => {
   it("never fills a card or panel with the screen's own Superficie", () => {
     const offenders = sourceFiles(__dirname)
       .filter((path) => /backgroundColor: colors\.surface\b/.test(readFileSync(path, "utf8")))
-      .map((path) => relative(__dirname, path));
+      .map((path) => path.slice(__dirname.length + 1));
 
     expect(offenders).toEqual([]);
   });
