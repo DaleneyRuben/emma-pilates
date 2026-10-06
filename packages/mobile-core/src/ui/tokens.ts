@@ -39,6 +39,14 @@ export const colors = {
   neutralTint: "rgba(216,201,187,0.14)",
   // The circle behind an empty panel's icon (S04's tablet split view).
   neutralWash: "rgba(216,201,187,0.18)",
+  // S02's «Con cupos» pill (MOB-042).
+  neutralPill: "rgba(216,201,187,0.34)",
+  // Tints of the accent `#D8BDB8`: 02's shortcut tile and 03's seat pill
+  // (0.28), the S04 and S11 avatars (0.4) (MOB-042).
+  accentTint: "rgba(216,189,184,0.28)",
+  accentWash: "rgba(216,189,184,0.4)",
+  // The tile of 02's disabled shortcut: Plomo cálido at low alpha (MOB-042).
+  inkTint: "rgba(74,74,74,0.05)",
   disabledBackground: "#E7DCD8",
   disabledText: "#B3A9A5",
   // The frames' quiet icon: the 34 pt empty-state glyphs of 07, 19, S20,
@@ -78,8 +86,12 @@ export const typography = {
   title: 30,
   titleSecondary: 22,
   price: 26,
+  // The Lora titles of the S02 and S13 cards and the Lora 19 of 03, S07, S11, and S15 (MOB-042).
+  titleCard: 20,
   titleSmall: 19,
   bodyLarge: 17,
+  // The names on S04's results, S15's rows, and 02's tiles (MOB-042).
+  bodyMedium: 16,
   body: 15,
   label: 12,
   note: 13,
