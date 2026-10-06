@@ -493,9 +493,16 @@ than 2 h 30 before its start offers **Cancelar** behind a confirmation sheet
 (the class returns to the balance); one inside that window shows **No
 cancelable** and **Reprogramar** to another Session of the same day; a
 Waitlist entry offers **Salir de la lista de espera**. With nothing upcoming,
-the screen offers **Reservar una clase**. **Ver historial** opens the attended
-classes grouped by month (empty for the fixtures until a Trainer records
-attendance).
+the screen offers **Reservar una clase**. **Ver historial** opens **Historial
+de clases**: «Has asistido a» over «N clases desde <mes>» in large Lora, then
+one group per month («Septiembre 2026» with its count, «4 clases», over a
+`#D8C9BB` rule) whose classes are rows drawn straight on the screen, not
+cards: a day column (the day of the month in Lora, the weekday in small
+capitals), the Class Type in Lora, and «Entrenadora · Sucursal» under it,
+separated by thin `#EFE7DE` rules. With no attendance yet the screen centres
+a quiet clock, «Aún no tienes clases en tu historial.», and «Aquí aparecerán
+tus clases una vez que registremos tu asistencia en el estudio.» (the
+fixtures reach this until a Trainer records attendance).
 
 That Client Account must not authenticate in the Staff app. Use a Staff fixture
 such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
@@ -1327,8 +1334,13 @@ inside it, **En lista de espera** plus **Salir de la lista de espera**. Items
 at a Branch you are not assigned to keep their action disabled with "Solo en
 tus sucursales". Cancelling asks "¿Cancelar esta reserva de Lucía Fernández?"
 first. With nothing upcoming the screen reads "Esta clienta no tiene reservas
-próximas." and offers **Reservar una clase**. **Ver historial completo** lists
-attended classes by month ("Septiembre 2026") under "Viendo historial de: …".
+próximas." and offers **Reservar una clase**. **Ver historial completo** opens
+**Historial de clases** under "Viendo historial de: …", drawn exactly like the
+Client's own (Test 5 B): «Ha asistido a» over «N clases desde <mes>», then
+month groups ("Septiembre 2026" with its count) of rows between thin rules
+with the day column, the Class Type, and «Entrenadora · Sucursal». A Client
+without attendance reads «Esta clienta aún no tiene clases en su historial.»
+under the quiet clock, with no supporting line.
 
 ### C. Book a class for her
 
