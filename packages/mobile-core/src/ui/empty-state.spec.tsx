@@ -66,3 +66,42 @@ describe("EmptyState", () => {
     ).toHaveStyle({ fontSize: 14, maxWidth: 340 });
   });
 });
+
+// MOB-040: 07 and S22 (like 19, S20, and S21) centre a bare empty state on
+// the screen: a quiet 34 pt clock, a Lora 21 title, and an optional note.
+describe("EmptyState plain variant", () => {
+  it("draws the bare clock, Lora 21 title, and 14 pt note on the screen", async () => {
+    const screen = await render(
+      <EmptyState
+        icon="clock"
+        message="Aquí aparecerán tus clases una vez que registremos tu asistencia en el estudio."
+        title="Aún no tienes clases en tu historial."
+        variant="plain"
+      />,
+    );
+
+    const title = screen.getByText("Aún no tienes clases en tu historial.");
+    expect(title).toHaveStyle({ fontFamily: "Lora_500Medium", fontSize: 21, textAlign: "center" });
+    expect(StyleSheet.flatten(title.parent?.props.style)).not.toHaveProperty("backgroundColor");
+    expect(StyleSheet.flatten(title.parent?.props.style)).not.toHaveProperty("borderWidth");
+    const icon = screen.getByTestId("empty-state-icon-clock", hidden);
+    expect(icon).toHaveProp("stroke", "#C4BAB6");
+    expect(icon).toHaveProp("width", 34);
+    expect(
+      screen.getByText(
+        "Aquí aparecerán tus clases una vez que registremos tu asistencia en el estudio.",
+      ),
+    ).toHaveStyle({ color: "#766D69", fontSize: 14, maxWidth: 260, textAlign: "center" });
+  });
+
+  it("stands with the title alone, as S22's does", async () => {
+    const screen = await render(
+      <EmptyState title="Esta clienta aún no tiene clases en su historial." variant="plain" />,
+    );
+
+    expect(screen.getByText("Esta clienta aún no tiene clases en su historial.")).toHaveStyle({
+      fontSize: 21,
+    });
+    expect(screen.queryByTestId("empty-state-icon-clock", hidden)).toBeNull();
+  });
+});

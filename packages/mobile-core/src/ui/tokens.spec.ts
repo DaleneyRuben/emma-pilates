@@ -53,3 +53,11 @@ describe("card tokens (MOB-039)", () => {
     expect(colors.neutralWash).toBe("rgba(216,201,187,0.18)");
   });
 });
+
+// MOB-040: the frames' quiet icon tone (empty-state glyphs, row chevrons) is
+// not in the README palette yet; the apps name it once.
+describe("quiet icon token (MOB-040)", () => {
+  it("names the frames' quiet icon tone", () => {
+    expect(colors.iconQuiet).toBe("#C4BAB6");
+  });
+});
