@@ -499,7 +499,14 @@ Plans.
 than 2 h 30 before its start offers **Cancelar** behind a confirmation sheet
 (the class returns to the balance); one inside that window shows **No
 cancelable** and **Reprogramar** to another Session of the same day; a
-Waitlist entry offers **Salir de la lista de espera**. With nothing upcoming,
+Waitlist entry offers **Salir de la lista de espera**. **Reprogramar** opens
+**Reprogramar clase**: the current Booking in a muted box, then the day's
+other classes with seats as the same white cards as **Reservar** (the spaced
+time over the Lora Class Type, and under the thin rule the Trainer after the
+person icon with the «N cupos» pill in Palo de rosa oscuro on Palo de rosa
+tinte at the right, where the booking list's cards show a chevron). Tapping
+a card draws its border in Palo de rosa (2 px) and enables **Confirmar
+cambio** (MOB-048). With nothing upcoming,
 the screen offers **Reservar una clase**. **Ver historial** opens **Historial
 de clases**: «Has asistido a» over «N clases desde <mes>» in large Lora, then
 one group per month («Septiembre 2026» with its count, «4 clases», over a
@@ -1352,7 +1359,11 @@ disponibles. Registra un pago para activar un plan y poder reservar." and
 **Ver reservas** opens **Reservas de la clienta** under the banner "Viendo
 reservas de: Lucía Fernández". Cards mirror the Client app: **Cancelar** for a
 reservation outside the 2 h 30 window, **No cancelable** plus **Reprogramar**
-inside it, **En lista de espera** plus **Salir de la lista de espera**. Items
+inside it, **En lista de espera** plus **Salir de la lista de espera**.
+**Reprogramar** opens **Reprogramar clase** under the banner with the same
+option cards as the Client's (Test 5 B: the shared Session card with the
+«N cupos» pill at the footer's right and a 2 px Palo de rosa border once
+selected; MOB-048). Items
 at a Branch you are not assigned to keep their action disabled with "Solo en
 tus sucursales". Cancelling asks "¿Cancelar esta reserva de Lucía Fernández?"
 first. With nothing upcoming the screen centres a quiet calendar, "Esta
@@ -1376,7 +1387,10 @@ the time and the Lora Class Type, the seat pill in the same tones with
 **Llena** for a full class, the Trainer after a person icon, the chevron), and
 like the Client's list it leaves out today's Sessions
 that already started (a Client cannot be booked into one, MOB-044). Tap a Session: the detail shows Trainer, Branch, date, time, duration,
-and "X de Y cupos disponibles". **Reservar** books it for the Client and lands
+and a white box with «X de Y cupos disponibles» beside a **Con cupos** pill
+(Palo de rosa oscuro on Palo de rosa tinte); a full class reads «0 de Y cupos
+disponibles» beside **Completa** on the neutral sand pill, never red or green,
+and no bar is drawn (MOB-048; follow-up 87). **Reservar** books it for the Client and lands
 on **Reservas de la clienta** with the "Reserva confirmada" notice. A full
 class offers **Unirme a la lista de espera** ("Clase llena. Se avisará al
 cliente si se libera un cupo."); a Client without classes left sees **Reservar**
