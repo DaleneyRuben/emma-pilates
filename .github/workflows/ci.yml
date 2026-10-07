@@ -41,7 +41,7 @@ jobs:
       - run: pnpm check:api
       - run: pnpm check:api-compat
 
-  backend:
+  api:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
@@ -68,16 +68,24 @@ jobs:
           # the in-band ESM run grows past Node's default heap on the runner
           NODE_OPTIONS: --max-old-space-size=4096
 
-  frontend:
+  web:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      # every one of these suites passes and then lingers on an open handle on
-      # Linux (the admin web for good, each mobile package for about five
-      # minutes), so Jest is told to exit once the tests are done
+      # the suite passes and then lingers on an open handle on Linux for good,
+      # so Jest is told to exit once the tests are done
       - run: pnpm --filter @pilates/admin-web exec jest --ci --forceExit
+
+  mobile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # each suite passes and then lingers on an open handle on Linux for about
+      # five minutes, so Jest is told to exit once the tests are done
       - run: pnpm --filter @pilates/client-mobile exec jest --ci --forceExit
       - run: pnpm --filter @pilates/staff-mobile exec jest --ci --forceExit
       - run: pnpm --filter @pilates/mobile-core exec jest --ci --forceExit
