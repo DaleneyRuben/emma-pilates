@@ -27,6 +27,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { CenteredCard } from "./assistant-layout";
+import { CapacitySummary } from "./capacity-summary";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { ClientBanner } from "./client-banner";
 import { useShowClientBookings } from "./show-client-bookings";
@@ -109,7 +110,6 @@ export function AssistantSessionDetailScreen({
     (view.status === "active" || view.status === "expiring_soon") &&
     (view.subscription?.remainingClassAllowance ?? 0) > 0;
   const full = forcedFull || detail.availableSeats === 0;
-  const fill = detail.capacity === 0 ? 0 : detail.bookedCount / detail.capacity;
 
   const refresh = () =>
     Promise.all([
@@ -203,22 +203,11 @@ export function AssistantSessionDetailScreen({
             <Text style={styles.factValue}>{`${detail.classType.durationMinutes} minutos`}</Text>
           </View>
         </View>
-        <View style={styles.capacity}>
-          <BodyText style={styles.factLabel}>Cupos disponibles</BodyText>
-          <View
-            accessibilityRole="progressbar"
-            accessibilityValue={{ max: detail.capacity, min: 0, now: detail.bookedCount }}
-            style={styles.capacityTrack}
-          >
-            <View style={[styles.capacityFill, { flex: fill }, full && styles.capacityFillFull]} />
-            <View style={{ flex: 1 - fill }} />
-          </View>
-          <Text style={styles.factValue}>
-            {full
-              ? "Lleno"
-              : `${detail.availableSeats} de ${detail.capacity} cupos disponibles`}
-          </Text>
-        </View>
+        <CapacitySummary
+          availableSeats={detail.availableSeats}
+          capacity={detail.capacity}
+          full={full}
+        />
       </ScrollView>
       <View style={styles.actions}>
         {message !== null ? (
@@ -275,20 +264,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     gap: spacing.sm,
     paddingTop: spacing.md,
-  },
-  capacity: {
-    ...surfaces.card,
-    gap: spacing.sm,
-    padding: spacing.lg,
-  },
-  capacityFill: { backgroundColor: colors.primary, borderRadius: radii.pill },
-  capacityFillFull: { backgroundColor: colors.textSubtle },
-  capacityTrack: {
-    backgroundColor: colors.primaryTint,
-    borderRadius: radii.pill,
-    flexDirection: "row",
-    height: 8,
-    overflow: "hidden",
   },
   content: { gap: spacing.lg, paddingBottom: spacing.lg },
   factLabel: { color: colors.textMuted, fontSize: typography.note },
