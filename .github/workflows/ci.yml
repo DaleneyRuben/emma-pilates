@@ -19,21 +19,42 @@ env:
   DATABASE_URL: postgresql://nobody@127.0.0.1:1/pilates_ci_unreachable
 
 jobs:
-  quality:
+  quality-api:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm --filter @pilates/admin-web format:check
+      - run: pnpm --filter @pilates/backend lint
+      - run: pnpm --filter @pilates/backend typecheck
       - run: pnpm --filter @pilates/backend build
-      - run: pnpm --filter @pilates/admin-web build
+      - run: pnpm --filter @pilates/api-contracts typecheck
       - run: pnpm --filter @pilates/api-contracts build
 
+  quality-web:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @pilates/admin-web lint
+      - run: pnpm --filter @pilates/admin-web format:check
+      - run: pnpm --filter @pilates/admin-web typecheck
+      - run: pnpm --filter @pilates/admin-web build
+
+  quality-mobile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      # the three mobile packages have no lint script yet (MOB-050)
+      - run: pnpm --filter @pilates/mobile-core typecheck
+      - run: pnpm --filter @pilates/client-mobile typecheck
+      - run: pnpm --filter @pilates/staff-mobile typecheck
+
   contracts:
-    needs: quality
+    needs: quality-api
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -71,7 +92,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
 
   web:
-    needs: contracts
+    needs: quality-web
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -82,7 +103,7 @@ jobs:
       - run: pnpm --filter @pilates/admin-web exec jest --ci --forceExit
 
   mobile:
-    needs: contracts
+    needs: quality-mobile
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
