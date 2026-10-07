@@ -196,6 +196,7 @@ Each of these was sent as the next message in the existing design session for th
 | [85](./followups/85-s04-tablet-result-rows.md) | `S04`'s result rows on the tablet (MOB-046): the contact line of every result row stays on one line and is trimmed with an ellipsis, a «Tablet · Resultados» frame shows two phone-style result rows in the 392px left panel with a trimmed contact, and the README gains a «Search result rows (`S04`)» section | ✅ applied |
 | [86](./followups/86-s13-started-sessions-note.md) | `S13`'s «Incluye clases llenas» note (MOB-044) says no Session is hidden; it now says no full class is hidden and that started Sessions, which can no longer be cancelled, do not appear | ✅ applied |
 | [87](./followups/87-s08-capacity-box-on-blanco.md) | `S08`'s capacity summary box (MOB-048): the box behind «N de M cupos disponibles» and the seat pill loses its Éxito `rgba(124,148,115,0.10)` and Error `rgba(178,93,75,0.07)` tints for Blanco `#FFFFFF`, a flat card whose pill alone carries the state; the README's «Seat pills» section gains a bullet saying so | ✅ applied (Claude Design export 2026-10-06, `10c09e5a`; the app side is built in MOB-048) |
+| [88](./followups/88-04-lleno-pill-and-bar-track.md) | `04`'s capacity block (MOB-049): the «Lleno» pill's `rgba(74,74,74,0.07)` becomes the seat-pill rule's `rgba(216,201,187,0.34)` and the bar's `#EFE4DC` track becomes Palo de rosa tinte `#EFE0DC`; the README's «Seat pills» heading and rule extend to `04` with a bullet for its bar | 🕓 pending |
 
 ## Status
 
