@@ -3,6 +3,6 @@
 process.env.DATABASE_URL =
   'postgresql://nobody@127.0.0.1:1/pilates_e2e_unreachable';
 process.env.NODE_ENV = 'test';
-// Application modules boot as they do for the offline OpenAPI generator: the
-// pg-boss factories return a stub instead of opening the job runtime.
-process.env.OPENAPI_GENERATION = 'true';
+// Application modules boot without the job runtime, as they do for the offline
+// OpenAPI generator: the pg-boss factories return a stub instead of pg-boss.
+process.env.BOOT_WITHOUT_JOB_RUNTIME = 'true';

@@ -11,7 +11,7 @@ import type { PgBoss } from 'pg-boss';
 import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
 import { createPgBoss, startInstalledPgBoss } from '../jobs/pg-boss-runtime';
-import { isOpenApiGeneration } from '../openapi/openapi-generation';
+import { bootsWithoutJobRuntime } from '../jobs/boot-without-job-runtime';
 import {
   AccountSecurityController,
   accountActivation,
@@ -87,7 +87,7 @@ const systemIdentityPrisma = Symbol('systemIdentityPrisma');
 const authenticationGateway = Symbol('authenticationGateway');
 const accountSecurityGateway = Symbol('accountSecurityGateway');
 
-const openApiPgBoss: Pick<PgBoss, 'stop'> = {
+const offlinePgBoss: Pick<PgBoss, 'stop'> = {
   stop: () => Promise.resolve(),
 };
 
@@ -132,8 +132,8 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
       provide: registrationPgBoss,
       inject: [ConfigService],
       useFactory: async (config: ConfigService<Environment, true>) => {
-        if (isOpenApiGeneration(process.env)) {
-          return openApiPgBoss as PgBoss;
+        if (bootsWithoutJobRuntime(process.env)) {
+          return offlinePgBoss as PgBoss;
         }
         const boss = createPgBoss(config.getOrThrow('DATABASE_URL'));
         await startInstalledPgBoss(boss);
