@@ -47,6 +47,14 @@ For TDD work, preserve the project's Red → Green → Refactor history: commit 
 
 Run only the tests and checks relevant to the logical change. Use the full suite only for cross-cutting changes. Do not commit when a relevant check fails; report the failure and stop.
 
+Lint every staged TypeScript file with its package's ESLint before staging,
+for example `pnpm --filter @pilates/backend exec eslint <paths>` from the
+repository root. In `apps/backend` formatting is a lint error (ESLint runs
+Prettier), so this is also the format check; `apps/admin-web` keeps a separate
+`format:check`. A file that fails lint is not committed, whatever the tests
+say: nine backend files committed on 2026-09-21 and 2026-09-22 without this
+step left `pnpm --filter @pilates/backend lint` red until BE-015.
+
 Documentation-only changes do not require invented tests. Run whitespace, link, schema, or skill validation appropriate to the edited documents.
 
 ## 4. Stage explicit paths
