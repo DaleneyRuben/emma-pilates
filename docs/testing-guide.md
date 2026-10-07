@@ -1107,6 +1107,58 @@ What they mean:
 - `check:api` proves that the committed OpenAPI document and generated API
   client match the backend controllers.
 
+### CI
+
+Every pull request and every push to `main` runs
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on GitHub Actions
+(EXT-004). It checks; it deploys nothing, and it needs no secret. Seven jobs
+run as three independent chains, one per surface, each job on a fresh Ubuntu
+runner after the shared setup in `.github/actions/setup/action.yml` (Node from
+`.nvmrc`, pnpm from the root `packageManager` field, cached pnpm store,
+`pnpm install --frozen-lockfile`, `prisma generate`):
+
+- **quality-api** (backend lint, typecheck, and build; api-contracts typecheck
+  and build) → **contracts** (`check:api`, `check:api-compat`) → **api** (the
+  backend unit, e2e, and integration suites against a `postgres:17-alpine`
+  service container; the integration suite runs through `TEST_DATABASE_URL`
+  on a `pilates_test_ci` admin database that lives and dies with the runner);
+- **quality-web** (admin-web lint, `format:check`, typecheck, build) →
+  **web** (the admin-web Jest suite);
+- **quality-mobile** (typecheck of mobile-core, client-mobile, and
+  staff-mobile; the three packages have no lint script until MOB-050) →
+  **mobile** (their three Jest suites).
+
+A job runs only when the job before it in its chain passed, so a lint or type
+error costs one two-minute job and the tests never start; a stale contract
+stops the api chain before the database run. On a pull request a first
+`changes` job also reads the pull request's whole list of changed files and
+starts only the chains of the surfaces it touches: `apps/backend/**` for api,
+`apps/admin-web/**` for web, the three mobile packages for mobile,
+`packages/api-contracts/**` for all three (every contract change touches the
+committed generated client), and the shared files (`package.json`,
+`pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.nvmrc`, `.github/**`) for all
+three. A docs-only pull request therefore runs nothing, and a backend fix that
+does not change the contract runs the api chain alone. A push to `main`
+always runs everything. Jobs that never started show as skipped. A clean run
+of all three chains takes about nine minutes of wall clock, set by the api
+chain.
+
+The Jest steps run with `--ci --forceExit`: every one of these suites passes
+and then lingers on an open handle on Linux, the admin web for good and each
+mobile package for about five minutes, so Jest is told to exit once the tests
+are done. The integration step raises Node's heap
+(`NODE_OPTIONS=--max-old-space-size=4096`) because the in-band ESM run grows
+past the runner's default limit; the backend scripts keep the shell's
+`NODE_OPTIONS` next to their own `--experimental-vm-modules` for that reason.
+
+A newer push to the same branch cancels the run in progress. To read a failed
+run, open the pull request's "Checks" tab or run
+`gh run list --branch <branch>` and `gh run view <run-id> --log-failed`: the
+failing job names the script that failed, and the log of that step is the same
+output you would see locally from the commands in the subsections above. Each
+job has a timeout (15 minutes, 20 for api), so a hung step fails instead of
+waiting forever.
+
 ## Test 9: try Perfil, the inbox, and password change in the apps
 
 Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
