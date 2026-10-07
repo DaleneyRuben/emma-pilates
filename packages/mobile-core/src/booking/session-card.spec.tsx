@@ -55,4 +55,29 @@ describe("SessionCard", () => {
     fireEvent.press(card);
     expect(onPress).toHaveBeenCalledTimes(1);
   });
+
+  // MOB-048: 06's option is the same card with the seat pill in the footer
+  // instead of the chevron and a 2px Palo de rosa border once selected.
+  it("marks a selected option by its border and takes a footer end in place of the chevron", async () => {
+    const screen = await render(
+      <SessionCard
+        accessibilityLabel="Reformer Pilates 07:00 – 07:50"
+        footerEnd={<Text>3 cupos</Text>}
+        onPress={() => undefined}
+        selected
+        time="07:00 – 07:50"
+        title="Reformer Pilates"
+        trainerName="Emma Vargas"
+      />,
+    );
+
+    const card = screen.getByRole("button", { name: "Reformer Pilates 07:00 – 07:50" });
+    expect(card).toHaveStyle({ borderColor: "#B78380", borderWidth: 2 });
+    expect(card).toHaveProp("accessibilityState", { selected: true });
+    expect(screen.queryByTestId("chevron", hidden)).toBeNull();
+    const footer = screen.getByTestId("card-footer");
+    expect(footer).toHaveStyle({ borderTopColor: "#EFE7DE", paddingTop: 12 });
+    expect(screen.getByText("3 cupos")).toBeOnTheScreen();
+    expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
+  });
 });
