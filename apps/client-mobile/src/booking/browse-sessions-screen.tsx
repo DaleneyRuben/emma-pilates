@@ -2,7 +2,6 @@ import {
   useListBranches,
   useListClassTypes,
   useListSessionAvailability,
-  type SessionAvailabilityDto,
 } from "@pilates/api-contracts";
 import {
   BodyText,

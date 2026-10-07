@@ -16,7 +16,6 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
-  typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";

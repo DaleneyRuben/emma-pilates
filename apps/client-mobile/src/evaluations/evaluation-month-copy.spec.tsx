@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
+import { cleanup, fireEvent, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse, routeFetcher } from "../test-support";
