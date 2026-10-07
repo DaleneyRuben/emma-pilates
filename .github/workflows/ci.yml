@@ -74,7 +74,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - run: pnpm --filter @pilates/admin-web exec jest --ci
+      # the admin-web suite leaves an open handle on Linux and never exits by itself
+      - run: pnpm --filter @pilates/admin-web exec jest --ci --forceExit
       - run: pnpm --filter @pilates/client-mobile exec jest --ci
       - run: pnpm --filter @pilates/staff-mobile exec jest --ci
       - run: pnpm --filter @pilates/mobile-core exec jest --ci
