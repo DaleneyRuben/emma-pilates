@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { resolve } from 'node:path';
 import {
@@ -57,14 +57,36 @@ const createDisposableDatabase = async (
   adminUrl: string,
 ): Promise<{ databaseUrl: string; drop: () => Promise<void> }> => {
   const name = `${disposableDatabasePrefix}${randomBytes(6).toString('hex')}`;
+  const watchdog = spawn(
+    process.execPath,
+    [resolve(backendRoot, 'test/database/disposable-database-watchdog.ts')],
+    {
+      detached: true,
+      stdio: ['pipe', 'ignore', 'ignore'],
+      env: {
+        ...process.env,
+        NODE_OPTIONS: '',
+        WATCHDOG_ADMIN_URL: adminUrl,
+        WATCHDOG_DATABASE: name,
+      },
+    },
+  );
+  watchdog.unref();
   await runAsAdmin(adminUrl, `create database "${name}"`);
   const url = new URL(adminUrl);
   url.pathname = `/${name}`;
 
   return {
     databaseUrl: url.toString(),
-    drop: () =>
-      runAsAdmin(adminUrl, `drop database if exists "${name}" with (force)`),
+    drop: async () => {
+      await runAsAdmin(
+        adminUrl,
+        `drop database if exists "${name}" with (force)`,
+      );
+      await new Promise<void>((done) => {
+        watchdog.stdin.end('release', done);
+      });
+    },
   };
 };
 
