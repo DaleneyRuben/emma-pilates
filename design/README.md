@@ -155,11 +155,12 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 
 - A 44px pill (1px `#D8C9BB`, Blanco, padding 0 16, gap 10, radius 999) with a 17px `#B78380` pin, «Sucursal: » and the Branch name in 14px `#4A4A4A` (the name at weight 500), and the 16px `#766D69` chevron pointing down; it opens the picker sheet above. `S13` offers «Todas las sucursales» as a name.
 
-### Seat pills (`03`, `06`, `S02`, `S07`, `S08`, `S13`)
+### Seat pills (`03`, `04`, `06`, `S02`, `S07`, `S08`, `S13`)
 
 - The pill on a Session row or detail says how many places remain or that none does; the number or word carries the state, so it takes no dot.
 - Seats remain («N cupos», «Con cupos»): Palo de rosa tinte `#EFE0DC` behind Palo de rosa oscuro `#7A4F4B`, the badge pair of the palette table. Full («Lleno», «Completa», «Llena»): `rgba(216,201,187,0.34)` behind Texto secundario `#6E6663`, never Error red and never Éxito green. 12px, weight 500, fully rounded.
 - `S08`'s capacity summary («N de M cupos disponibles» beside the pill) is a flat Blanco card: 1px `#D8C9BB`, radius 16, padding 16px 18px, no shadow. The pill alone carries the state, so the box takes no Éxito or Error tint.
+- `04`'s capacity block («**N** de M cupos disponibles» with the number in Lora 18 weight 500, then «N reservados» in 12px `#7A716D` or the «Lleno» pill on the right, and the 7px bar under the row) draws no card. The bar's track is Palo de rosa tinte `#EFE0DC` under a Palo de rosa `#B78380` fill sized to the booked share; when full the fill is Icono tenue `#C4BAB6`, the count reads «0 de M», and the pill alone names the state.
 
 ### Search result rows (`S04`)
 
