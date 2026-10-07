@@ -11,6 +11,7 @@ concurrency:
 
 permissions:
   contents: read
+  pull-requests: read
 
 env:
   # prisma.config.ts and the environment schema the OpenAPI generator validates
@@ -19,7 +20,46 @@ env:
   DATABASE_URL: postgresql://nobody@127.0.0.1:1/pilates_ci_unreachable
 
 jobs:
+  # A pull request runs only the chains of the surfaces it touches; the
+  # generated client in packages/api-contracts is shared by all three. A push
+  # to main always runs everything.
+  changes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      api: ${{ github.event_name != 'pull_request' || steps.filter.outputs.api == 'true' }}
+      web: ${{ github.event_name != 'pull_request' || steps.filter.outputs.web == 'true' }}
+      mobile: ${{ github.event_name != 'pull_request' || steps.filter.outputs.mobile == 'true' }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        if: github.event_name == 'pull_request'
+        with:
+          filters: |
+            shared: &shared
+              - package.json
+              - pnpm-lock.yaml
+              - pnpm-workspace.yaml
+              - .nvmrc
+              - .github/**
+            api:
+              - *shared
+              - apps/backend/**
+              - packages/api-contracts/**
+            web:
+              - *shared
+              - apps/admin-web/**
+              - packages/api-contracts/**
+            mobile:
+              - *shared
+              - apps/client-mobile/**
+              - apps/staff-mobile/**
+              - packages/mobile-core/**
+              - packages/api-contracts/**
+
   quality-api:
+    needs: changes
+    if: needs.changes.outputs.api == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -32,6 +72,8 @@ jobs:
       - run: pnpm --filter @pilates/api-contracts build
 
   quality-web:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -43,6 +85,8 @@ jobs:
       - run: pnpm --filter @pilates/admin-web build
 
   quality-mobile:
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
