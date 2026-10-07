@@ -33,6 +33,7 @@ jobs:
       - run: pnpm --filter @pilates/api-contracts build
 
   contracts:
+    needs: quality
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -42,6 +43,7 @@ jobs:
       - run: pnpm check:api-compat
 
   api:
+    needs: contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
@@ -69,6 +71,7 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
 
   web:
+    needs: contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -79,6 +82,7 @@ jobs:
       - run: pnpm --filter @pilates/admin-web exec jest --ci --forceExit
 
   mobile:
+    needs: contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
