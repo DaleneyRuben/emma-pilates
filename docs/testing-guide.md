@@ -489,11 +489,16 @@ list is open) opens «Elige una sucursal» with the current Branch's name in
 Palo de rosa profundo and a check on its right. The day and Class Type chip
 rows keep their height whether the Branch list is open or the day has no
 classes, on the iPhone and the iPad alike.
-Tapping a Session opens its detail; **Reservar** creates a real Booking and
-lands on **Mis reservas** with a "Reserva confirmada" notice and the updated
-class balance. A full Session offers **Unirme a la lista de espera**, and a
-Client without remaining classes sees the disabled button with a link to the
-Plans.
+Tapping a Session opens its detail. Under the facts card the capacity is a
+bare block, not a card (MOB-049): «N de M cupos disponibles» with the number
+in Lora, «N reservados» in small grey text on the right, and a thin Palo de
+rosa bar under them on a Palo de rosa tinte track, filled by the booked
+share. A full Session keeps the count at «0 de M» beside the same grey
+**Lleno** pill as the list (never red) and greys the bar. **Reservar**
+creates a real Booking and lands on **Mis reservas** with a "Reserva
+confirmada" notice and the updated class balance. A full Session offers
+**Unirme a la lista de espera**, and a Client without remaining classes sees
+the disabled button with a link to the Plans.
 
 **Mis reservas** lists upcoming Bookings and Waitlist entries. A Booking more
 than 2 h 30 before its start offers **Cancelar** behind a confirmation sheet
