@@ -4,7 +4,31 @@ import {
   startInstalledPgBoss,
 } from './pg-boss-runtime';
 
+// pg-boss ships only ES modules; resolving it through Jest's module registry
+// is what lets this suite run without --experimental-vm-modules.
+jest.mock('pg-boss', () => {
+  const { EventEmitter } =
+    jest.requireActual<typeof import('node:events')>('node:events');
+
+  class PgBoss extends EventEmitter {
+    constructor(readonly options: unknown) {
+      super();
+    }
+  }
+
+  return { PgBoss };
+});
+
 describe('pg-boss runtime', () => {
+  it('constructs the job client with the pinned options', async () => {
+    const boss = await createPgBoss('postgresql://localhost/unused');
+
+    expect(boss).toHaveProperty(
+      'options',
+      pgBossOptions('postgresql://localhost/unused'),
+    );
+  });
+
   it('reports pg-boss errors instead of crashing the process', async () => {
     const report = jest.fn();
     const boss = await createPgBoss('postgresql://localhost/unused', report);
