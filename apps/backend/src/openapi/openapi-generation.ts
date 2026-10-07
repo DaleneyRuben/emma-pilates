@@ -1,3 +1,3 @@
-export const isOpenApiGeneration = (environment: {
-  OPENAPI_GENERATION?: string;
-}): boolean => environment.OPENAPI_GENERATION === 'true';
+export const isOpenApiGeneration = (
+  environment: Readonly<Record<string, string | undefined>>,
+): boolean => environment.BOOT_WITHOUT_JOB_RUNTIME === 'true';

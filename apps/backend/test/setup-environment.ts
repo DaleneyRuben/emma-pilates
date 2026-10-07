@@ -5,4 +5,4 @@ process.env.DATABASE_URL =
 process.env.NODE_ENV = 'test';
 // Application modules boot as they do for the offline OpenAPI generator: the
 // pg-boss factories return a stub instead of opening the job runtime.
-process.env.OPENAPI_GENERATION = 'true';
+process.env.BOOT_WITHOUT_JOB_RUNTIME = 'true';
