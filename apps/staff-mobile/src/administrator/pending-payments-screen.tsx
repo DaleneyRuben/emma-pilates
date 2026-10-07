@@ -27,10 +27,7 @@ import { RootHeader } from "../ui/root-header";
 export type PaymentsNotice = "Pago confirmado" | "Pago rechazado";
 
 type PendingPaymentsNavigation = {
-  navigate: (
-    screen: "ReviewPayment" | "CancelClass",
-    params?: { paymentId: string },
-  ) => void;
+  navigate: (screen: "ReviewPayment" | "CancelClass", params?: { paymentId: string }) => void;
   setParams: (params: { notice?: PaymentsNotice }) => void;
 };
 
@@ -91,10 +88,7 @@ export function PendingPaymentsScreen({
   }
 
   const payments = pending.data.data;
-  const total = payments.reduce(
-    (sum, payment) => sum + payment.amountDueCentavos,
-    0,
-  );
+  const total = payments.reduce((sum, payment) => sum + payment.amountDueCentavos, 0);
   const now = new Date();
 
   return (
@@ -124,9 +118,7 @@ export function PendingPaymentsScreen({
                 accessibilityLabel={`Revisar pago de ${payment.clientName}`}
                 accessibilityRole="button"
                 key={payment.id}
-                onPress={() =>
-                  navigation.navigate("ReviewPayment", { paymentId: payment.id })
-                }
+                onPress={() => navigation.navigate("ReviewPayment", { paymentId: payment.id })}
                 style={styles.card}
               >
                 <View style={styles.cardHeader}>
@@ -140,10 +132,13 @@ export function PendingPaymentsScreen({
                   <Chevron />
                 </View>
                 <CardFooter paddingTop={13}>
-                  <Text style={styles.amount}>
-                    {formatBolivianos(payment.amountDueCentavos)}
-                  </Text>
-                  <DetailLine icon="clock" iconColor={colors.warning} iconSize={15} style={styles.ago}>
+                  <Text style={styles.amount}>{formatBolivianos(payment.amountDueCentavos)}</Text>
+                  <DetailLine
+                    icon="clock"
+                    iconColor={colors.warning}
+                    iconSize={15}
+                    style={styles.ago}
+                  >
                     {formatNotificationTime(payment.submittedAt, now)}
                   </DetailLine>
                 </CardFooter>
@@ -151,10 +146,7 @@ export function PendingPaymentsScreen({
             ))}
           </>
         )}
-        <TextButton
-          label="Cancelar una clase"
-          onPress={() => navigation.navigate("CancelClass")}
-        />
+        <TextButton label="Cancelar una clase" onPress={() => navigation.navigate("CancelClass")} />
       </ScrollView>
     </Screen>
   );

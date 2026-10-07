@@ -37,10 +37,7 @@ import type { ClientContext } from "./client-overview-screen";
 
 type BrowseNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "SessionDetail",
-    params: ClientContext & { sessionId: string },
-  ) => void;
+  navigate: (screen: "SessionDetail", params: ClientContext & { sessionId: string }) => void;
 };
 
 const allClassTypes = "all";
@@ -62,9 +59,7 @@ function Chip({
       onPress={onPress}
       style={[styles.chip, selected && styles.chipSelected]}
     >
-      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
-        {label}
-      </Text>
+      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</Text>
     </Pressable>
   );
 }
@@ -74,11 +69,7 @@ function seatsTag(session: SessionAvailabilityDto): string {
   return describeCount(session.availableSeats, "cupo", "cupos");
 }
 
-export function BrowseSessionsScreen({
-  route,
-}: {
-  route: { params: ClientContext };
-}) {
+export function BrowseSessionsScreen({ route }: { route: { params: ClientContext } }) {
   const { clientId, clientName } = route.params;
   const navigation = useNavigation<BrowseNavigation>();
   const fetcher = useStaffFetcher();
@@ -92,9 +83,7 @@ export function BrowseSessionsScreen({
   const branches = useListBranches({ fetcher });
   const classTypes = useListClassTypes({ fetcher });
   const branchList = branches.data?.status === 200 ? branches.data.data : [];
-  const branch =
-    branchList.find((candidate) => candidate.id === selectedBranchId) ??
-    branchList[0];
+  const branch = branchList.find((candidate) => candidate.id === selectedBranchId) ?? branchList[0];
   const { from, until } = civilDateRange(selectedDate);
   const sessions = useListSessionAvailability(
     { branchId: branch?.id ?? "", from, until, limit: 100 },
@@ -132,12 +121,9 @@ export function BrowseSessionsScreen({
     );
   }
 
-  const classTypeList =
-    classTypes.data?.status === 200 ? classTypes.data.data : [];
+  const classTypeList = classTypes.data?.status === 200 ? classTypes.data.data : [];
   const now = new Date();
-  const visible = (
-    sessions.data?.status === 200 ? sessions.data.data : []
-  ).filter(
+  const visible = (sessions.data?.status === 200 ? sessions.data.data : []).filter(
     (session) =>
       !hasStarted(session.startsAt, now) &&
       (classTypeId === allClassTypes || session.classTypeId === classTypeId),
@@ -188,9 +174,7 @@ export function BrowseSessionsScreen({
               <Text style={[styles.dayWeekday, selected && styles.chipLabelSelected]}>
                 {weekday}
               </Text>
-              <Text style={[styles.dayNumber, selected && styles.chipLabelSelected]}>
-                {day}
-              </Text>
+              <Text style={[styles.dayNumber, selected && styles.chipLabelSelected]}>{day}</Text>
             </Pressable>
           );
         })}
@@ -216,9 +200,7 @@ export function BrowseSessionsScreen({
           />
         ))}
       </ScrollView>
-      <Text style={styles.dayTitle}>
-        {formatSessionDate(`${selectedDate}T12:00:00.000Z`)}
-      </Text>
+      <Text style={styles.dayTitle}>{formatSessionDate(`${selectedDate}T12:00:00.000Z`)}</Text>
       {sessions.isPending ? (
         <BodyText accessibilityLabel="Cargando clases">Cargando…</BodyText>
       ) : sessions.isError ? (
@@ -236,25 +218,23 @@ export function BrowseSessionsScreen({
       ) : (
         <ScrollView contentContainerStyle={styles.list}>
           <TabletGrid testID="assistant-session-grid">
-          {visible.map((session) => (
-            <SessionCard
-              accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
-              key={session.id}
-              onPress={() =>
-                navigation.navigate("SessionDetail", {
-                  clientId,
-                  clientName,
-                  sessionId: session.id,
-                })
-              }
-              tag={
-                <SeatPill full={session.availableSeats === 0}>{seatsTag(session)}</SeatPill>
-              }
-              time={formatTimeRange(session.startsAt, session.endsAt)}
-              title={session.classTypeName}
-              trainerName={session.trainerName}
-            />
-          ))}
+            {visible.map((session) => (
+              <SessionCard
+                accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
+                key={session.id}
+                onPress={() =>
+                  navigation.navigate("SessionDetail", {
+                    clientId,
+                    clientName,
+                    sessionId: session.id,
+                  })
+                }
+                tag={<SeatPill full={session.availableSeats === 0}>{seatsTag(session)}</SeatPill>}
+                time={formatTimeRange(session.startsAt, session.endsAt)}
+                title={session.classTypeName}
+                trainerName={session.trainerName}
+              />
+            ))}
           </TabletGrid>
         </ScrollView>
       )}

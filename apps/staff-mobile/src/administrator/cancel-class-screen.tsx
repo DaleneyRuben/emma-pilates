@@ -56,9 +56,7 @@ function Chip({
       onPress={onPress}
       style={[styles.chip, selected && styles.chipSelected]}
     >
-      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
-        {label}
-      </Text>
+      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</Text>
     </Pressable>
   );
 }
@@ -79,9 +77,7 @@ export function CancelClassScreen() {
   const classTypes = useListClassTypes({ fetcher });
   const branchList = branches.data?.status === 200 ? branches.data.data : [];
   const allBranches = selectedBranchId === everyBranch;
-  const branch =
-    branchList.find((candidate) => candidate.id === selectedBranchId) ??
-    branchList[0];
+  const branch = branchList.find((candidate) => candidate.id === selectedBranchId) ?? branchList[0];
   const { from, until } = civilDateRange(selectedDate);
   const branchSessions = useListSessionAvailability(
     { branchId: branch?.id ?? "", from, until, limit: 100 },
@@ -127,12 +123,9 @@ export function CancelClassScreen() {
     );
   }
 
-  const classTypeList =
-    classTypes.data?.status === 200 ? classTypes.data.data : [];
+  const classTypeList = classTypes.data?.status === 200 ? classTypes.data.data : [];
   const now = new Date();
-  const visible = (
-    sessions.data?.status === 200 ? sessions.data.data : []
-  ).filter(
+  const visible = (sessions.data?.status === 200 ? sessions.data.data : []).filter(
     (session) =>
       !hasStarted(session.startsAt, now) &&
       (classTypeId === allClassTypes || session.classTypeId === classTypeId),
@@ -192,9 +185,7 @@ export function CancelClassScreen() {
               <Text style={[styles.dayWeekday, selected && styles.chipLabelSelected]}>
                 {weekday}
               </Text>
-              <Text style={[styles.dayNumber, selected && styles.chipLabelSelected]}>
-                {day}
-              </Text>
+              <Text style={[styles.dayNumber, selected && styles.chipLabelSelected]}>{day}</Text>
             </Pressable>
           );
         })}

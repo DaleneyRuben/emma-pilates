@@ -32,10 +32,7 @@ export type AssistantApi = {
   bookForClient: (sessionId: string, clientId: string) => Promise<{ id: string }>;
   cancelBooking: (bookingId: string) => Promise<void>;
   cancelInvitation: (clientId: string) => Promise<void>;
-  correctInvitationEmail: (
-    clientId: string,
-    email: string,
-  ) => Promise<ClientInvitationDto>;
+  correctInvitationEmail: (clientId: string, email: string) => Promise<ClientInvitationDto>;
   inviteClient: (input: {
     name: string;
     email: string;
@@ -47,16 +44,10 @@ export type AssistantApi = {
     planId: string,
     branchId: string,
   ) => Promise<AssistantCashPaymentDto>;
-  rescheduleBooking: (
-    bookingId: string,
-    targetSessionId: string,
-  ) => Promise<{ id: string }>;
+  rescheduleBooking: (bookingId: string, targetSessionId: string) => Promise<{ id: string }>;
   resendInvitation: (clientId: string) => Promise<ClientInvitationDto>;
   sendVerification: (clientId: string) => Promise<void>;
-  waitlistForClient: (
-    sessionId: string,
-    clientId: string,
-  ) => Promise<{ id: string }>;
+  waitlistForClient: (sessionId: string, clientId: string) => Promise<{ id: string }>;
 };
 
 const jsonHeaders = { "Content-Type": "application/json" };
@@ -74,11 +65,7 @@ function retryAfter(headers: Headers | undefined): number {
 }
 
 // The body type is the caller's: a documented 429 carries no schema.
-function requireSuccess(response: {
-  status: number;
-  data: unknown;
-  headers?: Headers;
-}): unknown {
+function requireSuccess(response: { status: number; data: unknown; headers?: Headers }): unknown {
   if (response.status < 200 || response.status >= 300) {
     throw new AssistantApiError(
       response.status,
@@ -89,9 +76,7 @@ function requireSuccess(response: {
   return response.data;
 }
 
-export function createAssistantApi(
-  fetcher: typeof globalThis.fetch,
-): AssistantApi {
+export function createAssistantApi(fetcher: typeof globalThis.fetch): AssistantApi {
   return {
     async bookForClient(sessionId, clientId) {
       const response = await createBooking(

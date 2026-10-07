@@ -21,8 +21,7 @@ const runtime = (unread: number) =>
       "/api/v1/trainer/sessions": () => jsonResponse([]),
       "/api/v1/staff-members/current": () => jsonResponse(trainer),
       "/api/v1/notifications/unread-count": () => jsonResponse({ unread }),
-      "/api/v1/notifications": () =>
-        jsonResponse({ items: [], hasMore: false, nextCursor: null }),
+      "/api/v1/notifications": () => jsonResponse({ items: [], hasMore: false, nextCursor: null }),
     }),
   );
 

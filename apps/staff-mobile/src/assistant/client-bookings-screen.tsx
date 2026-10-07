@@ -39,10 +39,7 @@ type BookingsNavigation = {
   setParams: (params: { confirmed?: ConfirmedBooking }) => void;
   navigate: {
     (screen: "BrowseSessions", params: ClientContext): void;
-    (
-      screen: "Reschedule",
-      params: ClientContext & { booking: AssistantClientBookingDto },
-    ): void;
+    (screen: "Reschedule", params: ClientContext & { booking: AssistantClientBookingDto }): void;
   };
 };
 
@@ -78,9 +75,7 @@ function OutlinedAction({
         disabled && styles.actionDisabled,
       ]}
     >
-      <Text style={[styles.actionLabel, tone === "error" && styles.actionLabelError]}>
-        {label}
-      </Text>
+      <Text style={[styles.actionLabel, tone === "error" && styles.actionLabelError]}>{label}</Text>
     </Pressable>
   );
 }
@@ -115,11 +110,7 @@ function BookingCard({
         {`${formatSessionDate(item.startsAt)} · ${formatTimeRange(item.startsAt, item.endsAt)}`}
       </BodyText>
       {item.kind === "waitlist" ? (
-        <OutlinedAction
-          disabled={locked}
-          label="Salir de la lista de espera"
-          onPress={onLeave}
-        />
+        <OutlinedAction disabled={locked} label="Salir de la lista de espera" onPress={onLeave} />
       ) : insideWindow ? (
         <OutlinedAction disabled={locked} label="Reprogramar" onPress={onReschedule} />
       ) : (
@@ -239,9 +230,7 @@ export function ClientBookingsScreen({
               key={item.bookingId ?? item.waitlistEntryId}
               onCancel={() => setCancelling(item)}
               onLeave={() => void leave(item)}
-              onReschedule={() =>
-                navigation.navigate("Reschedule", { ...context, booking: item })
-              }
+              onReschedule={() => navigation.navigate("Reschedule", { ...context, booking: item })}
             />
           ))}
         </ScrollView>

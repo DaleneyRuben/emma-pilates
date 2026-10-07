@@ -2,12 +2,7 @@ import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache, colors } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
-import {
-  assistantRoutes,
-  invitation,
-  newClient,
-  openClientSearch,
-} from "./assistant-fixtures";
+import { assistantRoutes, invitation, newClient, openClientSearch } from "./assistant-fixtures";
 
 jest.setTimeout(20_000);
 
@@ -44,17 +39,11 @@ async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearc
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
-  await fireEvent.changeText(
-    screen.getByLabelText("Correo electrónico"),
-    "ana@example.com",
-  );
+  await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
   await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 }
 
-const expectCardNotice = (
-  screen: Awaited<ReturnType<typeof openClientSearch>>,
-  wait: string,
-) => {
+const expectCardNotice = (screen: Awaited<ReturnType<typeof openClientSearch>>, wait: string) => {
   expect(screen.getByTestId("wait-notice")).toHaveStyle({
     backgroundColor: colors.white,
   });
@@ -94,10 +83,10 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
       ...assistantRoutes(),
       ...overviewRoutes,
       "/api/v1/assistant/client-invitations/client-new": () =>
-        new Response(
-          JSON.stringify({ code: "client_verification_pending", status: 404 }),
-          { headers: { "Content-Type": "application/problem+json" }, status: 404 },
-        ),
+        new Response(JSON.stringify({ code: "client_verification_pending", status: 404 }), {
+          headers: { "Content-Type": "application/problem+json" },
+          status: 404,
+        }),
       "POST /api/v1/assistant/client-invitations": createdAs("verification_pending"),
       "POST /api/v1/assistant/client-invitations/client-new/verification-emails": () =>
         limited("email_throttled", 40),
@@ -114,9 +103,7 @@ describe("S06's pending cards under an email limit (MOB-037)", () => {
 
     expect(await screen.findByRole("alert", { name: recipientLimit })).toBeOnTheScreen();
     expectCardNotice(screen, "Podrás reenviarlo en 0:40.");
-    expect(
-      screen.getByRole("button", { name: "Enviar enlace de verificación" }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Enviar enlace de verificación" })).toBeDisabled();
   });
 
   it("keeps S05's verification offer on the screen's tinted notice and full button", async () => {

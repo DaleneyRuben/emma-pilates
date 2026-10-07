@@ -19,14 +19,11 @@ export function AccountAvatar() {
     query: { refetchOnMount: "always" },
   });
   const name = profile.data?.status === 200 ? profile.data.data.name : "";
-  const unreadCount =
-    unread.data?.status === 200 ? unread.data.data.unread : 0;
+  const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : 0;
 
   return (
     <Pressable
-      accessibilityLabel={
-        unreadCount > 0 ? "Tu cuenta, notificaciones sin leer" : "Tu cuenta"
-      }
+      accessibilityLabel={unreadCount > 0 ? "Tu cuenta, notificaciones sin leer" : "Tu cuenta"}
       accessibilityRole="button"
       hitSlop={spacing.xs}
       onPress={() => navigation.navigate("Profile")}

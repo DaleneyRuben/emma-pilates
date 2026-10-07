@@ -1,14 +1,5 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
-import {
-  boliviaCivilDate,
-  civilDateRange,
-  clearMobileQueryCache,
-} from "@pilates/mobile-core";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -172,9 +163,7 @@ describe("Administrator payments and Session cancellation", () => {
     expect(screen.getByText("Andrea Roca")).toBeOnTheScreen();
     expect(screen.getByText("Hace 20 minutos")).toBeOnTheScreen();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Revisar pago de Carla Mendoza" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Revisar pago de Carla Mendoza" }));
 
     await waitFor(() => {
       expect(screen.getByText("Monto a verificar")).toBeOnTheScreen();
@@ -192,9 +181,7 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Comprobante ampliado")).toBeOnTheScreen();
     });
-    expect(
-      isInsideSafeArea(screen.getByRole("button", { name: "Cerrar" })),
-    ).toBe(true);
+    expect(isInsideSafeArea(screen.getByRole("button", { name: "Cerrar" }))).toBe(true);
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar" }));
     await waitFor(() => {
       expect(screen.queryByLabelText("Comprobante ampliado")).not.toBeOnTheScreen();
@@ -235,9 +222,7 @@ describe("Administrator payments and Session cancellation", () => {
     await waitFor(() => {
       expect(screen.getByText("Andrea Roca")).toBeOnTheScreen();
     });
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Revisar pago de Andrea Roca" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Revisar pago de Andrea Roca" }));
     await waitFor(() => {
       expect(screen.getByText("Monto a verificar")).toBeOnTheScreen();
     });
@@ -273,9 +258,7 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.getByText("No hay pagos pendientes.")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText(
-        "Todo al día. Te avisaremos cuando llegue una transferencia nueva.",
-      ),
+      screen.getByText("Todo al día. Te avisaremos cuando llegue una transferencia nueva."),
     ).toBeOnTheScreen();
   });
 
@@ -294,9 +277,7 @@ describe("Administrator payments and Session cancellation", () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Cancelar una clase" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Cancelar una clase" })).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar una clase" }));
     await waitFor(() => {
@@ -306,9 +287,7 @@ describe("Administrator payments and Session cancellation", () => {
       expect(screen.getByText("Centro")).toBeOnTheScreen();
     });
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
     expect(screen.getByText("6 reservas")).toBeOnTheScreen();
@@ -324,9 +303,7 @@ describe("Administrator payments and Session cancellation", () => {
     ).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Todas" }));
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
 
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
@@ -382,11 +359,11 @@ describe("Administrator payments and Session cancellation", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Todas las sucursales" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Mat Pilates \d.* · Urubó$/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Mat Pilates \d.* · Urubó$/ })).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Sucursal: Todas las sucursales" })).toBeOnTheScreen();
+    expect(
+      screen.getByRole("button", { name: "Sucursal: Todas las sucursales" }),
+    ).toBeOnTheScreen();
     expect(screen.getByText("2 clases")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: /^Mat Pilates \d.* · Urubó$/ }));

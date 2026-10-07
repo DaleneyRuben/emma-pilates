@@ -2,12 +2,7 @@ import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
-import {
-  assistantRoutes,
-  invitation,
-  newClient,
-  openClientSearch,
-} from "./assistant-fixtures";
+import { assistantRoutes, invitation, newClient, openClientSearch } from "./assistant-fixtures";
 
 jest.setTimeout(20_000);
 
@@ -36,10 +31,7 @@ const overviewRoutes = {
 };
 
 const invited = () =>
-  jsonResponse(
-    { status: "invited", clientId: "client-new", email: "ana@example.com" },
-    201,
-  );
+  jsonResponse({ status: "invited", clientId: "client-new", email: "ana@example.com" }, 201);
 
 async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearch>>) {
   await fireEvent.press(screen.getByRole("button", { name: "+ Nuevo cliente" }));
@@ -47,10 +39,7 @@ async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearc
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
-  await fireEvent.changeText(
-    screen.getByLabelText("Correo electrónico"),
-    "ana@example.com",
-  );
+  await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
   await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 }
 
@@ -68,20 +57,14 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
 
     await submitNewClient(screen);
 
-    expect(
-      await screen.findByRole("alert", { name: accountLimit }),
-    ).toBeOnTheScreen();
+    expect(await screen.findByRole("alert", { name: accountLimit })).toBeOnTheScreen();
     expect(screen.getByText("Podrás intentarlo en 14:52.")).toBeOnTheScreen();
     expect(
       screen.getByTestId("wait-notice-clock", { includeHiddenElements: true }),
     ).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Crear cuenta" })).toBeDisabled();
-    expect(screen.getByLabelText("Correo electrónico")).toHaveDisplayValue(
-      "ana@example.com",
-    );
-    expect(
-      screen.queryByText("No pudimos crear la cuenta. Inténtalo de nuevo."),
-    ).toBeNull();
+    expect(screen.getByLabelText("Correo electrónico")).toHaveDisplayValue("ana@example.com");
+    expect(screen.queryByText("No pudimos crear la cuenta. Inténtalo de nuevo.")).toBeNull();
   });
 
   it("shows the Account limit on S06's resend instead of the recipient's", async () => {
@@ -95,9 +78,7 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
     await submitNewClient(screen);
     await fireEvent.press(await screen.findByRole("button", { name: "Reenviar enlace" }));
 
-    expect(
-      await screen.findByRole("alert", { name: accountLimit }),
-    ).toBeOnTheScreen();
+    expect(await screen.findByRole("alert", { name: accountLimit })).toBeOnTheScreen();
     expect(screen.getByText("Podrás enviarlo en 14:52.")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reenviar enlace" })).toBeDisabled();
     expect(
@@ -112,8 +93,7 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
       ...assistantRoutes(),
       ...overviewRoutes,
       "POST /api/v1/assistant/client-invitations": invited,
-      "POST /api/v1/assistant/client-invitations/client-new/email-corrections":
-        accountLimited,
+      "POST /api/v1/assistant/client-invitations/client-new/email-corrections": accountLimited,
     });
 
     await submitNewClient(screen);
@@ -121,9 +101,7 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
     await fireEvent.changeText(screen.getByLabelText("Nuevo correo"), "ana.n@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
 
-    expect(
-      await screen.findByRole("alert", { name: accountLimit }),
-    ).toBeOnTheScreen();
+    expect(await screen.findByRole("alert", { name: accountLimit })).toBeOnTheScreen();
     expect(screen.getByText("Podrás enviarlo en 14:52.")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Guardar correo" })).toBeDisabled();
   });
@@ -136,8 +114,7 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
           { status: "verification_pending", clientId: "client-new", email: "ana@example.com" },
           201,
         ),
-      "POST /api/v1/assistant/client-invitations/client-new/verification-emails":
-        accountLimited,
+      "POST /api/v1/assistant/client-invitations/client-new/verification-emails": accountLimited,
     });
 
     await submitNewClient(screen);
@@ -145,15 +122,9 @@ describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
       await screen.findByRole("button", { name: "Enviar enlace de verificación" }),
     );
 
-    expect(
-      await screen.findByRole("alert", { name: accountLimit }),
-    ).toBeOnTheScreen();
+    expect(await screen.findByRole("alert", { name: accountLimit })).toBeOnTheScreen();
     expect(screen.getByText("Podrás enviarlo en 14:52.")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Enviar enlace de verificación" }),
-    ).toBeDisabled();
-    expect(
-      screen.queryByText("No pudimos enviar el enlace. Inténtalo de nuevo."),
-    ).toBeNull();
+    expect(screen.getByRole("button", { name: "Enviar enlace de verificación" })).toBeDisabled();
+    expect(screen.queryByText("No pudimos enviar el enlace. Inténtalo de nuevo.")).toBeNull();
   });
 });

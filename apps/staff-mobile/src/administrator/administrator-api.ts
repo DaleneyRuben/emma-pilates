@@ -20,9 +20,7 @@ function requireSuccessfulResponse({ status }: { status: number }): void {
   }
 }
 
-export function createAdministratorApi(
-  fetcher: typeof globalThis.fetch,
-): AdministratorApi {
+export function createAdministratorApi(fetcher: typeof globalThis.fetch): AdministratorApi {
   return {
     async cancelSession(sessionId) {
       const response = await cancelSession(sessionId, undefined, fetcher);
@@ -37,12 +35,7 @@ export function createAdministratorApi(
     // The receipt is a private, authenticated image (mobile-core loader).
     loadReceipt: (receiptUrl) => loadPrivateImage(fetcher, receiptUrl),
     async rejectPayment(paymentId, reason) {
-      const response = await rejectPayment(
-        paymentId,
-        { reason },
-        undefined,
-        fetcher,
-      );
+      const response = await rejectPayment(paymentId, { reason }, undefined, fetcher);
       requireSuccessfulResponse(response);
       return response.data as PaymentReviewDto;
     },

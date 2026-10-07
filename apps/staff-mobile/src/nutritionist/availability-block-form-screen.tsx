@@ -59,9 +59,7 @@ const blockProblems: Record<string, string> = {
 
 const problemMessage = (body: unknown): string => {
   const code =
-    typeof body === "object" && body !== null
-      ? (body as { code?: unknown }).code
-      : undefined;
+    typeof body === "object" && body !== null ? (body as { code?: unknown }).code : undefined;
   return (
     (typeof code === "string" ? blockProblems[code] : undefined) ??
     "No pudimos guardar el horario. Inténtalo de nuevo."
@@ -117,9 +115,7 @@ export function AvailabilityBlockFormScreen({
 
   const [weekday, setWeekday] = useState<number | null>(block?.weekday ?? null);
   const [chosenBranchId, setBranchId] = useState<string | null>(block?.branchId ?? null);
-  const [startsAtLocal, setStartsAtLocal] = useState<string | null>(
-    block?.startsAtLocal ?? null,
-  );
+  const [startsAtLocal, setStartsAtLocal] = useState<string | null>(block?.startsAtLocal ?? null);
   const [endsAtLocal, setEndsAtLocal] = useState<string | null>(block?.endsAtLocal ?? null);
   const [effectiveFrom, setEffectiveFrom] = useState(today);
   const [picking, setPicking] = useState<TimeField | null>(null);
@@ -129,19 +125,15 @@ export function AvailabilityBlockFormScreen({
   // A retried identical request replays; a changed request needs a new key.
   const lastAttempt = useRef<{ body: string; key: string } | null>(null);
 
-  const branchId =
-    chosenBranchId ?? (branches.length === 1 ? (branches[0]?.id ?? null) : null);
+  const branchId = chosenBranchId ?? (branches.length === 1 ? (branches[0]?.id ?? null) : null);
   const turnos =
-    startsAtLocal !== null && endsAtLocal !== null
-      ? turnosIn(startsAtLocal, endsAtLocal)
-      : 0;
+    startsAtLocal !== null && endsAtLocal !== null ? turnosIn(startsAtLocal, endsAtLocal) : 0;
   const input: AvailabilityBlockInputDto | null =
     weekday !== null && branchId !== null && startsAtLocal !== null && endsAtLocal !== null
       ? { branchId, weekday, startsAtLocal, endsAtLocal, effectiveFrom }
       : null;
   const valid =
-    input !== null &&
-    minutesOf(input.endsAtLocal) - minutesOf(input.startsAtLocal) >= slotMinutes;
+    input !== null && minutesOf(input.endsAtLocal) - minutesOf(input.startsAtLocal) >= slotMinutes;
   const booked = block?.upcomingBookedCount ?? 0;
 
   const idempotencyFor = (body: AvailabilityBlockInputDto) => {
@@ -185,9 +177,7 @@ export function AvailabilityBlockFormScreen({
     } else if (booked > 0 && confirming === null) {
       setConfirming("replace");
     } else {
-      void run(() =>
-        replaceAvailabilityBlock(block.id, input, idempotencyFor(input), fetcher),
-      );
+      void run(() => replaceAvailabilityBlock(block.id, input, idempotencyFor(input), fetcher));
     }
   };
 
@@ -207,16 +197,18 @@ export function AvailabilityBlockFormScreen({
         style={styles.timeField}
       >
         <Text style={styles.timeLabel}>{label}</Text>
-        <Text style={[styles.timeValue, value === null && styles.timePlaceholder]}>
-          {shown}
-        </Text>
+        <Text style={[styles.timeValue, value === null && styles.timePlaceholder]}>{shown}</Text>
       </Pressable>
     );
   };
 
   return (
     <Screen style={styles.screen}>
-      <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title={editing ? "Editar horario" : "Nuevo horario"} />
+      <ScreenTopBar
+        fullBleed
+        onBack={() => navigation.goBack()}
+        title={editing ? "Editar horario" : "Nuevo horario"}
+      />
       <ScrollView contentContainerStyle={styles.content}>
         <SectionLabel>Día</SectionLabel>
         <View style={styles.pills}>
@@ -278,9 +270,7 @@ export function AvailabilityBlockFormScreen({
           <Text style={styles.preview}>
             {[
               `${countLabel(turnos, "turno", "turnos")} de 45 min`,
-              ...(booked > 0
-                ? [countLabel(booked, "ya reservado", "ya reservados")]
-                : []),
+              ...(booked > 0 ? [countLabel(booked, "ya reservado", "ya reservados")] : []),
             ].join(" · ")}
           </Text>
         ) : null}
@@ -289,11 +279,7 @@ export function AvailabilityBlockFormScreen({
             {message}
           </BodyText>
         ) : null}
-        <PrimaryButton
-          disabled={!valid || submitting}
-          label="Guardar"
-          onPress={save}
-        />
+        <PrimaryButton disabled={!valid || submitting} label="Guardar" onPress={save} />
         {editing ? (
           <Pressable
             accessibilityLabel="Eliminar horario"
@@ -318,31 +304,27 @@ export function AvailabilityBlockFormScreen({
             </Text>
             <ScrollView contentContainerStyle={styles.timeOptions}>
               {quarterHours.map((time) => {
-                const selected =
-                  time === (picking === "start" ? startsAtLocal : endsAtLocal);
+                const selected = time === (picking === "start" ? startsAtLocal : endsAtLocal);
                 return (
-                <Pressable
-                  accessibilityLabel={displayTime(time)}
-                  accessibilityRole="button"
-                  accessibilityState={{ selected }}
-                  key={time}
-                  onPress={() => {
-                    if (picking === "start") setStartsAtLocal(time);
-                    else setEndsAtLocal(time);
-                    setPicking(null);
-                  }}
-                  style={styles.timeOption}
-                >
-                  <Text
-                    style={[
-                      styles.timeOptionText,
-                      selected && styles.timeOptionTextSelected,
-                    ]}
+                  <Pressable
+                    accessibilityLabel={displayTime(time)}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected }}
+                    key={time}
+                    onPress={() => {
+                      if (picking === "start") setStartsAtLocal(time);
+                      else setEndsAtLocal(time);
+                      setPicking(null);
+                    }}
+                    style={styles.timeOption}
                   >
-                    {displayTime(time)}
-                  </Text>
-                  <PickerCheck selected={selected} testID={`picker-check-${time}`} />
-                </Pressable>
+                    <Text
+                      style={[styles.timeOptionText, selected && styles.timeOptionTextSelected]}
+                    >
+                      {displayTime(time)}
+                    </Text>
+                    <PickerCheck selected={selected} testID={`picker-check-${time}`} />
+                  </Pressable>
                 );
               })}
             </ScrollView>

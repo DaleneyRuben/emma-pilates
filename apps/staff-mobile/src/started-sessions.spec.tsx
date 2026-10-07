@@ -63,10 +63,17 @@ describe("started Sessions on the Staff lists", () => {
             "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
             "/api/v1/administrator/payments/pending": () => jsonResponse([]),
             "/api/v1/branches": () =>
-              jsonResponse([{ id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" }]),
+              jsonResponse([
+                { id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" },
+              ]),
             "/api/v1/class-types": () =>
               jsonResponse([
-                { id: "class-reformer", name: "Reformer Pilates", description: "", durationMinutes: 50 },
+                {
+                  id: "class-reformer",
+                  name: "Reformer Pilates",
+                  description: "",
+                  durationMinutes: 50,
+                },
                 { id: "class-mat", name: "Mat Pilates", description: "", durationMinutes: 50 },
               ]),
             [centroDay]: () => jsonResponse([started, session]),

@@ -26,10 +26,7 @@ export function useShowClientBookings() {
     navigation.dispatch((state) => {
       const names = state.routes.map((route) => route.name);
       const overview = names.lastIndexOf("ClientOverview");
-      const routes = [
-        ...state.routes.slice(0, overview + 1),
-        { name: "ClientBookings", params },
-      ];
+      const routes = [...state.routes.slice(0, overview + 1), { name: "ClientBookings", params }];
       return CommonActions.reset({ ...state, index: routes.length - 1, routes });
     });
   };

@@ -79,8 +79,6 @@ describe("Assistant Session detail capacity summary", () => {
     });
     expect(summary.getByText("Completa")).toHaveStyle({ color: "#6E6663", fontSize: 12 });
     expect(screen.queryByText("Lleno")).toBeNull();
-    expect(
-      screen.getByRole("button", { name: "Unirme a la lista de espera" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Unirme a la lista de espera" })).toBeOnTheScreen();
   });
 });

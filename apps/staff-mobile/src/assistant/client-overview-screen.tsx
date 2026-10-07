@@ -1,7 +1,4 @@
-import {
-  useGetAssistantClientOverview,
-  type ClientOverviewDto,
-} from "@pilates/api-contracts";
+import { useGetAssistantClientOverview, type ClientOverviewDto } from "@pilates/api-contracts";
 import {
   BackLink,
   BodyText,
@@ -26,10 +23,7 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { useInClientPanel } from "./assistant-workspace";
 import { OutlinedButton } from "./outlined-button";
 import { PendingInvitationCard } from "./pending-invitation-card";
-import {
-  describeClasses,
-  formatCivilDate,
-} from "./assistant-format";
+import { describeClasses, formatCivilDate } from "./assistant-format";
 
 export type ClientContext = { clientId: string; clientName: string };
 
@@ -44,11 +38,7 @@ type OverviewNavigation = {
   };
 };
 
-function SubscriptionCard({
-  view,
-}: {
-  view: ClientOverviewDto["subscription"];
-}) {
+function SubscriptionCard({ view }: { view: ClientOverviewDto["subscription"] }) {
   const subscription = view.subscription;
   if (subscription === null || subscription === undefined) {
     return (
@@ -65,7 +55,9 @@ function SubscriptionCard({
       <View style={styles.cardHeader}>
         <Text style={styles.cardTitle}>{subscription.planName}</Text>
         <View style={[styles.badge, active ? styles.badgeActive : styles.badgeExpired]}>
-          <Text style={[styles.badgeLabel, active ? styles.badgeLabelActive : styles.badgeLabelExpired]}>
+          <Text
+            style={[styles.badgeLabel, active ? styles.badgeLabelActive : styles.badgeLabelExpired]}
+          >
             {active ? "Activa" : "Vencida"}
           </Text>
         </View>
@@ -119,12 +111,10 @@ export function ClientOverviewScreen({
   const { client } = data;
   const context: ClientContext = { clientId: client.id, clientName: client.name };
   const canBook =
-    (data.subscription.status === "active" ||
-      data.subscription.status === "expiring_soon") &&
+    (data.subscription.status === "active" || data.subscription.status === "expiring_soon") &&
     (data.subscription.subscription?.remainingClassAllowance ?? 0) > 0;
   const hasActiveSubscription =
-    data.subscription.status === "active" ||
-    data.subscription.status === "expiring_soon";
+    data.subscription.status === "active" || data.subscription.status === "expiring_soon";
 
   return (
     <Screen style={styles.screen}>
@@ -179,9 +169,7 @@ export function ClientOverviewScreen({
             />
           </View>
           {data.recentHistory.length === 0 ? (
-            <BodyText style={styles.muted}>
-              Aún no tiene clases en su historial.
-            </BodyText>
+            <BodyText style={styles.muted}>Aún no tiene clases en su historial.</BodyText>
           ) : (
             data.recentHistory.map((entry) => (
               <View key={entry.bookingId} style={styles.historyRow}>
@@ -189,9 +177,7 @@ export function ClientOverviewScreen({
                 <BodyText style={styles.muted}>
                   {`${entry.trainerName} · ${entry.branchName}`}
                 </BodyText>
-                <BodyText style={styles.muted}>
-                  {formatSessionDate(entry.startsAt)}
-                </BodyText>
+                <BodyText style={styles.muted}>{formatSessionDate(entry.startsAt)}</BodyText>
               </View>
             ))
           )}

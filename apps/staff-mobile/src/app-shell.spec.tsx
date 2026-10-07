@@ -30,11 +30,9 @@ function createRuntime(role?: "client" | "trainer") {
       endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
-      restore: jest.fn().mockResolvedValue(
-        role === undefined
-          ? null
-          : { accountId: "account-1", role },
-      ),
+      restore: jest
+        .fn()
+        .mockResolvedValue(role === undefined ? null : { accountId: "account-1", role }),
       start: jest.fn(),
       unlockWithBiometrics: jest.fn(),
     },
@@ -47,9 +45,7 @@ describe("Staff App", () => {
 
     await waitFor(() => {
       expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
-      expect(
-        screen.queryByRole("button", { name: "Regístrate" }),
-      ).not.toBeOnTheScreen();
+      expect(screen.queryByRole("button", { name: "Regístrate" })).not.toBeOnTheScreen();
     });
   });
 

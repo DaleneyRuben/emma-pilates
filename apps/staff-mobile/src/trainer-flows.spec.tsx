@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../App";
@@ -45,8 +40,7 @@ describe("Trainer agenda and attendance", () => {
             },
           ],
         }),
-      "POST /api/v1/sessions/session-1/attendance": () =>
-        new Response(null, { status: 201 }),
+      "POST /api/v1/sessions/session-1/attendance": () => new Response(null, { status: 201 }),
       "/api/v1/staff-members/current": () =>
         jsonResponse({
           id: "staff-1",
@@ -67,22 +61,20 @@ describe("Trainer agenda and attendance", () => {
     fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
 
     await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Ana Pérez: Asistió" }),
-      ).toHaveProp("accessibilityState", { selected: true }),
+      expect(screen.getByRole("button", { name: "Ana Pérez: Asistió" })).toHaveProp(
+        "accessibilityState",
+        { selected: true },
+      ),
     );
     // S03 (MOB-034): the chevron above the large title, not «← Volver».
     expect(screen.queryByText("← Volver")).toBeNull();
-    expect(
-      screen.getByTestId("back-chevron", { includeHiddenElements: true }),
-    ).toBeOnTheScreen();
-    fireEvent.press(
-      screen.getByRole("button", { name: "Luis Flores: Asistió" }),
-    );
+    expect(screen.getByTestId("back-chevron", { includeHiddenElements: true })).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
     await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Luis Flores: Asistió" }),
-      ).toHaveProp("accessibilityState", { selected: true }),
+      expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
+        "accessibilityState",
+        { selected: true },
+      ),
     );
     fireEvent.press(screen.getByRole("button", { name: "Guardar asistencia" }));
 

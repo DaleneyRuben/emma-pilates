@@ -1,7 +1,4 @@
-import {
-  useListAvailabilityBlocks,
-  type AvailabilityBlockDto,
-} from "@pilates/api-contracts";
+import { useListAvailabilityBlocks, type AvailabilityBlockDto } from "@pilates/api-contracts";
 import {
   BodyText,
   Chevron,
@@ -31,10 +28,7 @@ import {
 
 type AvailabilityNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "AvailabilityBlockForm",
-    params?: { block: AvailabilityBlockDto },
-  ) => void;
+  navigate: (screen: "AvailabilityBlockForm", params?: { block: AvailabilityBlockDto }) => void;
 };
 
 const blockRange = (block: AvailabilityBlockDto): string =>
@@ -50,9 +44,7 @@ const dateLine = (block: AvailabilityBlockDto, today: string): string | null => 
   const from = block.effectiveFrom > today ? civilDateLong(block.effectiveFrom) : null;
   // effectiveUntil is exclusive, so the last day is the one before it.
   const until =
-    block.effectiveUntil === null
-      ? null
-      : civilDateLong(addCivilDays(block.effectiveUntil, -1));
+    block.effectiveUntil === null ? null : civilDateLong(addCivilDays(block.effectiveUntil, -1));
   if (from !== null && until !== null) return `Desde el ${from} · hasta el ${until}`;
   if (from !== null) return `Desde el ${from}`;
   if (until !== null) return `Hasta el ${until}`;
@@ -156,9 +148,7 @@ export function AvailabilityScreen() {
                       ...(severalBranches ? [`Sucursal ${block.branchName}`] : []),
                     ].join(" · ")}
                   </BodyText>
-                  {dates === null ? null : (
-                    <BodyText style={styles.dates}>{dates}</BodyText>
-                  )}
+                  {dates === null ? null : <BodyText style={styles.dates}>{dates}</BodyText>}
                 </View>
                 <Chevron />
               </Pressable>

@@ -1,7 +1,4 @@
-import {
-  useQuoteAssistantClientPlans,
-  type PlanQuoteDto,
-} from "@pilates/api-contracts";
+import { useQuoteAssistantClientPlans, type PlanQuoteDto } from "@pilates/api-contracts";
 import {
   BackLink,
   BodyText,
@@ -26,10 +23,7 @@ import type { ClientContext } from "./client-overview-screen";
 
 type SelectPlanNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "ConfirmCashPayment",
-    params: ClientContext & { quote: PlanQuoteDto },
-  ) => void;
+  navigate: (screen: "ConfirmCashPayment", params: ClientContext & { quote: PlanQuoteDto }) => void;
 };
 
 function planTerms(plan: PlanQuoteDto): string {
@@ -66,10 +60,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar los planes."
-          onRetry={() => void quotes.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar los planes." onRetry={() => void quotes.refetch()} />
       </Screen>
     );
   }
@@ -88,34 +79,32 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
       ) : null}
       <ScrollView contentContainerStyle={styles.list}>
         <TabletGrid testID="assistant-plan-grid">
-        {plans.map((plan) => (
-          <Pressable
-            accessibilityLabel={plan.name}
-            accessibilityRole="button"
-            key={plan.id}
-            onPress={() =>
-              navigation.navigate("ConfirmCashPayment", {
-                clientId,
-                clientName,
-                quote: plan,
-              })
-            }
-            style={styles.card}
-          >
-            <View style={styles.cardBody}>
-              <Text style={styles.planName}>{plan.name}</Text>
-              <BodyText>{planTerms(plan)}</BodyText>
-            </View>
-            <View style={styles.prices}>
-              {plan.creditAppliedCentavos > 0 ? (
-                <Text style={styles.originalPrice}>
-                  {formatBolivianos(plan.priceCentavos)}
-                </Text>
-              ) : null}
-              <Text style={styles.price}>{formatBolivianos(plan.amountDueCentavos)}</Text>
-            </View>
-          </Pressable>
-        ))}
+          {plans.map((plan) => (
+            <Pressable
+              accessibilityLabel={plan.name}
+              accessibilityRole="button"
+              key={plan.id}
+              onPress={() =>
+                navigation.navigate("ConfirmCashPayment", {
+                  clientId,
+                  clientName,
+                  quote: plan,
+                })
+              }
+              style={styles.card}
+            >
+              <View style={styles.cardBody}>
+                <Text style={styles.planName}>{plan.name}</Text>
+                <BodyText>{planTerms(plan)}</BodyText>
+              </View>
+              <View style={styles.prices}>
+                {plan.creditAppliedCentavos > 0 ? (
+                  <Text style={styles.originalPrice}>{formatBolivianos(plan.priceCentavos)}</Text>
+                ) : null}
+                <Text style={styles.price}>{formatBolivianos(plan.amountDueCentavos)}</Text>
+              </View>
+            </Pressable>
+          ))}
         </TabletGrid>
       </ScrollView>
     </Screen>

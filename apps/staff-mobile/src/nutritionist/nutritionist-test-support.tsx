@@ -69,9 +69,7 @@ export function routes(overrides: Parameters<typeof routeFetcher>[0] = {}) {
 }
 
 export async function openApp(fetcher: typeof globalThis.fetch) {
-  const screen = await render(
-    <App runtime={createStaffRuntime(fetcher, "nutritionist")} />,
-  );
+  const screen = await render(<App runtime={createStaffRuntime(fetcher, "nutritionist")} />);
   await waitFor(
     () => {
       expect(screen.getByRole("button", { name: "Mi disponibilidad" })).toBeOnTheScreen();

@@ -1,7 +1,4 @@
-import {
-  useGetCurrentStaffMemberProfile,
-  useListTrainerSchedule,
-} from "@pilates/api-contracts";
+import { useGetCurrentStaffMemberProfile, useListTrainerSchedule } from "@pilates/api-contracts";
 import {
   BodyText,
   boliviaCivilDate,
@@ -62,9 +59,7 @@ function AgendaCard({
     >
       <View style={styles.header}>
         <View style={styles.titles}>
-          <Text style={styles.time}>
-            {formatTimeRange(session.startsAt, session.endsAt)}
-          </Text>
+          <Text style={styles.time}>{formatTimeRange(session.startsAt, session.endsAt)}</Text>
           <Text style={styles.cardTitle}>{session.classTypeName}</Text>
           <DetailLine icon="pin" iconSize={15} style={styles.branch}>
             {session.branchName}
@@ -96,8 +91,7 @@ export function TrainerAgendaScreen() {
     [selectedDate],
   );
 
-  const firstName =
-    profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
+  const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
   const header = (
     <RootHeader label="Mi agenda" title={firstName === undefined ? "Hola" : `Hola, ${firstName}`} />
   );

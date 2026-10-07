@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { Alert } from "react-native";
 
@@ -38,8 +33,7 @@ function staffRoutes(profile: unknown, unread = 0) {
     "/api/v1/trainer/sessions": () => jsonResponse([]),
     "/api/v1/staff-members/current": () => jsonResponse(profile),
     "/api/v1/notifications/unread-count": () => jsonResponse({ unread }),
-    "/api/v1/notifications": () =>
-      jsonResponse({ items: [], hasMore: false, nextCursor: null }),
+    "/api/v1/notifications": () => jsonResponse({ items: [], hasMore: false, nextCursor: null }),
   };
 }
 
@@ -76,23 +70,15 @@ describe("Staff Perfil", () => {
 
     expect(screen.getByText("emma.vargas@example.com")).toBeOnTheScreen();
     expect(screen.getByText("+591 707 45210")).toBeOnTheScreen();
-    expect(
-      screen.getByText("Tus datos los actualiza administración."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Tus datos los actualiza administración.")).toBeOnTheScreen();
     expect(screen.getByText("Rol")).toBeOnTheScreen();
     expect(screen.getByText("Entrenadora")).toBeOnTheScreen();
     expect(screen.getByText("Sucursales")).toBeOnTheScreen();
     expect(screen.getByText("Centro, Equipetrol")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Editar" })).not.toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Notificaciones" }),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Cambiar contraseña" }),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByText("Emma Pilates Studio · versión 1.0"),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cambiar contraseña" })).toBeOnTheScreen();
+    expect(screen.getByText("Emma Pilates Studio · versión 1.0")).toBeOnTheScreen();
 
     fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await waitFor(() => {
@@ -133,9 +119,7 @@ describe("Staff Perfil", () => {
       expect(screen.getByText("No tienes notificaciones.")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText(
-        "Te avisaremos aquí cuando haya algo que necesite tu atención.",
-      ),
+      screen.getByText("Te avisaremos aquí cuando haya algo que necesite tu atención."),
     ).toBeOnTheScreen();
   });
 
@@ -150,21 +134,13 @@ describe("Staff Perfil", () => {
   });
 
   it("asks for confirmation before logging out", async () => {
-    const alert = jest
-      .spyOn(Alert, "alert")
-      .mockImplementation(() => undefined);
-    const runtime = createStaffRuntime(
-      routeFetcher(staffRoutes(trainerProfile, 1)),
-    );
+    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
+    const runtime = createStaffRuntime(routeFetcher(staffRoutes(trainerProfile, 1)));
     const screen = await openProfile(runtime);
 
     fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
 
-    expect(alert).toHaveBeenCalledWith(
-      "¿Cerrar sesión?",
-      expect.any(String),
-      expect.any(Array),
-    );
+    expect(alert).toHaveBeenCalledWith("¿Cerrar sesión?", expect.any(String), expect.any(Array));
     const buttons = alert.mock.calls[0]?.[2] as {
       text?: string;
       onPress?: () => void;

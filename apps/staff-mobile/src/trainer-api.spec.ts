@@ -8,9 +8,7 @@ const response = (body: unknown) =>
 
 describe("Trainer API", () => {
   it("saves the complete attendance roster through the generated endpoint", async () => {
-    const fetcher = jest
-      .fn()
-      .mockResolvedValue(new Response(null, { status: 201 }));
+    const fetcher = jest.fn().mockResolvedValue(new Response(null, { status: 201 }));
     const api = createTrainerApi(fetcher);
 
     await api.saveAttendance("session-1", [

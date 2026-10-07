@@ -45,16 +45,13 @@ const kindLabel: Record<NutritionistAgendaEntryDto["kind"], string> = {
 };
 
 const groupByDay = (entries: NutritionistAgendaEntryDto[]) =>
-  entries.reduce<{ date: string; entries: NutritionistAgendaEntryDto[] }[]>(
-    (groups, entry) => {
-      const date = civilDateOf(entry.startsAt);
-      const last = groups[groups.length - 1];
-      if (last?.date === date) last.entries.push(entry);
-      else groups.push({ date, entries: [entry] });
-      return groups;
-    },
-    [],
-  );
+  entries.reduce<{ date: string; entries: NutritionistAgendaEntryDto[] }[]>((groups, entry) => {
+    const date = civilDateOf(entry.startsAt);
+    const last = groups[groups.length - 1];
+    if (last?.date === date) last.entries.push(entry);
+    else groups.push({ date, entries: [entry] });
+    return groups;
+  }, []);
 
 function AvailabilityAction({ onPress }: { onPress: () => void }) {
   return (
@@ -80,9 +77,7 @@ export function NutritionistAgendaScreen() {
     { fetcher, query: { refetchOnMount: "always" } },
   );
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [cancelling, setCancelling] = useState<NutritionistAgendaEntryDto | null>(
-    null,
-  );
+  const [cancelling, setCancelling] = useState<NutritionistAgendaEntryDto | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
 
@@ -93,8 +88,7 @@ export function NutritionistAgendaScreen() {
     return () => clearTimeout(timer);
   }, [notice]);
 
-  const firstName =
-    profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
+  const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
   const title = firstName === undefined ? "Hola" : `Hola, ${firstName}`;
   const header = (
     <RootHeader
@@ -112,11 +106,7 @@ export function NutritionistAgendaScreen() {
     setNotice(null);
     let cancelled = false;
     try {
-      const response = await cancelNutritionistEvaluation(
-        target.evaluationId,
-        undefined,
-        fetcher,
-      );
+      const response = await cancelNutritionistEvaluation(target.evaluationId, undefined, fetcher);
       cancelled = response.status === 204;
       if (!cancelled) {
         setFailure("No pudimos cancelar la evaluación. Inténtalo de nuevo.");
@@ -149,10 +139,7 @@ export function NutritionistAgendaScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar tu agenda."
-          onRetry={() => void agenda.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar tu agenda." onRetry={() => void agenda.refetch()} />
       </Screen>
     );
   }

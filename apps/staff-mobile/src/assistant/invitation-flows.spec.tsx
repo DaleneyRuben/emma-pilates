@@ -2,12 +2,7 @@ import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse } from "../test-support";
-import {
-  assistantRoutes,
-  invitation,
-  newClient,
-  openClientSearch,
-} from "./assistant-fixtures";
+import { assistantRoutes, invitation, newClient, openClientSearch } from "./assistant-fixtures";
 
 jest.setTimeout(20_000);
 
@@ -38,10 +33,7 @@ async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearc
     expect(screen.getByLabelText("Nuevo cliente")).toBeOnTheScreen();
   });
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
-  await fireEvent.changeText(
-    screen.getByLabelText("Correo electrónico"),
-    "ana@example.com",
-  );
+  await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
   await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 }
 
@@ -65,11 +57,10 @@ describe("Assistant invitations (S05, S06)", () => {
           },
           201,
         ),
-      "POST /api/v1/assistant/client-invitations/client-new/verification-emails":
-        () => {
-          sent();
-          return jsonResponse({ clientId: "client-new", email: "ana@example.com" }, 202);
-        },
+      "POST /api/v1/assistant/client-invitations/client-new/verification-emails": () => {
+        sent();
+        return jsonResponse({ clientId: "client-new", email: "ana@example.com" }, 202);
+      },
     });
 
     await submitNewClient(screen);
@@ -86,13 +77,9 @@ describe("Assistant invitations (S05, S06)", () => {
     ).toBeOnTheScreen();
     expect(sent).not.toHaveBeenCalled();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Enviar enlace de verificación" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace de verificación" }));
 
-    expect(
-      await screen.findByText("Enviamos un enlace de verificación nuevo."),
-    ).toBeOnTheScreen();
+    expect(await screen.findByText("Enviamos un enlace de verificación nuevo.")).toBeOnTheScreen();
     expect(sent).toHaveBeenCalledTimes(1);
     await fireEvent.press(screen.getByRole("button", { name: "Ver cliente" }));
     expect(await screen.findByLabelText("Ana Nueva")).toBeOnTheScreen();
@@ -104,20 +91,19 @@ describe("Assistant invitations (S05, S06)", () => {
       ...assistantRoutes(),
       ...overviewRoutes(),
       "/api/v1/assistant/client-invitations/client-new": () =>
-        new Response(
-          JSON.stringify({ code: "client_verification_pending", status: 404 }),
-          { headers: { "Content-Type": "application/problem+json" }, status: 404 },
-        ),
+        new Response(JSON.stringify({ code: "client_verification_pending", status: 404 }), {
+          headers: { "Content-Type": "application/problem+json" },
+          status: 404,
+        }),
       "POST /api/v1/assistant/client-invitations": () =>
         jsonResponse(
           { status: "verification_pending", clientId: "client-new", email: "ana@example.com" },
           201,
         ),
-      "POST /api/v1/assistant/client-invitations/client-new/verification-emails":
-        () => {
-          sent();
-          return jsonResponse({ clientId: "client-new", email: "ana@example.com" }, 202);
-        },
+      "POST /api/v1/assistant/client-invitations/client-new/verification-emails": () => {
+        sent();
+        return jsonResponse({ clientId: "client-new", email: "ana@example.com" }, 202);
+      },
     });
 
     await submitNewClient(screen);
@@ -133,13 +119,9 @@ describe("Assistant invitations (S05, S06)", () => {
     expect(screen.queryByRole("button", { name: "Reenviar enlace" })).toBeNull();
     expect(screen.queryByRole("button", { name: "Ver cliente" })).toBeNull();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Enviar enlace de verificación" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace de verificación" }));
 
-    expect(
-      await screen.findByText("Enviamos un enlace de verificación nuevo."),
-    ).toBeOnTheScreen();
+    expect(await screen.findByText("Enviamos un enlace de verificación nuevo.")).toBeOnTheScreen();
     expect(sent).toHaveBeenCalledTimes(1);
   });
 
@@ -156,11 +138,10 @@ describe("Assistant invitations (S05, S06)", () => {
           },
           201,
         ),
-      "POST /api/v1/assistant/client-invitations/client-new/verification-emails":
-        () =>
-          (sends += 1) === 1
-            ? jsonResponse({ clientId: "client-new", email: "ana@example.com" }, 202)
-            : limited("email_throttled", 40),
+      "POST /api/v1/assistant/client-invitations/client-new/verification-emails": () =>
+        (sends += 1) === 1
+          ? jsonResponse({ clientId: "client-new", email: "ana@example.com" }, 202)
+          : limited("email_throttled", 40),
     });
 
     await submitNewClient(screen);
@@ -168,9 +149,7 @@ describe("Assistant invitations (S05, S06)", () => {
       await screen.findByRole("button", { name: "Enviar enlace de verificación" }),
     );
     await screen.findByText("Enviamos un enlace de verificación nuevo.");
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Enviar enlace de verificación" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace de verificación" }));
 
     expect(
       await screen.findByText(
@@ -178,9 +157,7 @@ describe("Assistant invitations (S05, S06)", () => {
       ),
     ).toBeOnTheScreen();
     expect(screen.getByText("Podrás reenviarlo en 0:40.")).toBeOnTheScreen();
-    expect(
-      screen.queryByText("Enviamos un enlace de verificación nuevo."),
-    ).not.toBeOnTheScreen();
+    expect(screen.queryByText("Enviamos un enlace de verificación nuevo.")).not.toBeOnTheScreen();
   });
 
   it("says nothing changed when the email belongs to another account", async () => {
@@ -224,10 +201,7 @@ describe("Assistant invitations (S05, S06)", () => {
       ...assistantRoutes(),
       ...overviewRoutes(),
       "POST /api/v1/assistant/client-invitations": () =>
-        jsonResponse(
-          { status: "invited", clientId: "client-new", email: "ana@example.com" },
-          201,
-        ),
+        jsonResponse({ status: "invited", clientId: "client-new", email: "ana@example.com" }, 201),
       "POST /api/v1/assistant/client-invitations/client-new/resends": () =>
         limited("email_throttled", 40),
     });
@@ -248,10 +222,7 @@ describe("Assistant invitations (S05, S06)", () => {
       ...assistantRoutes(),
       ...overviewRoutes({ ...invitation, cancellable: false }),
       "POST /api/v1/assistant/client-invitations": () =>
-        jsonResponse(
-          { status: "invited", clientId: "client-new", email: "ana@example.com" },
-          201,
-        ),
+        jsonResponse({ status: "invited", clientId: "client-new", email: "ana@example.com" }, 201),
     });
 
     await submitNewClient(screen);
@@ -261,9 +232,7 @@ describe("Assistant invitations (S05, S06)", () => {
         "La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.",
       ),
     ).toBeOnTheScreen();
-    expect(
-      screen.queryByRole("button", { name: "Cancelar invitación" }),
-    ).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar invitación" })).not.toBeOnTheScreen();
   });
 
   it("words a failed email change apart from an invalid address", async () => {
@@ -271,20 +240,14 @@ describe("Assistant invitations (S05, S06)", () => {
       ...assistantRoutes(),
       ...overviewRoutes(),
       "POST /api/v1/assistant/client-invitations": () =>
-        jsonResponse(
-          { status: "invited", clientId: "client-new", email: "ana@example.com" },
-          201,
-        ),
+        jsonResponse({ status: "invited", clientId: "client-new", email: "ana@example.com" }, 201),
       "POST /api/v1/assistant/client-invitations/client-new/email-corrections": () =>
         jsonResponse({ code: "unexpected_error", status: 500 }, 500),
     });
 
     await submitNewClient(screen);
     await fireEvent.press(await screen.findByRole("button", { name: "Cambiar correo" }));
-    await fireEvent.changeText(
-      screen.getByLabelText("Nuevo correo"),
-      "ana.nueva@example.com",
-    );
+    await fireEvent.changeText(screen.getByLabelText("Nuevo correo"), "ana.nueva@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
 
     expect(

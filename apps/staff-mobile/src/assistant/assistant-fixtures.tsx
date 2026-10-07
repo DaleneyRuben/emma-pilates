@@ -59,23 +59,13 @@ export const soonBooking = {
   kind: "booking",
   bookingId: "booking-soon",
   actionable: true,
-  ...facts(
-    "session-soon",
-    "branch-centro",
-    new Date(Date.now() + 60 * minute),
-    "Mat Pilates",
-  ),
+  ...facts("session-soon", "branch-centro", new Date(Date.now() + 60 * minute), "Mat Pilates"),
 };
 export const waitlistEntry = {
   kind: "waitlist",
   waitlistEntryId: "entry-1",
   actionable: false,
-  ...facts(
-    "session-urubo",
-    "branch-urubo",
-    new Date(Date.now() + 48 * hour),
-    "Pilates Prenatal",
-  ),
+  ...facts("session-urubo", "branch-urubo", new Date(Date.now() + 48 * hour), "Pilates Prenatal"),
 };
 
 export const history = [
@@ -85,12 +75,7 @@ export const history = [
   },
   {
     bookingId: "past-2",
-    ...facts(
-      "session-p2",
-      "branch-centro",
-      new Date("2026-09-08T13:00:00.000Z"),
-      "Mat Pilates",
-    ),
+    ...facts("session-p2", "branch-centro", new Date("2026-09-08T13:00:00.000Z"), "Mat Pilates"),
   },
   {
     bookingId: "past-3",
@@ -191,10 +176,8 @@ export function assistantRoutes() {
     "/api/v1/assistant/clients/client-lucia": () => jsonResponse(overview),
     "/api/v1/assistant/clients/client-lucia/bookings": () =>
       jsonResponse([farBooking, soonBooking, waitlistEntry]),
-    "/api/v1/assistant/clients/client-lucia/class-history": () =>
-      jsonResponse(history),
-    "/api/v1/assistant/clients/client-lucia/plan-quotes": () =>
-      jsonResponse(planQuotes),
+    "/api/v1/assistant/clients/client-lucia/class-history": () => jsonResponse(history),
+    "/api/v1/assistant/clients/client-lucia/plan-quotes": () => jsonResponse(planQuotes),
     "/api/v1/branches": () =>
       jsonResponse([
         { id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" },
@@ -233,13 +216,9 @@ export async function openLucia(routes: Parameters<typeof routeFetcher>[0]) {
     "luc",
   );
   await waitFor(() => {
-    expect(
-      screen.getByRole("button", { name: "Ver cliente Lucía Fernández" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" })).toBeOnTheScreen();
   });
-  await fireEvent.press(
-    screen.getByRole("button", { name: "Ver cliente Lucía Fernández" }),
-  );
+  await fireEvent.press(screen.getByRole("button", { name: "Ver cliente Lucía Fernández" }));
   await waitFor(() => {
     expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen();
   });

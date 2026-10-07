@@ -48,7 +48,15 @@ const paymentProblems: Record<string, string> = {
   plan_not_purchasable: "Este plan ya no está disponible.",
 };
 
-function Line({ label, value, strong = false }: { label: string; value: string; strong?: boolean }) {
+function Line({
+  label,
+  value,
+  strong = false,
+}: {
+  label: string;
+  value: string;
+  strong?: boolean;
+}) {
   return (
     <View style={styles.line}>
       <BodyText style={strong ? styles.lineLabelStrong : styles.lineLabel}>{label}</BodyText>
@@ -76,11 +84,7 @@ export function ConfirmCashPaymentScreen({
     query: { enabled: profile.data?.status === 200 && assigned.length === 0 },
   });
   const options =
-    assigned.length > 0
-      ? assigned
-      : branches.data?.status === 200
-        ? branches.data.data
-        : [];
+    assigned.length > 0 ? assigned : branches.data?.status === 200 ? branches.data.data : [];
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
   const branchId = selectedBranchId ?? options[0]?.id ?? null;
   const [submitting, setSubmitting] = useState(false);
@@ -113,37 +117,37 @@ export function ConfirmCashPaymentScreen({
     return (
       <Screen style={styles.screen}>
         <CenteredCard maxWidth={520}>
-        <View style={styles.success}>
-          <View style={styles.successIcon}>
-            <Text style={styles.successGlyph}>✓</Text>
-          </View>
-          <Heading accessibilityLabel="¡Pago registrado!" style={styles.centered}>
-            ¡Pago registrado!
-          </Heading>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>{result.payment.planName}</Text>
-            <BodyText>{describeClasses(result.payment.classAllowance)}</BodyText>
-            {activated ? (
+          <View style={styles.success}>
+            <View style={styles.successIcon}>
+              <Text style={styles.successGlyph}>✓</Text>
+            </View>
+            <Heading accessibilityLabel="¡Pago registrado!" style={styles.centered}>
+              ¡Pago registrado!
+            </Heading>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>{result.payment.planName}</Text>
+              <BodyText>{describeClasses(result.payment.classAllowance)}</BodyText>
+              {activated ? (
+                <BodyText style={styles.muted}>
+                  {`Válido hasta el ${formatCivilDate(activated.endsOn)}`}
+                </BodyText>
+              ) : null}
               <BodyText style={styles.muted}>
-                {`Válido hasta el ${formatCivilDate(activated.endsOn)}`}
+                {`Cobrado en efectivo: ${formatBolivianos(result.payment.amountDueCentavos)}`}
               </BodyText>
-            ) : null}
-            <BodyText style={styles.muted}>
-              {`Cobrado en efectivo: ${formatBolivianos(result.payment.amountDueCentavos)}`}
-            </BodyText>
+            </View>
+            <PrimaryButton
+              label="Volver al cliente"
+              onPress={() => {
+                if (workspace.split) {
+                  workspace.show({ view: "overview", clientId });
+                  navigation.popTo("ClientSearch");
+                  return;
+                }
+                navigation.popTo("ClientOverview", { clientId });
+              }}
+            />
           </View>
-          <PrimaryButton
-            label="Volver al cliente"
-            onPress={() => {
-              if (workspace.split) {
-                workspace.show({ view: "overview", clientId });
-                navigation.popTo("ClientSearch");
-                return;
-              }
-              navigation.popTo("ClientOverview", { clientId });
-            }}
-          />
-        </View>
         </CenteredCard>
       </Screen>
     );
@@ -152,67 +156,66 @@ export function ConfirmCashPaymentScreen({
   return (
     <Screen style={styles.screen}>
       <CenteredCard maxWidth={520}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Confirmar pago en efectivo">
-        Confirmar pago en efectivo
-      </Heading>
-      <ClientBanner action="Registrando pago para" clientName={clientName} />
-      <ScrollView contentContainerStyle={styles.content}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{quote.name}</Text>
-          <Line label="Precio del plan" value={formatBolivianos(quote.priceCentavos)} />
-          {quote.creditAppliedCentavos > 0 ? (
+        <BackLink onPress={() => navigation.goBack()} />
+        <Heading accessibilityLabel="Confirmar pago en efectivo">
+          Confirmar pago en efectivo
+        </Heading>
+        <ClientBanner action="Registrando pago para" clientName={clientName} />
+        <ScrollView contentContainerStyle={styles.content}>
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>{quote.name}</Text>
+            <Line label="Precio del plan" value={formatBolivianos(quote.priceCentavos)} />
+            {quote.creditAppliedCentavos > 0 ? (
+              <Line
+                label="Crédito aplicado"
+                value={formatBolivianos(quote.creditAppliedCentavos)}
+              />
+            ) : null}
+            <View style={styles.divider} />
             <Line
-              label="Crédito aplicado"
-              value={formatBolivianos(quote.creditAppliedCentavos)}
+              label="Monto a cobrar en efectivo"
+              strong
+              value={formatBolivianos(quote.amountDueCentavos)}
             />
-          ) : null}
-          <View style={styles.divider} />
-          <Line
-            label="Monto a cobrar en efectivo"
-            strong
-            value={formatBolivianos(quote.amountDueCentavos)}
-          />
-        </View>
-        {options.length > 1 ? (
-          <View style={styles.branches}>
-            <BodyText style={styles.muted}>Sucursal donde recibes el efectivo</BodyText>
-            <View style={styles.chips}>
-              {options.map((branch) => {
-                const selected = branch.id === branchId;
-                return (
-                  <Pressable
-                    accessibilityLabel={branch.name}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected }}
-                    key={branch.id}
-                    onPress={() => setSelectedBranchId(branch.id)}
-                    style={[styles.chip, selected && styles.chipSelected]}
-                  >
-                    <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
-                      {branch.name}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
           </View>
-        ) : null}
-        <BodyText style={styles.muted}>
-          Confirma solo cuando tengas el efectivo en mano. El plan se activa al
-          instante.
-        </BodyText>
-        {failure !== null ? (
-          <BodyText accessibilityRole="alert" style={styles.failure}>
-            {failure}
+          {options.length > 1 ? (
+            <View style={styles.branches}>
+              <BodyText style={styles.muted}>Sucursal donde recibes el efectivo</BodyText>
+              <View style={styles.chips}>
+                {options.map((branch) => {
+                  const selected = branch.id === branchId;
+                  return (
+                    <Pressable
+                      accessibilityLabel={branch.name}
+                      accessibilityRole="button"
+                      accessibilityState={{ selected }}
+                      key={branch.id}
+                      onPress={() => setSelectedBranchId(branch.id)}
+                      style={[styles.chip, selected && styles.chipSelected]}
+                    >
+                      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
+                        {branch.name}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+          ) : null}
+          <BodyText style={styles.muted}>
+            Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.
           </BodyText>
-        ) : null}
-        <PrimaryButton
-          disabled={submitting || branchId === null}
-          label="Confirmar pago recibido"
-          onPress={() => void confirm()}
-        />
-      </ScrollView>
+          {failure !== null ? (
+            <BodyText accessibilityRole="alert" style={styles.failure}>
+              {failure}
+            </BodyText>
+          ) : null}
+          <PrimaryButton
+            disabled={submitting || branchId === null}
+            label="Confirmar pago recibido"
+            onPress={() => void confirm()}
+          />
+        </ScrollView>
       </CenteredCard>
     </Screen>
   );

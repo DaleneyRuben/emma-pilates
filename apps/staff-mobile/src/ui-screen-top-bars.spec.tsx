@@ -53,7 +53,12 @@ const screens: [string, ComponentType<never>, object, string][] = [
   ["S16", AvailabilityScreen as ComponentType<never>, {}, "Mi disponibilidad"],
   ["S17", AvailabilityBlockFormScreen as ComponentType<never>, {}, "Nuevo horario"],
   ["S21", ClientBookingsScreen as ComponentType<never>, client, "Reservas de la clienta"],
-  ["S21 reprogramar", AssistantRescheduleScreen as ComponentType<never>, { ...client, booking }, "Reprogramar clase"],
+  [
+    "S21 reprogramar",
+    AssistantRescheduleScreen as ComponentType<never>,
+    { ...client, booking },
+    "Reprogramar clase",
+  ],
   ["S22", ClientHistoryScreen as ComponentType<never>, client, "Historial de clases"],
   ["S23", StaffProfileScreen as ComponentType<never>, {}, "Perfil"],
 ];

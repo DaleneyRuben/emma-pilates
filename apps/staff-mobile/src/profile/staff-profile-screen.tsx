@@ -78,9 +78,7 @@ export function StaffProfileScreen() {
   });
   const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : 0;
 
-  const header = (
-    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Perfil" />
-  );
+  const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Perfil" />;
 
   if (profile.isPending) {
     return (
@@ -95,10 +93,7 @@ export function StaffProfileScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar tu perfil."
-          onRetry={() => void profile.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar tu perfil." onRetry={() => void profile.refetch()} />
       </Screen>
     );
   }
@@ -117,9 +112,7 @@ export function StaffProfileScreen() {
             <Text style={styles.name}>{member.name}</Text>
             <BodyText>{member.email}</BodyText>
             {member.phone ? <BodyText>{member.phone}</BodyText> : null}
-            <BodyText style={styles.note}>
-              Tus datos los actualiza administración.
-            </BodyText>
+            <BodyText style={styles.note}>Tus datos los actualiza administración.</BodyText>
           </View>
         </View>
         <View style={styles.group}>
@@ -149,9 +142,7 @@ export function StaffProfileScreen() {
             </Text>
           )}
         </Pressable>
-        <BodyText style={styles.footer}>
-          Emma Pilates Studio · versión 1.0
-        </BodyText>
+        <BodyText style={styles.footer}>Emma Pilates Studio · versión 1.0</BodyText>
       </ScrollView>
     </Screen>
   );
