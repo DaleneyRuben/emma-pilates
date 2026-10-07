@@ -9,6 +9,8 @@ This workflow is mandatory for every commit, regardless of AI tool. Invoke it as
 
 ## 1. Review the worktree
 
+Run `git branch --show-current` first. If it prints `main`, stop: commits on `main` are not allowed (see the coding standards' «Branches and pull requests»); create or switch to the item's branch and start again.
+
 Run `git status` and inspect both staged and unstaged diffs. Distinguish changes made for the current task from pre-existing user work. Never modify, discard, stage, or commit unrelated changes.
 
 ## 2. Enforce atomicity
