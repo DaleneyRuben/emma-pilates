@@ -7,3 +7,4 @@ describe("formatBolivianos", () => {
     expect(formatBolivianos(210_050)).toBe("Bs 2.100,50");
   });
 });
+// ci scratch: mobile-only touch, never merged
