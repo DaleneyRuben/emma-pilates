@@ -15,15 +15,15 @@ import {
   radii,
   Screen,
   ScreenTopBar,
+  SeatPill,
+  SessionCard,
   spacing,
-  surfaces,
   typography,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text } from "react-native";
-import { View } from "react-native";
+import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
@@ -134,23 +134,20 @@ export function AssistantRescheduleScreen({
           {options.map((session) => {
             const selected = session.id === selectedId;
             return (
-              <Pressable
+              <SessionCard
                 accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
-                accessibilityRole="button"
-                accessibilityState={{ selected }}
+                footerEnd={
+                  <SeatPill>
+                    {session.availableSeats === 1 ? "1 cupo" : `${session.availableSeats} cupos`}
+                  </SeatPill>
+                }
                 key={session.id}
                 onPress={() => setSelectedId(session.id)}
-                style={[styles.card, selected && styles.cardSelected]}
-              >
-                <Text style={styles.time}>
-                  {formatTimeRange(session.startsAt, session.endsAt)}
-                </Text>
-                <Text style={styles.cardTitle}>{session.classTypeName}</Text>
-                <BodyText>{session.trainerName}</BodyText>
-                <BodyText style={styles.seats}>
-                  {session.availableSeats === 1 ? "1 cupo" : `${session.availableSeats} cupos`}
-                </BodyText>
-              </Pressable>
+                selected={selected}
+                time={formatTimeRange(session.startsAt, session.endsAt)}
+                title={session.classTypeName}
+                trainerName={session.trainerName}
+              />
             );
           })}
         </ScrollView>
@@ -172,13 +169,6 @@ export function AssistantRescheduleScreen({
 }
 
 const styles = StyleSheet.create({
-  card: {
-    ...surfaces.card,
-    gap: spacing.xxs,
-    padding: spacing.lg,
-  },
-  cardSelected: { borderColor: colors.primary, borderWidth: 2 },
-  cardTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
   current: {
     backgroundColor: colors.divider,
     borderRadius: radii.inset,
@@ -191,6 +181,4 @@ const styles = StyleSheet.create({
   failure: { color: colors.errorText },
   list: { gap: spacing.md, paddingBottom: spacing.lg },
   screen: { gap: spacing.md },
-  seats: { color: colors.primaryDeep, fontSize: typography.note },
-  time: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "600" },
 });

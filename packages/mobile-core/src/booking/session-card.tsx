@@ -10,19 +10,25 @@ import { colors, spacing, surfaces, typography } from "../ui/tokens";
 /**
  * The Session card of 03 and S07 (MOB-042): a spaced 12 pt time over a Lora
  * 19 title with the seat pill on the right, then the Trainer and the chevron
- * under a rule.
+ * under a rule. 06's option (MOB-048) is the same card with the pill as the
+ * footer's end instead of the chevron and a 2 px Palo de rosa border once
+ * selected (README «Cards»: selection by the border alone).
  */
 export function SessionCard({
   accessibilityLabel,
+  footerEnd = <Chevron />,
   onPress,
+  selected,
   tag,
   time,
   title,
   trainerName,
 }: {
   accessibilityLabel: string;
+  footerEnd?: ReactNode;
   onPress: () => void;
-  tag: ReactNode;
+  selected?: boolean;
+  tag?: ReactNode;
   time: string;
   title: string;
   trainerName: string;
@@ -31,8 +37,9 @@ export function SessionCard({
     <Pressable
       accessibilityLabel={accessibilityLabel}
       accessibilityRole="button"
+      accessibilityState={selected === undefined ? undefined : { selected }}
       onPress={onPress}
-      style={styles.card}
+      style={[styles.card, selected === true && styles.cardSelected]}
     >
       <View style={styles.header}>
         <View style={styles.titles}>
@@ -45,7 +52,7 @@ export function SessionCard({
         <DetailLine icon="person" style={styles.trainer}>
           {trainerName}
         </DetailLine>
-        <Chevron />
+        {footerEnd}
       </CardFooter>
     </Pressable>
   );
@@ -53,6 +60,7 @@ export function SessionCard({
 
 const styles = StyleSheet.create({
   card: { ...surfaces.card, gap: spacing.md, padding: spacing.lgXl },
+  cardSelected: { borderColor: colors.primary, borderWidth: 2 },
   header: {
     alignItems: "flex-start",
     flexDirection: "row",
