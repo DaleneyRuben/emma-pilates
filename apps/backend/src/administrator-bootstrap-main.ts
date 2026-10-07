@@ -16,7 +16,7 @@ async function main(): Promise<void> {
   const prisma = new PrismaClient({
     adapter: createPrismaAdapter(environment.DATABASE_URL),
   });
-  const boss = await createPgBoss(environment.DATABASE_URL);
+  const boss = createPgBoss(environment.DATABASE_URL);
 
   try {
     await startInstalledPgBoss(boss);

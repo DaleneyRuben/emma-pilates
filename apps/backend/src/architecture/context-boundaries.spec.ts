@@ -55,6 +55,9 @@ const sharedKernel = [
 ];
 // Composition roots wire everything together.
 const compositionRoots = ['architecture', 'development-fixtures'];
+// Jest manual mocks of node modules the CommonJS unit suite cannot load
+// (pg-boss ships only ES modules); they import no context.
+const unitTestDoubles = ['__mocks__'];
 
 const listSourceFiles = (directory: string): string[] =>
   readdirSync(directory).flatMap((entry) => {
@@ -113,7 +116,12 @@ describe('bounded context boundaries', () => {
     const folders = readdirSync(sourceRoot).filter((entry) =>
       statSync(join(sourceRoot, entry)).isDirectory(),
     );
-    const known = [...contexts, ...sharedKernel, ...compositionRoots];
+    const known = [
+      ...contexts,
+      ...sharedKernel,
+      ...compositionRoots,
+      ...unitTestDoubles,
+    ];
 
     expect(folders.filter((folder) => !known.includes(folder))).toEqual([]);
   });

@@ -20,8 +20,8 @@ jest.mock('pg-boss', () => {
 });
 
 describe('pg-boss runtime', () => {
-  it('constructs the job client with the pinned options', async () => {
-    const boss = await createPgBoss('postgresql://localhost/unused');
+  it('constructs the job client with the pinned options', () => {
+    const boss = createPgBoss('postgresql://localhost/unused');
 
     expect(boss).toHaveProperty(
       'options',
@@ -29,9 +29,9 @@ describe('pg-boss runtime', () => {
     );
   });
 
-  it('reports pg-boss errors instead of crashing the process', async () => {
+  it('reports pg-boss errors instead of crashing the process', () => {
     const report = jest.fn();
-    const boss = await createPgBoss('postgresql://localhost/unused', report);
+    const boss = createPgBoss('postgresql://localhost/unused', report);
 
     expect(boss.listenerCount('error')).toBe(1);
     boss.emit(

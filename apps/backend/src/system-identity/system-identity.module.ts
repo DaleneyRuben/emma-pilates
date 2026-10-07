@@ -135,7 +135,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         if (isOpenApiGeneration(process.env)) {
           return openApiPgBoss as PgBoss;
         }
-        const boss = await createPgBoss(config.getOrThrow('DATABASE_URL'));
+        const boss = createPgBoss(config.getOrThrow('DATABASE_URL'));
         await startInstalledPgBoss(boss);
         return boss;
       },

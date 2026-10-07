@@ -1,4 +1,5 @@
-import type { ConstructorOptions, PgBoss } from 'pg-boss';
+import { PgBoss } from 'pg-boss';
+import type { ConstructorOptions } from 'pg-boss';
 
 export const PG_BOSS_SCHEMA_VERSION = 38;
 
@@ -29,11 +30,10 @@ const logPgBossError = (report: PgBossErrorReport): void => {
 
 // pg-boss emits connection failures as 'error' events; without a listener
 // Node terminates the process.
-export const createPgBoss = async (
+export const createPgBoss = (
   connectionString: string,
   report: (record: PgBossErrorReport) => void = logPgBossError,
-): Promise<PgBoss> => {
-  const { PgBoss } = await import('pg-boss');
+): PgBoss => {
   const boss = new PgBoss(pgBossOptions(connectionString));
   boss.on('error', (error: Error) => {
     report({ event: 'pg_boss_error', message: error.message });
