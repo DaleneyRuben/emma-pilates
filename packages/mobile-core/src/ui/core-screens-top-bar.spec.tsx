@@ -46,9 +46,7 @@ describe("The shared account screens' top bar", () => {
 
     const bar = await screen.findByTestId("screen-top-bar");
     expect(within(bar).getByLabelText("Notificaciones")).toBeOnTheScreen();
-    expect(
-      await within(bar).findByRole("button", { name: "Marcar leídas" }),
-    ).toBeOnTheScreen();
+    expect(await within(bar).findByRole("button", { name: "Marcar leídas" })).toBeOnTheScreen();
     expect(screen.queryByText("← Volver")).toBeNull();
   });
 

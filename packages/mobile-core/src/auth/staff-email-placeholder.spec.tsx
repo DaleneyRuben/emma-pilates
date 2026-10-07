@@ -16,14 +16,10 @@ describe("The email placeholder on Login and recovery (01, 20, S01, S18)", () =>
     ["the Staff app", false, "tu@emmapilates.bo"],
     ["the Client app", true, "tu@correo.com"],
   ])("shows %s its placeholder on Login and recovery", async (_app, client, placeholder) => {
-    const screen = await render(
-      <AuthenticationFlow allowClientRegistration={client} api={api} />,
-    );
+    const screen = await render(<AuthenticationFlow allowClientRegistration={client} api={api} />);
 
     expect(emailField(screen)).toHaveProp("placeholder", placeholder);
-    await fireEvent.press(
-      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }));
     expect(emailField(screen)).toHaveProp("placeholder", placeholder);
   });
 });

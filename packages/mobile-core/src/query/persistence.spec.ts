@@ -12,20 +12,12 @@ describe("mobile query persistence", () => {
   });
 
   it("persists only the approved read-only query projections", () => {
-    expect(shouldPersistQuery(["/api/v1/sessions", { branchId: "b" }])).toBe(
-      true,
-    );
-    expect(shouldPersistQuery(["/api/v1/trainer/sessions", { on: "d" }])).toBe(
-      true,
-    );
+    expect(shouldPersistQuery(["/api/v1/sessions", { branchId: "b" }])).toBe(true);
+    expect(shouldPersistQuery(["/api/v1/trainer/sessions", { on: "d" }])).toBe(true);
     expect(shouldPersistQuery(["/api/v1/bookings"])).toBe(true);
-    expect(shouldPersistQuery(["/api/v1/clients/current/subscription"])).toBe(
-      true,
-    );
+    expect(shouldPersistQuery(["/api/v1/clients/current/subscription"])).toBe(true);
     expect(shouldPersistQuery(["/api/v1/sessions/session-1"])).toBe(false);
-    expect(shouldPersistQuery(["/api/v1/notifications", { limit: 50 }])).toBe(
-      false,
-    );
+    expect(shouldPersistQuery(["/api/v1/notifications", { limit: 50 }])).toBe(false);
     expect(shouldPersistQuery(["/api/v1/payments"])).toBe(false);
     expect(shouldPersistQuery(["/api/v1/clients/current"])).toBe(false);
   });
@@ -36,11 +28,7 @@ describe("mobile query persistence", () => {
 
     await clearPersistedAccountCache("account-1");
 
-    await expect(
-      AsyncStorage.getItem(getPersistedCacheKey("account-1")),
-    ).resolves.toBeNull();
-    await expect(
-      AsyncStorage.getItem(getPersistedCacheKey("account-2")),
-    ).resolves.toBe("other");
+    await expect(AsyncStorage.getItem(getPersistedCacheKey("account-1"))).resolves.toBeNull();
+    await expect(AsyncStorage.getItem(getPersistedCacheKey("account-2"))).resolves.toBe("other");
   });
 });

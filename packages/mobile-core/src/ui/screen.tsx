@@ -1,8 +1,5 @@
 import { StyleSheet } from "react-native";
-import {
-  SafeAreaView,
-  type SafeAreaViewProps,
-} from "react-native-safe-area-context";
+import { SafeAreaView, type SafeAreaViewProps } from "react-native-safe-area-context";
 
 import { colors, spacing } from "./tokens";
 

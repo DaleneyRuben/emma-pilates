@@ -13,21 +13,11 @@ type CredentialStorageOptions = {
 type CredentialStorage = {
   canUseBiometricAuthentication?: () => boolean;
   deleteItemAsync: (key: string) => Promise<void>;
-  getItemAsync: (
-    key: string,
-    options?: CredentialStorageOptions,
-  ) => Promise<string | null>;
-  setItemAsync: (
-    key: string,
-    value: string,
-    options?: CredentialStorageOptions,
-  ) => Promise<void>;
+  getItemAsync: (key: string, options?: CredentialStorageOptions) => Promise<string | null>;
+  setItemAsync: (key: string, value: string, options?: CredentialStorageOptions) => Promise<void>;
 };
 
-export function createCredentialStore(
-  storage: CredentialStorage,
-  namespace = "",
-) {
+export function createCredentialStore(storage: CredentialStorage, namespace = "") {
   const prefix = namespace === "" ? "" : `${namespace}.`;
   const credentialKey = `${prefix}authentication-session`;
   const biometricCredentialKey = `${prefix}authentication-session-biometric`;
@@ -49,10 +39,7 @@ export function createCredentialStore(
       (await storage.getItemAsync(biometricCredentialMarkerKey)) === "true",
     load: () => storage.getItemAsync(credentialKey),
     async loadWithBiometrics(): Promise<string | null> {
-      const credential = await storage.getItemAsync(
-        biometricCredentialKey,
-        biometricOptions,
-      );
+      const credential = await storage.getItemAsync(biometricCredentialKey, biometricOptions);
 
       if (credential === null) {
         await Promise.all([
@@ -75,11 +62,7 @@ export function createCredentialStore(
         throw new Error("Biometric authentication is unavailable");
       }
 
-      await storage.setItemAsync(
-        biometricCredentialKey,
-        credential,
-        biometricOptions,
-      );
+      await storage.setItemAsync(biometricCredentialKey, credential, biometricOptions);
       await storage.setItemAsync(biometricCredentialMarkerKey, "true");
       await storage.deleteItemAsync(credentialKey);
     },

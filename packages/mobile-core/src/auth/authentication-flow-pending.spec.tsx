@@ -126,9 +126,7 @@ describe("AuthenticationFlow pending registration across launches", () => {
       />,
     );
 
-    await fireEvent.press(
-      await screen.findByRole("button", { name: "Volver a iniciar sesión" }),
-    );
+    await fireEvent.press(await screen.findByRole("button", { name: "Volver a iniciar sesión" }));
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "password");
     await fireEvent.press(screen.getByRole("button", { name: "Iniciar sesión" }));

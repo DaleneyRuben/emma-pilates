@@ -5,9 +5,7 @@ describe("base64", () => {
     const bytes = new Uint8Array([255, 0, 127, 1, 2]);
 
     expect(encodeBase64(bytes)).toBe(btoa(String.fromCharCode(...bytes)));
-    expect(Array.from(decodeBase64(encodeBase64(bytes)))).toEqual(
-      Array.from(bytes),
-    );
+    expect(Array.from(decodeBase64(encodeBase64(bytes)))).toEqual(Array.from(bytes));
     expect(encodeBase64(new Uint8Array([]))).toBe("");
     expect(Array.from(decodeBase64("aGk="))).toEqual([104, 105]);
   });

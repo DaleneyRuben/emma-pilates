@@ -1,7 +1,4 @@
-import {
-  type AuthenticationLinkIntent,
-  parseVerifiedLink,
-} from "./verified-link";
+import { type AuthenticationLinkIntent, parseVerifiedLink } from "./verified-link";
 
 export type LinkSource = {
   addEventListener: (
@@ -38,7 +35,10 @@ export function subscribeToVerifiedLinks({
     deliver(url);
   });
 
-  void source.getInitialURL().then(deliver).catch(() => undefined);
+  void source
+    .getInitialURL()
+    .then(deliver)
+    .catch(() => undefined);
 
   return () => subscription.remove();
 }

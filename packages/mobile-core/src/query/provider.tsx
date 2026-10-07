@@ -1,9 +1,5 @@
 import NetInfo from "@react-native-community/netinfo";
-import {
-  QueryClientProvider,
-  focusManager,
-  onlineManager,
-} from "@tanstack/react-query";
+import { QueryClientProvider, focusManager, onlineManager } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { type PropsWithChildren, useEffect, useMemo } from "react";
 import { AppState } from "react-native";
@@ -27,21 +23,15 @@ type MobileQueryProviderProps = PropsWithChildren<{
   accountId?: string;
 }>;
 
-export function MobileQueryProvider({
-  accountId,
-  children,
-}: MobileQueryProviderProps) {
+export function MobileQueryProvider({ accountId, children }: MobileQueryProviderProps) {
   useEffect(() => {
     if (AppState === undefined || NetInfo === undefined) {
       return undefined;
     }
 
-    const appStateSubscription = AppState.addEventListener(
-      "change",
-      (state) => {
-        focusManager.setFocused(state === "active");
-      },
-    );
+    const appStateSubscription = AppState.addEventListener("change", (state) => {
+      focusManager.setFocused(state === "active");
+    });
     const networkSubscription = NetInfo.addEventListener((state) => {
       onlineManager.setOnline(state.isConnected === true);
     });
@@ -62,9 +52,7 @@ export function MobileQueryProvider({
               shouldDehydrateQuery: (query: {
                 queryKey: readonly unknown[];
                 state: { status: string };
-              }) =>
-                query.state.status === "success" &&
-                shouldPersistQuery(query.queryKey),
+              }) => query.state.status === "success" && shouldPersistQuery(query.queryKey),
             },
             maxAge: persistedCacheMaxAgeMilliseconds,
             persister: createMobilePersister(accountId),
@@ -80,9 +68,7 @@ export function MobileQueryProvider({
   );
 
   if (persistOptions === null) {
-    return (
-      <QueryClientProvider client={queryClient}>{content}</QueryClientProvider>
-    );
+    return <QueryClientProvider client={queryClient}>{content}</QueryClientProvider>;
   }
 
   return (

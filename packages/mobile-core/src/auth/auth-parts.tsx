@@ -35,10 +35,7 @@ export function WaitNotice({
   waitLabel: string;
 }) {
   return (
-    <View
-      style={[styles.notice, surface === "card" && styles.noticeOnCard]}
-      testID="wait-notice"
-    >
+    <View style={[styles.notice, surface === "card" && styles.noticeOnCard]} testID="wait-notice">
       <ClockIcon testID="wait-notice-clock" />
       <View style={styles.noticeBody}>
         <Text accessibilityRole="alert" style={styles.noticeText}>
@@ -106,9 +103,7 @@ export function QuietButton({
       onPress={onPress}
       style={styles.quiet}
     >
-      <Text style={[styles.quietLabel, disabled && styles.disabledLabel]}>
-        {label}
-      </Text>
+      <Text style={[styles.quietLabel, disabled && styles.disabledLabel]}>{label}</Text>
     </Pressable>
   );
 }

@@ -83,11 +83,7 @@ export function createAuthenticationApi({
 
   return {
     async activateAccount(values: CompleteAccountActivationDto) {
-      const response = await activateAccountRequest(
-        values,
-        undefined,
-        fetcher,
-      );
+      const response = await activateAccountRequest(values, undefined, fetcher);
 
       if (response.status !== 200) {
         throw failure("Account activation", response);
@@ -107,11 +103,7 @@ export function createAuthenticationApi({
       }
     },
     async completeEmailChange(token: string) {
-      const response = await completeEmailChangeRequest(
-        { token },
-        undefined,
-        fetcher,
-      );
+      const response = await completeEmailChangeRequest({ token }, undefined, fetcher);
 
       if (response.status !== 200) {
         throw failure("Email change completion", response);
@@ -120,11 +112,7 @@ export function createAuthenticationApi({
       return response.data;
     },
     async completePasswordRecovery(values: CompletePasswordRecoveryDto) {
-      const response = await completePasswordRecoveryRequest(
-        values,
-        undefined,
-        fetcher,
-      );
+      const response = await completePasswordRecoveryRequest(values, undefined, fetcher);
 
       if (response.status !== 201) {
         throw failure("Password recovery", response);
@@ -133,11 +121,7 @@ export function createAuthenticationApi({
       return response.data;
     },
     async correctRegistrationEmail(values: CorrectPendingClientEmailDto) {
-      const response = await correctPendingClientEmail(
-        values,
-        await identified(),
-        fetcher,
-      );
+      const response = await correctPendingClientEmail(values, await identified(), fetcher);
 
       if (response.status !== 202) {
         throw failure("Email correction", response);
@@ -146,11 +130,7 @@ export function createAuthenticationApi({
       return response.data;
     },
     async inspectLink(token: string) {
-      const response = await inspectAuthenticationLink(
-        { token },
-        undefined,
-        fetcher,
-      );
+      const response = await inspectAuthenticationLink({ token }, undefined, fetcher);
 
       if (response.status !== 200) {
         throw failure("Link inspection", response);
@@ -168,11 +148,7 @@ export function createAuthenticationApi({
       return response.data;
     },
     async requestPasswordRecovery(email: string) {
-      const response = await requestPasswordRecoveryRequest(
-        { email },
-        await identified(),
-        fetcher,
-      );
+      const response = await requestPasswordRecoveryRequest({ email }, await identified(), fetcher);
 
       if (response.status !== 202) {
         throw failure("Password recovery request", response);
@@ -180,9 +156,7 @@ export function createAuthenticationApi({
 
       return response.data;
     },
-    async resendRegistrationVerification(
-      registrationContinuation: string,
-    ) {
+    async resendRegistrationVerification(registrationContinuation: string) {
       const response = await resendPendingClientVerification(
         { registrationContinuation },
         await identified(),
@@ -196,11 +170,7 @@ export function createAuthenticationApi({
       return response.data;
     },
     async verifyClientEmail(verificationToken: string) {
-      const response = await verifyClientEmailRequest(
-        { verificationToken },
-        undefined,
-        fetcher,
-      );
+      const response = await verifyClientEmailRequest({ verificationToken }, undefined, fetcher);
 
       if (response.status !== 200) {
         throw failure("Email verification", response);

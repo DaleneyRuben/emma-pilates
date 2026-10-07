@@ -1,15 +1,7 @@
-import {
-  act,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { Button, Text } from "react-native";
 
-import {
-  MobileIdentityProvider,
-  useMobileIdentity,
-} from "./identity-provider";
+import { MobileIdentityProvider, useMobileIdentity } from "./identity-provider";
 
 function IdentityProbe() {
   const identity = useMobileIdentity();
@@ -28,24 +20,17 @@ function IdentityActionsProbe() {
   return (
     <>
       <Text>{identity.status}</Text>
-      <Button
-        onPress={() => identity.start("new-credential")}
-        title="Start"
-      />
+      <Button onPress={() => identity.start("new-credential")} title="Start" />
       <Button onPress={() => identity.logout()} title="Logout" />
-      <Button
-        onPress={() => identity.unlockWithBiometrics()}
-        title="Unlock"
-      />
+      <Button onPress={() => identity.unlockWithBiometrics()} title="Unlock" />
     </>
   );
 }
 
 describe("MobileIdentityProvider", () => {
   it("restores the current mobile Authentication Session at startup", async () => {
-    let finishRestoration: (
-      session: { accountId: string; role: "trainer" },
-    ) => void = () => undefined;
+    let finishRestoration: (session: { accountId: string; role: "trainer" }) => void = () =>
+      undefined;
     const manager = {
       endLocally: jest.fn(),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
@@ -144,12 +129,8 @@ describe("MobileIdentityProvider", () => {
       endLocally: jest.fn().mockResolvedValue(undefined),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
-      restore: jest
-        .fn()
-        .mockResolvedValue({ accountId: "account-1", role: "client" }),
-      start: jest
-        .fn()
-        .mockResolvedValue({ accountId: "account-2", role: "client" }),
+      restore: jest.fn().mockResolvedValue({ accountId: "account-1", role: "client" }),
+      start: jest.fn().mockResolvedValue({ accountId: "account-2", role: "client" }),
       unlockWithBiometrics: jest.fn(),
     };
 
@@ -159,14 +140,8 @@ describe("MobileIdentityProvider", () => {
       return (
         <>
           <Text>{`${identity.status}|${identity.signOutNotice ?? "none"}`}</Text>
-          <Button
-            onPress={() => identity.endClosedSession("Cerramos tu cuenta.")}
-            title="Close"
-          />
-          <Button
-            onPress={() => identity.start("new-credential")}
-            title="Start"
-          />
+          <Button onPress={() => identity.endClosedSession("Cerramos tu cuenta.")} title="Close" />
+          <Button onPress={() => identity.start("new-credential")} title="Start" />
         </>
       );
     }
@@ -176,18 +151,14 @@ describe("MobileIdentityProvider", () => {
         <ClosureProbe />
       </MobileIdentityProvider>,
     );
-    await waitFor(() =>
-      expect(screen.getByText("signed-in|none")).toBeOnTheScreen(),
-    );
+    await waitFor(() => expect(screen.getByText("signed-in|none")).toBeOnTheScreen());
 
     await act(async () => {
       fireEvent.press(screen.getByText("Close"));
     });
 
     await waitFor(() =>
-      expect(
-        screen.getByText("signed-out|Cerramos tu cuenta."),
-      ).toBeOnTheScreen(),
+      expect(screen.getByText("signed-out|Cerramos tu cuenta.")).toBeOnTheScreen(),
     );
     expect(manager.endLocally).toHaveBeenCalledWith({
       accountId: "account-1",
@@ -199,8 +170,6 @@ describe("MobileIdentityProvider", () => {
       fireEvent.press(screen.getByText("Start"));
     });
 
-    await waitFor(() =>
-      expect(screen.getByText("signed-in|none")).toBeOnTheScreen(),
-    );
+    await waitFor(() => expect(screen.getByText("signed-in|none")).toBeOnTheScreen());
   });
 });

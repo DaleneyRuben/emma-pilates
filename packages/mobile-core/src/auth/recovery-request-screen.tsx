@@ -101,17 +101,9 @@ export function RecoveryRequestScreen({
         placeholder={emailPlaceholder(teamAccess)}
         value={email}
       />
-      {failure === null ? null : (
-        <BodyText accessibilityRole="alert">{failure}</BodyText>
-      )}
-      <PrimaryButton
-        disabled={submitting || limited}
-        label="Enviar enlace"
-        onPress={submit}
-      />
-      {limited ? (
-        <TextButton label="Volver a iniciar sesión" onPress={onBack} />
-      ) : null}
+      {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
+      <PrimaryButton disabled={submitting || limited} label="Enviar enlace" onPress={submit} />
+      {limited ? <TextButton label="Volver a iniciar sesión" onPress={onBack} /> : null}
     </AuthenticationScreen>
   );
 }

@@ -4,9 +4,7 @@ import { AuthenticationApiError, type AuthenticationApi } from "./authentication
 import { AuthenticationFlow } from "./authentication-flow";
 import { CheckEmailScreen } from "./pending-registration-screens";
 
-function createApiMock(
-  overrides: Partial<AuthenticationApi> = {},
-): AuthenticationApi {
+function createApiMock(overrides: Partial<AuthenticationApi> = {}): AuthenticationApi {
   return {
     activateAccount: jest.fn(),
     cancelRegistration: jest.fn().mockResolvedValue(undefined),
@@ -39,10 +37,7 @@ async function registerAndCheckEmail(api: AuthenticationApi) {
     "lucia.mendosa@example.com",
   );
   await fireEvent.changeText(screen.getByLabelText("Contraseña"), "pilates2026");
-  await fireEvent.changeText(
-    screen.getByLabelText("Confirmar contraseña"),
-    "pilates2026",
-  );
+  await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "pilates2026");
   await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
   return screen;
 }
@@ -52,15 +47,11 @@ describe("Revisa tu correo (01)", () => {
     const screen = await registerAndCheckEmail(createApiMock());
 
     expect(
-      screen.getByText(
-        "Si el registro puede continuar, enviamos las instrucciones a este correo:",
-      ),
+      screen.getByText("Si el registro puede continuar, enviamos las instrucciones a este correo:"),
     ).toBeOnTheScreen();
     expect(screen.getByText("lucia.mendosa@example.com")).toBeOnTheScreen();
     expect(
-      screen.getByText(
-        "El enlace vence en 24 horas; el correo indica la fecha y hora exactas.",
-      ),
+      screen.getByText("El enlace vence en 24 horas; el correo indica la fecha y hora exactas."),
     ).toBeOnTheScreen();
     expect(
       screen.getByText(
@@ -68,9 +59,7 @@ describe("Revisa tu correo (01)", () => {
       ),
     ).toBeOnTheScreen();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Volver a iniciar sesión" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a iniciar sesión" }));
     expect(screen.getByRole("button", { name: "Regístrate" })).toBeOnTheScreen();
   });
 
@@ -80,9 +69,7 @@ describe("Revisa tu correo (01)", () => {
 
     await fireEvent.press(screen.getByRole("button", { name: "Reenviar correo" }));
 
-    expect(api.resendRegistrationVerification).toHaveBeenCalledWith(
-      "continuation",
-    );
+    expect(api.resendRegistrationVerification).toHaveBeenCalledWith("continuation");
     expect(
       screen.getByText(
         "Si el envío está disponible, recibirás un correo nuevo. Solo funciona el enlace más reciente.",
@@ -94,9 +81,7 @@ describe("Revisa tu correo (01)", () => {
     const api = createApiMock({
       resendRegistrationVerification: jest
         .fn()
-        .mockRejectedValue(
-          new AuthenticationApiError("limited", 429, "rate_limit_exceeded", 45),
-        ),
+        .mockRejectedValue(new AuthenticationApiError("limited", 429, "rate_limit_exceeded", 45)),
     });
     const screen = await registerAndCheckEmail(api);
 
@@ -108,9 +93,7 @@ describe("Revisa tu correo (01)", () => {
       }),
     ).toBeOnTheScreen();
     expect(screen.getByText("Podrás reenviarlo en 0:45.")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Reenviar correo" }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Reenviar correo" })).toBeDisabled();
   });
 
   it("asks before cancelling the registration", async () => {
@@ -123,9 +106,7 @@ describe("Revisa tu correo (01)", () => {
     expect(api.cancelRegistration).not.toHaveBeenCalled();
 
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar registro" }));
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Sí, cancelar registro" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar registro" }));
 
     expect(api.cancelRegistration).toHaveBeenCalledWith("continuation");
     expect(screen.getByRole("button", { name: "Regístrate" })).toBeOnTheScreen();
@@ -175,9 +156,7 @@ describe("Revisa tu correo (01)", () => {
         "Pasaron 7 días sin verificar el correo, así que eliminamos el registro pendiente. Puedes registrarte de nuevo.",
       ),
     ).toBeOnTheScreen();
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Registrarme de nuevo" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Registrarme de nuevo" }));
     expect(onRegisterAgain).toHaveBeenCalled();
   });
 });

@@ -9,12 +9,7 @@ type FormFieldProps = TextInputProps & {
   label: string;
 };
 
-export function FormField({
-  error,
-  label,
-  style,
-  ...inputProps
-}: FormFieldProps) {
+export function FormField({ error, label, style, ...inputProps }: FormFieldProps) {
   return (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>

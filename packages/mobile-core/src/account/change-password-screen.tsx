@@ -2,13 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { changeCurrentAccountPassword } from "@pilates/api-contracts";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
 import { z } from "zod";
 
 import { BodyText } from "../ui/body-text";
@@ -37,14 +31,8 @@ type ChangePasswordScreenProps = {
   onSaved: () => void;
 };
 
-export function ChangePasswordScreen({
-  fetcher,
-  onBack,
-  onSaved,
-}: ChangePasswordScreenProps) {
-  const [currentPasswordError, setCurrentPasswordError] = useState<
-    string | undefined
-  >(undefined);
+export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswordScreenProps) {
+  const [currentPasswordError, setCurrentPasswordError] = useState<string | undefined>(undefined);
   const [failed, setFailed] = useState(false);
   const {
     control,
@@ -93,10 +81,7 @@ export function ChangePasswordScreen({
         keyboardVerticalOffset={spacing.xxl}
         style={styles.flex}
       >
-        <ScrollView
-          contentContainerStyle={styles.form}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
           <Controller
             control={control}
             name="currentPassword"

@@ -7,7 +7,6 @@ const fractionalBolivianos = new Intl.NumberFormat("es-BO", {
 });
 
 export function formatBolivianos(centavos: number): string {
-  const formatter =
-    centavos % 100 === 0 ? wholeBolivianos : fractionalBolivianos;
+  const formatter = centavos % 100 === 0 ? wholeBolivianos : fractionalBolivianos;
   return `Bs ${formatter.format(centavos / 100)}`;
 }

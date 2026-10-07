@@ -3,9 +3,7 @@ import { fireEvent, render, waitFor } from "@testing-library/react-native";
 import type { AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
 
-function createApiMock(
-  overrides: Partial<AuthenticationApi> = {},
-): AuthenticationApi {
+function createApiMock(overrides: Partial<AuthenticationApi> = {}): AuthenticationApi {
   return {
     activateAccount: jest.fn(),
     cancelRegistration: jest.fn(),
@@ -23,18 +21,11 @@ function createApiMock(
 describe("AuthenticationFlow", () => {
   it("keeps Client registration out of the Staff authentication flow", async () => {
     const screen = await render(
-      <AuthenticationFlow
-        allowClientRegistration={false}
-        api={createApiMock()}
-      />,
+      <AuthenticationFlow allowClientRegistration={false} api={createApiMock()} />,
     );
 
-    expect(
-      screen.queryByRole("button", { name: "Regístrate" }),
-    ).not.toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
-    ).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Regístrate" })).not.toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" })).toBeOnTheScreen();
   });
 
   it("registers a Client and shows the pending email actions", async () => {
@@ -43,29 +34,14 @@ describe("AuthenticationFlow", () => {
       registrationContinuation: "continuation",
       status: "verification_required",
     });
-    const screen = await render(
-      <AuthenticationFlow api={createApiMock({ register })} />,
-    );
+    const screen = await render(<AuthenticationFlow api={createApiMock({ register })} />);
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Regístrate" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Clienta");
-    await fireEvent.changeText(
-      screen.getByLabelText("Correo electrónico"),
-      "ana@example.com",
-    );
-    await fireEvent.changeText(
-      screen.getByLabelText("Contraseña"),
-      "local password",
-    );
-    await fireEvent.changeText(
-      screen.getByLabelText("Confirmar contraseña"),
-      "local password",
-    );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Crear cuenta" }),
-    );
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "local password");
+    await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "local password");
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
     expect(register).toHaveBeenCalledWith({
       email: "ana@example.com",
@@ -74,15 +50,9 @@ describe("AuthenticationFlow", () => {
     });
     expect(screen.getByText("Revisa tu correo")).toBeOnTheScreen();
     expect(screen.getByText("ana@example.com")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Cambiar correo" }),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Reenviar correo" }),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Cancelar registro" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cambiar correo" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Reenviar correo" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cancelar registro" })).toBeOnTheScreen();
   });
 
   it("corrects, resends, and cancels a pending registration", async () => {
@@ -110,32 +80,18 @@ describe("AuthenticationFlow", () => {
       />,
     );
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Regístrate" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Regístrate" }));
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Clienta");
-    await fireEvent.changeText(
-      screen.getByLabelText("Correo electrónico"),
-      "ana@example.com",
-    );
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "password");
-    await fireEvent.changeText(
-      screen.getByLabelText("Confirmar contraseña"),
-      "password",
-    );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Crear cuenta" }),
-    );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Cambiar correo" }),
-    );
+    await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "password");
+    await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar correo" }));
     await fireEvent.changeText(
       screen.getByLabelText("Correo electrónico"),
       "ana.corrected@example.com",
     );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Guardar correo" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar correo" }));
 
     expect(correctRegistrationEmail).toHaveBeenCalledWith({
       email: "ana.corrected@example.com",
@@ -143,57 +99,32 @@ describe("AuthenticationFlow", () => {
     });
     expect(screen.getByText("ana.corrected@example.com")).toBeOnTheScreen();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Reenviar correo" }),
-    );
-    expect(resendRegistrationVerification).toHaveBeenCalledWith(
-      "continuation",
-    );
-    expect(
-      screen.getByText(/Si el envío está disponible/),
-    ).toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole("button", { name: "Reenviar correo" }));
+    expect(resendRegistrationVerification).toHaveBeenCalledWith("continuation");
+    expect(screen.getByText(/Si el envío está disponible/)).toBeOnTheScreen();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Cancelar registro" }),
-    );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Sí, cancelar registro" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Cancelar registro" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar registro" }));
     expect(cancelRegistration).toHaveBeenCalledWith("continuation");
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
   });
 
   it("requests password recovery without revealing Account existence", async () => {
-    const requestPasswordRecovery = jest
-      .fn()
-      .mockResolvedValue({ status: "accepted" });
+    const requestPasswordRecovery = jest.fn().mockResolvedValue({ status: "accepted" });
     const screen = await render(
-      <AuthenticationFlow
-        api={createApiMock({ requestPasswordRecovery })}
-      />,
+      <AuthenticationFlow api={createApiMock({ requestPasswordRecovery })} />,
     );
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
-    );
-    await fireEvent.changeText(
-      screen.getByLabelText("Correo electrónico"),
-      "ana@example.com",
-    );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Enviar enlace" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }));
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace" }));
 
     expect(screen.getByText("Revisa tu correo")).toBeOnTheScreen();
-    expect(
-      screen.getByText(/Si hay una cuenta con ana@example.com/),
-    ).toBeOnTheScreen();
+    expect(screen.getByText(/Si hay una cuenta con ana@example.com/)).toBeOnTheScreen();
   });
 
   it("verifies a Client email link and returns to Login", async () => {
-    const verifyClientEmail = jest
-      .fn()
-      .mockResolvedValue({ status: "verified" });
+    const verifyClientEmail = jest.fn().mockResolvedValue({ status: "verified" });
     const screen = await render(
       <AuthenticationFlow
         api={createApiMock({ verifyClientEmail })}
@@ -205,27 +136,20 @@ describe("AuthenticationFlow", () => {
       expect(verifyClientEmail).toHaveBeenCalledWith("verification-token");
       expect(screen.getByText("Correo verificado")).toBeOnTheScreen();
     });
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Ir a iniciar sesión" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Ir a iniciar sesión" }));
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
   });
 
   it("opens a verified link received while Login is already visible", async () => {
-    const verifyClientEmail = jest
-      .fn()
-      .mockResolvedValue({ status: "verified" });
+    const verifyClientEmail = jest.fn().mockResolvedValue({ status: "verified" });
     const api = createApiMock({ verifyClientEmail });
     const screen = await render(<AuthenticationFlow api={api} />);
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
 
     await screen.rerender(
-      <AuthenticationFlow
-        api={api}
-        intent={{ token: "live-token", type: "verify-email" }}
-      />,
+      <AuthenticationFlow api={api} intent={{ token: "live-token", type: "verify-email" }} />,
     );
 
     await waitFor(() => {
@@ -257,31 +181,22 @@ describe("AuthenticationFlow", () => {
       expect(screen.getByLabelText("Contraseña nueva")).toBeOnTheScreen();
     });
 
-    await fireEvent.changeText(
-      screen.getByLabelText("Contraseña nueva"),
-      "replacement password",
-    );
+    await fireEvent.changeText(screen.getByLabelText("Contraseña nueva"), "replacement password");
     await fireEvent.changeText(
       screen.getByLabelText("Confirmar contraseña"),
       "replacement password",
     );
     await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Guardar contraseña" }),
-      ).not.toBeDisabled(),
+      expect(screen.getByRole("button", { name: "Guardar contraseña" })).not.toBeDisabled(),
     );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Guardar contraseña" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
 
     await waitFor(() => expect(startRecoveredSession).toHaveBeenCalled());
     expect(completePasswordRecovery).toHaveBeenCalledWith({
       password: "replacement password",
       token: "recovery-token",
     });
-    expect(startRecoveredSession).toHaveBeenCalledWith(
-      "replacement-credential",
-    );
+    expect(startRecoveredSession).toHaveBeenCalledWith("replacement-credential");
   });
 
   it("activates an Account without creating a Session", async () => {
@@ -289,9 +204,7 @@ describe("AuthenticationFlow", () => {
       purpose: "activation",
       status: "current",
     });
-    const activateAccount = jest
-      .fn()
-      .mockResolvedValue({ status: "activated" });
+    const activateAccount = jest.fn().mockResolvedValue({ status: "activated" });
     const startRecoveredSession = jest.fn();
     const screen = await render(
       <AuthenticationFlow
@@ -306,22 +219,12 @@ describe("AuthenticationFlow", () => {
       expect(screen.getByLabelText("Contraseña nueva")).toBeOnTheScreen();
     });
 
-    await fireEvent.changeText(
-      screen.getByLabelText("Contraseña nueva"),
-      "new password",
-    );
-    await fireEvent.changeText(
-      screen.getByLabelText("Confirmar contraseña"),
-      "new password",
-    );
+    await fireEvent.changeText(screen.getByLabelText("Contraseña nueva"), "new password");
+    await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "new password");
     await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Activar cuenta" }),
-      ).not.toBeDisabled(),
+      expect(screen.getByRole("button", { name: "Activar cuenta" })).not.toBeDisabled(),
     );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Activar cuenta" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Activar cuenta" }));
 
     expect(await screen.findByText("Tu cuenta está activa")).toBeOnTheScreen();
     expect(activateAccount).toHaveBeenCalledWith({
@@ -329,9 +232,7 @@ describe("AuthenticationFlow", () => {
       token: "activation-token",
     });
     expect(startRecoveredSession).not.toHaveBeenCalled();
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Ir a iniciar sesión" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Ir a iniciar sesión" }));
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
   });
 

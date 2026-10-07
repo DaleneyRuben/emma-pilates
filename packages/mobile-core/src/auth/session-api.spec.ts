@@ -32,11 +32,9 @@ describe("createSessionApi", () => {
         method: "POST",
       }),
     );
-    expect(
-      (fetchMock.mock.calls[0][1]?.headers as Headers).get(
-        "x-client-identifier",
-      ),
-    ).toBe("installation-1");
+    expect((fetchMock.mock.calls[0][1]?.headers as Headers).get("x-client-identifier")).toBe(
+      "installation-1",
+    );
   });
 
   it("returns a neutral rejection for incorrect Login credentials", async () => {
@@ -66,13 +64,10 @@ describe("createSessionApi", () => {
     const api = createSessionApi({
       baseUrl: "https://api.example.com/api/v1",
       fetch: jest.fn().mockResolvedValue(
-        new Response(
-          JSON.stringify({ code: "login_throttled", status: 429 }),
-          {
-            headers: { "Retry-After": "30" },
-            status: 429,
-          },
-        ),
+        new Response(JSON.stringify({ code: "login_throttled", status: 429 }), {
+          headers: { "Retry-After": "30" },
+          status: 429,
+        }),
       ),
     });
 
@@ -111,9 +106,9 @@ describe("createSessionApi", () => {
       "https://api.example.com/api/v1/authentication-sessions/current",
       expect.objectContaining({ method: "GET" }),
     );
-    expect(
-      (fetchMock.mock.calls[0][1]?.headers as Headers).get("Authorization"),
-    ).toBe("Bearer credential");
+    expect((fetchMock.mock.calls[0][1]?.headers as Headers).get("Authorization")).toBe(
+      "Bearer credential",
+    );
   });
 
   it("treats an unauthorized current-session response as a rejected credential", async () => {

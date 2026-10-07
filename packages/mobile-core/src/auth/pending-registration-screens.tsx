@@ -43,8 +43,8 @@ function RegistrationLapsed({
   return (
     <AuthenticationScreen brand={false} title="El registro venció">
       <BodyText>
-        Pasaron 7 días sin verificar el correo, así que eliminamos el registro
-        pendiente. Puedes registrarte de nuevo.
+        Pasaron 7 días sin verificar el correo, así que eliminamos el registro pendiente. Puedes
+        registrarte de nuevo.
       </BodyText>
       <PrimaryButton label="Registrarme de nuevo" onPress={onRegisterAgain} />
       <TextButton label="Volver a iniciar sesión" onPress={onBack} />
@@ -120,18 +120,14 @@ export function CheckEmailScreen({
 
   return (
     <AuthenticationScreen brand={false} title="Revisa tu correo">
-      <BodyText>
-        Si el registro puede continuar, enviamos las instrucciones a este correo:
-      </BodyText>
+      <BodyText>Si el registro puede continuar, enviamos las instrucciones a este correo:</BodyText>
       <View style={styles.emailLine}>
-        <BodyText style={[authStyles.emphasized, styles.email]}>
-          {pending.email}
-        </BodyText>
+        <BodyText style={[authStyles.emphasized, styles.email]}>{pending.email}</BodyText>
         <TextButton disabled={submitting} label="Cambiar correo" onPress={onCorrect} />
       </View>
       <BodyText>
-        Abre el enlace más reciente para verificar tu cuenta y luego inicia
-        sesión aquí. El enlace no inicia sesión por ti.
+        Abre el enlace más reciente para verificar tu cuenta y luego inicia sesión aquí. El enlace
+        no inicia sesión por ti.
       </BodyText>
       <BodyText style={authStyles.muted}>
         El enlace vence en 24 horas; el correo indica la fecha y hora exactas.
@@ -157,8 +153,8 @@ export function CheckEmailScreen({
       <TextButton label="Volver a iniciar sesión" onPress={onBack} />
       <View style={styles.cleanup}>
         <BodyText style={[authStyles.muted, styles.centered]}>
-          Si en 7 días no verificas, corriges el correo ni pides otro envío, el
-          registro pendiente se elimina.
+          Si en 7 días no verificas, corriges el correo ni pides otro envío, el registro pendiente
+          se elimina.
         </BodyText>
         <QuietButton
           disabled={submitting}
@@ -176,8 +172,8 @@ export function CheckEmailScreen({
           <View style={styles.sheet}>
             <Text style={styles.sheetTitle}>¿Cancelar tu registro?</Text>
             <BodyText>
-              Los enlaces enviados dejarán de funcionar y el correo quedará
-              libre. Si quieres, podrás registrarte de nuevo desde cero.
+              Los enlaces enviados dejarán de funcionar y el correo quedará libre. Si quieres,
+              podrás registrarte de nuevo desde cero.
             </BodyText>
             <SecondaryButton
               disabled={submitting}
@@ -240,10 +236,7 @@ export function CorrectEmailScreen({
   }
 
   return (
-    <AuthenticationScreen
-      brand={false}
-      topBar={{ onBack, title: "Cambiar correo" }}
-    >
+    <AuthenticationScreen brand={false} topBar={{ onBack, title: "Cambiar correo" }}>
       <BodyText>
         {`Escribe el correo correcto. Te enviaremos un enlace nuevo de 24 horas y los enlaces enviados a ${pending.email} dejarán de funcionar.`}
       </BodyText>

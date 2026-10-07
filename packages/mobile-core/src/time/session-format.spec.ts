@@ -28,12 +28,8 @@ describe("Session formatting", () => {
   });
 
   it("derives the Bolivia civil date from an instant", () => {
-    expect(boliviaCivilDate(new Date("2026-09-21T03:30:00.000Z"))).toBe(
-      "2026-09-20",
-    );
-    expect(boliviaCivilDate(new Date("2026-09-21T04:00:00.000Z"))).toBe(
-      "2026-09-21",
-    );
+    expect(boliviaCivilDate(new Date("2026-09-21T03:30:00.000Z"))).toBe("2026-09-20");
+    expect(boliviaCivilDate(new Date("2026-09-21T04:00:00.000Z"))).toBe("2026-09-21");
   });
 
   it("lists the next seven civil dates starting today", () => {
@@ -57,18 +53,14 @@ describe("Session formatting", () => {
   });
 
   it("labels history months in capitalized Spanish", () => {
-    expect(formatMonthHeading("2026-09-05T13:00:00.000Z")).toBe(
-      "Septiembre 2026",
-    );
+    expect(formatMonthHeading("2026-09-05T13:00:00.000Z")).toBe("Septiembre 2026");
     expect(formatMonthHeading("2026-08-19T11:00:00.000Z")).toBe("Agosto 2026");
   });
 
   it("formats Bolivia time ranges and long dates", () => {
-    expect(
-      formatTimeRange("2026-09-21T11:00:00.000Z", "2026-09-21T11:50:00.000Z"),
-    ).toBe("07:00 – 07:50");
-    expect(formatSessionDate("2026-09-21T11:00:00.000Z")).toBe(
-      "lunes 21 de septiembre",
+    expect(formatTimeRange("2026-09-21T11:00:00.000Z", "2026-09-21T11:50:00.000Z")).toBe(
+      "07:00 – 07:50",
     );
+    expect(formatSessionDate("2026-09-21T11:00:00.000Z")).toBe("lunes 21 de septiembre");
   });
 });

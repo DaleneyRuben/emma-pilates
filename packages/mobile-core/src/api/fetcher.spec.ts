@@ -15,9 +15,9 @@ describe("createApiFetcher", () => {
       "https://api.example.com/api/v1/health/live",
       expect.objectContaining({ method: "GET" }),
     );
-    expect(
-      (fetchMock.mock.calls[0][1]?.headers as Headers).get("Authorization"),
-    ).toBe("Bearer credential");
+    expect((fetchMock.mock.calls[0][1]?.headers as Headers).get("Authorization")).toBe(
+      "Bearer credential",
+    );
   });
 
   it("does not duplicate the API version from a generated request path", async () => {

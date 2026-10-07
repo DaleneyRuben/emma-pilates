@@ -1,9 +1,4 @@
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  type GestureResponderEvent,
-} from "react-native";
+import { Pressable, StyleSheet, Text, type GestureResponderEvent } from "react-native";
 
 import { colors, radii, spacing, typography } from "./tokens";
 
@@ -34,9 +29,7 @@ export function PrimaryButton({
         disabled && styles.disabledButton,
       ]}
     >
-      <Text style={[styles.label, disabled && styles.disabledLabel]}>
-        {label}
-      </Text>
+      <Text style={[styles.label, disabled && styles.disabledLabel]}>{label}</Text>
     </Pressable>
   );
 }

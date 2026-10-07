@@ -4,32 +4,16 @@ import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
 import { type ComponentType, useCallback, useMemo } from "react";
 
-import {
-  createAuthenticationApi,
-  type AuthenticationApi,
-} from "./auth/authentication-api";
-import {
-  MobileIdentityProvider,
-  useMobileIdentity,
-} from "./auth/identity-provider";
+import { createAuthenticationApi, type AuthenticationApi } from "./auth/authentication-api";
+import { MobileIdentityProvider, useMobileIdentity } from "./auth/identity-provider";
 import type { LoginSubmissionResult, LoginValues } from "./auth/login-screen";
 import type { PendingRegistrationStore } from "./auth/pending-registration-store";
 import { createSessionApi, type SessionLoginResult } from "./auth/session-api";
-import {
-  createSessionManager,
-  type AppRole,
-  type SessionManager,
-} from "./auth/session-manager";
+import { createSessionManager, type AppRole, type SessionManager } from "./auth/session-manager";
 import type { LinkSource } from "./ingress/link-ingress";
 import type { AuthenticationLinkIntent } from "./ingress/verified-link";
-import {
-  useVerifiedLinkIntent,
-  VerifiedLinkProvider,
-} from "./ingress/verified-link-provider";
-import {
-  getMobileApiBaseUrl,
-  getOrCreateInstallationIdentifier,
-} from "./config/runtime";
+import { useVerifiedLinkIntent, VerifiedLinkProvider } from "./ingress/verified-link-provider";
+import { getMobileApiBaseUrl, getOrCreateInstallationIdentifier } from "./config/runtime";
 import { createApiFetcher } from "./api/fetcher";
 import { clearPersistedAccountCache } from "./query/persistence";
 import { clearMobileQueryCache, MobileQueryProvider } from "./query/provider";
@@ -69,9 +53,7 @@ export function createDefaultMobileRuntime({
   pendingRegistrationStore,
 }: {
   acceptedIdentityKind: "client" | "staff";
-  credentialStore: Parameters<
-    typeof createSessionManager
-  >[0]["credentialStore"];
+  credentialStore: Parameters<typeof createSessionManager>[0]["credentialStore"];
   pendingRegistrationStore?: PendingRegistrationStore;
 }): MobileRuntime {
   const apiBaseUrl = getMobileApiBaseUrl(
@@ -79,8 +61,7 @@ export function createDefaultMobileRuntime({
     __DEV__,
   );
   const sessionApi = createSessionApi({ baseUrl: apiBaseUrl });
-  const installationIdentifier = () =>
-    getOrCreateInstallationIdentifier(AsyncStorage, randomUUID);
+  const installationIdentifier = () => getOrCreateInstallationIdentifier(AsyncStorage, randomUUID);
 
   async function clearAccountCache(accountId: string): Promise<void> {
     clearMobileQueryCache();
@@ -157,9 +138,7 @@ function IdentityNavigation({
       apiBaseUrl={apiBaseUrl}
       apiFetcher={apiFetcher}
       onBiometricUnlock={
-        identity.status === "biometric-locked"
-          ? identity.unlockWithBiometrics
-          : undefined
+        identity.status === "biometric-locked" ? identity.unlockWithBiometrics : undefined
       }
       onLogin={handleLogin}
       onRecoveryCredential={identity.start}

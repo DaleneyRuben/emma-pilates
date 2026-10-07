@@ -1,15 +1,9 @@
 export type AuthenticationLinkIntent = {
-  type:
-    | "verify-email"
-    | "activate-account"
-    | "recover-password"
-    | "confirm-email-change";
+  type: "verify-email" | "activate-account" | "recover-password" | "confirm-email-change";
   token: string;
 };
 
-const authenticationPaths: Readonly<
-  Record<string, AuthenticationLinkIntent["type"]>
-> = {
+const authenticationPaths: Readonly<Record<string, AuthenticationLinkIntent["type"]>> = {
   "/authentication/verify-email": "verify-email",
   "/authentication/activate-account": "activate-account",
   "/authentication/recover-password": "recover-password",

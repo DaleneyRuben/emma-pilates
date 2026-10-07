@@ -48,9 +48,7 @@ function NotificationRow({
     >
       {unread ? <View style={styles.dot} /> : <View style={styles.dotSpace} />}
       <View style={styles.rowBody}>
-        <Text style={[styles.message, !unread && styles.messageRead]}>
-          {notification.message}
-        </Text>
+        <Text style={[styles.message, !unread && styles.messageRead]}>{notification.message}</Text>
         <BodyText style={styles.time}>
           {formatNotificationTime(notification.createdAt, now)}
         </BodyText>
@@ -98,9 +96,7 @@ export function NotificationsScreen({
     return (
       <Screen style={styles.screen}>
         {header()}
-        <BodyText accessibilityLabel="Cargando notificaciones">
-          Cargando…
-        </BodyText>
+        <BodyText accessibilityLabel="Cargando notificaciones">Cargando…</BodyText>
       </Screen>
     );
   }

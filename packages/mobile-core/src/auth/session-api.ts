@@ -60,9 +60,7 @@ export function createSessionApi(options: SessionApiOptions) {
       }
 
       if (status === 429) {
-        const retryAfterSeconds = Number(
-          response.headers.get("Retry-After") ?? "0",
-        );
+        const retryAfterSeconds = Number(response.headers.get("Retry-After") ?? "0");
 
         return {
           retryAfterSeconds: Number.isFinite(retryAfterSeconds)
@@ -78,9 +76,7 @@ export function createSessionApi(options: SessionApiOptions) {
 
       return { credential: response.data.credential, status: "created" };
     },
-    async resolveCurrent(
-      credential: string,
-    ): Promise<CurrentAuthenticationPrincipalDto | null> {
+    async resolveCurrent(credential: string): Promise<CurrentAuthenticationPrincipalDto | null> {
       const response = await getCurrentAuthenticationSession(
         undefined,
         getAuthenticatedFetcher(credential),

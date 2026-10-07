@@ -11,11 +11,7 @@ import type { MobileSession, SessionManager } from "./session-manager";
 
 type MobileIdentityState = {
   session: MobileSession | null;
-  status:
-    | "biometric-locked"
-    | "restoring"
-    | "signed-in"
-    | "signed-out";
+  status: "biometric-locked" | "restoring" | "signed-in" | "signed-out";
 };
 
 type MobileIdentity = MobileIdentityState & {
@@ -24,25 +20,17 @@ type MobileIdentity = MobileIdentityState & {
   logout: () => Promise<void>;
   /** Shown once on the login screen after a closure; cleared by the next sign-in. */
   signOutNotice: string | null;
-  start: (
-    credential: string,
-    options?: { protectWithBiometrics?: boolean },
-  ) => Promise<void>;
+  start: (credential: string, options?: { protectWithBiometrics?: boolean }) => Promise<void>;
   unlockWithBiometrics: () => Promise<void>;
 };
 
-const MobileIdentityContext = createContext<MobileIdentity | undefined>(
-  undefined,
-);
+const MobileIdentityContext = createContext<MobileIdentity | undefined>(undefined);
 
 type MobileIdentityProviderProps = PropsWithChildren<{
   manager: SessionManager;
 }>;
 
-export function MobileIdentityProvider({
-  children,
-  manager,
-}: MobileIdentityProviderProps) {
+export function MobileIdentityProvider({ children, manager }: MobileIdentityProviderProps) {
   const [identity, setIdentity] = useState<MobileIdentityState>({
     session: null,
     status: "restoring",
@@ -52,22 +40,21 @@ export function MobileIdentityProvider({
   useEffect(() => {
     let active = true;
 
-    void Promise.all([
-      manager.restore(),
-      manager.hasBiometricSession(),
-    ]).then(([session, hasBiometricSession]) => {
-      if (active) {
-        setIdentity({
-          session,
-          status:
-            session === null && hasBiometricSession
-              ? "biometric-locked"
-              : session === null
-                ? "signed-out"
-                : "signed-in",
-        });
-      }
-    });
+    void Promise.all([manager.restore(), manager.hasBiometricSession()]).then(
+      ([session, hasBiometricSession]) => {
+        if (active) {
+          setIdentity({
+            session,
+            status:
+              session === null && hasBiometricSession
+                ? "biometric-locked"
+                : session === null
+                  ? "signed-out"
+                  : "signed-in",
+          });
+        }
+      },
+    );
 
     return () => {
       active = false;
@@ -75,10 +62,7 @@ export function MobileIdentityProvider({
   }, [manager]);
 
   const start = useCallback(
-    async (
-      credential: string,
-      options?: { protectWithBiometrics?: boolean },
-    ) => {
+    async (credential: string, options?: { protectWithBiometrics?: boolean }) => {
       const session =
         options === undefined
           ? await manager.start(credential)

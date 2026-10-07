@@ -1,19 +1,12 @@
 import { render, waitFor } from "@testing-library/react-native";
 import { Text } from "react-native";
 
-import {
-  useVerifiedLinkIntent,
-  VerifiedLinkProvider,
-} from "./verified-link-provider";
+import { useVerifiedLinkIntent, VerifiedLinkProvider } from "./verified-link-provider";
 
 function IntentProbe() {
   const { intent } = useVerifiedLinkIntent();
 
-  return (
-    <Text>
-      {intent === null ? "no-intent" : `${intent.type}:${intent.token}`}
-    </Text>
-  );
+  return <Text>{intent === null ? "no-intent" : `${intent.type}:${intent.token}`}</Text>;
 }
 
 describe("VerifiedLinkProvider", () => {
@@ -32,9 +25,7 @@ describe("VerifiedLinkProvider", () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText("recover-password:recovery"),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("recover-password:recovery")).toBeOnTheScreen();
     });
   });
 });

@@ -48,10 +48,7 @@ async function typePasswords(
   confirmation: string,
 ) {
   await fireEvent.changeText(screen.getByLabelText("Contraseña nueva"), password);
-  await fireEvent.changeText(
-    screen.getByLabelText("Confirmar contraseña"),
-    confirmation,
-  );
+  await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), confirmation);
 }
 
 describe("Crear contraseña (21, S19)", () => {
@@ -76,9 +73,7 @@ describe("Crear contraseña (21, S19)", () => {
 
     await typePasswords(screen, "pilates2026", "pilates2026");
     await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Activar cuenta" }),
-      ).not.toBeDisabled(),
+      expect(screen.getByRole("button", { name: "Activar cuenta" })).not.toBeDisabled(),
     );
     await fireEvent.press(screen.getByRole("button", { name: "Activar cuenta" }));
 
@@ -98,20 +93,14 @@ describe("Crear contraseña (21, S19)", () => {
     const screen = await openLink(api, "recover-password", { onRecoveryCredential });
 
     expect(await screen.findByText("Crea una contraseña nueva")).toBeOnTheScreen();
-    expect(
-      screen.getByText("Elige una contraseña nueva para tu cuenta."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Elige una contraseña nueva para tu cuenta.")).toBeOnTheScreen();
     await typePasswords(screen, "pilates2026", "pilates2026");
     await waitFor(() =>
-      expect(
-        screen.getByRole("button", { name: "Guardar contraseña" }),
-      ).not.toBeDisabled(),
+      expect(screen.getByRole("button", { name: "Guardar contraseña" })).not.toBeDisabled(),
     );
     await fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
 
-    await waitFor(() =>
-      expect(onRecoveryCredential).toHaveBeenCalledWith("credential"),
-    );
+    await waitFor(() => expect(onRecoveryCredential).toHaveBeenCalledWith("credential"));
   });
 
   it.each([
@@ -145,9 +134,7 @@ describe("Crear contraseña (21, S19)", () => {
     const api = createApiMock({ purpose: "activation", status: "removed" });
     const screen = await openLink(api, "activate-account", { staff });
 
-    expect(
-      await screen.findByText("Esta invitación ya no está activa"),
-    ).toBeOnTheScreen();
+    expect(await screen.findByText("Esta invitación ya no está activa")).toBeOnTheScreen();
     expect(screen.getByText(explanation)).toBeOnTheScreen();
   });
 
@@ -161,9 +148,7 @@ describe("Crear contraseña (21, S19)", () => {
         "Los enlaces para restablecer la contraseña vencen a los 30 minutos y sirven una sola vez. Pide uno nuevo.",
       ),
     ).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Volver a iniciar sesión" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Volver a iniciar sesión" })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Pedir un enlace nuevo" }));
 
     expect(
