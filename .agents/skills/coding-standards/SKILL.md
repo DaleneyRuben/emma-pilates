@@ -133,3 +133,15 @@ Before calling a change complete, run the narrowest relevant tests plus configur
 Create an atomic commit after each meaningful implementation checkpoint once its relevant tests are green. Do not batch unrelated work into a later commit.
 
 Every commit must use the project [`commit`](../commit/SKILL.md) skill. Invoke `$commit` in Codex, `/commit` in clients that expose slash skills, or read and execute that skill directly when native invocation is unavailable. Do not run `git commit` through an improvised workflow.
+
+## Branches and pull requests
+
+Every change reaches `main` through a pull request. This applies to code, generated contracts, design exports, documentation, and backlog-only edits alike; there is no «small enough» exception.
+
+- **Never commit on `main` and never push to it.** Start every piece of work by updating `main` (`git switch main && git pull --ff-only`) and branching from it. The commit skill refuses to commit while `main` is checked out.
+- **One branch and one pull request per backlog item** (or per design follow-up, handoff, or standards change when that is the whole unit of work). Name the branch after the item in lowercase with hyphens: `ext-004-github-actions-ci`, `mob-050-mobile-lint`, `standards-pull-requests`.
+- **Keep the commit history on the branch.** The red → green → refactor checkpoints and the separate mark-done commit stay as individual commits, because the backlog's Evidence column cites their hashes. Pull requests are therefore merged with a merge commit, never squashed and never rebased, so the cited hashes survive on `main`.
+- **The pull request is the handoff.** Open it with `gh pr create` when the item is marked done (or when the session stops partway, as a draft). The title is the backlog ID and the item in lowercase, like a commit message (`ext-004 add github actions ci`). The body follows [`.github/pull_request_template.md`](../../../.github/pull_request_template.md): what changed, how it was verified with the exact counts and the surfaces exercised, the decisions taken under the blanket approval, and leftovers, in the same words as the item's Evidence column. Like commit messages, pull request descriptions carry no AI attribution.
+- **The user merges.** A session opens the pull request, records its URL in the item's Evidence column and in the session handoff note, and stops; it never merges, closes, or force-pushes. CI (EXT-004) must be green before merging; `main` is protected with required status checks, required pull requests, and no force pushes, and the protection applies to administrators too.
+- **A session that finds the previous item's pull request still open** branches from `main` anyway and says so in its handoff; it does not stack branches. If the new work depends on the unmerged change, it stops and asks the user to merge first.
+- Pre-existing direct commits on `main` from before this rule (2026-10-07) stay as they are; nothing is rewritten.
