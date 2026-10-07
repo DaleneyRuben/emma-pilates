@@ -72,7 +72,7 @@ export const startDatabaseTestContext =
   async (): Promise<DatabaseTestContext> => {
     const databaseOverride = process.env.TEST_DATABASE_URL;
     let container: StartedPostgreSqlContainer | undefined;
-    let dropDatabase: () => Promise<void> = async () => undefined;
+    let dropDatabase: () => Promise<void> = () => Promise.resolve();
     let databaseUrl: string;
 
     if (databaseOverride) {

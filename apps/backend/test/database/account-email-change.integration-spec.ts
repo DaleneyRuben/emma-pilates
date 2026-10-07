@@ -1,5 +1,4 @@
 import { randomUUID } from 'node:crypto';
-import { PrismaPg } from '@prisma/adapter-pg';
 import { PgBoss } from 'pg-boss';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { createPrismaAdapter } from '../../src/database/prisma-adapter';

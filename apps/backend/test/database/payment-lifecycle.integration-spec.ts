@@ -30,21 +30,6 @@ describe('Prisma payment lifecycle', () => {
       referralRewardCentavos: 6000,
     });
 
-  const clientPrincipal = async (
-    email: string,
-  ): Promise<AuthenticatedPrincipal & { clientId: string }> => {
-    const account = await prisma.account.findFirstOrThrow({
-      where: { email, deletedAt: null },
-      select: { id: true, clientId: true },
-    });
-    return {
-      accountId: account.id,
-      authenticationSessionId: randomUUID(),
-      identity: { kind: 'client', clientId: account.clientId! },
-      clientId: account.clientId!,
-    };
-  };
-
   const staffPrincipal = async (
     email: string,
   ): Promise<AuthenticatedPrincipal> => {
