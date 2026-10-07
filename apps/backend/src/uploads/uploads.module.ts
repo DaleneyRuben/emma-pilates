@@ -5,7 +5,7 @@ import type { PgBoss } from 'pg-boss';
 import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
 import { createPgBoss, startInstalledPgBoss } from '../jobs/pg-boss-runtime';
-import { isOpenApiGeneration } from '../openapi/openapi-generation';
+import { bootsWithoutJobRuntime } from '../jobs/boot-without-job-runtime';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import { LocalObjectStorage } from './local-object-storage';
 import {
@@ -26,7 +26,7 @@ const uploadsPrisma = Symbol('uploadsPrisma');
 const uploadsStorage = Symbol('uploadsStorage');
 const uploadsPgBoss = Symbol('uploadsPgBoss');
 
-const openApiPgBoss: Pick<PgBoss, 'stop'> = {
+const offlinePgBoss: Pick<PgBoss, 'stop'> = {
   stop: () => Promise.resolve(),
 };
 
@@ -78,8 +78,8 @@ class UploadsRuntimeCleanup implements OnApplicationShutdown {
       provide: uploadsPgBoss,
       inject: [ConfigService],
       useFactory: async (config: ConfigService<Environment, true>) => {
-        if (isOpenApiGeneration(process.env)) {
-          return openApiPgBoss as PgBoss;
+        if (bootsWithoutJobRuntime(process.env)) {
+          return offlinePgBoss as PgBoss;
         }
         const boss = createPgBoss(config.getOrThrow('DATABASE_URL'));
         await startInstalledPgBoss(boss);
