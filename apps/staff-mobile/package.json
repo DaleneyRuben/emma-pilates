@@ -33,7 +33,10 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "typecheck": "tsc --noEmit",
-    "release:smoke": "node ../../scripts/mobile-release-smoke.mjs"
+    "release:smoke": "node ../../scripts/mobile-release-smoke.mjs",
+    "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" App.tsx index.ts jest.setup.ts",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" App.tsx index.ts jest.setup.ts"
   },
   "jest": {
     "preset": "jest-expo",

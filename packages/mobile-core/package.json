@@ -42,7 +42,10 @@
   "scripts": {
     "test": "jest",
     "test:watch": "jest --watch",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{ts,tsx}\" jest.setup.ts",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx}\" jest.setup.ts"
   },
   "jest": {
     "preset": "jest-expo",
