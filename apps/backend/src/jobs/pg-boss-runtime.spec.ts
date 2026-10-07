@@ -4,20 +4,7 @@ import {
   startInstalledPgBoss,
 } from './pg-boss-runtime';
 
-// pg-boss ships only ES modules; resolving it through Jest's module registry
-// is what lets this suite run without --experimental-vm-modules.
-jest.mock('pg-boss', () => {
-  const { EventEmitter } =
-    jest.requireActual<typeof import('node:events')>('node:events');
-
-  class PgBoss extends EventEmitter {
-    constructor(readonly options: unknown) {
-      super();
-    }
-  }
-
-  return { PgBoss };
-});
+// The unit suite resolves pg-boss to the double in src/__mocks__.
 
 describe('pg-boss runtime', () => {
   it('constructs the job client with the pinned options', () => {
