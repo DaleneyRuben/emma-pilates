@@ -1,13 +1,8 @@
-import { useEffect, useState, type PropsWithChildren } from "react";
-import { StyleSheet, Text } from "react-native";
+import { useEffect, useState } from "react";
 
 import type { AuthenticationLinkIntent } from "../ingress/verified-link";
 import { BodyText } from "../ui/body-text";
-import { fontFamilies } from "../ui/fonts";
-import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
-import { TextButton } from "../ui/text-button";
-import { colors, spacing, typography } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
 import type { AuthenticationApi } from "./authentication-api";
 import { LoginScreen, type LoginSubmissionResult, type LoginValues } from "./login-screen";
@@ -106,14 +101,6 @@ function VerifyEmailScreen({
       </BodyText>
       {status === "loading" ? null : <PrimaryButton label="Ir a iniciar sesión" onPress={onBack} />}
     </AuthenticationScreen>
-  );
-}
-
-function ErrorMessage({ children }: PropsWithChildren) {
-  return (
-    <Text accessibilityRole="alert" style={styles.error}>
-      {children}
-    </Text>
   );
 }
 
@@ -244,16 +231,3 @@ export function AuthenticationFlow({
     />
   );
 }
-
-const styles = StyleSheet.create({
-  emphasized: {
-    color: colors.text,
-    fontWeight: "600",
-  },
-  error: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 20,
-  },
-});
