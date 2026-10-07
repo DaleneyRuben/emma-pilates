@@ -34,3 +34,7 @@ describe('back office migration', () => {
     }
   });
 });
+
+it('ci break', () => {
+  expect(1).toBe(2);
+});
