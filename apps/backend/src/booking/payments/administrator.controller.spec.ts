@@ -110,7 +110,8 @@ describe('AdministratorPaymentsController', () => {
       'Cache-Control',
       'no-store',
     );
-    expect(file.getStream().read().toString()).toBe('png');
+    const bytes: unknown = file.getStream().read();
+    expect(bytes).toEqual(Buffer.from('png'));
   });
 
   it('confirms and rejects with normalized reasons', async () => {

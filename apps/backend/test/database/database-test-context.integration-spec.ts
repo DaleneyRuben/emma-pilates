@@ -37,7 +37,7 @@ describe('database test context', () => {
 
     const second = await startDatabaseTestContext();
     contexts.push(second);
-    const rows = await second.pool.query(
+    const rows = await second.pool.query<{ count: number }>(
       'select count(*)::int as count from booking.branches',
     );
 

@@ -245,7 +245,7 @@ describe('Prisma payment commands', () => {
     ]);
     expect(activity[0]).toMatchObject({
       amountCentavos: 6000,
-      occurredAt: expect.any(Date),
+      occurredAt: expect.any(Date) as Date,
     });
 
     const referrals = await commands().readReferrals(isabel);

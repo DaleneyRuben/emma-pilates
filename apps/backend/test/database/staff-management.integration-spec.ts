@@ -256,7 +256,7 @@ describe('Prisma staff management', () => {
     ).resolves.toMatchObject({
       items: expect.not.arrayContaining([
         expect.objectContaining({ id: created.id }),
-      ]),
+      ]) as unknown[],
     });
     await expect(principalBranches()).resolves.toEqual([branchId('Centro')]);
 

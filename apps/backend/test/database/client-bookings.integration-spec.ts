@@ -76,9 +76,9 @@ describe('Client upcoming bookings', () => {
       waitlistEntryId: entry.id,
       sessionId: first.id,
       startsAt: first.startsAt,
-      trainerName: expect.any(String),
-      branchName: expect.any(String),
-      classTypeName: expect.any(String),
+      trainerName: expect.any(String) as string,
+      branchName: expect.any(String) as string,
+      classTypeName: expect.any(String) as string,
     });
     expect(upcoming[1]).toMatchObject({
       bookingId: booking.id,

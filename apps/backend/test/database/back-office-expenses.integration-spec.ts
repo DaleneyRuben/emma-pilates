@@ -102,7 +102,7 @@ describe('Prisma Back Office expenses', () => {
       world.prisma.expenseCategory.findUniqueOrThrow({
         where: { id: cleaning.id },
       }),
-    ).resolves.toMatchObject({ deletedAt: expect.any(Date) });
+    ).resolves.toMatchObject({ deletedAt: expect.any(Date) as Date });
     await expect(
       expenses()
         .listExpenseCategories(await administrator())

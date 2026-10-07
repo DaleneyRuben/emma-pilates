@@ -668,7 +668,7 @@ describe('Prisma payment lifecycle', () => {
       ),
     ).resolves.toMatchObject({
       mediaType: 'image/jpeg',
-      objectKey: expect.stringContaining('pending/'),
+      objectKey: expect.stringContaining('pending/') as string,
     });
   });
 

@@ -252,10 +252,10 @@ describe('Client invitation unit of work', () => {
 
     await expect(
       prisma.account.findUniqueOrThrow({ where: { id: account.id } }),
-    ).resolves.toMatchObject({ deletedAt: expect.any(Date) });
+    ).resolves.toMatchObject({ deletedAt: expect.any(Date) as Date });
     await expect(
       prisma.client.findUniqueOrThrow({ where: { id: result.clientId } }),
-    ).resolves.toMatchObject({ deletedAt: expect.any(Date) });
+    ).resolves.toMatchObject({ deletedAt: expect.any(Date) as Date });
     await expect(
       prisma.authenticationToken.count({
         where: { accountId: account.id, usedAt: null, invalidatedAt: null },

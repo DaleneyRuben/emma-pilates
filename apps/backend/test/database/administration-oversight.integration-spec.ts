@@ -67,8 +67,8 @@ describe('Prisma administration oversight reads', () => {
     expect(page.totalItems).toBe(1);
     expect(page.items[0]).toMatchObject({
       clientName: 'Ana Justiniano',
-      nutritionistName: expect.any(String),
-      branchName: expect.any(String),
+      nutritionistName: expect.any(String) as string,
+      branchName: expect.any(String) as string,
     });
     await expect(
       codeOf(
@@ -88,9 +88,9 @@ describe('Prisma administration oversight reads', () => {
     expect(all.totalItems).toBe(2);
     expect(all.items[0]).toEqual(
       expect.objectContaining({
-        referrerName: expect.any(String),
-        referredName: expect.any(String),
-        state: expect.stringMatching(/pending|awarded/),
+        referrerName: expect.any(String) as string,
+        referredName: expect.any(String) as string,
+        state: expect.stringMatching(/pending|awarded/) as string,
       }),
     );
     const sofia = await oversight().listReferrals(
@@ -113,7 +113,7 @@ describe('Prisma administration oversight reads', () => {
         expect.objectContaining({
           clientName: 'Sofía Guzmán',
           availableCentavos: 6_000,
-          lastMovementAt: expect.any(Date),
+          lastMovementAt: expect.any(Date) as Date,
         }),
       ],
     });

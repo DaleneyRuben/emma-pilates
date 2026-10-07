@@ -162,7 +162,7 @@ describe('Prisma catalog administration', () => {
         { classTypeId: barre.id },
         await administrator(),
       ),
-    ).resolves.toMatchObject({ archivedAt: expect.any(Date) });
+    ).resolves.toMatchObject({ archivedAt: expect.any(Date) as Date });
   });
 
   it('creates, reprices, and hides Plans with audits, and rejects invalid durations', async () => {
@@ -185,7 +185,7 @@ describe('Prisma catalog administration', () => {
     ).resolves.toMatchObject({ priceCentavos: 30_000 });
     await expect(
       catalog().setPlanVisibility({ planId: plan.id, visible: false }, admin),
-    ).resolves.toMatchObject({ hiddenAt: expect.any(Date) });
+    ).resolves.toMatchObject({ hiddenAt: expect.any(Date) as Date });
     await expect(
       codeOf(
         catalog().createPlan(

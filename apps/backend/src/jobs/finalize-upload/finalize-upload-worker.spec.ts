@@ -10,8 +10,12 @@ const payload = {
   imageAssetId: '0ae2701e-f8ac-4c8a-8cf0-65182ee0fc1d',
 } as const;
 
+type ProcessOutcome = Promise<'verified' | 'failed' | 'stale'>;
+type ProcessMock = jest.Mock<ProcessOutcome, [unknown]>;
+const processMock = (): ProcessMock => jest.fn<ProcessOutcome, [unknown]>();
+
 const register = async (
-  process: jest.Mock<Promise<'verified' | 'failed' | 'stale'>, [unknown]>,
+  process: ProcessMock,
 ): Promise<FinalizeUploadWorkerHandler> => {
   let handler: FinalizeUploadWorkerHandler | undefined;
   const work = jest.fn<
@@ -40,7 +44,7 @@ const register = async (
 
 describe('finalize upload worker', () => {
   it('completes verified jobs', async () => {
-    const process = jest.fn().mockResolvedValue('verified');
+    const process = processMock().mockResolvedValue('verified');
     const handler = await register(process);
 
     await expect(handler([{ id: 'job-1', data: payload }])).resolves.toEqual([
@@ -50,7 +54,7 @@ describe('finalize upload worker', () => {
   });
 
   it('completes stale jobs without retrying them', async () => {
-    const process = jest.fn().mockResolvedValue('stale');
+    const process = processMock().mockResolvedValue('stale');
     const handler = await register(process);
 
     await expect(handler([{ id: 'job-2', data: payload }])).resolves.toEqual([
@@ -59,7 +63,7 @@ describe('finalize upload worker', () => {
   });
 
   it('completes business verification failures without retrying them', async () => {
-    const process = jest.fn().mockResolvedValue('failed');
+    const process = processMock().mockResolvedValue('failed');
     const handler = await register(process);
 
     await expect(handler([{ id: 'job-3', data: payload }])).resolves.toEqual([
@@ -68,9 +72,9 @@ describe('finalize upload worker', () => {
   });
 
   it('fails jobs that throw unexpectedly for pg-boss to retry', async () => {
-    const process = jest
-      .fn()
-      .mockRejectedValue(new Error('database unreachable'));
+    const process = processMock().mockRejectedValue(
+      new Error('database unreachable'),
+    );
     const handler = await register(process);
 
     await expect(handler([{ id: 'job-4', data: payload }])).resolves.toEqual([
@@ -83,7 +87,7 @@ describe('finalize upload worker', () => {
   });
 
   it('dead-letters invalid payloads without exposing their contents', async () => {
-    const process = jest.fn().mockResolvedValue('verified');
+    const process = processMock().mockResolvedValue('verified');
     const handler = await register(process);
 
     await expect(

@@ -104,7 +104,7 @@ describe('Client class history', () => {
 
     expect(history).toHaveLength(1);
     expect(history[0]).toMatchObject({
-      sessionId: expect.any(String),
+      sessionId: expect.any(String) as string,
       classTypeName: 'Reformer Pilates',
       trainerName: 'Emma Vargas',
       branchName: 'Centro',

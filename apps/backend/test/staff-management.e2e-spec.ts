@@ -137,7 +137,9 @@ describe('administrator staff members (e2e)', () => {
       .get('/api/v1/administrator/staff-members?role=owner')
       .set('authorization', bearer)
       .expect(400)
-      .expect(({ body }) => expect(body.code).toBe('invalid_request'));
+      .expect(({ body }: { body: { code: string } }) =>
+        expect(body.code).toBe('invalid_request'),
+      );
     await request(app.getHttpServer())
       .get('/api/v1/administrator/staff-members?pageSize=101')
       .set('authorization', bearer)
@@ -202,7 +204,9 @@ describe('administrator staff members (e2e)', () => {
         .post(`/api/v1/administrator/staff-members/${staffId}/deactivation`)
         .set('authorization', bearer)
         .expect(status)
-        .expect(({ body }) => expect(body.code).toBe(code));
+        .expect(({ body }: { body: { code: string } }) =>
+          expect(body.code).toBe(code),
+        );
     }
   });
 
@@ -221,7 +225,9 @@ describe('administrator staff members (e2e)', () => {
       .set('authorization', bearer)
       .send({ role: 'assistant' })
       .expect(200)
-      .expect(({ body }) => expect(body.role).toBe('assistant'));
+      .expect(({ body }: { body: { role: string } }) =>
+        expect(body.role).toBe('assistant'),
+      );
     expect(operations.changeRole).toHaveBeenCalledWith(
       { staffMemberId: staffId, role: 'assistant' },
       expect.anything(),
@@ -239,7 +245,9 @@ describe('administrator staff members (e2e)', () => {
       .post(`/api/v1/administrator/staff-members/${staffId}/deactivation`)
       .set('authorization', bearer)
       .expect(200)
-      .expect(({ body }) => expect(body.status).toBe('deactivated'));
+      .expect(({ body }: { body: { status: string } }) =>
+        expect(body.status).toBe('deactivated'),
+      );
     await request(app.getHttpServer())
       .get('/api/v1/administrator/staff-members/not-a-uuid')
       .set('authorization', bearer)

@@ -64,10 +64,10 @@ describe('Sessions across every Branch', () => {
     expect(starts).toEqual([...starts].sort((a, b) => a - b));
     expect(sessions[0]).toEqual(
       expect.objectContaining({
-        branchName: expect.any(String),
-        classTypeName: expect.any(String),
-        trainerName: expect.any(String),
-        availableSeats: expect.any(Number),
+        branchName: expect.any(String) as string,
+        classTypeName: expect.any(String) as string,
+        trainerName: expect.any(String) as string,
+        availableSeats: expect.any(Number) as number,
       }),
     );
   });

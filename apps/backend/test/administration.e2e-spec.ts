@@ -170,7 +170,9 @@ describe('administration endpoints (e2e)', () => {
       .post(`/api/v1/administrator/branches/${id}/archive`)
       .set('authorization', bearer)
       .expect(409)
-      .expect(({ body }) => expect(body.code).toBe('branch_in_use'));
+      .expect(({ body }: { body: { code: string } }) =>
+        expect(body.code).toBe('branch_in_use'),
+      );
   });
 
   it('hides a Plan', async () => {
@@ -179,7 +181,7 @@ describe('administration endpoints (e2e)', () => {
       .set('authorization', bearer)
       .send({ visible: false })
       .expect(200)
-      .expect(({ body }) =>
+      .expect(({ body }: { body: { hiddenAt: string } }) =>
         expect(body.hiddenAt).toBe('2026-09-23T12:00:00.000Z'),
       );
     expect(catalog.setPlanVisibility).toHaveBeenCalledWith(
@@ -259,7 +261,9 @@ describe('administration endpoints (e2e)', () => {
       .set('authorization', bearer)
       .send({ capacity: 6 })
       .expect(409)
-      .expect(({ body }) => expect(body.code).toBe('session_overlap'));
+      .expect(({ body }: { body: { code: string } }) =>
+        expect(body.code).toBe('session_overlap'),
+      );
     await request(app.getHttpServer())
       .post('/api/v1/administrator/sessions')
       .set('authorization', bearer)
@@ -309,7 +313,7 @@ describe('administration endpoints (e2e)', () => {
       .set('authorization', bearer)
       .send({ name: 'Centro', address: 'Calle 1' })
       .expect(403)
-      .expect(({ body }) =>
+      .expect(({ body }: { body: { code: string } }) =>
         expect(body.code).toBe('administration_access_denied'),
       );
   });

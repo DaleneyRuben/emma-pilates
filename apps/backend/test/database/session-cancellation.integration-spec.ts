@@ -119,7 +119,7 @@ describe('Administrator Session cancellation', () => {
     ).resolves.toMatchObject({
       state: 'CANCELLED',
       cancellationCause: 'NO_SUBSTITUTE_TRAINER',
-      cancelledAt: expect.any(Date),
+      cancelledAt: expect.any(Date) as Date,
       cancelledByAccountId: admin.accountId,
     });
     await expect(
@@ -142,7 +142,7 @@ describe('Administrator Session cancellation', () => {
       }),
     ).resolves.toMatchObject({
       closureReason: 'SESSION_CANCELLED',
-      closedAt: expect.any(Date),
+      closedAt: expect.any(Date) as Date,
     });
     await expect(
       prisma.auditRecord.findFirst({
