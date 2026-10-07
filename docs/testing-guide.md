@@ -1092,6 +1092,21 @@ on that server and drops it when it finishes, so files never see each other's
 rows; the admin database itself stays empty. Any other database name is
 refused.
 
+You may stop a run at any time with Ctrl-C. Each of those databases is watched
+by a small background Node process started with it, outside Jest and outside
+the terminal's Ctrl-C. When the test run ends without dropping the database
+(Ctrl-C, a closed terminal, a `kill`, a crash, or a run that fails before its
+cleanup), the watcher drops that one database, by its exact generated name, and
+exits. The watcher never touches the admin database or any other database. To
+confirm nothing was left behind, list the server's databases:
+
+```sh
+psql -l | grep pilates_test_
+```
+
+Only your admin database (and any you created by hand) should be listed, never
+a `pilates_test_` name followed by twelve letters and digits.
+
 ### Quality and generated-contract checks
 
 Run these from the project root:
