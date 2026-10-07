@@ -1130,8 +1130,17 @@ runner after the shared setup in `.github/actions/setup/action.yml` (Node from
 
 A job runs only when the job before it in its chain passed, so a lint or type
 error costs one two-minute job and the tests never start; a stale contract
-stops the api chain before the database run. Jobs that never started show as
-skipped. A clean run takes about nine minutes of wall clock, set by the api
+stops the api chain before the database run. On a pull request a first
+`changes` job also reads the pull request's whole list of changed files and
+starts only the chains of the surfaces it touches: `apps/backend/**` for api,
+`apps/admin-web/**` for web, the three mobile packages for mobile,
+`packages/api-contracts/**` for all three (every contract change touches the
+committed generated client), and the shared files (`package.json`,
+`pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.nvmrc`, `.github/**`) for all
+three. A docs-only pull request therefore runs nothing, and a backend fix that
+does not change the contract runs the api chain alone. A push to `main`
+always runs everything. Jobs that never started show as skipped. A clean run
+of all three chains takes about nine minutes of wall clock, set by the api
 chain.
 
 The Jest steps run with `--ci --forceExit`: every one of these suites passes
