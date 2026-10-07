@@ -91,7 +91,10 @@ describe("Referrals and Credit", () => {
       ),
     );
 
-    expect(screen.getByText("Bs 60")).toBeOnTheScreen();
+    // The balance comes from its own request; a slow runner renders Perfil first.
+    await waitFor(() => {
+      expect(screen.getByText("Bs 60")).toBeOnTheScreen();
+    });
     expect(
       screen.getByRole("button", { name: "Mi crédito: Bs 60" }),
     ).toBeOnTheScreen();
