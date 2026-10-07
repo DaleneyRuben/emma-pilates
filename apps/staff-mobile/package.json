@@ -16,11 +16,14 @@
     "react-native-screens": "~4.26.2"
   },
   "devDependencies": {
+    "@pilates/tooling": "workspace:*",
     "@testing-library/react-native": "^14.0.1",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
+    "eslint": "^9.39.4",
     "jest": "29.7.0",
     "jest-expo": "~57.0.5",
+    "prettier": "3.9.8",
     "typescript": "~6.0.3"
   },
   "scripts": {
