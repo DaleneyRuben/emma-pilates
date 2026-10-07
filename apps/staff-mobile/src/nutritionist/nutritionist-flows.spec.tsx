@@ -5,7 +5,6 @@ import { jsonResponse, routeFetcher } from "../test-support";
 import {
   block,
   centro,
-  day,
   entry,
   inDays,
   openApp,

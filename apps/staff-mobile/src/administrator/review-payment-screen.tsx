@@ -4,7 +4,6 @@ import {
   colors,
   formatBolivianos,
   FormField,
-  Heading,
   initials,
   PrimaryButton,
   QueryFailure,

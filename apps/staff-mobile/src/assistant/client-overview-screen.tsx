@@ -23,7 +23,7 @@ import { useStaffFetcher } from "../staff-fetcher";
 import { useInClientPanel } from "./assistant-workspace";
 import { OutlinedButton } from "./outlined-button";
 import { PendingInvitationCard } from "./pending-invitation-card";
-import { describeClasses, formatCivilDate } from "./assistant-format";
+import { formatCivilDate } from "./assistant-format";
 
 export type ClientContext = { clientId: string; clientName: string };
 

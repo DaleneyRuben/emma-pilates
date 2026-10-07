@@ -45,7 +45,6 @@ import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
 import { StaffFetcherContext, unavailableFetcher, useStaffFetcher } from "./staff-fetcher";
 import { createTrainerApi } from "./trainer-api";
-import { RootHeader } from "./ui/root-header";
 
 type StaffRole = Exclude<AppRole, "client">;
 type AttendanceOutcome = "attended" | "no_show";

@@ -4,12 +4,7 @@ import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilate
 import { jsonResponse } from "../test-support";
 import {
   minute,
-  assistant,
-  lucia,
-  subscription,
   soonBooking,
-  history,
-  overview,
   session,
   newClient,
   invitation,
