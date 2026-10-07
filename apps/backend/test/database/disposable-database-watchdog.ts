@@ -1,5 +1,10 @@
 import pg from 'pg';
 
+// Spawned detached by database-test-context.ts for each disposable database
+// and run by Node directly (type stripping), outside Jest and outside the
+// terminal's process group, so Ctrl-C does not reach it. It only ever drops
+// the one generated name it was given.
+
 const adminUrl = process.env.WATCHDOG_ADMIN_URL ?? '';
 const name = process.env.WATCHDOG_DATABASE ?? '';
 let input = '';

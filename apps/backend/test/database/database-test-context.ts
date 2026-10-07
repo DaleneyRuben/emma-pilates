@@ -10,6 +10,10 @@ import { prismaSessionOptions } from '../../src/database/prisma-adapter';
 
 const backendRoot = resolve(process.cwd());
 const disposableDatabasePrefix = 'pilates_test_';
+const watchdogScript = resolve(
+  backendRoot,
+  'test/database/disposable-database-watchdog.ts',
+);
 
 export type DatabaseTestContext = {
   databaseUrl: string;
@@ -51,27 +55,39 @@ const runAsAdmin = async (
   }
 };
 
+// Jest hands every test file a copy of process, so a signal listener here
+// never runs, and a signal, crash, or run that ends without stop skips the
+// drop below. A detached watchdog outlives this process instead: it drops
+// this one database by name when its stdin closes before stop releases it.
+const watchDisposableDatabase = (
+  adminUrl: string,
+  name: string,
+): (() => Promise<void>) => {
+  const watchdog = spawn(process.execPath, [watchdogScript], {
+    detached: true,
+    stdio: ['pipe', 'ignore', 'ignore'],
+    env: {
+      ...process.env,
+      NODE_OPTIONS: '',
+      WATCHDOG_ADMIN_URL: adminUrl,
+      WATCHDOG_DATABASE: name,
+    },
+  });
+  watchdog.unref();
+
+  return () =>
+    new Promise((done) => {
+      watchdog.stdin.end('release', done);
+    });
+};
+
 // TEST_DATABASE_URL names a server (through a pilates_test_* admin database);
 // every context still gets its own database there, like a container would.
 const createDisposableDatabase = async (
   adminUrl: string,
 ): Promise<{ databaseUrl: string; drop: () => Promise<void> }> => {
   const name = `${disposableDatabasePrefix}${randomBytes(6).toString('hex')}`;
-  const watchdog = spawn(
-    process.execPath,
-    [resolve(backendRoot, 'test/database/disposable-database-watchdog.ts')],
-    {
-      detached: true,
-      stdio: ['pipe', 'ignore', 'ignore'],
-      env: {
-        ...process.env,
-        NODE_OPTIONS: '',
-        WATCHDOG_ADMIN_URL: adminUrl,
-        WATCHDOG_DATABASE: name,
-      },
-    },
-  );
-  watchdog.unref();
+  const releaseWatchdog = watchDisposableDatabase(adminUrl, name);
   await runAsAdmin(adminUrl, `create database "${name}"`);
   const url = new URL(adminUrl);
   url.pathname = `/${name}`;
@@ -83,9 +99,7 @@ const createDisposableDatabase = async (
         adminUrl,
         `drop database if exists "${name}" with (force)`,
       );
-      await new Promise<void>((done) => {
-        watchdog.stdin.end('release', done);
-      });
+      await releaseWatchdog();
     },
   };
 };
