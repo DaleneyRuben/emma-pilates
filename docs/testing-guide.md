@@ -1053,8 +1053,12 @@ journey.
 The suite has no database. `apps/backend/test/setup-environment.ts` pins
 `DATABASE_URL` to a placeholder that reaches nothing (port 1 on localhost),
 ignoring any value exported by your shell, and boots the application modules
-the way the offline OpenAPI generator does (`OPENAPI_GENERATION=true`), so the
-pg-boss factories return a stub instead of opening the job runtime. If a
+without the job runtime (`BOOT_WITHOUT_JOB_RUNTIME=true`), the way the offline
+OpenAPI generator does, so the pg-boss factories return a stub instead of
+starting pg-boss. The gate is `apps/backend/src/jobs/boot-without-job-runtime.ts`;
+never set it for a running API, whose stub cannot send a job, so every command
+that schedules one would fail. The
+retired name `OPENAPI_GENERATION` no longer has any effect. If a
 spec ever tries to open a connection, it fails with `ECONNREFUSED 127.0.0.1:1`
 rather than touching a real database. The real-database boot of the whole
 application is covered by `client-registration-runtime.integration-spec.ts`
