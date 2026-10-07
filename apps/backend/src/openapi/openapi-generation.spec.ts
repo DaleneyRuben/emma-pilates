@@ -1,9 +1,19 @@
 import { isOpenApiGeneration } from './openapi-generation';
 
 describe('isOpenApiGeneration', () => {
-  it('enables the documentation-only runtime mode only when explicitly requested', () => {
-    expect(isOpenApiGeneration({ OPENAPI_GENERATION: 'true' })).toBe(true);
-    expect(isOpenApiGeneration({ OPENAPI_GENERATION: 'false' })).toBe(false);
-    expect(isOpenApiGeneration({})).toBe(false);
+  it('boots without the job runtime only when explicitly requested', () => {
+    const environment = (values: NodeJS.ProcessEnv) => values;
+
+    expect(
+      isOpenApiGeneration(environment({ BOOT_WITHOUT_JOB_RUNTIME: 'true' })),
+    ).toBe(true);
+    expect(
+      isOpenApiGeneration(environment({ BOOT_WITHOUT_JOB_RUNTIME: 'false' })),
+    ).toBe(false);
+    expect(isOpenApiGeneration(environment({}))).toBe(false);
+  });
+
+  it('ignores the retired OPENAPI_GENERATION name', () => {
+    expect(isOpenApiGeneration({ OPENAPI_GENERATION: 'true' })).toBe(false);
   });
 });
