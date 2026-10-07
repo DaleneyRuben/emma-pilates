@@ -159,6 +159,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 
 - The pill on a Session row or detail says how many places remain or that none does; the number or word carries the state, so it takes no dot.
 - Seats remain («N cupos», «Con cupos»): Palo de rosa tinte `#EFE0DC` behind Palo de rosa oscuro `#7A4F4B`, the badge pair of the palette table. Full («Lleno», «Completa», «Llena»): `rgba(216,201,187,0.34)` behind Texto secundario `#6E6663`, never Error red and never Éxito green. 12px, weight 500, fully rounded.
+- `S08`'s capacity summary («N de M cupos disponibles» beside the pill) is a flat Blanco card: 1px `#D8C9BB`, radius 16, padding 16px 18px, no shadow. The pill alone carries the state, so the box takes no Éxito or Error tint.
 
 ### Search result rows (`S04`)
 
