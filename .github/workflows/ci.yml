@@ -1,0 +1,78 @@
+name: ci
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # prisma.config.ts and the environment schema the OpenAPI generator validates
+  # need DATABASE_URL to exist; nothing in CI connects to it. The integration
+  # suite overrides it per disposable database through TEST_DATABASE_URL.
+  DATABASE_URL: postgresql://nobody@127.0.0.1:1/pilates_ci_unreachable
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm --filter @pilates/admin-web format:check
+      - run: pnpm --filter @pilates/backend build
+      - run: pnpm --filter @pilates/admin-web build
+      - run: pnpm --filter @pilates/api-contracts build
+
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm check:api
+      - run: pnpm check:api-compat
+
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: psql postgresql://postgres:postgres@localhost:5432/postgres -c 'create database pilates_test_ci'
+      - run: pnpm --filter @pilates/backend test
+      - run: pnpm --filter @pilates/backend test:e2e
+      - run: pnpm --filter @pilates/backend test:integration
+        env:
+          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilates_test_ci
+
+  frontend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @pilates/admin-web exec jest --ci
+      - run: pnpm --filter @pilates/client-mobile exec jest --ci
+      - run: pnpm --filter @pilates/staff-mobile exec jest --ci
+      - run: pnpm --filter @pilates/mobile-core exec jest --ci
