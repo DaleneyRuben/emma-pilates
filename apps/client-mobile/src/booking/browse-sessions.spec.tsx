@@ -1,10 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-  within,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -52,12 +46,7 @@ const today = boliviaCivilDate(new Date());
 const { from, until } = civilDateRange(today);
 const inOneHour = new Date(Date.now() + 60 * 60 * 1_000);
 const inTwoHours = new Date(Date.now() + 2 * 60 * 60 * 1_000);
-const session = (
-  id: string,
-  classTypeId: string,
-  startsAt: Date,
-  availableSeats: number,
-) => ({
+const session = (id: string, classTypeId: string, startsAt: Date, availableSeats: number) => ({
   id,
   branchId: "branch-centro",
   classTypeId,
@@ -82,15 +71,11 @@ function baseRoutes() {
 }
 
 async function openBrowse(routes: Parameters<typeof routeFetcher>[0]) {
-  const screen = await render(
-    <App runtime={createClientRuntime(routeFetcher(routes))} />,
-  );
+  const screen = await render(<App runtime={createClientRuntime(routeFetcher(routes))} />);
 
   await waitFor(
     () => {
-      expect(
-        screen.getByRole("button", { name: /Reservar, tab/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
@@ -123,16 +108,12 @@ describe("Client Browse Sessions", () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
     expect(screen.getAllByText("Emma Vargas")).toHaveLength(2);
     expect(screen.getByText("3 cupos")).toBeOnTheScreen();
     expect(screen.getByText("Lleno")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Sucursal: Centro" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
   });
 
   it("filters the list by Class Type and shows an empty state", async () => {
@@ -143,20 +124,14 @@ describe("Client Browse Sessions", () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
     fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("No hay clases con este filtro"),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("No hay clases con este filtro")).toBeOnTheScreen();
     });
-    expect(
-      screen.queryByRole("button", { name: /^Reformer Pilates \d/ }),
-    ).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: /^Reformer Pilates \d/ })).not.toBeOnTheScreen();
   });
 
   it("opens the Session detail from a card", async () => {
@@ -180,13 +155,9 @@ describe("Client Browse Sessions", () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    fireEvent.press(
-      screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
-    );
+    fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
 
     await waitFor(() => {
       expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();
@@ -201,15 +172,13 @@ describe("Client Browse Sessions", () => {
         () => jsonResponse([]),
     });
 
-    await fireEvent.press(
-      await screen.findByRole("button", { name: "Sucursal: Centro" }),
-    );
+    await fireEvent.press(await screen.findByRole("button", { name: "Sucursal: Centro" }));
 
     expect(screen.getByRole("button", { name: "Centro" })).toBeSelected();
     // The picker pill names the Branch too (MOB-042), so read the sheet row's label.
-    expect(
-      within(screen.getByRole("button", { name: "Centro" })).getByText("Centro"),
-    ).toHaveStyle({ color: "#8A5D59" });
+    expect(within(screen.getByRole("button", { name: "Centro" })).getByText("Centro")).toHaveStyle({
+      color: "#8A5D59",
+    });
     expect(
       screen.getByTestId("picker-check-branch-centro", { includeHiddenElements: true }),
     ).toBeOnTheScreen();
@@ -226,9 +195,7 @@ describe("Client Browse Sessions", () => {
         () => jsonResponse([]),
     });
 
-    await fireEvent.press(
-      await screen.findByRole("button", { name: "Sucursal: Centro" }),
-    );
+    await fireEvent.press(await screen.findByRole("button", { name: "Sucursal: Centro" }));
 
     // Spare tablet height must not stretch them, nor an open list squash them.
     for (const strip of ["browse-day-strip", "browse-class-type-strip"]) {

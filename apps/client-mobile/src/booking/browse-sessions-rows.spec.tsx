@@ -26,7 +26,12 @@ const active = {
     endsOn: "2026-10-11",
   },
 };
-const classType = { id: "class-reformer", name: "Reformer Pilates", description: "", durationMinutes: 50 };
+const classType = {
+  id: "class-reformer",
+  name: "Reformer Pilates",
+  description: "",
+  durationMinutes: 50,
+};
 const today = boliviaCivilDate(new Date());
 const { from, until } = civilDateRange(today);
 const session = (id: string, startsAt: Date, availableSeats: number) => ({
@@ -60,7 +65,9 @@ describe("Client class list rows", () => {
             "/api/v1/clients/current": () => jsonResponse(profile),
             "/api/v1/clients/current/subscription": () => jsonResponse(active),
             "/api/v1/branches": () =>
-              jsonResponse([{ id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" }]),
+              jsonResponse([
+                { id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" },
+              ]),
             "/api/v1/class-types": () => jsonResponse([classType]),
             [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
               () =>

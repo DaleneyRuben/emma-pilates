@@ -34,10 +34,7 @@ import {
 
 type RescheduleNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "MyBookings",
-    params: { confirmed: ConfirmedBooking },
-  ) => void;
+  navigate: (screen: "MyBookings", params: { confirmed: ConfirmedBooking }) => void;
 };
 
 async function loadSameDayAlternatives(
@@ -73,8 +70,7 @@ export function RescheduleScreen({
   const navigation = useNavigation<RescheduleNavigation>();
   const fetcher = useClientFetcher();
   const branches = useListBranches({ fetcher });
-  const branchIds =
-    branches.data?.status === 200 ? branches.data.data.map((b) => b.id) : [];
+  const branchIds = branches.data?.status === 200 ? branches.data.data.map((b) => b.id) : [];
   const alternatives = useQuery({
     enabled: branchIds.length > 0,
     queryFn: () => loadSameDayAlternatives(fetcher, branchIds, booking),

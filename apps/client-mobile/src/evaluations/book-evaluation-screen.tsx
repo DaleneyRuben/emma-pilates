@@ -28,26 +28,20 @@ import { clockTime, evaluationDate } from "./evaluation-format";
 
 type BookNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "MyEvaluations",
-    params: { confirmed: ClientEvaluationDto },
-  ) => void;
+  navigate: (screen: "MyEvaluations", params: { confirmed: ClientEvaluationDto }) => void;
 };
 
 const bookingProblems: Record<string, string> = {
   evaluation_month_used: "Ya tienes una evaluación reservada para ese mes.",
   evaluation_slot_unavailable: "Ese horario ya no está disponible. Elige otro.",
-  evaluation_booking_closed:
-    "Ese horario ya cerró: se puede reservar hasta 3 horas antes.",
+  evaluation_booking_closed: "Ese horario ya cerró: se puede reservar hasta 3 horas antes.",
   evaluation_slot_not_found: "Ese horario ya no está disponible. Elige otro.",
   no_eligible_subscription: "Necesitas un plan activo para reservar tu evaluación.",
 };
 
 const problemMessage = (body: unknown): string => {
   const code =
-    typeof body === "object" && body !== null
-      ? (body as { code?: unknown }).code
-      : undefined;
+    typeof body === "object" && body !== null ? (body as { code?: unknown }).code : undefined;
   return (
     (typeof code === "string" ? bookingProblems[code] : undefined) ??
     "No pudimos reservar la evaluación. Inténtalo de nuevo."
@@ -130,11 +124,7 @@ export function BookEvaluationScreen({
           </BodyText>
         ) : null}
       </ScrollView>
-      <PrimaryButton
-        disabled={submitting}
-        label="Confirmar"
-        onPress={() => void confirm()}
-      />
+      <PrimaryButton disabled={submitting} label="Confirmar" onPress={() => void confirm()} />
     </Screen>
   );
 }

@@ -4,14 +4,7 @@ import {
   resendCurrentAccountEmailChange,
   useGetCurrentAccountEmailChange,
 } from "@pilates/api-contracts";
-import {
-  BodyText,
-  colors,
-  radii,
-  spacing,
-  TextButton,
-  typography,
-} from "@pilates/mobile-core";
+import { BodyText, colors, radii, spacing, TextButton, typography } from "@pilates/mobile-core";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
@@ -27,8 +20,7 @@ export function EmailChangeSection() {
   const state = useGetCurrentAccountEmailChange({ fetcher });
   const [notice, setNotice] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const pending =
-    state.data?.status === 200 ? (state.data.data.pending ?? null) : null;
+  const pending = state.data?.status === 200 ? (state.data.data.pending ?? null) : null;
 
   if (pending === null) return null;
 
@@ -65,12 +57,22 @@ export function EmailChangeSection() {
     <View accessibilityLabel="Cambio de correo pendiente" style={styles.card}>
       <Text style={styles.title}>Revisa tu correo nuevo</Text>
       <BodyText>
-        Te enviamos un enlace a {pending.email}. Ábrelo dentro de 24 horas para
-        confirmar el cambio; hasta entonces sigues entrando con tu correo actual.
+        Te enviamos un enlace a {pending.email}. Ábrelo dentro de 24 horas para confirmar el cambio;
+        hasta entonces sigues entrando con tu correo actual.
       </BodyText>
       <View style={styles.actions}>
-        <TextButton disabled={busy} label="Reenviar correo" onPress={() => void resend()} tone="onTint" />
-        <TextButton disabled={busy} label="Cancelar cambio" onPress={() => void cancel()} tone="onTint" />
+        <TextButton
+          disabled={busy}
+          label="Reenviar correo"
+          onPress={() => void resend()}
+          tone="onTint"
+        />
+        <TextButton
+          disabled={busy}
+          label="Cancelar cambio"
+          onPress={() => void cancel()}
+          tone="onTint"
+        />
       </View>
       {notice === null ? null : <BodyText style={styles.notice}>{notice}</BodyText>}
     </View>

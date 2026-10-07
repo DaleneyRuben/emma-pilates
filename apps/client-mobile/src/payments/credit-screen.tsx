@@ -1,7 +1,4 @@
-import {
-  useGetCurrentClientCredit,
-  useGetCurrentClientReferrals,
-} from "@pilates/api-contracts";
+import { useGetCurrentClientCredit, useGetCurrentClientReferrals } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
@@ -51,10 +48,7 @@ export function CreditScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar tu crédito."
-          onRetry={() => void credit.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar tu crédito." onRetry={() => void credit.refetch()} />
       </Screen>
     );
   }
@@ -73,9 +67,7 @@ export function CreditScreen() {
       {header}
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.balance}>
-          {hasCredit ? (
-            <BodyText style={styles.balanceLabel}>Saldo a favor</BodyText>
-          ) : null}
+          {hasCredit ? <BodyText style={styles.balanceLabel}>Saldo a favor</BodyText> : null}
           <Text style={styles.amount}>{formatBolivianos(availableCentavos)}</Text>
           {hasCredit ? <BodyText>disponibles</BodyText> : null}
           {reservedCentavos > 0 ? (
@@ -87,8 +79,7 @@ export function CreditScreen() {
         {hasCredit ? (
           <>
             <BodyText style={styles.centered}>
-              Este crédito se aplica automáticamente al monto que pagues por tu
-              próximo plan.
+              Este crédito se aplica automáticamente al monto que pagues por tu próximo plan.
             </BodyText>
             {awarded.length > 0 ? (
               <View style={styles.origin}>
@@ -115,10 +106,7 @@ export function CreditScreen() {
             <BodyText style={styles.centered}>
               Aún no tienes crédito. Invita a tus amigos para ganar.
             </BodyText>
-            <PrimaryButton
-              label="Ver mi código"
-              onPress={() => navigation.navigate("Referrals")}
-            />
+            <PrimaryButton label="Ver mi código" onPress={() => navigation.navigate("Referrals")} />
           </>
         )}
       </ScrollView>

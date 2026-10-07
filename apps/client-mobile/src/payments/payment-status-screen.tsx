@@ -40,7 +40,10 @@ export function PaymentStatusScreen() {
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
   const payment = useGetCurrentPayment({ fetcher, query: { refetchOnMount: "always" } });
-  const subscription = useGetCurrentClientSubscription({ fetcher, query: { refetchOnMount: "always" } });
+  const subscription = useGetCurrentClientSubscription({
+    fetcher,
+    query: { refetchOnMount: "always" },
+  });
   const [retrying, setRetrying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,9 +67,7 @@ export function PaymentStatusScreen() {
 
   const current = payment.data.data;
   const active =
-    subscription.data?.status === 200
-      ? (subscription.data.data.subscription ?? null)
-      : null;
+    subscription.data?.status === 200 ? (subscription.data.data.subscription ?? null) : null;
 
   const startAgain = async () => {
     setError(null);

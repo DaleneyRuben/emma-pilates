@@ -36,8 +36,7 @@ import {
 import { useClientFetcher } from "../client-fetcher";
 import { describeAccountClosure } from "./close-account-consequences";
 
-export const closedAccountNotice =
-  "Cerramos tu cuenta. Gracias por entrenar con nosotras.";
+export const closedAccountNotice = "Cerramos tu cuenta. Gracias por entrenar con nosotras.";
 
 function DestructiveButton({
   disabled,
@@ -64,9 +63,7 @@ function DestructiveButton({
         pressed && styles.destructivePressed,
       ]}
     >
-      <Text
-        style={[styles.destructiveLabel, disabled && styles.destructiveLabelDisabled]}
-      >
+      <Text style={[styles.destructiveLabel, disabled && styles.destructiveLabelDisabled]}>
         {label}
       </Text>
     </Pressable>
@@ -125,17 +122,12 @@ export function CloseAccountScreen() {
   }
 
   const closure = describeAccountClosure({
-    availableCreditCentavos:
-      credit.data?.status === 200 ? credit.data.data.availableCentavos : 0,
+    availableCreditCentavos: credit.data?.status === 200 ? credit.data.data.availableCentavos : 0,
     bookings: bookings.data?.status === 200 ? bookings.data.data : [],
-    evaluations:
-      evaluations.data?.status === 200 ? evaluations.data.data.items : [],
+    evaluations: evaluations.data?.status === 200 ? evaluations.data.data.items : [],
     // No Payment yet answers 404, which is "nothing pending".
     latestPayment: payment.data?.status === 200 ? payment.data.data : null,
-    subscription:
-      subscription.data?.status === 200
-        ? subscription.data.data
-        : { status: "none" },
+    subscription: subscription.data?.status === 200 ? subscription.data.data : { status: "none" },
   });
 
   if (closure.blocked || refused) {
@@ -145,15 +137,12 @@ export function CloseAccountScreen() {
         <View style={styles.pending}>
           <Text style={styles.pendingTitle}>Pago en revisión</Text>
           <BodyText style={styles.pendingText}>
-            Tienes un pago por transferencia en revisión. Podrás cerrar tu
-            cuenta cuando el estudio lo confirme o lo rechace.
+            Tienes un pago por transferencia en revisión. Podrás cerrar tu cuenta cuando el estudio
+            lo confirme o lo rechace.
           </BodyText>
         </View>
         <View style={styles.spacer} />
-        <PrimaryButton
-          label="Volver al perfil"
-          onPress={() => navigation.goBack()}
-        />
+        <PrimaryButton label="Volver al perfil" onPress={() => navigation.goBack()} />
       </Screen>
     );
   }
@@ -163,11 +152,10 @@ export function CloseAccountScreen() {
     setPasswordError(undefined);
     setFailed(false);
     try {
-      const response = (await closeCurrentClientAccount(
-        { password },
-        undefined,
-        fetcher,
-      )) as { status: number; data: unknown };
+      const response = (await closeCurrentClientAccount({ password }, undefined, fetcher)) as {
+        status: number;
+        data: unknown;
+      };
       if (response.status === 200) {
         await identity.endClosedSession(closedAccountNotice);
         return;
@@ -194,22 +182,15 @@ export function CloseAccountScreen() {
         keyboardVerticalOffset={spacing.xxl}
         style={styles.flex}
       >
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           <BodyText style={styles.lead}>
-            Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo
-            que va a pasar:
+            Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:
           </BodyText>
           <View style={styles.card}>
             {closure.lines.map((line, index) => (
               <View
                 key={line}
-                style={[
-                  styles.line,
-                  index < closure.lines.length - 1 && styles.lineDivider,
-                ]}
+                style={[styles.line, index < closure.lines.length - 1 && styles.lineDivider]}
               >
                 <View style={styles.bullet} />
                 <BodyText style={styles.lineText}>{line}</BodyText>
@@ -217,8 +198,8 @@ export function CloseAccountScreen() {
             ))}
           </View>
           <BodyText style={styles.note}>
-            El estudio conserva el registro de tus pagos y tus clases, pero deja
-            de aparecer en la app y en las listas del estudio.
+            El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la
+            app y en las listas del estudio.
           </BodyText>
           <View style={styles.field}>
             <FormField

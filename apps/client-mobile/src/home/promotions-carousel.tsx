@@ -46,10 +46,7 @@ function Dots({ count, current }: { count: number; current: number }) {
       style={styles.dots}
     >
       {Array.from({ length: count }, (_, position) => (
-        <View
-          key={position}
-          style={[styles.dot, position === current && styles.dotActive]}
-        />
+        <View key={position} style={[styles.dot, position === current && styles.dotActive]} />
       ))}
     </View>
   );
@@ -70,10 +67,7 @@ export function PromotionsCarousel({
     return (
       <View style={styles.section}>
         <SectionLabel />
-        <View
-          accessibilityLabel="Cargando promociones"
-          style={[styles.card, { width: cardWidth }]}
-        >
+        <View accessibilityLabel="Cargando promociones" style={[styles.card, { width: cardWidth }]}>
           <View style={styles.imagePlaceholder} />
           <View style={styles.copy}>
             <View style={styles.headlinePlaceholder} />
@@ -85,11 +79,7 @@ export function PromotionsCarousel({
   }
 
   const cards = promotions.flatMap((promotion) => {
-    const source = choosePromotionImageSource(
-      promotion.image.sources,
-      cardWidth,
-      PixelRatio.get(),
-    );
+    const source = choosePromotionImageSource(promotion.image.sources, cardWidth, PixelRatio.get());
     return source === undefined || missingUrls.has(source.url)
       ? []
       : [{ promotion, uri: resolve(source.url), sourceUrl: source.url }];

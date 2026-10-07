@@ -67,9 +67,7 @@ function OutlinedAction({
       onPress={onPress}
       style={[styles.action, tone === "error" && styles.actionError]}
     >
-      <Text style={[styles.actionLabel, tone === "error" && styles.actionLabelError]}>
-        {label}
-      </Text>
+      <Text style={[styles.actionLabel, tone === "error" && styles.actionLabelError]}>{label}</Text>
     </Pressable>
   );
 }
@@ -122,9 +120,7 @@ export function BookingsScreen({
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
   const confirmed = route.params?.confirmed;
-  const [noticeFor, setNoticeFor] = useState<string | null>(
-    confirmed?.bookingId ?? null,
-  );
+  const [noticeFor, setNoticeFor] = useState<string | null>(confirmed?.bookingId ?? null);
   const [cancelling, setCancelling] = useState<UpcomingBookingDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const upcoming = useListUpcomingBookings({
@@ -192,10 +188,7 @@ export function BookingsScreen({
     <Screen style={styles.screen}>
       <View style={styles.header}>
         <Heading accessibilityLabel="Mis reservas">Mis reservas</Heading>
-        <TextButton
-          label="Ver historial"
-          onPress={() => navigation.navigate("History")}
-        />
+        <TextButton label="Ver historial" onPress={() => navigation.navigate("History")} />
       </View>
       {confirmed !== undefined && noticeFor === confirmed.bookingId ? (
         <View style={styles.notice}>
@@ -204,9 +197,7 @@ export function BookingsScreen({
             {`${confirmed.classTypeName} · ${formatSessionDate(confirmed.startsAt)} · ${formatTimeRange(confirmed.startsAt, confirmed.endsAt)}`}
           </BodyText>
           {remaining !== undefined ? (
-            <BodyText style={styles.balance}>
-              {`Te quedan ${remaining} clases en tu plan`}
-            </BodyText>
+            <BodyText style={styles.balance}>{`Te quedan ${remaining} clases en tu plan`}</BodyText>
           ) : null}
         </View>
       ) : null}
@@ -238,9 +229,7 @@ export function BookingsScreen({
               key={item.bookingId ?? item.waitlistEntryId}
               onCancel={() => setCancelling(item)}
               onLeave={() => void leave(item)}
-              onReschedule={() =>
-                navigation.navigate("Reschedule", { booking: item })
-              }
+              onReschedule={() => navigation.navigate("Reschedule", { booking: item })}
             />
           ))}
         </ScrollView>
@@ -260,8 +249,8 @@ export function BookingsScreen({
               </BodyText>
             ) : null}
             <BodyText>
-              La clase vuelve al saldo de tu plan y el cupo se libera; volver a
-              reservar depende de que siga habiendo lugar.
+              La clase vuelve al saldo de tu plan y el cupo se libera; volver a reservar depende de
+              que siga habiendo lugar.
             </BodyText>
             <OutlinedAction
               label="Sí, cancelar reserva"

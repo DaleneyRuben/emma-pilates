@@ -52,7 +52,13 @@ const slot = {
 };
 
 const screens: [string, ComponentType<never>, object, string, ("title" | "context")?][] = [
-  ["04", SessionDetailScreen as ComponentType<never>, { sessionId: "session-1" }, "Reservar una clase", "context"],
+  [
+    "04",
+    SessionDetailScreen as ComponentType<never>,
+    { sessionId: "session-1" },
+    "Reservar una clase",
+    "context",
+  ],
   ["06", RescheduleScreen as ComponentType<never>, { booking }, "Reprogramar clase"],
   ["07", ClassHistoryScreen as ComponentType<never>, {}, "Historial de clases"],
   ["08", PlansScreen as ComponentType<never>, {}, "Elige tu plan"],
@@ -75,19 +81,22 @@ describe("The Client screens' top bar", () => {
     clearMobileQueryCache();
   });
 
-  it.each(screens)("%s draws the bar with its title", async (_id, Component, params, title, tone = "title") => {
-    const Screen = Component as ComponentType<{ route: { params: object } }>;
-    const screen = await render(
-      <MobileQueryProvider>
-        <ClientFetcherContext.Provider value={pending}>
-          <Screen route={{ params }} />
-        </ClientFetcherContext.Provider>
-      </MobileQueryProvider>,
-    );
+  it.each(screens)(
+    "%s draws the bar with its title",
+    async (_id, Component, params, title, tone = "title") => {
+      const Screen = Component as ComponentType<{ route: { params: object } }>;
+      const screen = await render(
+        <MobileQueryProvider>
+          <ClientFetcherContext.Provider value={pending}>
+            <Screen route={{ params }} />
+          </ClientFetcherContext.Provider>
+        </MobileQueryProvider>,
+      );
 
-    const bar = screen.getByTestId("screen-top-bar");
-    const label = within(bar).getByLabelText(title);
-    expect(label).toHaveStyle({ fontSize: tone === "context" ? 14 : 19 });
-    expect(screen.getAllByLabelText(title)).toHaveLength(1);
-  });
+      const bar = screen.getByTestId("screen-top-bar");
+      const label = within(bar).getByLabelText(title);
+      expect(label).toHaveStyle({ fontSize: tone === "context" ? 14 : 19 });
+      expect(screen.getAllByLabelText(title)).toHaveLength(1);
+    },
+  );
 });

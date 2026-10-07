@@ -30,7 +30,11 @@ const uploadRoutes = (calls: string[]) => ({
   "POST /api/v1/uploads": (init?: RequestInit) => {
     calls.push(`upload ${JSON.parse(String(init?.body)).purpose}`);
     return jsonResponse(
-      { id: "asset-1", uploadUrl: "/api/v1/uploads/asset-1/object", expiresAt: "2026-09-24T15:15:00.000Z" },
+      {
+        id: "asset-1",
+        uploadUrl: "/api/v1/uploads/asset-1/object",
+        expiresAt: "2026-09-24T15:15:00.000Z",
+      },
       201,
     );
   },
@@ -80,9 +84,8 @@ describe("Client profile photo", () => {
             current = withPhoto;
             return jsonResponse(withPhoto);
           },
-          "/api/v1/clients/current/photo?variant=display": photoRoutes[
-            "/api/v1/clients/current/photo?variant=display"
-          ],
+          "/api/v1/clients/current/photo?variant=display":
+            photoRoutes["/api/v1/clients/current/photo?variant=display"],
         }),
       ),
     );
@@ -173,9 +176,7 @@ describe("Client profile photo", () => {
 
     await waitFor(
       () => {
-        expect(
-          screen.getByText("No pudimos subir la foto. Inténtalo de nuevo."),
-        ).toBeOnTheScreen();
+        expect(screen.getByText("No pudimos subir la foto. Inténtalo de nuevo.")).toBeOnTheScreen();
       },
       { timeout: 10_000 },
     );

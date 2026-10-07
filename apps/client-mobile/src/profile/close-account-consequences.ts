@@ -31,14 +31,10 @@ const cancellationLine = (bookings: number, evaluations: number) => {
     ...(bookings > 0 ? [bookingPhrase(bookings)] : []),
     ...(evaluations > 0 ? [evaluationPhrase(evaluations)] : []),
   ];
-  return parts.length === 0
-    ? []
-    : [`Cancelamos ${parts.join(" y ")}. No se descuenta nada.`];
+  return parts.length === 0 ? [] : [`Cancelamos ${parts.join(" y ")}. No se descuenta nada.`];
 };
 
-const planLine = (
-  subscription: ClosureInputs["subscription"],
-): string[] => {
+const planLine = (subscription: ClosureInputs["subscription"]): string[] => {
   const current = subscription.subscription;
   if (
     current == null ||
@@ -53,26 +49,19 @@ const planLine = (
       : left === 1
         ? " y pierdes la clase que te queda"
         : ` y pierdes las ${left} clases que te quedan`;
-  return [
-    `Tu plan ${current.planName} termina hoy. No se devuelve dinero${forfeited}.`,
-  ];
+  return [`Tu plan ${current.planName} termina hoy. No se devuelve dinero${forfeited}.`];
 };
 
 // What BE-007 G3–G6 do to this Client, drawn from data the app already loads
 // (prompt 24): only the lines that apply, then the two that always do.
-export const describeAccountClosure = (
-  inputs: ClosureInputs,
-): ClosureDescription => {
+export const describeAccountClosure = (inputs: ClosureInputs): ClosureDescription => {
   const bookings = inputs.bookings.filter(({ kind }) => kind === "booking").length;
   const waitlists = inputs.bookings.length - bookings;
-  const evaluations = inputs.evaluations.filter(
-    ({ state }) => state === "booked",
-  ).length;
+  const evaluations = inputs.evaluations.filter(({ state }) => state === "booked").length;
 
   return {
     blocked:
-      inputs.latestPayment?.method === "transfer" &&
-      inputs.latestPayment.state === "pending",
+      inputs.latestPayment?.method === "transfer" && inputs.latestPayment.state === "pending",
     lines: [
       ...cancellationLine(bookings, evaluations),
       ...(waitlists === 0

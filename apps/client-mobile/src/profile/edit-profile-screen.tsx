@@ -111,10 +111,7 @@ function EditProfileForm({
       keyboardVerticalOffset={spacing.xxl}
       style={styles.flex}
     >
-      <ScrollView
-        contentContainerStyle={styles.form}
-        keyboardShouldPersistTaps="handled"
-      >
+      <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
         <ProfilePhotoSection client={client} />
         <Controller
           control={control}
@@ -202,10 +199,7 @@ export function EditProfileScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar tu perfil."
-          onRetry={() => void profile.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar tu perfil." onRetry={() => void profile.refetch()} />
       </Screen>
     );
   }

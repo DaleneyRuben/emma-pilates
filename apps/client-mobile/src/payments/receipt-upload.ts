@@ -1,11 +1,6 @@
 import { attachPurchaseIntentReceipt } from "@pilates/api-contracts";
 
-import {
-  idempotency,
-  pickImage,
-  uploadImage,
-  type PickedImage,
-} from "../uploads/image-upload";
+import { idempotency, pickImage, uploadImage, type PickedImage } from "../uploads/image-upload";
 
 export type PickedReceipt = PickedImage;
 
@@ -21,12 +16,7 @@ export async function uploadReceipt(
   fetcher: typeof globalThis.fetch,
   sleep?: (milliseconds: number) => Promise<void>,
 ): Promise<AttachedReceipt> {
-  const imageAssetId = await uploadImage(
-    receipt,
-    "transfer_receipt",
-    fetcher,
-    sleep,
-  );
+  const imageAssetId = await uploadImage(receipt, "transfer_receipt", fetcher, sleep);
 
   const attached = await attachPurchaseIntentReceipt(
     purchaseIntentId,

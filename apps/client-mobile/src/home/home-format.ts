@@ -6,10 +6,7 @@ const civilDateFormatter = new Intl.DateTimeFormat("es-BO", {
   timeZone: "UTC",
 });
 
-const badgeCopy: Record<
-  Exclude<ClientSubscriptionDtoStatus, "none">,
-  string
-> = {
+const badgeCopy: Record<Exclude<ClientSubscriptionDtoStatus, "none">, string> = {
   active: "Activa",
   expiring_soon: "Por vencer",
   expired: "Vencida",
@@ -57,8 +54,6 @@ export function describeAllowance(remaining: number, original: number): string {
   return `${remaining} de ${original} clases`;
 }
 
-export function subscriptionBadge(
-  status: Exclude<ClientSubscriptionDtoStatus, "none">,
-): string {
+export function subscriptionBadge(status: Exclude<ClientSubscriptionDtoStatus, "none">): string {
   return badgeCopy[status];
 }

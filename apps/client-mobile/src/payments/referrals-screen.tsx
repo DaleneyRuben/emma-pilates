@@ -53,12 +53,7 @@ function ReferredRow({ entry }: { entry: ReferredClientDto }) {
         <BodyText style={styles.detail}>{detail}</BodyText>
       </View>
       <View style={[styles.badge, awarded ? styles.awarded : styles.pending]}>
-        <Text
-          style={[
-            styles.badgeText,
-            awarded ? styles.awardedText : styles.pendingText,
-          ]}
-        >
+        <Text style={[styles.badgeText, awarded ? styles.awardedText : styles.pendingText]}>
           {awarded ? "Crédito ganado" : "Esperando su primer pago"}
         </Text>
       </View>
@@ -100,8 +95,7 @@ export function ReferralsScreen() {
   }
 
   const { referralCode, referrals: referred } = referrals.data.data;
-  const available =
-    credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
+  const available = credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
   const creditValue = formatBolivianos(available);
 
   return (
@@ -117,8 +111,7 @@ export function ReferralsScreen() {
           />
         </View>
         <BodyText style={styles.explanation}>
-          Comparte tu código. Cuando un amigo se registre y haga su primer pago,
-          ganas crédito.
+          Comparte tu código. Cuando un amigo se registre y haga su primer pago, ganas crédito.
         </BodyText>
         <Pressable
           accessibilityLabel={`Tu crédito: ${creditValue}`}

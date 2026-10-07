@@ -29,9 +29,7 @@ export const readRoutes = {
   "/api/v1/clients/current/subscription": () => jsonResponse(expired),
 };
 
-export async function openProfile(
-  runtime = createClientRuntime(routeFetcher(readRoutes)),
-) {
+export async function openProfile(runtime = createClientRuntime(routeFetcher(readRoutes))) {
   const screen = await render(<App runtime={runtime} />);
 
   await waitFor(

@@ -60,9 +60,7 @@ function Chip({
       onPress={onPress}
       style={[styles.chip, selected && styles.chipSelected]}
     >
-      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
-        {label}
-      </Text>
+      <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>{label}</Text>
     </Pressable>
   );
 }
@@ -80,8 +78,7 @@ export function BrowseSessionsScreen() {
   const branches = useListBranches({ fetcher });
   const classTypes = useListClassTypes({ fetcher });
   const branchId =
-    selectedBranchId ??
-    (branches.data?.status === 200 ? branches.data.data[0]?.id : undefined);
+    selectedBranchId ?? (branches.data?.status === 200 ? branches.data.data[0]?.id : undefined);
   const { from, until } = civilDateRange(selectedDate);
   const sessions = useListSessionAvailability(
     { branchId: branchId ?? "", from, until, limit: 100 },
@@ -92,8 +89,7 @@ export function BrowseSessionsScreen() {
   );
 
   const branchList = branches.data?.status === 200 ? branches.data.data : [];
-  const classTypeList =
-    classTypes.data?.status === 200 ? classTypes.data.data : [];
+  const classTypeList = classTypes.data?.status === 200 ? classTypes.data.data : [];
   const selectedBranch = branchList.find((branch) => branch.id === branchId);
   const now = new Date();
   const visibleSessions =
@@ -101,8 +97,7 @@ export function BrowseSessionsScreen() {
       ? sessions.data.data.filter(
           (session) =>
             !hasStarted(session.startsAt, now) &&
-            (classTypeId === allClassTypes ||
-              session.classTypeId === classTypeId),
+            (classTypeId === allClassTypes || session.classTypeId === classTypeId),
         )
       : [];
 
@@ -111,8 +106,7 @@ export function BrowseSessionsScreen() {
     (branches.data !== undefined && branches.data.status !== 200) ||
     sessions.isError ||
     (sessions.data !== undefined && sessions.data.status !== 200);
-  const loading =
-    branches.isPending || (branchId !== undefined && sessions.isPending);
+  const loading = branches.isPending || (branchId !== undefined && sessions.isPending);
 
   return (
     <Screen style={styles.screen}>
@@ -141,19 +135,13 @@ export function BrowseSessionsScreen() {
             >
               <View style={styles.branchText}>
                 <Text
-                  style={[
-                    styles.branchName,
-                    branch.id === branchId && styles.branchNameSelected,
-                  ]}
+                  style={[styles.branchName, branch.id === branchId && styles.branchNameSelected]}
                 >
                   {branch.name}
                 </Text>
                 <BodyText style={styles.branchAddress}>{branch.address}</BodyText>
               </View>
-              <PickerCheck
-                selected={branch.id === branchId}
-                testID={`picker-check-${branch.id}`}
-              />
+              <PickerCheck selected={branch.id === branchId} testID={`picker-check-${branch.id}`} />
             </Pressable>
           ))}
         </View>
@@ -232,9 +220,7 @@ export function BrowseSessionsScreen() {
             <SessionCard
               accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}
               key={session.id}
-              onPress={() =>
-                navigation.navigate("SessionDetail", { sessionId: session.id })
-              }
+              onPress={() => navigation.navigate("SessionDetail", { sessionId: session.id })}
               tag={
                 <SeatPill full={session.availableSeats === 0}>
                   {seatsTag(session.availableSeats)}

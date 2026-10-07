@@ -1,8 +1,4 @@
-import {
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import App from "../App";
 
@@ -82,17 +78,9 @@ describe("Client App", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
     });
-    await fireEvent.changeText(
-      screen.getByLabelText("Correo electrónico"),
-      "ana@example.com",
-    );
-    await fireEvent.changeText(
-      screen.getByLabelText("Contraseña"),
-      "local password",
-    );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Iniciar sesión" }),
-    );
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "local password");
+    await fireEvent.press(screen.getByRole("button", { name: "Iniciar sesión" }));
 
     expect(login).toHaveBeenCalledWith({
       email: "ana@example.com",
@@ -102,9 +90,7 @@ describe("Client App", () => {
   });
 
   it("routes a verified email link into the authentication flow", async () => {
-    const verifyClientEmail = jest
-      .fn()
-      .mockResolvedValue({ status: "verified" });
+    const verifyClientEmail = jest.fn().mockResolvedValue({ status: "verified" });
     const screen = await render(
       <App
         runtime={{

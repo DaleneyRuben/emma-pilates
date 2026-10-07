@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -62,18 +57,14 @@ describe("Client Subscription detail", () => {
     expect(screen.getByText("Te quedan 5 clases por usar")).toBeOnTheScreen();
     expect(screen.getByText("25 de agosto de 2026")).toBeOnTheScreen();
     expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
-    expect(
-      screen.queryByRole("button", { name: "Comprar un plan" }),
-    ).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
   });
 
   it("warns about the paid-through date when expiring soon", async () => {
     const screen = await openSubscription(subscription("expiring_soon", 2));
 
     expect(screen.getByText("Por vencer")).toBeOnTheScreen();
-    expect(
-      screen.getByText("Tu plan vence el 24 de septiembre."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Tu plan vence el 24 de septiembre.")).toBeOnTheScreen();
   });
 
   it("tells the Client when no classes remain", async () => {
@@ -95,27 +86,20 @@ describe("Refreshed Mi plan (Client 12)", () => {
     expect(screen.getByText("Suscripción actual")).toBeOnTheScreen();
     expect(screen.getByText("25 de agosto de 2026")).toBeOnTheScreen();
     expect(screen.getByText("24 de septiembre de 2026")).toBeOnTheScreen();
-    expect(
-      screen.getByText("Podrás comprar un plan nuevo cuando este termine."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Podrás comprar un plan nuevo cuando este termine.")).toBeOnTheScreen();
   });
 
   it("adds the informational renewal line while expiring soon", async () => {
     const screen = await openSubscription(subscription("expiring_soon", 2));
 
-    expect(
-      screen.getByText("Podrás comprar uno nuevo apenas termine."),
-    ).toBeOnTheScreen();
-    expect(
-      screen.queryByRole("button", { name: "Comprar un plan" }),
-    ).not.toBeOnTheScreen();
+    expect(screen.getByText("Podrás comprar uno nuevo apenas termine.")).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Comprar un plan" })).not.toBeOnTheScreen();
   });
 
   it("shows the last Plan as expired with its end date and the only purchase action", async () => {
     const fetcher = routeFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
-      "/api/v1/clients/current/subscription": () =>
-        jsonResponse(subscription("expired", 3)),
+      "/api/v1/clients/current/subscription": () => jsonResponse(subscription("expired", 3)),
     });
     const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
     await waitFor(() => {

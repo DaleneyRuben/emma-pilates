@@ -38,9 +38,7 @@ describe("Client Evaluations", () => {
           return jsonResponse(upcomingEvaluation("evaluation-new", bookedStart), 201);
         },
         "/api/v1/evaluations?scope=upcoming": () =>
-          jsonResponse(
-            page(booked ? [upcomingEvaluation("evaluation-new", bookedStart)] : []),
-          ),
+          jsonResponse(page(booked ? [upcomingEvaluation("evaluation-new", bookedStart)] : [])),
       }),
     );
     const screen = await openProfileRow(fetcher, "Evaluación nutricional");
@@ -147,9 +145,7 @@ describe("Client Evaluations", () => {
       expect(screen.getByText("Ya usaste tu evaluación de este mes.")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText(
-        `Podrás agendar la de ${nextMonthName} desde el 1 de ${nextMonthName}.`,
-      ),
+      screen.getByText(`Podrás agendar la de ${nextMonthName} desde el 1 de ${nextMonthName}.`),
     ).toBeOnTheScreen();
     expect(screen.getByText("Tu última evaluación")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: /^Turno/ })).toBeNull();
@@ -235,9 +231,7 @@ describe("Client Evaluations", () => {
     expect(
       sheet.getByText("El horario queda libre y otras clientas podrán reservarlo."),
     ).toBeOnTheScreen();
-    expect(
-      sheet.getByText("Podrás reservar otra evaluación para este mes."),
-    ).toBeOnTheScreen();
+    expect(sheet.getByText("Podrás reservar otra evaluación para este mes.")).toBeOnTheScreen();
     await fireEvent.press(sheet.getByRole("button", { name: "Sí, cancelar evaluación" }));
 
     await waitFor(() => {

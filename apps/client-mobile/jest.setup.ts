@@ -28,12 +28,8 @@ jest.mock("expo-crypto", () => ({
 }));
 
 jest.mock("expo-image-picker", () => ({
-  requestMediaLibraryPermissionsAsync: jest
-    .fn()
-    .mockResolvedValue({ granted: true }),
-  launchImageLibraryAsync: jest
-    .fn()
-    .mockResolvedValue({ canceled: true, assets: [] }),
+  requestMediaLibraryPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+  launchImageLibraryAsync: jest.fn().mockResolvedValue({ canceled: true, assets: [] }),
 }));
 
 jest.mock("expo-image-manipulator", () => ({

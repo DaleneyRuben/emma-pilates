@@ -31,15 +31,11 @@ import { describeValidity, formatBolivianos } from "./plan-format";
 
 type PlanDetailNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "Payment" | "PaymentStatus",
-    params?: { purchaseIntentId: string },
-  ) => void;
+  navigate: (screen: "Payment" | "PaymentStatus", params?: { purchaseIntentId: string }) => void;
 };
 
 const purchaseErrorCopy: Record<string, string> = {
-  subscription_not_expired:
-    "Tu plan actual sigue activo. Podrás comprar uno nuevo cuando venza.",
+  subscription_not_expired: "Tu plan actual sigue activo. Podrás comprar uno nuevo cuando venza.",
   plan_not_purchasable: "Este plan no está disponible para compra.",
 };
 
@@ -53,11 +49,7 @@ const validityCopy = (durationMonths: number): string =>
     ? "Un mes de vigencia desde que se confirma tu pago."
     : `${durationMonths} meses de vigencia desde que se confirma tu pago.`;
 
-export function PlanDetailScreen({
-  route,
-}: {
-  route: { params: { planId: string } };
-}) {
+export function PlanDetailScreen({ route }: { route: { params: { planId: string } } }) {
   const navigation = useNavigation<PlanDetailNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
@@ -85,18 +77,14 @@ export function PlanDetailScreen({
     return (
       <Screen style={styles.screen}>
         <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Detalle del plan" />
-        <QueryFailure
-          label="No pudimos cargar el plan."
-          onRetry={() => void plan.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar el plan." onRetry={() => void plan.refetch()} />
       </Screen>
     );
   }
 
   const detail = plan.data.data;
   const price = formatBolivianos(detail.priceCentavos);
-  const available =
-    credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
+  const available = credit.data?.status === 200 ? credit.data.data.availableCentavos : 0;
   const applied = Math.min(available, detail.priceCentavos);
   const total = detail.priceCentavos - applied;
 
@@ -108,11 +96,7 @@ export function PlanDetailScreen({
     const headers = { "idempotency-key": randomUUID() };
     try {
       if (total === 0) {
-        const purchase = await completeCreditPurchase(
-          { planId: detail.id },
-          { headers },
-          fetcher,
-        );
+        const purchase = await completeCreditPurchase({ planId: detail.id }, { headers }, fetcher);
         if (purchase.status !== 201) {
           setError(
             purchaseErrorCopy[problemCode(purchase.data) ?? ""] ??
@@ -149,10 +133,7 @@ export function PlanDetailScreen({
         navigation.navigate("PaymentStatus");
         return;
       }
-      setError(
-        purchaseErrorCopy[code ?? ""] ??
-          "No pudimos iniciar el pago. Inténtalo de nuevo.",
-      );
+      setError(purchaseErrorCopy[code ?? ""] ?? "No pudimos iniciar el pago. Inténtalo de nuevo.");
     } catch {
       setError("No pudimos iniciar el pago. Inténtalo de nuevo.");
     } finally {
@@ -172,9 +153,7 @@ export function PlanDetailScreen({
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Qué incluye</Text>
           <BodyText>{`${detail.classAllowance} clases en cualquier sucursal del estudio.`}</BodyText>
-          <BodyText>
-            Cancelación sin costo hasta 2 h 30 antes de cada clase.
-          </BodyText>
+          <BodyText>Cancelación sin costo hasta 2 h 30 antes de cada clase.</BodyText>
           <BodyText>{validityCopy(detail.durationMonths)}</BodyText>
         </View>
         <View style={styles.section}>

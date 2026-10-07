@@ -38,8 +38,7 @@ describe("Client email change", () => {
       createClientRuntime(
         routeFetcher({
           ...readRoutes,
-          "/api/v1/accounts/current/email-change": () =>
-            jsonResponse({ pending: current }),
+          "/api/v1/accounts/current/email-change": () => jsonResponse({ pending: current }),
           "POST /api/v1/accounts/current/email-change": (init) => {
             calls.push(`request ${JSON.parse(String(init?.body)).email}`);
             current = pending;
@@ -63,10 +62,15 @@ describe("Client email change", () => {
     );
 
     expect(screen.getByLabelText("Correo electrónico")).not.toHaveProp("editable", false);
-    expect(screen.queryByText("Para cambiar tu correo, escríbenos al estudio.")).not.toBeOnTheScreen();
+    expect(
+      screen.queryByText("Para cambiar tu correo, escríbenos al estudio."),
+    ).not.toBeOnTheScreen();
 
     const dismiss = jest.spyOn(Keyboard, "dismiss").mockImplementation(() => undefined);
-    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "Sofia.Nueva@example.com");
+    await fireEvent.changeText(
+      screen.getByLabelText("Correo electrónico"),
+      "Sofia.Nueva@example.com",
+    );
     await fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
 
     await waitFor(() => {

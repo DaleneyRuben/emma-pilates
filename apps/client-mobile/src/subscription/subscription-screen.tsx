@@ -38,9 +38,7 @@ const badgeColors = {
 
 function allowanceMessage(remaining: number, expired: boolean): string {
   if (expired || remaining === 0) return "Sin clases disponibles";
-  return remaining === 1
-    ? "Te queda 1 clase por usar"
-    : `Te quedan ${remaining} clases por usar`;
+  return remaining === 1 ? "Te queda 1 clase por usar" : `Te quedan ${remaining} clases por usar`;
 }
 
 export function SubscriptionScreen() {
@@ -70,10 +68,7 @@ export function SubscriptionScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar tu plan."
-          onRetry={() => void view.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar tu plan." onRetry={() => void view.refetch()} />
       </Screen>
     );
   }
@@ -85,10 +80,7 @@ export function SubscriptionScreen() {
       <Screen style={styles.screen}>
         {header}
         <BodyText>Aún no tienes un plan. Elige el paquete que mejor te acomode.</BodyText>
-        <PrimaryButton
-          label="Comprar un plan"
-          onPress={() => navigation.navigate("Plans")}
-        />
+        <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
       </Screen>
     );
   }
@@ -108,9 +100,7 @@ export function SubscriptionScreen() {
             <Text style={styles.warningText}>
               {`Tu plan vence el ${formatCivilDate(subscription.endsOn)}.`}
             </Text>
-            <BodyText style={styles.warningNote}>
-              Podrás comprar uno nuevo apenas termine.
-            </BodyText>
+            <BodyText style={styles.warningNote}>Podrás comprar uno nuevo apenas termine.</BodyText>
           </View>
         ) : null}
         <View style={styles.card}>
@@ -135,11 +125,7 @@ export function SubscriptionScreen() {
             style={styles.progressTrack}
           >
             <View
-              style={[
-                styles.progressFill,
-                { flex: progress },
-                expired && styles.progressExpired,
-              ]}
+              style={[styles.progressFill, { flex: progress }, expired && styles.progressExpired]}
             />
             <View style={{ flex: 1 - progress }} />
           </View>
@@ -149,21 +135,15 @@ export function SubscriptionScreen() {
               subscription.originalClassAllowance,
             )}
           </BodyText>
-          <BodyText>
-            {allowanceMessage(subscription.remainingClassAllowance, expired)}
-          </BodyText>
+          <BodyText>{allowanceMessage(subscription.remainingClassAllowance, expired)}</BodyText>
         </View>
         <View style={styles.dates}>
           <View style={styles.dateRow}>
             <BodyText style={styles.dateLabel}>Inicio</BodyText>
-            <Text style={styles.dateValue}>
-              {formatCivilDateWithYear(subscription.startsOn)}
-            </Text>
+            <Text style={styles.dateValue}>{formatCivilDateWithYear(subscription.startsOn)}</Text>
           </View>
           <View style={styles.dateRow}>
-            <BodyText style={styles.dateLabel}>
-              {expired ? "Venció el" : "Pagado hasta"}
-            </BodyText>
+            <BodyText style={styles.dateLabel}>{expired ? "Venció el" : "Pagado hasta"}</BodyText>
             <Text style={[styles.dateValue, expired && styles.expiredDate]}>
               {formatCivilDateWithYear(subscription.endsOn)}
             </Text>
@@ -171,18 +151,11 @@ export function SubscriptionScreen() {
         </View>
         {expired ? (
           <View style={styles.purchase}>
-            <PrimaryButton
-              label="Comprar un plan"
-              onPress={() => navigation.navigate("Plans")}
-            />
-            <BodyText style={styles.note}>
-              Elige el paquete que mejor te acomode.
-            </BodyText>
+            <PrimaryButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
+            <BodyText style={styles.note}>Elige el paquete que mejor te acomode.</BodyText>
           </View>
         ) : status === "active" ? (
-          <BodyText style={styles.note}>
-            Podrás comprar un plan nuevo cuando este termine.
-          </BodyText>
+          <BodyText style={styles.note}>Podrás comprar un plan nuevo cuando este termine.</BodyText>
         ) : null}
       </ScrollView>
     </Screen>

@@ -38,8 +38,7 @@ export const dayName = (civilDate: string) => {
   return `${label.weekday} ${label.day}`;
 };
 
-export const civilDateIn = (days: number) =>
-  boliviaCivilDate(new Date(Date.now() + days * day));
+export const civilDateIn = (days: number) => boliviaCivilDate(new Date(Date.now() + days * day));
 
 export const slot = (
   id: string,
@@ -77,9 +76,7 @@ export const availability = {
       slots: [slot("slot-4", fullDay, "10:00", { bookable: false })],
     },
   ],
-  months: [
-    { month: `${firstDay.slice(0, 7)}-01`, status: "available", evaluation: null },
-  ],
+  months: [{ month: `${firstDay.slice(0, 7)}-01`, status: "available", evaluation: null }],
 };
 
 export const upcomingEvaluation = (

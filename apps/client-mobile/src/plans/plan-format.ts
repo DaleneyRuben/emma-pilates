@@ -10,10 +10,7 @@ export function describeValidity(durationMonths: number): string {
   return `Válido por ${months(durationMonths)}`;
 }
 
-export function describePlanTerms(
-  classAllowance: number,
-  durationMonths: number,
-): string {
+export function describePlanTerms(classAllowance: number, durationMonths: number): string {
   const validity = durationMonths === 1 ? "válido" : "válidas";
   return `${classAllowance} clases · ${validity} por ${months(durationMonths)}`;
 }

@@ -11,8 +11,7 @@ export function useClientPhoto(imageAssetId: string | null): string | null {
   const fetcher = useClientFetcher();
   const photo = useQuery({
     queryKey: ["client-photo", imageAssetId],
-    queryFn: () =>
-      loadPrivateImage(fetcher, getGetCurrentClientPhotoUrl({ variant: "display" })),
+    queryFn: () => loadPrivateImage(fetcher, getGetCurrentClientPhotoUrl({ variant: "display" })),
     enabled: imageAssetId !== null,
     staleTime: Infinity,
   });
