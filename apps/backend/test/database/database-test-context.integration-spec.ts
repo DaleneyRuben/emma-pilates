@@ -37,7 +37,9 @@ describe('database test context', () => {
 
     const second = await startDatabaseTestContext();
     contexts.push(second);
-    const rows = await second.pool.query('select count(*)::int as count from booking.branches');
+    const rows = await second.pool.query(
+      'select count(*)::int as count from booking.branches',
+    );
 
     expect(databaseName(second.databaseUrl)).not.toBe(
       databaseName(first.databaseUrl),

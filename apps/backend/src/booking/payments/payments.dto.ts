@@ -47,7 +47,10 @@ export class PurchaseIntentDto {
   @ApiProperty({ minimum: 0, description: 'Credit held for this purchase' })
   creditReservedCentavos!: number;
 
-  @ApiProperty({ minimum: 0, description: 'Amount to transfer in BOB centavos' })
+  @ApiProperty({
+    minimum: 0,
+    description: 'Amount to transfer in BOB centavos',
+  })
   amountDueCentavos!: number;
 
   @ApiProperty({ enum: ['open', 'submitted', 'expired'] })
@@ -136,7 +139,10 @@ export class CreditDto {
   @ApiProperty({ minimum: 0 })
   availableCentavos!: number;
 
-  @ApiProperty({ minimum: 0, description: 'Credit held for a Payment under review' })
+  @ApiProperty({
+    minimum: 0,
+    description: 'Credit held for a Payment under review',
+  })
   reservedCentavos!: number;
 
   @ApiProperty({ type: CreditActivityDto, isArray: true })
@@ -209,7 +215,8 @@ export class PaymentReviewDto extends PaymentDto {
   @ApiPropertyOptional({
     type: String,
     nullable: true,
-    description: 'Authenticated backend route streaming the receipt while it is retained',
+    description:
+      'Authenticated backend route streaming the receipt while it is retained',
   })
   receiptUrl!: string | null;
 }

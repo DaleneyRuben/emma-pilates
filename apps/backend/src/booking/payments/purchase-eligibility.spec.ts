@@ -28,7 +28,9 @@ describe('evaluatePurchaseEligibility', () => {
   });
 
   it('refuses hidden, missing, and zero-price plans', () => {
-    expect(codeOf(() => evaluatePurchaseEligibility({ ...baseline, plan: null }))).toBe('plan_not_purchasable');
+    expect(
+      codeOf(() => evaluatePurchaseEligibility({ ...baseline, plan: null })),
+    ).toBe('plan_not_purchasable');
     expect(
       codeOf(() =>
         evaluatePurchaseEligibility({
@@ -39,7 +41,10 @@ describe('evaluatePurchaseEligibility', () => {
     ).toBe('plan_not_purchasable');
     expect(
       codeOf(() =>
-        evaluatePurchaseEligibility({ ...baseline, plan: { ...plan, priceCentavos: 0 } }),
+        evaluatePurchaseEligibility({
+          ...baseline,
+          plan: { ...plan, priceCentavos: 0 },
+        }),
       ),
     ).toBe('plan_not_purchasable');
   });
@@ -47,12 +52,18 @@ describe('evaluatePurchaseEligibility', () => {
   it('refuses while an open intent or a pending payment exists', () => {
     expect(
       codeOf(() =>
-        evaluatePurchaseEligibility({ ...baseline, openPurchaseIntentId: 'intent-1' }),
+        evaluatePurchaseEligibility({
+          ...baseline,
+          openPurchaseIntentId: 'intent-1',
+        }),
       ),
     ).toBe('purchase_intent_open_exists');
     expect(
       codeOf(() =>
-        evaluatePurchaseEligibility({ ...baseline, pendingPaymentId: 'payment-1' }),
+        evaluatePurchaseEligibility({
+          ...baseline,
+          pendingPaymentId: 'payment-1',
+        }),
       ),
     ).toBe('payment_pending_exists');
   });
@@ -67,14 +78,21 @@ describe('evaluatePurchaseEligibility', () => {
 
     expect(
       codeOf(() =>
-        evaluatePurchaseEligibility({ ...baseline, activeSubscription: effective }),
+        evaluatePurchaseEligibility({
+          ...baseline,
+          activeSubscription: effective,
+        }),
       ),
     ).toBe('subscription_not_expired');
     expect(
       codeOf(() =>
         evaluatePurchaseEligibility({
           ...baseline,
-          activeSubscription: { ...effective, remainingClassAllowance: 3, futureBookedCount: 0 },
+          activeSubscription: {
+            ...effective,
+            remainingClassAllowance: 3,
+            futureBookedCount: 0,
+          },
         }),
       ),
     ).toBe('subscription_not_expired');
@@ -87,13 +105,20 @@ describe('evaluatePurchaseEligibility', () => {
       remainingClassAllowance: 5,
       futureBookedCount: 0,
     };
-    const exhausted = { ...byDate, endsOn: new Date('2026-12-01T00:00:00.000Z'), remainingClassAllowance: 0 };
+    const exhausted = {
+      ...byDate,
+      endsOn: new Date('2026-12-01T00:00:00.000Z'),
+      remainingClassAllowance: 0,
+    };
 
     expect(
       evaluatePurchaseEligibility({ ...baseline, activeSubscription: byDate }),
     ).toEqual({ subscriptionIdToExpire: 'subscription-1' });
     expect(
-      evaluatePurchaseEligibility({ ...baseline, activeSubscription: exhausted }),
+      evaluatePurchaseEligibility({
+        ...baseline,
+        activeSubscription: exhausted,
+      }),
     ).toEqual({ subscriptionIdToExpire: 'subscription-1' });
   });
 });

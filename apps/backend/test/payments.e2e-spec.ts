@@ -92,7 +92,10 @@ describe('client payments (e2e)', () => {
       identity: { kind: 'client', clientId: 'client-id' },
     });
     commands.createPurchaseIntent.mockResolvedValue(intent);
-    commands.attachReceipt.mockResolvedValue({ ...intent, receiptAttached: true });
+    commands.attachReceipt.mockResolvedValue({
+      ...intent,
+      receiptAttached: true,
+    });
     commands.submitTransfer.mockResolvedValue(payment);
     commands.completeCreditPurchase.mockResolvedValue({
       ...payment,
@@ -268,7 +271,10 @@ describe('client payments (e2e)', () => {
       .send({ planId })
       .expect(201)
       .expect(({ body }) => {
-        expect(body).toMatchObject({ method: 'credit_only', amountDueCentavos: 0 });
+        expect(body).toMatchObject({
+          method: 'credit_only',
+          amountDueCentavos: 0,
+        });
       });
   });
 

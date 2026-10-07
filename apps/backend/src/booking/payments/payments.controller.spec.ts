@@ -91,10 +91,16 @@ describe('PurchaseIntentsController', () => {
   it('rejects a missing Idempotency-Key and an invalid body', async () => {
     await expect(
       controller.create(bearer, undefined, { planId }),
-    ).rejects.toMatchObject({ status: 400, response: { code: 'invalid_request' } });
+    ).rejects.toMatchObject({
+      status: 400,
+      response: { code: 'invalid_request' },
+    });
     await expect(
       controller.create(bearer, key, { planId: 'nope' }),
-    ).rejects.toMatchObject({ status: 400, response: { code: 'invalid_request' } });
+    ).rejects.toMatchObject({
+      status: 400,
+      response: { code: 'invalid_request' },
+    });
     expect(handlers.createPurchaseIntent).not.toHaveBeenCalled();
   });
 
@@ -103,7 +109,9 @@ describe('PurchaseIntentsController', () => {
       new PaymentRuleError('subscription_not_expired', 'still active'),
     );
 
-    await expect(controller.create(bearer, key, { planId })).rejects.toMatchObject({
+    await expect(
+      controller.create(bearer, key, { planId }),
+    ).rejects.toMatchObject({
       status: 409,
       response: { code: 'subscription_not_expired', detail: 'still active' },
     });
@@ -133,7 +141,10 @@ describe('PurchaseIntentsController', () => {
   });
 
   it('attaches a receipt and submits the transfer', async () => {
-    handlers.attachReceipt.mockResolvedValue({ ...intent, receiptAttached: true });
+    handlers.attachReceipt.mockResolvedValue({
+      ...intent,
+      receiptAttached: true,
+    });
     handlers.submitTransfer.mockResolvedValue(payment);
     const imageAssetId = '55555555-5555-4555-8555-555555555555';
 
@@ -176,7 +187,9 @@ describe('client payment reads and Credit-only purchases', () => {
       resolvePrincipal,
     );
 
-    await expect(controller.create(bearer, key, { planId })).resolves.toMatchObject({
+    await expect(
+      controller.create(bearer, key, { planId }),
+    ).resolves.toMatchObject({
       method: 'credit_only',
     });
     expect(handlers.completeCreditPurchase).toHaveBeenCalledWith(
@@ -214,7 +227,10 @@ describe('client payment reads and Credit-only purchases', () => {
         occurredAt: new Date('2026-09-21T15:00:00.000Z'),
       },
     ]);
-    const controller = new ClientCreditController(handlers as never, resolvePrincipal);
+    const controller = new ClientCreditController(
+      handlers as never,
+      resolvePrincipal,
+    );
 
     await expect(controller.read(bearer)).resolves.toEqual({
       availableCentavos: 6000,
@@ -245,7 +261,10 @@ describe('client payment reads and Credit-only purchases', () => {
       ],
     };
     handlers.readReferrals.mockResolvedValue(referrals);
-    const controller = new ClientReferralsController(handlers as never, resolvePrincipal);
+    const controller = new ClientReferralsController(
+      handlers as never,
+      resolvePrincipal,
+    );
 
     await expect(controller.read(bearer)).resolves.toEqual(referrals);
   });

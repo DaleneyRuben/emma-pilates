@@ -87,7 +87,10 @@ const asProblem = (error: unknown): HttpException | null => {
       detail: 'Booking access is denied',
     });
   }
-  if (error instanceof Error && error.message === 'Rejection reason is required') {
+  if (
+    error instanceof Error &&
+    error.message === 'Rejection reason is required'
+  ) {
     return invalidRequest('Rejection reason must have 1 to 300 characters');
   }
   return null;
@@ -113,7 +116,8 @@ const requireIdempotencyKey = (value: string | undefined): string => {
 
 const requireIntentId = (value: string): string => {
   const parsed = parseUuid(value);
-  if (parsed === null) throw invalidRequest('Invalid Purchase Intent identifier');
+  if (parsed === null)
+    throw invalidRequest('Invalid Purchase Intent identifier');
   return parsed;
 };
 
@@ -135,7 +139,8 @@ abstract class AuthenticatedPaymentController {
 export class PurchaseIntentsController extends AuthenticatedPaymentController {
   constructor(
     @Inject(paymentCommands) commands: PaymentCommands,
-    @Inject(authenticatedPrincipalResolver) principalResolver: PrincipalResolver,
+    @Inject(authenticatedPrincipalResolver)
+    principalResolver: PrincipalResolver,
   ) {
     super(commands, principalResolver);
   }
@@ -152,7 +157,8 @@ export class PurchaseIntentsController extends AuthenticatedPaymentController {
     @Body() body: unknown,
   ): Promise<PurchaseIntentDto> {
     const parsed = parseCreatePurchaseIntent(body);
-    if (parsed === null) throw invalidRequest('Invalid Purchase Intent request');
+    if (parsed === null)
+      throw invalidRequest('Invalid Purchase Intent request');
     const key = requireIdempotencyKey(idempotencyKey);
     const principal = await this.authenticate(authorization);
 
@@ -223,7 +229,11 @@ export class PurchaseIntentsController extends AuthenticatedPaymentController {
     const principal = await this.authenticate(authorization);
 
     return runPaymentCommand(() =>
-      this.commands.submitTransfer({ purchaseIntentId: intentId }, principal, key),
+      this.commands.submitTransfer(
+        { purchaseIntentId: intentId },
+        principal,
+        key,
+      ),
     );
   }
 }
@@ -233,7 +243,8 @@ export class PurchaseIntentsController extends AuthenticatedPaymentController {
 export class CreditPurchasesController extends AuthenticatedPaymentController {
   constructor(
     @Inject(paymentCommands) commands: PaymentCommands,
-    @Inject(authenticatedPrincipalResolver) principalResolver: PrincipalResolver,
+    @Inject(authenticatedPrincipalResolver)
+    principalResolver: PrincipalResolver,
   ) {
     super(commands, principalResolver);
   }
@@ -250,7 +261,8 @@ export class CreditPurchasesController extends AuthenticatedPaymentController {
     @Body() body: unknown,
   ): Promise<PaymentDto> {
     const parsed = parseCreatePurchaseIntent(body);
-    if (parsed === null) throw invalidRequest('Invalid Credit purchase request');
+    if (parsed === null)
+      throw invalidRequest('Invalid Credit purchase request');
     const key = requireIdempotencyKey(idempotencyKey);
     const principal = await this.authenticate(authorization);
 
@@ -265,7 +277,8 @@ export class CreditPurchasesController extends AuthenticatedPaymentController {
 export class ClientPaymentsController extends AuthenticatedPaymentController {
   constructor(
     @Inject(paymentCommands) commands: PaymentCommands,
-    @Inject(authenticatedPrincipalResolver) principalResolver: PrincipalResolver,
+    @Inject(authenticatedPrincipalResolver)
+    principalResolver: PrincipalResolver,
   ) {
     super(commands, principalResolver);
   }
@@ -291,7 +304,8 @@ export class ClientPaymentsController extends AuthenticatedPaymentController {
 export class ClientCreditController extends AuthenticatedPaymentController {
   constructor(
     @Inject(paymentCommands) commands: PaymentCommands,
-    @Inject(authenticatedPrincipalResolver) principalResolver: PrincipalResolver,
+    @Inject(authenticatedPrincipalResolver)
+    principalResolver: PrincipalResolver,
   ) {
     super(commands, principalResolver);
   }
@@ -319,7 +333,8 @@ export class ClientCreditController extends AuthenticatedPaymentController {
 export class ClientReferralsController extends AuthenticatedPaymentController {
   constructor(
     @Inject(paymentCommands) commands: PaymentCommands,
-    @Inject(authenticatedPrincipalResolver) principalResolver: PrincipalResolver,
+    @Inject(authenticatedPrincipalResolver)
+    principalResolver: PrincipalResolver,
   ) {
     super(commands, principalResolver);
   }

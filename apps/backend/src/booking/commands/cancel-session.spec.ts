@@ -28,7 +28,9 @@ const dependencies = (overrides: Partial<typeof session> | null = {}) => ({
   principal: administrator,
   loadSession: jest
     .fn()
-    .mockResolvedValue(overrides === null ? null : { ...session, ...overrides }),
+    .mockResolvedValue(
+      overrides === null ? null : { ...session, ...overrides },
+    ),
   cancel: jest.fn().mockResolvedValue({ affectedBookings: 2 }),
   now: () => now,
 });
@@ -37,7 +39,9 @@ describe('cancelSession', () => {
   it('lets an Administrator cancel a future scheduled Session with live Bookings', async () => {
     const deps = dependencies();
 
-    await expect(cancelSession({ sessionId: 'session-1' }, deps)).resolves.toEqual({
+    await expect(
+      cancelSession({ sessionId: 'session-1' }, deps),
+    ).resolves.toEqual({
       affectedBookings: 2,
     });
     expect(deps.cancel).toHaveBeenCalledWith({
@@ -49,9 +53,9 @@ describe('cancelSession', () => {
   it('denies every other role', async () => {
     const deps = { ...dependencies(), principal: trainer };
 
-    await expect(cancelSession({ sessionId: 'session-1' }, deps)).rejects.toBeInstanceOf(
-      BookingAccessDeniedError,
-    );
+    await expect(
+      cancelSession({ sessionId: 'session-1' }, deps),
+    ).rejects.toBeInstanceOf(BookingAccessDeniedError);
     expect(deps.cancel).not.toHaveBeenCalled();
   });
 
@@ -60,7 +64,10 @@ describe('cancelSession', () => {
       cancelSession({ sessionId: 'session-1' }, dependencies(null)),
     ).rejects.toThrow('Session is not cancellable');
     await expect(
-      cancelSession({ sessionId: 'session-1' }, dependencies({ state: 'cancelled' })),
+      cancelSession(
+        { sessionId: 'session-1' },
+        dependencies({ state: 'cancelled' }),
+      ),
     ).rejects.toThrow('Session is not cancellable');
     await expect(
       cancelSession(
@@ -72,7 +79,10 @@ describe('cancelSession', () => {
 
   it('is a last resort for Sessions that still have Bookings', async () => {
     await expect(
-      cancelSession({ sessionId: 'session-1' }, dependencies({ liveBookingCount: 0 })),
+      cancelSession(
+        { sessionId: 'session-1' },
+        dependencies({ liveBookingCount: 0 }),
+      ),
     ).rejects.toThrow('Session has no Bookings');
   });
 });

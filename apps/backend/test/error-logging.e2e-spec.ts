@@ -99,7 +99,9 @@ describe('error logging (e2e)', () => {
         message: 'duplicate key value violates unique constraint',
       },
     });
-    expect((line.err as { stack?: string }).stack).toContain('FailingController.fail');
+    expect((line.err as { stack?: string }).stack).toContain(
+      'FailingController.fail',
+    );
     const serialized = JSON.stringify(lines);
     expect(serialized).not.toContain('lucia@example.com');
     expect(serialized).not.toContain('emma-local-2026');

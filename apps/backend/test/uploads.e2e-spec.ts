@@ -32,7 +32,9 @@ describe('uploads (e2e)', () => {
       ) => Promise<unknown>
     >();
   const readUploadStatus =
-    jest.fn<(imageAssetId: string, ownerAccountId: string) => Promise<unknown>>();
+    jest.fn<
+      (imageAssetId: string, ownerAccountId: string) => Promise<unknown>
+    >();
   const resolvePrincipal =
     jest.fn<
       (
