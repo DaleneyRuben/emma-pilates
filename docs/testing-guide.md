@@ -959,10 +959,13 @@ pnpm --filter @pilates/backend test
 
 This currently covers backend domain behavior, security helpers, registration
 rules, job behavior, and worker building blocks. It does not run the separate
-backend end-to-end or database integration suites. The script sets Node's
-`--experimental-vm-modules` flag (the pg-boss runtime loads its ESM package
-with a dynamic import), so the `ExperimentalWarning` line at the top is
-expected; a bare `jest` call without the flag fails that one spec.
+backend end-to-end or database integration suites. It needs no database, no
+Docker, and no environment variable, and a bare `pnpm exec jest` (or an
+editor's Jest runner) gives the same result as the script: the unit suite runs
+as CommonJS, and because pg-boss ships only ES modules, Jest substitutes the
+double in `apps/backend/src/__mocks__/pg-boss.ts` for the package there. The
+e2e and integration suites run as ES modules and load the real package, which
+is why only their scripts set Node's `--experimental-vm-modules` flag.
 
 It also runs the architecture checks, including the audit catalog check: every
 audit action code the backend writes must be listed in
@@ -1046,6 +1049,16 @@ These start the NestJS HTTP application inside Jest and verify routes, status
 codes, validation, and response shapes. The registration use cases are mocked
 in this suite, so this is an HTTP contract check rather than a real database
 journey.
+
+The suite has no database. `apps/backend/test/setup-environment.ts` pins
+`DATABASE_URL` to a placeholder that reaches nothing (port 1 on localhost),
+ignoring any value exported by your shell, and boots the application modules
+the way the offline OpenAPI generator does (`OPENAPI_GENERATION=true`), so the
+pg-boss factories return a stub instead of opening the job runtime. If a
+spec ever tries to open a connection, it fails with `ECONNREFUSED 127.0.0.1:1`
+rather than touching a real database. The real-database boot of the whole
+application is covered by `client-registration-runtime.integration-spec.ts`
+in the integration suite below.
 
 The Node.js `ExperimentalWarning` about VM Modules is expected for this command.
 
