@@ -45,7 +45,7 @@ const notificationRoutes = {
 // profile query is still pending (a cold cache), as it never is through Inicio
 // against a local API.
 function gatedProfileFetcher() {
-  let release = () => undefined;
+  let release: () => void = () => undefined;
   const gate = new Promise<void>((resolve) => {
     release = resolve;
   });
