@@ -121,11 +121,15 @@ export function AuthenticationFlow({
     store: pendingRegistrationStore,
   });
 
-  useEffect(() => {
+  // A link received while the flow is up opens its screen in the same render
+  // (state adjusted when a prop changes, as the React docs prescribe).
+  const [seenIntent, setSeenIntent] = useState(intent);
+  if (intent !== seenIntent) {
+    setSeenIntent(intent);
     if (intent !== null && intent !== undefined) {
       setRoute(routeForIntent(intent));
     }
-  }, [intent]);
+  }
 
   function showLogin() {
     setRoute("login");
