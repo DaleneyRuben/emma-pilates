@@ -68,6 +68,31 @@ describe("AuthenticationFlow pending registration across launches", () => {
     expect(store.clear).toHaveBeenCalled();
   });
 
+  // MOB-052: the restore runs once per launch; a re-render in the meantime
+  // (every render hands the hook a new `onRestored`) must neither restart it
+  // nor discard its result.
+  it("restores once however often the flow re-renders meanwhile", async () => {
+    let release: (kept: PendingRegistration | null) => void = () => undefined;
+    const store = createStore(stored(3 * day));
+    store.load.mockImplementation(
+      () =>
+        new Promise<PendingRegistration | null>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const api = createApiMock();
+    const screen = await render(<AuthenticationFlow api={api} pendingRegistrationStore={store} />);
+
+    expect(screen.toJSON()).toBeNull();
+    await screen.rerender(
+      <AuthenticationFlow api={api} notice="Hasta pronto." pendingRegistrationStore={store} />,
+    );
+    release(store.current());
+
+    expect(await screen.findByText("Revisa tu correo")).toBeOnTheScreen();
+    expect(store.load).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps a new registration and forgets it when she cancels", async () => {
     const store = createStore();
     const screen = await render(

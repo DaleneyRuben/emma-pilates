@@ -19,10 +19,11 @@ import {
   surfaces,
   TextButton,
   typography,
+  useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -41,6 +42,7 @@ type BookingsNavigation = {
     (screen: "History"): void;
     (screen: "Reschedule", params: { booking: UpcomingBookingDto }): void;
   };
+  setParams: (params: { confirmed?: ConfirmedBooking }) => void;
 };
 
 function Badge({ label }: { label: string }) {
@@ -119,8 +121,9 @@ export function BookingsScreen({
   const navigation = useNavigation<BookingsNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
-  const confirmed = route.params?.confirmed;
-  const [noticeFor, setNoticeFor] = useState<string | null>(confirmed?.bookingId ?? null);
+  const confirmed = useTransientNotice(route.params?.confirmed, noticeVisibleMs, () =>
+    navigation.setParams({ confirmed: undefined }),
+  );
   const [cancelling, setCancelling] = useState<UpcomingBookingDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const upcoming = useListUpcomingBookings({
@@ -131,13 +134,6 @@ export function BookingsScreen({
     fetcher,
     query: { refetchOnMount: "always" },
   });
-
-  useEffect(() => {
-    if (confirmed === undefined) return undefined;
-    setNoticeFor(confirmed.bookingId);
-    const timer = setTimeout(() => setNoticeFor(null), noticeVisibleMs);
-    return () => clearTimeout(timer);
-  }, [confirmed]);
 
   const refresh = () =>
     Promise.all([
@@ -190,7 +186,7 @@ export function BookingsScreen({
         <Heading accessibilityLabel="Mis reservas">Mis reservas</Heading>
         <TextButton label="Ver historial" onPress={() => navigation.navigate("History")} />
       </View>
-      {confirmed !== undefined && noticeFor === confirmed.bookingId ? (
+      {confirmed !== null ? (
         <View style={styles.notice}>
           <Text style={styles.noticeTitle}>Reserva confirmada</Text>
           <BodyText style={styles.noticeBody}>

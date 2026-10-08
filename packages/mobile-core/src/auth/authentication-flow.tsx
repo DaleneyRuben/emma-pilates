@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useEffectEvent, useState } from "react";
 
 import type { AuthenticationLinkIntent } from "../ingress/verified-link";
 import { BodyText } from "../ui/body-text";
@@ -66,6 +66,9 @@ function VerifyEmailScreen({
   token: string;
 }) {
   const [status, setStatus] = useState<"loading" | "verified" | "invalid">("loading");
+  // The token is consumed by its first use: the verification follows the api
+  // and the token, never the parent's latest `onVerified` closure.
+  const verified = useEffectEvent(onVerified);
 
   useEffect(() => {
     let active = true;
@@ -73,7 +76,7 @@ function VerifyEmailScreen({
     void api.verifyClientEmail(token).then((result) => {
       if (active) {
         setStatus(result.status === "verified" ? "verified" : "invalid");
-        if (result.status === "verified") onVerified();
+        if (result.status === "verified") verified();
       }
     });
 
@@ -121,11 +124,15 @@ export function AuthenticationFlow({
     store: pendingRegistrationStore,
   });
 
-  useEffect(() => {
+  // A link received while the flow is up opens its screen in the same render
+  // (state adjusted when a prop changes, as the React docs prescribe).
+  const [seenIntent, setSeenIntent] = useState(intent);
+  if (intent !== seenIntent) {
+    setSeenIntent(intent);
     if (intent !== null && intent !== undefined) {
       setRoute(routeForIntent(intent));
     }
-  }, [intent]);
+  }
 
   function showLogin() {
     setRoute("login");

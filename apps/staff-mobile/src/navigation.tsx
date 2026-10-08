@@ -14,11 +14,12 @@ import {
   type AppRole,
   type MobileNavigationProps,
   typography,
+  useMountedAt,
 } from "@pilates/mobile-core";
-import { useGetTrainerSessionRoster } from "@pilates/api-contracts";
+import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
 import { createStaticNavigation, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { CancelClassScreen } from "./administrator/cancel-class-screen";
@@ -50,6 +51,16 @@ type StaffRole = Exclude<AppRole, "client">;
 type AttendanceOutcome = "attended" | "no_show";
 type TrainerRosterNavigation = { goBack: () => void };
 
+function savedOutcomes(bookings: TrainerRosterBookingDto[]): Record<string, AttendanceOutcome> {
+  return Object.fromEntries(
+    bookings.flatMap((booking) =>
+      booking.attendanceOutcome === undefined || booking.attendanceOutcome === null
+        ? []
+        : [[booking.bookingId, booking.attendanceOutcome]],
+    ),
+  );
+}
+
 function TrainerRosterScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<TrainerRosterNavigation>();
   const fetcher = useStaffFetcher();
@@ -57,23 +68,12 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const [outcomes, setOutcomes] = useState<Record<string, AttendanceOutcome>>({});
+  // The Trainer's taps sit over the saved outcomes, so a refetch never undoes a tap.
+  const [edits, setEdits] = useState<Record<string, AttendanceOutcome>>({});
   const [saveError, setSaveError] = useState(false);
   const [saved, setSaved] = useState(false);
+  const openedAt = useMountedAt();
   const trainerApi = useMemo(() => createTrainerApi(fetcher), [fetcher]);
-
-  useEffect(() => {
-    if (roster.data === undefined) return;
-    setOutcomes(
-      Object.fromEntries(
-        roster.data.data.bookings.flatMap((booking) =>
-          booking.attendanceOutcome === undefined
-            ? []
-            : [[booking.bookingId, booking.attendanceOutcome as AttendanceOutcome]],
-        ),
-      ),
-    );
-  }, [roster.data]);
 
   if (roster.isPending)
     return (
@@ -92,7 +92,8 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
     );
 
   const session = roster.data.data;
-  const isPostSession = new Date(session.endsAt).getTime() <= Date.now();
+  const outcomes = { ...savedOutcomes(session.bookings), ...edits };
+  const isPostSession = new Date(session.endsAt).getTime() <= openedAt;
   const complete = session.bookings.every((booking) => outcomes[booking.bookingId] !== undefined);
   const saveAttendance = async () => {
     setSaveError(false);
@@ -134,7 +135,7 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
                       accessibilityState={{ selected }}
                       key={outcome}
                       onPress={() =>
-                        setOutcomes((current) => ({
+                        setEdits((current) => ({
                           ...current,
                           [booking.bookingId]: outcome,
                         }))

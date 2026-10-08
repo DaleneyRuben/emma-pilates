@@ -65,11 +65,6 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      // The React Compiler is not enabled in the apps (no experiments.reactCompiler),
-      // and the pre-existing «notice after navigation» effects and Date.now()
-      // reads in render are a separate item (MOB-052); both stay visible.
-      "react-hooks/set-state-in-effect": "warn",
-      "react-hooks/purity": "warn",
       // Airbnb's setting: props dropped before a ...rest spread are not unused.
       "@typescript-eslint/no-unused-vars": [
         "error",

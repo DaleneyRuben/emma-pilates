@@ -16,9 +16,9 @@ import {
   surfaces,
   TextButton,
   typography,
+  useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -44,17 +44,10 @@ export function PendingPaymentsScreen({
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const [notice, setNotice] = useState<PaymentsNotice | null>(null);
-  const incomingNotice = route.params?.notice;
-
   // Confirming or rejecting returns here with a two-second notice.
-  useEffect(() => {
-    if (incomingNotice === undefined) return;
-    setNotice(incomingNotice);
-    navigation.setParams({ notice: undefined });
-    const timer = setTimeout(() => setNotice(null), noticeMilliseconds);
-    return () => clearTimeout(timer);
-  }, [incomingNotice, navigation]);
+  const notice = useTransientNotice(route.params?.notice, noticeMilliseconds, () =>
+    navigation.setParams({ notice: undefined }),
+  );
 
   const header = (
     <>

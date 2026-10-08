@@ -158,6 +158,24 @@ describe("AuthenticationFlow", () => {
     });
   });
 
+  // MOB-052: `onVerified` is a new closure on every render of the flow and the
+  // token is consumed by the first call, so the verification must not follow it.
+  it("verifies the token once however often the flow re-renders", async () => {
+    const verifyClientEmail = jest.fn().mockResolvedValue({ status: "verified" });
+    const api = createApiMock({ verifyClientEmail });
+    const intent = { token: "verification-token", type: "verify-email" } as const;
+    const screen = await render(<AuthenticationFlow api={api} intent={intent} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Correo verificado")).toBeOnTheScreen();
+    });
+    await screen.rerender(<AuthenticationFlow api={api} intent={intent} notice="Hasta pronto." />);
+    await screen.rerender(<AuthenticationFlow api={api} intent={intent} notice={null} />);
+
+    expect(verifyClientEmail).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Correo verificado")).toBeOnTheScreen();
+  });
+
   it("starts the replacement Session after password recovery", async () => {
     const inspectLink = jest.fn().mockResolvedValue({
       purpose: "password_recovery",
