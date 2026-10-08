@@ -16,6 +16,7 @@ import {
   sofiaPayment,
   valeriaPayment,
 } from "../test/payment-fixtures";
+import { emptyPageHandlers } from "../test/page-handlers";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
@@ -237,7 +238,10 @@ describe("AW28 Pagos on a desktop browser", () => {
   });
 
   it("counts the pending transfers next to Pagos in the sidebar", async () => {
-    server.use(paymentTable(() => jsonResponse(paymentPage([sofiaPayment]))));
+    server.use(
+      paymentTable(() => jsonResponse(paymentPage([sofiaPayment]))),
+      ...emptyPageHandlers(),
+    );
     renderAdmin("/back-office/clientes");
 
     expect(

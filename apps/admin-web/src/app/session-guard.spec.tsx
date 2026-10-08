@@ -2,6 +2,7 @@ import { screen, within } from "@testing-library/react";
 import { ApiError } from "../api/problem";
 import { http, HttpResponse } from "msw";
 import { apiUrl, server, useMockServer } from "../test/msw";
+import { emptyPageHandlers } from "../test/page-handlers";
 import { renderAdmin } from "../test/render-admin";
 import {
   currentSessionPath,
@@ -32,7 +33,7 @@ describe("admin session guard", () => {
   });
 
   it("restores a signed-in browser session at startup without asking again", async () => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...emptyPageHandlers());
     renderAdmin("/back-office/evaluaciones-nutricionales");
 
     expect(await heading("Evaluaciones nutricionales")).toBeInTheDocument();
@@ -50,7 +51,7 @@ describe("admin session guard", () => {
   });
 
   it("returns to Login once, with a notice, when a later request finds the session ended", async () => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...emptyPageHandlers());
     const { router, queryClient } = renderAdmin("/back-office/gastos");
     await heading("Gastos");
     server.use(...signedOutHandlers());
@@ -79,6 +80,7 @@ describe("admin session guard", () => {
   it("reports an expiry again after a session restored without Login (another tab signed in)", async () => {
     server.use(
       ...signedInHandlers(),
+      ...emptyPageHandlers(),
       http.delete(apiUrl(currentSessionPath), () => {
         server.use(...signedOutHandlers());
         return new HttpResponse(null, { status: 204 });
@@ -98,7 +100,7 @@ describe("admin session guard", () => {
     await heading("Iniciar sesión");
 
     // Another tab signed in; this tab goes back and the probe finds a session.
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...emptyPageHandlers());
     await router.navigate({
       to: "/back-office/gastos",
       search: { page: 1, pageSize: 20 },
