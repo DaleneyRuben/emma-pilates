@@ -53,7 +53,7 @@ describe("Client App render errors (MOB-053)", () => {
     await waitFor(() => {
       expect(screen.getByText("Algo salió mal")).toBeOnTheScreen();
     });
-    expect(screen.getByLabelText("Perfil")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Perfil, tab, 4 of 4")).toBeOnTheScreen();
     expect(screen.queryByText("Inicio recuperado")).not.toBeOnTheScreen();
 
     mockHomeFails = false;
@@ -63,7 +63,7 @@ describe("Client App render errors (MOB-053)", () => {
       expect(screen.getByText("Inicio recuperado")).toBeOnTheScreen();
     });
     expect(screen.queryByText("Algo salió mal")).not.toBeOnTheScreen();
-    expect(screen.getByLabelText("Perfil")).toBeOnTheScreen();
+    expect(screen.getByLabelText("Perfil, tab, 4 of 4")).toBeOnTheScreen();
   });
 
   it("shows the recovery screen when the authentication flow throws and restarts it on Reintentar", async () => {
