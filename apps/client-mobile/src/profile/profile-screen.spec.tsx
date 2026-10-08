@@ -97,13 +97,16 @@ describe("Client Profile", () => {
   });
 
   it("recovers from a failed profile request when Reintentar succeeds", async () => {
-    let failures = 1;
+    // Inicio and Perfil both mount the profile query, so it keeps failing until
+    // the spec lets Reintentar succeed; a single failure could be overtaken by
+    // the second mount's refetch.
+    let failing = true;
     const screen = await openPerfilTab(
       createClientRuntime(
         routeFetcher({
           ...readRoutes,
           "/api/v1/clients/current": () =>
-            failures-- > 0
+            failing
               ? jsonResponse({ code: "internal_error", status: 500 }, 500)
               : jsonResponse(profile),
         }),
@@ -111,9 +114,11 @@ describe("Client Profile", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText("No pudimos cargar tu perfil.")).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Reintentar" })).toBeOnTheScreen();
     });
+    expect(screen.getByText("No pudimos cargar tu perfil.")).toBeOnTheScreen();
 
+    failing = false;
     fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
 
     await waitFor(() => {
