@@ -136,6 +136,11 @@ describe("admin session guard", () => {
     server.use(
       http.get(apiUrl(currentSessionPath), () => HttpResponse.error()),
     );
+    // React reports the error the route boundary catches through
+    // console.error; the test expects it instead of letting it print.
+    const reported = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
     renderAdmin("/");
     expect(
       await screen.findByText(
@@ -143,5 +148,9 @@ describe("admin session guard", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeEnabled();
+    expect(reported.mock.calls.flat()).toContainEqual(
+      expect.objectContaining({ status: 0, code: "network_error" }),
+    );
+    reported.mockRestore();
   });
 });
