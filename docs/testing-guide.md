@@ -1060,9 +1060,12 @@ same thing whenever you run it; timers, `waitFor`, and the other
 asynchronous APIs stay real. Specs that need a particular instant still set
 it explicitly in their fixtures.
 
-The same three packages are linted and format-checked (MOB-050):
+The same three packages are linted and format-checked (MOB-050), and so is
+the tooling package that holds their shared ESLint config and the release
+smoke script (MOB-055):
 
 ```sh
+pnpm --filter @pilates/tooling lint
 pnpm --filter @pilates/mobile-core lint
 pnpm --filter @pilates/mobile-core format:check
 pnpm --filter @pilates/client-mobile lint
@@ -1088,9 +1091,14 @@ when the notice's time is up, and a screen that compares a deadline with
 pattern needs an effect that copies into state or a `Date.now()` in render.
 `format:check` runs Prettier separately, as the admin web does, with
 `printWidth: 100` in each package's `.prettierrc`; `pnpm --filter <package>
-format` rewrites the files. Jest never runs ESLint, so a lint error does not
+format` rewrites the files. `@pilates/tooling` has its own
+`eslint.config.mjs` (the recommended JavaScript rules with Node's globals,
+nothing else: the package holds plain Node ES modules) that covers its
+`eslint/mobile.js` and `scripts/mobile-release-smoke.mjs`, the script
+behind each app's `release:smoke` (Test 19); it has no Prettier script,
+because adding one would mean a new dependency on that package. Jest never runs ESLint, so a lint error does not
 fail the tests; the project commit skill lints every staged TypeScript file,
-and CI's quality-mobile job runs both checks before the suites.
+and CI's quality-mobile job runs both checks, and the tooling lint, before the suites.
 
 ### Biometric testing limitation
 
@@ -1238,8 +1246,9 @@ runner after the shared setup in `.github/actions/setup/action.yml` (Node from
   on a `pilates_test_ci` admin database that lives and dies with the runner);
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
   **web** (the admin-web Jest suite);
-- **quality-mobile** (lint, `format:check`, and typecheck of mobile-core,
-  client-mobile, and staff-mobile) → **mobile** (their three Jest suites).
+- **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
+  mobile-core, client-mobile, and staff-mobile) → **mobile** (their three
+  Jest suites).
 
 A job runs only when the job before it in its chain passed, so a lint or type
 error costs one two-minute job and the tests never start; a stale contract
