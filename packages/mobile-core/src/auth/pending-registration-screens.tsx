@@ -10,6 +10,7 @@ import { colors, radii, spacing, typography } from "../ui/tokens";
 import { AuthenticationScreen, authStyles } from "./auth-layout";
 import { QuietButton, SecondaryButton, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
+import { useMountedAt } from "../time/mounted-at";
 import { useCountdown } from "./countdown";
 import { limitKeepsCurrentLink } from "./request-limit-copy";
 
@@ -75,8 +76,9 @@ export function CheckEmailScreen({
   const [submitting, setSubmitting] = useState(false);
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
+  const shownAt = useMountedAt();
 
-  if (Date.now() >= pending.pendingExpiresAt) {
+  if (shownAt >= pending.pendingExpiresAt) {
     return <RegistrationLapsed onBack={onBack} onRegisterAgain={onRegisterAgain} />;
   }
 

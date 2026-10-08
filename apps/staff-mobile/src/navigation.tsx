@@ -14,6 +14,7 @@ import {
   type AppRole,
   type MobileNavigationProps,
   typography,
+  useMountedAt,
 } from "@pilates/mobile-core";
 import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
 import { createStaticNavigation, useNavigation } from "@react-navigation/native";
@@ -71,6 +72,7 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
   const [edits, setEdits] = useState<Record<string, AttendanceOutcome>>({});
   const [saveError, setSaveError] = useState(false);
   const [saved, setSaved] = useState(false);
+  const openedAt = useMountedAt();
   const trainerApi = useMemo(() => createTrainerApi(fetcher), [fetcher]);
 
   if (roster.isPending)
@@ -91,7 +93,7 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
 
   const session = roster.data.data;
   const outcomes = { ...savedOutcomes(session.bookings), ...edits };
-  const isPostSession = new Date(session.endsAt).getTime() <= Date.now();
+  const isPostSession = new Date(session.endsAt).getTime() <= openedAt;
   const complete = session.bookings.every((booking) => outcomes[booking.bookingId] !== undefined);
   const saveAttendance = async () => {
     setSaveError(false);

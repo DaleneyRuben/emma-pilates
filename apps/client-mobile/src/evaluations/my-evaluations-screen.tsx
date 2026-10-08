@@ -17,6 +17,7 @@ import {
   surfaces,
   TextButton,
   typography,
+  useMountedAt,
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -62,9 +63,10 @@ function UpcomingCard({
   highlighted: boolean;
   onCancel: () => void;
 }) {
-  // The server's flag is a snapshot; the 3-hour limit keeps moving.
+  // The server's flag is a snapshot; the 3-hour limit is judged again when the card appears.
+  const shownAt = useMountedAt();
   const cancellable =
-    evaluation.cancellable && new Date(evaluation.cancellableUntil).getTime() > Date.now();
+    evaluation.cancellable && new Date(evaluation.cancellableUntil).getTime() > shownAt;
 
   return (
     <View style={[styles.card, highlighted && styles.cardHighlighted]}>
