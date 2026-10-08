@@ -1,4 +1,4 @@
-import { screen, within } from "@testing-library/react";
+import { act, screen, within } from "@testing-library/react";
 import { ApiError } from "../api/problem";
 import { http, HttpResponse } from "msw";
 import { apiUrl, server, useMockServer } from "../test/msw";
@@ -60,10 +60,14 @@ describe("admin session guard", () => {
       Promise.reject(
         new ApiError({ status: 401, code: "authentication_required" }),
       );
-    await Promise.allSettled([
-      queryClient.fetchQuery({ queryKey: ["uno"], queryFn: ended }),
-      queryClient.fetchQuery({ queryKey: ["dos"], queryFn: ended }),
-    ]);
+    // The expiry navigates as the rejections land, outside any Testing
+    // Library call, so the test holds the act scope itself.
+    await act(async () => {
+      await Promise.allSettled([
+        queryClient.fetchQuery({ queryKey: ["uno"], queryFn: ended }),
+        queryClient.fetchQuery({ queryKey: ["dos"], queryFn: ended }),
+      ]);
+    });
 
     expect(await heading("Iniciar sesión")).toBeInTheDocument();
     expect(
@@ -101,22 +105,26 @@ describe("admin session guard", () => {
 
     // Another tab signed in; this tab goes back and the probe finds a session.
     server.use(...signedInHandlers(), ...emptyPageHandlers());
-    await router.navigate({
-      to: "/back-office/gastos",
-      search: { page: 1, pageSize: 20 },
-    });
+    await act(() =>
+      router.navigate({
+        to: "/back-office/gastos",
+        search: { page: 1, pageSize: 20 },
+      }),
+    );
     await heading("Gastos");
 
     server.use(...signedOutHandlers());
-    await queryClient
-      .fetchQuery({
-        queryKey: ["tarde"],
-        queryFn: () =>
-          Promise.reject(
-            new ApiError({ status: 401, code: "authentication_required" }),
-          ),
-      })
-      .catch(() => undefined);
+    await act(async () => {
+      await queryClient
+        .fetchQuery({
+          queryKey: ["tarde"],
+          queryFn: () =>
+            Promise.reject(
+              new ApiError({ status: 401, code: "authentication_required" }),
+            ),
+        })
+        .catch(() => undefined);
+    });
 
     expect(await heading("Iniciar sesión")).toBeInTheDocument();
     expect(
