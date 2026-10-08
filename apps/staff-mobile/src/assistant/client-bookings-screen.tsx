@@ -20,10 +20,11 @@ import {
   surfaces,
   TextButton,
   typography,
+  useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -126,26 +127,20 @@ export function ClientBookingsScreen({
 }: {
   route: { params: ClientContext & { confirmed?: ConfirmedBooking } };
 }) {
-  const { clientId, clientName, confirmed } = route.params;
+  const { clientId, clientName } = route.params;
   const navigation = useNavigation<BookingsNavigation>();
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
   const api = useMemo(() => createAssistantApi(fetcher), [fetcher]);
-  const [notice, setNotice] = useState<ConfirmedBooking | null>(null);
+  const notice = useTransientNotice(route.params.confirmed, noticeVisibleMs, () =>
+    navigation.setParams({ confirmed: undefined }),
+  );
   const [cancelling, setCancelling] = useState<AssistantClientBookingDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const upcoming = useListAssistantClientBookings(clientId, {
     fetcher,
     query: { refetchOnMount: "always" },
   });
-
-  useEffect(() => {
-    if (confirmed === undefined) return undefined;
-    setNotice(confirmed);
-    navigation.setParams({ confirmed: undefined });
-    const timer = setTimeout(() => setNotice(null), noticeVisibleMs);
-    return () => clearTimeout(timer);
-  }, [confirmed, navigation]);
 
   const refresh = () =>
     Promise.all([

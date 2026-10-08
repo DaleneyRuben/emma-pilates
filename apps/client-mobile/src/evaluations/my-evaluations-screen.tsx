@@ -17,10 +17,11 @@ import {
   surfaces,
   TextButton,
   typography,
+  useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -39,6 +40,7 @@ const noticeVisibleMs = 8_000;
 type EvaluationsNavigation = {
   goBack: () => void;
   navigate: (screen: "EvaluationAvailability") => void;
+  setParams: (params: { confirmed?: ClientEvaluationDto }) => void;
 };
 
 function DateBadge({ instant }: { instant: string }) {
@@ -104,20 +106,14 @@ export function MyEvaluationsScreen({
   const navigation = useNavigation<EvaluationsNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
-  const confirmed = route.params?.confirmed;
-  const [noticeFor, setNoticeFor] = useState<string | null>(confirmed?.id ?? null);
+  const confirmed = useTransientNotice(route.params?.confirmed, noticeVisibleMs, () =>
+    navigation.setParams({ confirmed: undefined }),
+  );
   const [cancelling, setCancelling] = useState<ClientEvaluationDto | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const past = useListEvaluations({ scope: "past" }, queryOptions);
-
-  useEffect(() => {
-    if (confirmed === undefined) return undefined;
-    setNoticeFor(confirmed.id);
-    const timer = setTimeout(() => setNoticeFor(null), noticeVisibleMs);
-    return () => clearTimeout(timer);
-  }, [confirmed]);
 
   const confirmCancel = async () => {
     if (cancelling === null) return;
@@ -173,7 +169,7 @@ export function MyEvaluationsScreen({
   return (
     <Screen style={styles.screen}>
       {header}
-      {confirmed !== undefined && noticeFor === confirmed.id ? (
+      {confirmed !== null ? (
         <View style={styles.notice}>
           <Text style={styles.noticeTitle}>Evaluación confirmada</Text>
           <BodyText style={styles.noticeBody}>
@@ -206,7 +202,7 @@ export function MyEvaluationsScreen({
             {items.map((evaluation) => (
               <UpcomingCard
                 evaluation={evaluation}
-                highlighted={noticeFor === evaluation.id}
+                highlighted={confirmed?.id === evaluation.id}
                 key={evaluation.id}
                 onCancel={() => setCancelling(evaluation)}
               />
