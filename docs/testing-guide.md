@@ -126,6 +126,27 @@ circle, «Selecciona un cliente para ver sus detalles» in Lora, and «Busca por
 nombre, teléfono o correo en el panel izquierdo. Su ficha se abrirá aquí, sin
 perder la lista.», with no card behind it.
 
+Both apps catch a screen that fails while drawing (MOB-053). Instead of the
+full-screen red box of Expo Go or a closed app in a release build, the failed
+screen is replaced by the recovery screen: «Algo salió mal» in Lora, the note
+«No pudimos mostrar esta pantalla. Inténtalo de nuevo; si vuelve a pasar,
+cierra la app y ábrela otra vez.», and a **Reintentar** primary button,
+centred on the same Superficie with no card and no icon (design follow-up
+89). Only the failed screen is replaced: in the Client app the tab bar stays
+and the other tabs keep working; in the Staff app the Role's stack stays, so
+the iOS back swipe from the left edge returns to the previous screen.
+**Reintentar** draws the failed screen again from scratch. A failure above
+every screen (Login, the providers) shows the same screen over the whole
+viewport and **Reintentar** restarts the app's tree. You cannot reach it
+without a defect: to see it, make a screen throw while rendering (for
+example a temporary `throw new Error("probe")` at the top of a screen's
+render, never committed), reload, and tap through to that screen. In Expo Go
+the development LogBox still opens over it with a dismissible «Render Error»
+and the boundary's «Console Error» (React Native treats a component error as
+fatal for LogBox even when a boundary catches it); tap **Dismiss** on each to
+see the recovery screen. A release build has no LogBox. The error and its
+component stack go to `console.error` only; no crash reporter is wired.
+
 ### B. Open the Staff app
 
 Leave the Client Expo server running and open a second Terminal window. From the
@@ -1001,6 +1022,16 @@ The Client and Staff app tests verify that each application has its own
 credential namespace, links, navigation, and identity eligibility. They also
 prove that Client registration exists only in the Client app, Client Accounts
 cannot enter the Staff app, and Staff Roles cannot enter the Client app.
+
+The error boundary (MOB-053) is specified in mobile-core's
+`src/ui/render-error-boundary.spec.tsx` (a child that throws while rendering
+shows the recovery screen, the error and its component stack reach
+`console.error`, **Reintentar** draws the children again and succeeds once
+the child no longer throws, or shows the recovery screen again when it still
+does) and in each app's `src/render-errors.spec.tsx`, which mock one screen
+(Inicio, the Trainer's agenda) and the authentication flow to throw and
+expect the recovery screen in place, the Client tab bar still present, and
+the screen or Login back after **Reintentar**.
 
 Both app suites fail a spec on any React `act()` warning (MOB-054): each
 `jest.setup.ts` declares the act environment, delivers TanStack Query's
