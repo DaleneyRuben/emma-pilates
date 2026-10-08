@@ -16,8 +16,8 @@ jest.setTimeout(30_000);
 
 // Decided for MOB-022: name the month wherever it can differ from today's.
 describe("Evaluation month copy (13, 14, 15)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

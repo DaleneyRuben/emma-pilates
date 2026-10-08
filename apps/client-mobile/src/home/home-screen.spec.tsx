@@ -29,8 +29,8 @@ const activeSubscription = {
 };
 
 describe("Client Home", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -114,7 +114,7 @@ describe("Client Home", () => {
     await waitFor(() => {
       expect(screen.getByText("No pudimos cargar tu inicio.")).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
 
     await waitFor(() => {
       expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();

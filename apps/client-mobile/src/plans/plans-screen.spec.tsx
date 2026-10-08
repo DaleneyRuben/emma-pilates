@@ -30,8 +30,8 @@ const plans = [
 ];
 
 describe("Client Plans", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

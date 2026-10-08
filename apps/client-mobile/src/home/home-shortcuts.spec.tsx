@@ -48,8 +48,8 @@ async function openHome(subscription: unknown) {
 // MOB-042: 02's shortcuts are a full-width «Reservar una clase» row with an
 // icon tile over two half-width tiles, as the frame draws them.
 describe("Client Home shortcut tiles", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

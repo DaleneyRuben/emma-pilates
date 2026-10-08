@@ -26,8 +26,8 @@ const startedAgo = () => {
 };
 
 describe("Nutritionist Evaluation gaps (S15, S17)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

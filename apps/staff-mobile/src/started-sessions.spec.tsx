@@ -35,8 +35,8 @@ const staffMember = (role: string, name: string) => ({
 // (attendance is marked after the class) and leave the Assistant's booking
 // list and the Administrator's cancel list, like the Client's 03.
 describe("started Sessions on the Staff lists", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

@@ -38,7 +38,7 @@ export async function openProfile(runtime = createClientRuntime(routeFetcher(rea
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
   await waitFor(
     () => {
       expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();

@@ -77,14 +77,14 @@ async function openHistory(entries: unknown[]) {
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Mis Reservas, tab/ }));
   await waitFor(
     () => {
       expect(screen.getByRole("button", { name: "Ver historial" })).toBeOnTheScreen();
     },
     { timeout: 5_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: "Ver historial" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Ver historial" }));
   await waitFor(() => {
     expect(screen.getByText("Historial de clases")).toBeOnTheScreen();
   });
@@ -93,8 +93,8 @@ async function openHistory(entries: unknown[]) {
 }
 
 describe("Client Class History", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

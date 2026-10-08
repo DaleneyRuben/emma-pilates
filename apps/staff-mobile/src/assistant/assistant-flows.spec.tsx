@@ -16,8 +16,8 @@ import {
 jest.setTimeout(20_000);
 
 describe("Assistant Client flows", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

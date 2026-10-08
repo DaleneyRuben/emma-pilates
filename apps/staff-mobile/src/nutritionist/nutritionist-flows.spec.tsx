@@ -19,8 +19,8 @@ import {
 jest.setTimeout(30_000);
 
 describe("Nutritionist agenda and availability", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

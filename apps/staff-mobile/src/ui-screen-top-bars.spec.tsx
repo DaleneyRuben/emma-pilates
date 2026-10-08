@@ -76,8 +76,8 @@ const renderScreen = (Component: ComponentType<never>, params: object) => {
 
 // MOB-034: the Staff screens draw the export's top bar, not «← Volver».
 describe("The Staff screens' top bar", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

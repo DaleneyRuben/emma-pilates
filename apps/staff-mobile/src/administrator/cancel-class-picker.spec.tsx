@@ -30,8 +30,8 @@ const routes = {
 // MOB-041: S13's «Sucursal:» row ends in the 16 pt Texto tenue chevron that
 // points down while the picker is closed and up while it is open.
 describe("Cancel a class Branch picker", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

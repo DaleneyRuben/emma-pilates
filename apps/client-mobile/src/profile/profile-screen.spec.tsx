@@ -68,13 +68,13 @@ async function openPerfilTab(runtime: ReturnType<typeof createClientRuntime>) {
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
   return screen;
 }
 
 describe("Client Profile", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -119,7 +119,7 @@ describe("Client Profile", () => {
     expect(screen.getByText("No pudimos cargar tu perfil.")).toBeOnTheScreen();
 
     failing = false;
-    fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
 
     await waitFor(() => {
       expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();
@@ -173,7 +173,7 @@ describe("Client Profile", () => {
   it("opens the expired Plan detail with a purchase action", async () => {
     const screen = await openProfile();
 
-    fireEvent.press(screen.getByRole("button", { name: "Mi plan: Vencida" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Mi plan: Vencida" }));
 
     await waitFor(() => {
       expect(screen.getByText("Último plan")).toBeOnTheScreen();
@@ -187,7 +187,7 @@ describe("Client Profile", () => {
     const runtime = createClientRuntime(routeFetcher(readRoutes));
     const screen = await openProfile(runtime);
 
-    fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
 
     expect(alert).toHaveBeenCalledWith("¿Cerrar sesión?", expect.any(String), expect.any(Array));
     expect(runtime.sessionManager.logout).not.toHaveBeenCalled();
@@ -214,7 +214,7 @@ describe("Client Profile", () => {
     });
     expect(screen.getByText("Emma Pilates Studio · versión 1.0")).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
 
     await waitFor(() => {
       expect(screen.getByText("Sin leer")).toBeOnTheScreen();
@@ -226,7 +226,7 @@ describe("Client Profile", () => {
   it("opens the change password step from Perfil", async () => {
     const screen = await openProfile();
 
-    fireEvent.press(screen.getByRole("button", { name: "Cambiar contraseña" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar contraseña" }));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Contraseña actual")).toBeOnTheScreen();
@@ -252,7 +252,7 @@ describe("Client Profile", () => {
       ),
     );
 
-    fireEvent.press(screen.getByRole("button", { name: "Editar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Editar" }));
     await waitFor(() => {
       expect(screen.getByText("Editar perfil")).toBeOnTheScreen();
     });
@@ -260,9 +260,9 @@ describe("Client Profile", () => {
     // The email is editable since IDN-008; unchanged, it sends no request.
     expect(screen.getByLabelText("Correo electrónico")).toHaveProp("value", "sofia@example.com");
 
-    fireEvent.changeText(screen.getByLabelText("Nombre"), "Sofía Guzmán Vega");
-    fireEvent.changeText(screen.getByLabelText("Teléfono"), "");
-    fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
+    await fireEvent.changeText(screen.getByLabelText("Nombre"), "Sofía Guzmán Vega");
+    await fireEvent.changeText(screen.getByLabelText("Teléfono"), "");
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar cambios" }));
 
     await waitFor(() => {
       expect(saved).toHaveBeenCalledWith({

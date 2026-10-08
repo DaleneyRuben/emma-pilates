@@ -110,8 +110,8 @@ async function openApp(fetcher: typeof globalThis.fetch) {
 }
 
 describe("Client Home quick actions and notification destinations", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -127,7 +127,7 @@ describe("Client Home quick actions and notification destinations", () => {
       screen.getByRole("button", { name: "Mis referidos: 2 amigas invitadas" }),
     ).toBeOnTheScreen();
 
-    fireEvent.press(
+    await fireEvent.press(
       screen.getByRole("button", { name: "Evaluación nutricional: Próxima: 2 de octubre" }),
     );
     await waitFor(() => {
@@ -155,7 +155,7 @@ describe("Client Home quick actions and notification destinations", () => {
       screen.getByRole("button", { name: "Mis referidos: Invita amigas y gana crédito" }),
     ).toBeOnTheScreen();
 
-    fireEvent.press(
+    await fireEvent.press(
       screen.getByRole("button", { name: "Evaluación nutricional: Agenda tu cita del mes" }),
     );
     await waitFor(() => {
@@ -165,25 +165,25 @@ describe("Client Home quick actions and notification destinations", () => {
 
   it("opens Mis evaluaciones and Mis reservas from their notifications", async () => {
     const screen = await openApp(routeFetcher(routes()));
-    fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
     await waitFor(() => {
       expect(screen.getByText("El estudio canceló tu evaluación nutricional.")).toBeOnTheScreen();
     });
 
-    fireEvent.press(screen.getByText("El estudio canceló tu evaluación nutricional."));
+    await fireEvent.press(screen.getByText("El estudio canceló tu evaluación nutricional."));
     await waitFor(() => {
       expect(screen.getByText("Mis evaluaciones")).toBeOnTheScreen();
     });
 
-    fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await waitFor(() => {
       expect(screen.getByText("Tu clase de Reformer Pilates fue cancelada.")).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByText("Tu clase de Reformer Pilates fue cancelada."));
+    await fireEvent.press(screen.getByText("Tu clase de Reformer Pilates fue cancelada."));
     await waitFor(() => {
       expect(screen.getByText("Mis reservas")).toBeOnTheScreen();
     });

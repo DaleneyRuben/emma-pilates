@@ -8,8 +8,8 @@ jest.setTimeout(20_000);
 // MOB-046: the result row keeps «phone · email» on one line and trims it,
 // so the split view's 344 pt column never wraps it under the name.
 describe("Assistant search result contact", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

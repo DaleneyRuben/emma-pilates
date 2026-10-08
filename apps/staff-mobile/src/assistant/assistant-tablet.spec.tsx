@@ -56,8 +56,8 @@ describe("Assistant flows on a tablet", () => {
       .mockReturnValue({ width: 1024, height: 1366, scale: 2, fontScale: 1 });
   });
 
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
     jest.restoreAllMocks();
   });

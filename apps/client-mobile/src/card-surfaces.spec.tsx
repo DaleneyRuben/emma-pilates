@@ -27,8 +27,8 @@ const activeSubscription = {
 // MOB-039: the Client frames draw every card on Blanco with a 1 px Borde
 // fuerte and radius 16; Inicio's plan card stands for them.
 describe("Client card surfaces (MOB-039)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

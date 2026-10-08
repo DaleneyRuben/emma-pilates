@@ -18,8 +18,8 @@ const hidden = { includeHiddenElements: true };
 // MOB-042: S04's result is an avatar, the name over the contact, and the
 // chevron; S07 draws the picker pill and the shared Session card.
 describe("Assistant rows", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
