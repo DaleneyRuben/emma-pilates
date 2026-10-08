@@ -175,8 +175,9 @@ describe("Client My Bookings", () => {
   });
 
   it("reschedules a Booking inside the Cancellation Window to a same-day Session", async () => {
-    const today = boliviaCivilDate(new Date());
-    const { from, until } = civilDateRange(today);
+    // The screen asks for the Booking's own civil day, which is tomorrow's
+    // when the test runs within an hour of midnight in Bolivia.
+    const { from, until } = civilDateRange(boliviaCivilDate(new Date(insideWindow.startsAt)));
     const alternative = {
       id: "session-alt",
       branchId: "branch-centro",

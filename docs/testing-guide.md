@@ -1002,6 +1002,13 @@ credential namespace, links, navigation, and identity eligibility. They also
 prove that Client registration exists only in the Client app, Client Accounts
 cannot enter the Staff app, and Staff Roles cannot enter the Client app.
 
+Both app suites run against a frozen clock (MOB-051): their Jest config fakes
+`Date` only, at 2026-10-08 14:00 UTC (10:00 in Bolivia), so a spec that
+builds a Session «in one hour» or an Evaluation «today at 23:00» means the
+same thing whenever you run it; timers, `waitFor`, and the other
+asynchronous APIs stay real. Specs that need a particular instant still set
+it explicitly in their fixtures.
+
 The same three packages are linted and format-checked (MOB-050):
 
 ```sh

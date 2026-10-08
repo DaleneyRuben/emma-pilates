@@ -48,7 +48,27 @@
     },
     "testMatch": [
       "<rootDir>/src/**/*.spec.ts?(x)"
-    ]
+    ],
+    "fakeTimers": {
+      "enableGlobally": true,
+      "now": 1791468000000,
+      "doNotFake": [
+        "cancelAnimationFrame",
+        "cancelIdleCallback",
+        "clearImmediate",
+        "clearInterval",
+        "clearTimeout",
+        "hrtime",
+        "nextTick",
+        "performance",
+        "queueMicrotask",
+        "requestAnimationFrame",
+        "requestIdleCallback",
+        "setImmediate",
+        "setInterval",
+        "setTimeout"
+      ]
+    }
   },
   "private": true
 }

@@ -64,7 +64,9 @@ describe("Client reschedule option card", () => {
   });
 
   async function openReschedule() {
-    const { from, until } = civilDateRange(boliviaCivilDate(new Date()));
+    // The Booking's own civil day, not today's: within an hour of midnight in
+    // Bolivia the Booking already falls on tomorrow.
+    const { from, until } = civilDateRange(boliviaCivilDate(new Date(insideWindow.startsAt)));
     const screen = await render(
       <App
         runtime={createClientRuntime(
