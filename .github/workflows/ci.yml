@@ -183,6 +183,15 @@ jobs:
       - run: pnpm test:admin-e2e
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilates_test_ci
+      # the traces and screenshots of the failed journeys and both servers'
+      # stderr (Test 31)
+      - if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: web-e2e-test-results
+          path: apps/admin-web/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
   mobile:
     needs: quality-mobile
