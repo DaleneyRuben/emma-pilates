@@ -85,6 +85,9 @@ export function ProfileScreen() {
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const unread = useGetUnreadNotificationCount(queryOptions);
   const credit = useGetCurrentClientCredit(queryOptions);
+  const photoUri = useClientPhoto(
+    profile.data?.status === 200 ? (profile.data.data.photo?.imageAssetId ?? null) : null,
+  );
 
   const header = <Heading accessibilityLabel="Perfil">Perfil</Heading>;
 
@@ -107,10 +110,6 @@ export function ProfileScreen() {
   }
 
   const client = profile.data.data;
-  // The hook runs after the loading and failure returns above, so its count
-  // changes between renders; MOB-051 moves it before them.
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const photoUri = useClientPhoto(client.photo?.imageAssetId ?? null);
   const status = subscription.data?.status === 200 ? subscription.data.data.status : null;
   const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : undefined;
   const availableCredit =
