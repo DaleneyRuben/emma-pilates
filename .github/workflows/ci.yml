@@ -165,3 +165,18 @@ jobs:
       - run: pnpm --filter @pilates/client-mobile exec jest --ci --forceExit
       - run: pnpm --filter @pilates/staff-mobile exec jest --ci --forceExit
       - run: pnpm --filter @pilates/mobile-core exec jest --ci --forceExit
+
+  # Temporary MOB-057 diagnostic, removed before the item is marked done:
+  # reproduces the Linux-only linger of the mobile suites on the runner and
+  # names the handle that holds the process.
+  mobile-handle-diagnostic:
+    needs: changes
+    if: needs.changes.outputs.mobile == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: nproc; node -e "const os = require('node:os'); console.log('cpus', os.cpus().length, 'availableParallelism', os.availableParallelism())"
+      - run: date -u +%T; timeout 420 pnpm --filter @pilates/client-mobile exec jest --ci --detectOpenHandles src/render-errors.spec.tsx; echo "exit $?"; date -u +%T
+      - run: date -u +%T; timeout 120 pnpm --filter @pilates/client-mobile exec jest src/render-errors.spec.tsx src/app-shell.spec.tsx --ci --forceExit --setupFilesAfterEnv=./jest.setup.ts --setupFilesAfterEnv=../../.github/scripts/jest-handle-diagnostic.js; echo "exit $?"; date -u +%T
