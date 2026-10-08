@@ -24,10 +24,7 @@ function plural(amount: number, singular: string, pluralForm: string): string {
 
 export function formatNotificationTime(createdAt: string, now: Date): string {
   const created = new Date(createdAt);
-  const elapsedMinutes = Math.max(
-    0,
-    Math.floor((now.getTime() - created.getTime()) / 60_000),
-  );
+  const elapsedMinutes = Math.max(0, Math.floor((now.getTime() - created.getTime()) / 60_000));
 
   if (elapsedMinutes < 60) return plural(elapsedMinutes, "minuto", "minutos");
 
@@ -39,9 +36,5 @@ export function formatNotificationTime(createdAt: string, now: Date): string {
     return plural(Math.floor(elapsedMinutes / 60), "hora", "horas");
   }
 
-  return plural(
-    Math.max(2, Math.floor(elapsedMinutes / (24 * 60))),
-    "día",
-    "días",
-  );
+  return plural(Math.max(2, Math.floor(elapsedMinutes / (24 * 60))), "día", "días");
 }

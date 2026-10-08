@@ -55,11 +55,7 @@ export function ShortcutRow({
       style={[styles.row, disabled && styles.rowDisabled]}
     >
       <View style={[styles.iconTile, disabled && styles.iconTileDisabled]} testID="shortcut-tile">
-        <Glyph
-          color={disabled ? colors.disabledText : colors.primary}
-          name="calendar"
-          size={22}
-        />
+        <Glyph color={disabled ? colors.disabledText : colors.primary} name="calendar" size={22} />
       </View>
       <View style={styles.rowBody}>
         <Text style={[styles.rowTitle, disabled && styles.rowTitleDisabled]}>{label}</Text>

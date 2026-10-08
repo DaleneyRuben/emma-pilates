@@ -1,8 +1,4 @@
-import {
-  Lora_400Regular,
-  Lora_500Medium,
-  Lora_600SemiBold,
-} from "@expo-google-fonts/lora";
+import { Lora_400Regular, Lora_500Medium, Lora_600SemiBold } from "@expo-google-fonts/lora";
 import {
   WorkSans_300Light,
   WorkSans_400Regular,

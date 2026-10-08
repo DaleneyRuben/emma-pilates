@@ -6,7 +6,8 @@ export function ClientBanner({
   action,
   clientName,
 }: {
-  action: "Reservando para" | "Registrando pago para" | "Viendo reservas de" | "Viendo historial de";
+  action:
+    "Reservando para" | "Registrando pago para" | "Viendo reservas de" | "Viendo historial de";
   clientName: string;
 }) {
   return (

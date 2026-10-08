@@ -31,28 +31,16 @@ describe("ClientNavigation", () => {
     const screen = await render(<ClientNavigation {...defaultProps} />);
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Regístrate" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Regístrate" })).toBeOnTheScreen();
   });
 
   it("submits email and password through the Client Login boundary", async () => {
     const onLogin = jest.fn().mockResolvedValue(undefined);
-    const screen = await render(
-      <ClientNavigation {...defaultProps} onLogin={onLogin} />,
-    );
+    const screen = await render(<ClientNavigation {...defaultProps} onLogin={onLogin} />);
 
-    await fireEvent.changeText(
-      screen.getByLabelText("Correo electrónico"),
-      "ana@example.com",
-    );
-    await fireEvent.changeText(
-      screen.getByLabelText("Contraseña"),
-      "local password",
-    );
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Iniciar sesión" }),
-    );
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "local password");
+    await fireEvent.press(screen.getByRole("button", { name: "Iniciar sesión" }));
 
     expect(onLogin).toHaveBeenCalledWith({
       email: "ana@example.com",
@@ -61,18 +49,14 @@ describe("ClientNavigation", () => {
   });
 
   it("renders the authenticated Client tabs", async () => {
-    const screen = await render(
-      <ClientNavigation {...defaultProps} role="client" />,
-    );
+    const screen = await render(<ClientNavigation {...defaultProps} role="client" />);
 
     expect(screen.getByLabelText("Inicio")).toBeOnTheScreen();
     expect(screen.queryByLabelText("Iniciar sesión")).not.toBeOnTheScreen();
   });
 
   it("draws 02's line icons, tinting the focused tab Palo de rosa", async () => {
-    const screen = await render(
-      <ClientNavigation {...defaultProps} role="client" />,
-    );
+    const screen = await render(<ClientNavigation {...defaultProps} role="client" />);
     // React Navigation cross-fades an active and an idle copy of each icon.
     const icon = (name: string) =>
       screen
@@ -84,17 +68,13 @@ describe("ClientNavigation", () => {
       expect(icon(name)).toHaveProp("stroke", colors.textSubtle);
     }
     const tabLabel = (name: string) =>
-      within(screen.getByRole("button", { name: new RegExp(`^${name}, tab`) })).getByText(
-        name,
-      );
+      within(screen.getByRole("button", { name: new RegExp(`^${name}, tab`) })).getByText(name);
     expect(tabLabel("Inicio")).toHaveStyle({ color: colors.primary });
     expect(tabLabel("Reservar")).toHaveStyle({ color: colors.textSubtle });
   });
 
   it("does not render Staff navigation for a Staff identity", async () => {
-    const screen = await render(
-      <ClientNavigation {...defaultProps} role="trainer" />,
-    );
+    const screen = await render(<ClientNavigation {...defaultProps} role="trainer" />);
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
     expect(screen.queryByLabelText("Mi agenda")).not.toBeOnTheScreen();

@@ -13,13 +13,9 @@ import { StyleSheet, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import {
-  accountEmailLimitCode,
-  resendLimitNotice,
-} from "./assistant-format";
+import { accountEmailLimitCode, resendLimitNotice } from "./assistant-format";
 
-const problemOf = (error: unknown) =>
-  error instanceof AssistantApiError ? error : null;
+const problemOf = (error: unknown) => (error instanceof AssistantApiError ? error : null);
 
 /**
  * S05 «Verificación pendiente», also on S06: she registered herself, so only a
@@ -75,18 +71,16 @@ export function SelfRegisteredNotice({
   return (
     <View style={styles.notice}>
       <BodyText accessibilityRole="alert">
-        Este correo ya se registró desde la app y espera verificación. No
-        cambiamos sus datos ni su contraseña.
+        Este correo ya se registró desde la app y espera verificación. No cambiamos sus datos ni su
+        contraseña.
       </BodyText>
       <BodyText style={styles.email}>{email}</BodyText>
       <BodyText style={styles.note}>
-        Puedes enviarle un enlace de verificación nuevo, válido por 24 horas.
-        Los anteriores dejan de funcionar.
+        Puedes enviarle un enlace de verificación nuevo, válido por 24 horas. Los anteriores dejan
+        de funcionar.
       </BodyText>
       {sent ? (
-        <BodyText style={styles.success}>
-          Enviamos un enlace de verificación nuevo.
-        </BodyText>
+        <BodyText style={styles.success}>Enviamos un enlace de verificación nuevo.</BodyText>
       ) : null}
       {failure !== null ? <BodyText style={styles.failure}>{failure}</BodyText> : null}
       {(limited || accountLimited) && waitSeconds > 0 ? (

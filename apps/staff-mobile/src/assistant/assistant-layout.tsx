@@ -17,23 +17,14 @@ export function CenteredCard({
 }) {
   const tablet = useIsTablet();
   return (
-    <View
-      style={[styles.column, tablet && { maxWidth }, style]}
-      testID="assistant-centered-card"
-    >
+    <View style={[styles.column, tablet && { maxWidth }, style]} testID="assistant-centered-card">
       {children}
     </View>
   );
 }
 
 // A single column on phones and a two-column grid of cards on tablets.
-export function TabletGrid({
-  children,
-  testID,
-}: {
-  children: ReactNode;
-  testID: string;
-}) {
+export function TabletGrid({ children, testID }: { children: ReactNode; testID: string }) {
   const tablet = useIsTablet();
   return (
     <View style={[styles.list, tablet && styles.grid]} testID={testID}>

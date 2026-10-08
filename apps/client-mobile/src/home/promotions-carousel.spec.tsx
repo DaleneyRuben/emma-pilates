@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -137,8 +132,7 @@ describe("Client Home Promotions carousel", () => {
     const screen = await openHome(
       routeFetcher(
         routes({
-          "/api/v1/promotions": () =>
-            jsonResponse({ code: "unexpected_error", status: 500 }, 500),
+          "/api/v1/promotions": () => jsonResponse({ code: "unexpected_error", status: 500 }, 500),
         }),
       ),
     );

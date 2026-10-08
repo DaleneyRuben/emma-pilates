@@ -14,10 +14,7 @@ describe("createCredentialStore", () => {
 
     await store.save("staff-credential");
 
-    expect(setItemAsync).toHaveBeenCalledWith(
-      "staff.authentication-session",
-      "staff-credential",
-    );
+    expect(setItemAsync).toHaveBeenCalledWith("staff.authentication-session", "staff-credential");
   });
 
   it("stores, retrieves, and clears an authentication credential", async () => {
@@ -41,14 +38,10 @@ describe("createCredentialStore", () => {
 
   it("stores and retrieves a credential behind biometric authentication", async () => {
     const values = new Map<string, string>();
-    const setItemAsync = jest.fn(
-      async (key: string, value: string) => {
-        values.set(key, value);
-      },
-    );
-    const getItemAsync = jest.fn(
-      async (key: string) => values.get(key) ?? null,
-    );
+    const setItemAsync = jest.fn(async (key: string, value: string) => {
+      values.set(key, value);
+    });
+    const getItemAsync = jest.fn(async (key: string) => values.get(key) ?? null);
     const store = createCredentialStore({
       canUseBiometricAuthentication: () => true,
       deleteItemAsync: async (key) => {
@@ -62,9 +55,7 @@ describe("createCredentialStore", () => {
 
     expect(await store.hasBiometricCredential()).toBe(true);
     expect(await store.load()).toBeNull();
-    await expect(store.loadWithBiometrics()).resolves.toBe(
-      "protected-credential",
-    );
+    await expect(store.loadWithBiometrics()).resolves.toBe("protected-credential");
     expect(setItemAsync).toHaveBeenCalledWith(
       "authentication-session-biometric",
       "protected-credential",
@@ -73,13 +64,10 @@ describe("createCredentialStore", () => {
         requireAuthentication: true,
       },
     );
-    expect(getItemAsync).toHaveBeenCalledWith(
-      "authentication-session-biometric",
-      {
-        authenticationPrompt: "Confirma tu identidad para iniciar sesión.",
-        requireAuthentication: true,
-      },
-    );
+    expect(getItemAsync).toHaveBeenCalledWith("authentication-session-biometric", {
+      authenticationPrompt: "Confirma tu identidad para iniciar sesión.",
+      requireAuthentication: true,
+    });
   });
 
   it("rejects biometric protection when the device cannot provide it", async () => {
@@ -92,9 +80,9 @@ describe("createCredentialStore", () => {
     });
 
     expect(store.canUseBiometrics()).toBe(false);
-    await expect(
-      store.saveWithBiometrics("credential"),
-    ).rejects.toThrow("Biometric authentication is unavailable");
+    await expect(store.saveWithBiometrics("credential")).rejects.toThrow(
+      "Biometric authentication is unavailable",
+    );
     expect(setItemAsync).not.toHaveBeenCalled();
   });
 
@@ -142,9 +130,7 @@ describe("createCredentialStore", () => {
   });
 
   it("removes the biometric marker when the phone invalidates its key", async () => {
-    const values = new Map<string, string>([
-      ["authentication-session-biometric-enabled", "true"],
-    ]);
+    const values = new Map<string, string>([["authentication-session-biometric-enabled", "true"]]);
     const store = createCredentialStore({
       deleteItemAsync: async (key) => {
         values.delete(key);

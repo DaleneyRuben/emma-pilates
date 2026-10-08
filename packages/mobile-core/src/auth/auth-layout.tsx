@@ -1,12 +1,5 @@
 import type { PropsWithChildren, ReactNode } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
@@ -38,9 +31,7 @@ export function BrandHeader({
       <Text style={styles.wordmark}>Emma</Text>
       <View style={styles.brandRule} />
       {tagline ? (
-        <BodyText style={styles.tagline}>
-          Movimiento · Equilibrio · Bienestar
-        </BodyText>
+        <BodyText style={styles.tagline}>Movimiento · Equilibrio · Bienestar</BodyText>
       ) : null}
       {teamAccess ? <TeamAccessBadge /> : null}
     </View>
@@ -74,24 +65,15 @@ export function AuthenticationScreen({
 }>) {
   return (
     <Screen style={[styles.screen, topBar !== undefined && styles.screenWithBar]}>
-      {topBar === undefined ? null : (
-        <ScreenTopBar onBack={topBar.onBack} title={topBar.title} />
-      )}
+      {topBar === undefined ? null : <ScreenTopBar onBack={topBar.onBack} title={topBar.title} />}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={[styles.flex, topBar !== undefined && styles.inset]}
       >
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-        >
-          {brand ? (
-            <BrandHeader tagline={tagline} teamAccess={teamAccess} />
-          ) : null}
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+          {brand ? <BrandHeader tagline={tagline} teamAccess={teamAccess} /> : null}
           <View style={styles.panel}>
-            {eyebrow === undefined ? null : (
-              <Text style={styles.eyebrow}>{eyebrow}</Text>
-            )}
+            {eyebrow === undefined ? null : <Text style={styles.eyebrow}>{eyebrow}</Text>}
             {badge === undefined ? null : <OutcomeBadge {...badge} />}
             {title === undefined ? null : (
               <Heading style={badge === undefined ? undefined : authStyles.centered}>

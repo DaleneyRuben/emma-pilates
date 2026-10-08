@@ -8,11 +8,7 @@ import {
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 
-import {
-  InClientPanel,
-  useAssistantWorkspace,
-  type ClientPanel,
-} from "./assistant-workspace";
+import { InClientPanel, useAssistantWorkspace, type ClientPanel } from "./assistant-workspace";
 import { ClientBookingsScreen } from "./client-bookings-screen";
 import { ClientHistoryScreen } from "./client-history-screen";
 import { ClientOverviewScreen } from "./client-overview-screen";

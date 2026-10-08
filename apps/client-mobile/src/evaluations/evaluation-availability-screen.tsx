@@ -52,9 +52,7 @@ const openDays = (availability: EvaluationAvailabilityDto): OpenDay[] =>
 
 // The month a Client can book next once the open picker is empty: the first
 // unused month in the horizon, else the month after the last used one.
-const nextUnusedMonth = (
-  months: EvaluationAvailabilityDto["months"],
-): string | null => {
+const nextUnusedMonth = (months: EvaluationAvailabilityDto["months"]): string | null => {
   const lastUsed = [...months].reverse().find((month) => month.status === "used");
   if (lastUsed === undefined) return null;
   const available = months.find(
@@ -66,8 +64,7 @@ const nextUnusedMonth = (
 function Intro() {
   return (
     <BodyText>
-      Reserva tu evaluación gratuita con la nutricionista. Tienes una
-      evaluación disponible por mes.
+      Reserva tu evaluación gratuita con la nutricionista. Tienes una evaluación disponible por mes.
     </BodyText>
   );
 }
@@ -122,10 +119,7 @@ export function EvaluationAvailabilityScreen() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
 
   const availability = slots.data?.status === 200 ? slots.data.data : null;
-  const days = useMemo(
-    () => (availability === null ? [] : openDays(availability)),
-    [availability],
-  );
+  const days = useMemo(() => (availability === null ? [] : openDays(availability)), [availability]);
 
   const header = (
     <>
@@ -154,8 +148,7 @@ export function EvaluationAvailabilityScreen() {
     );
   }
 
-  const status =
-    subscription.data?.status === 200 ? subscription.data.data.status : "none";
+  const status = subscription.data?.status === 200 ? subscription.data.data.status : "none";
   if (status !== "active" && status !== "expiring_soon") {
     return (
       <Screen style={styles.screen}>
@@ -246,9 +239,7 @@ export function EvaluationAvailabilityScreen() {
                 {evaluationDate(selected.slots[0]?.startsAt ?? "")}
               </Text>
               <BodyText style={styles.muted}>
-                {selected.slots.length === 1
-                  ? "1 horario"
-                  : `${selected.slots.length} horarios`}
+                {selected.slots.length === 1 ? "1 horario" : `${selected.slots.length} horarios`}
               </BodyText>
             </View>
             <View style={styles.grid}>
@@ -273,8 +264,8 @@ export function EvaluationAvailabilityScreen() {
           </>
         ) : null}
         <BodyText style={styles.muted}>
-          Los horarios ocupados no se muestran. Al elegir uno confirmarás la cita
-          en la siguiente pantalla.
+          Los horarios ocupados no se muestran. Al elegir uno confirmarás la cita en la siguiente
+          pantalla.
         </BodyText>
         <BodyText style={styles.muted}>Puedes reservar hasta 3 horas antes.</BodyText>
       </ScrollView>

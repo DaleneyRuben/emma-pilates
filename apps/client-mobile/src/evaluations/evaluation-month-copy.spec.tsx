@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
+import { cleanup, fireEvent, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import { jsonResponse, routeFetcher } from "../test-support";
@@ -48,10 +48,7 @@ describe("Evaluation month copy (13, 14, 15)", () => {
   });
 
   it("says where to cancel on 14", async () => {
-    const screen = await openProfileRow(
-      routeFetcher(baseRoutes()),
-      "Evaluación nutricional",
-    );
+    const screen = await openProfileRow(routeFetcher(baseRoutes()), "Evaluación nutricional");
     await fireEvent.press(await screen.findByRole("button", { name: "Turno 09:00" }));
 
     expect(

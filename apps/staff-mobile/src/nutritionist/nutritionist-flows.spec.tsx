@@ -5,7 +5,6 @@ import { jsonResponse, routeFetcher } from "../test-support";
 import {
   block,
   centro,
-  day,
   entry,
   inDays,
   openApp,
@@ -136,9 +135,7 @@ describe("Nutritionist agenda and availability", () => {
     const screen = await openAvailability(routeFetcher(routes()));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Aún no publicaste horarios de disponibilidad."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("Aún no publicaste horarios de disponibilidad.")).toBeOnTheScreen();
     });
   });
 
@@ -148,9 +145,7 @@ describe("Nutritionist agenda and availability", () => {
       routes({
         "/api/v1/nutritionist/availability-blocks": () =>
           jsonResponse(
-            created
-              ? [block({ weekday: 2, startsAtLocal: "10:00", endsAtLocal: "12:15" })]
-              : [],
+            created ? [block({ weekday: 2, startsAtLocal: "10:00", endsAtLocal: "12:15" })] : [],
           ),
         "POST /api/v1/nutritionist/availability-blocks": () => {
           created = true;
@@ -266,9 +261,7 @@ describe("Nutritionist agenda and availability", () => {
 
     const sheet = within(screen.getByTestId("block-change-sheet"));
     expect(sheet.getByText("¿Aplicar el cambio?")).toBeOnTheScreen();
-    expect(
-      sheet.getByText("Las 2 evaluaciones ya reservadas se mantienen."),
-    ).toBeOnTheScreen();
+    expect(sheet.getByText("Las 2 evaluaciones ya reservadas se mantienen.")).toBeOnTheScreen();
     await fireEvent.press(sheet.getByRole("button", { name: "Aplicar cambio" }));
 
     await waitFor(() => {

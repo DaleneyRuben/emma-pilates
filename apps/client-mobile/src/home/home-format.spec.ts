@@ -1,9 +1,4 @@
-import {
-  describeAllowance,
-  firstName,
-  formatCivilDate,
-  subscriptionBadge,
-} from "./home-format";
+import { describeAllowance, firstName, formatCivilDate, subscriptionBadge } from "./home-format";
 
 describe("Home formatting", () => {
   it("greets by first name only", () => {

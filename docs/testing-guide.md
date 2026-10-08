@@ -1002,6 +1002,35 @@ credential namespace, links, navigation, and identity eligibility. They also
 prove that Client registration exists only in the Client app, Client Accounts
 cannot enter the Staff app, and Staff Roles cannot enter the Client app.
 
+The same three packages are linted and format-checked (MOB-050):
+
+```sh
+pnpm --filter @pilates/mobile-core lint
+pnpm --filter @pilates/mobile-core format:check
+pnpm --filter @pilates/client-mobile lint
+pnpm --filter @pilates/client-mobile format:check
+pnpm --filter @pilates/staff-mobile lint
+pnpm --filter @pilates/staff-mobile format:check
+```
+
+Each `lint` runs ESLint over the package with the shared flat config in
+`packages/tooling/eslint/mobile.js` (`@pilates/tooling`, the development-only
+package ADR-0013 reserves for tooling configuration): the recommended
+JavaScript and typescript-eslint rules, the React Hooks rules, and
+`no-restricted-imports` patterns that refuse deep imports into
+`@pilates/api-contracts` or `@pilates/mobile-core`, imports of another
+application, and relative paths that leave the package. A clean run exits 0
+and prints only warnings: the two React Compiler rules
+`react-hooks/set-state-in-effect` and `react-hooks/purity` are downgraded to
+warnings because the apps do not compile with the React Compiler and the
+flagged patterns are pre-existing (MOB-052 lists them), and two
+`react-hooks/exhaustive-deps` warnings in mobile-core belong to the same item.
+`format:check` runs Prettier separately, as the admin web does, with
+`printWidth: 100` in each package's `.prettierrc`; `pnpm --filter <package>
+format` rewrites the files. Jest never runs ESLint, so a lint error does not
+fail the tests; the project commit skill lints every staged TypeScript file,
+and CI's quality-mobile job runs both checks before the suites.
+
 ### Biometric testing limitation
 
 The iOS Simulator can prove that the app starts, bundles, and displays the Face
@@ -1120,7 +1149,12 @@ pnpm check:api
 
 What they mean:
 
-- `lint` checks code-style and common programming mistakes;
+- `lint` checks code-style and common programming mistakes in every package
+  with a `lint` script (the backend, the admin web, and since MOB-050 the three
+  mobile packages; the mobile packages print warnings but no errors, see
+  «Mobile automated tests»); the admin web and the mobile packages keep
+  Prettier as a separate `format:check` script, the backend runs it through
+  ESLint;
 - `typecheck` checks TypeScript types without running the apps;
 - `build` proves that the current applications compile; and
 - `check:api` proves that the committed OpenAPI document and generated API
@@ -1143,9 +1177,8 @@ runner after the shared setup in `.github/actions/setup/action.yml` (Node from
   on a `pilates_test_ci` admin database that lives and dies with the runner);
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
   **web** (the admin-web Jest suite);
-- **quality-mobile** (typecheck of mobile-core, client-mobile, and
-  staff-mobile; the three packages have no lint script until MOB-050) →
-  **mobile** (their three Jest suites).
+- **quality-mobile** (lint, `format:check`, and typecheck of mobile-core,
+  client-mobile, and staff-mobile) → **mobile** (their three Jest suites).
 
 A job runs only when the job before it in its chain passed, so a lint or type
 error costs one two-minute job and the tests never start; a stale contract
@@ -1153,6 +1186,7 @@ stops the api chain before the database run. On a pull request a first
 `changes` job also reads the pull request's whole list of changed files and
 starts only the chains of the surfaces it touches: `apps/backend/**` for api,
 `apps/admin-web/**` for web, the three mobile packages for mobile,
+`packages/tooling/**` for mobile (its only consumers today),
 `packages/api-contracts/**` for all three (every contract change touches the
 committed generated client), and the shared files (`package.json`,
 `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.nvmrc`, `.github/**`) for all

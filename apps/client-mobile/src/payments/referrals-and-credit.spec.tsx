@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { Share } from "react-native";
 
@@ -41,8 +36,7 @@ const routes = (credit: number, referrals: unknown[]) => ({
             ]
           : [],
     }),
-  "/api/v1/clients/current/referrals": () =>
-    jsonResponse({ referralCode: "REF-LUCIA", referrals }),
+  "/api/v1/clients/current/referrals": () => jsonResponse({ referralCode: "REF-LUCIA", referrals }),
 });
 
 async function openPerfil(fetcher: ReturnType<typeof routeFetcher>) {
@@ -95,9 +89,7 @@ describe("Referrals and Credit", () => {
     await waitFor(() => {
       expect(screen.getByText("Bs 60")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByRole("button", { name: "Mi crédito: Bs 60" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Mi crédito: Bs 60" })).toBeOnTheScreen();
     await fireEvent.press(screen.getByRole("button", { name: "Mis referidos" }));
 
     await waitFor(() => {
@@ -152,9 +144,7 @@ describe("Referrals and Credit", () => {
     const screen = await openPerfil(routeFetcher(routes(0, [])));
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Mi crédito: Bs 0" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Mi crédito: Bs 0" })).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Mi crédito: Bs 0" }));
     await waitFor(() => {
@@ -168,8 +158,6 @@ describe("Referrals and Credit", () => {
     await waitFor(() => {
       expect(screen.getByText("REF-LUCIA")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText("Aún no has invitado a nadie. ¡Comparte tu código!"),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Aún no has invitado a nadie. ¡Comparte tu código!")).toBeOnTheScreen();
   });
 });

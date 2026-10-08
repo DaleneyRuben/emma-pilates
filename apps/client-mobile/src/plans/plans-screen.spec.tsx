@@ -1,10 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-  within,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -52,9 +46,7 @@ describe("Client Plans", () => {
     const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Comprar un plan" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
 
@@ -66,9 +58,7 @@ describe("Client Plans", () => {
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Trimestral 36 clases" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Trimestral 36 clases" }));
 
     // The loading state shares the «Detalle del plan» heading, so wait for the Plan itself.
     await waitFor(() => {
@@ -78,13 +68,9 @@ describe("Client Plans", () => {
     expect(
       within(screen.getByTestId("screen-top-bar")).getByLabelText("Trimestral 36 clases"),
     ).toBeOnTheScreen();
-    expect(
-      screen.getByText("36 clases en cualquier sucursal del estudio."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("36 clases en cualquier sucursal del estudio.")).toBeOnTheScreen();
     expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Continuar al pago" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Continuar al pago" })).toBeOnTheScreen();
   });
 
   it("shows an empty state when no Plan is visible", async () => {
@@ -97,16 +83,12 @@ describe("Client Plans", () => {
     const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Comprar un plan" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Por ahora no hay planes disponibles."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("Por ahora no hay planes disponibles.")).toBeOnTheScreen();
     });
   });
 });

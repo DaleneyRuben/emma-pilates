@@ -69,10 +69,7 @@ export function hasStarted(startsAt: string, now: Date): boolean {
 
 const cancellationWindowMs = 2.5 * 60 * 60 * 1_000;
 
-export function isInsideCancellationWindow(
-  startsAt: string,
-  now: Date,
-): boolean {
+export function isInsideCancellationWindow(startsAt: string, now: Date): boolean {
   return new Date(startsAt).getTime() - now.getTime() <= cancellationWindowMs;
 }
 

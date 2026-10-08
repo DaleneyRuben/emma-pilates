@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../App";
@@ -63,9 +58,7 @@ async function openNoticeAndTap(
   );
   fireEvent.press(screen.getByRole("button", { name: /Notificaciones/ }));
   await waitFor(() =>
-    expect(
-      screen.getByText("Tu clase de Mat Pilates de hoy 07:00 se canceló."),
-    ).toBeOnTheScreen(),
+    expect(screen.getByText("Tu clase de Mat Pilates de hoy 07:00 se canceló.")).toBeOnTheScreen(),
   );
   fireEvent.press(screen.getByText("Tu clase de Mat Pilates de hoy 07:00 se canceló."));
   await waitFor(() => expect(screen.getByText(agendaMarker)).toBeOnTheScreen());

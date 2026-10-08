@@ -14,15 +14,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
-import {
-  Keyboard,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Keyboard, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
@@ -99,22 +91,15 @@ export function ClientSearchScreen() {
       />
       <NewClientButton onPress={() => navigation.navigate("NewClient")} />
       {!searching ? (
-        <BodyText style={styles.hint}>
-          Escribe al menos dos letras o números para buscar.
-        </BodyText>
+        <BodyText style={styles.hint}>Escribe al menos dos letras o números para buscar.</BodyText>
       ) : results.isPending ? (
         <BodyText accessibilityLabel="Buscando clientes">Buscando…</BodyText>
       ) : results.isError || results.data.status !== 200 ? (
-        <QueryFailure
-          label="No pudimos buscar clientes."
-          onRetry={() => void results.refetch()}
-        />
+        <QueryFailure label="No pudimos buscar clientes." onRetry={() => void results.refetch()} />
       ) : clients.length === 0 ? (
         <View style={styles.empty}>
           <Text style={styles.emptyTitle}>No se encontró ningún cliente.</Text>
-          <BodyText style={styles.hint}>
-            Revisa el nombre o crea la cuenta del cliente.
-          </BodyText>
+          <BodyText style={styles.hint}>Revisa el nombre o crea la cuenta del cliente.</BodyText>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.list} keyboardShouldPersistTaps="handled">

@@ -23,9 +23,7 @@ export function clearPersistedAccountCache(accountId: string): Promise<void> {
 }
 
 export function shouldPersistQuery(queryKey: readonly unknown[]): boolean {
-  return (
-    typeof queryKey[0] === "string" && persistableQueryPaths.has(queryKey[0])
-  );
+  return typeof queryKey[0] === "string" && persistableQueryPaths.has(queryKey[0]);
 }
 
 export function createMobilePersister(accountId: string) {

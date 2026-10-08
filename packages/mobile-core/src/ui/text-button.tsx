@@ -27,13 +27,7 @@ export function TextButton({
       onPress={onPress}
       style={styles.button}
     >
-      <Text
-        style={[
-          styles.label,
-          tone === "onTint" && styles.onTint,
-          disabled && styles.disabled,
-        ]}
-      >
+      <Text style={[styles.label, tone === "onTint" && styles.onTint, disabled && styles.disabled]}>
         {label}
       </Text>
     </Pressable>

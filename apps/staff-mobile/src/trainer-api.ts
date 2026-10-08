@@ -7,10 +7,7 @@ import {
   type TrainerSessionRosterDto,
 } from "@pilates/api-contracts";
 
-type AttendanceOutcome = Exclude<
-  TrainerRosterBookingDtoAttendanceOutcome,
-  undefined
->;
+type AttendanceOutcome = Exclude<TrainerRosterBookingDtoAttendanceOutcome, undefined>;
 
 type AttendanceEntry = {
   bookingId: string;
@@ -20,10 +17,7 @@ type AttendanceEntry = {
 export type TrainerApi = {
   getRoster: (sessionId: string) => Promise<TrainerSessionRosterDto>;
   listSchedule: (on: string) => Promise<TrainerScheduleSessionDto[]>;
-  saveAttendance: (
-    sessionId: string,
-    outcomes: AttendanceEntry[],
-  ) => Promise<void>;
+  saveAttendance: (sessionId: string, outcomes: AttendanceEntry[]) => Promise<void>;
 };
 
 function requireSuccessfulResponse({ status }: { status: number }): void {
@@ -35,11 +29,7 @@ function requireSuccessfulResponse({ status }: { status: number }): void {
 export function createTrainerApi(fetcher: typeof globalThis.fetch): TrainerApi {
   return {
     async getRoster(sessionId) {
-      const response = await getTrainerSessionRoster(
-        sessionId,
-        undefined,
-        fetcher,
-      );
+      const response = await getTrainerSessionRoster(sessionId, undefined, fetcher);
       requireSuccessfulResponse(response);
       return response.data;
     },

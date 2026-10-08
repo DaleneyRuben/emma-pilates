@@ -3,9 +3,7 @@ import { fireEvent, render } from "@testing-library/react-native";
 import { AuthenticationApiError, type AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
 
-function createApiMock(
-  overrides: Partial<AuthenticationApi> = {},
-): AuthenticationApi {
+function createApiMock(overrides: Partial<AuthenticationApi> = {}): AuthenticationApi {
   return {
     activateAccount: jest.fn(),
     cancelRegistration: jest.fn(),
@@ -21,12 +19,8 @@ function createApiMock(
 }
 
 async function requestLink(api: AuthenticationApi, staff = false) {
-  const screen = await render(
-    <AuthenticationFlow allowClientRegistration={!staff} api={api} />,
-  );
-  await fireEvent.press(
-    screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
-  );
+  const screen = await render(<AuthenticationFlow allowClientRegistration={!staff} api={api} />);
+  await fireEvent.press(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }));
   return screen;
 }
 
@@ -38,10 +32,7 @@ describe("Recuperar contraseña (20, S18)", () => {
     expect(
       screen.getByText("Te enviaremos un enlace para restablecer tu contraseña."),
     ).toBeOnTheScreen();
-    await fireEvent.changeText(
-      screen.getByLabelText("Correo electrónico"),
-      "ana.paz@example.com",
-    );
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana.paz@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace" }));
 
     expect(api.requestPasswordRecovery).toHaveBeenCalledWith("ana.paz@example.com");
@@ -52,13 +43,9 @@ describe("Recuperar contraseña (20, S18)", () => {
       ),
     ).toBeOnTheScreen();
     expect(
-      screen.getByText(
-        "El enlace vence en 30 minutos. Si no llega, revisa tu carpeta de spam.",
-      ),
+      screen.getByText("El enlace vence en 30 minutos. Si no llega, revisa tu carpeta de spam."),
     ).toBeOnTheScreen();
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Volver a iniciar sesión" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Volver a iniciar sesión" }));
     expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeOnTheScreen();
   });
 
@@ -74,16 +61,11 @@ describe("Recuperar contraseña (20, S18)", () => {
     const api = createApiMock({
       requestPasswordRecovery: jest
         .fn()
-        .mockRejectedValue(
-          new AuthenticationApiError("limited", 429, "rate_limit_exceeded", 52),
-        ),
+        .mockRejectedValue(new AuthenticationApiError("limited", 429, "rate_limit_exceeded", 52)),
     });
     const screen = await requestLink(api);
 
-    await fireEvent.changeText(
-      screen.getByLabelText("Correo electrónico"),
-      "ana.paz@example.com",
-    );
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana.paz@example.com");
     await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace" }));
 
     expect(
@@ -93,9 +75,7 @@ describe("Recuperar contraseña (20, S18)", () => {
     ).toBeOnTheScreen();
     expect(screen.getByText("Podrás pedirlo en 0:52.")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Enviar enlace" })).toBeDisabled();
-    expect(
-      screen.getByRole("button", { name: "Volver a iniciar sesión" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Volver a iniciar sesión" })).toBeOnTheScreen();
   });
 
   it("names the team access on the Staff Login and recovery", async () => {
@@ -104,9 +84,7 @@ describe("Recuperar contraseña (20, S18)", () => {
     );
 
     expect(screen.getByText("Acceso del equipo")).toBeOnTheScreen();
-    await fireEvent.press(
-      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }));
     expect(screen.getByText("Acceso del equipo")).toBeOnTheScreen();
   });
 });

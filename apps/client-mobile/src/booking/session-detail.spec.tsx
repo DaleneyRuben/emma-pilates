@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -80,8 +75,7 @@ async function openDetail(
   let subscriptionRemaining = remaining;
   const fetcher = routeFetcher({
     "/api/v1/clients/current": () => jsonResponse(profile),
-    "/api/v1/clients/current/subscription": () =>
-      jsonResponse(subscription(subscriptionRemaining)),
+    "/api/v1/clients/current/subscription": () => jsonResponse(subscription(subscriptionRemaining)),
     "/api/v1/branches": () => jsonResponse([branch]),
     "/api/v1/class-types": () => jsonResponse([classType]),
     [listUrl]: () => jsonResponse([listed(availableSeats)]),
@@ -92,9 +86,7 @@ async function openDetail(
 
   await waitFor(
     () => {
-      expect(
-        screen.getByRole("button", { name: /Reservar, tab/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
@@ -140,18 +132,14 @@ describe("Client Session detail", () => {
     expect(screen.getByText("50 minutos")).toBeOnTheScreen();
     expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();
     expect(screen.getByText(classType.description)).toBeOnTheScreen();
-    expect(
-      screen.getByText("Se descontará 1 clase de tu paquete."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Se descontará 1 clase de tu paquete.")).toBeOnTheScreen();
 
     fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
 
     await waitFor(() => {
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
     });
-    expect(booked).toHaveBeenCalledWith(
-      expect.stringMatching(/^[0-9a-f-]{36}$/),
-    );
+    expect(booked).toHaveBeenCalledWith(expect.stringMatching(/^[0-9a-f-]{36}$/));
     expect(screen.getByText("Te quedan 4 clases en tu plan")).toBeOnTheScreen();
   });
 
@@ -168,14 +156,10 @@ describe("Client Session detail", () => {
       0,
     );
 
-    expect(
-      screen.getByText("Clase llena. Te avisaremos si se libera un cupo."),
-    ).toBeOnTheScreen();
+    expect(screen.getByText("Clase llena. Te avisaremos si se libera un cupo.")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar" })).not.toBeOnTheScreen();
 
-    fireEvent.press(
-      screen.getByRole("button", { name: "Unirme a la lista de espera" }),
-    );
+    fireEvent.press(screen.getByRole("button", { name: "Unirme a la lista de espera" }));
 
     await waitFor(() => {
       expect(screen.getByText("Ya estás en la lista de espera.")).toBeOnTheScreen();
@@ -186,10 +170,9 @@ describe("Client Session detail", () => {
   it("disables booking without remaining classes and links to the Plans", async () => {
     const { screen } = await openDetail({}, 0, 3);
 
-    expect(screen.getByRole("button", { name: "Reservar" })).toHaveProp(
-      "accessibilityState",
-      { disabled: true },
-    );
+    expect(screen.getByRole("button", { name: "Reservar" })).toHaveProp("accessibilityState", {
+      disabled: true,
+    });
     expect(screen.getByText("No te quedan clases en tu plan.")).toBeOnTheScreen();
 
     fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
@@ -202,18 +185,13 @@ describe("Client Session detail", () => {
   it("explains a rejected Booking with the problem code", async () => {
     const { screen } = await openDetail({
       "POST /api/v1/sessions/session-1/bookings": () =>
-        jsonResponse(
-          { code: "booking_overlap", status: 409, title: "Conflict" },
-          409,
-        ),
+        jsonResponse({ code: "booking_overlap", status: 409, title: "Conflict" }, 409),
     });
 
     fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Ya tienes una reserva a esa hora."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("Ya tienes una reserva a esa hora.")).toBeOnTheScreen();
     });
   });
 });

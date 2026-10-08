@@ -23,12 +23,11 @@ export type PickedImage = {
   bytes: Uint8Array<ArrayBuffer>;
 };
 
-const acceptedMediaTypes: ReadonlySet<string> =
-  new Set<CreatePendingUploadDtoMediaType>([
-    "image/jpeg",
-    "image/png",
-    "image/webp",
-  ]);
+const acceptedMediaTypes: ReadonlySet<string> = new Set<CreatePendingUploadDtoMediaType>([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+]);
 const verificationPollMilliseconds = 700;
 const verificationPollAttempts = 40;
 
@@ -91,10 +90,7 @@ export async function uploadImage(
   sleep: (milliseconds: number) => Promise<void> = wait,
 ): Promise<string> {
   // expo-crypto's native digest only accepts typed arrays, never a bare buffer.
-  const digest = await Crypto.digest(
-    Crypto.CryptoDigestAlgorithm.SHA256,
-    image.bytes,
-  );
+  const digest = await Crypto.digest(Crypto.CryptoDigestAlgorithm.SHA256, image.bytes);
   const declared = await createPendingUpload(
     {
       purpose,

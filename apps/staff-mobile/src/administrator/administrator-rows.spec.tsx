@@ -56,7 +56,12 @@ async function openPayments(sessions = [session]) {
             jsonResponse([{ id: "branch-centro", name: "Centro", address: "Calle Ayacucho 245" }]),
           "/api/v1/class-types": () =>
             jsonResponse([
-              { id: "class-reformer", name: "Reformer Pilates", description: "", durationMinutes: 50 },
+              {
+                id: "class-reformer",
+                name: "Reformer Pilates",
+                description: "",
+                durationMinutes: 50,
+              },
             ]),
           [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
             () => jsonResponse(sessions),

@@ -46,11 +46,7 @@ describe("describeAccountClosure", () => {
     expect(
       describeAccountClosure({
         ...nothing,
-        bookings: [
-          { kind: "booking" },
-          { kind: "waitlist" },
-          { kind: "waitlist" },
-        ],
+        bookings: [{ kind: "booking" }, { kind: "waitlist" }, { kind: "waitlist" }],
         evaluations: [{ state: "booked" }, { state: "booked" }],
         subscription: {
           status: "expiring_soon",

@@ -1,11 +1,6 @@
 import type { CurrentAuthenticationPrincipalDto } from "@pilates/api-contracts";
 
-export type AppRole =
-  | "client"
-  | "trainer"
-  | "assistant"
-  | "administrator"
-  | "nutritionist";
+export type AppRole = "client" | "trainer" | "assistant" | "administrator" | "nutritionist";
 
 export type MobileSession = {
   accountId: string;
@@ -26,9 +21,7 @@ type SessionManagerOptions = {
   acceptedIdentityKind?: "client" | "staff";
   clearAccountCache: (accountId: string) => Promise<void>;
   credentialStore: CredentialStore;
-  resolveCurrent: (
-    credential: string,
-  ) => Promise<CurrentAuthenticationPrincipalDto | null>;
+  resolveCurrent: (credential: string) => Promise<CurrentAuthenticationPrincipalDto | null>;
   revokeCurrent: (credential: string) => Promise<void>;
 };
 
@@ -45,21 +38,14 @@ export type SessionManager = {
   unlockWithBiometrics: () => Promise<MobileSession | null>;
 };
 
-function toMobileSession(
-  principal: CurrentAuthenticationPrincipalDto,
-): MobileSession {
+function toMobileSession(principal: CurrentAuthenticationPrincipalDto): MobileSession {
   return {
     accountId: principal.accountId,
-    role:
-      principal.identity.kind === "client"
-        ? "client"
-        : principal.identity.role,
+    role: principal.identity.kind === "client" ? "client" : principal.identity.role,
   };
 }
 
-export function createSessionManager(
-  options: SessionManagerOptions,
-): SessionManager {
+export function createSessionManager(options: SessionManagerOptions): SessionManager {
   const {
     acceptedIdentityKind,
     clearAccountCache,
@@ -69,9 +55,7 @@ export function createSessionManager(
   } = options;
   let activeCredential: string | null = null;
 
-  async function resolveCredential(
-    credential: string,
-  ): Promise<MobileSession | null> {
+  async function resolveCredential(credential: string): Promise<MobileSession | null> {
     const principal = await resolveCurrent(credential);
 
     if (principal === null) {
@@ -80,10 +64,7 @@ export function createSessionManager(
       return null;
     }
 
-    if (
-      acceptedIdentityKind !== undefined &&
-      principal.identity.kind !== acceptedIdentityKind
-    ) {
+    if (acceptedIdentityKind !== undefined && principal.identity.kind !== acceptedIdentityKind) {
       activeCredential = null;
       await revokeCurrent(credential);
       await credentialStore.clear();
@@ -107,10 +88,7 @@ export function createSessionManager(
 
       return resolveCredential(credential);
     },
-    async start(
-      credential: string,
-      options = {},
-    ): Promise<MobileSession | null> {
+    async start(credential: string, options = {}): Promise<MobileSession | null> {
       if (options.protectWithBiometrics) {
         if (credentialStore.saveWithBiometrics === undefined) {
           throw new Error("Biometric credential storage is unavailable");
@@ -124,8 +102,7 @@ export function createSessionManager(
       return resolveCredential(credential);
     },
     async unlockWithBiometrics(): Promise<MobileSession | null> {
-      const credential =
-        (await credentialStore.loadWithBiometrics?.()) ?? null;
+      const credential = (await credentialStore.loadWithBiometrics?.()) ?? null;
 
       if (credential === null) {
         return null;
@@ -134,8 +111,7 @@ export function createSessionManager(
       return resolveCredential(credential);
     },
     async logout(session: MobileSession): Promise<void> {
-      const credential =
-        activeCredential ?? (await credentialStore.load());
+      const credential = activeCredential ?? (await credentialStore.load());
 
       if (credential !== null) {
         await revokeCurrent(credential);

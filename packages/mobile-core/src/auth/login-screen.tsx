@@ -1,13 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -31,8 +24,7 @@ const loginSchema = z.object({
 export type LoginValues = z.infer<typeof loginSchema>;
 
 export type LoginSubmissionResult =
-  | { status: "rejected" }
-  | { retryAfterSeconds: number; status: "throttled" };
+  { status: "rejected" } | { retryAfterSeconds: number; status: "throttled" };
 
 type LoginScreenProps = {
   /** A one-time message, such as the one left by closing the Account. */
@@ -84,10 +76,7 @@ export function LoginScreen({
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.flex}
       >
-        <ScrollView
-          contentContainerStyle={styles.content}
-          keyboardShouldPersistTaps="handled"
-        >
+        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
           {notice === null ? null : (
             <View accessibilityRole="summary" style={styles.notice}>
               <BodyText style={styles.noticeText}>{notice}</BodyText>
@@ -96,16 +85,12 @@ export function LoginScreen({
           <View style={styles.brand}>
             <Text style={styles.wordmark}>Emma</Text>
             <View style={styles.brandRule} />
-            <BodyText style={styles.tagline}>
-              Movimiento · Equilibrio · Bienestar
-            </BodyText>
+            <BodyText style={styles.tagline}>Movimiento · Equilibrio · Bienestar</BodyText>
             {teamAccess ? <TeamAccessBadge /> : null}
           </View>
 
           <View style={styles.form}>
-            {rejected ? (
-              <FormAlert>El correo o la contraseña no son correctos.</FormAlert>
-            ) : null}
+            {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
             {retryAfterSeconds > 0 ? (
               <WaitNotice
                 message="Demasiados intentos. Intenta de nuevo en un momento."
@@ -155,10 +140,7 @@ export function LoginScreen({
               <BiometricLoginButton onPress={onBiometricUnlock} />
             )}
             {onForgotPassword === undefined ? null : (
-              <TextButton
-                label="¿Olvidaste tu contraseña?"
-                onPress={onForgotPassword}
-              />
+              <TextButton label="¿Olvidaste tu contraseña?" onPress={onForgotPassword} />
             )}
           </View>
           {onRegister === undefined ? null : (

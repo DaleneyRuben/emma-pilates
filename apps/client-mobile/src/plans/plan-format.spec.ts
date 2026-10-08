@@ -1,8 +1,4 @@
-import {
-  describePlanTerms,
-  describeValidity,
-  formatBolivianos,
-} from "./plan-format";
+import { describePlanTerms, describeValidity, formatBolivianos } from "./plan-format";
 
 describe("Plan formatting", () => {
   it("formats centavos as Bolivianos with es-BO grouping", () => {

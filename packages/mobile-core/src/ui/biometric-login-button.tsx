@@ -7,13 +7,9 @@ type BiometricLoginButtonProps = {
   onPress: () => void;
 };
 
-export function BiometricLoginButton({
-  onPress,
-}: BiometricLoginButtonProps) {
+export function BiometricLoginButton({ onPress }: BiometricLoginButtonProps) {
   const label =
-    Platform.OS === "ios"
-      ? "Iniciar sesión con Face ID"
-      : "Iniciar sesión con huella digital";
+    Platform.OS === "ios" ? "Iniciar sesión con Face ID" : "Iniciar sesión con huella digital";
 
   return (
     <Pressable

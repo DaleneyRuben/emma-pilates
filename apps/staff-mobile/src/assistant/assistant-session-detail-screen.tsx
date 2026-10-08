@@ -95,10 +95,7 @@ export function AssistantSessionDetailScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar la clase."
-          onRetry={() => void session.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar la clase." onRetry={() => void session.refetch()} />
       </Screen>
     );
   }
@@ -161,10 +158,7 @@ export function AssistantSessionDetailScreen({
       await refresh();
       setWaitlisted(true);
     } catch (error) {
-      if (
-        error instanceof AssistantApiError &&
-        error.code === "active_waitlist_entry_exists"
-      ) {
+      if (error instanceof AssistantApiError && error.code === "active_waitlist_entry_exists") {
         setWaitlisted(true);
         return;
       }
@@ -177,82 +171,80 @@ export function AssistantSessionDetailScreen({
   return (
     <Screen style={styles.screen}>
       <CenteredCard maxWidth={640}>
-      {header}
-      <ScrollView contentContainerStyle={styles.content}>
-        <Heading accessibilityLabel={detail.classType.name}>
-          {detail.classType.name}
-        </Heading>
-        <Text style={styles.trainerName}>{detail.trainerName}</Text>
-        <View style={styles.facts}>
-          <View style={styles.factRow}>
-            <BodyText style={styles.factLabel}>Sucursal</BodyText>
-            <Text style={styles.factValue}>{detail.branch.name}</Text>
+        {header}
+        <ScrollView contentContainerStyle={styles.content}>
+          <Heading accessibilityLabel={detail.classType.name}>{detail.classType.name}</Heading>
+          <Text style={styles.trainerName}>{detail.trainerName}</Text>
+          <View style={styles.facts}>
+            <View style={styles.factRow}>
+              <BodyText style={styles.factLabel}>Sucursal</BodyText>
+              <Text style={styles.factValue}>{detail.branch.name}</Text>
+            </View>
+            <View style={styles.factRow}>
+              <BodyText style={styles.factLabel}>Fecha</BodyText>
+              <Text style={styles.factValue}>{formatSessionDate(detail.startsAt)}</Text>
+            </View>
+            <View style={styles.factRow}>
+              <BodyText style={styles.factLabel}>Horario</BodyText>
+              <Text style={styles.factValue}>
+                {formatTimeRange(detail.startsAt, detail.endsAt)}
+              </Text>
+            </View>
+            <View style={styles.factRow}>
+              <BodyText style={styles.factLabel}>Duración</BodyText>
+              <Text style={styles.factValue}>{`${detail.classType.durationMinutes} minutos`}</Text>
+            </View>
           </View>
-          <View style={styles.factRow}>
-            <BodyText style={styles.factLabel}>Fecha</BodyText>
-            <Text style={styles.factValue}>{formatSessionDate(detail.startsAt)}</Text>
-          </View>
-          <View style={styles.factRow}>
-            <BodyText style={styles.factLabel}>Horario</BodyText>
-            <Text style={styles.factValue}>
-              {formatTimeRange(detail.startsAt, detail.endsAt)}
-            </Text>
-          </View>
-          <View style={styles.factRow}>
-            <BodyText style={styles.factLabel}>Duración</BodyText>
-            <Text style={styles.factValue}>{`${detail.classType.durationMinutes} minutos`}</Text>
-          </View>
-        </View>
-        <CapacitySummary
-          availableSeats={detail.availableSeats}
-          capacity={detail.capacity}
-          full={full}
-        />
-      </ScrollView>
-      <View style={styles.actions}>
-        {message !== null ? (
-          <BodyText accessibilityRole="alert" style={styles.message}>
-            {message}
-          </BodyText>
-        ) : null}
-        {full ? (
-          waitlisted ? (
-            <BodyText style={styles.note}>El cliente ya está en la lista de espera.</BodyText>
+          <CapacitySummary
+            availableSeats={detail.availableSeats}
+            capacity={detail.capacity}
+            full={full}
+          />
+        </ScrollView>
+        <View style={styles.actions}>
+          {message !== null ? (
+            <BodyText accessibilityRole="alert" style={styles.message}>
+              {message}
+            </BodyText>
+          ) : null}
+          {full ? (
+            waitlisted ? (
+              <BodyText style={styles.note}>El cliente ya está en la lista de espera.</BodyText>
+            ) : (
+              <>
+                <Pressable
+                  accessibilityLabel="Unirme a la lista de espera"
+                  accessibilityRole="button"
+                  accessibilityState={{ disabled: submitting }}
+                  disabled={submitting}
+                  onPress={() => void joinWaitlist()}
+                  style={styles.outlinedButton}
+                >
+                  <Text style={styles.outlinedLabel}>Unirme a la lista de espera</Text>
+                </Pressable>
+                <BodyText style={styles.note}>
+                  Clase llena. Se avisará al cliente si se libera un cupo.
+                </BodyText>
+              </>
+            )
+          ) : hasAllowance ? (
+            <>
+              <PrimaryButton disabled={submitting} label="Reservar" onPress={() => void book()} />
+              <BodyText style={styles.note}>Se descontará 1 clase de su plan.</BodyText>
+            </>
           ) : (
             <>
-              <Pressable
-                accessibilityLabel="Unirme a la lista de espera"
-                accessibilityRole="button"
-                accessibilityState={{ disabled: submitting }}
-                disabled={submitting}
-                onPress={() => void joinWaitlist()}
-                style={styles.outlinedButton}
-              >
-                <Text style={styles.outlinedLabel}>Unirme a la lista de espera</Text>
-              </Pressable>
+              <PrimaryButton disabled label="Reservar" />
               <BodyText style={styles.note}>
-                Clase llena. Se avisará al cliente si se libera un cupo.
+                El cliente no tiene clases disponibles en su plan.
               </BodyText>
+              <TextButton
+                label="Registrar pago"
+                onPress={() => navigation.navigate("SelectPlan", { clientId, clientName })}
+              />
             </>
-          )
-        ) : hasAllowance ? (
-          <>
-            <PrimaryButton disabled={submitting} label="Reservar" onPress={() => void book()} />
-            <BodyText style={styles.note}>Se descontará 1 clase de su plan.</BodyText>
-          </>
-        ) : (
-          <>
-            <PrimaryButton disabled label="Reservar" />
-            <BodyText style={styles.note}>
-              El cliente no tiene clases disponibles en su plan.
-            </BodyText>
-            <TextButton
-              label="Registrar pago"
-              onPress={() => navigation.navigate("SelectPlan", { clientId, clientName })}
-            />
-          </>
-        )}
-      </View>
+          )}
+        </View>
       </CenteredCard>
     </Screen>
   );

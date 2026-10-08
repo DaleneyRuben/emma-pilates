@@ -9,18 +9,12 @@ import { AuthenticationScreen } from "./auth-layout";
 import { FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { serverWaitSeconds, type AuthenticationApi } from "./authentication-api";
 import { useCountdown } from "./countdown";
-import {
-  restartPendingWindow,
-  type PendingRegistration,
-} from "./pending-registration-screens";
+import { restartPendingWindow, type PendingRegistration } from "./pending-registration-screens";
 import { limitKeepsAnyLink } from "./request-limit-copy";
 
 export const minimumPasswordLength = 8;
 
-const referralProblems = new Set([
-  "referral_code_invalid",
-  "referral_self_reference",
-]);
+const referralProblems = new Set(["referral_code_invalid", "referral_self_reference"]);
 
 function problemCode(error: unknown): string | null {
   const code = (error as { code?: unknown } | null)?.code;
@@ -48,16 +42,11 @@ export function RegistrationScreen({
   const [submitting, setSubmitting] = useState(false);
   const [waitSeconds, startWait] = useCountdown();
 
-  const nameError =
-    submitted && name.trim() === "" ? "Escribe tu nombre." : undefined;
+  const nameError = submitted && name.trim() === "" ? "Escribe tu nombre." : undefined;
   const emailError =
-    submitted && !email.includes("@")
-      ? "Escribe un correo electrónico válido."
-      : undefined;
+    submitted && !email.includes("@") ? "Escribe un correo electrónico válido." : undefined;
   const passwordError =
-    submitted && password.length < minimumPasswordLength
-      ? "Mínimo 8 caracteres."
-      : undefined;
+    submitted && password.length < minimumPasswordLength ? "Mínimo 8 caracteres." : undefined;
   const confirmationError =
     submitted && passwordError === undefined && password !== confirmation
       ? "Las contraseñas no coinciden."
@@ -106,11 +95,7 @@ export function RegistrationScreen({
   return (
     <AuthenticationScreen
       footer={
-        <FooterPrompt
-          action="Inicia sesión"
-          onPress={onBack}
-          prompt="¿Ya tienes una cuenta?"
-        />
+        <FooterPrompt action="Inicia sesión" onPress={onBack} prompt="¿Ya tienes una cuenta?" />
       }
       tagline
     >

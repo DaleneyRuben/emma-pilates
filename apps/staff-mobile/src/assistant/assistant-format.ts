@@ -26,10 +26,7 @@ export function describeClasses(count: number): string {
   return count === 1 ? "1 clase" : `${count} clases`;
 }
 
-export function describeContact(
-  phone: string | null | undefined,
-  email: string,
-): string {
+export function describeContact(phone: string | null | undefined, email: string): string {
   return phone ? `${phone} · ${email}` : email;
 }
 

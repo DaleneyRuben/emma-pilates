@@ -34,8 +34,7 @@ const monthNameFormatter = new Intl.DateTimeFormat("es-BO", {
   timeZone: "UTC",
 });
 
-const capitalized = (value: string): string =>
-  value.charAt(0).toUpperCase() + value.slice(1);
+const capitalized = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
 // "09:45" in Bolivia time.
 export function clockTime(instant: string): string {

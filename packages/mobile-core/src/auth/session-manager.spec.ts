@@ -33,20 +33,14 @@ describe("createSessionManager", () => {
         revokeCurrent,
       });
 
-      await expect(
-        manager.start("wrong-application-credential"),
-      ).resolves.toBeNull();
-      expect(revokeCurrent).toHaveBeenCalledWith(
-        "wrong-application-credential",
-      );
+      await expect(manager.start("wrong-application-credential")).resolves.toBeNull();
+      expect(revokeCurrent).toHaveBeenCalledWith("wrong-application-credential");
       expect(clear).toHaveBeenCalledTimes(1);
     },
   );
 
   it("detects a biometric session without unlocking it during startup", async () => {
-    const loadWithBiometrics = jest
-      .fn()
-      .mockResolvedValue("protected-credential");
+    const loadWithBiometrics = jest.fn().mockResolvedValue("protected-credential");
     const manager = createSessionManager({
       clearAccountCache: jest.fn(),
       credentialStore: {
@@ -68,9 +62,7 @@ describe("createSessionManager", () => {
   });
 
   it("unlocks a protected credential and resolves its current Account", async () => {
-    const loadWithBiometrics = jest
-      .fn()
-      .mockResolvedValue("protected-credential");
+    const loadWithBiometrics = jest.fn().mockResolvedValue("protected-credential");
     const resolveCurrent = jest.fn().mockResolvedValue({
       accountId: "account-1",
       identity: { kind: "client", clientId: "client-1" },
@@ -219,9 +211,7 @@ describe("createSessionManager", () => {
   });
 
   it("revokes an unlocked biometric session without prompting a second time", async () => {
-    const loadWithBiometrics = jest
-      .fn()
-      .mockResolvedValue("protected-credential");
+    const loadWithBiometrics = jest.fn().mockResolvedValue("protected-credential");
     const revokeCurrent = jest.fn();
     const manager = createSessionManager({
       clearAccountCache: jest.fn(),

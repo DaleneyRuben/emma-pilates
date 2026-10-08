@@ -68,9 +68,7 @@ function MenuRow({
       <ProfileRowIcon name={icon} />
       <Text style={styles.rowLabel}>{label}</Text>
       <View style={styles.rowTrailing}>
-        {value === undefined ? null : (
-          <BodyText style={styles.rowValue}>{value}</BodyText>
-        )}
+        {value === undefined ? null : <BodyText style={styles.rowValue}>{value}</BodyText>}
         <UnreadCountPill count={badge ?? 0} testID="notifications-row-badge" />
         <Chevron tone="quiet" />
       </View>
@@ -103,20 +101,18 @@ export function ProfileScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar tu perfil."
-          onRetry={() => void profile.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar tu perfil." onRetry={() => void profile.refetch()} />
       </Screen>
     );
   }
 
   const client = profile.data.data;
+  // The hook runs after the loading and failure returns above, so its count
+  // changes between renders; MOB-051 moves it before them.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const photoUri = useClientPhoto(client.photo?.imageAssetId ?? null);
-  const status =
-    subscription.data?.status === 200 ? subscription.data.data.status : null;
-  const unreadCount =
-    unread.data?.status === 200 ? unread.data.data.unread : undefined;
+  const status = subscription.data?.status === 200 ? subscription.data.data.status : null;
+  const unreadCount = unread.data?.status === 200 ? unread.data.data.unread : undefined;
   const availableCredit =
     credit.data?.status === 200 ? credit.data.data.availableCentavos : undefined;
 
@@ -131,21 +127,14 @@ export function ProfileScreen() {
             <BodyText>{client.email}</BodyText>
             {client.phone ? <BodyText>{client.phone}</BodyText> : null}
           </View>
-          <TextButton
-            label="Editar"
-            onPress={() => navigation.navigate("EditProfile")}
-          />
+          <TextButton label="Editar" onPress={() => navigation.navigate("EditProfile")} />
         </View>
         <View style={styles.menu}>
           <MenuRow
             icon="plan"
             label="Mi plan"
             onPress={() => navigation.navigate("Subscription")}
-            value={
-              status === null || status === "none"
-                ? undefined
-                : subscriptionBadge(status)
-            }
+            value={status === null || status === "none" ? undefined : subscriptionBadge(status)}
           />
           <MenuRow
             icon="evaluation"
@@ -166,11 +155,7 @@ export function ProfileScreen() {
             icon="credit"
             label="Mi crédito"
             onPress={() => navigation.navigate("Credit")}
-            value={
-              availableCredit === undefined
-                ? undefined
-                : formatBolivianos(availableCredit)
-            }
+            value={availableCredit === undefined ? undefined : formatBolivianos(availableCredit)}
           />
           <MenuRow
             badge={unreadCount}
@@ -205,9 +190,7 @@ export function ProfileScreen() {
         >
           <Text style={styles.closeAccountText}>Cerrar mi cuenta</Text>
         </Pressable>
-        <BodyText style={styles.footer}>
-          Emma Pilates Studio · versión 1.0
-        </BodyText>
+        <BodyText style={styles.footer}>Emma Pilates Studio · versión 1.0</BodyText>
       </ScrollView>
     </Screen>
   );

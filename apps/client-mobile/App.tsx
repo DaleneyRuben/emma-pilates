@@ -21,10 +21,5 @@ export default function App({ runtime }: { runtime?: MobileRuntime }) {
     [runtime],
   );
 
-  return (
-    <MobileApplication
-      Navigation={ClientNavigation}
-      runtime={mobileRuntime}
-    />
-  );
+  return <MobileApplication Navigation={ClientNavigation} runtime={mobileRuntime} />;
 }

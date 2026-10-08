@@ -27,13 +27,7 @@ const shapes = {
 
 export type ClientTabIconName = keyof typeof shapes;
 
-export function ClientTabIcon({
-  color,
-  name,
-}: {
-  color: string;
-  name: ClientTabIconName;
-}) {
+export function ClientTabIcon({ color, name }: { color: string; name: ClientTabIconName }) {
   return (
     <Svg
       accessibilityElementsHidden

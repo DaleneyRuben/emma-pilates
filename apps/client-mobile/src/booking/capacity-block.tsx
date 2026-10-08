@@ -1,11 +1,4 @@
-import {
-  colors,
-  fontFamilies,
-  radii,
-  SeatPill,
-  spacing,
-  typography,
-} from "@pilates/mobile-core";
+import { colors, fontFamilies, radii, SeatPill, spacing, typography } from "@pilates/mobile-core";
 import { StyleSheet, Text, View } from "react-native";
 
 /**

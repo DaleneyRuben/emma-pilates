@@ -42,8 +42,7 @@ export function getApiBaseUrl(environment: RuntimeEnvironment): string {
   }
 
   const isLoopbackHttp =
-    url.protocol === "http:" &&
-    ["127.0.0.1", "[::1]", "localhost"].includes(url.hostname);
+    url.protocol === "http:" && ["127.0.0.1", "[::1]", "localhost"].includes(url.hostname);
 
   if (url.protocol !== "https:" && !isLoopbackHttp) {
     throw new Error("EXPO_PUBLIC_API_URL must use HTTPS");
@@ -52,13 +51,9 @@ export function getApiBaseUrl(environment: RuntimeEnvironment): string {
   return url.toString().replace(/\/$/, "");
 }
 
-export function getMobileApiBaseUrl(
-  environment: RuntimeEnvironment,
-  development: boolean,
-): string {
+export function getMobileApiBaseUrl(environment: RuntimeEnvironment, development: boolean): string {
   return getApiBaseUrl({
     EXPO_PUBLIC_API_URL:
-      environment.EXPO_PUBLIC_API_URL ??
-      (development ? localDevelopmentApiUrl : undefined),
+      environment.EXPO_PUBLIC_API_URL ?? (development ? localDevelopmentApiUrl : undefined),
   });
 }

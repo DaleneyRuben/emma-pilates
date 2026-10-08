@@ -62,11 +62,7 @@ function problemMessage(body: unknown): string | null {
   return typeof code === "string" ? (bookingProblems[code] ?? null) : null;
 }
 
-export function SessionDetailScreen({
-  route,
-}: {
-  route: { params: { sessionId: string } };
-}) {
+export function SessionDetailScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<DetailNavigation>();
   const fetcher = useClientFetcher();
   const queryClient = useQueryClient();
@@ -103,17 +99,13 @@ export function SessionDetailScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar la clase."
-          onRetry={() => void session.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar la clase." onRetry={() => void session.refetch()} />
       </Screen>
     );
   }
 
   const detail = session.data.data;
-  const view =
-    subscription.data?.status === 200 ? subscription.data.data : null;
+  const view = subscription.data?.status === 200 ? subscription.data.data : null;
   const hasAllowance =
     view !== null &&
     (view.status === "active" || view.status === "expiring_soon") &&
@@ -160,8 +152,7 @@ export function SessionDetailScreen({
         return;
       }
       setMessage(
-        problemMessage(response.data) ??
-          "No pudimos completar la reserva. Inténtalo de nuevo.",
+        problemMessage(response.data) ?? "No pudimos completar la reserva. Inténtalo de nuevo.",
       );
     } catch {
       setMessage("No pudimos completar la reserva. Inténtalo de nuevo.");
@@ -199,9 +190,7 @@ export function SessionDetailScreen({
           "No pudimos anotarte en la lista de espera. Inténtalo de nuevo.",
       );
     } catch {
-      setMessage(
-        "No pudimos anotarte en la lista de espera. Inténtalo de nuevo.",
-      );
+      setMessage("No pudimos anotarte en la lista de espera. Inténtalo de nuevo.");
     } finally {
       setSubmitting(false);
     }
@@ -211,9 +200,7 @@ export function SessionDetailScreen({
     <Screen style={styles.screen}>
       {header}
       <ScrollView contentContainerStyle={styles.content}>
-        <Heading accessibilityLabel={detail.classType.name}>
-          {detail.classType.name}
-        </Heading>
+        <Heading accessibilityLabel={detail.classType.name}>{detail.classType.name}</Heading>
         <View style={styles.trainer}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials(detail.trainerName)}</Text>
@@ -231,9 +218,7 @@ export function SessionDetailScreen({
           </View>
           <View style={styles.factRow}>
             <BodyText style={styles.factLabel}>Horario</BodyText>
-            <Text style={styles.factValue}>
-              {formatTimeRange(detail.startsAt, detail.endsAt)}
-            </Text>
+            <Text style={styles.factValue}>{formatTimeRange(detail.startsAt, detail.endsAt)}</Text>
           </View>
           <View style={styles.factRow}>
             <BodyText style={styles.factLabel}>Duración</BodyText>
@@ -279,23 +264,14 @@ export function SessionDetailScreen({
           )
         ) : hasAllowance ? (
           <>
-            <PrimaryButton
-              disabled={submitting}
-              label="Reservar"
-              onPress={() => void book()}
-            />
-            <BodyText style={styles.note}>
-              Se descontará 1 clase de tu paquete.
-            </BodyText>
+            <PrimaryButton disabled={submitting} label="Reservar" onPress={() => void book()} />
+            <BodyText style={styles.note}>Se descontará 1 clase de tu paquete.</BodyText>
           </>
         ) : (
           <>
             <PrimaryButton disabled label="Reservar" />
             <BodyText style={styles.note}>No te quedan clases en tu plan.</BodyText>
-            <TextButton
-              label="Comprar un plan"
-              onPress={() => navigation.navigate("Plans")}
-            />
+            <TextButton label="Comprar un plan" onPress={() => navigation.navigate("Plans")} />
           </>
         )}
       </View>

@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -176,9 +171,7 @@ describe("Client Home quick actions and notification destinations", () => {
     });
     fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
     await waitFor(() => {
-      expect(
-        screen.getByText("El estudio canceló tu evaluación nutricional."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("El estudio canceló tu evaluación nutricional.")).toBeOnTheScreen();
     });
 
     fireEvent.press(screen.getByText("El estudio canceló tu evaluación nutricional."));

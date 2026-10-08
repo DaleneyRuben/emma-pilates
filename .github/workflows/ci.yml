@@ -55,6 +55,7 @@ jobs:
               - apps/client-mobile/**
               - apps/staff-mobile/**
               - packages/mobile-core/**
+              - packages/tooling/**
               - packages/api-contracts/**
 
   quality-api:
@@ -92,9 +93,14 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      # the three mobile packages have no lint script yet (MOB-050)
+      - run: pnpm --filter @pilates/mobile-core lint
+      - run: pnpm --filter @pilates/mobile-core format:check
       - run: pnpm --filter @pilates/mobile-core typecheck
+      - run: pnpm --filter @pilates/client-mobile lint
+      - run: pnpm --filter @pilates/client-mobile format:check
       - run: pnpm --filter @pilates/client-mobile typecheck
+      - run: pnpm --filter @pilates/staff-mobile lint
+      - run: pnpm --filter @pilates/staff-mobile format:check
       - run: pnpm --filter @pilates/staff-mobile typecheck
 
   contracts:

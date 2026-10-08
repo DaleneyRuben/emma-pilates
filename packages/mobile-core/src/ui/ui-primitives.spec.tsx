@@ -8,9 +8,7 @@ import { Screen } from "./screen";
 describe("mobile UI primitives", () => {
   it("uses the approved Lora title styling for headings", async () => {
     const screen = await render(
-      <Heading accessibilityLabel="Emma Pilates Studio">
-        Emma Pilates Studio
-      </Heading>,
+      <Heading accessibilityLabel="Emma Pilates Studio">Emma Pilates Studio</Heading>,
     );
 
     expect(screen.getByLabelText("Emma Pilates Studio")).toHaveStyle({
@@ -49,9 +47,7 @@ describe("mobile UI primitives", () => {
       </BodyText>,
     );
 
-    expect(
-      screen.getByLabelText("Movimiento, equilibrio, bienestar"),
-    ).toHaveStyle({
+    expect(screen.getByLabelText("Movimiento, equilibrio, bienestar")).toHaveStyle({
       fontFamily: "WorkSans_400Regular",
       fontSize: 15,
     });

@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import { clearMobileQueryCache, MobileQueryProvider } from "../query/provider";
 import { NotificationsScreen } from "./notifications-screen";
@@ -17,12 +12,7 @@ function jsonResponse(body: unknown, status = 200) {
   });
 }
 
-function notification(
-  id: string,
-  message: string,
-  createdAt: string,
-  readAt: string | null,
-) {
+function notification(id: string, message: string, createdAt: string, readAt: string | null) {
   return {
     id,
     category: "booking_schedule",
@@ -83,10 +73,7 @@ function createFetcher(pages: unknown[]) {
   }) as unknown as jest.Mock & typeof globalThis.fetch;
 }
 
-async function renderScreen(
-  fetcher: typeof globalThis.fetch,
-  onOpen = jest.fn(),
-) {
+async function renderScreen(fetcher: typeof globalThis.fetch, onOpen = jest.fn()) {
   const screen = await render(
     <MobileQueryProvider>
       <NotificationsScreen
@@ -108,9 +95,7 @@ describe("NotificationsScreen", () => {
   });
 
   it("groups unread and earlier notifications with relative times", async () => {
-    const screen = await renderScreen(
-      createFetcher([{ items, hasMore: false, nextCursor: null }]),
-    );
+    const screen = await renderScreen(createFetcher([{ items, hasMore: false, nextCursor: null }]));
 
     await waitFor(() => {
       expect(screen.getByText("Sin leer")).toBeOnTheScreen();
@@ -120,26 +105,18 @@ describe("NotificationsScreen", () => {
     expect(screen.getByText("Hace 2 horas")).toBeOnTheScreen();
     expect(screen.getByText("Ayer, 18:05")).toBeOnTheScreen();
     expect(screen.getByText("Hace 2 días")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Marcar leídas" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Marcar leídas" })).toBeOnTheScreen();
   });
 
   it("marks a notification read when opened and reports its destination", async () => {
-    const fetcher = createFetcher([
-      { items, hasMore: false, nextCursor: null },
-    ]);
+    const fetcher = createFetcher([{ items, hasMore: false, nextCursor: null }]);
     const onOpen = jest.fn();
     const screen = await renderScreen(fetcher, onOpen);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Tu clase de Reformer Pilates fue cancelada."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("Tu clase de Reformer Pilates fue cancelada.")).toBeOnTheScreen();
     });
-    await fireEvent.press(
-      screen.getByText("Tu clase de Reformer Pilates fue cancelada."),
-    );
+    await fireEvent.press(screen.getByText("Tu clase de Reformer Pilates fue cancelada."));
 
     await waitFor(() => {
       expect(fetcher).toHaveBeenCalledWith(
@@ -164,9 +141,7 @@ describe("NotificationsScreen", () => {
     const screen = await renderScreen(fetcher);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Marcar leídas" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Marcar leídas" })).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Marcar leídas" }));
 
@@ -177,9 +152,7 @@ describe("NotificationsScreen", () => {
       );
     });
     await waitFor(() => {
-      expect(
-        screen.queryByRole("button", { name: "Marcar leídas" }),
-      ).not.toBeOnTheScreen();
+      expect(screen.queryByRole("button", { name: "Marcar leídas" })).not.toBeOnTheScreen();
     });
     expect(screen.queryByText("Sin leer")).not.toBeOnTheScreen();
   });
@@ -203,12 +176,8 @@ describe("NotificationsScreen", () => {
     expect(bell).toHaveProp("stroke", "#C4BAB6");
     expect(bell).toHaveProp("width", 34);
     expect(
-      screen.getByText(
-        "Aquí te avisaremos sobre tus clases, pagos y evaluaciones.",
-      ),
+      screen.getByText("Aquí te avisaremos sobre tus clases, pagos y evaluaciones."),
     ).toHaveStyle({ color: "#766D69", fontSize: 14 });
-    expect(
-      screen.queryByRole("button", { name: "Marcar leídas" }),
-    ).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Marcar leídas" })).not.toBeOnTheScreen();
   });
 });

@@ -1,20 +1,11 @@
-import { useEffect, useState, type PropsWithChildren } from "react";
-import { StyleSheet, Text } from "react-native";
+import { useEffect, useState } from "react";
 
 import type { AuthenticationLinkIntent } from "../ingress/verified-link";
 import { BodyText } from "../ui/body-text";
-import { fontFamilies } from "../ui/fonts";
-import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
-import { TextButton } from "../ui/text-button";
-import { colors, spacing, typography } from "../ui/tokens";
 import { AuthenticationScreen } from "./auth-layout";
 import type { AuthenticationApi } from "./authentication-api";
-import {
-  LoginScreen,
-  type LoginSubmissionResult,
-  type LoginValues,
-} from "./login-screen";
+import { LoginScreen, type LoginSubmissionResult, type LoginValues } from "./login-screen";
 import {
   CheckEmailScreen,
   CorrectEmailScreen,
@@ -50,9 +41,7 @@ type AuthenticationFlowProps = {
   pendingRegistrationStore?: PendingRegistrationStore;
 };
 
-function routeForIntent(
-  intent: AuthenticationLinkIntent | null | undefined,
-): AuthenticationRoute {
+function routeForIntent(intent: AuthenticationLinkIntent | null | undefined): AuthenticationRoute {
   switch (intent?.type) {
     case "activate-account":
       return "activate";
@@ -76,9 +65,7 @@ function VerifyEmailScreen({
   onVerified: () => void;
   token: string;
 }) {
-  const [status, setStatus] = useState<"loading" | "verified" | "invalid">(
-    "loading",
-  );
+  const [status, setStatus] = useState<"loading" | "verified" | "invalid">("loading");
 
   useEffect(() => {
     let active = true;
@@ -112,18 +99,8 @@ function VerifyEmailScreen({
             ? "Tu cuenta está lista. Ahora puedes iniciar sesión."
             : "Este enlace venció o ya fue utilizado."}
       </BodyText>
-      {status === "loading" ? null : (
-        <PrimaryButton label="Ir a iniciar sesión" onPress={onBack} />
-      )}
+      {status === "loading" ? null : <PrimaryButton label="Ir a iniciar sesión" onPress={onBack} />}
     </AuthenticationScreen>
-  );
-}
-
-function ErrorMessage({ children }: PropsWithChildren) {
-  return (
-    <Text accessibilityRole="alert" style={styles.error}>
-      {children}
-    </Text>
   );
 }
 
@@ -137,9 +114,7 @@ export function AuthenticationFlow({
   onRecoveryCredential = () => undefined,
   pendingRegistrationStore,
 }: AuthenticationFlowProps) {
-  const [route, setRoute] = useState<AuthenticationRoute>(() =>
-    routeForIntent(intent),
-  );
+  const [route, setRoute] = useState<AuthenticationRoute>(() => routeForIntent(intent));
   const { pending, restoring, setPending } = usePendingRegistration({
     onRestored: () => setRoute("check-email"),
     restore: intent === null || intent === undefined,
@@ -214,11 +189,7 @@ export function AuthenticationFlow({
 
   if (route === "recovery-request") {
     return (
-      <RecoveryRequestScreen
-        api={api}
-        onBack={showLogin}
-        teamAccess={!allowClientRegistration}
-      />
+      <RecoveryRequestScreen api={api} onBack={showLogin} teamAccess={!allowClientRegistration} />
     );
   }
 
@@ -254,24 +225,9 @@ export function AuthenticationFlow({
       notice={notice}
       onBiometricUnlock={onBiometricUnlock}
       onForgotPassword={() => setRoute("recovery-request")}
-      onRegister={
-        allowClientRegistration ? () => setRoute("register") : undefined
-      }
+      onRegister={allowClientRegistration ? () => setRoute("register") : undefined}
       onSubmit={onLogin === undefined ? undefined : login}
       teamAccess={!allowClientRegistration}
     />
   );
 }
-
-const styles = StyleSheet.create({
-  emphasized: {
-    color: colors.text,
-    fontWeight: "600",
-  },
-  error: {
-    color: colors.errorText,
-    fontFamily: fontFamilies.body,
-    fontSize: typography.note,
-    lineHeight: 20,
-  },
-});

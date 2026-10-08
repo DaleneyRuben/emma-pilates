@@ -4,7 +4,6 @@ import {
   colors,
   formatBolivianos,
   FormField,
-  Heading,
   initials,
   PrimaryButton,
   QueryFailure,
@@ -20,15 +19,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Image,
-  Modal,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAdministratorApi } from "./administrator-api";
@@ -46,11 +37,7 @@ const stateLabels = {
   rejected: "Rechazado",
 } as const;
 
-export function ReviewPaymentScreen({
-  route,
-}: {
-  route: { params: { paymentId: string } };
-}) {
+export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: string } } }) {
   const navigation = useNavigation<ReviewNavigation>();
   const fetcher = useStaffFetcher();
   const queryClient = useQueryClient();
@@ -59,8 +46,7 @@ export function ReviewPaymentScreen({
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const receiptUrl =
-    review.data?.status === 200 ? (review.data.data.receiptUrl ?? null) : null;
+  const receiptUrl = review.data?.status === 200 ? (review.data.data.receiptUrl ?? null) : null;
   const [receiptUri, setReceiptUri] = useState<string | null>(null);
   const [enlarged, setEnlarged] = useState(false);
   const [rejecting, setRejecting] = useState(false);
@@ -82,9 +68,7 @@ export function ReviewPaymentScreen({
     };
   }, [api, receiptUrl]);
 
-  const header = (
-    <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Revisar pago" />
-  );
+  const header = <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Revisar pago" />;
 
   if (review.isPending) {
     return (
@@ -98,10 +82,7 @@ export function ReviewPaymentScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        <QueryFailure
-          label="No pudimos cargar el pago."
-          onRetry={() => void review.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar el pago." onRetry={() => void review.refetch()} />
       </Screen>
     );
   }
@@ -197,10 +178,7 @@ export function ReviewPaymentScreen({
               accessibilityState={{ disabled: trimmedReason === "" || submitting }}
               disabled={trimmedReason === "" || submitting}
               onPress={() =>
-                void decide(
-                  () => api.rejectPayment(payment.id, trimmedReason),
-                  "Pago rechazado",
-                )
+                void decide(() => api.rejectPayment(payment.id, trimmedReason), "Pago rechazado")
               }
               style={[
                 styles.destructive,
@@ -216,9 +194,7 @@ export function ReviewPaymentScreen({
             <PrimaryButton
               disabled={submitting}
               label="Confirmar pago"
-              onPress={() =>
-                void decide(() => api.confirmPayment(payment.id), "Pago confirmado")
-              }
+              onPress={() => void decide(() => api.confirmPayment(payment.id), "Pago confirmado")}
             />
             <Pressable
               accessibilityLabel="Rechazar"

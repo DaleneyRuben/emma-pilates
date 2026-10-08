@@ -21,11 +21,7 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
-import {
-  accountEmailLimitCode,
-  formatInstantDate,
-  resendLimitNotice,
-} from "./assistant-format";
+import { accountEmailLimitCode, formatInstantDate, resendLimitNotice } from "./assistant-format";
 import { OutlinedButton } from "./outlined-button";
 import { SelfRegisteredNotice } from "./self-registered-notice";
 
@@ -116,9 +112,7 @@ export function PendingInvitationCard({
         startWait(problem.retryAfterSeconds);
         return;
       }
-      setFailure(
-        (problem?.code ? invitationProblems[problem.code] : undefined) ?? fallback,
-      );
+      setFailure((problem?.code ? invitationProblems[problem.code] : undefined) ?? fallback);
     } finally {
       setBusy(false);
     }
@@ -171,8 +165,7 @@ export function PendingInvitationCard({
         </BodyText>
       ) : null}
       <BodyText style={[styles.muted, styles.ruled]}>
-        La invitación se elimina a los 30 días sin activación, cambio de correo
-        o reenvío.
+        La invitación se elimina a los 30 días sin activación, cambio de correo o reenvío.
       </BodyText>
       {notice !== null ? <BodyText style={styles.success}>{notice}</BodyText> : null}
       {failure !== null ? (
@@ -212,14 +205,10 @@ export function PendingInvitationCard({
             onPress={() => void resend()}
           />
           {pending.cancellable ? (
-            <TextButton
-              label="Cancelar invitación"
-              onPress={() => setConfirmingCancel(true)}
-            />
+            <TextButton label="Cancelar invitación" onPress={() => setConfirmingCancel(true)} />
           ) : (
             <BodyText style={styles.muted}>
-              La cuenta ya tiene pagos o reservas, así que la invitación se
-              mantiene.
+              La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.
             </BodyText>
           )}
         </View>
@@ -234,8 +223,8 @@ export function PendingInvitationCard({
           <View style={styles.sheet}>
             <Text style={styles.sheetTitle}>{`¿Cancelar la invitación de ${clientName}?`}</Text>
             <BodyText>
-              Se anularán los enlaces enviados, se liberará el correo y la
-              cuenta pendiente desaparecerá.
+              Se anularán los enlaces enviados, se liberará el correo y la cuenta pendiente
+              desaparecerá.
             </BodyText>
             <OutlinedButton
               label="Sí, cancelar invitación"

@@ -33,17 +33,20 @@ const expectBadge = (screen: Screen, tone: "success" | "primary", icon: string, 
 };
 
 describe("The outcome badge (MOB-035)", () => {
-  it.each([false, true])("draws the success check on «Revisa tu correo» (staff: %s)", async (staff) => {
-    const screen = await render(
-      <AuthenticationFlow allowClientRegistration={!staff} api={api()} />,
-    );
-    await fireEvent.press(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }));
-    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
-    await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace" }));
+  it.each([false, true])(
+    "draws the success check on «Revisa tu correo» (staff: %s)",
+    async (staff) => {
+      const screen = await render(
+        <AuthenticationFlow allowClientRegistration={!staff} api={api()} />,
+      );
+      await fireEvent.press(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }));
+      await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+      await fireEvent.press(screen.getByRole("button", { name: "Enviar enlace" }));
 
-    await screen.findByText("Revisa tu correo");
-    expectBadge(screen, "success", "check", "Revisa tu correo");
-  });
+      await screen.findByText("Revisa tu correo");
+      expectBadge(screen, "success", "check", "Revisa tu correo");
+    },
+  );
 
   it("draws the success check once the account is active (21, S19)", async () => {
     const screen = await render(
@@ -67,17 +70,20 @@ describe("The outcome badge (MOB-035)", () => {
     ["activate-account", "activation", "expired", "Este enlace ya no es válido"],
     ["activate-account", "activation", "removed", "Esta invitación ya no está activa"],
     ["recover-password", "password_recovery", "expired", "Este enlace ya no es válido"],
-  ] as const)("draws the Palo de rosa clock on a dead %s link (%s, %s)", async (type, purpose, status, title) => {
-    const screen = await render(
-      <AuthenticationFlow
-        api={api({ purpose, status } as Inspection)}
-        intent={{ token: "link-token", type }}
-      />,
-    );
+  ] as const)(
+    "draws the Palo de rosa clock on a dead %s link (%s, %s)",
+    async (type, purpose, status, title) => {
+      const screen = await render(
+        <AuthenticationFlow
+          api={api({ purpose, status } as Inspection)}
+          intent={{ token: "link-token", type }}
+        />,
+      );
 
-    await screen.findByText(title);
-    expectBadge(screen, "primary", "clock", title);
-  });
+      await screen.findByText(title);
+      expectBadge(screen, "primary", "clock", title);
+    },
+  );
 
   it.each([
     [null, "mail", "Confirmando tu correo", "primary"],

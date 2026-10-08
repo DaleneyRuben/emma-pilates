@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 
 import { useIsTablet } from "../ui/use-is-tablet";
 import type { ConfirmedBooking } from "./assistant-session-detail-screen";
@@ -48,10 +41,7 @@ export function AssistantWorkspaceProvider({ children }: { children: ReactNode }
       setPanel((current) => ({ opened: current.opened + 1, panel: next })),
     [],
   );
-  const value = useMemo(
-    () => ({ opened, panel, show, split }),
-    [opened, panel, show, split],
-  );
+  const value = useMemo(() => ({ opened, panel, show, split }), [opened, panel, show, split]);
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>;
 }
 

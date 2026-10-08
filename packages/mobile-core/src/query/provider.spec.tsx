@@ -10,11 +10,7 @@ import {
 } from "@tanstack/react-query";
 import { Text } from "react-native";
 
-import {
-  createMobilePersister,
-  getPersistedCacheKey,
-  persistedCacheVersion,
-} from "./persistence";
+import { createMobilePersister, getPersistedCacheKey, persistedCacheVersion } from "./persistence";
 import { clearMobileQueryCache, MobileQueryProvider } from "./provider";
 
 let providedClient: QueryClientType | undefined;
@@ -32,9 +28,7 @@ function RestoredBookingsProbe() {
 
   return (
     <Text>
-      {restoring
-        ? "restoring"
-        : JSON.stringify(client.getQueryData(["/api/v1/bookings"]) ?? null)}
+      {restoring ? "restoring" : JSON.stringify(client.getQueryData(["/api/v1/bookings"]) ?? null)}
     </Text>
   );
 }
@@ -100,9 +94,7 @@ describe("MobileQueryProvider", () => {
     });
 
     await act(async () => {
-      providedClient?.setQueryData(["/api/v1/bookings"], [
-        { bookingId: "booking-2" },
-      ]);
+      providedClient?.setQueryData(["/api/v1/bookings"], [{ bookingId: "booking-2" }]);
       providedClient?.setQueryData(["/api/v1/notifications", { limit: 50 }], {
         items: [{ id: "n-secret" }],
       });
@@ -110,9 +102,7 @@ describe("MobileQueryProvider", () => {
 
     await waitFor(
       async () => {
-        const stored = await AsyncStorage.getItem(
-          getPersistedCacheKey("account-2"),
-        );
+        const stored = await AsyncStorage.getItem(getPersistedCacheKey("account-2"));
         expect(stored).toContain("booking-2");
         expect(stored).not.toContain("n-secret");
       },
@@ -138,9 +128,7 @@ describe("MobileQueryProvider", () => {
       onlineManager.setOnline(true);
     });
     expect(
-      screen.queryByText(
-        "Sin conexión. Mostrando la última información guardada.",
-      ),
+      screen.queryByText("Sin conexión. Mostrando la última información guardada."),
     ).not.toBeOnTheScreen();
   });
 });

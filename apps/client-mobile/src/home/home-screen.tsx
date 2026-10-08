@@ -20,14 +20,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import {
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import {
   describeAllowance,
@@ -74,17 +67,14 @@ function SubscriptionCard({
   const progress =
     subscription.originalClassAllowance === 0
       ? 0
-      : subscription.remainingClassAllowance /
-        subscription.originalClassAllowance;
+      : subscription.remainingClassAllowance / subscription.originalClassAllowance;
 
   return (
     <View style={styles.card}>
       <View style={styles.cardHeader}>
         <BodyText style={styles.cardLabel}>Tu plan</BodyText>
         <View style={[styles.badge, { backgroundColor: badge.background }]}>
-          <Text style={[styles.badgeText, { color: badge.text }]}>
-            {subscriptionBadge(status)}
-          </Text>
+          <Text style={[styles.badgeText, { color: badge.text }]}>{subscriptionBadge(status)}</Text>
         </View>
       </View>
       <Text style={styles.planName}>{subscription.planName}</Text>
@@ -149,9 +139,7 @@ export function HomeScreen() {
   const refresh = async () => {
     setRefreshing(true);
     await Promise.all(
-      [profile, subscription, evaluations, referrals, promotions].map((query) =>
-        query.refetch(),
-      ),
+      [profile, subscription, evaluations, referrals, promotions].map((query) => query.refetch()),
     );
     setRefreshing(false);
   };

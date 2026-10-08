@@ -1,0 +1,19 @@
+{
+  "name": "@pilates/tooling",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Development-only configuration shared by the workspace packages (ADR-0013)",
+  "exports": {
+    "./eslint/mobile": "./eslint/mobile.js"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.39.4",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "globals": "^17.4.0",
+    "typescript-eslint": "^8.57.1"
+  },
+  "peerDependencies": {
+    "eslint": "^9.39.4"
+  }
+}

@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system/legacy";
@@ -143,9 +138,10 @@ describe("Client purchase flow", () => {
     await waitFor(() => {
       expect(screen.getByLabelText("Código QR del estudio")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByRole("button", { name: "Enviar comprobante" }),
-    ).toHaveProp("accessibilityState", { disabled: true });
+    expect(screen.getByRole("button", { name: "Enviar comprobante" })).toHaveProp(
+      "accessibilityState",
+      { disabled: true },
+    );
   });
 
   it("uploads the chosen receipt, waits for verification, attaches it, and submits the transfer", async () => {
@@ -161,9 +157,7 @@ describe("Client purchase flow", () => {
         },
       ],
     } as never);
-    jest
-      .mocked(FileSystem.readAsStringAsync)
-      .mockResolvedValue(encodeBase64(receiptBytes));
+    jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(encodeBase64(receiptBytes));
     const calls: string[] = [];
     let statusReads = 0;
     const fetcher = routeFetcher({
@@ -172,7 +166,11 @@ describe("Client purchase flow", () => {
       "POST /api/v1/uploads": (init) => {
         calls.push(`upload ${String(init?.body)}`);
         return jsonResponse(
-          { id: "asset-1", uploadUrl: "/api/v1/uploads/asset-1/object", expiresAt: "2026-09-21T15:15:00.000Z" },
+          {
+            id: "asset-1",
+            uploadUrl: "/api/v1/uploads/asset-1/object",
+            expiresAt: "2026-09-21T15:15:00.000Z",
+          },
           201,
         );
       },
@@ -205,7 +203,9 @@ describe("Client purchase flow", () => {
     const screen = await openPlanDetail(fetcher);
     fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Sube tu comprobante de transferencia" })).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
+      ).toBeOnTheScreen();
     });
 
     fireEvent.press(screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }));
@@ -302,7 +302,8 @@ describe("Client purchase flow", () => {
               category: "subscription_payment",
               type: "payment_rejected",
               title: "Comprobante rechazado",
-              message: "Tu comprobante fue rechazado: El monto no coincide con el plan. Sube uno nuevo para activar tu plan.",
+              message:
+                "Tu comprobante fue rechazado: El monto no coincide con el plan. Sube uno nuevo para activar tu plan.",
               destinationType: "payment",
               destinationId: "payment-1",
               createdAt: "2026-09-21T17:00:00.000Z",
@@ -315,9 +316,12 @@ describe("Client purchase flow", () => {
       "POST /api/v1/notifications/n1/read": () => jsonResponse({ marked: 1 }),
     });
     const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
-    await waitFor(() => {
-      expect(screen.getByRole("button", { name: /Perfil/ })).toBeOnTheScreen();
-    }, { timeout: 10_000 });
+    await waitFor(
+      () => {
+        expect(screen.getByRole("button", { name: /Perfil/ })).toBeOnTheScreen();
+      },
+      { timeout: 10_000 },
+    );
     fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
@@ -332,8 +336,6 @@ describe("Client purchase flow", () => {
       expect(screen.getByText("Tu comprobante fue rechazado")).toBeOnTheScreen();
     });
     expect(screen.getByText("El monto no coincide con el plan.")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Subir un nuevo comprobante" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Subir un nuevo comprobante" })).toBeOnTheScreen();
   });
 });

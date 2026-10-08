@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { StyleSheet } from "react-native";
 
@@ -78,9 +73,7 @@ async function openHistory(entries: unknown[]) {
 
   await waitFor(
     () => {
-      expect(
-        screen.getByRole("button", { name: /Mis Reservas, tab/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
@@ -149,9 +142,7 @@ describe("Client Class History", () => {
     const screen = await openHistory([]);
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Aún no tienes clases en tu historial."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("Aún no tienes clases en tu historial.")).toBeOnTheScreen();
     });
   });
 
@@ -173,8 +164,6 @@ describe("Client Class History", () => {
         "Aquí aparecerán tus clases una vez que registremos tu asistencia en el estudio.",
       ),
     ).toBeOnTheScreen();
-    expect(
-      screen.queryByText("Aquí verás las clases a las que asististe."),
-    ).not.toBeOnTheScreen();
+    expect(screen.queryByText("Aquí verás las clases a las que asististe.")).not.toBeOnTheScreen();
   });
 });

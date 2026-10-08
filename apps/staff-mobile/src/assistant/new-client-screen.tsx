@@ -31,16 +31,12 @@ type NewClientNavigation = {
   goBack: () => void;
   popTo: (screen: "ClientSearch") => void;
   // The form is done once the account exists, so the overview replaces it.
-  replace: (
-    screen: "ClientOverview",
-    params: { clientId: string; reopened?: boolean },
-  ) => void;
+  replace: (screen: "ClientOverview", params: { clientId: string; reopened?: boolean }) => void;
 };
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const problemOf = (error: unknown) =>
-  error instanceof AssistantApiError ? error : null;
+const problemOf = (error: unknown) => (error instanceof AssistantApiError ? error : null);
 
 export function NewClientScreen() {
   const navigation = useNavigation<NewClientNavigation>();
@@ -60,8 +56,7 @@ export function NewClientScreen() {
     email: string;
   } | null>(null);
 
-  const nameError =
-    submitted && name.trim().length === 0 ? "Escribe el nombre." : undefined;
+  const nameError = submitted && name.trim().length === 0 ? "Escribe el nombre." : undefined;
   const emailError = emailInUse
     ? "Este correo ya pertenece a otra cuenta. No se creó ni se cambió nada."
     : submitted && !emailPattern.test(email.trim())
@@ -117,76 +112,76 @@ export function NewClientScreen() {
   return (
     <Screen style={styles.screen}>
       <CenteredCard maxWidth={560}>
-      <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel="Nuevo cliente">Nuevo cliente</Heading>
-      <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-        {selfRegistered !== null ? (
-          <SelfRegisteredNotice
-            clientId={selfRegistered.clientId}
-            email={selfRegistered.email}
-            onOpen={() => openClient(selfRegistered.clientId)}
-          />
-        ) : (
-          <>
-            {accountLimited && waitSeconds > 0 ? (
-              <WaitNotice
-                message={accountEmailLimitMessage}
-                remainingSeconds={waitSeconds}
-                waitLabel="Podrás intentarlo en"
+        <BackLink onPress={() => navigation.goBack()} />
+        <Heading accessibilityLabel="Nuevo cliente">Nuevo cliente</Heading>
+        <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
+          {selfRegistered !== null ? (
+            <SelfRegisteredNotice
+              clientId={selfRegistered.clientId}
+              email={selfRegistered.email}
+              onOpen={() => openClient(selfRegistered.clientId)}
+            />
+          ) : (
+            <>
+              {accountLimited && waitSeconds > 0 ? (
+                <WaitNotice
+                  message={accountEmailLimitMessage}
+                  remainingSeconds={waitSeconds}
+                  waitLabel="Podrás intentarlo en"
+                />
+              ) : null}
+              <FormField
+                autoCapitalize="words"
+                error={nameError}
+                label="Nombre"
+                onChangeText={setName}
+                placeholder="Nombre y apellido"
+                value={name}
               />
-            ) : null}
-            <FormField
-              autoCapitalize="words"
-              error={nameError}
-              label="Nombre"
-              onChangeText={setName}
-              placeholder="Nombre y apellido"
-              value={name}
-            />
-            <FormField
-              autoCapitalize="none"
-              autoCorrect={false}
-              error={emailError}
-              keyboardType="email-address"
-              label="Correo electrónico"
-              onChangeText={(value) => {
-                setEmail(value);
-                setEmailInUse(false);
-              }}
-              placeholder="correo@ejemplo.com"
-              value={email}
-            />
-            <FormField
-              keyboardType="phone-pad"
-              label="Teléfono (opcional)"
-              onChangeText={setPhone}
-              placeholder="+591 700 00000"
-              value={phone}
-            />
-            <BodyText style={styles.note}>
-              Enviaremos un enlace de activación al correo. Vence en 7 días.
-            </BodyText>
-            {failure !== null ? (
-              <BodyText
-                accessibilityRole="alert"
-                style={failure === limitedEmailMessage ? undefined : styles.failure}
-              >
-                {failure}
-              </BodyText>
-            ) : null}
-            {waitSeconds > 0 && !accountLimited ? (
+              <FormField
+                autoCapitalize="none"
+                autoCorrect={false}
+                error={emailError}
+                keyboardType="email-address"
+                label="Correo electrónico"
+                onChangeText={(value) => {
+                  setEmail(value);
+                  setEmailInUse(false);
+                }}
+                placeholder="correo@ejemplo.com"
+                value={email}
+              />
+              <FormField
+                keyboardType="phone-pad"
+                label="Teléfono (opcional)"
+                onChangeText={setPhone}
+                placeholder="+591 700 00000"
+                value={phone}
+              />
               <BodyText style={styles.note}>
-                {`Podrás intentarlo en ${formatCountdown(waitSeconds)}.`}
+                Enviaremos un enlace de activación al correo. Vence en 7 días.
               </BodyText>
-            ) : null}
-            <PrimaryButton
-              disabled={submitting || waitSeconds > 0}
-              label="Crear cuenta"
-              onPress={() => void create()}
-            />
-          </>
-        )}
-      </ScrollView>
+              {failure !== null ? (
+                <BodyText
+                  accessibilityRole="alert"
+                  style={failure === limitedEmailMessage ? undefined : styles.failure}
+                >
+                  {failure}
+                </BodyText>
+              ) : null}
+              {waitSeconds > 0 && !accountLimited ? (
+                <BodyText style={styles.note}>
+                  {`Podrás intentarlo en ${formatCountdown(waitSeconds)}.`}
+                </BodyText>
+              ) : null}
+              <PrimaryButton
+                disabled={submitting || waitSeconds > 0}
+                label="Crear cuenta"
+                onPress={() => void create()}
+              />
+            </>
+          )}
+        </ScrollView>
       </CenteredCard>
     </Screen>
   );

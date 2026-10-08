@@ -16,10 +16,7 @@ import {
   typography,
 } from "@pilates/mobile-core";
 import { useGetTrainerSessionRoster } from "@pilates/api-contracts";
-import {
-  createStaticNavigation,
-  useNavigation,
-} from "@react-navigation/native";
+import { createStaticNavigation, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -46,32 +43,21 @@ import { StaffChangePasswordScreen } from "./profile/staff-change-password-scree
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
-import {
-  StaffFetcherContext,
-  unavailableFetcher,
-  useStaffFetcher,
-} from "./staff-fetcher";
+import { StaffFetcherContext, unavailableFetcher, useStaffFetcher } from "./staff-fetcher";
 import { createTrainerApi } from "./trainer-api";
-import { RootHeader } from "./ui/root-header";
 
 type StaffRole = Exclude<AppRole, "client">;
 type AttendanceOutcome = "attended" | "no_show";
 type TrainerRosterNavigation = { goBack: () => void };
 
-function TrainerRosterScreen({
-  route,
-}: {
-  route: { params: { sessionId: string } };
-}) {
+function TrainerRosterScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<TrainerRosterNavigation>();
   const fetcher = useStaffFetcher();
   const roster = useGetTrainerSessionRoster(route.params.sessionId, {
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const [outcomes, setOutcomes] = useState<Record<string, AttendanceOutcome>>(
-    {},
-  );
+  const [outcomes, setOutcomes] = useState<Record<string, AttendanceOutcome>>({});
   const [saveError, setSaveError] = useState(false);
   const [saved, setSaved] = useState(false);
   const trainerApi = useMemo(() => createTrainerApi(fetcher), [fetcher]);
@@ -83,12 +69,7 @@ function TrainerRosterScreen({
         roster.data.data.bookings.flatMap((booking) =>
           booking.attendanceOutcome === undefined
             ? []
-            : [
-                [
-                  booking.bookingId,
-                  booking.attendanceOutcome as AttendanceOutcome,
-                ],
-              ],
+            : [[booking.bookingId, booking.attendanceOutcome as AttendanceOutcome]],
         ),
       ),
     );
@@ -112,9 +93,7 @@ function TrainerRosterScreen({
 
   const session = roster.data.data;
   const isPostSession = new Date(session.endsAt).getTime() <= Date.now();
-  const complete = session.bookings.every(
-    (booking) => outcomes[booking.bookingId] !== undefined,
-  );
+  const complete = session.bookings.every((booking) => outcomes[booking.bookingId] !== undefined);
   const saveAttendance = async () => {
     setSaveError(false);
     try {
@@ -134,9 +113,7 @@ function TrainerRosterScreen({
   return (
     <Screen style={styles.screen}>
       <BackLink onPress={() => navigation.goBack()} />
-      <Heading accessibilityLabel={session.classTypeName}>
-        {session.classTypeName}
-      </Heading>
+      <Heading accessibilityLabel={session.classTypeName}>{session.classTypeName}</Heading>
       <BodyText>{`${session.branchName} · ${formatTimeRange(session.startsAt, session.endsAt)}`}</BodyText>
       <ScrollView contentContainerStyle={styles.list}>
         {session.bookings.length === 0 ? (
@@ -148,8 +125,7 @@ function TrainerRosterScreen({
             {isPostSession ? (
               <View style={styles.segmented}>
                 {(["attended", "no_show"] as const).map((outcome) => {
-                  const label =
-                    outcome === "attended" ? "Asistió" : "No asistió";
+                  const label = outcome === "attended" ? "Asistió" : "No asistió";
                   const selected = outcomes[booking.bookingId] === outcome;
                   return (
                     <Pressable
@@ -163,17 +139,9 @@ function TrainerRosterScreen({
                           [booking.bookingId]: outcome,
                         }))
                       }
-                      style={[
-                        styles.segment,
-                        selected && styles.segmentSelected,
-                      ]}
+                      style={[styles.segment, selected && styles.segmentSelected]}
                     >
-                      <Text
-                        style={[
-                          styles.segmentText,
-                          selected && styles.segmentTextSelected,
-                        ]}
-                      >
+                      <Text style={[styles.segmentText, selected && styles.segmentTextSelected]}>
                         {label}
                       </Text>
                     </Pressable>
@@ -188,9 +156,7 @@ function TrainerRosterScreen({
         <BodyText>Podrás marcar asistencia cuando termine la clase.</BodyText>
       ) : null}
       {saveError ? (
-        <BodyText accessibilityRole="alert">
-          No pudimos guardar la asistencia.
-        </BodyText>
+        <BodyText accessibilityRole="alert">No pudimos guardar la asistencia.</BodyText>
       ) : null}
       {saved ? <BodyText>Asistencia guardada.</BodyText> : null}
       {isPostSession ? (
@@ -253,10 +219,7 @@ const NutritionistStack = createNativeStackNavigator({
     ...accountScreens,
   },
 });
-const roleNavigation: Record<
-  StaffRole,
-  ReturnType<typeof createStaticNavigation>
-> = {
+const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNavigation>> = {
   administrator: createStaticNavigation(AdministratorStack),
   assistant: createStaticNavigation(AssistantStack),
   nutritionist: createStaticNavigation(NutritionistStack),
@@ -289,11 +252,7 @@ export function StaffNavigation({
     <AuthenticationFlow
       allowClientRegistration={false}
       api={authenticationApi}
-      intent={
-        authenticationIntent?.type === "verify-email"
-          ? null
-          : authenticationIntent
-      }
+      intent={authenticationIntent?.type === "verify-email" ? null : authenticationIntent}
       onBiometricUnlock={onBiometricUnlock}
       onLogin={onLogin}
       onRecoveryCredential={onRecoveryCredential}

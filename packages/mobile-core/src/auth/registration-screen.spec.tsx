@@ -3,9 +3,7 @@ import { act, fireEvent, render } from "@testing-library/react-native";
 import { AuthenticationApiError, type AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
 
-function createApiMock(
-  overrides: Partial<AuthenticationApi> = {},
-): AuthenticationApi {
+function createApiMock(overrides: Partial<AuthenticationApi> = {}): AuthenticationApi {
   return {
     activateAccount: jest.fn(),
     cancelRegistration: jest.fn(),
@@ -35,15 +33,9 @@ async function fillForm(
   confirmation = "pilates2026",
 ) {
   await fireEvent.changeText(screen.getByLabelText("Nombre"), "Lucía Mendoza");
-  await fireEvent.changeText(
-    screen.getByLabelText("Correo electrónico"),
-    "lucia@example.com",
-  );
+  await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "lucia@example.com");
   await fireEvent.changeText(screen.getByLabelText("Contraseña"), "pilates2026");
-  await fireEvent.changeText(
-    screen.getByLabelText("Confirmar contraseña"),
-    confirmation,
-  );
+  await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), confirmation);
 }
 
 describe("Client registration (01)", () => {
@@ -68,9 +60,7 @@ describe("Client registration (01)", () => {
     await fillForm(screen, "pilates202");
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
-    expect(
-      screen.getByRole("alert", { name: "Las contraseñas no coinciden." }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("alert", { name: "Las contraseñas no coinciden." })).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();
   });
 
@@ -79,20 +69,12 @@ describe("Client registration (01)", () => {
     const screen = await openRegistration(api);
 
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Lucía Mendoza");
-    await fireEvent.changeText(
-      screen.getByLabelText("Correo electrónico"),
-      "lucia@example.com",
-    );
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "lucia@example.com");
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "corta");
-    await fireEvent.changeText(
-      screen.getByLabelText("Confirmar contraseña"),
-      "corta",
-    );
+    await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), "corta");
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
-    expect(
-      screen.getByRole("alert", { name: "Mínimo 8 caracteres." }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("alert", { name: "Mínimo 8 caracteres." })).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();
   });
 
@@ -101,13 +83,8 @@ describe("Client registration (01)", () => {
     const screen = await openRegistration(api);
 
     expect(screen.queryByLabelText("Código de referido")).not.toBeOnTheScreen();
-    await fireEvent.press(
-      screen.getByRole("button", { name: "¿Tienes un código de referido?" }),
-    );
-    await fireEvent.changeText(
-      screen.getByLabelText("Código de referido"),
-      " EMMA-2026 ",
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "¿Tienes un código de referido?" }));
+    await fireEvent.changeText(screen.getByLabelText("Código de referido"), " EMMA-2026 ");
     await fillForm(screen);
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
@@ -130,19 +107,12 @@ describe("Client registration (01)", () => {
     });
     const screen = await openRegistration(api);
 
-    await fireEvent.press(
-      screen.getByRole("button", { name: "¿Tienes un código de referido?" }),
-    );
-    await fireEvent.changeText(
-      screen.getByLabelText("Código de referido"),
-      "NADIE",
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "¿Tienes un código de referido?" }));
+    await fireEvent.changeText(screen.getByLabelText("Código de referido"), "NADIE");
     await fillForm(screen);
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
-    expect(
-      screen.getByRole("alert", { name: "Revisa el código de referido." }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("alert", { name: "Revisa el código de referido." })).toBeOnTheScreen();
   });
 });
 

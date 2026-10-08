@@ -30,9 +30,7 @@ function PlanCard({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
     >
       <View style={styles.cardBody}>
         <Text style={styles.planName}>{plan.name}</Text>
-        <BodyText>
-          {describePlanTerms(plan.classAllowance, plan.durationMonths)}
-        </BodyText>
+        <BodyText>{describePlanTerms(plan.classAllowance, plan.durationMonths)}</BodyText>
       </View>
       <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
     </Pressable>
@@ -53,10 +51,7 @@ export function PlansScreen() {
       {plans.isPending ? (
         <BodyText accessibilityLabel="Cargando planes">Cargando…</BodyText>
       ) : plans.isError || plans.data.status !== 200 ? (
-        <QueryFailure
-          label="No pudimos cargar los planes."
-          onRetry={() => void plans.refetch()}
-        />
+        <QueryFailure label="No pudimos cargar los planes." onRetry={() => void plans.refetch()} />
       ) : plans.data.data.length === 0 ? (
         <BodyText>Por ahora no hay planes disponibles.</BodyText>
       ) : (
@@ -64,15 +59,12 @@ export function PlansScreen() {
           {plans.data.data.map((plan) => (
             <PlanCard
               key={plan.id}
-              onPress={() =>
-                navigation.navigate("PlanDetail", { planId: plan.id })
-              }
+              onPress={() => navigation.navigate("PlanDetail", { planId: plan.id })}
               plan={plan}
             />
           ))}
           <BodyText style={styles.note}>
-            Todos los planes se activan al confirmarse el pago en el estudio o
-            desde la app.
+            Todos los planes se activan al confirmarse el pago en el estudio o desde la app.
           </BodyText>
         </ScrollView>
       )}

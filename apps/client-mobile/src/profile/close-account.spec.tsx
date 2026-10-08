@@ -58,19 +58,13 @@ const payment = (state: "pending" | "confirmed") => ({
   submittedAt: "2026-09-01T12:00:00.000Z",
 });
 
-const closureRoutes = (
-  overrides: Record<string, (init?: RequestInit) => Response> = {},
-) => ({
+const closureRoutes = (overrides: Record<string, (init?: RequestInit) => Response> = {}) => ({
   ...readRoutes,
   "/api/v1/clients/current/subscription": () => jsonResponse(active),
   "/api/v1/clients/current/credit": () =>
     jsonResponse({ availableCentavos: 12_000, reservedCentavos: 0, activity: [] }),
   "/api/v1/bookings": () =>
-    jsonResponse([
-      booking("booking", "b1"),
-      booking("booking", "b2"),
-      booking("waitlist", "w1"),
-    ]),
+    jsonResponse([booking("booking", "b1"), booking("booking", "b2"), booking("waitlist", "w1")]),
   "/api/v1/evaluations?scope=upcoming": () =>
     jsonResponse({ items: [evaluation], hasMore: false, nextCursor: null }),
   "/api/v1/payments/current": () => jsonResponse(payment("confirmed")),
@@ -112,15 +106,11 @@ describe("Cerrar mi cuenta", () => {
     ]) {
       expect(screen.getByText(line)).toBeOnTheScreen();
     }
-    expect(
-      screen.getByRole("button", { name: "Cerrar mi cuenta" }),
-    ).toBeDisabled();
+    expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeDisabled();
 
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
 
-    expect(
-      screen.getByRole("button", { name: "Cerrar mi cuenta" }),
-    ).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeEnabled();
   });
 
   it("closes the Account, forgets the session, and shows the notice on the login screen", async () => {
@@ -153,9 +143,7 @@ describe("Cerrar mi cuenta", () => {
       role: "client",
     });
     expect(runtime.sessionManager.logout).not.toHaveBeenCalled();
-    expect(
-      screen.getByRole("button", { name: "Iniciar sesión" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeOnTheScreen();
   });
 
   it("shows a wrong password under the field and keeps the screen", async () => {
@@ -172,9 +160,7 @@ describe("Cerrar mi cuenta", () => {
     await waitFor(() => {
       expect(screen.getByText("La contraseña no es correcta.")).toBeOnTheScreen();
     });
-    expect(
-      screen.getByRole("button", { name: "Cerrar mi cuenta" }),
-    ).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeEnabled();
   });
 
   it("explains a network failure and keeps the password", async () => {

@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -76,15 +71,11 @@ function baseRoutes(upcoming: () => unknown[]) {
 }
 
 async function openMyBookings(routes: Parameters<typeof routeFetcher>[0]) {
-  const screen = await render(
-    <App runtime={createClientRuntime(routeFetcher(routes))} />,
-  );
+  const screen = await render(<App runtime={createClientRuntime(routeFetcher(routes))} />);
 
   await waitFor(
     () => {
-      expect(
-        screen.getByRole("button", { name: /Mis Reservas, tab/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /Mis Reservas, tab/ })).toBeOnTheScreen();
     },
     { timeout: 10_000 },
   );
@@ -106,9 +97,7 @@ describe("Client My Bookings", () => {
   });
 
   it("shows the three card states with their actions", async () => {
-    const screen = await openMyBookings(
-      baseRoutes(() => [insideWindow, cancellable, waitlisted]),
-    );
+    const screen = await openMyBookings(baseRoutes(() => [insideWindow, cancellable, waitlisted]));
 
     await waitFor(() => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
@@ -117,9 +106,7 @@ describe("Client My Bookings", () => {
     expect(screen.getByText("No cancelable")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reprogramar" })).toBeOnTheScreen();
     expect(screen.getByText("En lista de espera")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Salir de la lista de espera" }),
-    ).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Salir de la lista de espera" })).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Ver historial" })).toBeOnTheScreen();
   });
 
@@ -127,9 +114,7 @@ describe("Client My Bookings", () => {
     const screen = await openMyBookings(baseRoutes(() => []));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("Aún no tienes reservas próximas."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("Aún no tienes reservas próximas.")).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Reservar una clase" }));
 
@@ -158,9 +143,7 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByText("¿Cancelar esta reserva?")).toBeOnTheScreen();
     });
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Sí, cancelar reserva" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Sí, cancelar reserva" }));
 
     await waitFor(() => {
       expect(cancelled).toHaveBeenCalled();
@@ -181,13 +164,9 @@ describe("Client My Bookings", () => {
     });
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Salir de la lista de espera" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Salir de la lista de espera" })).toBeOnTheScreen();
     });
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Salir de la lista de espera" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Salir de la lista de espera" }));
 
     await waitFor(() => {
       expect(left).toHaveBeenCalled();
@@ -216,16 +195,12 @@ describe("Client My Bookings", () => {
     const screen = await openMyBookings({
       ...baseRoutes(() => upcoming),
       "/api/v1/branches": () =>
-        jsonResponse([
-          { id: "branch-centro", name: "Centro", address: "Calle 1" },
-        ]),
+        jsonResponse([{ id: "branch-centro", name: "Centro", address: "Calle 1" }]),
       [`/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`]:
         () => jsonResponse([alternative]),
       "POST /api/v1/bookings/booking-soon/reschedule": (init) => {
         rescheduled(JSON.parse(String(init?.body)));
-        upcoming = [
-          { ...insideWindow, bookingId: "booking-new", ...facts(at(3 * hour)) },
-        ];
+        upcoming = [{ ...insideWindow, bookingId: "booking-new", ...facts(at(3 * hour)) }];
         return jsonResponse({ id: "booking-new" }, 201);
       },
     });
@@ -243,21 +218,22 @@ describe("Client My Bookings", () => {
     ).toBeOnTheScreen();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    expect(
-      screen.getByRole("button", { name: "Confirmar cambio" }),
-    ).toHaveProp("accessibilityState", { disabled: true });
+    expect(screen.getByRole("button", { name: "Confirmar cambio" })).toHaveProp(
+      "accessibilityState",
+      { disabled: true },
+    );
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: /^Reformer Pilates \d/ }),
-      ).toHaveProp("accessibilityState", { selected: true });
-      expect(
-        screen.getByRole("button", { name: "Confirmar cambio" }),
-      ).toHaveProp("accessibilityState", { disabled: false });
+      expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toHaveProp(
+        "accessibilityState",
+        { selected: true },
+      );
+      expect(screen.getByRole("button", { name: "Confirmar cambio" })).toHaveProp(
+        "accessibilityState",
+        { disabled: false },
+      );
     });
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar cambio" }));
 

@@ -33,11 +33,7 @@ export function ProfilePhotoSection({ client }: { client: ClientProfileDto }) {
   const storedUri = useClientPhoto(client.photo?.imageAssetId ?? null);
   const busy = state.status === "uploading" || state.status === "removing";
   const shownUri =
-    state.status === "uploading"
-      ? state.localUri
-      : state.status === "removing"
-        ? null
-        : storedUri;
+    state.status === "uploading" ? state.localUri : state.status === "removing" ? null : storedUri;
 
   const remember = (profile: ClientProfileDto) =>
     queryClient.setQueryData(getGetCurrentClientProfileQueryKey(), {

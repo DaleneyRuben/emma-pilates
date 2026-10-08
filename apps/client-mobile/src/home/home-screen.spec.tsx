@@ -1,9 +1,4 @@
-import {
-  cleanup,
-  fireEvent,
-  render,
-  waitFor,
-} from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
@@ -42,8 +37,7 @@ describe("Client Home", () => {
   it("greets the Client and shows an active Subscription", async () => {
     const fetcher = createFetcher({
       "/api/v1/clients/current": () => jsonResponse(profile),
-      "/api/v1/clients/current/subscription": () =>
-        jsonResponse(activeSubscription),
+      "/api/v1/clients/current/subscription": () => jsonResponse(activeSubscription),
     });
     const screen = await render(<App runtime={createRuntime(fetcher)} />);
 
@@ -54,9 +48,10 @@ describe("Client Home", () => {
     expect(screen.getByText("5 de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("Pagado hasta el 11 de octubre")).toBeOnTheScreen();
     expect(screen.getByText("Activa")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Reservar una clase" }),
-    ).toHaveProp("accessibilityState", { disabled: false });
+    expect(screen.getByRole("button", { name: "Reservar una clase" })).toHaveProp(
+      "accessibilityState",
+      { disabled: false },
+    );
     // MOB-041: 02 ends its full-width «Reservar una clase» shortcut in a Palo
     // de rosa chevron; its two tiles carry none.
     const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
@@ -88,16 +83,13 @@ describe("Client Home", () => {
     const screen = await render(<App runtime={createRuntime(fetcher)} />);
 
     await waitFor(() => {
-      expect(
-        screen.getByRole("button", { name: "Comprar un plan" }),
-      ).toBeOnTheScreen();
+      expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
     });
-    expect(
-      screen.getByText("Necesitas un plan activo para reservar"),
-    ).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Reservar una clase" }),
-    ).toHaveProp("accessibilityState", { disabled: true });
+    expect(screen.getByText("Necesitas un plan activo para reservar")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Reservar una clase" })).toHaveProp(
+      "accessibilityState",
+      { disabled: true },
+    );
     expect(screen.queryByText("Activa")).not.toBeOnTheScreen();
     // MOB-041: the disabled shortcut ends in the quiet lock instead of the chevron.
     const lock = screen.getByTestId("shortcut-lock", { includeHiddenElements: true });

@@ -62,9 +62,7 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
       await screen.findByRole("button", { name: `${started.time} Valeria Áñez` }),
     );
 
-    expect(
-      screen.queryByRole("button", { name: "Cancelar evaluación" }),
-    ).not.toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Cancelar evaluación" })).not.toBeOnTheScreen();
   });
 
   it("lets the «Evaluación cancelada» strip fade after 8 seconds", async () => {
@@ -81,18 +79,15 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
       ),
     );
 
-    await fireEvent.press(
-      await screen.findByRole("button", { name: "09:45 Lucía Justiniano" }),
-    );
+    await fireEvent.press(await screen.findByRole("button", { name: "09:45 Lucía Justiniano" }));
     await fireEvent.press(screen.getByRole("button", { name: "Cancelar evaluación" }));
     const sheet = within(screen.getByTestId("cancel-evaluation-sheet"));
     await fireEvent.press(sheet.getByRole("button", { name: "Sí, cancelar evaluación" }));
     expect(await screen.findByText("Evaluación cancelada")).toBeOnTheScreen();
 
-    await waitFor(
-      () => expect(screen.queryByText("Evaluación cancelada")).not.toBeOnTheScreen(),
-      { timeout: 10_000 },
-    );
+    await waitFor(() => expect(screen.queryByText("Evaluación cancelada")).not.toBeOnTheScreen(), {
+      timeout: 10_000,
+    });
   });
 
   it("marks the field's current time in the S17 time sheet (follow-up 74)", async () => {
@@ -107,9 +102,9 @@ describe("Nutritionist Evaluation gaps (S15, S17)", () => {
 
     expect(screen.getByRole("button", { name: "10:00" })).toBeSelected();
     expect(screen.getByRole("button", { name: "10:15" })).not.toBeSelected();
-    expect(
-      within(screen.getByRole("button", { name: "10:00" })).getByText("10:00"),
-    ).toHaveStyle({ color: "#8A5D59" });
+    expect(within(screen.getByRole("button", { name: "10:00" })).getByText("10:00")).toHaveStyle({
+      color: "#8A5D59",
+    });
     expect(
       screen.getByTestId("picker-check-10:00", { includeHiddenElements: true }),
     ).toBeOnTheScreen();

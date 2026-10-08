@@ -89,9 +89,7 @@ export function CancelSessionScreen({
       </View>
       <View style={styles.warning}>
         <Text style={styles.warningTitle}>Esto no se puede deshacer</Text>
-        <BodyText style={styles.warningText}>
-          {describeSessionCancellation(session)}
-        </BodyText>
+        <BodyText style={styles.warningText}>{describeSessionCancellation(session)}</BodyText>
       </View>
       {failure === null ? null : (
         <BodyText accessibilityRole="alert" style={styles.failure}>

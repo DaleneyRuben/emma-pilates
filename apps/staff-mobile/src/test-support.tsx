@@ -9,22 +9,15 @@ export function jsonResponse(body: unknown, status = 200): Response {
 
 type Route = (init?: RequestInit) => Response;
 
-export function routeFetcher(
-  routes: Record<string, Route>,
-): jest.Mock & typeof globalThis.fetch {
+export function routeFetcher(routes: Record<string, Route>): jest.Mock & typeof globalThis.fetch {
   return jest.fn((input: RequestInfo | URL, init?: RequestInit) => {
     const path = typeof input === "string" ? input : input.toString();
     const method = init?.method?.toUpperCase() ?? "GET";
     const bare = path.split("?")[0] ?? path;
     const route =
-      routes[`${method} ${path}`] ??
-      routes[path] ??
-      routes[`${method} ${bare}`] ??
-      routes[bare];
+      routes[`${method} ${path}`] ?? routes[path] ?? routes[`${method} ${bare}`] ?? routes[bare];
     return Promise.resolve(
-      route === undefined
-        ? jsonResponse({ code: "not_found", status: 404 }, 404)
-        : route(init),
+      route === undefined ? jsonResponse({ code: "not_found", status: 404 }, 404) : route(init),
     );
   }) as unknown as jest.Mock & typeof globalThis.fetch;
 }

@@ -13,33 +13,21 @@ async function fillForm(
   screen: Awaited<ReturnType<typeof render>>,
   values: { current: string; next: string; confirm: string },
 ) {
-  await fireEvent.changeText(
-    screen.getByLabelText("Contraseña actual"),
-    values.current,
-  );
-  await fireEvent.changeText(
-    screen.getByLabelText("Contraseña nueva"),
-    values.next,
-  );
-  await fireEvent.changeText(
-    screen.getByLabelText("Confirmar contraseña"),
-    values.confirm,
-  );
+  await fireEvent.changeText(screen.getByLabelText("Contraseña actual"), values.current);
+  await fireEvent.changeText(screen.getByLabelText("Contraseña nueva"), values.next);
+  await fireEvent.changeText(screen.getByLabelText("Confirmar contraseña"), values.confirm);
 }
 
 describe("ChangePasswordScreen", () => {
   it("keeps the save button disabled until the three fields are valid", async () => {
     const screen = await render(
-      <ChangePasswordScreen
-        fetcher={jest.fn()}
-        onBack={jest.fn()}
-        onSaved={jest.fn()}
-      />,
+      <ChangePasswordScreen fetcher={jest.fn()} onBack={jest.fn()} onSaved={jest.fn()} />,
     );
 
-    expect(
-      screen.getByRole("button", { name: "Guardar contraseña" }),
-    ).toHaveProp("accessibilityState", { disabled: true });
+    expect(screen.getByRole("button", { name: "Guardar contraseña" })).toHaveProp(
+      "accessibilityState",
+      { disabled: true },
+    );
 
     await fillForm(screen, {
       current: "Emma2026lucia",
@@ -48,9 +36,10 @@ describe("ChangePasswordScreen", () => {
     });
 
     expect(screen.getByText("Las contraseñas no coinciden.")).toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "Guardar contraseña" }),
-    ).toHaveProp("accessibilityState", { disabled: true });
+    expect(screen.getByRole("button", { name: "Guardar contraseña" })).toHaveProp(
+      "accessibilityState",
+      { disabled: true },
+    );
   });
 
   it("changes the password through the API and reports success", async () => {
@@ -65,9 +54,7 @@ describe("ChangePasswordScreen", () => {
       next: "Reformer2026lm",
       confirm: "Reformer2026lm",
     });
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Guardar contraseña" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
 
     await waitFor(() => {
       expect(onSaved).toHaveBeenCalled();
@@ -87,9 +74,7 @@ describe("ChangePasswordScreen", () => {
   it("shows the server rejection under the current password field", async () => {
     const fetcher = jest
       .fn()
-      .mockResolvedValue(
-        jsonResponse({ code: "current_password_incorrect", status: 400 }, 400),
-      );
+      .mockResolvedValue(jsonResponse({ code: "current_password_incorrect", status: 400 }, 400));
     const onSaved = jest.fn();
     const screen = await render(
       <ChangePasswordScreen fetcher={fetcher} onBack={jest.fn()} onSaved={onSaved} />,
@@ -100,14 +85,10 @@ describe("ChangePasswordScreen", () => {
       next: "Reformer2026lm",
       confirm: "Reformer2026lm",
     });
-    await fireEvent.press(
-      screen.getByRole("button", { name: "Guardar contraseña" }),
-    );
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar contraseña" }));
 
     await waitFor(() => {
-      expect(
-        screen.getByText("La contraseña actual no es correcta."),
-      ).toBeOnTheScreen();
+      expect(screen.getByText("La contraseña actual no es correcta.")).toBeOnTheScreen();
     });
     expect(onSaved).not.toHaveBeenCalled();
   });

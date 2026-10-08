@@ -12,12 +12,7 @@ import { AuthenticationScreen, authStyles } from "./auth-layout";
 import { FormAlert } from "./auth-parts";
 import type { AuthenticationApi } from "./authentication-api";
 
-type LinkState =
-  | "activated"
-  | "current"
-  | "expired"
-  | "loading"
-  | "removed";
+type LinkState = "activated" | "current" | "expired" | "loading" | "removed";
 
 const passwordSchema = z
   .object({
@@ -92,9 +87,7 @@ export function PasswordLinkScreen({
           return;
         }
         setState(
-          result.status === "current" || result.status === "removed"
-            ? result.status
-            : "expired",
+          result.status === "current" || result.status === "removed" ? result.status : "expired",
         );
       })
       .catch(() => {
@@ -146,8 +139,8 @@ export function PasswordLinkScreen({
         title="Tu cuenta está activa"
       >
         <BodyText style={authStyles.centered}>
-          Tu correo quedó verificado. Inicia sesión con tu correo y la
-          contraseña que acabas de crear.
+          Tu correo quedó verificado. Inicia sesión con tu correo y la contraseña que acabas de
+          crear.
         </BodyText>
         <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />
       </AuthenticationScreen>
@@ -156,13 +149,8 @@ export function PasswordLinkScreen({
 
   if (state === "removed") {
     return (
-      <AuthenticationScreen
-        badge={deadLinkBadge}
-        title="Esta invitación ya no está activa"
-      >
-        <BodyText style={authStyles.centered}>
-          {deadLinkCopy[audience].removed}
-        </BodyText>
+      <AuthenticationScreen badge={deadLinkBadge} title="Esta invitación ya no está activa">
+        <BodyText style={authStyles.centered}>{deadLinkCopy[audience].removed}</BodyText>
         <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />
       </AuthenticationScreen>
     );
@@ -173,21 +161,16 @@ export function PasswordLinkScreen({
       <AuthenticationScreen badge={deadLinkBadge} title="Este enlace ya no es válido">
         {activation ? (
           <>
-            <BodyText style={authStyles.centered}>
-              {deadLinkCopy[audience].expired}
-            </BodyText>
+            <BodyText style={authStyles.centered}>{deadLinkCopy[audience].expired}</BodyText>
             <PrimaryButton label="Ir a iniciar sesión" onPress={onLogin} />
           </>
         ) : (
           <>
             <BodyText style={authStyles.centered}>
-              Los enlaces para restablecer la contraseña vencen a los 30
-              minutos y sirven una sola vez. Pide uno nuevo.
+              Los enlaces para restablecer la contraseña vencen a los 30 minutos y sirven una sola
+              vez. Pide uno nuevo.
             </BodyText>
-            <PrimaryButton
-              label="Pedir un enlace nuevo"
-              onPress={onRequestRecovery}
-            />
+            <PrimaryButton label="Pedir un enlace nuevo" onPress={onRequestRecovery} />
             <TextButton label="Volver a iniciar sesión" onPress={onLogin} />
           </>
         )}
@@ -205,9 +188,7 @@ export function PasswordLinkScreen({
           ? "Elegir tu contraseña activa tu cuenta y confirma tu correo. Luego inicias sesión con ella."
           : "Elige una contraseña nueva para tu cuenta."}
       </BodyText>
-      {failed ? (
-        <FormAlert>No pudimos guardar la contraseña. Inténtalo de nuevo.</FormAlert>
-      ) : null}
+      {failed ? <FormAlert>No pudimos guardar la contraseña. Inténtalo de nuevo.</FormAlert> : null}
       <Controller
         control={control}
         name="password"
@@ -230,11 +211,7 @@ export function PasswordLinkScreen({
         render={({ field: { onBlur, onChange, value } }) => (
           <FormField
             autoComplete="new-password"
-            error={
-              errors.confirmation?.type === "custom"
-                ? errors.confirmation.message
-                : undefined
-            }
+            error={errors.confirmation?.type === "custom" ? errors.confirmation.message : undefined}
             label="Confirmar contraseña"
             onBlur={onBlur}
             onChangeText={onChange}

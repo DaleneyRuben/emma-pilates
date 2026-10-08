@@ -46,12 +46,8 @@ describe("StaffNavigation", () => {
     const screen = await render(<StaffNavigation {...defaultProps} />);
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
-    expect(
-      screen.queryByRole("button", { name: "Regístrate" }),
-    ).not.toBeOnTheScreen();
-    expect(
-      screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" }),
-    ).toBeOnTheScreen();
+    expect(screen.queryByRole("button", { name: "Regístrate" })).not.toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "¿Olvidaste tu contraseña?" })).toBeOnTheScreen();
   });
 
   it.each([
@@ -60,18 +56,14 @@ describe("StaffNavigation", () => {
     ["administrator", "Pagos pendientes"],
     ["nutritionist", "Mi agenda"],
   ] as const)("routes %s to its Staff destination", async (role, label) => {
-    const screen = await render(
-      <StaffNavigation {...defaultProps} role={role} />,
-    );
+    const screen = await render(<StaffNavigation {...defaultProps} role={role} />);
 
     expect(screen.getByLabelText(label)).toBeOnTheScreen();
     expect(screen.queryByLabelText("Iniciar sesión")).not.toBeOnTheScreen();
   });
 
   it("does not render Client navigation for a Client identity", async () => {
-    const screen = await render(
-      <StaffNavigation {...defaultProps} role="client" />,
-    );
+    const screen = await render(<StaffNavigation {...defaultProps} role="client" />);
 
     expect(screen.getByLabelText("Iniciar sesión")).toBeOnTheScreen();
     expect(screen.queryByLabelText("Inicio")).not.toBeOnTheScreen();
