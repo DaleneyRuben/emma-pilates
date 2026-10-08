@@ -8,6 +8,7 @@ import {
   MobileQueryProvider,
   PrimaryButton,
   QueryFailure,
+  recoveryScreenLayout,
   Screen,
   spacing,
   surfaces,
@@ -178,6 +179,7 @@ const accountScreens = {
 };
 
 const TrainerStack = createNativeStackNavigator({
+  screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Agenda: TrainerAgendaScreen,
@@ -186,6 +188,7 @@ const TrainerStack = createNativeStackNavigator({
   },
 });
 const AssistantStack = createNativeStackNavigator({
+  screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     ClientSearch: ClientSearchScreen,
@@ -202,6 +205,7 @@ const AssistantStack = createNativeStackNavigator({
   },
 });
 const AdministratorStack = createNativeStackNavigator({
+  screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Payments: PendingPaymentsScreen,
@@ -212,6 +216,7 @@ const AdministratorStack = createNativeStackNavigator({
   },
 });
 const NutritionistStack = createNativeStackNavigator({
+  screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Agenda: NutritionistAgendaScreen,

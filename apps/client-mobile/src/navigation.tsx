@@ -4,6 +4,7 @@ import {
   EmailChangeLinkScreen,
   MobileQueryProvider,
   type MobileNavigationProps,
+  recoveryScreenLayout,
   typography,
 } from "@pilates/mobile-core";
 import { getGetCurrentClientProfileQueryKey } from "@pilates/api-contracts";
@@ -61,11 +62,13 @@ const shortcutScreens = {
 };
 
 const HomeStack = createNativeStackNavigator({
+  screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
   screens: { Home: HomeScreen, ...planScreens, ...shortcutScreens },
 });
 
 const BookingsStack = createNativeStackNavigator({
+  screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     MyBookings: BookingsScreen,
@@ -75,6 +78,7 @@ const BookingsStack = createNativeStackNavigator({
 });
 
 const BookingStack = createNativeStackNavigator({
+  screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Browse: BrowseSessionsScreen,
@@ -84,6 +88,7 @@ const BookingStack = createNativeStackNavigator({
 });
 
 const ProfileStack = createNativeStackNavigator({
+  screenLayout: recoveryScreenLayout,
   screenOptions: { headerShown: false },
   screens: {
     Profile: ProfileScreen,
