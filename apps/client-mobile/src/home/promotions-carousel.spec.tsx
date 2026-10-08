@@ -74,8 +74,8 @@ async function openHome(fetcher: typeof globalThis.fetch) {
 }
 
 describe("Client Home Promotions carousel", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

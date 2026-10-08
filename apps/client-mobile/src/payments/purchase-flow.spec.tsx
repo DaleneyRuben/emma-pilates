@@ -87,11 +87,11 @@ async function openPlanDetail(fetcher: ReturnType<typeof routeFetcher>) {
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
   await waitFor(() => {
     expect(screen.getByRole("button", { name: "Paquete de 8 clases" })).toBeOnTheScreen();
   });
-  fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
   await waitFor(() => {
     expect(screen.getByText("Total a pagar")).toBeOnTheScreen();
   });
@@ -99,8 +99,8 @@ async function openPlanDetail(fetcher: ReturnType<typeof routeFetcher>) {
 }
 
 describe("Client purchase flow", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
     jest.mocked(ImagePicker.launchImageLibraryAsync).mockReset();
     jest.mocked(FileSystem.readAsStringAsync).mockReset();
@@ -121,7 +121,7 @@ describe("Client purchase flow", () => {
     expect(screen.getByText("−Bs 60")).toBeOnTheScreen();
     expect(screen.getByText("Bs 500")).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
 
     await waitFor(() => {
       expect(screen.getByText("Pago por transferencia")).toBeOnTheScreen();
@@ -201,14 +201,16 @@ describe("Client purchase flow", () => {
       "/api/v1/payments/current": () => jsonResponse(payment),
     });
     const screen = await openPlanDetail(fetcher);
-    fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
     await waitFor(() => {
       expect(
         screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
       ).toBeOnTheScreen();
     });
 
-    fireEvent.press(screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }));
+    await fireEvent.press(
+      screen.getByRole("button", { name: "Sube tu comprobante de transferencia" }),
+    );
 
     await waitFor(
       () => {
@@ -234,7 +236,7 @@ describe("Client purchase flow", () => {
       screen.getByRole("button", { name: "Comprobante adjunto. Toca para cambiarlo." }),
     ).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Enviar comprobante" }));
 
     await waitFor(() => {
       expect(screen.getByText("Tu pago está en revisión")).toBeOnTheScreen();
@@ -245,7 +247,7 @@ describe("Client purchase flow", () => {
         "Un administrador va a confirmar tu comprobante pronto. Te avisaremos apenas esté listo.",
       ),
     ).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole("button", { name: "Volver al inicio" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Volver al inicio" }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
     });
@@ -274,7 +276,7 @@ describe("Client purchase flow", () => {
 
     expect(screen.getByText("−Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 0")).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Continuar al pago" }));
 
     await waitFor(() => {
       expect(screen.getByText("¡Pago confirmado!")).toBeOnTheScreen();
@@ -322,15 +324,15 @@ describe("Client purchase flow", () => {
       },
       { timeout: 10_000 },
     );
-    fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Notificaciones" })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
     await waitFor(() => {
       expect(screen.getByText(/Tu comprobante fue rechazado/)).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByText(/Tu comprobante fue rechazado/));
+    await fireEvent.press(screen.getByText(/Tu comprobante fue rechazado/));
 
     await waitFor(() => {
       expect(screen.getByText("Tu comprobante fue rechazado")).toBeOnTheScreen();

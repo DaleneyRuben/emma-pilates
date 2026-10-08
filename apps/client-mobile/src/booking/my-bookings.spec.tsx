@@ -91,8 +91,8 @@ async function openMyBookings(routes: Parameters<typeof routeFetcher>[0]) {
 }
 
 describe("Client My Bookings", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

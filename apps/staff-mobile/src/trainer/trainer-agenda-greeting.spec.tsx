@@ -44,8 +44,8 @@ const renderTrainer = () =>
 // Nutritionist and the frame greets «Hola, Camila», and writes its times in
 // the 24-hour form every frame and the other lists use.
 describe("Trainer agenda greeting and times", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -63,7 +63,7 @@ describe("Trainer agenda greeting and times", () => {
     await waitFor(() => {
       expect(screen.getByText("10:00 – 10:50")).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
     await waitFor(() => {
       expect(screen.getByText("Sopocachi · 10:00 – 10:50")).toBeOnTheScreen();
     });

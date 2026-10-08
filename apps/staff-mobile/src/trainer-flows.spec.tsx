@@ -16,8 +16,8 @@ const session = {
 };
 
 describe("Trainer agenda and attendance", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -59,7 +59,7 @@ describe("Trainer agenda and attendance", () => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
       expect(screen.getByText("6 de 8 reservados")).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
 
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Ana Pérez: Asistió" })).toHaveProp(
@@ -70,14 +70,14 @@ describe("Trainer agenda and attendance", () => {
     // S03 (MOB-034): the chevron above the large title, not «← Volver».
     expect(screen.queryByText("← Volver")).toBeNull();
     expect(screen.getByTestId("back-chevron", { includeHiddenElements: true })).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
         "accessibilityState",
         { selected: true },
       ),
     );
-    fireEvent.press(screen.getByRole("button", { name: "Guardar asistencia" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Guardar asistencia" }));
 
     await waitFor(() => {
       expect(fetcher).toHaveBeenCalledWith(
@@ -122,14 +122,14 @@ describe("Trainer agenda and attendance", () => {
     await waitFor(() => {
       expect(screen.getByText("Reformer Pilates")).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reformer Pilates" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Ana Pérez: Asistió" })).toHaveProp(
         "accessibilityState",
         { selected: true },
       ),
     );
-    fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Luis Flores: Asistió" }));
     await waitFor(() =>
       expect(screen.getByRole("button", { name: "Luis Flores: Asistió" })).toHaveProp(
         "accessibilityState",

@@ -12,8 +12,8 @@ const hidden = { includeHiddenElements: true };
 // «Reservar una clase» under them; S07's «Sucursal:» row ends in a 16 pt
 // Texto tenue chevron pointing down.
 describe("Assistant Client Bookings empty state", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

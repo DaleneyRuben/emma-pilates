@@ -51,8 +51,8 @@ const uploadRoutes = (calls: string[]) => ({
 });
 
 describe("Client profile photo", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

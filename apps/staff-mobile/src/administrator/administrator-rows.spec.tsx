@@ -78,8 +78,8 @@ async function openPayments(sessions = [session]) {
 
 // MOB-042: S11's payment card and S13's Session card as their frames draw them.
 describe("Administrator rows", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

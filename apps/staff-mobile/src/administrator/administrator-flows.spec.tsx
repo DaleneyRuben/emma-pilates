@@ -135,8 +135,8 @@ async function openPendingPayments(routes: Parameters<typeof routeFetcher>[0]) {
 }
 
 describe("Administrator payments and Session cancellation", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

@@ -76,14 +76,14 @@ async function openDetail(availableSeats: number) {
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
   await waitFor(
     () => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     },
     { timeout: 5_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
   await waitFor(() => {
     expect(screen.getByText("Sobre la clase")).toBeOnTheScreen();
   });
@@ -99,8 +99,8 @@ async function openDetail(availableSeats: number) {
 // when the class is full; the bar's track is Palo de rosa tinte, its fill
 // Palo de rosa by the booked share, Icono tenue when full.
 describe("Client Session detail capacity block", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

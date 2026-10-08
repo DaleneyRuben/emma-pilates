@@ -16,8 +16,8 @@ const withoutPlan = () => ({
 
 // MOB-038: the screens moved onto Superficie, so S06's surfaces follow the frames.
 describe("Assistant surfaces on Superficie", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
     jest.restoreAllMocks();
   });
@@ -67,8 +67,8 @@ const hidden = { includeHiddenElements: true };
 // MOB-039: the cards take the frames' border and radius, and the two empty
 // states their icon, Lora title, and copy.
 describe("Assistant cards and empty states (MOB-039)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
     jest.restoreAllMocks();
   });

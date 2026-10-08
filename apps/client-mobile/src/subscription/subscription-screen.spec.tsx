@@ -34,7 +34,7 @@ async function openSubscription(view: unknown) {
   await waitFor(() => {
     expect(screen.getByRole("button", { name: "Ver detalle" })).toBeOnTheScreen();
   });
-  fireEvent.press(screen.getByRole("button", { name: "Ver detalle" }));
+  await fireEvent.press(screen.getByRole("button", { name: "Ver detalle" }));
   await waitFor(() => {
     expect(screen.getByText("Mi plan")).toBeOnTheScreen();
   });
@@ -43,8 +43,8 @@ async function openSubscription(view: unknown) {
 }
 
 describe("Client Subscription detail", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -75,8 +75,8 @@ describe("Client Subscription detail", () => {
 });
 
 describe("Refreshed Mi plan (Client 12)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -105,11 +105,11 @@ describe("Refreshed Mi plan (Client 12)", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Perfil, .*tab/ })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Perfil, .*tab/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Mi plan/ })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Mi plan/ }));
     await waitFor(() => {
       expect(screen.getByText("Último plan")).toBeOnTheScreen();
     });

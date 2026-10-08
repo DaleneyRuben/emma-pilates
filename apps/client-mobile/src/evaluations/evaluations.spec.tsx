@@ -23,8 +23,8 @@ import {
 jest.setTimeout(30_000);
 
 describe("Client Evaluations", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

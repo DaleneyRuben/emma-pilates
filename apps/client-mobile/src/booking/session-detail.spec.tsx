@@ -90,14 +90,14 @@ async function openDetail(
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
   await waitFor(
     () => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     },
     { timeout: 5_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
   await waitFor(() => {
     expect(screen.getByText("Sobre la clase")).toBeOnTheScreen();
   });
@@ -112,8 +112,8 @@ async function openDetail(
 }
 
 describe("Client Session detail", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -134,7 +134,7 @@ describe("Client Session detail", () => {
     expect(screen.getByText(classType.description)).toBeOnTheScreen();
     expect(screen.getByText("Se descontará 1 clase de tu paquete.")).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
 
     await waitFor(() => {
       expect(screen.getByText("Reserva confirmada")).toBeOnTheScreen();
@@ -159,7 +159,7 @@ describe("Client Session detail", () => {
     expect(screen.getByText("Clase llena. Te avisaremos si se libera un cupo.")).toBeOnTheScreen();
     expect(screen.queryByRole("button", { name: "Reservar" })).not.toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Unirme a la lista de espera" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Unirme a la lista de espera" }));
 
     await waitFor(() => {
       expect(screen.getByText("Ya estás en la lista de espera.")).toBeOnTheScreen();
@@ -175,7 +175,7 @@ describe("Client Session detail", () => {
     });
     expect(screen.getByText("No te quedan clases en tu plan.")).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));
 
     await waitFor(() => {
       expect(screen.getByText("Elige tu plan")).toBeOnTheScreen();
@@ -188,7 +188,7 @@ describe("Client Session detail", () => {
         jsonResponse({ code: "booking_overlap", status: 409, title: "Conflict" }, 409),
     });
 
-    fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
 
     await waitFor(() => {
       expect(screen.getByText("Ya tienes una reserva a esa hora.")).toBeOnTheScreen();

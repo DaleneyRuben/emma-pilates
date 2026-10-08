@@ -58,8 +58,8 @@ const alternative = {
 // Lora title, then the Trainer after the person icon and the seat pill under
 // the rule; no chevron, and a 2px Palo de rosa border once selected.
 describe("Client reschedule option card", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

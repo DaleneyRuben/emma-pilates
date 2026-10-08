@@ -54,8 +54,8 @@ const expectCardNotice = (screen: Awaited<ReturnType<typeof openClientSearch>>, 
 };
 
 describe("S06's pending cards under an email limit (MOB-037)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

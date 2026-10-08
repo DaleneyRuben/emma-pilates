@@ -51,7 +51,7 @@ async function openProfile(
   await waitFor(() => {
     expect(screen.getByText("EV")).toBeOnTheScreen();
   });
-  fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
   await waitFor(() => {
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
   });
@@ -60,8 +60,8 @@ async function openProfile(
 }
 
 describe("Staff Perfil", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -80,7 +80,7 @@ describe("Staff Perfil", () => {
     expect(screen.getByRole("button", { name: "Cambiar contraseña" })).toBeOnTheScreen();
     expect(screen.getByText("Emma Pilates Studio · versión 1.0")).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Mi agenda")).toBeOnTheScreen();
     });
@@ -102,7 +102,7 @@ describe("Staff Perfil", () => {
       },
       { timeout: 10_000 },
     );
-    fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
 
     await waitFor(() => {
       expect(screen.getByText("Administración")).toBeOnTheScreen();
@@ -113,7 +113,7 @@ describe("Staff Perfil", () => {
   it("opens the staff inbox with its own empty state", async () => {
     const screen = await openProfile();
 
-    fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Notificaciones" }));
 
     await waitFor(() => {
       expect(screen.getByText("No tienes notificaciones.")).toBeOnTheScreen();
@@ -126,7 +126,7 @@ describe("Staff Perfil", () => {
   it("opens the change password step", async () => {
     const screen = await openProfile();
 
-    fireEvent.press(screen.getByRole("button", { name: "Cambiar contraseña" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cambiar contraseña" }));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Contraseña actual")).toBeOnTheScreen();
@@ -138,7 +138,7 @@ describe("Staff Perfil", () => {
     const runtime = createStaffRuntime(routeFetcher(staffRoutes(trainerProfile, 1)));
     const screen = await openProfile(runtime);
 
-    fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
 
     expect(alert).toHaveBeenCalledWith("¿Cerrar sesión?", expect.any(String), expect.any(Array));
     const buttons = alert.mock.calls[0]?.[2] as {

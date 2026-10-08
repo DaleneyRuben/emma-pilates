@@ -1033,6 +1033,18 @@ does) and in each app's `src/render-errors.spec.tsx`, which mock one screen
 expect the recovery screen in place, the Client tab bar still present, and
 the screen or Login back after **Reintentar**.
 
+Both app suites fail a spec on any React `act()` warning (MOB-054): each
+`jest.setup.ts` declares the act environment, delivers TanStack Query's
+notifications synchronously so a query settles inside the awaited call that
+produced it, and collects every «not wrapped in act», «not configured to
+support act», and «overlapping act» line from `console.error`, which the
+`afterEach` and `afterAll` hooks expect to be empty. A spec that lets one
+through fails with the warning printed above it; the fix is always to `await`
+the RNTL 14 call that is still in flight (`render`, `fireEvent.*`, `cleanup`,
+`rerender`, `unmount` are asynchronous) or to `waitFor` the state the screen
+is still loading. All three mobile suites exit on their own; the `--forceExit`
+that CI passes is harmless and no longer needed.
+
 Both app suites run against a frozen clock (MOB-051): their Jest config fakes
 `Date` only, at 2026-10-08 14:00 UTC (10:00 in Bolivia), so a spec that
 builds a Session «in one hour» or an Evaluation «today at 23:00» means the

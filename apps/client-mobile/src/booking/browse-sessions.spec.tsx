@@ -79,7 +79,7 @@ async function openBrowse(routes: Parameters<typeof routeFetcher>[0]) {
     },
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
   await waitFor(
     () => {
       expect(screen.getByText("Reservar una clase")).toBeOnTheScreen();
@@ -91,8 +91,8 @@ async function openBrowse(routes: Parameters<typeof routeFetcher>[0]) {
 }
 
 describe("Client Browse Sessions", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -126,7 +126,7 @@ describe("Client Browse Sessions", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Mat Pilates" }));
 
     await waitFor(() => {
       expect(screen.getByText("No hay clases con este filtro")).toBeOnTheScreen();
@@ -157,7 +157,7 @@ describe("Client Browse Sessions", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
 
     await waitFor(() => {
       expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();

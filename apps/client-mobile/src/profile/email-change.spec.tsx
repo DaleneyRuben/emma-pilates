@@ -26,8 +26,8 @@ async function openEditProfile(runtime: ReturnType<typeof createClientRuntime>) 
 }
 
 describe("Client email change", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
