@@ -52,22 +52,22 @@ async function openNoticeAndTap(
     () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
     { timeout: 10_000 },
   );
-  fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
   await waitFor(() =>
     expect(screen.getByRole("button", { name: /Notificaciones/ })).toBeOnTheScreen(),
   );
-  fireEvent.press(screen.getByRole("button", { name: /Notificaciones/ }));
+  await fireEvent.press(screen.getByRole("button", { name: /Notificaciones/ }));
   await waitFor(() =>
     expect(screen.getByText("Tu clase de Mat Pilates de hoy 07:00 se canceló.")).toBeOnTheScreen(),
   );
-  fireEvent.press(screen.getByText("Tu clase de Mat Pilates de hoy 07:00 se canceló."));
+  await fireEvent.press(screen.getByText("Tu clase de Mat Pilates de hoy 07:00 se canceló."));
   await waitFor(() => expect(screen.getByText(agendaMarker)).toBeOnTheScreen());
   expect(screen.queryByText("Tu clase de Mat Pilates de hoy 07:00 se canceló.")).toBeNull();
 }
 
 describe("Staff notification destinations", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

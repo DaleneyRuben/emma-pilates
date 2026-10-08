@@ -21,8 +21,8 @@ const session = (sessionId: string, classTypeName: string, bookedCount: number) 
 // MOB-042: S02's agenda card ends in the chevron beside the time and title,
 // names the Branch after a pin, and closes with the booked count and a pill.
 describe("Trainer agenda rows", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

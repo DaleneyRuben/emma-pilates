@@ -88,8 +88,8 @@ async function openClosure(routes = closureRoutes()) {
 }
 
 describe("Cerrar mi cuenta", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

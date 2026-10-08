@@ -12,8 +12,8 @@ const hidden = { includeHiddenElements: true };
 // Session card with the seat pill in the footer instead of the chevron and a
 // 2px Palo de rosa border once selected.
 describe("Assistant reschedule option card", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

@@ -27,8 +27,8 @@ const runtime = (unread: number) =>
 
 // Follow-up 73: a dot without number on the avatar, the count on S23's row.
 describe("Staff unread language", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

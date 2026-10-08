@@ -10,8 +10,8 @@ jest.setTimeout(20_000);
 // M cupos disponibles» beside the seat pill («Con cupos» or «Completa») in a
 // flat Blanco card (follow-up 87), with no bar and no label above it.
 describe("Assistant Session detail capacity summary", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

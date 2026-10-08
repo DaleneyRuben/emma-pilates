@@ -38,8 +38,8 @@ async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearc
 }
 
 describe("Assistant invitations (S05, S06)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

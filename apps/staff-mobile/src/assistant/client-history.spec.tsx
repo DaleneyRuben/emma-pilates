@@ -21,8 +21,8 @@ async function openHistory(routes: ReturnType<typeof assistantRoutes>) {
 // MOB-040: S22 draws the same rows between rules as 07, headed by «Ha
 // asistido a», with the frame's bare empty state.
 describe("Assistant Client history (S22)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

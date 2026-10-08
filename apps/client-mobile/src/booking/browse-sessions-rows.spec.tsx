@@ -52,8 +52,8 @@ const session = (id: string, startsAt: Date, availableSeats: number) => ({
 // MOB-042: 03's «Sucursal:» picker is the shared pill and every Session card,
 // full ones included, ends in the chevron after the Trainer line.
 describe("Client class list rows", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
@@ -82,7 +82,7 @@ describe("Client class list rows", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen();
     });
-    fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
+    await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: "Sucursal: Centro" })).toBeOnTheScreen();
     });

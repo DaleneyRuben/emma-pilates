@@ -44,8 +44,8 @@ async function submitNewClient(screen: Awaited<ReturnType<typeof openClientSearc
 }
 
 describe("The staff Account's email limit (BE-013, follow-up 78)", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

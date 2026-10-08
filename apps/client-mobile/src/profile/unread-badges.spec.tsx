@@ -17,8 +17,8 @@ const withUnread = (unread: number) =>
 
 // Follow-up 73: one unread colour, Palo de rosa profundo, never Error red.
 describe("Client unread badges", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

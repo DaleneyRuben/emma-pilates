@@ -55,8 +55,8 @@ async function openPerfil(fetcher: ReturnType<typeof routeFetcher>) {
 }
 
 describe("Referrals and Credit", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

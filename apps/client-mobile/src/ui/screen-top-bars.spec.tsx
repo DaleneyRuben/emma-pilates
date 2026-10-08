@@ -76,8 +76,8 @@ const screens: [string, ComponentType<never>, object, string, ("title" | "contex
 
 // MOB-034: the Client screens draw the export's top bar, not «← Volver».
 describe("The Client screens' top bar", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 

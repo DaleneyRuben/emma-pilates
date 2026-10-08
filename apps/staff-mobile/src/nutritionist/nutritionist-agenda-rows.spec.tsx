@@ -11,8 +11,8 @@ const hidden = { includeHiddenElements: true };
 // MOB-042: S15's row is a Lora time column, a thin divider, the Client over
 // the kind, and the chevron.
 describe("Nutritionist agenda rows", () => {
-  afterEach(() => {
-    cleanup();
+  afterEach(async () => {
+    await cleanup();
     clearMobileQueryCache();
   });
 
