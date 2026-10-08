@@ -1301,11 +1301,13 @@ What they mean:
 
 Every pull request and every push to `main` runs
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on GitHub Actions
-(EXT-004). It checks; it deploys nothing, and it needs no secret. Seven jobs
+(EXT-004). It checks; it deploys nothing, and it needs no secret. Eight jobs
 run as three independent chains, one per surface, each job on a fresh Ubuntu
 runner after the shared setup in `.github/actions/setup/action.yml` (Node from
 `.nvmrc`, pnpm from the root `packageManager` field, cached pnpm store,
-`pnpm install --frozen-lockfile`, `prisma generate`):
+`pnpm install --frozen-lockfile`, `prisma generate`, and, for the job that
+asks for it, Playwright's pinned Chromium from a cache keyed by the Playwright
+version):
 
 - **quality-api** (backend lint, typecheck, and build; api-contracts typecheck
   and build) → **contracts** (`check:api`, `check:api-compat`) → **api** (the
@@ -1313,7 +1315,10 @@ runner after the shared setup in `.github/actions/setup/action.yml` (Node from
   service container; the integration suite runs through `TEST_DATABASE_URL`
   on a `pilates_test_ci` admin database that lives and dies with the runner);
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
-  **web** (the admin-web Jest suite);
+  **web** (the admin-web Jest suite) → **web-e2e** (the ten Playwright
+  journeys of Test 31 through the built backend and the built admin web, on
+  a `postgres:17-alpine` service container with a `pilates_test_ci` admin
+  database, WEB-017);
 - **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
   mobile-core, client-mobile, and staff-mobile) → **mobile** (their three
   Jest suites).
@@ -1331,8 +1336,9 @@ committed generated client), and the shared files (`package.json`,
 three. A docs-only pull request therefore runs nothing, and a backend fix that
 does not change the contract runs the api chain alone. A push to `main`
 always runs everything. Jobs that never started show as skipped. A clean run
-of all three chains takes about nine minutes of wall clock, set by the api
-chain.
+of all three chains takes eight to ten minutes of wall clock, set by the api
+chain; the web chain takes about six (quality-web 1 m 25 s, web 2 m 15 s,
+web-e2e 2 m 15 s with a warm browser cache, 2 m 40 s with a cold one).
 
 The four frontend Jest steps run with `--ci` alone and exit on their own:
 the runner has two cores, so Jest runs each suite in band and every handle a
@@ -1346,6 +1352,10 @@ the spec instead of scrolling past. The integration step raises Node's heap
 (`NODE_OPTIONS=--max-old-space-size=4096`) because the in-band ESM run grows
 past the runner's default limit; the backend scripts keep the shell's
 `NODE_OPTIONS` next to their own `--experimental-vm-modules` for that reason.
+The web-e2e job needs no flag of its own: the global setup's teardown stops
+both servers and drops the database, and the step exits with Playwright's
+result. Its failures are read through the `web-e2e-test-results` artifact
+(Test 31).
 
 A newer push to the same branch cancels the run in progress. To read a failed
 run, open the pull request's "Checks" tab or run
@@ -2728,6 +2738,29 @@ at most five seconds for each server before killing it.
 Set `TEST_DATABASE_URL` to another `pilates_test_*` admin database, or
 `E2E_API_PORT` and `E2E_WEB_PORT` to other ports, when the defaults collide
 with something on your machine.
+
+CI runs the same ten journeys in the **web-e2e** job of
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (WEB-017), after
+the web job, on every pull request that touches the admin web and on every
+push to `main`. The job runs `pnpm test:admin-e2e` exactly as above, on a
+`postgres:17-alpine` service container: a `psql` step first creates the
+`pilates_test_ci` admin database the api job also uses, and
+`TEST_DATABASE_URL` points the global setup at it, so the run creates its
+own `pilates_test_*` database beside it as it does locally (the setup's line
+and the teardown's «stopped both servers and dropped database …» line are
+both in the step's log). The runner has no browser, so the shared setup
+action installs the pinned Chromium (`playwright install chromium`, kept in
+GitHub's cache under `~/.cache/ms-playwright` by Playwright version, about
+fifteen seconds to download when the cache is cold) and its system packages
+(`playwright install-deps chromium`, about fifteen seconds on every run).
+The backend starts with its development defaults: no secret is needed. A
+failed run uploads `apps/admin-web/test-results/` (the traces, the
+screenshots, and both servers' stderr) as the `web-e2e-test-results`
+artifact, kept for seven days, from the run's summary page; download it,
+unzip it, and open a trace with `pnpm exec playwright show-trace <file>`. A
+green run uploads nothing. The job takes about two and a half minutes (the
+setup with the browser about 1 m 20 s, both builds about 35 s, the journeys
+about 25 s on the two-core runner).
 
 ## Test 32: image variants and Promotions through Swagger
 

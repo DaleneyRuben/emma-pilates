@@ -114,5 +114,6 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
     await stopChild(web);
     await stopChild(api);
     dropDatabase();
+    console.log(`e2e: stopped both servers and dropped database ${name}`);
   };
 }
