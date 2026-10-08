@@ -1,7 +1,12 @@
 # Critical journey: browse Sessions, book one, see it in Mis reservas, cancel it.
+# Needs a Client whose Plan is active with classes left and a scheduled
+# Session in the fixtures' 30-day window: Lucía (5 of 8 classes left). Sofía's
+# fixture Plan is expired, so her booking is refused and the flow fails on a
+# fresh database. The booking is cancelled at the end, so the class goes back
+# to her Plan.
 appId: ${APP_ID}
 env:
-  EMAIL: sofia@example.com
+  EMAIL: lucia@example.com
 ---
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
