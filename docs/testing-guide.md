@@ -581,6 +581,14 @@ cancellation or a login, the next launch opens Login. Seven days after the
 last registration, correction, or resend, the next launch shows «El registro
 venció» once (with **Registrarme de nuevo**) and then forgets it. You cannot
 wait seven days by hand, so the automated tests cover that frame.
+A link opened at launch wins over the kept registration (MOB-056): when the
+app starts from the email's verification link while **Revisa tu correo** is
+still being restored, it shows the link's screen («Correo verificado» or
+«Enlace no válido»), never «Revisa tu correo» on top of it; a verified email
+completes and forgets the registration as above, an invalid link leaves it
+stored, so the next launch without a link opens **Revisa tu correo** again.
+Expo Go cannot receive the link (LNK-001), so the automated tests cover this
+frame too.
 
 ### C. Log in through Swagger
 

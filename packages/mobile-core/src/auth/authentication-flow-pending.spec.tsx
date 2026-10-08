@@ -93,6 +93,67 @@ describe("AuthenticationFlow pending registration across launches", () => {
     expect(store.load).toHaveBeenCalledTimes(1);
   });
 
+  // MOB-056: the link's screen wins over a kept registration that is still
+  // loading, and the registration stays stored for the next launch.
+  it("opens a verification link that arrives while a kept registration is still loading", async () => {
+    let release: (kept: PendingRegistration | null) => void = () => undefined;
+    const store = createStore(stored(3 * day));
+    store.load.mockImplementation(
+      () =>
+        new Promise<PendingRegistration | null>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const api = createApiMock();
+    const screen = await render(<AuthenticationFlow api={api} pendingRegistrationStore={store} />);
+
+    await screen.rerender(
+      <AuthenticationFlow
+        api={api}
+        intent={{ token: "verification-token", type: "verify-email" }}
+        pendingRegistrationStore={store}
+      />,
+    );
+    release(store.current());
+
+    expect(await screen.findByText("Correo verificado")).toBeOnTheScreen();
+    expect(api.verifyClientEmail).toHaveBeenCalledWith("verification-token");
+    expect(screen.queryByText("Revisa tu correo")).not.toBeOnTheScreen();
+    // The verified email completes the kept registration, as it always did.
+    await waitFor(() => {
+      expect(store.current()).toBeNull();
+    });
+  });
+
+  it("keeps the registration stored when the link that arrived during the load is invalid", async () => {
+    let release: (kept: PendingRegistration | null) => void = () => undefined;
+    const store = createStore(stored(3 * day));
+    store.load.mockImplementation(
+      () =>
+        new Promise<PendingRegistration | null>((resolve) => {
+          release = resolve;
+        }),
+    );
+    const api = createApiMock({
+      verifyClientEmail: jest.fn().mockResolvedValue({ status: "invalid" }),
+    });
+    const screen = await render(<AuthenticationFlow api={api} pendingRegistrationStore={store} />);
+
+    await screen.rerender(
+      <AuthenticationFlow
+        api={api}
+        intent={{ token: "stale-token", type: "verify-email" }}
+        pendingRegistrationStore={store}
+      />,
+    );
+    release(store.current());
+
+    expect(await screen.findByText("Enlace no válido")).toBeOnTheScreen();
+    expect(screen.queryByText("Revisa tu correo")).not.toBeOnTheScreen();
+    expect(store.clear).not.toHaveBeenCalled();
+    expect(store.current()).toMatchObject({ email: "ana@example.com" });
+  });
+
   it("keeps a new registration and forgets it when she cancels", async () => {
     const store = createStore();
     const screen = await render(
