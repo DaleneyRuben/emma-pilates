@@ -18,6 +18,7 @@ import { createApiFetcher } from "./api/fetcher";
 import { clearPersistedAccountCache } from "./query/persistence";
 import { clearMobileQueryCache, MobileQueryProvider } from "./query/provider";
 import { fontAssets } from "./ui/fonts";
+import { RenderErrorBoundary } from "./ui/render-error-boundary";
 
 export type MobileRuntime = {
   allowedLinkHosts: readonly string[];
@@ -163,25 +164,30 @@ export function MobileApplication({
     return null;
   }
 
+  // The last resort for the authentication flow, the providers, and the
+  // navigators' own chrome; each navigator wraps its screens on its own
+  // (recoveryScreenLayout) so a failed screen keeps the navigator (MOB-053).
   return (
     <>
-      <MobileQueryProvider>
-        <VerifiedLinkProvider
-          allowedHosts={mobileRuntime.allowedLinkHosts}
-          source={mobileRuntime.linkSource}
-        >
-          <MobileIdentityProvider manager={mobileRuntime.sessionManager}>
-            <IdentityNavigation
-              Navigation={Navigation}
-              authenticationApi={mobileRuntime.authenticationApi}
-              apiBaseUrl={mobileRuntime.apiBaseUrl}
-              apiFetcher={mobileRuntime.apiFetcher}
-              login={mobileRuntime.login}
-              pendingRegistrationStore={mobileRuntime.pendingRegistrationStore}
-            />
-          </MobileIdentityProvider>
-        </VerifiedLinkProvider>
-      </MobileQueryProvider>
+      <RenderErrorBoundary>
+        <MobileQueryProvider>
+          <VerifiedLinkProvider
+            allowedHosts={mobileRuntime.allowedLinkHosts}
+            source={mobileRuntime.linkSource}
+          >
+            <MobileIdentityProvider manager={mobileRuntime.sessionManager}>
+              <IdentityNavigation
+                Navigation={Navigation}
+                authenticationApi={mobileRuntime.authenticationApi}
+                apiBaseUrl={mobileRuntime.apiBaseUrl}
+                apiFetcher={mobileRuntime.apiFetcher}
+                login={mobileRuntime.login}
+                pendingRegistrationStore={mobileRuntime.pendingRegistrationStore}
+              />
+            </MobileIdentityProvider>
+          </VerifiedLinkProvider>
+        </MobileQueryProvider>
+      </RenderErrorBoundary>
       <StatusBar style="auto" />
     </>
   );
