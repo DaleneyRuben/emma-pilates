@@ -47,7 +47,7 @@ describe("RenderErrorBoundary", () => {
     expect(consoleError).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({ message: "mob-053 probe" }),
-      expect.stringContaining("Child"),
+      expect.stringContaining("render-error-boundary.spec.tsx"),
     );
   });
 
