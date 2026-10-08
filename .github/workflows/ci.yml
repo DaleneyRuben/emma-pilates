@@ -153,6 +153,19 @@ jobs:
       # so Jest is told to exit once the tests are done
       - run: pnpm --filter @pilates/admin-web exec jest --ci --forceExit
 
+  # temporary (WEB-016): what holds the admin-web Jest process on this runner
+  web-handle-diagnostic:
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: nproc; node -e 'const os = require("node:os"); console.log(os.cpus().length, os.availableParallelism())'
+      - run: date -u; timeout 780 pnpm --filter @pilates/admin-web exec jest --ci --setupFilesAfterEnv ./jest.setup.ts ./test/handle-tracer.cjs; echo "exit=$?"; date -u
+        shell: bash
+
   mobile:
     needs: quality-mobile
     runs-on: ubuntu-24.04
