@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useEffectEvent, useState } from "react";
 
 import type { PendingRegistration } from "./pending-registration-screens";
 import type { PendingRegistrationStore } from "./pending-registration-store";
@@ -21,22 +21,30 @@ export function usePendingRegistration({
   const [pending, setPendingState] = useState<PendingRegistration | null>(null);
   const [restoring, setRestoring] = useState(store !== undefined && restore);
 
+  // Restoring happens once per launch, whatever the props do later: the effect
+  // runs once and reads the props through an effect event, so a later render
+  // (a new `onRestored` closure, a link that flips `restore`) neither restarts
+  // the load nor discards its result.
+  const restoreProps = useEffectEvent(() =>
+    store === undefined || !restore ? null : { onRestored, store },
+  );
+
   useEffect(() => {
-    if (store === undefined || !restore) return undefined;
-    let active = true;
-    void store.load().then(async (kept) => {
-      if (!active) return;
+    const props = restoreProps();
+    if (props === null) return undefined;
+    let mounted = true;
+    void props.store.load().then(async (kept) => {
+      if (!mounted) return;
       if (kept !== null) {
-        if (Date.now() >= kept.pendingExpiresAt) await store.clear();
+        if (Date.now() >= kept.pendingExpiresAt) await props.store.clear();
         setPendingState(kept);
-        onRestored();
+        props.onRestored();
       }
       setRestoring(false);
     });
     return () => {
-      active = false;
+      mounted = false;
     };
-    // Restoring happens once per launch, whatever the props do later.
   }, []);
 
   const setPending = useCallback(
