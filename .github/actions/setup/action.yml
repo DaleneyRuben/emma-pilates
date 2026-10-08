@@ -1,5 +1,11 @@
 name: setup
-description: Node from .nvmrc, pnpm from the packageManager field, cached pnpm store, frozen install, generated Prisma client
+description: Node from .nvmrc, pnpm from the packageManager field, cached pnpm store, frozen install, generated Prisma client, and on request the Chromium build Playwright is pinned to
+
+inputs:
+  playwright-browser:
+    description: Install the admin web's pinned Playwright Chromium (cached under ~/.cache/ms-playwright by Playwright version) and its system packages
+    required: false
+    default: "false"
 
 runs:
   using: composite
@@ -12,4 +18,21 @@ runs:
     - run: pnpm install --frozen-lockfile
       shell: bash
     - run: pnpm --filter @pilates/backend prisma:generate
+      shell: bash
+    - if: inputs.playwright-browser == 'true'
+      id: playwright
+      run: echo "version=$(pnpm --filter @pilates/admin-web exec playwright --version | awk '{ print $2 }')" >> "$GITHUB_OUTPUT"
+      shell: bash
+    - if: inputs.playwright-browser == 'true'
+      id: playwright-cache
+      uses: actions/cache@v6
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-chromium-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+    - if: inputs.playwright-browser == 'true' && steps.playwright-cache.outputs.cache-hit != 'true'
+      run: pnpm --filter @pilates/admin-web exec playwright install chromium
+      shell: bash
+    # the browser's shared libraries are not part of the cached download
+    - if: inputs.playwright-browser == 'true'
+      run: pnpm --filter @pilates/admin-web exec playwright install-deps chromium
       shell: bash
