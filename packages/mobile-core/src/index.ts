@@ -41,6 +41,8 @@ export * from "./ui/glyph";
 export * from "./ui/text-button";
 export * from "./ui/primary-button";
 export * from "./ui/query-failure";
+export * from "./ui/recovery-screen";
+export * from "./ui/render-error-boundary";
 export * from "./ui/heading";
 export * from "./ui/line-icon";
 export * from "./ui/offline-banner";
