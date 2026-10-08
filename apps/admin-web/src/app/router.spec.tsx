@@ -1,5 +1,6 @@
-import { screen } from "@testing-library/react";
+import { act, screen } from "@testing-library/react";
 import { server, useMockServer } from "../test/msw";
+import { emptyPageHandlers } from "../test/page-handlers";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { navigationGroups, navigationItems } from "./navigation";
@@ -78,7 +79,7 @@ describe("admin navigation", () => {
 
 describe("admin routes", () => {
   useMockServer();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), ...emptyPageHandlers()));
 
   it("opens the schedule at the root path", async () => {
     renderAt("/");
@@ -105,10 +106,14 @@ describe("admin routes", () => {
       pageSize: 20,
     });
 
-    await router.navigate({
-      to: "/promociones/referidos",
-      search: { page: 3, pageSize: 50 },
-    });
+    // A navigation outside any Testing Library call renders outside an
+    // act scope, so the test holds one itself.
+    await act(() =>
+      router.navigate({
+        to: "/promociones/referidos",
+        search: { page: 3, pageSize: 50 },
+      }),
+    );
     expect(router.state.matches.at(-1)?.search).toEqual({
       page: 3,
       pageSize: 50,

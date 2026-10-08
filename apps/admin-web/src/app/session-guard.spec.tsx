@@ -1,7 +1,8 @@
-import { screen, within } from "@testing-library/react";
+import { act, screen, within } from "@testing-library/react";
 import { ApiError } from "../api/problem";
 import { http, HttpResponse } from "msw";
 import { apiUrl, server, useMockServer } from "../test/msw";
+import { emptyPageHandlers } from "../test/page-handlers";
 import { renderAdmin } from "../test/render-admin";
 import {
   currentSessionPath,
@@ -32,7 +33,7 @@ describe("admin session guard", () => {
   });
 
   it("restores a signed-in browser session at startup without asking again", async () => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...emptyPageHandlers());
     renderAdmin("/back-office/evaluaciones-nutricionales");
 
     expect(await heading("Evaluaciones nutricionales")).toBeInTheDocument();
@@ -50,7 +51,7 @@ describe("admin session guard", () => {
   });
 
   it("returns to Login once, with a notice, when a later request finds the session ended", async () => {
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), ...emptyPageHandlers());
     const { router, queryClient } = renderAdmin("/back-office/gastos");
     await heading("Gastos");
     server.use(...signedOutHandlers());
@@ -59,10 +60,14 @@ describe("admin session guard", () => {
       Promise.reject(
         new ApiError({ status: 401, code: "authentication_required" }),
       );
-    await Promise.allSettled([
-      queryClient.fetchQuery({ queryKey: ["uno"], queryFn: ended }),
-      queryClient.fetchQuery({ queryKey: ["dos"], queryFn: ended }),
-    ]);
+    // The expiry navigates as the rejections land, outside any Testing
+    // Library call, so the test holds the act scope itself.
+    await act(async () => {
+      await Promise.allSettled([
+        queryClient.fetchQuery({ queryKey: ["uno"], queryFn: ended }),
+        queryClient.fetchQuery({ queryKey: ["dos"], queryFn: ended }),
+      ]);
+    });
 
     expect(await heading("Iniciar sesión")).toBeInTheDocument();
     expect(
@@ -79,6 +84,7 @@ describe("admin session guard", () => {
   it("reports an expiry again after a session restored without Login (another tab signed in)", async () => {
     server.use(
       ...signedInHandlers(),
+      ...emptyPageHandlers(),
       http.delete(apiUrl(currentSessionPath), () => {
         server.use(...signedOutHandlers());
         return new HttpResponse(null, { status: 204 });
@@ -98,23 +104,27 @@ describe("admin session guard", () => {
     await heading("Iniciar sesión");
 
     // Another tab signed in; this tab goes back and the probe finds a session.
-    server.use(...signedInHandlers());
-    await router.navigate({
-      to: "/back-office/gastos",
-      search: { page: 1, pageSize: 20 },
-    });
+    server.use(...signedInHandlers(), ...emptyPageHandlers());
+    await act(() =>
+      router.navigate({
+        to: "/back-office/gastos",
+        search: { page: 1, pageSize: 20 },
+      }),
+    );
     await heading("Gastos");
 
     server.use(...signedOutHandlers());
-    await queryClient
-      .fetchQuery({
-        queryKey: ["tarde"],
-        queryFn: () =>
-          Promise.reject(
-            new ApiError({ status: 401, code: "authentication_required" }),
-          ),
-      })
-      .catch(() => undefined);
+    await act(async () => {
+      await queryClient
+        .fetchQuery({
+          queryKey: ["tarde"],
+          queryFn: () =>
+            Promise.reject(
+              new ApiError({ status: 401, code: "authentication_required" }),
+            ),
+        })
+        .catch(() => undefined);
+    });
 
     expect(await heading("Iniciar sesión")).toBeInTheDocument();
     expect(
@@ -126,6 +136,11 @@ describe("admin session guard", () => {
     server.use(
       http.get(apiUrl(currentSessionPath), () => HttpResponse.error()),
     );
+    // React reports the error the route boundary catches through
+    // console.error; the test expects it instead of letting it print.
+    const reported = jest
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
     renderAdmin("/");
     expect(
       await screen.findByText(
@@ -133,5 +148,9 @@ describe("admin session guard", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reintentar" })).toBeEnabled();
+    expect(reported.mock.calls.flat()).toContainEqual(
+      expect.objectContaining({ status: 0, code: "network_error" }),
+    );
+    reported.mockRestore();
   });
 });

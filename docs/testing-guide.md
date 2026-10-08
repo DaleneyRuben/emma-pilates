@@ -1180,6 +1180,31 @@ stack); an `async_hooks` setup file that logs every resource still
 referenced after the last spec names it in one run, as WEB-016's temporary
 diagnostic did.
 
+A green run prints nothing (WEB-018). Two guards hold that line: `useMockServer`
+in `src/test/msw.ts` records every request that MSW's «error» strategy rejects
+(its `request:unhandled` event) and fails the test that issued it, and
+`jest.setup.ts` collects React's «not wrapped in act» lines from
+`console.error` and fails the spec that let one through, as the mobile setups
+do (MOB-054); both still print the original message above the failure, so the
+failing spec shows which request or update it was. Before WEB-018 every run
+logged 17 «[MSW] Error: intercepted a request without a matching request
+handler» lines and 34 act warnings: six specs rendered or walked to a page for
+the shell's sake (the sidebar marker, the session guard, a badge, the logout)
+and checked only its heading, so the page's own reads (expenses, expense
+categories, promotions, clients, referrals, evaluations, nutritionists) found
+no handler while the test still ran, and two specs drove `router.navigate` and
+`queryClient.fetchQuery` outside any Testing Library call, so the renders they
+caused landed outside an act scope. `src/test/page-handlers.ts` answers those
+pages' reads with empty lists for such specs, the two specs hold an `act`
+scope around the calls they make themselves, and the one test that makes the
+startup boundary catch a network error expects React's report of it instead of
+letting it print. The lines looked CI-only but never were: Jest 30 picks its
+agent reporter when an AI-agent variable (`CLAUDECODE`, `AI_AGENT`, and
+others) is in the environment, and that reporter prints a file's `PASS` line
+and console output only when the file fails, so a green suite run from an
+assistant's shell is a bare summary; `--verbose` prints the console output as
+it happens, and a plain terminal or the CI runner prints everything.
+
 ### Backend HTTP end-to-end tests
 
 ```sh
@@ -1315,7 +1340,9 @@ spec leaves behind would hold the process. The three mobile setups keep
 TanStack's timers from doing so (MOB-057, about three minutes for the mobile
 job), and the admin web's environment keeps React's scheduler off a Node
 `MessagePort` (WEB-016, about two minutes for the web job). No step uses
-`--forceExit` any more. The integration step raises Node's heap
+`--forceExit` any more. A green web job prints no `console.error` line
+(WEB-018): a request no handler answers and a React act warning each fail
+the spec instead of scrolling past. The integration step raises Node's heap
 (`NODE_OPTIONS=--max-old-space-size=4096`) because the in-band ESM run grows
 past the runner's default limit; the backend scripts keep the shell's
 `NODE_OPTIONS` next to their own `--experimental-vm-modules` for that reason.

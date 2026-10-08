@@ -2,6 +2,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import { http } from "msw";
 import { activeBranchesHandler, branchesPath } from "../test/booking-handlers";
 import { apiUrl, problemResponse, server, useMockServer } from "../test/msw";
+import { emptyPageHandlers } from "../test/page-handlers";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
 import { useNarrowViewport } from "../test/viewport";
@@ -10,7 +11,7 @@ const renderShell = (path = "/") => renderAdmin(path);
 
 describe("admin shell", () => {
   useMockServer();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), ...emptyPageHandlers()));
 
   const heading = (name: string) =>
     screen.findByRole("heading", { level: 1, name });

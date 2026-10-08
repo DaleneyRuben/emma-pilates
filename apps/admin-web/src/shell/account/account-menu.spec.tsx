@@ -1,6 +1,7 @@
 import { screen, within } from "@testing-library/react";
 import { http, HttpResponse } from "msw";
 import { apiUrl, problemResponse, server, useMockServer } from "../../test/msw";
+import { emptyPageHandlers } from "../../test/page-handlers";
 import { renderAdmin } from "../../test/render-admin";
 import {
   currentSessionPath,
@@ -18,7 +19,7 @@ const openMenu = async (user: ReturnType<typeof renderAdmin>["user"]) => {
 
 describe("AW33 user menu on a desktop browser", () => {
   useMockServer();
-  beforeEach(() => server.use(...signedInHandlers()));
+  beforeEach(() => server.use(...signedInHandlers(), ...emptyPageHandlers()));
 
   it("replaces the placeholder with the signed-in Administrator", async () => {
     const { user } = renderAdmin("/");

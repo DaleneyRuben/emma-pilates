@@ -5,6 +5,30 @@ import { configure } from "@testing-library/dom";
 // render can outlast Testing Library's one-second default lookup.
 configure({ asyncUtilTimeout: 3_000 });
 
+// WEB-018, as MOB-054 does in the mobile setups: a React act() warning fails
+// the spec that let it through instead of scrolling past in the output. The
+// warning is still printed, so the failing spec shows which update landed
+// outside an act scope.
+const actWarnings: string[] = [];
+const reportError = console.error;
+console.error = (...args: unknown[]) => {
+  reportError(...args);
+  const message = String(args[0]).replace("%s", String(args[1]));
+  if (
+    /not wrapped in act|not configured to support act|overlapping act/.test(
+      message,
+    )
+  ) {
+    actWarnings.push(message.split("\n")[0] ?? message);
+  }
+};
+afterEach(() => {
+  expect(actWarnings.splice(0)).toEqual([]);
+});
+afterAll(() => {
+  expect(actWarnings).toEqual([]);
+});
+
 // jsdom has no matchMedia; the shell treats a missing implementation as the
 // desktop layout, and narrow-width tests install their own stub.
 if (typeof window.matchMedia !== "function") {

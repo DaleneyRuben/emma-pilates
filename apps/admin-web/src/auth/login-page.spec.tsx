@@ -7,6 +7,7 @@ import {
   server,
   useMockServer,
 } from "../test/msw";
+import { emptyPageHandlers } from "../test/page-handlers";
 import { renderAdmin } from "../test/render-admin";
 import {
   paolaPrincipal,
@@ -38,7 +39,7 @@ describe("AW01 Login", () => {
     server.use(
       http.post(apiUrl(loginPath), async ({ request }) => {
         body = await request.json();
-        server.use(...signedInHandlers());
+        server.use(...signedInHandlers(), ...emptyPageHandlers());
         return jsonResponse(paolaPrincipal, 201);
       }),
     );
