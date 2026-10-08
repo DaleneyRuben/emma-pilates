@@ -1,7 +1,8 @@
-import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { Alert } from "react-native";
 
+import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
 import { openProfile, profile, readRoutes } from "./profile-test-support";
 
@@ -40,10 +41,85 @@ const notificationRoutes = {
     }),
 };
 
+// Holds the profile request until `release` runs, so Perfil mounts while the
+// profile query is still pending (a cold cache), as it never is through Inicio
+// against a local API.
+function gatedProfileFetcher() {
+  let release = () => undefined;
+  const gate = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  const fetcher = routeFetcher(readRoutes);
+  const gated = jest.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
+    const method = init?.method?.toUpperCase() ?? "GET";
+    if (method === "GET" && String(input).endsWith("/api/v1/clients/current")) {
+      await gate;
+    }
+    return fetcher(input, init);
+  }) as unknown as typeof globalThis.fetch;
+  return { fetcher: gated, release: () => release() };
+}
+
+async function openPerfilTab(runtime: ReturnType<typeof createClientRuntime>) {
+  const screen = await render(<App runtime={runtime} />);
+  await waitFor(
+    () => {
+      expect(screen.getByRole("button", { name: /Perfil/ })).toBeOnTheScreen();
+    },
+    { timeout: 10_000 },
+  );
+  fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
+  return screen;
+}
+
 describe("Client Profile", () => {
   afterEach(() => {
     cleanup();
     clearMobileQueryCache();
+  });
+
+  // MOB-051: the hook count must not change when the profile query settles.
+  it("shows the profile once a pending profile request answers", async () => {
+    const { fetcher, release } = gatedProfileFetcher();
+    const screen = await openPerfilTab(createClientRuntime(fetcher));
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Cargando perfil")).toBeOnTheScreen();
+    });
+
+    release();
+
+    await waitFor(() => {
+      expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("sofia@example.com")).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Cerrar sesión" })).toBeOnTheScreen();
+  });
+
+  it("recovers from a failed profile request when Reintentar succeeds", async () => {
+    let failures = 1;
+    const screen = await openPerfilTab(
+      createClientRuntime(
+        routeFetcher({
+          ...readRoutes,
+          "/api/v1/clients/current": () =>
+            failures-- > 0
+              ? jsonResponse({ code: "internal_error", status: 500 }, 500)
+              : jsonResponse(profile),
+        }),
+      ),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("No pudimos cargar tu perfil.")).toBeOnTheScreen();
+    });
+
+    fireEvent.press(screen.getByRole("button", { name: "Reintentar" }));
+
+    await waitFor(() => {
+      expect(screen.getByText("Sofía Guzmán")).toBeOnTheScreen();
+    });
+    expect(screen.queryByText("No pudimos cargar tu perfil.")).not.toBeOnTheScreen();
   });
 
   it("draws 18's line icon on every Perfil row (follow-up 70)", async () => {
