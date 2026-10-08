@@ -119,7 +119,9 @@ export function AuthenticationFlow({
 }: AuthenticationFlowProps) {
   const [route, setRoute] = useState<AuthenticationRoute>(() => routeForIntent(intent));
   const { pending, restoring, setPending } = usePendingRegistration({
-    onRestored: () => setRoute("check-email"),
+    // A link that arrived while the kept registration was loading keeps its
+    // screen; the registration stays stored for a launch without one (MOB-056).
+    onRestored: () => setRoute((current) => (current === "login" ? "check-email" : current)),
     restore: intent === null || intent === undefined,
     store: pendingRegistrationStore,
   });
