@@ -1050,10 +1050,29 @@ support act», and «overlapping act» line from `console.error`, which the
 through fails with the warning printed above it; the fix is always to `await`
 the RNTL 14 call that is still in flight (`render`, `fireEvent.*`, `cleanup`,
 `rerender`, `unmount` are asynchronous) or to `waitFor` the state the screen
-is still loading. All three mobile suites exit on their own on macOS; on
-CI's Linux runner each one lingers five to six minutes after its summary
-(MOB-057 measured 5 m 45 s and 5 m 53 s for the two app suites without the
-flag), so CI keeps `--forceExit` until that Linux-only handle is found.
+is still loading.
+
+All three mobile suites exit on their own, without `--forceExit`, wherever
+they run (MOB-057). TanStack Query schedules a five-minute garbage-collection
+timer for every query and mutation that loses its last observer, which RNTL's
+cleanup makes happen at the end of every spec; each `jest.setup.ts` therefore
+gives TanStack's `timeoutManager` a provider whose timers do not hold the Node
+process (`unref`), so Jest exits as soon as the last spec is done while
+`staleTime`, `gcTime`, retries, and the persister's throttle still fire during
+a spec (Jest's own five-second hook timeout holds the process then). The
+timers went unnoticed on a Mac because Jest hands each spec file to a worker
+and kills the worker half a second after the run; where Jest runs the suite
+in its own process (`--runInBand`, `--detectOpenHandles`, or a machine with
+two cores such as CI's runner, whose `maxWorkers` is then 1) they kept the
+process alive for exactly five minutes after the summary. To see the
+difference yourself, run any suite with `--runInBand`: before MOB-057 the
+summary was followed by «Jest did not exit one second after the test run
+has completed» and a five-minute wait. Jest's `--detectOpenHandles` never
+named them because a timer scheduled from a promise continuation has no
+test-file frame on its stack, which is the filter Jest's collector applies.
+If a suite lingers again, trace it with an `async_hooks` setup file that logs
+every `Timeout` still referenced after the last spec, as MOB-057's temporary
+diagnostic did.
 
 Both app suites run against a frozen clock (MOB-051): their Jest config fakes
 `Date` only, at 2026-10-08 14:00 UTC (10:00 in Bolivia), so a spec that
@@ -1268,12 +1287,13 @@ always runs everything. Jobs that never started show as skipped. A clean run
 of all three chains takes about nine minutes of wall clock, set by the api
 chain.
 
-The Jest steps run with `--ci --forceExit`: every one of these suites passes
-and then lingers on an open handle on Linux, the admin web for good and each
-mobile package for five to six minutes (measured by MOB-057 on 2026-10-08:
-without the flag the mobile job ran past its 15-minute timeout after two of
-its three suites), so Jest is told to exit once the tests are done. On macOS
-the mobile suites exit on their own (MOB-054), so the handle is Linux-only. The integration step raises Node's heap
+The three mobile Jest steps run with `--ci` alone and exit on their own
+(MOB-057: the runner has two cores, so Jest runs each suite in band and every
+timer a spec leaves behind would hold the process; the setups above keep
+TanStack's timers from doing so, and the mobile job takes about three
+minutes). The admin-web step keeps `--ci --forceExit`: that suite passes and
+then lingers on an open handle on Linux for good, so Jest is told to exit
+once its tests are done. The integration step raises Node's heap
 (`NODE_OPTIONS=--max-old-space-size=4096`) because the in-band ESM run grows
 past the runner's default limit; the backend scripts keep the shell's
 `NODE_OPTIONS` next to their own `--experimental-vm-modules` for that reason.
