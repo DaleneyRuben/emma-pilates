@@ -155,6 +155,18 @@ jobs:
       # suite exits on its own
       - run: pnpm --filter @pilates/admin-web exec jest --ci
 
+  # the ten Playwright journeys of Test 31 through the built backend and the
+  # built admin web; the suite's global setup makes its own pilates_test_*
+  # database and starts both servers
+  web-e2e:
+    needs: web
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm test:admin-e2e
+
   mobile:
     needs: quality-mobile
     runs-on: ubuntu-24.04
