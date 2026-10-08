@@ -1027,11 +1027,14 @@ JavaScript and typescript-eslint rules, the React Hooks rules, and
 `no-restricted-imports` patterns that refuse deep imports into
 `@pilates/api-contracts` or `@pilates/mobile-core`, imports of another
 application, and relative paths that leave the package. A clean run exits 0
-and prints only warnings: the two React Compiler rules
-`react-hooks/set-state-in-effect` and `react-hooks/purity` are downgraded to
-warnings because the apps do not compile with the React Compiler and the
-flagged patterns are pre-existing (MOB-052 lists them), and two
-`react-hooks/exhaustive-deps` warnings in mobile-core belong to the same item.
+and prints nothing: since MOB-052 every React Hooks rule of the recommended
+set, the React Compiler rules `react-hooks/set-state-in-effect` and
+`react-hooks/purity` included, is an error, and no warning is left. A notice
+that a navigation carries («Reserva confirmada», «Pago confirmado») is read
+from the route param through `useTransientNotice`, which clears the param
+when the notice's time is up, and a screen that compares a deadline with
+«now» reads the clock once through `useMountedAt` when it appears, so neither
+pattern needs an effect that copies into state or a `Date.now()` in render.
 `format:check` runs Prettier separately, as the admin web does, with
 `printWidth: 100` in each package's `.prettierrc`; `pnpm --filter <package>
 format` rewrites the files. Jest never runs ESLint, so a lint error does not
@@ -1158,7 +1161,7 @@ What they mean:
 
 - `lint` checks code-style and common programming mistakes in every package
   with a `lint` script (the backend, the admin web, and since MOB-050 the three
-  mobile packages; the mobile packages print warnings but no errors, see
+  mobile packages, which print nothing since MOB-052, see
   «Mobile automated tests»); the admin web and the mobile packages keep
   Prettier as a separate `format:check` script, the backend runs it through
   ESLint;
