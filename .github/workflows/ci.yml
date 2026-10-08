@@ -149,9 +149,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      # the suite passes and then lingers on an open handle on Linux for good,
-      # so Jest is told to exit once the tests are done
-      - run: pnpm --filter @pilates/admin-web exec jest --ci --forceExit
+      # the runner has two cores, so Jest runs the suite in band and every
+      # handle a spec leaves behind holds the process; jest.environment.cjs
+      # keeps React's scheduler off a Node MessagePort (WEB-016), and the
+      # suite exits on its own
+      - run: pnpm --filter @pilates/admin-web exec jest --ci
 
   # temporary (WEB-016): what holds the admin-web Jest process on this runner
   web-handle-diagnostic:
