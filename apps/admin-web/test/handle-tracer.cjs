@@ -2,6 +2,7 @@
 // process and prints the ones still referenced after each spec file.
 const asyncHooks = require("node:async_hooks");
 const realProcess = require("node:process");
+const nodeTimers = require("node:timers");
 const tracked = new Set([
   "Timeout", "Immediate", "MessagePort", "TCPWRAP", "TCPSERVERWRAP",
   "PIPEWRAP", "PIPESERVERWRAP", "TTYWRAP", "FSREQCALLBACK", "SIGNALWRAP",
@@ -14,7 +15,7 @@ if (!realProcess.__handleTracer) {
   asyncHooks
     .createHook({
       init(id, type, triggerId, resource) {
-        if (!tracked.has(type)) return;
+        if (type === "PROMISE" || type === "TickObject" || type === "Microtask") return;
         const stack = new Error().stack.split("\n").slice(1, 14).join("\n");
         live.set(id, { type, resource, stack, triggerId });
       },
@@ -42,7 +43,7 @@ afterAll(() => report(`after ${expect.getState().testPath}`));
 // Keeps reporting while something else holds the process after the summary;
 // the interval itself never holds it.
 if (!realProcess.__handleTracer.ticker) {
-  realProcess.__handleTracer.ticker = setInterval(
+  realProcess.__handleTracer.ticker = nodeTimers.setInterval(
     () => report("still alive"),
     60_000,
   );
