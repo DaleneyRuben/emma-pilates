@@ -25,6 +25,7 @@ export * from "./money/bolivianos";
 export * from "./notifications/notification-time";
 export * from "./notifications/notifications-screen";
 export * from "./query/provider";
+export * from "./time/mounted-at";
 export * from "./time/session-format";
 export * from "./ui/avatar-circle";
 export * from "./ui/back-link";
