@@ -1050,8 +1050,8 @@ support act», and «overlapping act» line from `console.error`, which the
 through fails with the warning printed above it; the fix is always to `await`
 the RNTL 14 call that is still in flight (`render`, `fireEvent.*`, `cleanup`,
 `rerender`, `unmount` are asynchronous) or to `waitFor` the state the screen
-is still loading. All three mobile suites exit on their own; the `--forceExit`
-that CI passes is harmless and no longer needed.
+is still loading. All three mobile suites exit on their own, and since
+MOB-057 CI runs them without `--forceExit`.
 
 Both app suites run against a frozen clock (MOB-051): their Jest config fakes
 `Date` only, at 2026-10-08 14:00 UTC (10:00 in Bolivia), so a spec that
@@ -1257,10 +1257,11 @@ always runs everything. Jobs that never started show as skipped. A clean run
 of all three chains takes about nine minutes of wall clock, set by the api
 chain.
 
-The Jest steps run with `--ci --forceExit`: every one of these suites passes
-and then lingers on an open handle on Linux, the admin web for good and each
-mobile package for about five minutes, so Jest is told to exit once the tests
-are done. The integration step raises Node's heap
+The admin-web Jest step runs with `--ci --forceExit`: that suite passes and
+then lingers on an open handle on Linux for good, so Jest is told to exit
+once the tests are done. The three mobile suites run with `--ci` alone: they
+exit on their own (MOB-054 found no open handle; MOB-057 dropped the flag).
+The integration step raises Node's heap
 (`NODE_OPTIONS=--max-old-space-size=4096`) because the in-band ESM run grows
 past the runner's default limit; the backend scripts keep the shell's
 `NODE_OPTIONS` next to their own `--experimental-vm-modules` for that reason.
