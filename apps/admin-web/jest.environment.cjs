@@ -2,6 +2,11 @@ const { TestEnvironment } = require("jest-environment-jsdom");
 
 // jsdom lacks the WHATWG fetch and stream globals that MSW's Node
 // interceptors and the generated fetch client need; Node 24 has them all.
+// MessageChannel and MessagePort stay out on purpose: nothing the specs load
+// needs them, and with a MessageChannel in scope React's scheduler drives its
+// work through a Node MessagePort whose message listener keeps the process
+// alive for good once Jest runs in band (WEB-016); without one it falls back
+// to setTimeout, as in any jsdom environment.
 const nodeGlobals = [
   "fetch",
   "Request",
@@ -16,8 +21,6 @@ const nodeGlobals = [
   "WritableStream",
   "TransformStream",
   "BroadcastChannel",
-  "MessageChannel",
-  "MessagePort",
   "structuredClone",
 ];
 

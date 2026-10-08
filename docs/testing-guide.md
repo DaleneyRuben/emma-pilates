@@ -1158,6 +1158,28 @@ too. `pnpm --filter @pilates/admin-web lint`, `typecheck`, `build`, and
 `format:check` are the remaining quality checks for that app. The Playwright
 journeys through the built app and the real backend are Test 31.
 
+The suite exits on its own, without `--forceExit`, wherever it runs
+(WEB-016). Its custom environment (`jest.environment.cjs`) copies the fetch
+and stream globals jsdom lacks from Node, and until WEB-016 it copied
+`MessageChannel` and `MessagePort` too; React's scheduler prefers a
+`MessageChannel` over `setTimeout` when one is in scope, and Node's
+`MessagePort` with a message listener is a referenced handle that nothing
+ever closes, so once Jest ran the suite in band (`--runInBand`, or CI's
+two-core runner) the process never exited: not after five minutes, ever. The
+environment no longer copies the two, nothing the specs load needs them, and
+the scheduler falls back to `setTimeout` as in any jsdom environment.
+TanStack Query's five-minute garbage-collection timers, MOB-057's cause in
+the mobile suites, exist here as well but do not matter: they are scheduled
+through jsdom's `window.setTimeout`, and the environment's teardown closes
+the window and clears them. To see the difference yourself, run any
+rendering spec with `--runInBand`: before WEB-016 the summary was followed
+by «Jest did not exit one second after the test run has completed» and a
+process that never ended. `--detectOpenHandles` cannot name the port (it is
+created while the `scheduler` module loads, with no test-file frame on its
+stack); an `async_hooks` setup file that logs every resource still
+referenced after the last spec names it in one run, as WEB-016's temporary
+diagnostic did.
+
 ### Backend HTTP end-to-end tests
 
 ```sh
@@ -1287,13 +1309,13 @@ always runs everything. Jobs that never started show as skipped. A clean run
 of all three chains takes about nine minutes of wall clock, set by the api
 chain.
 
-The three mobile Jest steps run with `--ci` alone and exit on their own
-(MOB-057: the runner has two cores, so Jest runs each suite in band and every
-timer a spec leaves behind would hold the process; the setups above keep
-TanStack's timers from doing so, and the mobile job takes about three
-minutes). The admin-web step keeps `--ci --forceExit`: that suite passes and
-then lingers on an open handle on Linux for good, so Jest is told to exit
-once its tests are done. The integration step raises Node's heap
+The four frontend Jest steps run with `--ci` alone and exit on their own:
+the runner has two cores, so Jest runs each suite in band and every handle a
+spec leaves behind would hold the process. The three mobile setups keep
+TanStack's timers from doing so (MOB-057, about three minutes for the mobile
+job), and the admin web's environment keeps React's scheduler off a Node
+`MessagePort` (WEB-016, about two minutes for the web job). No step uses
+`--forceExit` any more. The integration step raises Node's heap
 (`NODE_OPTIONS=--max-old-space-size=4096`) because the in-band ESM run grows
 past the runner's default limit; the backend scripts keep the shell's
 `NODE_OPTIONS` next to their own `--experimental-vm-modules` for that reason.
