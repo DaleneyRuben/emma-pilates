@@ -1,6 +1,8 @@
+#!/usr/bin/env node
 // Release-build smoke check (REL-001): builds the production, minified
 // Hermes bundles for iOS and Android exactly as EAS Build does before
-// compiling native code, and fails if either is missing. Run from an app:
+// compiling native code, and fails if either is missing. Exposed as the
+// `pilates-mobile-release-smoke` bin of @pilates/tooling; run it from an app:
 //   EXPO_PUBLIC_API_URL=https://api.example.com pnpm release:smoke
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, readFileSync, rmSync, statSync } from "node:fs";

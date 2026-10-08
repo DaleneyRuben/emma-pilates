@@ -7,6 +7,9 @@
   "exports": {
     "./eslint/mobile": "./eslint/mobile.js"
   },
+  "bin": {
+    "pilates-mobile-release-smoke": "./scripts/mobile-release-smoke.mjs"
+  },
   "dependencies": {
     "@eslint/js": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
