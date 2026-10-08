@@ -1060,9 +1060,12 @@ same thing whenever you run it; timers, `waitFor`, and the other
 asynchronous APIs stay real. Specs that need a particular instant still set
 it explicitly in their fixtures.
 
-The same three packages are linted and format-checked (MOB-050):
+The same three packages are linted and format-checked (MOB-050), and so is
+the tooling package that holds their shared ESLint config and the release
+smoke script (MOB-055):
 
 ```sh
+pnpm --filter @pilates/tooling lint
 pnpm --filter @pilates/mobile-core lint
 pnpm --filter @pilates/mobile-core format:check
 pnpm --filter @pilates/client-mobile lint
@@ -1088,9 +1091,14 @@ when the notice's time is up, and a screen that compares a deadline with
 pattern needs an effect that copies into state or a `Date.now()` in render.
 `format:check` runs Prettier separately, as the admin web does, with
 `printWidth: 100` in each package's `.prettierrc`; `pnpm --filter <package>
-format` rewrites the files. Jest never runs ESLint, so a lint error does not
+format` rewrites the files. `@pilates/tooling` has its own
+`eslint.config.mjs` (the recommended JavaScript rules with Node's globals,
+nothing else: the package holds plain Node ES modules) that covers its
+`eslint/mobile.js` and `scripts/mobile-release-smoke.mjs`, the script
+behind each app's `release:smoke` (Test 19); it has no Prettier script,
+because adding one would mean a new dependency on that package. Jest never runs ESLint, so a lint error does not
 fail the tests; the project commit skill lints every staged TypeScript file,
-and CI's quality-mobile job runs both checks before the suites.
+and CI's quality-mobile job runs both checks, and the tooling lint, before the suites.
 
 ### Biometric testing limitation
 
@@ -1238,8 +1246,9 @@ runner after the shared setup in `.github/actions/setup/action.yml` (Node from
   on a `pilates_test_ci` admin database that lives and dies with the runner);
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
   **web** (the admin-web Jest suite);
-- **quality-mobile** (lint, `format:check`, and typecheck of mobile-core,
-  client-mobile, and staff-mobile) → **mobile** (their three Jest suites).
+- **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
+  mobile-core, client-mobile, and staff-mobile) → **mobile** (their three
+  Jest suites).
 
 A job runs only when the job before it in its chain passed, so a lint or type
 error costs one two-minute job and the tests never start; a stale contract
@@ -1882,34 +1891,98 @@ Nutritionist's Evaluation notices open **Mi agenda**.
 
 ## Test 19: run the mobile critical journeys and the release smoke check
 
-With fixtures freshly applied (Test 5A), the two Promotions of Test 33
-published (the Home flow asserts «Nueva sala de Reformer en Urubó» and «Clases
-de Barre los sábados»; pass `-e PROMOTION_1=… -e PROMOTION_2=…` for other
-headlines), the backend running, and both apps served (client Metro on any
-free port, staff on 8082), run the committed Maestro journeys from each app
-folder:
+The committed Maestro flows under `apps/client-mobile/.maestro` and
+`apps/staff-mobile/.maestro` are the critical journeys. Each flow's header
+names the fixture Account it logs in as and what it needs beyond the
+fixtures; this test is the checklist for the whole suite.
+
+**Before a run.** Rebuild `pilates_dev_sim` from the migrations and load
+fresh fixtures (Test 5A; stop the API and worker first:
+`dropdb pilates_dev_sim && createdb pilates_dev_sim`, then `db:migrate:deploy`
+and `db:fixtures` on it). Start the API **and the worker** on it
+(`pnpm --filter @pilates/backend start:worker`): `profile-photo.yaml`
+uploads a photo that stays «processing» until the worker rebuilds it, and
+without the worker the flow times out waiting for «Quitar foto». Serve both
+apps in development mode (Expo Go cannot run a production bundle here): the
+staff Metro on 8082 and the client Metro on any free port (8083 below,
+because another project holds 8081 on this machine). Then seed what the
+fixtures do not ship:
+
+- **Two published Promotions** with the headlines of Test 33, «Nueva sala de
+  Reformer en Urubó» and «Clases de Barre los sábados», created in the
+  admin web (Test 33) or through Swagger (Test 32C) with the worker running
+  for their image variants. `home-plan-and-notifications.yaml` asserts those
+  two headlines; its `PROMOTION_1` and `PROMOTION_2` defaults cannot be
+  changed from the command line, because a flow's `env:` value wins over
+  `-e` (a `-e EMAIL=sofia@example.com` against the booking flow's Lucía
+  default still logs in as Lucía).
+- **Two notifications for Lucía**, which the same flow opens from Perfil →
+  Notificaciones: an Evaluation cancelled by the studio («El estudio
+  canceló tu evaluación nutricional…»: book one of Gabriela's slots as
+  `lucia@example.com` through `POST /api/v1/evaluation-slots/{slotId}/evaluations`,
+  then cancel it as `gabriela.flores@example.com` with
+  `DELETE /api/v1/nutritionist/evaluations/{id}`), and a class cancelled by
+  administration («Tu clase de … fue cancelada por administración.»: book a
+  Session inside her Plan as Lucía, then cancel it as
+  `paola.mendoza@example.com` with
+  `POST /api/v1/administrator/sessions/{id}/cancel`). Both must fall inside
+  Lucía's Plan (it ends 20 days after the fixtures), or the API refuses the
+  booking.
+- **One image in each Simulator's photo library** for `profile-photo.yaml`:
+  `xcrun simctl addmedia <udid> photo.jpg` (Maestro has no command that
+  reaches the library, so the flow picks the first grid cell of whatever is
+  there).
+
+**Run.** From each app folder, with the device's UDID (the iPhone 16 Pro and
+the iPad Pro 11 here; shut the iPhone down before the iPad run, or the iPad
+driver does not connect):
 
 ```sh
 cd apps/client-mobile
-maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8081 \
+maestro --udid <udid> test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8083 \
   -e PASSWORD=emma-local-2026 .maestro
 cd ../staff-mobile
-maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8082 \
+maestro --udid <udid> test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8082 \
   -e PASSWORD=emma-local-2026 .maestro
 ```
 
-The Client suite books and cancels a class, walks Home with its carousel, Mi
-plan, and the notification destinations, and books and cancels an Evaluation. The Staff suite
-covers the Administrator's pending payments, the Trainer's agenda and inbox,
-the Assistant's Client search, and the Nutritionist's availability. Each flow
-changes the development database, so re-apply fixtures before running again.
+The Client suite runs its six flows in the order its `config.yaml` pins
+(Maestro's own order is not the file order): `book-and-cancel-class`
+(Lucía books the first Session of the day and cancels it; Sofía's fixture
+Plan is expired, so she cannot book), `email-change` (Lucía asks, resends, and cancels an email
+change; the captured link of Test 34 is not read), `evaluation-book-and-cancel`
+(Lucía), `home-plan-and-notifications` (Lucía; the Promotions and
+notifications above), `profile-photo` (Lucía; the worker and the library
+photo above), and last `close-account` (Sofía closes her Account for good,
+Test 35: nothing after it logs in as her, but the database is spent, so
+rebuild it before the next run instead of re-applying the fixtures). The
+Staff suite runs `administrator-pending-payments`
+(Paola; «No hay pagos pendientes.» is accepted, so no transfer is needed),
+`assistant-client-search` (Camila finds Lucía), `nutritionist-availability`
+(Gabriela publishes and removes a Friday block), and `trainer-agenda-and-inbox`
+(Emma; an empty day is accepted). Every run changes the database: rebuild it
+between the iPhone and the iPad.
+
+**Expo Go's floating gear.** In development mode Expo Go draws its dev-menu
+button over the top-right corner of every screen, where the Staff avatar
+«Tu cuenta» and the Nutritionist's «+ Nuevo horario» sit. The four Staff
+flows park it before the first tap: the button is in the view hierarchy as
+`gearshape.fill`, and a `swipe` from that element moves it to the
+bottom-right corner, on the phone and on the tablet alike; the step runs
+only when the element is visible, so a development build without the gear
+is not affected. The Client flows tap nothing under it. A render error in
+Expo Go opens LogBox over the recovery screen (Test 1); none of the
+committed flows provokes one.
 
 To check that the release bundles build, run
 `EXPO_PUBLIC_API_URL=https://api.example.com pnpm --filter @pilates/client-mobile release:smoke`
-(and the same for `@pilates/staff-mobile`). It prints
-`mobile_release_smoke_passed` with both bundle sizes. Store builds and updates
-follow the [mobile release runbook](./runbooks/mobile-release.md) and need the
-Expo, Apple, and Google accounts first.
+(and the same for `@pilates/staff-mobile`). The script behind it is the
+`pilates-mobile-release-smoke` bin of `@pilates/tooling`
+(`packages/tooling/scripts/mobile-release-smoke.mjs`, linted by that
+package's `lint`, Test 8). It prints `mobile_release_smoke_passed` with both
+bundle sizes. Store builds and updates follow the
+[mobile release runbook](./runbooks/mobile-release.md) and need the Expo,
+Apple, and Google accounts first.
 
 ## Test 20: search every Branch as the Administrator
 

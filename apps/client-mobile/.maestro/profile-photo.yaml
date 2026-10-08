@@ -1,5 +1,12 @@
 # Critical journey: pick, upload, see, and remove the profile photo (MOB-020).
-# Needs at least one image in the Simulator's photo library (xcrun simctl addmedia).
+# Needs two things the fixtures and the API do not provide (Test 19):
+# - the worker running (`pnpm --filter @pilates/backend start:worker`): the
+#   upload stays «processing» until the worker rebuilds it, so without the
+#   worker «Quitar foto» never appears and the flow times out after it picks;
+# - at least one image in the Simulator's photo library, seeded by the
+#   operator with `xcrun simctl addmedia <udid> photo.jpg` before the run.
+#   Maestro has no command that reaches the photo library, so the flow cannot
+#   seed it itself; it picks the first grid cell of the system picker.
 appId: ${APP_ID}
 env:
   EMAIL: lucia@example.com

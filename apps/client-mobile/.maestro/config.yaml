@@ -1,7 +1,17 @@
 # Run from apps/client-mobile with the app served and fixtures freshly applied:
 #   maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8083 \
 #     -e PASSWORD=emma-local-2026 .maestro
+# Test 19 lists what each flow needs beyond the fixtures.
 flows:
   - "*.yaml"
 executionOrder:
   continueOnFailure: false
+  # Maestro's default order is not the file order; close-account closes
+  # Sofía's Account for good, so it runs last.
+  flowsOrder:
+    - book-and-cancel-class
+    - email-change
+    - evaluation-book-and-cancel
+    - home-plan-and-notifications
+    - profile-photo
+    - close-account

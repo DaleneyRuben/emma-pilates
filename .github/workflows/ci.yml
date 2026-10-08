@@ -93,6 +93,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
+      - run: pnpm --filter @pilates/tooling lint
       - run: pnpm --filter @pilates/mobile-core lint
       - run: pnpm --filter @pilates/mobile-core format:check
       - run: pnpm --filter @pilates/mobile-core typecheck
