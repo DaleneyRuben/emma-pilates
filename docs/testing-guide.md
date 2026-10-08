@@ -1336,9 +1336,9 @@ committed generated client), and the shared files (`package.json`,
 three. A docs-only pull request therefore runs nothing, and a backend fix that
 does not change the contract runs the api chain alone. A push to `main`
 always runs everything. Jobs that never started show as skipped. A clean run
-of all three chains takes about eight minutes of wall clock, set by the api
-chain; the web chain takes about six and a half (quality-web 1 m 25 s, web
-2 m 15 s, web-e2e 2 m 40 s).
+of all three chains takes eight to ten minutes of wall clock, set by the api
+chain; the web chain takes about six (quality-web 1 m 25 s, web 2 m 15 s,
+web-e2e 2 m 15 s with a warm browser cache, 2 m 40 s with a cold one).
 
 The four frontend Jest steps run with `--ci` alone and exit on their own:
 the runner has two cores, so Jest runs each suite in band and every handle a
