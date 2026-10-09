@@ -1301,69 +1301,105 @@ What they mean:
 
 Every pull request and every push to `main` runs
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) on GitHub Actions
-(EXT-004). It checks; it deploys nothing, and it needs no secret. Eight jobs
-run as three independent chains, one per surface, each job on a fresh Ubuntu
-runner after the shared setup in `.github/actions/setup/action.yml` (Node from
-`.nvmrc`, pnpm from the root `packageManager` field, cached pnpm store,
+(EXT-004). It checks; it deploys nothing, and it needs no secret. Eleven jobs
+run as three independent chains, one per surface, with one job per test level
+named `<surface>-<level>` (EXT-005), each job on a fresh Ubuntu runner after
+the shared setup in `.github/actions/setup/action.yml` (Node from `.nvmrc`,
+pnpm from the root `packageManager` field, cached pnpm store,
 `pnpm install --frozen-lockfile`, `prisma generate`, and, for the job that
 asks for it, Playwright's pinned Chromium from a cache keyed by the Playwright
 version):
 
 - **quality-api** (backend lint, typecheck, and build; api-contracts typecheck
-  and build) → **contracts** (`check:api`, `check:api-compat`) → **api** (the
-  backend unit, e2e, and integration suites against a `postgres:17-alpine`
-  service container; the integration suite runs through `TEST_DATABASE_URL`
-  on a `pilates_test_ci` admin database that lives and dies with the runner);
+  and build) → **contracts** (`check:api`, `check:api-compat`) and
+  **api-unit** (the backend unit suite) side by side → **api-e2e** (the
+  supertest suites, which boot the application without a database) and
+  **api-integration** (the Prisma repositories and PostgreSQL behaviour
+  against a `postgres:17-alpine` service container, through
+  `TEST_DATABASE_URL` on a `pilates_test_ci` admin database that lives and
+  dies with the runner) side by side, each waiting for both contracts and
+  api-unit;
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
-  **web** (the admin-web Jest suite) → **web-e2e** (the ten Playwright
+  **web-unit** (the admin-web Jest suite) and **web-e2e** (the ten Playwright
   journeys of Test 31 through the built backend and the built admin web, on
   a `postgres:17-alpine` service container with a `pilates_test_ci` admin
-  database, WEB-017);
+  database, WEB-017) side by side;
 - **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
-  mobile-core, client-mobile, and staff-mobile) → **mobile** (their three
-  Jest suites).
+  mobile-core, client-mobile, and staff-mobile) → **mobile-unit** (their
+  three Jest suites).
 
-A job runs only when the job before it in its chain passed, so a lint or type
-error costs one two-minute job and the tests never start; a stale contract
-stops the api chain before the database run. On a pull request a first
-`changes` job also reads the pull request's whole list of changed files and
-starts only the chains of the surfaces it touches: `apps/backend/**` for api,
-`apps/admin-web/**` for web, the three mobile packages for mobile,
-`packages/tooling/**` for mobile (its only consumers today),
-`packages/api-contracts/**` for all three (every contract change touches the
-committed generated client), and the shared files (`package.json`,
-`pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.nvmrc`, `.github/**`) for all
-three. A docs-only pull request therefore runs nothing, and a backend fix that
-does not change the contract runs the api chain alone. A push to `main`
-always runs everything. Jobs that never started show as skipped. A clean run
-of all three chains takes eight to ten minutes of wall clock, set by the api
-chain; the web chain takes about six (quality-web 1 m 25 s, web 2 m 15 s,
-web-e2e 2 m 15 s with a warm browser cache, 2 m 40 s with a cold one).
+Two rules order the jobs: no test level starts before its surface's quality
+job passed, and no database run (api-integration) and no e2e run against the
+backend (api-e2e) starts before the contracts job and the unit suite passed.
+A lint or type error therefore costs one two-minute job and the tests never
+start; a stale contract or a failing unit suite stops the api chain before the
+database run. web-e2e needs only quality-web: its journeys go through the
+built backend, so a contract drift surfaces there as a failed journey, not as
+a skipped job. No job mixes levels, so a job carries only what its level
+needs: api-unit, api-e2e, web-unit, and mobile-unit have no service container
+and no database variable; api-integration and web-e2e each have their own
+service container and `TEST_DATABASE_URL`. There is no mobile-e2e job by
+decision: Maestro on a macOS runner belongs to REL-001.
+
+On a pull request a first `changes` job also reads the pull request's whole
+list of changed files and starts only the chains of the surfaces it touches:
+`apps/backend/**` for api, `apps/admin-web/**` for web, the three mobile
+packages for mobile, `packages/tooling/**` for mobile (its only consumers
+today), `packages/api-contracts/**` for all three (every contract change
+touches the committed generated client), and the shared files
+(`package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `.nvmrc`,
+`.github/**`) for all three. A docs-only pull request therefore runs nothing,
+and a backend fix that does not change the contract runs the api chain alone.
+A push to `main` always runs everything. Jobs that never started show as
+skipped.
+
+A clean run of all three chains takes about nine minutes of wall clock, set
+by the api chain, whose integration suite alone runs five minutes on the
+two-core runner. Measured on the last run of the previous shape (eight jobs,
+`main` run 37854052558) and the first green run of this one (eleven jobs,
+run 37939483154 of EXT-005's pull request), job durations as GitHub reports
+them, chains from the first quality job's start to the chain's last job's end:
+
+| Chain  | Before                                                   | After                                                                                 |
+| ------ | -------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| api    | quality-api 1:52 → contracts 0:57 → api 6:52; **9:47**   | quality-api 1:24 → contracts 1:28 ‖ api-unit 1:02 → api-e2e 1:12 ‖ api-integration 6:11; **9:09** |
+| web    | quality-web 1:36 → web 2:25 → web-e2e 2:35; **6:43**     | quality-web 1:37 → web-unit 2:27 ‖ web-e2e 2:19; **4:08**                              |
+| mobile | quality-mobile 1:37 → mobile 2:20; **4:00**              | quality-mobile 1:27 → mobile-unit 2:57; **4:27**                                       |
+| run    | wall clock 9:55, 20 m 19 s of runner time over 9 jobs   | wall clock 9:16, 22 m 08 s of runner time over 11 jobs                                 |
+
+The two extra jobs cost about two runner minutes: the shared setup step is
+35 to 45 s on every job (about 1 m 10 s with the browser), and api-unit and
+api-e2e each pay it once more than the old api job did. The web chain is two
+and a half minutes shorter because web-e2e no longer waits for the Jest
+suite, and the api chain's e2e suite runs beside the integration suite
+instead of before it. Jest's own times move with the runner (unit 9 s, e2e
+26 s, integration 5 m 12 s on this run against 2 s, 4 s, and 2 m 02 s on a
+Mac), so compare chains between runs of the same shape, not single steps.
 
 The four frontend Jest steps run with `--ci` alone and exit on their own:
 the runner has two cores, so Jest runs each suite in band and every handle a
 spec leaves behind would hold the process. The three mobile setups keep
-TanStack's timers from doing so (MOB-057, about three minutes for the mobile
-job), and the admin web's environment keeps React's scheduler off a Node
-`MessagePort` (WEB-016, about two minutes for the web job). No step uses
-`--forceExit` any more. A green web job prints no `console.error` line
-(WEB-018): a request no handler answers and a React act warning each fail
-the spec instead of scrolling past. The integration step raises Node's heap
-(`NODE_OPTIONS=--max-old-space-size=4096`) because the in-band ESM run grows
-past the runner's default limit; the backend scripts keep the shell's
-`NODE_OPTIONS` next to their own `--experimental-vm-modules` for that reason.
-The web-e2e job needs no flag of its own: the global setup's teardown stops
-both servers and drops the database, and the step exits with Playwright's
-result. Its failures are read through the `web-e2e-test-results` artifact
-(Test 31).
+TanStack's timers from doing so (MOB-057, about three minutes for the
+mobile-unit job), and the admin web's environment keeps React's scheduler
+off a Node `MessagePort` (WEB-016, about two and a half minutes for the
+web-unit job). No step uses `--forceExit` any more. A green web-unit job
+prints no `console.error` line (WEB-018): a request no handler answers and a
+React act warning each fail the spec instead of scrolling past. The
+api-integration job raises Node's heap (`NODE_OPTIONS=--max-old-space-size=4096`)
+because the in-band ESM run grows past the runner's default limit; the
+backend scripts keep the shell's `NODE_OPTIONS` next to their own
+`--experimental-vm-modules` for that reason. The web-e2e job needs no flag
+of its own: the global setup's teardown stops both servers and drops the
+database, and the step exits with Playwright's result. Its failures are read
+through the `web-e2e-test-results` artifact (Test 31).
 
 A newer push to the same branch cancels the run in progress. To read a failed
 run, open the pull request's "Checks" tab or run
 `gh run list --branch <branch>` and `gh run view <run-id> --log-failed`: the
 failing job names the script that failed, and the log of that step is the same
 output you would see locally from the commands in the subsections above. Each
-job has a timeout (15 minutes, 20 for api), so a hung step fails instead of
-waiting forever.
+job has a timeout (15 minutes, 20 for api-integration), so a hung step fails
+instead of waiting forever.
 
 ## Test 9: try Perfil, the inbox, and password change in the apps
 
@@ -2740,11 +2776,12 @@ Set `TEST_DATABASE_URL` to another `pilates_test_*` admin database, or
 with something on your machine.
 
 CI runs the same ten journeys in the **web-e2e** job of
-[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (WEB-017), after
-the web job, on every pull request that touches the admin web and on every
-push to `main`. The job runs `pnpm test:admin-e2e` exactly as above, on a
-`postgres:17-alpine` service container: a `psql` step first creates the
-`pilates_test_ci` admin database the api job also uses, and
+[`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (WEB-017), beside
+the web-unit job as soon as quality-web passed (EXT-005), on every pull
+request that touches the admin web and on every push to `main`. The job runs
+`pnpm test:admin-e2e` exactly as above, on a `postgres:17-alpine` service
+container: a `psql` step first creates the `pilates_test_ci` admin database
+the api-integration job also uses, and
 `TEST_DATABASE_URL` points the global setup at it, so the run creates its
 own `pilates_test_*` database beside it as it does locally (the setup's line
 and the teardown's «stopped both servers and dropped database …» line are
