@@ -21,7 +21,7 @@ you are starting with no project knowledge.
 | Email request limits         | Fill the device or network budget for registration, resend, email correction, and recovery: the API answers `429` `authentication_email_throttled` with `Retry-After`, and the apps and admin web show «Demasiadas solicitudes…» with the wait (Test 5 G) | Every admitted request counts, even one for an unknown address or a suppressed email; reset by marking your local `email_requested` rows deleted |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); sign in through a Vercel preview against the shared development API (Test 36) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 
 ## Before you begin
 
@@ -2943,8 +2943,10 @@ The following are not ready for manual product testing:
   works, see Test 10; the Promotion API works through Swagger, see Test 32,
   the admin web manages Promotions, see Test 33, and the Client app shows
   them, see Test 18);
-- the admin web on a real Vercel preview or production origin, so the proxy,
-  cookies, and trusted origins of ADR-0084 are only proven locally (EXT-003);
+- the admin web on a Vercel preview from any branch but the one whose origin
+  is in the development API's `ADMIN_WEB_TRUSTED_ORIGINS` (each branch's
+  origin is added by hand until preview registration is automated, WEB-019),
+  and on the production origin, which has no backend yet (EXT-003);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
@@ -3084,3 +3086,40 @@ confirming the list reloads without her under «Cuenta de … cerrada.». For
 once and links to Pagos.
 
 Drop the copy afterwards: `dropdb pilates_test_closure`.
+
+## Test 36: sign in through a Vercel preview
+
+Every push to a pull request's branch builds a preview of the admin web on
+Vercel. `apps/admin-web/vercel.json` proxies the preview's `/api/v1` to the
+shared development API (https://emma-pilates-dev-api.onrender.com, on the Neon
+database `emma-pilates-dev`) and serves `index.html` for every other path that
+is not under `api/`, so the browser only ever talks to the preview's own origin
+(ADR-0084). The production alias `emma-pilates-admin.vercel.app` is left out
+of the proxy, so production never reaches development data; its `/api/v1`
+answers `404` until the production API exists.
+
+1. Open the pull request's **branch** preview address, the
+   `emma-pilates-admin-git-<branch>-fernando-daleney-s-projects.vercel.app`
+   link in Vercel's comment on the pull request. It stays the same on every
+   push to the branch; the per-deployment `emma-pilates-admin-<hash>-…`
+   address changes on every push and is not trusted.
+2. Sign in to Vercel when it asks (previews are behind Vercel
+   Authentication).
+3. Make sure the development API trusts that exact origin: in Render,
+   `emma-pilates-dev-api` → Environment, `ADMIN_WEB_TRUSTED_ORIGINS` lists it
+   (comma-separated, no trailing slash). Without it, or on the per-deployment
+   address, signing in answers `403` `untrusted_origin` in RFC 9457 form.
+4. The shared database holds the development fixtures (loaded once with
+   `read -rs NEON_URL && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:fixtures; unset NEON_URL`,
+   pasting Neon's direct connection string). Sign in as
+   `paola.mendoza@example.com` with the fixture password. The first request
+   after the Render service has slept can take about a minute.
+5. Expect Horario for Sucursal Centro. In DevTools → Network,
+   `authentication-sessions` is `201` and the reads after it are `200`; in
+   Application → Cookies, both `__Host-` cookies are HttpOnly, Secure,
+   SameSite Lax, and Path `/` with no Domain (host-only).
+6. Open Planes and reload: the page loads again (the fallback), not a `404`.
+
+The fixture password is public in the repository, so anyone who finds the
+development API can sign in to its fake data; never put real data there.
+
