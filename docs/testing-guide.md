@@ -2943,10 +2943,8 @@ The following are not ready for manual product testing:
   works, see Test 10; the Promotion API works through Swagger, see Test 32,
   the admin web manages Promotions, see Test 33, and the Client app shows
   them, see Test 18);
-- the admin web on a Vercel preview from any branch but the one whose origin
-  is in the development API's `ADMIN_WEB_TRUSTED_ORIGINS` (each branch's
-  origin is added by hand until preview registration is automated, WEB-019),
-  and on the production origin, which has no backend yet (EXT-003);
+- the admin web on its production origin, which has no backend yet
+  (EXT-003);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
 - real SendPulse email, Expo push notifications, store builds, or production
   deployment.
@@ -3105,10 +3103,15 @@ answers `404` until the production API exists.
    address changes on every push and is not trusted.
 2. Sign in to Vercel when it asks (previews are behind Vercel
    Authentication).
-3. Make sure the development API trusts that exact origin: in Render,
-   `emma-pilates-dev-api` → Environment, `ADMIN_WEB_TRUSTED_ORIGINS` lists it
-   (comma-separated, no trailing slash). Without it, or on the per-deployment
-   address, signing in answers `403` `untrusted_origin` in RFC 9457 form.
+3. The **register preview origins** workflow
+   (`.github/workflows/preview-origins.yml`, WEB-019) adds that exact origin
+   to the development API's `ADMIN_WEB_TRUSTED_ORIGINS` on Render when the
+   preview finishes, and removes it when the pull request closes; Render then
+   redeploys, so give it about two minutes after the preview is ready. Until
+   then, or on the per-deployment address, signing in answers `403`
+   `untrusted_origin` in RFC 9457 form. If a run failed, re-run it from the
+   Actions tab or with `gh workflow run preview-origins.yml`; its log prints
+   the current and desired lists.
 4. The shared database holds the development fixtures (loaded once with
    `read -rs NEON_URL && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:fixtures; unset NEON_URL`,
    pasting Neon's direct connection string). Sign in as
