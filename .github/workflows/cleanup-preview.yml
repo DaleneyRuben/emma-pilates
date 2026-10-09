@@ -1,0 +1,39 @@
+name: cleanup vercel previews
+
+# EXT-007: when a pull request closes (merged or not), delete the admin web's
+# Vercel preview deployments built from its branch, as the catering project does.
+on:
+  pull_request:
+    types: [closed]
+
+permissions: {}
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Delete the closed branch's preview deployments
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_TEAM_SLUG: fernando-daleney-s-projects
+          BRANCH: ${{ github.head_ref }}
+        run: |
+          set -euo pipefail
+          if [ -z "$VERCEL_TOKEN" ] || [ -z "$VERCEL_PROJECT_ID" ]; then
+            echo "::error::VERCEL_TOKEN and VERCEL_PROJECT_ID repository secrets are required"
+            exit 1
+          fi
+          uids=$(curl -fsS "https://api.vercel.com/v6/deployments?projectId=$VERCEL_PROJECT_ID&teamSlug=$VERCEL_TEAM_SLUG&target=preview&limit=100" \
+            -H "Authorization: Bearer $VERCEL_TOKEN" |
+            jq -r --arg branch "$BRANCH" '.deployments[] | select(.meta.githubCommitRef == $branch) | .uid')
+          if [ -z "$uids" ]; then
+            echo "No preview deployments for $BRANCH"
+            exit 0
+          fi
+          for deployment_uid in $uids; do
+            echo "Deleting $deployment_uid"
+            curl -fsS -X DELETE "https://api.vercel.com/v13/deployments/$deployment_uid?teamSlug=$VERCEL_TEAM_SLUG" \
+              -H "Authorization: Bearer $VERCEL_TOKEN" > /dev/null
+          done
