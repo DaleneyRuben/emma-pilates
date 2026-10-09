@@ -114,8 +114,33 @@ jobs:
       - run: pnpm check:api
       - run: pnpm check:api-compat
 
-  api:
-    needs: contracts
+  # one job per test level (EXT-005): a job carries only what its level needs,
+  # so the unit and e2e suites run without a database and the two database
+  # suites run side by side
+  api-unit:
+    needs: quality-api
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @pilates/backend test
+
+  # the supertest suites boot the application without a database
+  api-e2e:
+    needs: [contracts, api-unit]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: pnpm --filter @pilates/backend test:e2e
+
+  # the Prisma repositories and PostgreSQL behaviour on a service container;
+  # the suite runs through TEST_DATABASE_URL on a pilates_test_ci admin
+  # database that lives and dies with the runner
+  api-integration:
+    needs: [contracts, api-unit]
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     services:
@@ -134,15 +159,13 @@ jobs:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - run: psql postgresql://postgres:postgres@localhost:5432/postgres -c 'create database pilates_test_ci'
-      - run: pnpm --filter @pilates/backend test
-      - run: pnpm --filter @pilates/backend test:e2e
       - run: pnpm --filter @pilates/backend test:integration
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilates_test_ci
           # the in-band ESM run grows past Node's default heap on the runner
           NODE_OPTIONS: --max-old-space-size=4096
 
-  web:
+  web-unit:
     needs: quality-web
     runs-on: ubuntu-24.04
     timeout-minutes: 15
@@ -159,7 +182,7 @@ jobs:
   # built admin web; the suite's global setup makes its own pilates_test_*
   # database and starts both servers
   web-e2e:
-    needs: web
+    needs: quality-web
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     services:
@@ -193,7 +216,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  mobile:
+  mobile-unit:
     needs: quality-mobile
     runs-on: ubuntu-24.04
     timeout-minutes: 15
