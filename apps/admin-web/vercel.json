@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/api/v1/:path*",
+      "missing": [{ "type": "host", "value": "emma-pilates-admin.vercel.app" }],
+      "destination": "https://emma-pilates-dev-api.onrender.com/api/v1/:path*"
+    },
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
