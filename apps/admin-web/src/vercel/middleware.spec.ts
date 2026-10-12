@@ -1,4 +1,4 @@
-import { withProxyProof } from "./proxy-proof";
+import { withProxyProof } from "../../middleware";
 
 describe("ADR-0087 proxy proof", () => {
   it("adds the configured secret to the forwarded request", () => {
