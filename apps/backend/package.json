@@ -39,6 +39,7 @@
     "@nestjs/swagger": "^11.4.7",
     "@prisma/adapter-pg": "7.10.0",
     "@prisma/client": "7.10.0",
+    "@sentry/node": "11.0.0",
     "argon2": "^0.45.1",
     "dotenv": "^17.4.2",
     "nestjs-pino": "^5.2.0",
