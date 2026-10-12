@@ -1,0 +1,15 @@
+# Trust forwarded addresses only from known hosting proxies
+
+Status: accepted
+
+[ADR-0029](./0029-manage-authentication-in-nestjs-backend.md) takes the network address for throttling from the direct connection or explicitly trusted hosting proxies. This decision says which proxies are trusted and how the backend proves it.
+
+The API reads the network address from the request's forwarding chain: the `X-Forwarded-For` entries followed by the direct connection's address. Each environment sets `TRUSTED_PROXY_HOPS`, the number of proxies its hosting platform always places in front of the API. The network address is the entry that many places from the right end of the chain. Entries further left were written by the requester or by a proxy the backend does not trust, so they are never used. The default is `0`, the direct connection, which is what local development and tests use. When a chain is shorter than the configured count, the backend takes its leftmost entry, which a trusted proxy wrote.
+
+The admin web's Vercel origin is one more proxy, but only for requests that really pass through it. Vercel replaces any `X-Forwarded-For` the browser sends with the visitor's address, so its entry can be trusted. Vercel Routing Middleware in the admin web adds a secret proof header, `x-pilates-proxy-proof`, to every `/api/v1` request it forwards. The backend trusts one extra hop only when that header matches `ADMIN_WEB_PROXY_SECRET` in a constant-time comparison. A request that reaches the API directly, such as from a mobile app or a requester bypassing Vercel, cannot present the secret, so it keeps the platform's hop count. The secret is a random value of at least 32 characters, stored in the Vercel project and the API's provider store per environment. Without it configured, no request receives the extra hop.
+
+A hop count is taken from a measurement, not from documentation. Render appends its proxies' addresses to whatever chain the requester sent and does not document how many there are. Before an environment's count is set, the request log records only the number of `X-Forwarded-For` entries and whether the proof matched, never the addresses. A request sent with no forwarding header then shows how many entries the platform adds. The same check is repeated after a platform change.
+
+Express `trust proxy` stays unset. Its hop count cannot depend on the proof header, and the rest of the API does not read the client address.
+
+Trusting the leftmost `X-Forwarded-For` entry was rejected because any requester can write it. Trusting Vercel's published address ranges was rejected because they change, and Render's proxies hide the connecting address anyway. Moving throttling into Vercel was rejected because the mobile apps do not pass through Vercel and [ADR-0084](./0084-proxy-admin-api-requests-through-vercel.md) keeps System Identity in the backend.
