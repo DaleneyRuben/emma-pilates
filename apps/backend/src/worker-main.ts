@@ -7,6 +7,7 @@ import { SpanishAuthenticationEmailRenderer } from './jobs/authentication-email/
 import { PrismaAuthenticationEmailStateReader } from './jobs/authentication-email/prisma-authentication-email-state-reader';
 import { createPgBoss } from './jobs/pg-boss-runtime';
 import { createWorkerLog } from './jobs/worker-log';
+import { createHeartbeatPing } from './monitoring/heartbeat-ping';
 import { createPrismaEvaluationCommands } from './booking/evaluations/prisma-evaluation-commands';
 import { createPrismaSessionMaterializer } from './booking/sessions/prisma-session-materializer';
 import { createPrismaSessionStartChecks } from './booking/sessions/prisma-session-start-checks';
@@ -69,6 +70,11 @@ async function bootstrap(): Promise<void> {
   const sessionMaterializer = createPrismaSessionMaterializer(prisma, { now });
   const sessionStartChecks = createPrismaSessionStartChecks(prisma, { now });
 
+  const emit = createWorkerLog({
+    environment: environment.NODE_ENV,
+    release: environment.RELEASE_ID,
+  });
+
   const stopWorker = await startWorker({
     boss,
     authenticationEmail: {
@@ -110,9 +116,10 @@ async function bootstrap(): Promise<void> {
     },
     retentionSweeps: createPrismaRetentionSweeps(prisma, { now }),
     serviceVersion: process.env.npm_package_version ?? 'local',
-    emit: createWorkerLog({
-      environment: environment.NODE_ENV,
-      release: environment.RELEASE_ID,
+    emit,
+    pingHeartbeat: createHeartbeatPing(environment.WORKER_HEARTBEAT_URL, {
+      fetch,
+      emit,
     }),
   });
 

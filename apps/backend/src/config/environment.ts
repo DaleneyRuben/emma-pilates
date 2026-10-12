@@ -109,6 +109,16 @@ const environmentSchema = z
     UPLOADS_LOCAL_STORAGE_ROOT: z.string().min(1).default('.data/uploads'),
     // ADR-0081: Better Stack's error-tracking DSN; unset reports nothing.
     ERROR_REPORTING_DSN: z.url().nullable().default(null),
+    // ADR-0066: Better Stack's heartbeat URL for the worker; unset pings
+    // nothing.
+    WORKER_HEARTBEAT_URL: z
+      .url()
+      .refine(
+        (value) => value.startsWith('https://'),
+        'WORKER_HEARTBEAT_URL must use HTTPS',
+      )
+      .nullable()
+      .default(null),
     // Where the local email capture writes each message (never production).
     EMAIL_CAPTURE_DIRECTORY: z.string().min(1).default('.data/email-capture'),
   })

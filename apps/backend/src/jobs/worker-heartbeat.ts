@@ -13,11 +13,17 @@ type WorkerHeartbeat = {
   queues: { authenticationEmail: QueueCounts; finalizeUpload: QueueCounts };
 };
 
+type WorkerHeartbeatFailure = {
+  event: 'worker_heartbeat_failed';
+  serviceVersion: string;
+};
+
 type WorkerHeartbeatDependencies = {
   serviceVersion: string;
   getAuthenticationEmailCounts(): Promise<QueueCounts>;
   getFinalizeUploadCounts(): Promise<QueueCounts>;
-  emit(heartbeat: WorkerHeartbeat): void;
+  emit(heartbeat: WorkerHeartbeat | WorkerHeartbeatFailure): void;
+  ping?: () => Promise<void>;
   now?: () => Date;
 };
 
@@ -29,14 +35,25 @@ export const startWorkerHeartbeat = (
     void Promise.all([
       dependencies.getAuthenticationEmailCounts(),
       dependencies.getFinalizeUploadCounts(),
-    ]).then(([authenticationEmail, finalizeUpload]) => {
-      dependencies.emit({
-        event: 'worker_heartbeat',
-        serviceVersion: dependencies.serviceVersion,
-        timestamp: now().toISOString(),
-        queues: { authenticationEmail, finalizeUpload },
-      });
-    });
+    ]).then(
+      ([authenticationEmail, finalizeUpload]) => {
+        dependencies.emit({
+          event: 'worker_heartbeat',
+          serviceVersion: dependencies.serviceVersion,
+          timestamp: now().toISOString(),
+          queues: { authenticationEmail, finalizeUpload },
+        });
+        return dependencies.ping?.();
+      },
+      // ADR-0066: no ping while the queues cannot be read, so the external
+      // heartbeat monitor alerts.
+      () => {
+        dependencies.emit({
+          event: 'worker_heartbeat_failed',
+          serviceVersion: dependencies.serviceVersion,
+        });
+      },
+    );
   }, WORKER_HEARTBEAT_INTERVAL_MS);
 
   return () => clearInterval(interval);
