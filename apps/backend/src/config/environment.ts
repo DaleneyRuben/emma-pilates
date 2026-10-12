@@ -44,6 +44,8 @@ const approvedReferralRewardCentavos = 6000;
 const environmentSchema = z
   .object({
     ADMIN_WEB_TRUSTED_ORIGINS: trustedOriginsSchema,
+    // ADR-0087: the admin web's Vercel middleware proves its hop with this.
+    ADMIN_WEB_PROXY_SECRET: z.string().min(32).nullable().default(null),
     AUTHENTICATION_EMAIL_DIGEST_KEY: z
       .string()
       .min(32)
@@ -77,6 +79,8 @@ const environmentSchema = z
       .enum(['development', 'test', 'production'])
       .default('development'),
     PORT: z.coerce.number().int().positive().max(65_535).default(3100),
+    // ADR-0087: proxies the hosting platform always puts in front of the API.
+    TRUSTED_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(0),
     // Release identifier reported by readiness and logs (ADR-0080/0081).
     RELEASE_ID: z.string().min(1).default('local'),
     REFERRAL_REWARD_CENTAVOS: z.coerce
