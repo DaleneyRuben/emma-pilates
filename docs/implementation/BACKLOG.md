@@ -183,34 +183,61 @@ reach production.
 | Studio business data | Transfer instructions and QR shown to Clients | Production config | Real `TRANSFER_BENEFICIARY_NAME`, `TRANSFER_BANK_NAME`, `TRANSFER_ACCOUNT_NUMBER`, QR image | Placeholder values in `.env.example` |
 | Production secrets | Link encryption and email digests | EXT-003 | Fresh `AUTHENTICATION_EMAIL_DIGEST_KEY`, `AUTHENTICATION_LINK_ENCRYPTION_KEY(_ID)` with a rotation plan, `RELEASE_ID` per deploy | Development-only keys |
 
-### Order to open the gates (agreed 2026-10-07)
+### Cost of each gate (researched 2026-10-12)
 
-Every code item without an account gate is done since BE-014, so the order
-below is the project's priority order; each gate names the item it unblocks.
+Prices from the providers' pages or, where marked ~, from third-party trackers;
+confirm on the provider's page before paying. Billing: **once**, **year**,
+**month**, or **usage**.
 
-1. GitHub repository with Actions → EXT-004 (CI on the three backend suites).
-   Open and closed: the repository is `DaleneyRuben/emma-pilates`; CI is built
-   and green since 2026-10-07, and protecting `main` was dropped by decision on
-   2026-10-08 (it would need GitHub Pro or a public repository, and the user
-   wants neither), so `main` is protected by convention only.
-2. Domain and DNS → the API, admin, mobile-link, and email-sending hostnames
-   that LNK-001, EXT-001, and EXT-003 verify against.
-3. SendPulse → EXT-001 (real authentication email; readiness line 3).
-4. Expo/EAS and Apple Developer → REL-001 account parts (bundle IDs, EAS Build
-   and Submit, TestFlight smoke), then NOT-002 push on iOS, then LNK-001
-   Universal Links.
-5. Northflank + Aiven, Render + Neon, Better Stack → EXT-003 (production and
-   shared development hosting, staged migrations, backups, monitoring).
-6. Cloudflare R2 → EXT-002.
-7. Google Play Console + Firebase → the Android halves of REL-001, NOT-002, and
-   LNK-001 (Android has never been verified; expect fixes).
-8. Vercel → WEB-010.
-9. Studio business data and production secrets → the production configuration
-   at go-live.
+| Service | What we use it for | Plan we use | Price | Billing | Next step up |
+| --- | --- | --- | --- | --- | --- |
+| GitHub Actions | CI, preview cleanup (EXT-007), preview-origin registration (WEB-019), deploy jobs | Free | $0 within 2,000 private-repo minutes | usage: ~$0.006 per Linux minute beyond | — |
+| Render | Shared development API for previews | Free (sleeps when idle) | $0 | — | — |
+| Neon | Shared development database | Free | $0 | — | — |
+| Vercel | Admin web previews and production, `/api/v1` proxy, ADR-0087 middleware | Hobby, also for production by decision | $0 within 100 GB transfer and 1M middleware invocations a month | — | — |
+| Expo / EAS | Build, sign, and submit both apps; over-the-air updates | Free | $0: 15 iOS and 15 Android builds, 60 workflow minutes, updates to 1,000 monthly users | month | Starter $19 a month ($45 build credit), then ~$1–4 a build |
+| Firebase Cloud Messaging | Android push delivery behind Expo Push | Free | $0 | — | — |
+| Better Stack | Uptime checks, worker heartbeat, error alerts | Free | $0: 10 monitors and heartbeats, 100k exceptions a month, 3 GB logs for 3 days | — | $29 a seat a month (annual) or $34 (monthly) |
+| SendPulse SMTP | Verification, activation, recovery, and email-change messages | Free | $0: 12,000 emails a month, 50 an hour; needs our domain | — | 10,000 emails for $15 (usage, valid a year) |
+| Cloudflare R2 | Receipt, profile-photo, and Promotion images | Free allowance (asks for a card) | $0 within 10 GB-month, 1M writes, 10M reads; egress free | usage: $0.015 per GB-month, $4.50 per million writes, $0.36 per million reads | — |
+| Northflank | Production API and worker | Developer Sandbox | $0: 2 always-on services, 1 database, 2 cron jobs | — | usage: $0.01667 per vCPU-hour (~$12 a month), $0.00833 per GB-hour of memory (~$6 a month); smallest plan $2.70 a month |
+| Aiven PostgreSQL | Production database with backups | Free | $0: 1 GB disk, 20 connections, backups, no SLA | — | ~Hobbyist $12 a month (8 GB), ~Startup $60–75 a month |
+| Domain (`.com` at Cloudflare) | Email sender records, API and admin hostnames, privacy-policy and support pages, mobile links | — | ~$10.46 | year | `.bo` ~€130–300 a year through resellers |
+| Google Play Console | Publish both Android apps | — | $25 | once | — (a personal account must run a 14-day closed test with 12 testers first) |
+| Apple Developer Program | iOS device builds, TestFlight, App Store, APNs push, Universal Links | — | $99 | year | — |
+| D-U-N-S number | Only if the stores' accounts are the studio's (organization) | — | $0 | — | up to 30 days to arrive |
 
-Meanwhile, without any gate: BE-016, then BE-017 (BE-015 is done since
-2026-10-07); MOB-050 (mobile lint, so the quality-mobile job can lint) still
-needs a row. FUT-001 stays deferred.
+### Order to open the gates (revised 2026-10-12: cheapest and fastest first)
+
+Every code item without an account gate is done, so this order is the
+project's priority order. On 2026-10-12 the user asked to spend as little as
+possible while the studio is not operating, so gates are opened by price and
+lead time, and paid store accounts wait until shortly before launch. (The
+2026-10-07 order put the domain, SendPulse, and Apple before hosting.)
+
+1. GitHub with Actions → EXT-004: done; `main` is protected by convention only
+   (decision 2026-10-08).
+2. Render + Neon and Vercel previews → EXT-003's development half, WEB-010's
+   preview part, WEB-019, WEB-020: done.
+3. Expo/EAS (free) → REL-001's build half: EAS projects, build profiles, and a
+   workflow producing installable Android builds and iOS Simulator builds,
+   with no store account.
+4. Domain (~$10.46 a year) → the hostnames LNK-001, EXT-001, and EXT-003 need,
+   and the privacy-policy and support pages the stores require.
+5. SendPulse (free, needs 4) → EXT-001; Better Stack (free) → EXT-003's
+   monitors.
+6. Northflank Developer Sandbox + Aiven free → EXT-003's production half,
+   then WEB-010's production deploy on Vercel Hobby (repeat ADR-0087's hop
+   measurement and secret for production).
+7. Cloudflare R2 (free allowance, card on file) → EXT-002.
+8. Google Play ($25 once), about three weeks before launch → the Android
+   halves of REL-001, NOT-002, and LNK-001, starting the 14-day closed test.
+9. Apple Developer ($99 a year), one to two weeks before launch → REL-001's
+   iOS release, NOT-002's iOS push, LNK-001's Universal Links.
+10. Studio business data and production secrets → the production
+    configuration at go-live.
+
+FUT-001 stays deferred.
 
 ## Pending design exports
 
