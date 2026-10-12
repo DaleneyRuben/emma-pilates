@@ -1,7 +1,6 @@
 import type { Request } from 'express';
 import {
   createNetworkAddressMiddleware,
-  forwardedEntryCount,
   requestNetworkAddress,
   resolveNetworkAddress,
 } from './request-source';
@@ -66,13 +65,6 @@ describe('ADR-0087 network address', () => {
         proxyProofSecret: null,
       }),
     ).toBe('203.0.113.7');
-  });
-
-  it('counts forwarded entries without reading them', () => {
-    expect(forwardedEntryCount(request({}))).toBe(0);
-    expect(
-      forwardedEntryCount(request({ 'x-forwarded-for': '1.1.1.1, 2.2.2.2' })),
-    ).toBe(2);
   });
 
   it('hands the resolved address to the throttling callers', () => {

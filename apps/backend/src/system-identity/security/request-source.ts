@@ -1,5 +1,6 @@
 import { timingSafeEqual } from 'node:crypto';
 import type { NextFunction, Request, Response } from 'express';
+import { forwardedEntries } from '../../http/forwarded-for';
 
 /** Who a request comes from, as ADR-0029's origin throttling sees it. */
 export type RequestSource = {
@@ -25,19 +26,6 @@ export const parseClientIdentifier = (value: unknown): string | null =>
 // Express `trust proxy` stays unset, so `request.ip` is the direct connection.
 const directAddress = (request: Request): string =>
   request.ip ?? request.socket?.remoteAddress ?? 'unknown';
-
-const forwardedEntries = (request: Request): string[] => {
-  const header = request.headers['x-forwarded-for'];
-  const value = Array.isArray(header) ? header.join(',') : (header ?? '');
-  return value
-    .split(',')
-    .map((entry) => entry.trim())
-    .filter((entry) => entry !== '');
-};
-
-/** For the request log: how many entries arrived, never which. */
-export const forwardedEntryCount = (request: Request): number =>
-  forwardedEntries(request).length;
 
 const hasProxyProof = (request: Request, secret: string | null): boolean => {
   const proof = request.headers[proxyProofHeader];
