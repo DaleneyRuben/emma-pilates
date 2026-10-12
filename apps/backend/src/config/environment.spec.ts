@@ -184,4 +184,42 @@ describe('environment configuration', () => {
       ).toThrow('ADMIN_WEB_PROXY_SECRET');
     });
   });
+
+  describe('ADR-0081 Better Stack monitoring', () => {
+    const base = {
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+    };
+
+    it('reports no errors and pings no heartbeat by default', () => {
+      const environment = validateEnvironment(base);
+
+      expect(environment.ERROR_REPORTING_DSN).toBeNull();
+      expect(environment.WORKER_HEARTBEAT_URL).toBeNull();
+    });
+
+    it('reads the error-reporting DSN and the heartbeat URL', () => {
+      const environment = validateEnvironment({
+        ...base,
+        ERROR_REPORTING_DSN: 'https://token@errors.example.com/1',
+        WORKER_HEARTBEAT_URL: 'https://uptime.example.com/api/v1/heartbeat/abc',
+      });
+
+      expect(environment.ERROR_REPORTING_DSN).toBe(
+        'https://token@errors.example.com/1',
+      );
+      expect(environment.WORKER_HEARTBEAT_URL).toBe(
+        'https://uptime.example.com/api/v1/heartbeat/abc',
+      );
+    });
+
+    it('rejects a heartbeat URL that is not HTTPS', () => {
+      expect(() =>
+        validateEnvironment({
+          ...base,
+          WORKER_HEARTBEAT_URL: 'http://uptime.example.com/heartbeat',
+        }),
+      ).toThrow('WORKER_HEARTBEAT_URL');
+    });
+  });
 });

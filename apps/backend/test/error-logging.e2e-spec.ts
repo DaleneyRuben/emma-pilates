@@ -1,4 +1,5 @@
 import { Writable } from 'node:stream';
+import { jest } from '@jest/globals';
 import {
   Controller,
   Get,
@@ -6,6 +7,7 @@ import {
   Module,
   NotFoundException,
   Post,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { Test } from '@nestjs/testing';
@@ -14,6 +16,7 @@ import request from 'supertest';
 import { App } from 'supertest/types';
 import { createLoggerParams } from '../src/http/logging';
 import { ProblemDetailsFilter } from '../src/http/problem-details.filter';
+import { ERROR_REPORTER } from '../src/monitoring/error-reporting';
 
 class DriverError extends Error {
   readonly code = '23505';
@@ -31,14 +34,21 @@ class FailingController {
   missing(): never {
     throw new NotFoundException();
   }
+
+  @Get('unavailable')
+  unavailable(): never {
+    throw new ServiceUnavailableException({ code: 'not_ready' });
+  }
 }
 
 describe('error logging (e2e)', () => {
   let app: INestApplication<App>;
   let lines: Record<string, unknown>[];
+  let report: jest.Mock<(error: unknown) => void>;
 
   beforeEach(async () => {
     lines = [];
+    report = jest.fn<(error: unknown) => void>();
     const destination = new Writable({
       write(chunk: Buffer, _encoding, done) {
         for (const line of chunk.toString().split('\n').filter(Boolean)) {
@@ -60,7 +70,10 @@ describe('error logging (e2e)', () => {
         ),
       ],
       controllers: [FailingController],
-      providers: [{ provide: APP_FILTER, useClass: ProblemDetailsFilter }],
+      providers: [
+        { provide: APP_FILTER, useClass: ProblemDetailsFilter },
+        { provide: ERROR_REPORTER, useValue: { report } },
+      ],
     })
     class LoggedModule {}
 
@@ -112,5 +125,22 @@ describe('error logging (e2e)', () => {
 
     expect(errorLines()).toEqual([]);
     expect(lines.some((line) => Number(line.level) >= 50)).toBe(false);
+  });
+
+  // ADR-0081: only unexpected failures reach Better Stack.
+  it('reports an unexpected failure to the error reporter', async () => {
+    await request(app.getHttpServer()).post('/v1/failing').expect(500);
+
+    expect(report).toHaveBeenCalledTimes(1);
+    expect(report).toHaveBeenCalledWith(expect.any(DriverError));
+  });
+
+  it('does not report client errors or a deliberate unavailable answer', async () => {
+    await request(app.getHttpServer()).get('/v1/failing/missing').expect(404);
+    await request(app.getHttpServer())
+      .get('/v1/failing/unavailable')
+      .expect(503);
+
+    expect(report).not.toHaveBeenCalled();
   });
 });
