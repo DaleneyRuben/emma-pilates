@@ -3,6 +3,7 @@ import { isNativeError } from 'node:util/types';
 import type { Params } from 'nestjs-pino';
 import type { DestinationStream } from 'pino';
 import type { Options } from 'pino-http';
+import { forwardedEntries } from './forwarded-for';
 
 // A caller-supplied identifier is kept only when it cannot smuggle log syntax.
 const requestIdPattern = /^[A-Za-z0-9._:-]{8,128}$/;
@@ -56,7 +57,11 @@ export function createLoggerParams(settings: LoggerSettings): Params {
       response.setHeader('x-request-id', id);
       return id;
     },
-    customProps: (request) => ({ reqId: request.id }),
+    // ADR-0087: the count measures the hosting proxies; addresses never log.
+    customProps: (request) => ({
+      reqId: request.id,
+      forwardedFor: forwardedEntries(request).length,
+    }),
     serializers: {
       req: (request: { method?: string; url?: string }) => ({
         method: request.method,
