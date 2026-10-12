@@ -153,4 +153,35 @@ describe('environment configuration', () => {
       ).toEqual(['https://admin.emmapilates.bo']);
     });
   });
+
+  describe('ADR-0087 forwarding proxies', () => {
+    const base = {
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+    };
+
+    it('trusts no proxy and no proof by default', () => {
+      const environment = validateEnvironment(base);
+
+      expect(environment.TRUSTED_PROXY_HOPS).toBe(0);
+      expect(environment.ADMIN_WEB_PROXY_SECRET).toBeNull();
+    });
+
+    it('reads the measured hop count and the proof secret', () => {
+      const environment = validateEnvironment({
+        ...base,
+        TRUSTED_PROXY_HOPS: '2',
+        ADMIN_WEB_PROXY_SECRET: 's'.repeat(32),
+      });
+
+      expect(environment.TRUSTED_PROXY_HOPS).toBe(2);
+      expect(environment.ADMIN_WEB_PROXY_SECRET).toBe('s'.repeat(32));
+    });
+
+    it('rejects a guessable proof secret', () => {
+      expect(() =>
+        validateEnvironment({ ...base, ADMIN_WEB_PROXY_SECRET: 'short' }),
+      ).toThrow('ADMIN_WEB_PROXY_SECRET');
+    });
+  });
 });

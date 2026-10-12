@@ -104,4 +104,16 @@ describe('request logging (e2e)', () => {
 
     expect(response.headers['x-request-id']).toMatch(/^[0-9a-f-]{36}$/);
   });
+
+  it('counts the forwarded entries without logging any address (ADR-0087)', async () => {
+    await request(app.getHttpServer())
+      .get('/v1/probe')
+      .set('x-forwarded-for', '198.51.100.4, 203.0.113.7')
+      .expect(200);
+
+    expect(completed()).toMatchObject({ forwardedFor: 2 });
+    const serialized = JSON.stringify(lines);
+    expect(serialized).not.toContain('198.51.100.4');
+    expect(serialized).not.toContain('203.0.113.7');
+  });
 });
