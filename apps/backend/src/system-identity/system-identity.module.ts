@@ -37,8 +37,8 @@ import {
   mobileLogin,
 } from './authentication/authentication.controller';
 import { adminWebProviders } from './admin-web/admin-web-providers';
-import { createAdminWebRequestMiddleware } from './admin-web/admin-web-request.middleware';
 import { AdminWebSessionController } from './admin-web/admin-web-session.controller';
+import { applySystemIdentityMiddleware } from './system-identity-middleware';
 import { passwordRecoveryDependencies } from './account-security/password-recovery-dependencies';
 import type { AuthenticationSurface } from './authentication/create-authentication-session';
 import { login } from './authentication/login';
@@ -442,12 +442,6 @@ export class SystemIdentityModule implements NestModule {
   constructor(private readonly config: ConfigService<Environment, true>) {}
 
   configure(consumer: MiddlewareConsumer): void {
-    consumer
-      .apply(
-        createAdminWebRequestMiddleware(
-          this.config.getOrThrow('ADMIN_WEB_TRUSTED_ORIGINS'),
-        ),
-      )
-      .forRoutes('{*splat}');
+    applySystemIdentityMiddleware(consumer, this.config);
   }
 }
