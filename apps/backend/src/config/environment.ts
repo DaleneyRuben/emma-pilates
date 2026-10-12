@@ -107,6 +107,8 @@ const environmentSchema = z
       .min(1)
       .default(localTransferInstructions.TRANSFER_QR_IMAGE_PATH),
     UPLOADS_LOCAL_STORAGE_ROOT: z.string().min(1).default('.data/uploads'),
+    // ADR-0081: Better Stack's error-tracking DSN; unset reports nothing.
+    ERROR_REPORTING_DSN: z.url().nullable().default(null),
     // Where the local email capture writes each message (never production).
     EMAIL_CAPTURE_DIRECTORY: z.string().min(1).default('.data/email-capture'),
   })
