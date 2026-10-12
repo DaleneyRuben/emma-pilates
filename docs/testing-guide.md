@@ -3124,6 +3124,18 @@ answers `404` until the production API exists.
    SameSite Lax, and Path `/` with no Domain (host-only).
 6. Open Planes and reload: the page loads again (the fallback), not a `404`.
 
+Every `/api/v1` request through the preview passes the admin web's Vercel
+middleware (`apps/admin-web/middleware.ts`), which adds the
+`x-pilates-proxy-proof` header from the Preview variable
+`ADMIN_WEB_PROXY_SECRET`. The development API holds the same secret and
+`TRUSTED_PROXY_HOPS=3` (ADR-0087), so its throttling sees the visitor's
+address, not Vercel's or Render's. To re-measure Render's hops, send
+`curl https://emma-pilates-dev-api.onrender.com/api/v1/hop-probe` with no
+`X-Forwarded-For` and read `forwardedFor` on that path's line in Render's
+Logs; a request through the preview shows one more. If the preview answers
+`500 MIDDLEWARE_INVOCATION_FAILED`, read the deployment's Logs in Vercel: the
+middleware must import nothing local, because Vercel compiles it alone.
+
 The fixture password is public in the repository, so anyone who finds the
 development API can sign in to its fake data; never put real data there.
 
