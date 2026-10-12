@@ -154,6 +154,19 @@ describe("AW01 Login", () => {
 
   it("explains a failure that is not a rejection without blaming the credentials", async () => {
     server.use(
+      http.post(apiUrl(loginPath), () => problemResponse(503, "not_ready")),
+    );
+    const { user } = renderAdmin("/iniciar-sesion");
+
+    await fillLogin(user);
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "No pudimos iniciar sesión. Inténtalo de nuevo en unos minutos.",
+    );
+  });
+
+  it("sends an untrusted address back to the panel's usual link instead of asking to wait", async () => {
+    server.use(
       http.post(apiUrl(loginPath), () =>
         problemResponse(403, "untrusted_origin"),
       ),
@@ -163,7 +176,7 @@ describe("AW01 Login", () => {
     await fillLogin(user);
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "No pudimos iniciar sesión. Inténtalo de nuevo en unos minutos.",
+      "No podemos iniciar sesión desde esta dirección. Abre el panel desde su enlace habitual.",
     );
   });
 
