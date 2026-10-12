@@ -219,18 +219,20 @@ lead time, and paid store accounts wait until shortly before launch. (The
    (decision 2026-10-08).
 2. Render + Neon and Vercel previews → EXT-003's development half, WEB-010's
    preview part, WEB-019, WEB-020: done.
-3. Domain (~$10.46 a year) → the hostnames LNK-001, EXT-001, and EXT-003 need,
-   and the privacy-policy and support pages the stores require.
-4. SendPulse (free, needs 3) → EXT-001; Better Stack (free) → EXT-003's
-   monitors.
-5. Northflank Developer Sandbox + Aiven free → EXT-003's production half,
-   then WEB-010's production deploy on Vercel Hobby (repeat ADR-0087's hop
-   measurement and secret for production).
-6. Cloudflare R2 (free allowance, card on file) → EXT-002.
-7. Expo/EAS (free) → REL-001's build half: EAS projects, build profiles, and
+3. Better Stack (free) → EXT-003's monitors.
+4. Northflank Developer Sandbox + Aiven free → EXT-003's production half on
+   the providers' own hostnames, then WEB-010's production deploy on Vercel
+   Hobby (repeat ADR-0087's hop measurement and secret for production).
+5. Cloudflare R2 (free allowance, card on file) → EXT-002.
+6. Expo/EAS (free) → REL-001's build half: EAS projects, build profiles, and
    automated builds. Held until shortly before the store accounts by the
    user's decision (2026-10-12), so no build spends the monthly allowance
    early.
+7. Domain (~$10.46 a year), as late as possible by the user's decision
+   (2026-10-12), but before Google Play: SendPulse (free) needs it to send
+   from our own address (EXT-001), and the closed test's testers cannot
+   register without verification and activation emails. It also gives LNK-001
+   its link domain and the stores their privacy-policy and support pages.
 8. Google Play ($25 once), about three weeks before launch → the Android
    halves of REL-001, NOT-002, and LNK-001, starting the 14-day closed test.
 9. Apple Developer ($99 a year), one to two weeks before launch → REL-001's
