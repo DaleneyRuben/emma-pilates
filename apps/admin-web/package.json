@@ -6,8 +6,8 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "dev": "vite",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.ts\" playwright.config.ts",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.ts\" playwright.config.ts",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.ts\" playwright.config.ts middleware.ts",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"e2e/**/*.ts\" playwright.config.ts middleware.ts",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "jest",
@@ -21,6 +21,7 @@
     "@tanstack/react-query": "5.102.8",
     "@tanstack/react-router": "1.170.38",
     "@tanstack/react-table": "8.21.3",
+    "@vercel/functions": "3.9.11",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "lucide-react": "1.47.0",
