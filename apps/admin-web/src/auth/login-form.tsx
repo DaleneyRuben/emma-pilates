@@ -30,7 +30,7 @@ const loginSchema = z.object({
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
-type Failure = "rejected" | "unavailable" | null;
+type Failure = "rejected" | "untrusted" | "unavailable" | null;
 
 // ADR-0029: one neutral message for every rejected Login; the throttled
 // state only follows the server's Retry-After (follow-up 37).
@@ -60,6 +60,8 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
         startWait(error.problem.retryAfterSeconds ?? 30);
       } else if (isApiError(error) && error.code === "authentication_failed") {
         setFailure("rejected");
+      } else if (isApiError(error) && error.code === "untrusted_origin") {
+        setFailure("untrusted");
       } else {
         setFailure("unavailable");
       }
@@ -110,6 +112,12 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
         {!throttled && failure === "rejected" ? (
           <p role="alert" className="text-nota text-error-texto">
             El correo o la contraseña no son correctos.
+          </p>
+        ) : null}
+        {!throttled && failure === "untrusted" ? (
+          <p role="alert" className="text-nota text-error-texto">
+            No podemos iniciar sesión desde esta dirección. Abre el panel desde
+            su enlace habitual.
           </p>
         ) : null}
         {!throttled && failure === "unavailable" ? (

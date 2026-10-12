@@ -3109,7 +3109,8 @@ answers `404` until the production API exists.
    preview finishes, and removes it when the pull request closes; Render then
    redeploys, so give it about two minutes after the preview is ready. Until
    then, or on the per-deployment address, signing in answers `403`
-   `untrusted_origin` in RFC 9457 form. If a run failed, re-run it from the
+   `untrusted_origin` in RFC 9457 form, and the form says «No podemos iniciar
+   sesión desde esta dirección. Abre el panel desde su enlace habitual.». If a run failed, re-run it from the
    Actions tab or with `gh workflow run preview-origins.yml`; its log prints
    the current and desired lists.
 4. The shared database holds the development fixtures (loaded once with
