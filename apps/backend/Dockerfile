@@ -1,6 +1,7 @@
 # Backend image for the API, the worker, and the migration job (ADR-0052).
 # Build from the repository root:
 #   docker build -f apps/backend/Dockerfile --build-arg RELEASE_ID=<commit> .
+# Northflank passes NF_GIT_SHA instead, which RELEASE_ID defaults to.
 
 FROM node:24-bookworm-slim AS base
 # Prisma's schema engine needs OpenSSL for `prisma migrate deploy`.
@@ -34,8 +35,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=build --chown=node:node /out ./
 # Readiness and every log line report the commit this image was built from
-# (ADR-0080, ADR-0081).
-ARG RELEASE_ID=unknown
+# (ADR-0080, ADR-0081). Northflank passes the commit as NF_GIT_SHA.
+ARG NF_GIT_SHA=unknown
+ARG RELEASE_ID=${NF_GIT_SHA}
 ENV RELEASE_ID=${RELEASE_ID}
 USER node
 EXPOSE 3100
