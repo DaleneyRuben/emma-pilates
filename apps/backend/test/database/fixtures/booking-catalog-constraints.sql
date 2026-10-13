@@ -5,6 +5,9 @@ BEGIN
     EXECUTE statement;
   EXCEPTION WHEN OTHERS THEN
     IF SQLSTATE = expected_code THEN RETURN; END IF;
+    -- PostgreSQL 18 reports a RESTRICT foreign key as 23001; older servers as 23503.
+    IF expected_code = '23001' AND SQLSTATE = '23503'
+      AND current_setting('server_version_num')::int < 180000 THEN RETURN; END IF;
     RAISE;
   END;
   RAISE EXCEPTION 'Expected SQLSTATE %, but statement succeeded: %', expected_code, statement;
@@ -71,9 +74,9 @@ SELECT pg_temp.expect_failure('UPDATE booking.subscriptions SET expired_at = now
 SELECT pg_temp.expect_failure('INSERT INTO booking.subscriptions SELECT ''00000000-0000-0000-0000-000000000002'', client_id, plan_id, plan_name_snapshot, duration_months_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, state, activated_at, expired_at, created_at, updated_at FROM booking.subscriptions', '23505');
 UPDATE booking.subscriptions SET state = 'expired', expired_at = now();
 INSERT INTO booking.subscriptions SELECT '00000000-0000-0000-0000-000000000002', client_id, plan_id, plan_name_snapshot, duration_months_snapshot, original_class_allowance, remaining_class_allowance, '2026-03-01', '2026-04-01', 'active', now(), NULL, now(), now() FROM booking.subscriptions;
-SELECT pg_temp.expect_failure('DELETE FROM booking.plans', '23503');
-SELECT pg_temp.expect_failure('DELETE FROM booking.class_types', '23503');
-SELECT pg_temp.expect_failure('DELETE FROM booking.session_schedules', '23503');
+SELECT pg_temp.expect_failure('DELETE FROM booking.plans', '23001');
+SELECT pg_temp.expect_failure('DELETE FROM booking.class_types', '23001');
+SELECT pg_temp.expect_failure('DELETE FROM booking.session_schedules', '23001');
 
 -- Hiding frees a normalized catalog name but does not rewrite the snapshot.
 SELECT pg_temp.expect_failure('INSERT INTO booking.plans SELECT ''00000000-0000-0000-0000-000000000002'', '' paquete de 8 CLASES '', duration_months, class_allowance, price_centavos, display_order, hidden_at, created_at, updated_at FROM booking.plans', '23505');
@@ -92,6 +95,6 @@ INSERT INTO system.image_assets (id, owner_account_id, purpose, pending_object_k
 UPDATE booking.promotions SET image_asset_id = '00000000-0000-0000-0000-000000000001', published_at = now();
 SELECT pg_temp.expect_failure('UPDATE booking.promotions SET archived_at = now()', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.promotions SET image_asset_id = NULL', '23514');
-SELECT pg_temp.expect_failure('DELETE FROM system.image_assets', '23503');
+SELECT pg_temp.expect_failure('DELETE FROM system.image_assets', '23001');
 UPDATE booking.promotions SET published_at = NULL, image_asset_id = NULL;
 DELETE FROM system.image_assets;

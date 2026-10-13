@@ -1,0 +1,13 @@
+**/node_modules
+**/dist
+**/.data
+**/.env
+**/.env.*
+**/coverage
+**/*.log
+**/.DS_Store
+.git
+.pnpm-store
+apps/backend/src/generated/prisma
+design
+docs

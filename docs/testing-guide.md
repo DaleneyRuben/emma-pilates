@@ -21,7 +21,7 @@ you are starting with no project knowledge.
 | Email request limits         | Fill the device or network budget for registration, resend, email correction, and recovery: the API answers `429` `authentication_email_throttled` with `Retry-After`, and the apps and admin web show «Demasiadas solicitudes…» with the wait (Test 5 G) | Every admitted request counts, even one for an unknown address or a suppressed email; reset by marking your local `email_requested` rows deleted |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); sign in through a Vercel preview against the shared development API (Test 36) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); sign in through a Vercel preview against the shared development API (Test 36); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 
 ## Before you begin
 
@@ -2943,11 +2943,12 @@ The following are not ready for manual product testing:
   works, see Test 10; the Promotion API works through Swagger, see Test 32,
   the admin web manages Promotions, see Test 33, and the Client app shows
   them, see Test 18);
-- the admin web on its production origin, which has no backend yet
-  (EXT-003);
+- signing in to production (Test 38): no Administrator can be activated
+  until real email exists (EXT-001), so production's signed-in cookies and
+  pages are proved only on the Vercel preview (Test 36);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
-- real SendPulse email, Expo push notifications, store builds, or production
-  deployment.
+- real SendPulse email, Expo push notifications, store builds, or a
+  production worker (the production API runs without one, Test 38).
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -3093,8 +3094,8 @@ shared development API (https://emma-pilates-dev-api.onrender.com, on the Neon
 database `emma-pilates-dev`) and serves `index.html` for every other path that
 is not under `api/`, so the browser only ever talks to the preview's own origin
 (ADR-0084). The production alias `emma-pilates-admin.vercel.app` is left out
-of the proxy, so production never reaches development data; its `/api/v1`
-answers `404` until the production API exists.
+of that rule, so production never reaches development data: its `/api/v1`
+goes to the production API on Northflank instead (Test 38).
 
 1. Open the pull request's **branch** preview address, the
    `emma-pilates-admin-git-<branch>-fernando-daleney-s-projects.vercel.app`
@@ -3148,23 +3149,21 @@ https://betterstack.com; the error DSN and the heartbeat URL are credentials
 and live only in your own `apps/backend/.env` (commented out) and in the
 hosts' environments, never in the repository.
 
-**Dev API readiness** (Uptime → Monitors) checks
-https://emma-pilates-dev-api.onrender.com/health/ready. It stays **paused**
-with a 30-minute check: each check wakes Render for about 16 minutes, and while
-the API is awake its pg-boss supervisor keeps the Neon database awake, so even
-the longest free check (30 minutes) would spend about 130 of Neon Free's 100
-compute hours a month. At gate 4 it moves to the production API at 3 minutes.
-To test it:
+**Production API readiness** (Uptime → Monitors) checks
+https://p01--api--mmps25fn9k9x.code.run/health/ready every 3 minutes. It was
+the paused «Dev API readiness» monitor until 2026-10-13; the Render API is no
+longer monitored, because each check would keep Render and Neon awake past
+Neon Free's 100 compute hours. Northflank and Aiven never sleep, so the check
+costs nothing. To test it:
 
-1. Set **Check frequency** to 3 minutes and **Resume** the monitor.
-2. In Render, open `emma-pilates-dev-api` → **Settings** → **Suspend Web
-   Service**. `curl -s -o /dev/null -w "%{http_code}\n" https://emma-pilates-dev-api.onrender.com/health/ready`
-   answers `503`.
-3. Within about 6 minutes (one check plus the 3-minute confirmation period)
+1. In Northflank, open the `api` service and click **Pause**.
+   `curl -s -o /dev/null -w "%{http_code}\n" https://p01--api--mmps25fn9k9x.code.run/health/ready`
+   answers `503` («no healthy upstream»).
+2. Within about 6 minutes (one check plus the 3-minute confirmation period)
    the monitor turns **Down** and «New incident started» arrives.
-4. **Resume Web Service** in Render; once `curl` answers `200`, the monitor
-   turns **Up** and «Incident resolved» arrives within about 3 minutes.
-5. Set the frequency back to 30 minutes and **Pause** the monitor.
+3. Click **Resume**; once `curl` answers `200` (about 5 minutes on 0.2 vCPU),
+   the monitor turns **Up** and «Incident resolved» arrives within about 3
+   minutes.
 
 **emma-pilates-api** (Error tracking → Applications) receives the API's
 unexpected failures through the Sentry SDK when `ERROR_REPORTING_DSN` is set.
@@ -3191,12 +3190,18 @@ locally:
    arrives. **Resolve** it; «Incident resolved» arrives.
 5. Stop the API and comment the DSN out again.
 
+The production API on Northflank reads the same `ERROR_REPORTING_DSN` from its
+`production` secret group, so its unexpected failures arrive here with
+environment `production` and the commit as release.
+
 **Worker heartbeat** (Uptime → Heartbeats) expects a ping every minute with
 a one-minute grace. The worker pings `WORKER_HEARTBEAT_URL` after every
 30-second heartbeat whose queue counts it could read; a failed read logs
 `worker_heartbeat_failed` and skips the ping, and a failed ping logs
-`worker_heartbeat_ping_failed` without the URL. No worker runs on Render, so
-the heartbeat stays **paused** until gate 4. To test it:
+`worker_heartbeat_ping_failed` without the URL. No worker runs on Render, and
+production has no worker until R2 (gate 5) and real email (gate 7) exist,
+because `worker-main` refuses `NODE_ENV=production`; the heartbeat stays
+**paused**. To test it:
 
 1. **Resume** the heartbeat and uncomment `WORKER_HEARTBEAT_URL`.
 2. From `apps/backend`, run the worker on `pilates_dev_sim`:
@@ -3206,3 +3211,59 @@ the heartbeat stays **paused** until gate 4. To test it:
    **Down** and «New incident started» («Missed heartbeat») arrives.
 4. Start the worker again; «Incident resolved» arrives within a minute.
 5. Stop the worker, **Pause** the heartbeat, and comment the URL out again.
+
+
+## Test 38: check the production API and the production admin web
+
+Production runs on free plans (EXT-003, gate 4): the API on Northflank
+(https://p01--api--mmps25fn9k9x.code.run, US Central), the database on Aiven
+(PostgreSQL 18, DigitalOcean US West), and the admin web on Vercel Hobby
+(https://emma-pilates-admin.vercel.app), whose `/api/v1` the Vercel proxy
+sends to Northflank. [The release runbook](./runbooks/production-release.md)
+says how a commit gets there and where each setting lives.
+
+**What production can and cannot do yet.** It answers health, OpenAPI, and
+every endpoint's validation and authorization, refuses untrusted admin
+origins, and stores data in Aiven. It sends no email (no worker runs, because
+`worker-main` refuses `NODE_ENV=production` until SendPulse and R2 exist), so
+no Client can verify a registration and no Administrator can be activated:
+nobody can sign in. Image uploads answer `501 local_upload_disabled`, and
+scheduled jobs (Session materialization, reminders, sweeps, expiry) do not
+run. The transfer name, bank, and account number are the placeholder
+`PENDIENTE`; the QR is the studio's real image.
+
+1. From the repository root, with the commit Northflank shows on the `api`
+   service:
+
+   ```sh
+   SMOKE_BASE_URL=https://p01--api--mmps25fn9k9x.code.run SMOKE_EXPECTED_RELEASE=<full commit hash> pnpm --filter @pilates/backend smoke
+   ```
+
+   It prints `"passed":true` (liveness, readiness with that release, OpenAPI,
+   and an anonymous request refused `401` as a problem).
+2. Through the admin web's proxy, an admin login from a foreign origin is
+   refused before any password check:
+
+   ```sh
+   curl -s -X POST -H "Origin: https://attacker.example" -H "Content-Type: application/json" -d '{"email":"probe@example.com","password":"probe-password-123"}' https://emma-pilates-admin.vercel.app/api/v1/admin-web/authentication-sessions
+   ```
+
+   answers `403` `untrusted_origin`. (`/api/v1/authentication-sessions`, the
+   mobile login, is not origin-checked and answers `401`.)
+3. In a private browser window, open https://emma-pilates-admin.vercel.app and
+   sign in with a made-up account (`probe@example.com`,
+   `probe-password-123`). The form says «El correo o la contraseña no son
+   correctos.»; DevTools → Network shows `authentication-sessions` `401`
+   `authentication_failed` in RFC 9457 form; Application → Cookies holds only
+   `__Host-emma-admin-client`, HttpOnly, Secure, SameSite Lax, Path `/`,
+   host-only. Reload `/catalogo/planes`: the login page loads, not a `404`.
+4. To re-measure the hops (ADR-0087), send
+   `curl https://p01--api--mmps25fn9k9x.code.run/api/v1/hop-probe` and the same
+   path through `https://emma-pilates-admin.vercel.app`, then search the path
+   in the `api` service's Logs and open each line: `forwardedFor` is `1`
+   directly and `2` through Vercel (measured 2026-10-13; a request with two
+   forged `X-Forwarded-For` entries showed `3`, so Northflank appends).
+   `TRUSTED_PROXY_HOPS=1`, plus one with the proxy proof, lands on the
+   visitor.
+
+Test 37 covers the production readiness monitor firing and recovering.

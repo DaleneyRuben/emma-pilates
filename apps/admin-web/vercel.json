@@ -3,6 +3,11 @@
   "rewrites": [
     {
       "source": "/api/v1/:path*",
+      "has": [{ "type": "host", "value": "emma-pilates-admin.vercel.app" }],
+      "destination": "https://p01--api--mmps25fn9k9x.code.run/api/v1/:path*"
+    },
+    {
+      "source": "/api/v1/:path*",
       "missing": [{ "type": "host", "value": "emma-pilates-admin.vercel.app" }],
       "destination": "https://emma-pilates-dev-api.onrender.com/api/v1/:path*"
     },

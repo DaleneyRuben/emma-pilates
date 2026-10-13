@@ -14,9 +14,14 @@ import { authenticationTokens } from './system-identity/security/authentication-
 async function main(): Promise<void> {
   const environment = validateEnvironment(process.env);
   const prisma = new PrismaClient({
-    adapter: createPrismaAdapter(environment.DATABASE_URL),
+    adapter: createPrismaAdapter(
+      environment.DATABASE_URL,
+      environment.DATABASE_POOL_MAX,
+    ),
   });
-  const boss = createPgBoss(environment.DATABASE_URL);
+  const boss = createPgBoss(environment.DATABASE_URL, {
+    poolMax: environment.DATABASE_POOL_MAX,
+  });
 
   try {
     await startInstalledPgBoss(boss);

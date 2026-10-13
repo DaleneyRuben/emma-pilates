@@ -19,7 +19,10 @@ async function bootstrap(): Promise<void> {
   }
 
   const prisma = new PrismaClient({
-    adapter: createPrismaAdapter(environment.DATABASE_URL),
+    adapter: createPrismaAdapter(
+      environment.DATABASE_URL,
+      environment.DATABASE_POOL_MAX,
+    ),
   });
 
   try {
