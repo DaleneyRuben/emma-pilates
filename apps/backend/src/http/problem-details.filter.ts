@@ -4,9 +4,16 @@ import {
   ExceptionFilter,
   HttpException,
   HttpStatus,
+  Inject,
   Logger,
+  Optional,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
+import {
+  ERROR_REPORTER,
+  noErrorReporting,
+  type ErrorReporter,
+} from '../monitoring/error-reporting';
 
 const problemCodes: Readonly<Record<number, string>> = {
   [HttpStatus.BAD_REQUEST]: 'invalid_request',
@@ -32,6 +39,12 @@ function getTitle(status: number): string {
 export class ProblemDetailsFilter implements ExceptionFilter {
   private readonly logger = new Logger(ProblemDetailsFilter.name);
 
+  constructor(
+    @Optional()
+    @Inject(ERROR_REPORTER)
+    private readonly errorReporter: ErrorReporter = noErrorReporting,
+  ) {}
+
   catch(exception: unknown, host: ArgumentsHost): void {
     const http = host.switchToHttp();
     const request = http.getRequest<Request>();
@@ -42,6 +55,13 @@ export class ProblemDetailsFilter implements ExceptionFilter {
       : HttpStatus.INTERNAL_SERVER_ERROR;
     if (status >= 500) {
       this.logger.error({ err: exception }, 'Unexpected request failure');
+    }
+    // A deliberate 5xx such as readiness's 503 is an answer, not a failure.
+    if (!isHttpException) {
+      const requestId = response.getHeader('x-request-id');
+      this.errorReporter.report(exception, {
+        ...(typeof requestId === 'string' && { requestId }),
+      });
     }
     const exceptionResponse = isHttpException ? exception.getResponse() : null;
     const problem =

@@ -50,6 +50,7 @@ const sharedKernel = [
   'health',
   'http',
   'jobs',
+  'monitoring',
   'openapi',
   'time',
 ];

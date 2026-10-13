@@ -83,6 +83,7 @@ type WorkerDependencies = {
   };
   serviceVersion: string;
   emit(record: unknown): void;
+  pingHeartbeat?: () => Promise<void>;
 };
 
 export const startWorker = async (
@@ -234,6 +235,7 @@ export const startWorker = async (
       getQueueCounts(AUTHENTICATION_EMAIL_QUEUE),
     getFinalizeUploadCounts: () => getQueueCounts(FINALIZE_UPLOAD_QUEUE),
     emit: (record) => dependencies.emit(record),
+    ping: dependencies.pingHeartbeat,
   });
 
   return async () => {
