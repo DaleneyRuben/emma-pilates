@@ -18,7 +18,7 @@ describe('pg-boss runtime', () => {
 
   it('reports pg-boss errors instead of crashing the process', () => {
     const report = jest.fn();
-    const boss = createPgBoss('postgresql://localhost/unused', report);
+    const boss = createPgBoss('postgresql://localhost/unused', { report });
 
     expect(boss.listenerCount('error')).toBe(1);
     boss.emit(
@@ -28,6 +28,18 @@ describe('pg-boss runtime', () => {
     expect(report).toHaveBeenCalledWith({
       event: 'pg_boss_error',
       message: 'Connection terminated due to connection timeout',
+    });
+  });
+
+  it('caps the job client pool at the configured size', () => {
+    const boss = createPgBoss('postgresql://localhost/unused', { poolMax: 2 });
+
+    expect(boss).toHaveProperty(
+      'options',
+      pgBossOptions('postgresql://localhost/unused', 2),
+    );
+    expect(pgBossOptions('postgresql://localhost/unused', 2)).toMatchObject({
+      max: 2,
     });
   });
 

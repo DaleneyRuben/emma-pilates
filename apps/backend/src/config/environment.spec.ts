@@ -222,4 +222,28 @@ describe('environment configuration', () => {
       ).toThrow('WORKER_HEARTBEAT_URL');
     });
   });
+
+  describe('database pool size', () => {
+    const base = {
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+    };
+
+    it("defaults to pg's own pool size", () => {
+      expect(validateEnvironment(base).DATABASE_POOL_MAX).toBe(10);
+    });
+
+    it('reads a smaller pool for a connection-capped database', () => {
+      expect(
+        validateEnvironment({ ...base, DATABASE_POOL_MAX: '2' })
+          .DATABASE_POOL_MAX,
+      ).toBe(2);
+    });
+
+    it.each(['0', '21', '1.5'])('rejects a pool size of %s', (value) => {
+      expect(() =>
+        validateEnvironment({ ...base, DATABASE_POOL_MAX: value }),
+      ).toThrow('DATABASE_POOL_MAX');
+    });
+  });
 });
