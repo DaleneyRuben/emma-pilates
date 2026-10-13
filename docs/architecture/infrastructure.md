@@ -155,7 +155,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | Setting | Production | Development | Local / Mac | Notes |
 | --- | --- | --- | --- | --- |
 | `DATABASE_URL` | Northflank `production` | Render | `.env` (local), commented `# DEV_DATABASE_URL=` (Neon) | Reset in Aiven or Neon to rotate |
-| `DATABASE_POOL_MAX` | Northflank `production` (2) | default 10 | default 10 | Aiven allows 20 connections; BE-018 |
+| `DATABASE_POOL_MAX` | Northflank `production` (4) | default 10 | default 10 | Most connections per process (API or worker), split between its one Prisma and one pg-boss pool; Aiven allows 20 (BE-018) |
 | `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | Render | `.env` | Fresh per environment; rotation plan still to write |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY` | Northflank `production` | Render | `.env` | 32 random bytes, base64 |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | Northflank `production` (`northflank-prod-v1`) | Render (`render-dev-v1`) | `local-development-v1` | |
@@ -203,11 +203,10 @@ Values never go in the repository or a chat. «Mac» means the user's own
 ## Known gaps
 
 - No production worker: no email, no scheduled jobs, nobody can sign in
-  (gates 5 and 7, BE-018 first).
+  (gates 5 and 7).
 - No portable backup or restore drill (EXT-009): no real Client data before
   the first drill passes.
 - Releases are manual (EXT-008).
-- The API can open 16 database connections, above ADR-0027's four (BE-018).
 - No domain: production uses the providers' hostnames.
 
 ## Keeping this current

@@ -68,8 +68,14 @@ run:
 read -rs P && printf 'postgresql://avnadmin:%s@emma-pilates-prod-db-emma-pilates-prod.b.aivencloud.com:20680/emma?sslmode=verify-full&sslrootcert=/etc/secrets/emma-ca.pem&sslcert=/etc/secrets/emma-ca.pem&sslaccept=strict' "$P" | pbcopy && unset P
 ```
 
-`DATABASE_POOL_MAX=2` caps each of the API's eight pools, so the API holds at
-most 16 of Aiven's 20 connections.
+`DATABASE_POOL_MAX=4` is the most connections one process holds (BE-018). The
+API gives its one pg-boss 1 and its one Prisma client 3; the worker splits 2
+and 2. The API and the future worker together hold at most 8 of Aiven's 20,
+which leaves room for the `migrate` job, the console, and backups. Each pool
+names itself in `application_name` (`pilates-api-prisma`, `pilates-api-pgboss`,
+`pilates-worker-prisma`, `pilates-worker-pgboss`), so the count per owner is
+one query away (testing guide, Test 39). Never raise the value while an older
+release that opened eight pools per API could still be running.
 
 ## Forwarded addresses
 
