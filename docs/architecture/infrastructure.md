@@ -20,7 +20,7 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
  (none yet) (Northflank api, US Central)            (Render Free, Ohio, sleeps when idle)
               │ TLS, Aiven CA verified                          │ TLS
               ▼                                                 ▼
-            Aiven Free PostgreSQL 18                          Neon Free PostgreSQL 17
+            Aiven Free PostgreSQL 18                          Neon Free PostgreSQL 18
             emma-pilates-prod-db / emma                       emma-pilates-dev / pilates_dev
             (DigitalOcean US West)                            (AWS US East 2, Ohio)
 
@@ -34,7 +34,7 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
 | --- | --- | --- | --- |
 | API | Northflank `api` | Render `emma-pilates-dev-api` | `pnpm dev:backend` on port 3100 |
 | Worker | **none yet** (gates 5 and 7) | none (Render Free cannot run one) | `node dist/src/worker-main.js` |
-| Database | Aiven `emma-pilates-prod-db`, database `emma`, PostgreSQL 18 | Neon `emma-pilates-dev`, database `pilates_dev`, PostgreSQL 17 | Homebrew PostgreSQL 14.18 on 5432: `emma_pilates`, `pilates_dev_sim`, `pilates_test_fixtures` |
+| Database | Aiven `emma-pilates-prod-db`, database `emma`, PostgreSQL 18 | Neon `emma-pilates-dev`, database `pilates_dev`, PostgreSQL 18 | Homebrew `postgresql@18` (18.6) on 5433: `emma_pilates`, `pilates_dev_sim`, `pilates_test_fixtures` |
 | Admin web | https://emma-pilates-admin.vercel.app | Vercel preview per pull request | `pnpm dev:admin` on 5173 |
 | Data | Real, empty so far; nobody can sign in yet | Public development fixtures only (the fixture password is in the repository) | Fixtures |
 | `NODE_ENV` | `production` | `development` | `development` |
@@ -42,8 +42,12 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
 | Images | upload refused (`501`) | local disk, lost on redeploy | `apps/backend/.data/uploads` |
 | Release | by hand, [runbook](../runbooks/production-release.md) | Render auto-deploys every push to `main` | — |
 
-CI runs PostgreSQL 18 (`postgres:18-alpine`); moving local and Neon to 18 is
-BE-019.
+Every environment runs PostgreSQL 18: production (Aiven 18.6), shared
+development (Neon 18.6), CI (`postgres:18-alpine`), the integration suite's
+Docker fallback (`postgres:18-alpine`), and local (Homebrew 18.6 on port 5433,
+beside an older PostgreSQL on 5432 that other projects on the Mac use; BE-019).
+The schema tests expect PostgreSQL 18's SQLSTATE 23001 for a `RESTRICT`
+violation and no longer accept older servers' 23503.
 
 ## Accounts
 
@@ -56,7 +60,7 @@ Every account belongs to the project owner and is shared with no one else.
 | Aiven | organization «My Organization», project `emma-pilates-prod` | Free (a $50 trial runs beside it, unused) | No | Production database |
 | Vercel | `fernando-daleney-s-projects`, project `emma-pilates-admin` | Hobby, also for production by decision | — | Admin web previews and production, `/api/v1` proxy |
 | Render | service `emma-pilates-dev-api` (`srv-db4ivt6i0phs73cru2p0`) | Free | — | Shared development API |
-| Neon | project `emma-pilates-dev` (`mute-base-19499907`) | Free | No | Shared development database |
+| Neon | project `emma-pilates-dev` (`winter-paper-96646104`) | Free | No | Shared development database |
 | Better Stack | team `t614177` | Free | No | Uptime, error tracking, heartbeat, email alerts |
 | Expo, Apple, Google Play, Cloudflare R2, SendPulse, domain | not created yet | — | — | Gates 5–9 |
 
@@ -129,7 +133,10 @@ Every account belongs to the project owner and is shared with no one else.
   Reports `release` `local` (no `RELEASE_ID`). `TRUSTED_PROXY_HOPS=3`
   (measured 2026-10-12). Not monitored: any uptime check would keep Neon awake
   past its 100 compute hours.
-- **Neon `emma-pilates-dev`:** Free, AWS US East 2, PostgreSQL 17, one branch
+- **Neon `emma-pilates-dev`** (`winter-paper-96646104`, created 2026-10-13 by
+  BE-019; it replaced the PostgreSQL 17 project `mute-base-19499907`, which was
+  deleted the same day because Neon cannot upgrade a project's major
+  version): Free, AWS US East 2, PostgreSQL 18, one branch
   (Neon calls it `production`; the whole project is development), database
   `pilates_dev`, role `pilates_dev_owner`, 0.25–2 CU scaling to zero, direct
   (unpooled) connection because Prisma migrations and pg-boss need session
@@ -201,7 +208,6 @@ Values never go in the repository or a chat. «Mac» means the user's own
   the first drill passes.
 - Releases are manual (EXT-008).
 - The API can open 16 database connections, above ADR-0027's four (BE-018).
-- Local and Neon are not on PostgreSQL 18 yet (BE-019).
 - No domain: production uses the providers' hostnames.
 
 ## Keeping this current

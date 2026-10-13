@@ -16,11 +16,13 @@ Install dependencies from the repository root:
 pnpm install
 ```
 
-The backend uses the locally installed PostgreSQL server. Create its development
-database once, then copy the example configuration:
+The backend uses a locally installed PostgreSQL 18 (Homebrew `postgresql@18` on
+port 5433, so it can run beside an older PostgreSQL on 5432; the
+[testing guide](docs/testing-guide.md), Test 2, has the setup). Create its
+development database once, then copy the example configuration:
 
 ```sh
-createdb emma_pilates
+createdb -p 5433 emma_pilates
 cp apps/backend/.env.example apps/backend/.env
 ```
 

@@ -14,7 +14,7 @@ export const webOrigin = `http://localhost:${webPort}`;
  */
 export const adminDatabaseUrl =
   process.env.TEST_DATABASE_URL ??
-  `postgresql://${userInfo().username}@localhost:5432/pilates_test_fixtures`;
+  `postgresql://${userInfo().username}@localhost:5433/pilates_test_fixtures`;
 
 export const fixtures = {
   administrator: {

@@ -41,7 +41,7 @@ The local services use these default ports:
 | Client Expo server      |       `8081` |
 | Staff Expo server       |       `8082` |
 | Admin web               |       `5173` |
-| PostgreSQL              |       `5432` |
+| PostgreSQL 18           |       `5433` |
 
 These defaults avoid the `8080`, `3000`, `3005`, and `3015` ports used by the
 other local project.
@@ -201,14 +201,34 @@ Press `Ctrl+C` in Terminal when you want to stop Expo.
 These steps create and update a database named `emma_pilates` on your own
 computer. Never run them with a shared-development or production database URL.
 
-First, make sure PostgreSQL is running:
+The project runs on **PostgreSQL 18** everywhere (production, CI, the shared
+development database, and your computer). Locally it is Homebrew's
+`postgresql@18` on port **5433**, so it can sit beside an older PostgreSQL on
+5432 that other projects use. Install and start it once:
+
+```sh
+brew install postgresql@18
+sed -i '' 's/^#port = 5432/port = 5433/' /opt/homebrew/var/postgresql@18/postgresql.conf
+brew services start postgresql@18
+```
+
+Then, in every Terminal you use for this guide, point the PostgreSQL command
+line tools (`createdb`, `dropdb`, `psql`, `pg_isready`) at it. Every such
+command in this guide assumes these two lines:
+
+```sh
+export PATH="/opt/homebrew/opt/postgresql@18/bin:$PATH"
+export PGPORT=5433
+```
+
+Make sure it is running:
 
 ```sh
 pg_isready
 ```
 
-A response containing `accepting connections` means it is ready. Then create
-the local database and configuration file:
+A response containing `5433 - accepting connections` means it is ready. Then
+create the local database and configuration file:
 
 ```sh
 createdb emma_pilates
@@ -225,10 +245,15 @@ sure it contains:
 PORT=3100
 ```
 
-If PostgreSQL is installed through Homebrew but `pg_isready` does not report
-`accepting connections`, run `brew services list`, find the service whose name
-starts with `postgresql`, and start that exact service with
-`brew services start SERVICE_NAME`.
+If you created `apps/backend/.env` while the project still used port 5432,
+change its `DATABASE_URL` to
+`postgresql://YOUR_MAC_USER@localhost:5433/emma_pilates` (Prisma needs the
+user name in the URL).
+
+If `pg_isready` does not report `accepting connections`, run
+`brew services list` and start `postgresql@18` with
+`brew services start postgresql@18`. Leave any other PostgreSQL service as it
+is.
 
 Apply the project's already approved, committed migrations:
 
@@ -471,8 +496,9 @@ The running worker also cancels, once and for good, every fixture Session that
 still has no Bookings two hours before it starts, and tells its Trainer. Book
 a class first if you want to keep it for a manual test (Test 13).
 
-These fixtures exist only for your local `emma_pilates` database. Never load
-them into a shared-development or production database.
+These fixtures are for your local databases and the shared development
+database on Neon (Test 36), whose data is public and resettable. Never load
+them into production.
 
 ### B. Log in from the mobile app
 
@@ -1249,7 +1275,7 @@ throwaway admin database whose name starts with `pilates_test_`:
 
 ```sh
 createdb pilates_test_admin
-TEST_DATABASE_URL="postgresql://$USER@localhost:5432/pilates_test_admin" \
+TEST_DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_admin" \
   pnpm --filter @pilates/backend test:integration
 ```
 
@@ -1315,14 +1341,14 @@ version):
   **api-unit** (the backend unit suite) side by side → **api-e2e** (the
   supertest suites, which boot the application without a database) and
   **api-integration** (the Prisma repositories and PostgreSQL behaviour
-  against a `postgres:17-alpine` service container, through
+  against a `postgres:18-alpine` service container, through
   `TEST_DATABASE_URL` on a `pilates_test_ci` admin database that lives and
   dies with the runner) side by side, each waiting for both contracts and
   api-unit;
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
   **web-unit** (the admin-web Jest suite) and **web-e2e** (the ten Playwright
   journeys of Test 31 through the built backend and the built admin web, on
-  a `postgres:17-alpine` service container with a `pilates_test_ci` admin
+  a `postgres:18-alpine` service container with a `pilates_test_ci` admin
   database, WEB-017) side by side;
 - **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
   mobile-core, client-mobile, and staff-mobile) → **mobile-unit** (their
@@ -1856,7 +1882,7 @@ database so your fixture data stays intact:
 ```sh
 createdb pilates_test_bootstrap
 cd apps/backend
-export DATABASE_URL=postgresql://$USER@localhost:5432/pilates_test_bootstrap
+export DATABASE_URL=postgresql://$USER@localhost:5433/pilates_test_bootstrap
 pnpm exec prisma migrate deploy
 BOOTSTRAP_ADMINISTRATOR_EMAIL=duena@example.com \
 BOOTSTRAP_ADMINISTRATOR_NAME="Dueña del estudio" pnpm admin:bootstrap
@@ -2219,7 +2245,7 @@ pnpm --filter @pilates/admin-web preview
 ```
 
 ```sh
-DATABASE_URL="postgresql://$USER@localhost:5432/pilates_dev_sim" ADMIN_WEB_TRUSTED_ORIGINS="http://localhost:5173,http://localhost:4173" pnpm dev:backend
+DATABASE_URL="postgresql://$USER@localhost:5433/pilates_dev_sim" ADMIN_WEB_TRUSTED_ORIGINS="http://localhost:5173,http://localhost:4173" pnpm dev:backend
 ```
 
 The built app is split by page: the shell, the Login pages, and the session
@@ -2276,8 +2302,8 @@ Start the backend against the local simulator database and load the fixtures
 (Test 2 and Test 5 A), then start the admin web in a second Terminal:
 
 ```sh
-DATABASE_URL="postgresql://$USER@localhost:5432/pilates_dev_sim" pnpm --filter @pilates/backend db:fixtures
-DATABASE_URL="postgresql://$USER@localhost:5432/pilates_dev_sim" pnpm dev:backend
+DATABASE_URL="postgresql://$USER@localhost:5433/pilates_dev_sim" pnpm --filter @pilates/backend db:fixtures
+DATABASE_URL="postgresql://$USER@localhost:5433/pilates_dev_sim" pnpm dev:backend
 pnpm dev:admin
 ```
 
@@ -2779,7 +2805,7 @@ CI runs the same ten journeys in the **web-e2e** job of
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (WEB-017), beside
 the web-unit job as soon as quality-web passed (EXT-005), on every pull
 request that touches the admin web and on every push to `main`. The job runs
-`pnpm test:admin-e2e` exactly as above, on a `postgres:17-alpine` service
+`pnpm test:admin-e2e` exactly as above, on a `postgres:18-alpine` service
 container: a `psql` step first creates the `pilates_test_ci` admin database
 the api-integration job also uses, and
 `TEST_DATABASE_URL` points the global setup at it, so the run creates its
@@ -3045,7 +3071,7 @@ Closing is permanent, so use a disposable database, not the one you keep:
 
 ```sh
 createdb -T pilates_dev_sim pilates_test_closure
-DATABASE_URL="postgresql://$USER@localhost:5432/pilates_test_closure" \
+DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
   pnpm --filter @pilates/backend start
 ```
 
@@ -3091,7 +3117,7 @@ Drop the copy afterwards: `dropdb pilates_test_closure`.
 Every push to a pull request's branch builds a preview of the admin web on
 Vercel. `apps/admin-web/vercel.json` proxies the preview's `/api/v1` to the
 shared development API (https://emma-pilates-dev-api.onrender.com, on the Neon
-database `emma-pilates-dev`) and serves `index.html` for every other path that
+project `emma-pilates-dev`, PostgreSQL 18) and serves `index.html` for every other path that
 is not under `api/`, so the browser only ever talks to the preview's own origin
 (ADR-0084). The production alias `emma-pilates-admin.vercel.app` is left out
 of that rule, so production never reaches development data: its `/api/v1`
@@ -3114,9 +3140,12 @@ goes to the production API on Northflank instead (Test 38).
    sesión desde esta dirección. Abre el panel desde su enlace habitual.». If a run failed, re-run it from the
    Actions tab or with `gh workflow run preview-origins.yml`; its log prints
    the current and desired lists.
-4. The shared database holds the development fixtures (loaded once with
-   `read -rs NEON_URL && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:fixtures; unset NEON_URL`,
-   pasting Neon's direct connection string). Sign in as
+4. The shared database holds the development fixtures. Migrations and
+   fixtures are applied from your Mac with Neon's direct (unpooled)
+   connection string pasted into a hidden prompt, never shown:
+   `read -rs NEON_URL && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:migrate:deploy && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:fixtures; unset NEON_URL`.
+   Run it again after a merged pull request adds a migration, because Render
+   deploys the code but never migrates. Sign in as
    `paola.mendoza@example.com` with the fixture password. The first request
    after the Render service has slept can take about a minute.
 5. Expect Horario for Sucursal Centro. In DevTools → Network,
@@ -3181,7 +3210,7 @@ locally:
 1. Uncomment `ERROR_REPORTING_DSN` in `apps/backend/.env`, then
    `pnpm --filter @pilates/backend build`.
 2. From `apps/backend`, start the API on a database that does not exist:
-   `DATABASE_URL=postgresql://postgres@localhost:5432/missing_database BOOT_WITHOUT_JOB_RUNTIME=true PORT=3199 node --env-file=.env dist/src/main.js`.
+   `DATABASE_URL=postgresql://postgres@localhost:5433/missing_database BOOT_WITHOUT_JOB_RUNTIME=true PORT=3199 node --env-file=.env dist/src/main.js`.
 3. `curl -i -X POST -H "Content-Type: application/json" -d '{"email":"probe@example.com","password":"probe-password-123"}' http://localhost:3199/api/v1/authentication-sessions`
    answers `500` `unexpected_error`; note its `x-request-id`.
 4. In Better Stack the error appears (or re-opens) as

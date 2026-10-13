@@ -5,9 +5,6 @@ BEGIN
     EXECUTE statement;
   EXCEPTION WHEN OTHERS THEN
     IF SQLSTATE = expected_code THEN RETURN; END IF;
-    -- PostgreSQL 18 reports a RESTRICT foreign key as 23001; older servers as 23503.
-    IF expected_code = '23001' AND SQLSTATE = '23503'
-      AND current_setting('server_version_num')::int < 180000 THEN RETURN; END IF;
     RAISE;
   END;
   RAISE EXCEPTION 'Expected SQLSTATE %, but statement succeeded: %', expected_code, statement;

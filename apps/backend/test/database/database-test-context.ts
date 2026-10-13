@@ -117,7 +117,7 @@ export const startDatabaseTestContext =
       databaseUrl = disposable.databaseUrl;
       dropDatabase = disposable.drop;
     } else {
-      container = await new PostgreSqlContainer('postgres:17-alpine')
+      container = await new PostgreSqlContainer('postgres:18-alpine')
         .withDatabase('pilates_test_container')
         .start();
       databaseUrl = container.getConnectionUri();
