@@ -1,15 +1,10 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  BeforeApplicationShutdown,
-  Injectable,
-  Module,
-  OnModuleDestroy,
-} from '@nestjs/common';
+import { BeforeApplicationShutdown, Injectable, Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Environment } from '../config/environment';
-import { createPrismaAdapter } from '../database/prisma-adapter';
-import { PrismaClient } from '../generated/prisma/client';
+import { PRISMA_CLIENT } from '../database/database.module';
+import type { PrismaClient } from '../generated/prisma/client';
 import { HealthController } from './health.controller';
 import { checkReadiness } from './readiness';
 import {
@@ -42,27 +37,10 @@ class ShutdownState implements BeforeApplicationShutdown {
   }
 }
 
-@Injectable()
-class HealthPrisma extends PrismaClient implements OnModuleDestroy {
-  constructor(config: ConfigService<Environment, true>) {
-    super({
-      adapter: createPrismaAdapter(
-        config.getOrThrow('DATABASE_URL'),
-        config.getOrThrow('DATABASE_POOL_MAX'),
-      ),
-    });
-  }
-
-  async onModuleDestroy(): Promise<void> {
-    await this.$disconnect();
-  }
-}
-
 @Module({
   controllers: [HealthController, ReadinessController],
   providers: [
     ShutdownState,
-    HealthPrisma,
     {
       provide: releaseIdentifier,
       inject: [ConfigService],
@@ -71,8 +49,8 @@ class HealthPrisma extends PrismaClient implements OnModuleDestroy {
     },
     {
       provide: readinessCheck,
-      inject: [HealthPrisma, ShutdownState],
-      useFactory: (prisma: HealthPrisma, shutdown: ShutdownState) => {
+      inject: [PRISMA_CLIENT, ShutdownState],
+      useFactory: (prisma: PrismaClient, shutdown: ShutdownState) => {
         const expectedMigrations = readShippedMigrations();
         return () =>
           checkReadiness({

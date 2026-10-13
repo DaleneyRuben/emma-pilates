@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { Module, OnApplicationShutdown } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Environment } from '../config/environment';
-import { createPrismaAdapter } from '../database/prisma-adapter';
+import { PRISMA_CLIENT } from '../database/database.module';
 import { PrismaClient } from '../generated/prisma/client';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import {
@@ -150,16 +150,6 @@ import { receiptReadProvider } from './payments/prisma-receipt-read';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 
-const bookingPrisma = Symbol('bookingPrisma');
-
-class BookingRuntimeCleanup implements OnApplicationShutdown {
-  constructor(private readonly prisma: PrismaClient) {}
-
-  onApplicationShutdown(): Promise<void> {
-    return this.prisma.$disconnect();
-  }
-}
-
 @Module({
   imports: [SystemIdentityModule],
   controllers: [
@@ -201,19 +191,8 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
   ],
   providers: [
     {
-      provide: bookingPrisma,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        new PrismaClient({
-          adapter: createPrismaAdapter(
-            config.getOrThrow('DATABASE_URL'),
-            config.getOrThrow('DATABASE_POOL_MAX'),
-          ),
-        }),
-    },
-    {
       provide: createBookingCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.createIdempotent.bind(commands);
@@ -221,7 +200,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: joinWaitlistCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.joinWaitlistIdempotent.bind(commands);
@@ -229,7 +208,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: cancelBookingCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.cancel.bind(commands);
@@ -237,7 +216,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: rescheduleBookingCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.reschedule.bind(commands);
@@ -245,7 +224,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: classHistory,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -258,7 +237,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: recordAttendanceCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.recordAttendance.bind(commands);
@@ -266,7 +245,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: trainerSchedule,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -314,7 +293,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: trainerSessionRoster,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -371,12 +350,12 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: sessionAvailability,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => listSessionAvailability(prisma),
     },
     {
       provide: clientProfile,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -390,7 +369,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: administratorSessionSearch,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient): AdministratorSessionSearch =>
         (query, principal) =>
@@ -402,7 +381,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: staffManagementOperations,
-      inject: [bookingPrisma, staffAccountRuntime],
+      inject: [PRISMA_CLIENT, staffAccountRuntime],
       useFactory: (
         prisma: PrismaClient,
         runtime: StaffAccountRuntime,
@@ -442,7 +421,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: staffProfile,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -456,7 +435,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: clientBookings,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -471,7 +450,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: leaveWaitlistCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.leaveWaitlist.bind(commands);
@@ -479,7 +458,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: clientProfileUpdate,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -497,7 +476,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: clientSubscription,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -533,7 +512,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: planCatalog,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient): PlanCatalogHandler => ({
         list: () => createCatalogRepository(prisma).listVisiblePlans(),
         find: (planId) =>
@@ -542,25 +521,25 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: branchCatalog,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => () =>
         createCatalogRepository(prisma).listBranches(),
     },
     {
       provide: classTypeCatalog,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => () =>
         createCatalogRepository(prisma).listClassTypes(),
     },
     {
       provide: sessionDetail,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => (sessionId: string) =>
         createCatalogRepository(prisma).findSessionDetail(sessionId),
     },
     {
       provide: paymentCommands,
-      inject: [bookingPrisma, ConfigService],
+      inject: [PRISMA_CLIENT, ConfigService],
       useFactory: (
         prisma: PrismaClient,
         config: ConfigService<Environment, true>,
@@ -572,7 +551,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: assistantClientOperations,
-      inject: [bookingPrisma, paymentCommands],
+      inject: [PRISMA_CLIENT, paymentCommands],
       useFactory: (
         prisma: PrismaClient,
         payments: import('./payments/prisma-payment-commands').PaymentCommands,
@@ -591,7 +570,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: cancelSessionCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.cancelSession.bind(commands);
@@ -611,13 +590,13 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: evaluationCommands,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) =>
         createPrismaEvaluationCommands(prisma, { now: () => new Date() }),
     },
     {
       provide: administrationOperations,
-      inject: [bookingPrisma, evaluationCommands],
+      inject: [PRISMA_CLIENT, evaluationCommands],
       useFactory: (
         prisma: PrismaClient,
         evaluations: EvaluationCommands,
@@ -634,19 +613,14 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: catalogListOperations,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => createPrismaCatalogLists(prisma),
     },
-    ...adminWebReads.providers(bookingPrisma),
-    ...accountClosure.providers(bookingPrisma),
-    receiptReadProvider(bookingPrisma),
-    ...promotionsWiring.providers(bookingPrisma),
-    ...clientPhotoWiring.providers(bookingPrisma),
-    {
-      provide: BookingRuntimeCleanup,
-      inject: [bookingPrisma],
-      useFactory: (prisma: PrismaClient) => new BookingRuntimeCleanup(prisma),
-    },
+    ...adminWebReads.providers(PRISMA_CLIENT),
+    ...accountClosure.providers(PRISMA_CLIENT),
+    receiptReadProvider(PRISMA_CLIENT),
+    ...promotionsWiring.providers(PRISMA_CLIENT),
+    ...clientPhotoWiring.providers(PRISMA_CLIENT),
   ],
 })
 export class BookingModule {}

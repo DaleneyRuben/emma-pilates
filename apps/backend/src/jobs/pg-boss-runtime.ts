@@ -12,9 +12,13 @@ export interface StartablePgBoss {
 export const pgBossOptions = (
   connectionString: string,
   poolMax = 10,
+  applicationName?: string,
 ): ConstructorOptions => ({
   connectionString,
   max: poolMax,
+  ...(applicationName === undefined
+    ? {}
+    : { application_name: applicationName }),
   schema: 'pgboss',
   migrate: false,
   createSchema: false,
@@ -36,13 +40,17 @@ export const createPgBoss = (
   connectionString: string,
   {
     poolMax,
+    applicationName,
     report = logPgBossError,
   }: {
     poolMax?: number;
+    applicationName?: string;
     report?: (record: PgBossErrorReport) => void;
   } = {},
 ): PgBoss => {
-  const boss = new PgBoss(pgBossOptions(connectionString, poolMax));
+  const boss = new PgBoss(
+    pgBossOptions(connectionString, poolMax, applicationName),
+  );
   boss.on('error', (error: Error) => {
     report({ event: 'pg_boss_error', message: error.message });
   });

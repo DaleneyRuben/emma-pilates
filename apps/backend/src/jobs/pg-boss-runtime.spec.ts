@@ -43,6 +43,21 @@ describe('pg-boss runtime', () => {
     });
   });
 
+  it('tags pg-boss connections with the owning process', () => {
+    const boss = createPgBoss('postgresql://localhost/unused', {
+      poolMax: 1,
+      applicationName: 'pilates-api-pgboss',
+    });
+
+    expect(boss).toHaveProperty(
+      'options',
+      expect.objectContaining({
+        max: 1,
+        application_name: 'pilates-api-pgboss',
+      }),
+    );
+  });
+
   it('disables runtime schema changes and unused persistence', () => {
     expect(pgBossOptions('postgresql://localhost/pilates')).toMatchObject({
       connectionString: 'postgresql://localhost/pilates',

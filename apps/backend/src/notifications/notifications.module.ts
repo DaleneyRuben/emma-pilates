@@ -1,7 +1,5 @@
-import { Module, OnApplicationShutdown } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { createPrismaAdapter } from '../database/prisma-adapter';
-import type { Environment } from '../config/environment';
+import { Module } from '@nestjs/common';
+import { PRISMA_CLIENT } from '../database/database.module';
 import { PrismaClient } from '../generated/prisma/client';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
@@ -19,16 +17,7 @@ import {
 } from './notifications.controller';
 import { createNotificationStore } from './prisma-notification-store';
 
-const notificationsPrisma = Symbol('notificationsPrisma');
 const notificationStore = Symbol('notificationStore');
-
-class NotificationsRuntimeCleanup implements OnApplicationShutdown {
-  constructor(private readonly prisma: PrismaClient) {}
-
-  onApplicationShutdown(): Promise<void> {
-    return this.prisma.$disconnect();
-  }
-}
 
 type Store = ReturnType<typeof createNotificationStore>;
 
@@ -37,19 +26,8 @@ type Store = ReturnType<typeof createNotificationStore>;
   controllers: [NotificationsController],
   providers: [
     {
-      provide: notificationsPrisma,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        new PrismaClient({
-          adapter: createPrismaAdapter(
-            config.getOrThrow('DATABASE_URL'),
-            config.getOrThrow('DATABASE_POOL_MAX'),
-          ),
-        }),
-    },
-    {
       provide: notificationStore,
-      inject: [notificationsPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => createNotificationStore(prisma),
     },
     {
@@ -96,12 +74,6 @@ type Store = ReturnType<typeof createNotificationStore>;
           markAllRead: (input) => store.markAllRead(input),
           now: () => new Date(),
         }),
-    },
-    {
-      provide: NotificationsRuntimeCleanup,
-      inject: [notificationsPrisma],
-      useFactory: (prisma: PrismaClient) =>
-        new NotificationsRuntimeCleanup(prisma),
     },
   ],
 })

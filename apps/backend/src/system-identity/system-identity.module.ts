@@ -3,15 +3,12 @@ import {
   type MiddlewareConsumer,
   Module,
   type NestModule,
-  OnApplicationShutdown,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { createPrismaAdapter } from '../database/prisma-adapter';
+import { PG_BOSS, PRISMA_CLIENT } from '../database/database.module';
 import type { PgBoss } from 'pg-boss';
 import type { Environment } from '../config/environment';
 import { PrismaClient } from '../generated/prisma/client';
-import { createPgBoss, startInstalledPgBoss } from '../jobs/pg-boss-runtime';
-import { bootsWithoutJobRuntime } from '../jobs/boot-without-job-runtime';
 import {
   AccountSecurityController,
   accountActivation,
@@ -82,29 +79,8 @@ import {
 } from './staff-accounts/staff-accounts';
 
 const registrationGateway = Symbol('registrationGateway');
-const registrationPgBoss = Symbol('registrationPgBoss');
-const systemIdentityPrisma = Symbol('systemIdentityPrisma');
 const authenticationGateway = Symbol('authenticationGateway');
 const accountSecurityGateway = Symbol('accountSecurityGateway');
-
-const offlinePgBoss: Pick<PgBoss, 'stop'> = {
-  stop: () => Promise.resolve(),
-};
-
-class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
-  constructor(
-    private readonly prisma: PrismaClient,
-    private readonly boss: PgBoss,
-  ) {}
-
-  async onApplicationShutdown(): Promise<void> {
-    try {
-      await this.boss.stop({ graceful: true });
-    } finally {
-      await this.prisma.$disconnect();
-    }
-  }
-}
 
 @Module({
   controllers: [
@@ -117,34 +93,9 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     ClientRegistrationController,
   ],
   providers: [
-    ...emailChangeWiring.providers(systemIdentityPrisma),
-    ...emailSourceBudgetProviders(systemIdentityPrisma),
-    ...staffEmailBudgetProviders(systemIdentityPrisma),
-    {
-      provide: systemIdentityPrisma,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        new PrismaClient({
-          adapter: createPrismaAdapter(
-            config.getOrThrow('DATABASE_URL'),
-            config.getOrThrow('DATABASE_POOL_MAX'),
-          ),
-        }),
-    },
-    {
-      provide: registrationPgBoss,
-      inject: [ConfigService],
-      useFactory: async (config: ConfigService<Environment, true>) => {
-        if (bootsWithoutJobRuntime(process.env)) {
-          return offlinePgBoss as PgBoss;
-        }
-        const boss = createPgBoss(config.getOrThrow('DATABASE_URL'), {
-          poolMax: config.getOrThrow('DATABASE_POOL_MAX'),
-        });
-        await startInstalledPgBoss(boss);
-        return boss;
-      },
-    },
+    ...emailChangeWiring.providers(PRISMA_CLIENT),
+    ...emailSourceBudgetProviders(PRISMA_CLIENT),
+    ...staffEmailBudgetProviders(PRISMA_CLIENT),
     {
       provide: AuthenticationLinkCipher,
       inject: [ConfigService],
@@ -159,7 +110,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: registrationGateway,
-      inject: [systemIdentityPrisma, registrationPgBoss, ConfigService],
+      inject: [PRISMA_CLIENT, PG_BOSS, ConfigService],
       useFactory: (
         prisma: PrismaClient,
         boss: PgBoss,
@@ -173,13 +124,13 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: authenticationGateway,
-      inject: [systemIdentityPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) =>
         new PrismaAuthenticationGateway(prisma),
     },
     {
       provide: accountSecurityGateway,
-      inject: [systemIdentityPrisma, registrationPgBoss, ConfigService],
+      inject: [PRISMA_CLIENT, PG_BOSS, ConfigService],
       useFactory: (
         prisma: PrismaClient,
         boss: PgBoss,
@@ -308,12 +259,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: clientInvitationOperations,
-      inject: [
-        systemIdentityPrisma,
-        registrationPgBoss,
-        ConfigService,
-        AuthenticationLinkCipher,
-      ],
+      inject: [PRISMA_CLIENT, PG_BOSS, ConfigService, AuthenticationLinkCipher],
       useFactory: (
         prisma: PrismaClient,
         boss: PgBoss,
@@ -418,7 +364,7 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
     },
     {
       provide: staffAccountRuntime,
-      inject: [registrationPgBoss, ConfigService, AuthenticationLinkCipher],
+      inject: [PG_BOSS, ConfigService, AuthenticationLinkCipher],
       useFactory: (
         boss: PgBoss,
         config: ConfigService<Environment, true>,
@@ -429,12 +375,6 @@ class SystemIdentityRuntimeCleanup implements OnApplicationShutdown {
         linkCipher,
         tokenIssuer: authenticationTokens,
       }),
-    },
-    {
-      provide: SystemIdentityRuntimeCleanup,
-      inject: [systemIdentityPrisma, registrationPgBoss],
-      useFactory: (prisma: PrismaClient, boss: PgBoss) =>
-        new SystemIdentityRuntimeCleanup(prisma, boss),
     },
   ],
   exports: [

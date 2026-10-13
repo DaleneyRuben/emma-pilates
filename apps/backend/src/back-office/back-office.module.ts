@@ -1,7 +1,5 @@
-import { Module, OnApplicationShutdown } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { Environment } from '../config/environment';
-import { createPrismaAdapter } from '../database/prisma-adapter';
+import { Module } from '@nestjs/common';
+import { PRISMA_CLIENT } from '../database/database.module';
 import { PrismaClient } from '../generated/prisma/client';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import {
@@ -14,35 +12,14 @@ import { createPrismaSalaryPayments } from './payroll/prisma-salary-payments';
 import { createPrismaExpenseReport } from './reports/prisma-expense-report';
 import { createPrismaSupplies } from './supplies/prisma-supplies';
 
-const backOfficePrisma = Symbol('backOfficePrisma');
-
-class BackOfficeRuntimeCleanup implements OnApplicationShutdown {
-  constructor(private readonly prisma: PrismaClient) {}
-
-  onApplicationShutdown(): Promise<void> {
-    return this.prisma.$disconnect();
-  }
-}
-
 // Admin-only inventory, payroll, and expenses (Back Office context, BKO-002).
 @Module({
   imports: [SystemIdentityModule],
   controllers: backOfficeControllers,
   providers: [
     {
-      provide: backOfficePrisma,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        new PrismaClient({
-          adapter: createPrismaAdapter(
-            config.getOrThrow('DATABASE_URL'),
-            config.getOrThrow('DATABASE_POOL_MAX'),
-          ),
-        }),
-    },
-    {
       provide: backOfficeOperations,
-      inject: [backOfficePrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient): BackOfficeOperations => {
         const now = () => new Date();
         return {
@@ -52,12 +29,6 @@ class BackOfficeRuntimeCleanup implements OnApplicationShutdown {
           report: createPrismaExpenseReport(prisma, { now }),
         };
       },
-    },
-    {
-      provide: BackOfficeRuntimeCleanup,
-      inject: [backOfficePrisma],
-      useFactory: (prisma: PrismaClient) =>
-        new BackOfficeRuntimeCleanup(prisma),
     },
   ],
 })
