@@ -8,13 +8,19 @@ export const prismaSessionOptions = '-c TimeZone=UTC';
 export const prismaPoolConfig = (
   connectionString: string,
   poolMax: number,
+  applicationName?: string,
 ): PoolConfig => ({
   connectionString,
   max: poolMax,
   options: prismaSessionOptions,
+  ...(applicationName === undefined
+    ? {}
+    : { application_name: applicationName }),
 });
 
 export const createPrismaAdapter = (
   connectionString: string,
   poolMax = 10,
-): PrismaPg => new PrismaPg(prismaPoolConfig(connectionString, poolMax));
+  applicationName?: string,
+): PrismaPg =>
+  new PrismaPg(prismaPoolConfig(connectionString, poolMax, applicationName));

@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
-import { Module, OnApplicationShutdown } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { Environment } from '../config/environment';
-import { createPrismaAdapter } from '../database/prisma-adapter';
+import { PRISMA_CLIENT } from '../database/database.module';
 import { PrismaClient } from '../generated/prisma/client';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import {
@@ -152,14 +152,6 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
 
 const bookingPrisma = Symbol('bookingPrisma');
 
-class BookingRuntimeCleanup implements OnApplicationShutdown {
-  constructor(private readonly prisma: PrismaClient) {}
-
-  onApplicationShutdown(): Promise<void> {
-    return this.prisma.$disconnect();
-  }
-}
-
 @Module({
   imports: [SystemIdentityModule],
   controllers: [
@@ -200,17 +192,7 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     NutritionistAvailabilityBlocksController,
   ],
   providers: [
-    {
-      provide: bookingPrisma,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        new PrismaClient({
-          adapter: createPrismaAdapter(
-            config.getOrThrow('DATABASE_URL'),
-            config.getOrThrow('DATABASE_POOL_MAX'),
-          ),
-        }),
-    },
+    { provide: bookingPrisma, useExisting: PRISMA_CLIENT },
     {
       provide: createBookingCommand,
       inject: [bookingPrisma],
@@ -642,11 +624,6 @@ class BookingRuntimeCleanup implements OnApplicationShutdown {
     receiptReadProvider(bookingPrisma),
     ...promotionsWiring.providers(bookingPrisma),
     ...clientPhotoWiring.providers(bookingPrisma),
-    {
-      provide: BookingRuntimeCleanup,
-      inject: [bookingPrisma],
-      useFactory: (prisma: PrismaClient) => new BookingRuntimeCleanup(prisma),
-    },
   ],
 })
 export class BookingModule {}

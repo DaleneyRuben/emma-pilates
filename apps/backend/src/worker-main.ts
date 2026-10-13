@@ -1,11 +1,9 @@
 import { createHmac, randomUUID } from 'node:crypto';
-import { createPrismaAdapter } from './database/prisma-adapter';
+import { createDatabaseClients } from './database/database-clients';
 import { validateEnvironment } from './config/environment';
-import { PrismaClient } from './generated/prisma/client';
 import { LocalEmailCapture } from './jobs/authentication-email/local-email-capture';
 import { SpanishAuthenticationEmailRenderer } from './jobs/authentication-email/spanish-authentication-email-renderer';
 import { PrismaAuthenticationEmailStateReader } from './jobs/authentication-email/prisma-authentication-email-state-reader';
-import { createPgBoss } from './jobs/pg-boss-runtime';
 import { createWorkerLog } from './jobs/worker-log';
 import { createHeartbeatPing } from './monitoring/heartbeat-ping';
 import { createPrismaEvaluationCommands } from './booking/evaluations/prisma-evaluation-commands';
@@ -33,15 +31,7 @@ async function bootstrap(): Promise<void> {
   }
 
   const now = () => new Date();
-  const prisma = new PrismaClient({
-    adapter: createPrismaAdapter(
-      environment.DATABASE_URL,
-      environment.DATABASE_POOL_MAX,
-    ),
-  });
-  const boss = createPgBoss(environment.DATABASE_URL, {
-    poolMax: environment.DATABASE_POOL_MAX,
-  });
+  const { prisma, boss } = createDatabaseClients('worker', environment);
   const storage = new LocalObjectStorage(
     environment.UPLOADS_LOCAL_STORAGE_ROOT,
   );

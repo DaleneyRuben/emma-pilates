@@ -1,8 +1,7 @@
 import { createHmac, randomUUID } from 'node:crypto';
 import { validateEnvironment } from './config/environment';
-import { createPrismaAdapter } from './database/prisma-adapter';
-import { PrismaClient } from './generated/prisma/client';
-import { createPgBoss, startInstalledPgBoss } from './jobs/pg-boss-runtime';
+import { createDatabaseClients } from './database/database-clients';
+import { startInstalledPgBoss } from './jobs/pg-boss-runtime';
 import { runAdministratorBootstrapCommand } from './system-identity/bootstrap/administrator-bootstrap-command';
 import { bootstrapFirstAdministrator } from './system-identity/bootstrap/bootstrap-first-administrator';
 import { PrismaAdministratorBootstrapUnitOfWork } from './system-identity/bootstrap/prisma-administrator-bootstrap-unit-of-work';
@@ -13,15 +12,10 @@ import { authenticationTokens } from './system-identity/security/authentication-
 // docs/runbooks/first-administrator-bootstrap.md.
 async function main(): Promise<void> {
   const environment = validateEnvironment(process.env);
-  const prisma = new PrismaClient({
-    adapter: createPrismaAdapter(
-      environment.DATABASE_URL,
-      environment.DATABASE_POOL_MAX,
-    ),
-  });
-  const boss = createPgBoss(environment.DATABASE_URL, {
-    poolMax: environment.DATABASE_POOL_MAX,
-  });
+  const { prisma, boss } = createDatabaseClients(
+    'administrator-bootstrap',
+    environment,
+  );
 
   try {
     await startInstalledPgBoss(boss);

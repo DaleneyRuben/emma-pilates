@@ -75,9 +75,9 @@ const environmentSchema = z
           value.startsWith('postgresql://') || value.startsWith('postgres://'),
         'DATABASE_URL must use the PostgreSQL protocol',
       ),
-    // Size of every Prisma and pg-boss pool; Aiven Free caps the server at 20
-    // connections and the API opens eight pools.
-    DATABASE_POOL_MAX: z.coerce.number().int().min(1).max(20).default(10),
+    // Most connections one process holds across its Prisma and pg-boss pools;
+    // Aiven Free caps the server at 20 (ADR-0027 budgets four per process).
+    DATABASE_POOL_MAX: z.coerce.number().int().min(2).max(20).default(10),
     NODE_ENV: z
       .enum(['development', 'test', 'production'])
       .default('development'),

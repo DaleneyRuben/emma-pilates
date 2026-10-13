@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import type { Environment } from './config/environment';
 import { BackOfficeModule } from './back-office/back-office.module';
+import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
 import { ProblemDetailsFilter } from './http/problem-details.filter';
 import {
@@ -16,6 +17,7 @@ import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
+    DatabaseModule,
     HealthModule,
     SystemIdentityModule,
     BookingModule,
