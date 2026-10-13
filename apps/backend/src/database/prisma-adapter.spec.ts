@@ -8,4 +8,14 @@ describe('Prisma adapter pool', () => {
       options: prismaSessionOptions,
     });
   });
+
+  it('tags connections with the owning process', () => {
+    expect(
+      prismaPoolConfig(
+        'postgresql://localhost/pilates',
+        3,
+        'pilates-api-prisma',
+      ),
+    ).toMatchObject({ max: 3, application_name: 'pilates-api-prisma' });
+  });
 });

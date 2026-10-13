@@ -240,7 +240,7 @@ describe('environment configuration', () => {
       ).toBe(2);
     });
 
-    it.each(['0', '21', '1.5'])('rejects a pool size of %s', (value) => {
+    it.each(['0', '1', '21', '1.5'])('rejects a pool size of %s', (value) => {
       expect(() =>
         validateEnvironment({ ...base, DATABASE_POOL_MAX: value }),
       ).toThrow('DATABASE_POOL_MAX');
