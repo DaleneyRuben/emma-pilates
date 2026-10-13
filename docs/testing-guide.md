@@ -3296,3 +3296,52 @@ run. The transfer name, bank, and account number are the placeholder
    visitor.
 
 Test 37 covers the production readiness monitor firing and recovering.
+
+## Test 39: count database connections per process
+
+Each process (the API and the worker) holds one Prisma pool and one pg-boss
+pool, and `DATABASE_POOL_MAX` caps the two together (BE-018, ADR-0027). The
+API gives pg-boss 1 connection and Prisma the rest, because jobs are sent
+through Prisma's transaction; the worker splits the budget in half. Every pool
+names itself in `application_name`.
+
+1. With PostgreSQL 18 set up as in Test 2, copy the simulation database and
+   build the backend:
+
+   ```sh
+   createdb -T pilates_dev_sim pilates_connections && pnpm --filter @pilates/backend build
+   ```
+
+2. In two terminals under `apps/backend`, start the API and the worker on the
+   copy with the production value:
+
+   ```sh
+   DATABASE_URL="postgresql://$USER@localhost:5433/pilates_connections" DATABASE_POOL_MAX=4 node dist/src/main.js
+   ```
+
+   ```sh
+   DATABASE_URL="postgresql://$USER@localhost:5433/pilates_connections" DATABASE_POOL_MAX=4 node dist/src/worker-main.js
+   ```
+
+3. Load every module at once: log in as `lucia@example.com` and
+   `paola.mendoza@example.com` (`POST /api/v1/authentication-sessions`), then
+   send 25 parallel requests each to `/health/ready`,
+   `/api/v1/notifications/unread-count`, `/api/v1/plans`,
+   `/api/v1/uploads/<any UUID>`, and
+   `/api/v1/administrator/expense-categories`, while this runs in a third
+   terminal:
+
+   ```sh
+   psql -d postgres -c "select application_name, count(*) from pg_stat_activity where datname = 'pilates_connections' group by 1 order by 1"
+   ```
+
+   You should see at most `pilates-api-pgboss` 1, `pilates-api-prisma` 3,
+   `pilates-worker-pgboss` 2, and `pilates-worker-prisma` 2: eight in all.
+   Every request answers `200` (the made-up upload `404`), none `5xx`.
+   Before BE-018 the API alone reached 16 at `DATABASE_POOL_MAX=2`.
+4. Stop both with Ctrl+C: the count drops to 0. Then
+   `dropdb pilates_connections`.
+
+**In production**, with the Aiven URL exported from a hidden prompt (never
+printed), the same query against the database `emma` (with
+`datname = 'emma'`) shows the `api` service's two pools within 4.
