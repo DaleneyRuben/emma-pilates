@@ -58,7 +58,10 @@ export class ProblemDetailsFilter implements ExceptionFilter {
     }
     // A deliberate 5xx such as readiness's 503 is an answer, not a failure.
     if (!isHttpException) {
-      this.errorReporter.report(exception);
+      const requestId = response.getHeader('x-request-id');
+      this.errorReporter.report(exception, {
+        ...(typeof requestId === 'string' && { requestId }),
+      });
     }
     const exceptionResponse = isHttpException ? exception.getResponse() : null;
     const problem =

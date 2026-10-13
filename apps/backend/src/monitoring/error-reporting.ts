@@ -3,8 +3,10 @@ import type { ErrorEvent, Exception, StackFrame } from '@sentry/node';
 
 export const ERROR_REPORTER = Symbol('ERROR_REPORTER');
 
+export type ErrorReportContext = { requestId?: string };
+
 export interface ErrorReporter {
-  report(error: unknown): void;
+  report(error: unknown, context?: ErrorReportContext): void;
 }
 
 export const noErrorReporting: ErrorReporter = { report: () => undefined };
@@ -18,7 +20,10 @@ type ErrorReportingSettings = {
 
 type ErrorReportingSdk = {
   initWithoutDefaultIntegrations(options: Sentry.NodeOptions): unknown;
-  captureException(error: unknown): unknown;
+  captureException(
+    error: unknown,
+    hint: { tags: Record<string, string> },
+  ): unknown;
 };
 
 const collectNothing: Sentry.NodeOptions['dataCollection'] = {
@@ -42,16 +47,16 @@ const keepFrame = (frame: StackFrame): StackFrame => ({
 
 const keepException = (exception: Exception): Exception => ({
   type: exception.type,
-  value: exception.value,
   mechanism: exception.mechanism,
   ...(exception.stacktrace && {
     stacktrace: { frames: exception.stacktrace.frames?.map(keepFrame) },
   }),
 });
 
-// ADR-0081: an allowlist, like the logs' describeFailure. Requests, users,
-// breadcrumbs, local variables, source lines, and the host never leave the
-// process; the message and stack are what the logs already keep.
+// ADR-0081: an allowlist. Requests, users, breadcrumbs, local variables,
+// source lines, the host, and the message never leave the process: driver and
+// ORM messages can echo query arguments. The type, code, and stack locate the
+// failure, and the request identifier finds its full log line.
 export function sanitizeErrorEvent(event: ErrorEvent): ErrorEvent {
   return {
     type: undefined,
@@ -61,7 +66,15 @@ export function sanitizeErrorEvent(event: ErrorEvent): ErrorEvent {
     platform: event.platform,
     environment: event.environment,
     release: event.release,
-    tags: { service: event.tags?.service },
+    tags: {
+      service: event.tags?.service,
+      ...(event.tags?.error_code !== undefined && {
+        error_code: event.tags.error_code,
+      }),
+      ...(event.tags?.request_id !== undefined && {
+        request_id: event.tags.request_id,
+      }),
+    },
     exception: { values: event.exception?.values?.map(keepException) },
   };
 }
@@ -86,5 +99,17 @@ export function createErrorReporter(
     initialScope: { tags: { service: settings.service } },
     beforeSend: sanitizeErrorEvent,
   });
-  return { report: (error) => void sdk.captureException(error) };
+  return {
+    report: (error, context = {}) => {
+      const code = (error as { code?: unknown } | null)?.code;
+      void sdk.captureException(error, {
+        tags: {
+          ...(typeof code === 'string' && { error_code: code }),
+          ...(context.requestId !== undefined && {
+            request_id: context.requestId,
+          }),
+        },
+      });
+    },
+  };
 }
