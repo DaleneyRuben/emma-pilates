@@ -3139,3 +3139,70 @@ middleware must import nothing local, because Vercel compiles it alone.
 The fixture password is public in the repository, so anyone who finds the
 development API can sign in to its fake data; never put real data there.
 
+
+## Test 37: check the Better Stack monitors fire and recover
+
+Better Stack's free plan (ADR-0081, ADR-0066) holds three monitors, all
+alerting by email to the account's only team member. Its dashboard is at
+https://betterstack.com; the error DSN and the heartbeat URL are credentials
+and live only in your own `apps/backend/.env` (commented out) and in the
+hosts' environments, never in the repository.
+
+**Dev API readiness** (Uptime → Monitors) checks
+https://emma-pilates-dev-api.onrender.com/health/ready. It stays **paused**
+with a 30-minute check: each check wakes Render for about 16 minutes, and while
+the API is awake its pg-boss supervisor keeps the Neon database awake, so even
+the longest free check (30 minutes) would spend about 130 of Neon Free's 100
+compute hours a month. At gate 4 it moves to the production API at 3 minutes.
+To test it:
+
+1. Set **Check frequency** to 3 minutes and **Resume** the monitor.
+2. In Render, open `emma-pilates-dev-api` → **Settings** → **Suspend Web
+   Service**. `curl -s -o /dev/null -w "%{http_code}\n" https://emma-pilates-dev-api.onrender.com/health/ready`
+   answers `503`.
+3. Within about 6 minutes (one check plus the 3-minute confirmation period)
+   the monitor turns **Down** and «New incident started» arrives.
+4. **Resume Web Service** in Render; once `curl` answers `200`, the monitor
+   turns **Up** and «Incident resolved» arrives within about 3 minutes.
+5. Set the frequency back to 30 minutes and **Pause** the monitor.
+
+**emma-pilates-api** (Error tracking → Applications) receives the API's
+unexpected failures through the Sentry SDK when `ERROR_REPORTING_DSN` is set.
+Only failures that are not an `HttpException` are reported, so 4xx answers and
+readiness's deliberate `503` never are. An event carries the error type, a
+string `code` as the `error_code` tag (Prisma's `P1010`, for example), the
+stack's file, function, and line, environment, release, service, and the
+request's `x-request-id` as `request_id`; never the message, the request, a
+user, local variables, or the host name, because driver messages can echo
+query arguments. Search the host's logs for the `request_id` to read the full
+message. The **Incidents** integration (Error tracking → Integrations) emails
+on **New error occurs** and **Error is automatically re-opened**. To test it
+locally:
+
+1. Uncomment `ERROR_REPORTING_DSN` in `apps/backend/.env`, then
+   `pnpm --filter @pilates/backend build`.
+2. From `apps/backend`, start the API on a database that does not exist:
+   `DATABASE_URL=postgresql://postgres@localhost:5432/missing_database BOOT_WITHOUT_JOB_RUNTIME=true PORT=3199 node --env-file=.env dist/src/main.js`.
+3. `curl -i -X POST -H "Content-Type: application/json" -d '{"email":"probe@example.com","password":"probe-password-123"}' http://localhost:3199/api/v1/authentication-sessions`
+   answers `500` `unexpected_error`; note its `x-request-id`.
+4. In Better Stack the error appears (or re-opens) as
+   `PrismaClientKnownRequestError`; its event's **Tags** show `error_code` and
+   that `request_id`, **Request** and **Breadcrumbs** are empty, and an email
+   arrives. **Resolve** it; «Incident resolved» arrives.
+5. Stop the API and comment the DSN out again.
+
+**Worker heartbeat** (Uptime → Heartbeats) expects a ping every minute with
+a one-minute grace. The worker pings `WORKER_HEARTBEAT_URL` after every
+30-second heartbeat whose queue counts it could read; a failed read logs
+`worker_heartbeat_failed` and skips the ping, and a failed ping logs
+`worker_heartbeat_ping_failed` without the URL. No worker runs on Render, so
+the heartbeat stays **paused** until gate 4. To test it:
+
+1. **Resume** the heartbeat and uncomment `WORKER_HEARTBEAT_URL`.
+2. From `apps/backend`, run the worker on `pilates_dev_sim`:
+   `DATABASE_URL=<your local URL ending in /pilates_dev_sim> node --env-file=.env dist/src/worker-main.js`.
+   Within a minute the heartbeat turns **Up**.
+3. Stop the worker (`Ctrl+C`); about two minutes later the heartbeat turns
+   **Down** and «New incident started» («Missed heartbeat») arrives.
+4. Start the worker again; «Incident resolved» arrives within a minute.
+5. Stop the worker, **Pause** the heartbeat, and comment the URL out again.
