@@ -44,11 +44,14 @@ class FailingController {
 describe('error logging (e2e)', () => {
   let app: INestApplication<App>;
   let lines: Record<string, unknown>[];
-  let report: jest.Mock<(error: unknown) => void>;
+  let report: jest.Mock<
+    (error: unknown, context?: { requestId?: string }) => void
+  >;
 
   beforeEach(async () => {
     lines = [];
-    report = jest.fn<(error: unknown) => void>();
+    report =
+      jest.fn<(error: unknown, context?: { requestId?: string }) => void>();
     const destination = new Writable({
       write(chunk: Buffer, _encoding, done) {
         for (const line of chunk.toString().split('\n').filter(Boolean)) {
@@ -129,10 +132,14 @@ describe('error logging (e2e)', () => {
 
   // ADR-0081: only unexpected failures reach Better Stack.
   it('reports an unexpected failure to the error reporter', async () => {
-    await request(app.getHttpServer()).post('/v1/failing').expect(500);
+    const response = await request(app.getHttpServer())
+      .post('/v1/failing')
+      .expect(500);
 
     expect(report).toHaveBeenCalledTimes(1);
-    expect(report).toHaveBeenCalledWith(expect.any(DriverError));
+    expect(report).toHaveBeenCalledWith(expect.any(DriverError), {
+      requestId: response.headers['x-request-id'],
+    });
   });
 
   it('does not report client errors or a deliberate unavailable answer', async () => {

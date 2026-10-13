@@ -49,17 +49,31 @@ describe('error reporting', () => {
     );
   });
 
-  it('captures a reported failure', () => {
+  it('captures a reported failure with its code and request identifier', () => {
+    const sdk = fakeSdk();
+    const reporter = createErrorReporter(settings, sdk);
+    const failure = Object.assign(new Error('boom'), { code: 'P1003' });
+
+    reporter.report(failure, { requestId: 'req-1' });
+
+    expect(sdk.captureException).toHaveBeenCalledWith(failure, {
+      tags: { error_code: 'P1003', request_id: 'req-1' },
+    });
+  });
+
+  it('captures a failure without a code or request identifier', () => {
     const sdk = fakeSdk();
     const reporter = createErrorReporter(settings, sdk);
     const failure = new Error('boom');
 
     reporter.report(failure);
 
-    expect(sdk.captureException).toHaveBeenCalledWith(failure);
+    expect(sdk.captureException).toHaveBeenCalledWith(failure, { tags: {} });
   });
 
-  it('keeps only the exception, release, and service of an event', () => {
+  // Driver and ORM messages can echo query arguments, so only the type, code,
+  // and stack leave the process; the request identifier finds the full log.
+  it('keeps only the exception type and stack, release, and safe tags', () => {
     const event = {
       type: undefined,
       event_id: 'e1',
@@ -69,7 +83,12 @@ describe('error reporting', () => {
       environment: 'development',
       release: 'release-42',
       server_name: 'render-host-7',
-      tags: { service: 'api', email: 'lucia@example.com' },
+      tags: {
+        service: 'api',
+        error_code: 'P1003',
+        request_id: 'req-1',
+        email: 'lucia@example.com',
+      },
       request: { headers: { authorization: 'Bearer secret' } },
       user: { email: 'lucia@example.com' },
       breadcrumbs: [{ message: 'lucia@example.com' }],
@@ -110,12 +129,11 @@ describe('error reporting', () => {
       platform: 'node',
       environment: 'development',
       release: 'release-42',
-      tags: { service: 'api' },
+      tags: { service: 'api', error_code: 'P1003', request_id: 'req-1' },
       exception: {
         values: [
           {
             type: 'DriverError',
-            value: 'duplicate key value violates unique constraint',
             mechanism: { type: 'generic', handled: true },
             stacktrace: {
               frames: [
