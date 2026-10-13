@@ -46,7 +46,10 @@ class ShutdownState implements BeforeApplicationShutdown {
 class HealthPrisma extends PrismaClient implements OnModuleDestroy {
   constructor(config: ConfigService<Environment, true>) {
     super({
-      adapter: createPrismaAdapter(config.getOrThrow('DATABASE_URL')),
+      adapter: createPrismaAdapter(
+        config.getOrThrow('DATABASE_URL'),
+        config.getOrThrow('DATABASE_POOL_MAX'),
+      ),
     });
   }
 

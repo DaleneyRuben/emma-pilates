@@ -11,8 +11,10 @@ export interface StartablePgBoss {
 
 export const pgBossOptions = (
   connectionString: string,
+  poolMax = 10,
 ): ConstructorOptions => ({
   connectionString,
+  max: poolMax,
   schema: 'pgboss',
   migrate: false,
   createSchema: false,
@@ -32,9 +34,15 @@ const logPgBossError = (report: PgBossErrorReport): void => {
 // Node terminates the process.
 export const createPgBoss = (
   connectionString: string,
-  report: (record: PgBossErrorReport) => void = logPgBossError,
+  {
+    poolMax,
+    report = logPgBossError,
+  }: {
+    poolMax?: number;
+    report?: (record: PgBossErrorReport) => void;
+  } = {},
 ): PgBoss => {
-  const boss = new PgBoss(pgBossOptions(connectionString));
+  const boss = new PgBoss(pgBossOptions(connectionString, poolMax));
   boss.on('error', (error: Error) => {
     report({ event: 'pg_boss_error', message: error.message });
   });

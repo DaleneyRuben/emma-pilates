@@ -34,9 +34,14 @@ async function bootstrap(): Promise<void> {
 
   const now = () => new Date();
   const prisma = new PrismaClient({
-    adapter: createPrismaAdapter(environment.DATABASE_URL),
+    adapter: createPrismaAdapter(
+      environment.DATABASE_URL,
+      environment.DATABASE_POOL_MAX,
+    ),
   });
-  const boss = createPgBoss(environment.DATABASE_URL);
+  const boss = createPgBoss(environment.DATABASE_URL, {
+    poolMax: environment.DATABASE_POOL_MAX,
+  });
   const storage = new LocalObjectStorage(
     environment.UPLOADS_LOCAL_STORAGE_ROOT,
   );

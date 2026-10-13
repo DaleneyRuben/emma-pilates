@@ -41,7 +41,10 @@ type Store = ReturnType<typeof createNotificationStore>;
       inject: [ConfigService],
       useFactory: (config: ConfigService<Environment, true>) =>
         new PrismaClient({
-          adapter: createPrismaAdapter(config.getOrThrow('DATABASE_URL')),
+          adapter: createPrismaAdapter(
+            config.getOrThrow('DATABASE_URL'),
+            config.getOrThrow('DATABASE_POOL_MAX'),
+          ),
         }),
     },
     {

@@ -54,7 +54,10 @@ class UploadsRuntimeCleanup implements OnApplicationShutdown {
       inject: [ConfigService],
       useFactory: (config: ConfigService<Environment, true>) =>
         new PrismaClient({
-          adapter: createPrismaAdapter(config.getOrThrow('DATABASE_URL')),
+          adapter: createPrismaAdapter(
+            config.getOrThrow('DATABASE_URL'),
+            config.getOrThrow('DATABASE_POOL_MAX'),
+          ),
         }),
     },
     {
@@ -81,7 +84,9 @@ class UploadsRuntimeCleanup implements OnApplicationShutdown {
         if (bootsWithoutJobRuntime(process.env)) {
           return offlinePgBoss as PgBoss;
         }
-        const boss = createPgBoss(config.getOrThrow('DATABASE_URL'));
+        const boss = createPgBoss(config.getOrThrow('DATABASE_URL'), {
+          poolMax: config.getOrThrow('DATABASE_POOL_MAX'),
+        });
         await startInstalledPgBoss(boss);
         return boss;
       },
