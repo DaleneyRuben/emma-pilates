@@ -12,17 +12,14 @@ import { createPrismaSalaryPayments } from './payroll/prisma-salary-payments';
 import { createPrismaExpenseReport } from './reports/prisma-expense-report';
 import { createPrismaSupplies } from './supplies/prisma-supplies';
 
-const backOfficePrisma = Symbol('backOfficePrisma');
-
 // Admin-only inventory, payroll, and expenses (Back Office context, BKO-002).
 @Module({
   imports: [SystemIdentityModule],
   controllers: backOfficeControllers,
   providers: [
-    { provide: backOfficePrisma, useExisting: PRISMA_CLIENT },
     {
       provide: backOfficeOperations,
-      inject: [backOfficePrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient): BackOfficeOperations => {
         const now = () => new Date();
         return {

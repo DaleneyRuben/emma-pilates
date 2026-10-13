@@ -79,8 +79,6 @@ import {
 } from './staff-accounts/staff-accounts';
 
 const registrationGateway = Symbol('registrationGateway');
-const registrationPgBoss = Symbol('registrationPgBoss');
-const systemIdentityPrisma = Symbol('systemIdentityPrisma');
 const authenticationGateway = Symbol('authenticationGateway');
 const accountSecurityGateway = Symbol('accountSecurityGateway');
 
@@ -95,11 +93,9 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     ClientRegistrationController,
   ],
   providers: [
-    ...emailChangeWiring.providers(systemIdentityPrisma),
-    ...emailSourceBudgetProviders(systemIdentityPrisma),
-    ...staffEmailBudgetProviders(systemIdentityPrisma),
-    { provide: systemIdentityPrisma, useExisting: PRISMA_CLIENT },
-    { provide: registrationPgBoss, useExisting: PG_BOSS },
+    ...emailChangeWiring.providers(PRISMA_CLIENT),
+    ...emailSourceBudgetProviders(PRISMA_CLIENT),
+    ...staffEmailBudgetProviders(PRISMA_CLIENT),
     {
       provide: AuthenticationLinkCipher,
       inject: [ConfigService],
@@ -114,7 +110,7 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     },
     {
       provide: registrationGateway,
-      inject: [systemIdentityPrisma, registrationPgBoss, ConfigService],
+      inject: [PRISMA_CLIENT, PG_BOSS, ConfigService],
       useFactory: (
         prisma: PrismaClient,
         boss: PgBoss,
@@ -128,13 +124,13 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     },
     {
       provide: authenticationGateway,
-      inject: [systemIdentityPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) =>
         new PrismaAuthenticationGateway(prisma),
     },
     {
       provide: accountSecurityGateway,
-      inject: [systemIdentityPrisma, registrationPgBoss, ConfigService],
+      inject: [PRISMA_CLIENT, PG_BOSS, ConfigService],
       useFactory: (
         prisma: PrismaClient,
         boss: PgBoss,
@@ -263,12 +259,7 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     },
     {
       provide: clientInvitationOperations,
-      inject: [
-        systemIdentityPrisma,
-        registrationPgBoss,
-        ConfigService,
-        AuthenticationLinkCipher,
-      ],
+      inject: [PRISMA_CLIENT, PG_BOSS, ConfigService, AuthenticationLinkCipher],
       useFactory: (
         prisma: PrismaClient,
         boss: PgBoss,
@@ -373,7 +364,7 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     },
     {
       provide: staffAccountRuntime,
-      inject: [registrationPgBoss, ConfigService, AuthenticationLinkCipher],
+      inject: [PG_BOSS, ConfigService, AuthenticationLinkCipher],
       useFactory: (
         boss: PgBoss,
         config: ConfigService<Environment, true>,

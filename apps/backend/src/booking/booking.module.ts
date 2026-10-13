@@ -150,8 +150,6 @@ import { receiptReadProvider } from './payments/prisma-receipt-read';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 
-const bookingPrisma = Symbol('bookingPrisma');
-
 @Module({
   imports: [SystemIdentityModule],
   controllers: [
@@ -192,10 +190,9 @@ const bookingPrisma = Symbol('bookingPrisma');
     NutritionistAvailabilityBlocksController,
   ],
   providers: [
-    { provide: bookingPrisma, useExisting: PRISMA_CLIENT },
     {
       provide: createBookingCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.createIdempotent.bind(commands);
@@ -203,7 +200,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: joinWaitlistCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.joinWaitlistIdempotent.bind(commands);
@@ -211,7 +208,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: cancelBookingCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.cancel.bind(commands);
@@ -219,7 +216,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: rescheduleBookingCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.reschedule.bind(commands);
@@ -227,7 +224,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: classHistory,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -240,7 +237,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: recordAttendanceCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.recordAttendance.bind(commands);
@@ -248,7 +245,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: trainerSchedule,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -296,7 +293,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: trainerSessionRoster,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -353,12 +350,12 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: sessionAvailability,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => listSessionAvailability(prisma),
     },
     {
       provide: clientProfile,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -372,7 +369,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: administratorSessionSearch,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient): AdministratorSessionSearch =>
         (query, principal) =>
@@ -384,7 +381,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: staffManagementOperations,
-      inject: [bookingPrisma, staffAccountRuntime],
+      inject: [PRISMA_CLIENT, staffAccountRuntime],
       useFactory: (
         prisma: PrismaClient,
         runtime: StaffAccountRuntime,
@@ -424,7 +421,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: staffProfile,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -438,7 +435,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: clientBookings,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -453,7 +450,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: leaveWaitlistCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.leaveWaitlist.bind(commands);
@@ -461,7 +458,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: clientProfileUpdate,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -479,7 +476,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: clientSubscription,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory:
         (prisma: PrismaClient) =>
         (
@@ -515,7 +512,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: planCatalog,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient): PlanCatalogHandler => ({
         list: () => createCatalogRepository(prisma).listVisiblePlans(),
         find: (planId) =>
@@ -524,25 +521,25 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: branchCatalog,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => () =>
         createCatalogRepository(prisma).listBranches(),
     },
     {
       provide: classTypeCatalog,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => () =>
         createCatalogRepository(prisma).listClassTypes(),
     },
     {
       provide: sessionDetail,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => (sessionId: string) =>
         createCatalogRepository(prisma).findSessionDetail(sessionId),
     },
     {
       provide: paymentCommands,
-      inject: [bookingPrisma, ConfigService],
+      inject: [PRISMA_CLIENT, ConfigService],
       useFactory: (
         prisma: PrismaClient,
         config: ConfigService<Environment, true>,
@@ -554,7 +551,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: assistantClientOperations,
-      inject: [bookingPrisma, paymentCommands],
+      inject: [PRISMA_CLIENT, paymentCommands],
       useFactory: (
         prisma: PrismaClient,
         payments: import('./payments/prisma-payment-commands').PaymentCommands,
@@ -573,7 +570,7 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: cancelSessionCommand,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => {
         const commands = new PrismaBookingCommands(prisma, () => new Date());
         return commands.cancelSession.bind(commands);
@@ -593,13 +590,13 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: evaluationCommands,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) =>
         createPrismaEvaluationCommands(prisma, { now: () => new Date() }),
     },
     {
       provide: administrationOperations,
-      inject: [bookingPrisma, evaluationCommands],
+      inject: [PRISMA_CLIENT, evaluationCommands],
       useFactory: (
         prisma: PrismaClient,
         evaluations: EvaluationCommands,
@@ -616,14 +613,14 @@ const bookingPrisma = Symbol('bookingPrisma');
     },
     {
       provide: catalogListOperations,
-      inject: [bookingPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => createPrismaCatalogLists(prisma),
     },
-    ...adminWebReads.providers(bookingPrisma),
-    ...accountClosure.providers(bookingPrisma),
-    receiptReadProvider(bookingPrisma),
-    ...promotionsWiring.providers(bookingPrisma),
-    ...clientPhotoWiring.providers(bookingPrisma),
+    ...adminWebReads.providers(PRISMA_CLIENT),
+    ...accountClosure.providers(PRISMA_CLIENT),
+    receiptReadProvider(PRISMA_CLIENT),
+    ...promotionsWiring.providers(PRISMA_CLIENT),
+    ...clientPhotoWiring.providers(PRISMA_CLIENT),
   ],
 })
 export class BookingModule {}

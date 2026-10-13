@@ -20,15 +20,12 @@ import {
 } from './uploads.controller';
 import { createReadUploadStatus } from './prisma-upload-commands';
 
-const uploadsPrisma = Symbol('uploadsPrisma');
 const uploadsStorage = Symbol('uploadsStorage');
-const uploadsPgBoss = Symbol('uploadsPgBoss');
 
 @Module({
   imports: [SystemIdentityModule],
   controllers: [UploadsController],
   providers: [
-    { provide: uploadsPrisma, useExisting: PRISMA_CLIENT },
     {
       provide: uploadsStorage,
       inject: [ConfigService],
@@ -37,7 +34,7 @@ const uploadsPgBoss = Symbol('uploadsPgBoss');
     },
     {
       provide: readUploadStatusCommand,
-      inject: [uploadsPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => createReadUploadStatus(prisma),
     },
     {
@@ -46,10 +43,9 @@ const uploadsPgBoss = Symbol('uploadsPgBoss');
       useFactory: (config: ConfigService<Environment, true>) =>
         config.getOrThrow<string>('NODE_ENV'),
     },
-    { provide: uploadsPgBoss, useExisting: PG_BOSS },
     {
       provide: createPendingUploadCommand,
-      inject: [uploadsPrisma, uploadsStorage, uploadsPgBoss],
+      inject: [PRISMA_CLIENT, uploadsStorage, PG_BOSS],
       useFactory: (
         prisma: PrismaClient,
         storage: LocalObjectStorage,
@@ -60,7 +56,7 @@ const uploadsPgBoss = Symbol('uploadsPgBoss');
     },
     {
       provide: putPendingUploadObjectCommand,
-      inject: [uploadsPrisma, uploadsStorage, uploadsPgBoss],
+      inject: [PRISMA_CLIENT, uploadsStorage, PG_BOSS],
       useFactory: (
         prisma: PrismaClient,
         storage: LocalObjectStorage,
@@ -71,7 +67,7 @@ const uploadsPgBoss = Symbol('uploadsPgBoss');
     },
     {
       provide: finalizeUploadCommand,
-      inject: [uploadsPrisma, uploadsStorage, uploadsPgBoss],
+      inject: [PRISMA_CLIENT, uploadsStorage, PG_BOSS],
       useFactory: (
         prisma: PrismaClient,
         storage: LocalObjectStorage,

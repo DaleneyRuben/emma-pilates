@@ -17,7 +17,6 @@ import {
 } from './notifications.controller';
 import { createNotificationStore } from './prisma-notification-store';
 
-const notificationsPrisma = Symbol('notificationsPrisma');
 const notificationStore = Symbol('notificationStore');
 
 type Store = ReturnType<typeof createNotificationStore>;
@@ -26,10 +25,9 @@ type Store = ReturnType<typeof createNotificationStore>;
   imports: [SystemIdentityModule],
   controllers: [NotificationsController],
   providers: [
-    { provide: notificationsPrisma, useExisting: PRISMA_CLIENT },
     {
       provide: notificationStore,
-      inject: [notificationsPrisma],
+      inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => createNotificationStore(prisma),
     },
     {
