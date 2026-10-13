@@ -7,6 +7,7 @@ This document tracks which architectural areas are settled, which area is curren
 - [`CONTEXT-MAP.md`](../../CONTEXT-MAP.md) defines the bounded contexts and points to their domain glossaries and context-specific ADRs.
 - [`docs/adr/`](../adr/) contains system-wide decisions and trade-offs.
 - [`booking/CONTEXT.md`](../../booking/CONTEXT.md) and [`back-office/CONTEXT.md`](../../back-office/CONTEXT.md) define the canonical domain language and business rules.
+- [`infrastructure.md`](./infrastructure.md) records what runs where in production, development, and locally, each provider account, and where every setting and secret lives.
 - [`docs/design/`](../design/) contains the design-system reference and screen prompts that describe the intended user journeys.
 - [`AGENTS.md`](../../AGENTS.md) and the project skills under [`.agents/skills/`](../../.agents/skills/) define the engineering and delivery workflow.
 
