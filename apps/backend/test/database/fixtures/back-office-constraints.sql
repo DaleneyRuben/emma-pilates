@@ -5,6 +5,9 @@ BEGIN
     EXECUTE statement;
   EXCEPTION WHEN OTHERS THEN
     IF SQLSTATE = expected_code THEN RETURN; END IF;
+    -- PostgreSQL 18 reports a RESTRICT foreign key as 23001; older servers as 23503.
+    IF expected_code = '23001' AND SQLSTATE = '23503'
+      AND current_setting('server_version_num')::int < 180000 THEN RETURN; END IF;
     RAISE;
   END;
   RAISE EXCEPTION 'Expected SQLSTATE %, but statement succeeded: %', expected_code, statement;
@@ -44,7 +47,7 @@ SELECT pg_temp.expect_failure($q$UPDATE back_office.supplies SET branch_id = '00
 SELECT pg_temp.expect_failure($q$UPDATE back_office.supplies SET initial_quantity = 20 WHERE id = '00000000-0000-0000-0000-000000000001'$q$, '55000');
 SELECT pg_temp.expect_failure($q$DELETE FROM back_office.supplies WHERE id = '00000000-0000-0000-0000-000000000001'$q$, '55000');
 UPDATE back_office.supplies SET name = 'Papel higiénico doble hoja', low_stock_threshold = 3 WHERE id = '00000000-0000-0000-0000-000000000001';
-SELECT pg_temp.expect_failure($q$DELETE FROM booking.branches WHERE id = '00000000-0000-0000-0000-000000000002'$q$, '23503');
+SELECT pg_temp.expect_failure($q$DELETE FROM booking.branches WHERE id = '00000000-0000-0000-0000-000000000002'$q$, '23001');
 
 -- Withdrawals and Restocks
 SELECT pg_temp.expect_failure($q$INSERT INTO back_office.withdrawals (id, supply_id, quantity, recorded_by_account_id) VALUES (gen_random_uuid(), '00000000-0000-0000-0000-000000000001', 0, '00000000-0000-0000-0000-000000000001')$q$, '23514');
@@ -84,7 +87,7 @@ UPDATE back_office.salary_payments SET amount_centavos = 360000, paid_on = '2026
 SELECT pg_temp.expect_failure($q$UPDATE back_office.salary_payments SET amount_centavos = -1$q$, '23514');
 SELECT pg_temp.expect_failure($q$UPDATE back_office.salary_payments SET created_at = created_at - interval '1 day'$q$, '55000');
 SELECT pg_temp.expect_failure($q$DELETE FROM back_office.salary_payments$q$, '55000');
-SELECT pg_temp.expect_failure($q$DELETE FROM system.accounts$q$, '23503');
+SELECT pg_temp.expect_failure($q$DELETE FROM system.accounts$q$, '23001');
 
 -- Expense Categories and Expenses
 SELECT pg_temp.expect_failure($q$INSERT INTO back_office.expense_categories (id, name, updated_at) VALUES (gen_random_uuid(), '', now())$q$, '23514');
@@ -99,6 +102,6 @@ INSERT INTO back_office.expenses (id, branch_id, expense_category_id, amount_cen
 UPDATE back_office.expenses SET expense_category_id = '00000000-0000-0000-0000-000000000002', amount_centavos = 47000, incurred_on = '2026-09-16';
 SELECT pg_temp.expect_failure($q$UPDATE back_office.expenses SET branch_id = '00000000-0000-0000-0000-000000000002'$q$, '55000');
 SELECT pg_temp.expect_failure($q$DELETE FROM back_office.expenses$q$, '55000');
-SELECT pg_temp.expect_failure($q$DELETE FROM back_office.expense_categories WHERE id = '00000000-0000-0000-0000-000000000002'$q$, '23503');
+SELECT pg_temp.expect_failure($q$DELETE FROM back_office.expense_categories WHERE id = '00000000-0000-0000-0000-000000000002'$q$, '23001');
 DELETE FROM back_office.expense_categories WHERE id = '00000000-0000-0000-0000-000000000003';
-SELECT pg_temp.expect_failure($q$DELETE FROM booking.branches WHERE id = '00000000-0000-0000-0000-000000000001'$q$, '23503');
+SELECT pg_temp.expect_failure($q$DELETE FROM booking.branches WHERE id = '00000000-0000-0000-0000-000000000001'$q$, '23001');
