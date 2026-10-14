@@ -121,6 +121,9 @@ const environmentSchema = z
       )
       .nullable()
       .default(null),
+    // NOT-002: Expo's access token, required once enhanced push security is
+    // on; unset sends pushes without one.
+    EXPO_ACCESS_TOKEN: z.string().min(1).nullable().default(null),
     // Where the local email capture writes each message (never production).
     EMAIL_CAPTURE_DIRECTORY: z.string().min(1).default('.data/email-capture'),
   })
