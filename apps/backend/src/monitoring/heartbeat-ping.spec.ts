@@ -40,4 +40,19 @@ describe('heartbeat ping', () => {
     });
     expect(JSON.stringify(emit.mock.calls)).not.toContain('abc');
   });
+
+  it('records failures under the event its caller names', async () => {
+    const emit = jest.fn();
+    const failing = jest.fn().mockRejectedValue(new Error('getaddrinfo'));
+
+    await createHeartbeatPing(
+      heartbeatUrl,
+      { fetch: failing, emit },
+      'database_backup_ping_failed',
+    )();
+
+    expect(emit).toHaveBeenCalledWith({
+      event: 'database_backup_ping_failed',
+    });
+  });
 });
