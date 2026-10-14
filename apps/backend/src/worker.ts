@@ -14,7 +14,11 @@ import {
   startInstalledPgBoss,
   type StartablePgBoss,
 } from './jobs/pg-boss-runtime';
-import type { SqlExecutor } from './jobs/oldest-ready-jobs';
+import {
+  readOldestReadyJobs,
+  type SqlExecutor,
+} from './jobs/oldest-ready-jobs';
+import { findProgressStalls } from './jobs/worker-progress';
 import { startWorkerHeartbeat } from './jobs/worker-heartbeat';
 import {
   noErrorReporting,
@@ -234,11 +238,26 @@ export const startWorker = async (
     };
   };
 
+  // The authentication email queue fills on purpose while email is disabled.
+  const watchedQueues =
+    dependencies.authenticationEmail === null
+      ? [FINALIZE_UPLOAD_QUEUE]
+      : [FINALIZE_UPLOAD_QUEUE, AUTHENTICATION_EMAIL_QUEUE];
+
   const stopHeartbeat = startWorkerHeartbeat({
     serviceVersion: dependencies.serviceVersion,
     getAuthenticationEmailCounts: () =>
       getQueueCounts(AUTHENTICATION_EMAIL_QUEUE),
     getFinalizeUploadCounts: () => getQueueCounts(FINALIZE_UPLOAD_QUEUE),
+    findStalls: async () =>
+      findProgressStalls({
+        now: new Date(),
+        oldestReadyJobs: await readOldestReadyJobs(
+          dependencies.boss.getDb(),
+          watchedQueues,
+        ),
+        sweeps: sweeps.progress(),
+      }),
     emit: (record) => dependencies.emit(record),
     ping: dependencies.pingHeartbeat,
   });
