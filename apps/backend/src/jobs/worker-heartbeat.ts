@@ -42,19 +42,48 @@ export const startWorkerHeartbeat = (
   dependencies: WorkerHeartbeatDependencies,
 ): (() => void) => {
   const now = dependencies.now ?? (() => new Date());
+  const findStalls = dependencies.findStalls ?? (() => Promise.resolve([]));
+  let reportedStalls: string | null = null;
+
+  // Logged once per change of reasons, so a long stall is one record.
+  const recordProgress = (stalls: string[]) => {
+    const key = stalls.join(',');
+    if (key === (reportedStalls ?? '')) {
+      return;
+    }
+    if (stalls.length === 0) {
+      dependencies.emit({
+        event: 'worker_progress_resumed',
+        serviceVersion: dependencies.serviceVersion,
+      });
+      reportedStalls = null;
+    } else {
+      dependencies.emit({
+        event: 'worker_progress_stalled',
+        serviceVersion: dependencies.serviceVersion,
+        reasons: stalls,
+      });
+      reportedStalls = key;
+    }
+  };
+
   const interval = setInterval(() => {
     void Promise.all([
       dependencies.getAuthenticationEmailCounts(),
       dependencies.getFinalizeUploadCounts(),
+      findStalls(),
     ]).then(
-      ([authenticationEmail, finalizeUpload]) => {
+      ([authenticationEmail, finalizeUpload, stalls]) => {
         dependencies.emit({
           event: 'worker_heartbeat',
           serviceVersion: dependencies.serviceVersion,
           timestamp: now().toISOString(),
           queues: { authenticationEmail, finalizeUpload },
         });
-        return dependencies.ping?.();
+        recordProgress(stalls);
+        // ADR-0066: a stuck queue or a stale sweep silences the ping, so the
+        // external heartbeat monitor alerts.
+        return stalls.length === 0 ? dependencies.ping?.() : undefined;
       },
       // ADR-0066: no ping while the queues cannot be read, so the external
       // heartbeat monitor alerts.
