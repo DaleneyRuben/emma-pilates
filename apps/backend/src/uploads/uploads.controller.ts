@@ -221,16 +221,6 @@ export class UploadsController {
     @Headers('authorization') authorization: string | undefined,
     @Req() request: RawBodySource,
   ): Promise<void> {
-    if (this.nodeEnv === 'production') {
-      throw new HttpException(
-        {
-          code: 'local_upload_disabled',
-          detail: 'Direct object upload is only available in local development',
-        },
-        HttpStatus.NOT_IMPLEMENTED,
-      );
-    }
-
     const parsedId = parseUuid(id);
     if (parsedId === null) throw invalidRequest('Invalid Upload identifier');
     const principal = await this.authenticate(authorization);
