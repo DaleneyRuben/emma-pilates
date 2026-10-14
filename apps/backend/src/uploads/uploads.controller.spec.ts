@@ -23,7 +23,6 @@ describe('UploadsController', () => {
     finalizeUpload,
     readUploadStatus,
     resolvePrincipal,
-    'test',
   );
 
   beforeEach(() => {
@@ -134,30 +133,6 @@ describe('UploadsController', () => {
       },
       'account-id',
     );
-  });
-
-  it('disables direct object upload outside local development', async () => {
-    const productionController = new UploadsController(
-      createPendingUpload,
-      putPendingUploadObject,
-      finalizeUpload,
-      readUploadStatus,
-      resolvePrincipal,
-      'production',
-    );
-
-    await expect(
-      productionController.putObject(
-        '11111111-1111-4111-8111-111111111111',
-        validAuthorization,
-        Readable.from([Buffer.from('bytes')]),
-      ),
-    ).rejects.toMatchObject({
-      response: { code: 'local_upload_disabled' },
-      status: 501,
-    });
-
-    expect(putPendingUploadObject).not.toHaveBeenCalled();
   });
 
   it('returns a stable problem code when writing to an upload another Account owns', async () => {

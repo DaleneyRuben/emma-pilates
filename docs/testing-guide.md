@@ -2850,7 +2850,7 @@ one file per variant (`readable` and `thumbnail` for a receipt, `display` and
 the `pending/<purpose>/<id>` original is gone. A Promotion image smaller than
 1200×675 ends `failed` with `image_dimensions_too_small`; an animated image
 with `image_animated_not_allowed`. Failed originals stay under `pending/` until
-the 24-hour cleanup (Test 13's worker) removes them.
+the three-day cleanup (Test 13's worker, ADR-0089) removes them.
 
 ### B. The receipt variants in the review screens
 
@@ -2950,7 +2950,7 @@ crop).
 
 Deleted Promotions stay archived in `booking.promotions`; the fixtures
 command does not remove them. A refused upload leaves nothing behind; one the
-worker refused waits under `pending/` for the 24-hour cleanup (Test 13).
+worker refused waits under `pending/` for the three-day cleanup (Test 13).
 
 ## What you cannot test yet
 
@@ -3415,3 +3415,73 @@ working until no supported release reads them. Start the API on
    `/purchase-intents/current` and `/transfer-instructions/qr` only).
 4. Setting the three retired variables changes nothing: the API starts and
    the answer above stays empty.
+
+## Test 42: store uploads in S3-compatible storage (Cloudflare R2)
+
+Since EXT-002 the API and the worker keep uploaded images in one object store
+chosen by `OBJECT_STORAGE` ([ADR-0088](./adr/0088-proxy-upload-bytes-through-the-api.md)):
+`local` (the default: `UPLOADS_LOCAL_STORAGE_ROOT` on disk, used locally, in
+CI, and on Render) or `s3` (production, on Cloudflare R2). The apps still send
+the bytes to `PUT /api/v1/uploads/{id}/object`; the API writes them to the
+store, so no contract changed. Production refuses to start unless
+`OBJECT_STORAGE=s3` and the four `OBJECT_STORAGE_*` settings are set, with an
+HTTPS endpoint.
+
+### A. Run the S3 adapter locally against MinIO
+
+1. Install and start MinIO on ports the project does not otherwise use:
+
+   ```sh
+   brew install minio
+   MINIO_ROOT_USER=pilateslocal MINIO_ROOT_PASSWORD=pilateslocalsecret minio server --address 127.0.0.1:9100 --console-address 127.0.0.1:9101 ~/minio-pilates
+   ```
+
+   Create the bucket `pilates-local` in the console at http://127.0.0.1:9101.
+2. Run the integration suite with the S3 spec enabled (it is skipped without
+   the endpoint; CI runs it against S3Mock):
+
+   ```sh
+   OBJECT_STORAGE_TEST_ENDPOINT=http://127.0.0.1:9100 \
+   OBJECT_STORAGE_TEST_ACCESS_KEY_ID=pilateslocal \
+   OBJECT_STORAGE_TEST_SECRET_ACCESS_KEY=pilateslocalsecret \
+   TEST_DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_fixtures" \
+   pnpm --filter @pilates/backend test:integration -- test/storage
+   ```
+
+   Three cases pass: a 1 MB object comes back byte for byte, `put` refuses an
+   existing key while `replace` overwrites it, and `delete` is idempotent.
+3. Start the API and the worker on `pilates_dev_sim` with the S3 settings
+   (`OBJECT_STORAGE=s3`, `OBJECT_STORAGE_ENDPOINT=http://127.0.0.1:9100`,
+   `OBJECT_STORAGE_BUCKET=pilates-local`, and the MinIO user and password as
+   the access key and secret). Upload a receipt from the Client app (Test 10 B)
+   and a profile photo (Test 19): both reach `READY`, the bucket holds
+   `private/transfer_receipt/<id>/readable` and `thumbnail` (or
+   `private/profile_photo/<id>/display` and `thumbnail`), the `pending/` copy is
+   gone, and nothing new appears under `apps/backend/.data/uploads`.
+
+### B. Production
+
+1. Upload a receipt through the production API (any signed-in Account may
+   upload; Test 7 lists the four calls). `GET /api/v1/uploads/{id}` answers
+   `ready` within a few seconds; it stays `processing` if the worker service
+   is down.
+2. In Cloudflare, R2 → `emma-pilates-prod-images` → Objects shows the two
+   variants under `private/transfer_receipt/<id>/`.
+3. Northflank → `worker` → Logs shows `authentication_email_disabled` once at
+   start (no email provider until EXT-001) and the finalize job for the upload.
+
+### C. The first Administrator without email
+
+Until EXT-001 sends email, the first production Administrator's Activation
+Link is read from the queue in the `api` service's shell, right after the
+bootstrap command ([runbook](./runbooks/first-administrator-bootstrap.md)):
+
+```sh
+node dist/src/administrator-activation-link-main.js
+```
+
+It prints `activation_link_found` with a link to the admin web's
+`/crear-contrasena` page, or `activation_link_not_found` (exit 1) when no
+current link is queued. Locally, on a disposable database after
+`admin:bootstrap`, `POST /api/v1/authentication-links/inspection` with the
+printed token answers `{"status":"current","purpose":"activation"}`.

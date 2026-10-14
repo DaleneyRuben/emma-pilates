@@ -2,8 +2,10 @@ name: release production
 
 # EXT-008 (ADR-0052, ADR-0080): once ci passes on a push to main, build that
 # commit for Northflank's migrate job, run it, build the same commit on the api
-# service, wait for /health/ready to report it, and smoke check it. Northflank
-# keeps CI off on both, so nothing else deploys a push.
+# service, wait for /health/ready to report it, then build it on the worker
+# service once the repository variable NORTHFLANK_WORKER_SERVICE_ID names it
+# (EXT-002), and smoke check it. Northflank keeps CI off on all three, so
+# nothing else deploys a push.
 on:
   workflow_run:
     workflows: [ci]
@@ -61,13 +63,14 @@ jobs:
         with:
           ref: ${{ steps.commit.outputs.sha }}
       - uses: ./.github/actions/setup
-      - name: Migrate, then release the API
+      - name: Migrate, then release the API and the worker
         id: release
         env:
           NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
           NORTHFLANK_PROJECT_ID: default
           NORTHFLANK_JOB_ID: migrate
           NORTHFLANK_SERVICE_ID: api
+          NORTHFLANK_WORKER_SERVICE_ID: ${{ vars.NORTHFLANK_WORKER_SERVICE_ID }}
           RELEASE_SHA: ${{ steps.commit.outputs.sha }}
           MAIN_HEAD: ${{ steps.commit.outputs.main_head }}
         run: pnpm --filter @pilates/backend release:production

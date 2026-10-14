@@ -9,7 +9,8 @@ import {
 // EXT-008: the release-production workflow runs this after CI passed on main.
 // NORTHFLANK_API_TOKEN=… RELEASE_SHA=<commit> MAIN_HEAD=<main's head>
 // NORTHFLANK_PROJECT_ID=default NORTHFLANK_JOB_ID=migrate
-// NORTHFLANK_SERVICE_ID=api PRODUCTION_API_URL=https://… pnpm release:production
+// NORTHFLANK_SERVICE_ID=api [NORTHFLANK_WORKER_SERVICE_ID=worker]
+// PRODUCTION_API_URL=https://… pnpm release:production
 function required(name: string): string {
   const value = process.env[name];
   if (value === undefined || value === '') {
@@ -41,6 +42,8 @@ async function main(): Promise<void> {
     mainHead: required('MAIN_HEAD'),
     jobId: required('NORTHFLANK_JOB_ID'),
     serviceId: required('NORTHFLANK_SERVICE_ID'),
+    // Empty until Northflank's worker service exists (EXT-002).
+    workerServiceId: process.env.NORTHFLANK_WORKER_SERVICE_ID || null,
     readinessUrl: new URL('/health/ready', required('PRODUCTION_API_URL')).href,
     northflank,
     fetch: (url, init) => fetch(url, init),

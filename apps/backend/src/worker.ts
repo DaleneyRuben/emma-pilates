@@ -44,7 +44,9 @@ export interface WorkerBoss extends StartablePgBoss {
 
 type WorkerDependencies = {
   boss: WorkerBoss;
-  authenticationEmail: AuthenticationEmailProcessorDependencies;
+  // Null while production has no email provider (EXT-001): the jobs stay
+  // queued until one exists.
+  authenticationEmail: AuthenticationEmailProcessorDependencies | null;
   finalizeUpload: FinalizeUploadWorkerDependencies;
   pendingAccountCleanup: {
     execute(): Promise<{ cleaned: number }>;
@@ -90,10 +92,17 @@ export const startWorker = async (
   dependencies: WorkerDependencies,
 ): Promise<() => Promise<void>> => {
   await startInstalledPgBoss(dependencies.boss);
-  await registerAuthenticationEmailWorker(
-    dependencies.boss,
-    dependencies.authenticationEmail,
-  );
+  if (dependencies.authenticationEmail === null) {
+    dependencies.emit({
+      event: 'authentication_email_disabled',
+      serviceVersion: dependencies.serviceVersion,
+    });
+  } else {
+    await registerAuthenticationEmailWorker(
+      dependencies.boss,
+      dependencies.authenticationEmail,
+    );
+  }
   await registerFinalizeUploadWorker(
     dependencies.boss,
     dependencies.finalizeUpload,

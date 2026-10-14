@@ -14,8 +14,9 @@ by that Administrator through the product (IDN-007).
 - The target database has every shipped migration applied (`GET /health/ready`
   returns 200, or run the migration command first).
 - The worker is deployed or will be started: it delivers the queued email.
-  Until real email delivery (EXT-001) exists, only the local capture adapter
-  receives it, so a production bootstrap waits for EXT-001.
+  Until real email delivery (EXT-001) exists, the production worker leaves
+  authentication emails queued; read the link from the shell instead
+  («Production before email» below).
 - You know the Administrator's real email address and name. The email becomes
   their login and cannot be changed by this command afterwards.
 - The environment has its real `DATABASE_URL`,
@@ -52,6 +53,26 @@ The command prints one JSON line and exits:
 | `administrator_bootstrap_failed` | 1 | Unexpected failure (for example the database is unreachable). The transaction rolled back; fix the cause and rerun. |
 
 Output never includes the email address, token, or link.
+
+## Production before email (EXT-001)
+
+Since EXT-002 the production worker runs without an email provider and leaves
+the Activation Link email queued. Right after the command above, in the same
+Northflank `api` shell (Services → `api` → Shell), print the link:
+
+```sh
+node dist/src/administrator-activation-link-main.js
+```
+
+It prints one JSON line, `activation_link_found`, whose `link` opens the
+production admin web's **Crear contraseña** page
+(`https://emma-pilates-admin.vercel.app/crear-contrasena?token=…`), or
+`activation_link_not_found` (exit 1) when no current Activation Link is
+queued. The link is the credential: open it in your own browser, set the
+password there, and never paste it into a chat, ticket, or document. It lasts
+seven days; rerunning the bootstrap with the same email invalidates it and
+queues a new one. When EXT-001 starts the email queue, a stale queued email is
+skipped because its link is already used.
 
 ## After it runs
 

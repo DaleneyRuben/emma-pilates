@@ -51,7 +51,7 @@ import { loadClientProfile } from './client/client-profile';
 import { loadClientSubscription } from './client/client-subscription';
 import { updateClientProfile } from './client/update-client-profile';
 import { PrismaBookingCommands } from './commands/prisma-booking-commands';
-import { LocalObjectStorage } from '../uploads/local-object-storage';
+import { OBJECT_STORAGE } from '../uploads/object-storage.module';
 import { createAssistantClientOperations } from './assistant/assistant-operations';
 import {
   AssistantClientsController,
@@ -564,9 +564,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     },
     {
       provide: receiptObjectStorage,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        new LocalObjectStorage(config.getOrThrow('UPLOADS_LOCAL_STORAGE_ROOT')),
+      useExisting: OBJECT_STORAGE,
     },
     {
       provide: cancelSessionCommand,

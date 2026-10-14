@@ -23,6 +23,13 @@ export type NorthflankRun = {
   concluded: boolean;
 };
 
+// A service's rollout as Northflank reports it; combined services carry no
+// deployed commit, so the release compares the transition time instead.
+export type NorthflankDeployment = {
+  status: string;
+  transitionedAt: number | null;
+};
+
 export type NorthflankClient = {
   startJobBuild(jobId: string, sha: string): Promise<NorthflankBuild>;
   getJobBuild(jobId: string, buildId: string): Promise<NorthflankBuild>;
@@ -30,6 +37,7 @@ export type NorthflankClient = {
   getJobRun(jobId: string, runId: string): Promise<NorthflankRun>;
   startServiceBuild(serviceId: string, sha: string): Promise<NorthflankBuild>;
   getServiceBuild(serviceId: string, buildId: string): Promise<NorthflankBuild>;
+  getServiceDeployment(serviceId: string): Promise<NorthflankDeployment>;
 };
 
 // Carries the HTTP status and path only; the token never reaches a message.
@@ -60,6 +68,26 @@ function toBuild(data: Record<string, unknown>): NorthflankBuild {
     concluded: data.concluded === true,
     success: data.success === true,
     message: typeof data.message === 'string' ? data.message : null,
+  };
+}
+
+function toDeployment(data: Record<string, unknown>): NorthflankDeployment {
+  const status =
+    typeof data.status === 'object' && data.status !== null
+      ? (data.status as Record<string, unknown>)
+      : {};
+  const deployment =
+    typeof status.deployment === 'object' && status.deployment !== null
+      ? (status.deployment as Record<string, unknown>)
+      : {};
+  const transition =
+    typeof deployment.lastTransitionTime === 'string'
+      ? Date.parse(deployment.lastTransitionTime)
+      : Number.NaN;
+  return {
+    status:
+      typeof deployment.status === 'string' ? deployment.status : 'UNKNOWN',
+    transitionedAt: Number.isNaN(transition) ? null : transition,
   };
 }
 
@@ -139,5 +167,7 @@ export function createNorthflankClient(input: {
           `${project}/services/${serviceId}/build/${buildId}`,
         ),
       ),
+    getServiceDeployment: async (serviceId) =>
+      toDeployment(await request('GET', `${project}/services/${serviceId}`)),
   };
 }

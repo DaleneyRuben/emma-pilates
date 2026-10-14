@@ -36,6 +36,13 @@ const trustedOriginsSchema = z
 // Bs 60; any other reward needs separate product approval (PAY-001).
 const approvedReferralRewardCentavos = 6000;
 
+const objectStorageSettings = [
+  'OBJECT_STORAGE_ENDPOINT',
+  'OBJECT_STORAGE_BUCKET',
+  'OBJECT_STORAGE_ACCESS_KEY_ID',
+  'OBJECT_STORAGE_SECRET_ACCESS_KEY',
+] as const;
+
 const environmentSchema = z
   .object({
     ADMIN_WEB_TRUSTED_ORIGINS: trustedOriginsSchema,
@@ -90,7 +97,18 @@ const environmentSchema = z
       .default(approvedReferralRewardCentavos),
     // PAY-003: the studio's QR image is the only transfer instruction.
     TRANSFER_QR_IMAGE_PATH: z.string().min(1).default(localTransferQrImagePath),
+    // ADR-0088: local disk outside production, R2's S3 API in production.
+    OBJECT_STORAGE: z.enum(['local', 's3']).default('local'),
     UPLOADS_LOCAL_STORAGE_ROOT: z.string().min(1).default('.data/uploads'),
+    OBJECT_STORAGE_ENDPOINT: z.url().nullable().default(null),
+    OBJECT_STORAGE_REGION: z.string().min(1).default('auto'),
+    OBJECT_STORAGE_BUCKET: z.string().min(1).nullable().default(null),
+    OBJECT_STORAGE_ACCESS_KEY_ID: z.string().min(1).nullable().default(null),
+    OBJECT_STORAGE_SECRET_ACCESS_KEY: z
+      .string()
+      .min(1)
+      .nullable()
+      .default(null),
     // ADR-0081: Better Stack's error-tracking DSN; unset reports nothing.
     ERROR_REPORTING_DSN: z.url().nullable().default(null),
     // ADR-0066: Better Stack's heartbeat URL for the worker; unset pings
@@ -107,8 +125,35 @@ const environmentSchema = z
     EMAIL_CAPTURE_DIRECTORY: z.string().min(1).default('.data/email-capture'),
   })
   .superRefine((environment, context) => {
+    if (environment.OBJECT_STORAGE === 's3') {
+      objectStorageSettings.forEach((name) => {
+        if (environment[name] === null) {
+          context.addIssue({
+            code: 'custom',
+            message: `${name} is required for S3-compatible object storage`,
+            path: [name],
+          });
+        }
+      });
+    }
+
     if (environment.NODE_ENV !== 'production') {
       return;
+    }
+
+    if (environment.OBJECT_STORAGE !== 's3') {
+      context.addIssue({
+        code: 'custom',
+        message: 'OBJECT_STORAGE must be s3 in production',
+        path: ['OBJECT_STORAGE'],
+      });
+    }
+    if (environment.OBJECT_STORAGE_ENDPOINT?.startsWith('http://')) {
+      context.addIssue({
+        code: 'custom',
+        message: 'OBJECT_STORAGE_ENDPOINT must use HTTPS in production',
+        path: ['OBJECT_STORAGE_ENDPOINT'],
+      });
     }
 
     const localDefaults: readonly (readonly [

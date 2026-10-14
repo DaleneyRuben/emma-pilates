@@ -4,11 +4,11 @@ import type {
   AbandonedUpload,
   DetachedVariant,
 } from './cleanup-abandoned-uploads';
-import type { LocalObjectStorage } from './local-object-storage';
+import type { ObjectStorage } from './object-storage';
 
 export function createUploadCleanupGateway(
   prisma: PrismaClient,
-  storage: LocalObjectStorage,
+  storage: ObjectStorage,
 ) {
   return {
     markDueForDeletion: async (now: Date): Promise<AbandonedUpload[]> =>

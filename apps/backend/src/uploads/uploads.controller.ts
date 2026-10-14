@@ -49,7 +49,6 @@ export const putPendingUploadObjectCommand = Symbol(
   'putPendingUploadObjectCommand',
 );
 export const finalizeUploadCommand = Symbol('finalizeUploadCommand');
-export const uploadsNodeEnv = Symbol('uploadsNodeEnv');
 export const readUploadStatusCommand = Symbol('readUploadStatusCommand');
 
 type ReadUploadStatusHandler = (
@@ -174,7 +173,6 @@ export class UploadsController {
     private readonly readUploadStatus: ReadUploadStatusHandler,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
-    @Inject(uploadsNodeEnv) private readonly nodeEnv: string,
   ) {}
 
   @Post()
@@ -221,16 +219,6 @@ export class UploadsController {
     @Headers('authorization') authorization: string | undefined,
     @Req() request: RawBodySource,
   ): Promise<void> {
-    if (this.nodeEnv === 'production') {
-      throw new HttpException(
-        {
-          code: 'local_upload_disabled',
-          detail: 'Direct object upload is only available in local development',
-        },
-        HttpStatus.NOT_IMPLEMENTED,
-      );
-    }
-
     const parsedId = parseUuid(id);
     if (parsedId === null) throw invalidRequest('Invalid Upload identifier');
     const principal = await this.authenticate(authorization);

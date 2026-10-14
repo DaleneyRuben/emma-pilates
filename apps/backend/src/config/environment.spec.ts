@@ -58,6 +58,11 @@ describe('environment configuration', () => {
       AUTHENTICATION_LINK_ENCRYPTION_KEY_ID: 'prod-v1',
       AUTHENTICATION_LINK_BASE_URL: 'https://links.emmapilates.bo',
       ADMIN_WEB_TRUSTED_ORIGINS: 'https://admin.emmapilates.bo',
+      OBJECT_STORAGE: 's3',
+      OBJECT_STORAGE_ENDPOINT: 'https://account.r2.cloudflarestorage.com',
+      OBJECT_STORAGE_BUCKET: 'images',
+      OBJECT_STORAGE_ACCESS_KEY_ID: 'key-id',
+      OBJECT_STORAGE_SECRET_ACCESS_KEY: 'secret',
     };
 
     it('requires an explicit transfer QR image path', () => {
@@ -125,6 +130,11 @@ describe('environment configuration', () => {
       AUTHENTICATION_LINK_ENCRYPTION_KEY_ID: 'prod-v1',
       AUTHENTICATION_LINK_BASE_URL: 'https://links.emmapilates.bo',
       TRANSFER_QR_IMAGE_PATH: '/qr.png',
+      OBJECT_STORAGE: 's3',
+      OBJECT_STORAGE_ENDPOINT: 'https://account.r2.cloudflarestorage.com',
+      OBJECT_STORAGE_BUCKET: 'images',
+      OBJECT_STORAGE_ACCESS_KEY_ID: 'key-id',
+      OBJECT_STORAGE_SECRET_ACCESS_KEY: 'secret',
     };
 
     it('trusts the local Vite origin by default outside production', () => {
