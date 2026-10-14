@@ -1,5 +1,7 @@
 import appConfig from "../app.json";
 import easConfig from "../eas.json";
+import packageJson from "../package.json";
+import workspacePackageJson from "../../../package.json";
 
 // ADR-0038/0039: manual EAS Build and Submit releases and controlled EAS
 // Updates, isolated per application (ADR-0085).
@@ -43,6 +45,21 @@ describe("client release configuration", () => {
     });
     expect(JSON.stringify(build.production)).not.toContain("localhost");
     expect(easConfig.cli.appVersionSource).toBe("local");
+  });
+
+  it("installs development builds on the iOS Simulator with the development client", () => {
+    expect(easConfig.build.development).toMatchObject({ ios: { simulator: true } });
+    expect(packageJson.dependencies).toHaveProperty("expo-dev-client");
+  });
+
+  it("builds every profile with the workspace's Node and pnpm versions", () => {
+    const { base, development, preview, production }: Record<string, unknown> = easConfig.build;
+    const pnpmVersion = workspacePackageJson.packageManager.replace("pnpm@", "");
+
+    expect(base).toEqual({ node: "24.13.0", pnpm: pnpmVersion });
+    [development, preview, production].forEach((profile) => {
+      expect(profile).toMatchObject({ extends: "base" });
+    });
   });
 
   it("submits only the production profile", () => {
