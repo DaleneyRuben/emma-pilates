@@ -15,16 +15,39 @@ import {
   notificationMarkRead,
   notificationUnreadCount,
 } from './notifications.controller';
+import {
+  DevicesController,
+  deviceDeactivation,
+  deviceRegistration,
+} from './devices/devices.controller';
+import { createPrismaAccountDevices } from './devices/prisma-account-devices';
 import { createNotificationStore } from './prisma-notification-store';
 
 const notificationStore = Symbol('notificationStore');
+const accountDevices = Symbol('accountDevices');
 
 type Store = ReturnType<typeof createNotificationStore>;
+type Devices = ReturnType<typeof createPrismaAccountDevices>;
 
 @Module({
   imports: [SystemIdentityModule],
-  controllers: [NotificationsController],
+  controllers: [NotificationsController, DevicesController],
   providers: [
+    {
+      provide: accountDevices,
+      inject: [PRISMA_CLIENT],
+      useFactory: (prisma: PrismaClient) => createPrismaAccountDevices(prisma),
+    },
+    {
+      provide: deviceRegistration,
+      inject: [accountDevices],
+      useFactory: (devices: Devices) => devices.registerCurrentDevice,
+    },
+    {
+      provide: deviceDeactivation,
+      inject: [accountDevices],
+      useFactory: (devices: Devices) => devices.deactivateCurrentDevice,
+    },
     {
       provide: notificationStore,
       inject: [PRISMA_CLIENT],
