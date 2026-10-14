@@ -6,7 +6,10 @@
   "build": {
     "base": {
       "node": "24.13.0",
-      "pnpm": "11.19.0"
+      "pnpm": "11.19.0",
+      "env": {
+        "SHARP_IGNORE_GLOBAL_LIBVIPS": "1"
+      }
     },
     "development": {
       "extends": "base",
