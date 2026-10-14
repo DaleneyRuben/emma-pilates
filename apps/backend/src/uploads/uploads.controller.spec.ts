@@ -136,7 +136,7 @@ describe('UploadsController', () => {
     );
   });
 
-  it('disables direct object upload outside local development', async () => {
+  it('stores the bytes through the API in production too (ADR-0088)', async () => {
     const productionController = new UploadsController(
       createPendingUpload,
       putPendingUploadObject,
@@ -152,12 +152,15 @@ describe('UploadsController', () => {
         validAuthorization,
         Readable.from([Buffer.from('bytes')]),
       ),
-    ).rejects.toMatchObject({
-      response: { code: 'local_upload_disabled' },
-      status: 501,
-    });
+    ).resolves.toBeUndefined();
 
-    expect(putPendingUploadObject).not.toHaveBeenCalled();
+    expect(putPendingUploadObject).toHaveBeenCalledWith(
+      {
+        imageAssetId: '11111111-1111-4111-8111-111111111111',
+        bytes: Buffer.from('bytes'),
+      },
+      'account-id',
+    );
   });
 
   it('returns a stable problem code when writing to an upload another Account owns', async () => {
