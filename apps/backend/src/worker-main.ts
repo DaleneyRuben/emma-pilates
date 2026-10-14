@@ -13,6 +13,7 @@ import { createPrismaSessionStartChecks } from './booking/sessions/prisma-sessio
 import { createPrismaRetentionSweeps } from './system-identity/retention/prisma-retention-sweeps';
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
 import { createNotificationRecorder } from './notifications/prisma-notification-store';
+import { createPushDeliveryRuntime } from './notifications/push/push-delivery-runtime';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
 import { PrismaClientRegistrationUnitOfWork } from './system-identity/registration/prisma-client-registration-unit-of-work';
@@ -120,6 +121,12 @@ async function bootstrap(): Promise<void> {
     startedSessionWaitlists: {
       execute: () => sessionStartChecks.closeStartedWaitlists(),
     },
+    ...createPushDeliveryRuntime({
+      prisma,
+      fetch,
+      expoAccessToken: environment.EXPO_ACCESS_TOKEN,
+      now,
+    }),
     retentionSweeps: createPrismaRetentionSweeps(prisma, { now }),
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit,
