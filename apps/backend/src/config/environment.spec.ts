@@ -124,9 +124,6 @@ describe('environment configuration', () => {
       ),
       AUTHENTICATION_LINK_ENCRYPTION_KEY_ID: 'prod-v1',
       AUTHENTICATION_LINK_BASE_URL: 'https://links.emmapilates.bo',
-      TRANSFER_BENEFICIARY_NAME: 'Studio',
-      TRANSFER_BANK_NAME: 'Bank',
-      TRANSFER_ACCOUNT_NUMBER: '123',
       TRANSFER_QR_IMAGE_PATH: '/qr.png',
     };
 
