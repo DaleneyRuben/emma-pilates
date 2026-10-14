@@ -314,8 +314,13 @@ Values never go in the repository or a chat. «Mac» means the user's own
   the production admin web reports uncaught errors, unhandled rejections,
   and render errors (no message, URL, user, or breadcrumbs; 4xx answers
   never) when Vercel Production has `VITE_ERROR_REPORTING_DSN`; stacks are
-  minified, no source maps. Brave Shields and ad blockers block the send
-  (`ERR_BLOCKED_BY_CLIENT`), so a staff browser with one reports nothing.
+  minified, no source maps. The browser posts to its own origin,
+  `/api/monitoring/envelope` (EXT-012), so Brave Shields and ad blockers let
+  the events through; the Vercel Function `apps/admin-web/api/monitoring/envelope.ts`
+  reads the same variable at runtime and forwards only envelopes addressed
+  to that DSN (403 otherwise, 404 without it), only the body, to Better
+  Stack's ingest. Before EXT-012, Shields blocked the direct send
+  (`ERR_BLOCKED_BY_CLIENT`).
 - **Incidents integration** (team-wide, «Any application»): emails «Your
   team» when a new error occurs or one is automatically re-opened.
 - **Better Stack «Worker heartbeat»:** the worker pings every 30 seconds,
