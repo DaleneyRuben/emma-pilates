@@ -110,10 +110,10 @@ export const startWorker = async (
       dependencies.authenticationEmail,
     );
   }
-  await registerFinalizeUploadWorker(
-    dependencies.boss,
-    dependencies.finalizeUpload,
-  );
+  await registerFinalizeUploadWorker(dependencies.boss, {
+    process: (job) => dependencies.finalizeUpload.process(job),
+    reportError: (error, context) => errorReporter.report(error, context),
+  });
   const stopSweeps = await startSweeps(
     [
       {
