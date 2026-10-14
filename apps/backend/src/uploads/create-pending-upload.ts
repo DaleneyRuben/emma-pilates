@@ -34,7 +34,8 @@ type CreatePendingUploadDependencies = {
 };
 
 const uploadUrlLifetimeMs = 15 * 60 * 1_000;
-const abandonedUploadCleanupMs = 24 * 60 * 60 * 1_000;
+// ADR-0089: one window for the app's sweep and R2's `pending/` lifecycle rule.
+const abandonedUploadCleanupMs = 3 * 24 * 60 * 60 * 1_000;
 
 export const createPendingUpload = async (
   command: CreatePendingUploadCommand,
