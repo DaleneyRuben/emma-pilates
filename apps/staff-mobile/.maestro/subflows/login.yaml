@@ -7,6 +7,29 @@ appId: ${APP_ID}
     clearKeychain: true
     clearState: true
 - openLink: ${APP_LINK}
+# iOS asks «Open in "<app>"?» for the link, sometimes twice on a
+# development build (once for the launcher, again once the bundle loads), and
+# an open alert hides the app from Maestro. Answer it until the app's first
+# screen shows, then once more if a late alert follows.
+- repeat:
+    times: 12
+    while:
+      notVisible: "Continue|Iniciar sesión"
+    commands:
+      - tapOn:
+          text: "Open"
+          optional: true
+      - extendedWaitUntil:
+          visible: "Open|Continue|Iniciar sesión"
+          timeout: 15000
+          optional: true
+- extendedWaitUntil:
+    visible: "Open"
+    timeout: 5000
+    optional: true
+- tapOn:
+    text: "Open"
+    optional: true
 - extendedWaitUntil:
     visible:
       text: "Continue|Iniciar sesión"
