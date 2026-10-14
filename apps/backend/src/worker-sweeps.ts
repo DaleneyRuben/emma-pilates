@@ -1,3 +1,5 @@
+import type { SweepProgress } from './jobs/worker-progress';
+
 export type SweepStep = {
   // Names the sweep in logs: a failure is logged as `<job>_failed`.
   job: string;
@@ -14,6 +16,12 @@ type SweepDependencies = {
   serviceVersion: string;
   emit(record: unknown): void;
   reportError(error: unknown, context: { job: string }): void;
+  now?: () => Date;
+};
+
+export type RunningSweeps = {
+  stop: () => void;
+  progress: () => SweepProgress[];
 };
 
 // Each group runs once at startup, then on its interval. A failed step is
@@ -21,7 +29,7 @@ type SweepDependencies = {
 export const startSweeps = async (
   groups: SweepGroup[],
   dependencies: SweepDependencies,
-): Promise<() => void> => {
+): Promise<RunningSweeps> => {
   const runStep = (step: SweepStep) =>
     step.execute().then(
       () => undefined,
@@ -49,5 +57,8 @@ export const startSweeps = async (
     );
   }
 
-  return () => timers.forEach((timer) => clearInterval(timer));
+  return {
+    stop: () => timers.forEach((timer) => clearInterval(timer)),
+    progress: () => [],
+  };
 };

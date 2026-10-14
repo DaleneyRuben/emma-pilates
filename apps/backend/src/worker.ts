@@ -114,7 +114,7 @@ export const startWorker = async (
     process: (job) => dependencies.finalizeUpload.process(job),
     reportError: (error, context) => errorReporter.report(error, context),
   });
-  const stopSweeps = await startSweeps(
+  const sweeps = await startSweeps(
     [
       {
         intervalMs: pendingAccountCleanupIntervalMs,
@@ -242,7 +242,7 @@ export const startWorker = async (
   });
 
   return async () => {
-    stopSweeps();
+    sweeps.stop();
     stopHeartbeat();
     await dependencies.boss.stop({ graceful: true });
   };
