@@ -16,6 +16,7 @@ const processMock = (): ProcessMock => jest.fn<ProcessOutcome, [unknown]>();
 
 const register = async (
   process: ProcessMock,
+  reportError: jest.Mock = jest.fn(),
 ): Promise<FinalizeUploadWorkerHandler> => {
   let handler: FinalizeUploadWorkerHandler | undefined;
   const work = jest.fn<
@@ -27,7 +28,7 @@ const register = async (
   });
   const boss: FinalizeUploadWorkerBoss = { work };
 
-  await registerFinalizeUploadWorker(boss, { process });
+  await registerFinalizeUploadWorker(boss, { process, reportError });
 
   expect(work).toHaveBeenCalledWith(
     FINALIZE_UPLOAD_QUEUE,
@@ -102,5 +103,45 @@ describe('finalize upload worker', () => {
       },
     ]);
     expect(process).not.toHaveBeenCalled();
+  });
+
+  // EXT-011: a failed record holds only its category, so the error itself
+  // goes to error reporting, tagged with the queue.
+  it('reports an unexpected failure with the queue as its job', async () => {
+    const failure = new Error('database unreachable');
+    const reportError = jest.fn();
+    const handler = await register(
+      processMock().mockRejectedValue(failure),
+      reportError,
+    );
+
+    await handler([{ id: 'job-6', data: payload }]);
+
+    expect(reportError).toHaveBeenCalledWith(failure, {
+      job: FINALIZE_UPLOAD_QUEUE,
+    });
+  });
+
+  it('reports a dead-lettered payload with the queue as its job', async () => {
+    const reportError = jest.fn();
+    const handler = await register(processMock(), reportError);
+
+    await handler([{ id: 'job-7', data: { version: 2 } }]);
+
+    expect(reportError).toHaveBeenCalledWith(expect.any(Error), {
+      job: FINALIZE_UPLOAD_QUEUE,
+    });
+  });
+
+  it('reports nothing for an outcome the upload already decided', async () => {
+    const reportError = jest.fn();
+    const handler = await register(
+      processMock().mockResolvedValue('failed'),
+      reportError,
+    );
+
+    await handler([{ id: 'job-8', data: payload }]);
+
+    expect(reportError).not.toHaveBeenCalled();
   });
 });
