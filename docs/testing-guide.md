@@ -3255,13 +3255,12 @@ says how a commit gets there and where each setting lives.
 
 **What production can and cannot do yet.** It answers health, OpenAPI, and
 every endpoint's validation and authorization, refuses untrusted admin
-origins, and stores data in Aiven. It sends no email (no worker runs, because
-`worker-main` refuses `NODE_ENV=production` until SendPulse and R2 exist), so
-no Client can verify a registration and no Administrator can be activated:
-nobody can sign in. Image uploads answer `501 local_upload_disabled`, and
-scheduled jobs (Session materialization, reminders, sweeps, expiry) do not
-run. The transfer name, bank, and account number are the placeholder
-`PENDIENTE`; the QR is the studio's real image.
+origins, stores data in Aiven and images in R2, and runs the worker (EXT-002)
+and the daily backup (EXT-009). The first Administrator was activated through
+a link printed in the `api` shell, so the admin web can be signed into
+(step 5). It still sends no email (gate 7, EXT-001): no Client can verify a
+registration and no Staff Member can be activated or recover a password.
+The transfer instructions are the studio's real QR image (PAY-003).
 
 1. From the repository root, with the commit Northflank shows on the `api`
    service:
@@ -3288,6 +3287,18 @@ run. The transfer name, bank, and account number are the placeholder
    `authentication_failed` in RFC 9457 form; Application → Cookies holds only
    `__Host-emma-admin-client`, HttpOnly, Secure, SameSite Lax, Path `/`,
    host-only. Reload `/catalogo/planes`: the login page loads, not a `404`.
+5. **Signed in** (WEB-010, verified 2026-10-14). In a private window with
+   DevTools → Network (Preserve log), sign in as the production
+   Administrator. `admin-web/authentication-sessions` answers `201` and
+   `authentication-sessions/current` `200`. Before any screenshot of
+   Application → Cookies, right-click the header and untick **Value** (the
+   session cookie is a credential). The two cookies are
+   `__Host-emma-admin-client` and `__Host-emma-admin-session`, both
+   HttpOnly, Secure, SameSite Lax, Path `/`, host-only; `document.cookie` in
+   the Console prints `''`. Pages load (empty while production has no
+   Branches), a reload keeps the session, and «Cerrar sesión» returns to
+   the login page, removes the session cookie, and keeps the client one;
+   Back stays on the login page.
 4. To re-measure the hops (ADR-0087), send
    `curl https://p01--api--mmps25fn9k9x.code.run/api/v1/hop-probe` and the same
    path through `https://emma-pilates-admin.vercel.app`, then search the path
