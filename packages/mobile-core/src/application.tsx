@@ -11,6 +11,8 @@ import type { PendingRegistrationStore } from "./auth/pending-registration-store
 import { createSessionApi, type SessionLoginResult } from "./auth/session-api";
 import { createSessionManager, type AppRole, type SessionManager } from "./auth/session-manager";
 import type { LinkSource } from "./ingress/link-ingress";
+import { createExpoPushPlatform } from "./notifications/expo-push-platform";
+import type { PushPlatform } from "./notifications/push-platform";
 import type { AuthenticationLinkIntent } from "./ingress/verified-link";
 import { useVerifiedLinkIntent, VerifiedLinkProvider } from "./ingress/verified-link-provider";
 import { getMobileApiBaseUrl, getOrCreateInstallationIdentifier } from "./config/runtime";
@@ -26,9 +28,13 @@ export type MobileRuntime = {
   apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
   authenticationApi: AuthenticationApi;
+  /** The stable per-installation id; push registration sends it (NOT-002). */
+  installationIdentifier?: () => Promise<string>;
   linkSource?: LinkSource;
   login: (values: LoginValues) => Promise<SessionLoginResult>;
   pendingRegistrationStore?: PendingRegistrationStore;
+  /** Absent in tests and wherever push is unavailable. */
+  pushPlatform?: PushPlatform;
   sessionManager: SessionManager;
 };
 
@@ -38,11 +44,13 @@ export type MobileNavigationProps = {
   authenticationIntent: AuthenticationLinkIntent | null;
   apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
+  installationIdentifier?: () => Promise<string>;
   onBiometricUnlock?: () => void;
   onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
   onRecoveryCredential: (credential: string) => Promise<void>;
   /** The Client app keeps «Revisa tu correo» across launches (MOB-028). */
   pendingRegistrationStore?: PendingRegistrationStore;
+  pushPlatform?: PushPlatform;
   role?: AppRole;
   /** The login screen's one-time notice, such as after closing the Account. */
   signOutNotice?: string | null;
@@ -80,12 +88,14 @@ export function createDefaultMobileRuntime({
       baseUrl: apiBaseUrl,
       clientIdentifier: installationIdentifier,
     }),
+    installationIdentifier,
     async login({ email, password }) {
       const clientIdentifier = await installationIdentifier();
 
       return sessionApi.login({ clientIdentifier, email, password });
     },
     pendingRegistrationStore,
+    pushPlatform: createExpoPushPlatform(),
     sessionManager: createSessionManager({
       acceptedIdentityKind,
       clearAccountCache,
@@ -101,15 +111,19 @@ function IdentityNavigation({
   authenticationApi,
   apiBaseUrl,
   apiFetcher,
+  installationIdentifier,
   login,
   pendingRegistrationStore,
+  pushPlatform,
 }: {
   Navigation: ComponentType<MobileNavigationProps>;
   authenticationApi: AuthenticationApi;
   apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
+  installationIdentifier?: () => Promise<string>;
   login: MobileRuntime["login"];
   pendingRegistrationStore?: PendingRegistrationStore;
+  pushPlatform?: PushPlatform;
 }) {
   const identity = useMobileIdentity();
   const { intent } = useVerifiedLinkIntent();
@@ -138,12 +152,14 @@ function IdentityNavigation({
       authenticationIntent={intent}
       apiBaseUrl={apiBaseUrl}
       apiFetcher={apiFetcher}
+      installationIdentifier={installationIdentifier}
       onBiometricUnlock={
         identity.status === "biometric-locked" ? identity.unlockWithBiometrics : undefined
       }
       onLogin={handleLogin}
       onRecoveryCredential={identity.start}
       pendingRegistrationStore={pendingRegistrationStore}
+      pushPlatform={pushPlatform}
       role={identity.session?.role}
       signOutNotice={identity.signOutNotice}
     />
@@ -181,8 +197,10 @@ export function MobileApplication({
                 authenticationApi={mobileRuntime.authenticationApi}
                 apiBaseUrl={mobileRuntime.apiBaseUrl}
                 apiFetcher={mobileRuntime.apiFetcher}
+                installationIdentifier={mobileRuntime.installationIdentifier}
                 login={mobileRuntime.login}
                 pendingRegistrationStore={mobileRuntime.pendingRegistrationStore}
+                pushPlatform={mobileRuntime.pushPlatform}
               />
             </MobileIdentityProvider>
           </VerifiedLinkProvider>
