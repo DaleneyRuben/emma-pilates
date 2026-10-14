@@ -18,11 +18,22 @@ type WorkerHeartbeatFailure = {
   serviceVersion: string;
 };
 
+type WorkerProgressRecord =
+  | {
+      event: 'worker_progress_stalled';
+      serviceVersion: string;
+      reasons: string[];
+    }
+  | { event: 'worker_progress_resumed'; serviceVersion: string };
+
 type WorkerHeartbeatDependencies = {
   serviceVersion: string;
   getAuthenticationEmailCounts(): Promise<QueueCounts>;
   getFinalizeUploadCounts(): Promise<QueueCounts>;
-  emit(heartbeat: WorkerHeartbeat | WorkerHeartbeatFailure): void;
+  findStalls?: () => Promise<string[]>;
+  emit(
+    heartbeat: WorkerHeartbeat | WorkerHeartbeatFailure | WorkerProgressRecord,
+  ): void;
   ping?: () => Promise<void>;
   now?: () => Date;
 };
