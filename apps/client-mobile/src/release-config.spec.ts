@@ -26,6 +26,13 @@ describe("client release configuration", () => {
     });
   });
 
+  it("receives updates from its own EAS project's update URL", () => {
+    const { projectId } = appConfig.expo.extra.eas;
+
+    expect(appConfig.expo).toMatchObject({ updates: { url: `https://u.expo.dev/${projectId}` } });
+    expect(packageJson.dependencies).toHaveProperty("expo-updates");
+  });
+
   it("builds a development client, an internal preview, and a store production binary on separate update channels", () => {
     const { build } = easConfig;
 
