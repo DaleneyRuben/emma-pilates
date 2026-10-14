@@ -18,6 +18,7 @@ import { ScreenTopBar } from "../ui/screen-top-bar";
 import { TextButton } from "../ui/text-button";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 import { formatNotificationTime } from "./notification-time";
+import { usePushNotifications } from "./push-notifications";
 
 const pageSize = 50;
 
@@ -28,6 +29,26 @@ type NotificationsScreenProps = {
   onBack: () => void;
   onOpen?: (notification: NotificationDto) => void;
 };
+
+// ADR-0067: once permission is denied the app never asks again; the inbox
+// offers a deliberate way to the system settings instead.
+function DeniedNotice() {
+  const { permissionStatus, openSettings } = usePushNotifications();
+
+  if (permissionStatus !== "denied") {
+    return null;
+  }
+
+  return (
+    <View style={styles.notice}>
+      <BodyText>
+        Las notificaciones están desactivadas en este dispositivo. Actívalas para enterarte a tiempo
+        de cambios y recordatorios.
+      </BodyText>
+      <TextButton label="Abrir Ajustes" onPress={openSettings} />
+    </View>
+  );
+}
 
 function NotificationRow({
   notification,
@@ -129,6 +150,7 @@ export function NotificationsScreen({
     return (
       <Screen style={styles.screen}>
         {header()}
+        <DeniedNotice />
         <EmptyState
           icon="bell"
           message={emptySupport}
@@ -151,6 +173,7 @@ export function NotificationsScreen({
         ) : undefined,
       )}
       <ScrollView contentContainerStyle={styles.content}>
+        <DeniedNotice />
         {unread.length > 0 ? (
           <>
             <Text style={styles.sectionTitle}>Sin leer</Text>
@@ -194,6 +217,13 @@ const styles = StyleSheet.create({
   dotSpace: { width: 8 },
   message: { color: colors.text, fontSize: typography.body, lineHeight: 22 },
   messageRead: { color: colors.textSecondary },
+  notice: {
+    alignItems: "flex-start",
+    backgroundColor: colors.secondaryTint,
+    borderRadius: radii.inset,
+    gap: spacing.sm,
+    padding: spacing.lg,
+  },
   row: {
     alignItems: "flex-start",
     borderRadius: radii.inset,
