@@ -274,9 +274,6 @@ describe('TransferInstructionsController', () => {
   const resolvePrincipal = jest.fn().mockResolvedValue(principal);
   const controller = new TransferInstructionsController(
     {
-      beneficiaryName: 'Emma Pilates Studio',
-      bankName: 'Banco Local',
-      accountNumber: '0000000000',
       qrImagePath: '.data/transfer-qr.png',
     },
     resolvePrincipal,

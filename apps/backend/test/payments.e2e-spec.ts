@@ -130,9 +130,6 @@ describe('client payments (e2e)', () => {
         {
           provide: transferInstructions,
           useValue: {
-            beneficiaryName: 'Emma Pilates Studio',
-            bankName: 'Banco Local',
-            accountNumber: '0000000000',
             qrImagePath,
           },
         },
