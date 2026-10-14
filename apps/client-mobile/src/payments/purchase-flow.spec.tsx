@@ -108,8 +108,10 @@ describe("Client purchase flow", () => {
 
   it("applies available Credit on the Plan detail and opens the transfer payment", async () => {
     const created = jest.fn();
+    const instructionsRequested = jest.fn(() => jsonResponse(instructions));
     const fetcher = routeFetcher({
       ...baseRoutes(6000),
+      "/api/v1/transfer-instructions": instructionsRequested,
       "POST /api/v1/purchase-intents": (init) => {
         created(init?.headers, JSON.parse(String(init?.body)));
         return jsonResponse(intent, 201);
@@ -134,10 +136,13 @@ describe("Client purchase flow", () => {
     expect(
       screen.getByText("Escanea el código con tu app bancaria y transfiere el monto exacto."),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Emma Pilates Studio")).toBeOnTheScreen();
     await waitFor(() => {
       expect(screen.getByLabelText("Código QR del estudio")).toBeOnTheScreen();
     });
+    // PAY-003: the QR is the only instruction; no bank details are read or shown.
+    expect(instructionsRequested).not.toHaveBeenCalled();
+    expect(screen.queryByText("Emma Pilates Studio")).toBeNull();
+    expect(screen.queryByText(/Cuenta/)).toBeNull();
     expect(screen.getByRole("button", { name: "Enviar comprobante" })).toHaveProp(
       "accessibilityState",
       { disabled: true },
