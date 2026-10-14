@@ -6472,6 +6472,66 @@
           "Notifications"
         ]
       }
+    },
+    "/api/v1/notifications/devices/current": {
+      "put": {
+        "operationId": "registerCurrentDevice",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceRegistrationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Devices"
+        ]
+      }
+    },
+    "/api/v1/notifications/devices/current/deactivate": {
+      "post": {
+        "operationId": "deactivateCurrentDevice",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceDeactivationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Devices"
+        ]
+      }
     }
   },
   "info": {
@@ -11503,6 +11563,45 @@
         },
         "required": [
           "marked"
+        ]
+      },
+      "DeviceRegistrationDto": {
+        "type": "object",
+        "properties": {
+          "installationId": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 200
+          },
+          "expoPushToken": {
+            "type": "string",
+            "example": "ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "ios",
+              "android"
+            ]
+          }
+        },
+        "required": [
+          "installationId",
+          "expoPushToken",
+          "platform"
+        ]
+      },
+      "DeviceDeactivationDto": {
+        "type": "object",
+        "properties": {
+          "installationId": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "installationId"
         ]
       }
     }

@@ -91,6 +91,8 @@ import type {
   CreatedBookingDto,
   CreditDto,
   CurrentAuthenticationPrincipalDto,
+  DeviceDeactivationDto,
+  DeviceRegistrationDto,
   EmailChangeCompletionResultDto,
   EmailChangeRequestResultDto,
   EmailChangeResendResultDto,
@@ -24408,6 +24410,263 @@ export const useMarkNotificationRead = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(
     getMarkNotificationReadMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type registerCurrentDeviceResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type registerCurrentDeviceResponseSuccess =
+  registerCurrentDeviceResponse204 & {
+    headers: Headers;
+  };
+export type registerCurrentDeviceResponse =
+  registerCurrentDeviceResponseSuccess;
+
+export const getRegisterCurrentDeviceUrl = () => {
+  return `/api/v1/notifications/devices/current`;
+};
+
+export const registerCurrentDevice = async (
+  deviceRegistrationDto: DeviceRegistrationDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<registerCurrentDeviceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRegisterCurrentDeviceUrl(), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(deviceRegistrationDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: registerCurrentDeviceResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as registerCurrentDeviceResponse;
+};
+
+export const getRegisterCurrentDeviceMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof registerCurrentDevice>>,
+    TError,
+    RegisterCurrentDeviceMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof registerCurrentDevice>>,
+  TError,
+  RegisterCurrentDeviceMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["registerCurrentDevice"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof registerCurrentDevice>>,
+    RegisterCurrentDeviceMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return registerCurrentDevice(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RegisterCurrentDeviceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof registerCurrentDevice>>
+>;
+export type RegisterCurrentDeviceMutationBody = DeviceRegistrationDto;
+export type RegisterCurrentDeviceMutationError = unknown;
+export type RegisterCurrentDeviceMutationVariables = {
+  data: DeviceRegistrationDto;
+};
+
+export const useRegisterCurrentDevice = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof registerCurrentDevice>>,
+      TError,
+      RegisterCurrentDeviceMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof registerCurrentDevice>>,
+  TError,
+  RegisterCurrentDeviceMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRegisterCurrentDeviceMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type deactivateCurrentDeviceResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deactivateCurrentDeviceResponseSuccess =
+  deactivateCurrentDeviceResponse204 & {
+    headers: Headers;
+  };
+export type deactivateCurrentDeviceResponse =
+  deactivateCurrentDeviceResponseSuccess;
+
+export const getDeactivateCurrentDeviceUrl = () => {
+  return `/api/v1/notifications/devices/current/deactivate`;
+};
+
+export const deactivateCurrentDevice = async (
+  deviceDeactivationDto: DeviceDeactivationDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<deactivateCurrentDeviceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getDeactivateCurrentDeviceUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(deviceDeactivationDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deactivateCurrentDeviceResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deactivateCurrentDeviceResponse;
+};
+
+export const getDeactivateCurrentDeviceMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof deactivateCurrentDevice>>,
+    TError,
+    DeactivateCurrentDeviceMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof deactivateCurrentDevice>>,
+  TError,
+  DeactivateCurrentDeviceMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["deactivateCurrentDevice"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof deactivateCurrentDevice>>,
+    DeactivateCurrentDeviceMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return deactivateCurrentDevice(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DeactivateCurrentDeviceMutationResult = NonNullable<
+  Awaited<ReturnType<typeof deactivateCurrentDevice>>
+>;
+export type DeactivateCurrentDeviceMutationBody = DeviceDeactivationDto;
+export type DeactivateCurrentDeviceMutationError = unknown;
+export type DeactivateCurrentDeviceMutationVariables = {
+  data: DeviceDeactivationDto;
+};
+
+export const useDeactivateCurrentDevice = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof deactivateCurrentDevice>>,
+      TError,
+      DeactivateCurrentDeviceMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof deactivateCurrentDevice>>,
+  TError,
+  DeactivateCurrentDeviceMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getDeactivateCurrentDeviceMutationOptions(options),
     queryClient,
   );
 };
