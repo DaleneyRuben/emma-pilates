@@ -63,7 +63,12 @@ describe("client release configuration", () => {
     const { base, development, preview, production }: Record<string, unknown> = easConfig.build;
     const pnpmVersion = workspacePackageJson.packageManager.replace("pnpm@", "");
 
-    expect(base).toEqual({ node: "24.13.0", pnpm: pnpmVersion });
+    expect(base).toEqual({
+      node: "24.13.0",
+      pnpm: pnpmVersion,
+      // The backend's sharp would otherwise compile against the macOS builder's Homebrew libvips.
+      env: { SHARP_IGNORE_GLOBAL_LIBVIPS: "1" },
+    });
     [development, preview, production].forEach((profile) => {
       expect(profile).toMatchObject({ extends: "base" });
     });
