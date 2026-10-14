@@ -11,7 +11,12 @@ export type ReleaseClock = {
 };
 
 export type ReleaseStage =
-  'migrate_build' | 'migrate_run' | 'api_build' | 'readiness';
+  | 'migrate_build'
+  | 'migrate_run'
+  | 'api_build'
+  | 'readiness'
+  | 'worker_build'
+  | 'worker_deploy';
 
 export type ReleaseResult =
   | { outcome: 'released' }
@@ -45,6 +50,8 @@ type ReleaseInput = {
   mainHead: string;
   jobId: string;
   serviceId: string;
+  // Null until Northflank's worker service exists (EXT-002).
+  workerServiceId: string | null;
   readinessUrl: string;
   northflank: NorthflankClient;
   fetch: ReleaseFetch;

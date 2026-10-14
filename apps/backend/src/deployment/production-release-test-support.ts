@@ -50,6 +50,7 @@ const healthyAnswers: Answers = {
     build('api-build-1', 'BUILDING'),
     build('api-build-1', 'SUCCESS'),
   ],
+  getServiceDeployment: [{ status: 'COMPLETED', transitionedAt: null }],
 };
 
 // Each operation answers its queued replies in turn and repeats the last one;
@@ -76,6 +77,7 @@ export function fakeNorthflank(overrides: Partial<Answers> = {}) {
     getJobRun: answer('getJobRun'),
     startServiceBuild: answer('startServiceBuild'),
     getServiceBuild: answer('getServiceBuild'),
+    getServiceDeployment: answer('getServiceDeployment'),
   };
   const journal = () => calls.map((call) => call.operation);
   return { northflank, calls, countOf, journal };
@@ -120,6 +122,7 @@ export function release(
   northflank: NorthflankClient,
   fetch: ReleaseFetch,
   mainHead: string = sha,
+  workerServiceId: string | null = null,
 ) {
   const log: string[] = [];
   const result = releaseProduction({
@@ -127,6 +130,7 @@ export function release(
     mainHead,
     jobId: 'migrate',
     serviceId: 'api',
+    workerServiceId,
     readinessUrl: 'https://api.example.com/health/ready',
     northflank,
     fetch,

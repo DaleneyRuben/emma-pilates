@@ -23,6 +23,13 @@ export type NorthflankRun = {
   concluded: boolean;
 };
 
+// A service's rollout as Northflank reports it; combined services carry no
+// deployed commit, so the release compares the transition time instead.
+export type NorthflankDeployment = {
+  status: string;
+  transitionedAt: number | null;
+};
+
 export type NorthflankClient = {
   startJobBuild(jobId: string, sha: string): Promise<NorthflankBuild>;
   getJobBuild(jobId: string, buildId: string): Promise<NorthflankBuild>;
@@ -30,6 +37,7 @@ export type NorthflankClient = {
   getJobRun(jobId: string, runId: string): Promise<NorthflankRun>;
   startServiceBuild(serviceId: string, sha: string): Promise<NorthflankBuild>;
   getServiceBuild(serviceId: string, buildId: string): Promise<NorthflankBuild>;
+  getServiceDeployment(serviceId: string): Promise<NorthflankDeployment>;
 };
 
 // Carries the HTTP status and path only; the token never reaches a message.
@@ -139,5 +147,7 @@ export function createNorthflankClient(input: {
           `${project}/services/${serviceId}/build/${buildId}`,
         ),
       ),
+    getServiceDeployment: (serviceId) =>
+      Promise.reject(new Error(`not implemented ${serviceId}`)),
   };
 }

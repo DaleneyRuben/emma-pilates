@@ -193,4 +193,39 @@ describe('createNorthflankClient', () => {
       ),
     );
   });
+
+  it("reads a service's rollout status and when it last changed", async () => {
+    const { calls, fetch } = fakeFetch(200, {
+      data: {
+        id: 'worker',
+        status: {
+          build: { status: 'SUCCESS' },
+          deployment: {
+            status: 'COMPLETED',
+            reason: 'DEPLOYING',
+            lastTransitionTime: '2026-10-14T03:00:00.000Z',
+          },
+        },
+      },
+    });
+
+    const deployment = await client(fetch).getServiceDeployment('worker');
+
+    expect(calls[0]).toMatchObject({
+      url: 'https://api.northflank.com/v1/projects/default/services/worker',
+      method: 'GET',
+    });
+    expect(deployment).toEqual({
+      status: 'COMPLETED',
+      transitionedAt: Date.parse('2026-10-14T03:00:00.000Z'),
+    });
+  });
+
+  it('reads a service that has not rolled out yet', async () => {
+    const { fetch } = fakeFetch(200, { data: { id: 'worker', status: {} } });
+
+    await expect(client(fetch).getServiceDeployment('worker')).resolves.toEqual(
+      { status: 'UNKNOWN', transitionedAt: null },
+    );
+  });
 });
