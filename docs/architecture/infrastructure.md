@@ -259,7 +259,8 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `ADMIN_WEB_TRUSTED_ORIGINS` | Northflank `production` (`https://emma-pilates-admin.vercel.app`) | Render, rewritten by the `preview-origins` workflow | `http://localhost:5173` | |
 | `ADMIN_WEB_PROXY_SECRET` | Northflank `production` **and** Vercel Production | Render **and** Vercel Preview | unset | Same value on both sides of each pair, different per environment |
 | `TRUSTED_PROXY_HOPS` | Northflank `api` service (1) | Render (3) | 0 | Measured, never assumed (ADR-0087) |
-| `ERROR_REPORTING_DSN` | Northflank `production` | Render | commented in `.env` | Write-only; one Better Stack application for every environment |
+| `ERROR_REPORTING_DSN` | Northflank `production` (the API and the worker) | Render | commented in `.env` | Write-only; `emma-pilates-api`, one Better Stack application for every environment and both processes |
+| `VITE_ERROR_REPORTING_DSN` | Vercel Production (Config, readable) | unset | unset | `emma-pilates-admin`'s DSN; Vite inlines it in the browser bundle, so it is public by design and can only send errors; a change needs a redeploy |
 | `WORKER_HEARTBEAT_URL` | Northflank `worker` service | not set | commented in `.env` | Better Stack «Worker heartbeat» |
 | `OBJECT_STORAGE` | Northflank `production` (`s3`) | default (`local`) | default (`local`) | ADR-0088; production refuses `local` |
 | `OBJECT_STORAGE_ENDPOINT`, `OBJECT_STORAGE_BUCKET` | Northflank `production` | unset | unset (MinIO for Test 42) | Default R2 endpoint, bucket `emma-pilates-prod-images` |
@@ -304,12 +305,26 @@ Values never go in the repository or a chat. «Mac» means the user's own
 - **Better Stack «Production API readiness»:** `/health/ready` on Northflank
   every 3 minutes, 3-minute confirmation, four regions, email alerts; verified
   to fire and recover on 2026-10-13.
-- **Better Stack error tracking `emma-pilates-api`:** both APIs report
-  unexpected failures (no messages, no request data) when
-  `ERROR_REPORTING_DSN` is set; the Incidents integration emails on new and
-  re-opened errors.
-- **Better Stack «Worker heartbeat»:** the worker pings every 30 seconds;
-  expected every minute, active since 2026-10-14.
+- **Better Stack error tracking `emma-pilates-api`:** both APIs and the
+  production worker report unexpected failures (no messages, no request or
+  job data) when `ERROR_REPORTING_DSN` is set, tagged `service` `api` or
+  `worker`; the worker adds `job` (the sweep, or `uploads.finalize.v1`).
+  Proved from production on 2026-10-14 (EXT-011).
+- **Better Stack error tracking `emma-pilates-admin`** (React, US region):
+  the production admin web reports uncaught errors, unhandled rejections,
+  and render errors (no message, URL, user, or breadcrumbs; 4xx answers
+  never) when Vercel Production has `VITE_ERROR_REPORTING_DSN`; stacks are
+  minified, no source maps. Brave Shields and ad blockers block the send
+  (`ERR_BLOCKED_BY_CLIENT`), so a staff browser with one reports nothing.
+- **Incidents integration** (team-wide, «Any application»): emails «Your
+  team» when a new error occurs or one is automatically re-opened.
+- **Better Stack «Worker heartbeat»:** the worker pings every 30 seconds,
+  but only while it makes progress: the oldest ready `uploads.finalize.v1`
+  job is under 5 minutes old (the authentication email queue joins once
+  email is enabled) and every sweep succeeded within twice its interval
+  plus 2 minutes (ADR-0066, EXT-011). Otherwise it logs
+  `worker_progress_stalled` with the reasons and the monitor alerts after
+  its 1-minute grace. Expected every minute, active since 2026-10-14.
 - **Better Stack «Database backup»:** the `backup` job pings after each dump
   is stored, or `…/fail` when a step fails or the dump is under half the
   previous one; expected every day with a 2-hour grace, Up since the first run
@@ -319,9 +334,9 @@ Values never go in the repository or a chat. «Mac» means the user's own
   alerts. The worker has no probes: Northflank restarts it only when its
   process exits, and the heartbeat catches anything else.
 - **Northflank:** logs (JSON lines), metrics, container restarts.
-- Not yet: admin-web and mobile error reporting with source maps (ADR-0081),
-  worker error reporting (only the API reports to Better Stack), queue-age and
-  reconciler alerts (ADR-0066).
+- Not yet: mobile error reporting (gate 6, EAS); source maps for the admin
+  web (declined: the upload needs an account-wide Better Stack token on
+  Vercel).
 
 ## Known gaps
 
