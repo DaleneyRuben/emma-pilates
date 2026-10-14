@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-nati
 
 import { clearMobileQueryCache, MobileQueryProvider } from "../query/provider";
 import { NotificationsScreen } from "./notifications-screen";
+import { PushNotificationsContext } from "./push-notifications";
 
 const now = () => new Date("2026-09-22T15:00:00.000Z");
 
@@ -179,5 +180,38 @@ describe("NotificationsScreen", () => {
       screen.getByText("Aquí te avisaremos sobre tus clases, pagos y evaluaciones."),
     ).toHaveStyle({ color: "#766D69", fontSize: 14 });
     expect(screen.queryByRole("button", { name: "Marcar leídas" })).not.toBeOnTheScreen();
+  });
+
+  it("points to the system settings once notifications are denied", async () => {
+    const openSettings = jest.fn();
+    const screen = await render(
+      <MobileQueryProvider>
+        <PushNotificationsContext.Provider
+          value={{ permissionStatus: "denied", offerPermission: jest.fn(), openSettings }}
+        >
+          <NotificationsScreen
+            emptySupport="Aquí te avisaremos sobre tus clases, pagos y evaluaciones."
+            fetcher={createFetcher([{ items, hasMore: false, nextCursor: null }])}
+            now={now}
+            onBack={jest.fn()}
+          />
+        </PushNotificationsContext.Provider>
+      </MobileQueryProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Las notificaciones están desactivadas/)).toBeOnTheScreen();
+    });
+    await fireEvent.press(screen.getByRole("button", { name: "Abrir Ajustes" }));
+    expect(openSettings).toHaveBeenCalled();
+  });
+
+  it("shows no settings notice while notifications are allowed or not yet asked", async () => {
+    const screen = await renderScreen(createFetcher([{ items, hasMore: false, nextCursor: null }]));
+
+    await waitFor(() => {
+      expect(screen.getByText("Sin leer")).toBeOnTheScreen();
+    });
+    expect(screen.queryByRole("button", { name: "Abrir Ajustes" })).not.toBeOnTheScreen();
   });
 });

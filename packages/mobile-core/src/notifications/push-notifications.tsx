@@ -38,7 +38,7 @@ const inactive: PushNotificationsState = {
   openSettings: () => undefined,
 };
 
-const PushNotificationsContext = createContext<PushNotificationsState>(inactive);
+export const PushNotificationsContext = createContext<PushNotificationsState>(inactive);
 
 export function usePushNotifications(): PushNotificationsState {
   return useContext(PushNotificationsContext);
