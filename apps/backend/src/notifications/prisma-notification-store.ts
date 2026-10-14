@@ -1,4 +1,6 @@
+import type { PgBoss } from 'pg-boss';
 import type { Prisma, PrismaClient } from '../generated/prisma/client';
+import { schedulePushDispatch } from '../jobs/push-dispatch/schedule-push-dispatch';
 import { NotificationCategory as PrismaNotificationCategory } from '../generated/prisma/enums';
 import type {
   NotificationCategory,
@@ -21,11 +23,6 @@ export type NotificationRecorder = (
   transaction: Prisma.TransactionClient,
   notification: NewNotification,
 ) => Promise<void>;
-
-export const createNotificationRecorder =
-  (boss: unknown): NotificationRecorder =>
-  () =>
-    Promise.reject(new Error(`not implemented ${typeof boss}`));
 
 const categories: Record<NotificationCategory, PrismaNotificationCategory> = {
   booking_schedule: PrismaNotificationCategory.BOOKING_SCHEDULE,
@@ -50,27 +47,50 @@ const notificationSelect = {
   readAt: true,
 } as const;
 
+const insertNotification = (
+  transaction: Prisma.TransactionClient,
+  notification: NewNotification,
+): Promise<number> =>
+  transaction.notification
+    .createMany({
+      data: {
+        accountId: notification.accountId,
+        category: categories[notification.category],
+        type: notification.type,
+        businessEventKey: notification.businessEventKey,
+        title: notification.title,
+        message: notification.message,
+        destinationType: notification.destination?.type ?? null,
+        destinationId: notification.destination?.id ?? null,
+        createdAt: notification.occurredAt,
+      },
+      skipDuplicates: true,
+    })
+    .then((result) => result.count);
+
 // Notifications are addressed to an Account and deduplicated per business event,
-// so an at-least-once producer can record the same event twice safely.
+// so an at-least-once producer can record the same event twice safely. This
+// recorder keeps the inbox entry only; production wires the pushing recorder.
 export const recordNotification: NotificationRecorder = async (
   transaction,
   notification,
 ) => {
-  await transaction.notification.createMany({
-    data: {
-      accountId: notification.accountId,
-      category: categories[notification.category],
-      type: notification.type,
-      businessEventKey: notification.businessEventKey,
-      title: notification.title,
-      message: notification.message,
-      destinationType: notification.destination?.type ?? null,
-      destinationId: notification.destination?.id ?? null,
-      createdAt: notification.occurredAt,
-    },
-    skipDuplicates: true,
-  });
+  await insertNotification(transaction, notification);
 };
+
+// ADR-0024: the push is queued in the transaction that records the entry, and
+// only when this call created it, so a repeated event sends nothing twice.
+export const createNotificationRecorder =
+  (boss: Pick<PgBoss, 'send'>): NotificationRecorder =>
+  async (transaction, notification) => {
+    if ((await insertNotification(transaction, notification)) === 0) return;
+
+    await schedulePushDispatch(boss, transaction, {
+      version: 1,
+      accountId: notification.accountId,
+      businessEventKey: notification.businessEventKey,
+    });
+  };
 
 export const createNotificationStore = (prisma: PrismaClient) => ({
   record: recordNotification,
