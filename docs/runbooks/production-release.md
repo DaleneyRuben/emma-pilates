@@ -11,6 +11,7 @@ EXT-008 (2026-10-14) a merge to `main` releases itself through the
 | Piece | Where | Notes |
 | --- | --- | --- |
 | API | Northflank project `default`, team `emma-pilates`, combined service `api`, region US Central (Council Bluffs) | Developer Sandbox, nf-compute-20 (0.2 vCPU, 512 MB), 1 instance; public at https://p01--api--mmps25fn9k9x.code.run, port 3100 HTTP |
+| Worker | Northflank combined service `worker` | Same image as `api`, command `node dist/src/worker-main.js`, no ports, nf-compute-20; watched by the Better Stack «Worker heartbeat» |
 | Migrations | Northflank manual job `migrate` | Same repository, branch, and `apps/backend/Dockerfile`; command `node_modules/.bin/prisma migrate deploy`; retry limit 0 |
 | Database | Aiven project `emma-pilates-prod`, service `emma-pilates-prod-db`, database `emma` | Free plan, PostgreSQL 18, DigitalOcean US West (Santa Clara), 20 connections, 1 GB disk |
 | Settings | Northflank secret group `production` (runtime, unrestricted) | Every variable both pieces share, plus the files `/etc/secrets/emma-ca.pem` (Aiven's CA) and `/etc/secrets/transfer-qr.png` |
@@ -39,7 +40,11 @@ starts within seconds and runs
    CD deploys it and the readiness probe keeps the old instance serving
    until the new one is ready;
 5. waits until `/health/ready` reports the commit (at most 10 min);
-6. runs `pnpm smoke` with `SMOKE_EXPECTED_RELEASE` set to the commit.
+6. builds the same commit on the `worker` service (at most 20 min) and waits
+   until its rollout completes after that build started (at most 10 min);
+   the repository variable `NORTHFLANK_WORKER_SERVICE_ID` names the service,
+   and an empty value skips this step (EXT-002);
+7. runs `pnpm smoke` with `SMOKE_EXPECTED_RELEASE` set to the commit.
 
 Every step starts only after the one before it succeeded, and the first
 failure stops the release. The job's own limit is 60 minutes. Releases queue
@@ -64,6 +69,7 @@ automatically (ADR-0080):
 | migrate build | the previous release, schema untouched | Read the build's log in Northflank (Jobs → `migrate` → Builds), fix, merge again |
 | migrate run | the previous release; the schema may be partly migrated | Read the run's Logs; fix the migration forward, never edit an applied one |
 | api build | the previous release on the new schema | Read the build's log (Services → `api` → Builds); fix and merge again |
+| worker build or rollout | the new API; the worker on its previous release | Read Services → `worker` → Builds or Logs (a `ZodError` names a missing setting); fix and merge again. The old worker keeps running the jobs meanwhile |
 | readiness | the previous release, or a new one that never became ready | Read `api`'s Logs: a `ZodError` names a missing setting, and readiness stays `503` until every migration shipped in the image is applied |
 | smoke | the new release, marked unsuccessful | Read the smoke JSON in the run's log; decide on a fix forward or the incident runbook |
 | any stage with `Northflank answered 401` or `403` | unchanged | The token expired or lost a permission; see «The deploy token» |
@@ -101,7 +107,10 @@ Only when the workflow cannot run (GitHub Actions down, token lapsed):
 3. **Then the API.** Services → `api` → Commits → **Rebuild** on the same
    commit. CD deploys it when the build finishes; the readiness probe keeps
    the old instance serving until the new one is ready.
-4. **Check the release** from the repository root:
+4. **Then the worker.** Services → `worker` → Commits → **Rebuild** on the
+   same commit; CD deploys it. Its Logs should show JSON lines with
+   `"service":"worker"` and the new `release`.
+5. **Check the release** from the repository root:
 
    ```sh
    SMOKE_BASE_URL=https://p01--api--mmps25fn9k9x.code.run \
@@ -118,11 +127,13 @@ serves traffic.
 
 ## Change a setting
 
-Edit the `production` secret group (or the service's own Environment for
-`AUTHENTICATION_LINK_BASE_URL` and `TRUSTED_PROXY_HOPS`), then **Restart**
-the `api` service: the group's own Restart button only works for restricted
-groups. A missing or local-default production setting stops the API at boot
-with a `ZodError` in its Logs that names the variable.
+Edit the `production` secret group (or a service's own Environment:
+`AUTHENTICATION_LINK_BASE_URL` on both services, `TRUSTED_PROXY_HOPS` on
+`api`, `WORKER_HEARTBEAT_URL` on `worker`), then **Restart** every service
+that reads it, `api` and `worker` for the group: the group's own Restart button
+only works for restricted groups. A missing or local-default production
+setting stops the process at boot with a `ZodError` in its Logs that names the
+variable.
 
 ## Database connection
 
