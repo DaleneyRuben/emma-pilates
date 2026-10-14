@@ -30,9 +30,14 @@ export const startSweeps = async (
   groups: SweepGroup[],
   dependencies: SweepDependencies,
 ): Promise<RunningSweeps> => {
+  const now = dependencies.now ?? (() => new Date());
+  const startedAt = now();
+  const lastSuccessAt = new Map<string, Date>();
   const runStep = (step: SweepStep) =>
     step.execute().then(
-      () => undefined,
+      () => {
+        lastSuccessAt.set(step.job, now());
+      },
       (error: unknown) => {
         dependencies.reportError(error, { job: step.job });
         dependencies.emit({
@@ -59,6 +64,13 @@ export const startSweeps = async (
 
   return {
     stop: () => timers.forEach((timer) => clearInterval(timer)),
-    progress: () => [],
+    progress: () =>
+      groups.flatMap(({ intervalMs, steps }) =>
+        steps.map(({ job }) => ({
+          job,
+          intervalMs,
+          lastSuccessAt: lastSuccessAt.get(job) ?? startedAt,
+        })),
+      ),
   };
 };
