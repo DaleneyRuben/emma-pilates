@@ -1,3 +1,4 @@
+import { revokeAuthenticationSessions } from './revoke-authentication-sessions';
 import type { PrismaClient } from '../../generated/prisma/client';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
@@ -247,12 +248,15 @@ export class PrismaAuthenticationGateway {
     revokedAt: Date;
     reason: 'logout';
   }): Promise<void> {
-    await this.prisma.authenticationSession.updateMany({
-      where: { id: input.authenticationSessionId, revokedAt: null },
-      data: {
-        revokedAt: input.revokedAt,
-        revocationReason: AuthenticationSessionRevocationReason.LOGOUT,
-      },
-    });
+    await this.prisma.$transaction((transaction) =>
+      revokeAuthenticationSessions(
+        transaction,
+        { id: input.authenticationSessionId },
+        {
+          revokedAt: input.revokedAt,
+          reason: AuthenticationSessionRevocationReason.LOGOUT,
+        },
+      ),
+    );
   }
 }
