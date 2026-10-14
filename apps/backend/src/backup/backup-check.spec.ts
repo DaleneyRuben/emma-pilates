@@ -18,7 +18,7 @@ const monthly = (lastWrite: Date, size = 300_000): StoredBackup => ({
 });
 
 // What R2 holds after the job ran every day since `first`: one daily per run
-// within the last 35 days, and each month's copy last written by its final
+// within the last 30 days, and each month's copy last written by its final
 // run, kept for 365 days.
 const healthyBucket = (first: Date, until: Date): StoredBackup[] => {
   const runs: Date[] = [];
@@ -26,7 +26,7 @@ const healthyBucket = (first: Date, until: Date): StoredBackup[] => {
     runs.push(at);
   }
   const dailies = runs
-    .filter((at) => until.getTime() - at.getTime() < 35 * day)
+    .filter((at) => until.getTime() - at.getTime() < 30 * day)
     .map((at) => daily(at));
   const lastOfMonth = new Map<string, Date>();
   runs.forEach((at) => lastOfMonth.set(monthlyBackupKey('emma', at), at));
@@ -48,7 +48,7 @@ describe('backup check (EXT-009 retention)', () => {
 
     expect(report.problems).toEqual([]);
     expect(report.passed).toBe(true);
-    expect(report.dailyCount).toBe(35);
+    expect(report.dailyCount).toBe(30);
     // Twelve complete months and the current one.
     expect(report.monthlyCount).toBe(13);
     expect(report.latestDaily).toEqual({
@@ -89,7 +89,7 @@ describe('backup check (EXT-009 retention)', () => {
     expect(codes(objects)).toEqual(['latest_daily_shrank']);
   });
 
-  it('flags a day without a dump inside the 35-day window', () => {
+  it('flags a day without a dump inside the 30-day window', () => {
     const objects = healthyBucket(runAt('2026-09-01'), runAt('2026-10-14'));
     const without = objects.filter(
       (object) => object.key !== 'daily/emma-20261002T070000Z.dump',
@@ -115,7 +115,8 @@ describe('backup check (EXT-009 retention)', () => {
 
   it('flags dumps the lifecycle rules should already have deleted', () => {
     const objects = healthyBucket(runAt('2026-09-01'), runAt('2026-10-14'));
-    objects.push(daily(runAt('2026-08-20')));
+    // 33 days old: past the 30-day rule and its two days of slack.
+    objects.push(daily(runAt('2026-09-11')));
     objects.push(monthly(new Date('2025-09-30T07:00:00Z')));
 
     expect(codes(objects)).toEqual([
