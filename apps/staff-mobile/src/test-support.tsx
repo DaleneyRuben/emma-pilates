@@ -1,4 +1,4 @@
-import type { AppRole } from "@pilates/mobile-core";
+import type { AppRole, MobileRuntime } from "@pilates/mobile-core";
 
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -25,6 +25,7 @@ export function routeFetcher(routes: Record<string, Route>): jest.Mock & typeof 
 export function createStaffRuntime(
   fetcher: typeof globalThis.fetch,
   role: Exclude<AppRole, "client"> = "trainer",
+  overrides: Pick<MobileRuntime, "installationIdentifier" | "pushPlatform"> = {},
 ) {
   return {
     allowedLinkHosts: ["links.emmapilates.test"],
@@ -54,5 +55,6 @@ export function createStaffRuntime(
       start: jest.fn(),
       unlockWithBiometrics: jest.fn(),
     },
+    ...overrides,
   };
 }
