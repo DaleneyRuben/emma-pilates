@@ -3,7 +3,7 @@ import type { ErrorEvent, Exception, StackFrame } from '@sentry/node';
 
 export const ERROR_REPORTER = Symbol('ERROR_REPORTER');
 
-export type ErrorReportContext = { requestId?: string };
+export type ErrorReportContext = { requestId?: string; job?: string };
 
 export interface ErrorReporter {
   report(error: unknown, context?: ErrorReportContext): void;
@@ -56,7 +56,7 @@ const keepException = (exception: Exception): Exception => ({
 // ADR-0081: an allowlist. Requests, users, breadcrumbs, local variables,
 // source lines, the host, and the message never leave the process: driver and
 // ORM messages can echo query arguments. The type, code, and stack locate the
-// failure, and the request identifier finds its full log line.
+// failure, and the request identifier or worker job finds its full log line.
 export function sanitizeErrorEvent(event: ErrorEvent): ErrorEvent {
   return {
     type: undefined,
@@ -74,6 +74,7 @@ export function sanitizeErrorEvent(event: ErrorEvent): ErrorEvent {
       ...(event.tags?.request_id !== undefined && {
         request_id: event.tags.request_id,
       }),
+      ...(event.tags?.job !== undefined && { job: event.tags.job }),
     },
     exception: { values: event.exception?.values?.map(keepException) },
   };
@@ -108,6 +109,7 @@ export function createErrorReporter(
           ...(context.requestId !== undefined && {
             request_id: context.requestId,
           }),
+          ...(context.job !== undefined && { job: context.job }),
         },
       });
     },

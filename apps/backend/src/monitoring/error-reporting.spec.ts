@@ -61,6 +61,21 @@ describe('error reporting', () => {
     });
   });
 
+  it('captures a worker failure with the job it came from', () => {
+    const sdk = fakeSdk();
+    const reporter = createErrorReporter(
+      { ...settings, service: 'worker' },
+      sdk,
+    );
+    const failure = new Error('boom');
+
+    reporter.report(failure, { job: 'retention_sweep' });
+
+    expect(sdk.captureException).toHaveBeenCalledWith(failure, {
+      tags: { job: 'retention_sweep' },
+    });
+  });
+
   it('captures a failure without a code or request identifier', () => {
     const sdk = fakeSdk();
     const reporter = createErrorReporter(settings, sdk);
@@ -87,6 +102,7 @@ describe('error reporting', () => {
         service: 'api',
         error_code: 'P1003',
         request_id: 'req-1',
+        job: 'retention_sweep',
         email: 'lucia@example.com',
       },
       request: { headers: { authorization: 'Bearer secret' } },
@@ -129,7 +145,12 @@ describe('error reporting', () => {
       platform: 'node',
       environment: 'development',
       release: 'release-42',
-      tags: { service: 'api', error_code: 'P1003', request_id: 'req-1' },
+      tags: {
+        service: 'api',
+        error_code: 'P1003',
+        request_id: 'req-1',
+        job: 'retention_sweep',
+      },
       exception: {
         values: [
           {

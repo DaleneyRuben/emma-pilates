@@ -35,6 +35,9 @@ describe('worker startup sweeps (EXT-002)', () => {
         start: jest.fn().mockResolvedValue(undefined),
         work: jest.fn().mockResolvedValue('worker-id') as WorkerBoss['work'],
         getQueueStats: jest.fn().mockResolvedValue([]),
+        getDb: () => ({
+          executeSql: jest.fn().mockResolvedValue({ rows: [] }),
+        }),
         stop: jest.fn().mockResolvedValue(undefined),
       };
       const emit = jest.fn();

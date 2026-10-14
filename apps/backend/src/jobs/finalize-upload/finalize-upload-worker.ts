@@ -34,6 +34,7 @@ export type FinalizeUploadWorkerDependencies = {
   process(job: {
     imageAssetId: string;
   }): Promise<'verified' | 'failed' | 'stale'>;
+  reportError?: (error: unknown, context: { job: string }) => void;
 };
 
 const processJob = async (
@@ -44,7 +45,8 @@ const processJob = async (
 
   try {
     payload = parseFinalizeUploadJob(job.data);
-  } catch {
+  } catch (error) {
+    dependencies.reportError?.(error, { job: FINALIZE_UPLOAD_QUEUE });
     return {
       id: job.id,
       status: 'deadletter',
@@ -55,7 +57,8 @@ const processJob = async (
   try {
     const outcome = await dependencies.process(payload);
     return { id: job.id, status: 'completed', output: { outcome } };
-  } catch {
+  } catch (error) {
+    dependencies.reportError?.(error, { job: FINALIZE_UPLOAD_QUEUE });
     return {
       id: job.id,
       status: 'failed',

@@ -5,6 +5,7 @@ import { LocalEmailCapture } from './jobs/authentication-email/local-email-captu
 import { SpanishAuthenticationEmailRenderer } from './jobs/authentication-email/spanish-authentication-email-renderer';
 import { PrismaAuthenticationEmailStateReader } from './jobs/authentication-email/prisma-authentication-email-state-reader';
 import { createWorkerLog } from './jobs/worker-log';
+import { createErrorReporter } from './monitoring/error-reporting';
 import { createHeartbeatPing } from './monitoring/heartbeat-ping';
 import { createPrismaEvaluationCommands } from './booking/evaluations/prisma-evaluation-commands';
 import { createPrismaSessionMaterializer } from './booking/sessions/prisma-session-materializer';
@@ -109,6 +110,12 @@ async function bootstrap(): Promise<void> {
     retentionSweeps: createPrismaRetentionSweeps(prisma, { now }),
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit,
+    errorReporter: createErrorReporter({
+      dsn: environment.ERROR_REPORTING_DSN,
+      environment: environment.NODE_ENV,
+      release: environment.RELEASE_ID,
+      service: 'worker',
+    }),
     pingHeartbeat: createHeartbeatPing(environment.WORKER_HEARTBEAT_URL, {
       fetch,
       emit,

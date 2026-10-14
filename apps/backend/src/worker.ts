@@ -14,7 +14,17 @@ import {
   startInstalledPgBoss,
   type StartablePgBoss,
 } from './jobs/pg-boss-runtime';
+import {
+  readOldestReadyJobs,
+  type SqlExecutor,
+} from './jobs/oldest-ready-jobs';
+import { findProgressStalls } from './jobs/worker-progress';
 import { startWorkerHeartbeat } from './jobs/worker-heartbeat';
+import {
+  noErrorReporting,
+  type ErrorReporter,
+} from './monitoring/error-reporting';
+import { startSweeps } from './worker-sweeps';
 
 const pendingAccountCleanupIntervalMs = 60 * 60 * 1_000;
 const imageUploadCleanupIntervalMs = 60 * 60 * 1_000;
@@ -39,6 +49,7 @@ export interface WorkerBoss extends StartablePgBoss {
     name: string,
     options: { force: true },
   ): Promise<QueueStatsSnapshot[]>;
+  getDb(): SqlExecutor;
   stop(options: { graceful: true }): Promise<void>;
 }
 
@@ -85,12 +96,14 @@ type WorkerDependencies = {
   };
   serviceVersion: string;
   emit(record: unknown): void;
+  errorReporter?: ErrorReporter;
   pingHeartbeat?: () => Promise<void>;
 };
 
 export const startWorker = async (
   dependencies: WorkerDependencies,
 ): Promise<() => Promise<void>> => {
+  const errorReporter = dependencies.errorReporter ?? noErrorReporting;
   await startInstalledPgBoss(dependencies.boss);
   if (dependencies.authenticationEmail === null) {
     dependencies.emit({
@@ -103,135 +116,114 @@ export const startWorker = async (
       dependencies.authenticationEmail,
     );
   }
-  await registerFinalizeUploadWorker(
-    dependencies.boss,
-    dependencies.finalizeUpload,
+  await registerFinalizeUploadWorker(dependencies.boss, {
+    process: (job) => dependencies.finalizeUpload.process(job),
+    reportError: (error, context) => errorReporter.report(error, context),
+  });
+  const sweeps = await startSweeps(
+    [
+      {
+        intervalMs: pendingAccountCleanupIntervalMs,
+        steps: [
+          {
+            job: 'pending_account_cleanup',
+            execute: () => dependencies.pendingAccountCleanup.execute(),
+          },
+        ],
+      },
+      {
+        intervalMs: imageUploadCleanupIntervalMs,
+        steps: [
+          {
+            job: 'image_upload_cleanup',
+            execute: () => dependencies.imageUploadCleanup.execute(),
+          },
+        ],
+      },
+      {
+        intervalMs: subscriptionReminderIntervalMs,
+        steps: [
+          {
+            job: 'subscription_reminders',
+            execute: () => dependencies.subscriptionReminders.execute(),
+          },
+        ],
+      },
+      {
+        intervalMs: purchaseIntentExpiryIntervalMs,
+        steps: [
+          {
+            job: 'purchase_intent_expiry',
+            execute: () => dependencies.purchaseIntentExpiry.execute(),
+          },
+        ],
+      },
+      // The Session horizon moves only at Bolivia midnight, so an hourly pass
+      // keeps it filled (ADR-0059).
+      {
+        intervalMs: sessionScheduleIntervalMs,
+        steps: [
+          {
+            job: 'session_materialization',
+            execute: () => dependencies.sessionSchedules.execute(),
+          },
+        ],
+      },
+      // Block commands materialize synchronously, so an hourly pass is enough
+      // (ADR-0059); reminders are swept every minute so each is at most a
+      // minute late (ADR-0058).
+      {
+        intervalMs: evaluationSlotIntervalMs,
+        steps: [
+          {
+            job: 'evaluation_slot_materialization',
+            execute: () => dependencies.evaluationSlots.execute(),
+          },
+        ],
+      },
+      {
+        intervalMs: evaluationReminderIntervalMs,
+        steps: [
+          {
+            job: 'evaluation_reminders',
+            execute: () => dependencies.evaluationReminders.execute(),
+          },
+        ],
+      },
+      // The one-time empty check and the Session-start Waitlist closure are
+      // each swept every minute (ADR-0058). The check runs first so one the
+      // worker missed settles before its Session's Waitlist closes.
+      {
+        intervalMs: sessionStartCheckIntervalMs,
+        steps: [
+          {
+            job: 'empty_session_check',
+            execute: () => dependencies.emptySessionChecks.execute(),
+          },
+          {
+            job: 'started_waitlist_closure',
+            execute: () => dependencies.startedSessionWaitlists.execute(),
+          },
+        ],
+      },
+      // Housekeeping for rows past their provisional retention (BE-008);
+      // hourly keeps each batch small.
+      {
+        intervalMs: retentionSweepIntervalMs,
+        steps: [
+          {
+            job: 'retention_sweep',
+            execute: () => dependencies.retentionSweeps.execute(),
+          },
+        ],
+      },
+    ],
+    {
+      serviceVersion: dependencies.serviceVersion,
+      emit: (record) => dependencies.emit(record),
+      reportError: (error, context) => errorReporter.report(error, context),
+    },
   );
-  const runPendingAccountCleanup = () =>
-    dependencies.pendingAccountCleanup.execute().catch(() => {
-      dependencies.emit({
-        event: 'pending_account_cleanup_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  await runPendingAccountCleanup();
-  const pendingAccountCleanupTimer = setInterval(() => {
-    void runPendingAccountCleanup();
-  }, pendingAccountCleanupIntervalMs);
-
-  const runImageUploadCleanup = () =>
-    dependencies.imageUploadCleanup.execute().catch(() => {
-      dependencies.emit({
-        event: 'image_upload_cleanup_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  await runImageUploadCleanup();
-  const imageUploadCleanupTimer = setInterval(() => {
-    void runImageUploadCleanup();
-  }, imageUploadCleanupIntervalMs);
-
-  const runSubscriptionReminders = () =>
-    dependencies.subscriptionReminders.execute().catch(() => {
-      dependencies.emit({
-        event: 'subscription_reminders_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  await runSubscriptionReminders();
-  const subscriptionReminderTimer = setInterval(() => {
-    void runSubscriptionReminders();
-  }, subscriptionReminderIntervalMs);
-
-  const runPurchaseIntentExpiry = () =>
-    dependencies.purchaseIntentExpiry.execute().catch(() => {
-      dependencies.emit({
-        event: 'purchase_intent_expiry_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  await runPurchaseIntentExpiry();
-  const purchaseIntentExpiryTimer = setInterval(() => {
-    void runPurchaseIntentExpiry();
-  }, purchaseIntentExpiryIntervalMs);
-
-  // The Session horizon moves only at Bolivia midnight, so an hourly pass
-  // keeps it filled (ADR-0059).
-  const runSessionSchedules = () =>
-    dependencies.sessionSchedules.execute().catch(() => {
-      dependencies.emit({
-        event: 'session_materialization_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  await runSessionSchedules();
-  const sessionScheduleTimer = setInterval(() => {
-    void runSessionSchedules();
-  }, sessionScheduleIntervalMs);
-
-  // The horizon moves only at Bolivia midnight and block commands materialize
-  // synchronously, so an hourly pass is enough (ADR-0059); reminders are swept
-  // every minute so each is at most a minute late (ADR-0058).
-  const runEvaluationSlots = () =>
-    dependencies.evaluationSlots.execute().catch(() => {
-      dependencies.emit({
-        event: 'evaluation_slot_materialization_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  const runEvaluationReminders = () =>
-    dependencies.evaluationReminders.execute().catch(() => {
-      dependencies.emit({
-        event: 'evaluation_reminders_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  await runEvaluationSlots();
-  const evaluationSlotTimer = setInterval(() => {
-    void runEvaluationSlots();
-  }, evaluationSlotIntervalMs);
-  await runEvaluationReminders();
-  const evaluationReminderTimer = setInterval(() => {
-    void runEvaluationReminders();
-  }, evaluationReminderIntervalMs);
-
-  // The one-time empty check and the Session-start Waitlist closure are each
-  // swept every minute, so neither is more than a minute late (ADR-0058). The
-  // check runs first so one the worker missed settles before its Session's
-  // Waitlist closes.
-  const runEmptySessionChecks = () =>
-    dependencies.emptySessionChecks.execute().catch(() => {
-      dependencies.emit({
-        event: 'empty_session_check_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  const runStartedSessionWaitlists = () =>
-    dependencies.startedSessionWaitlists.execute().catch(() => {
-      dependencies.emit({
-        event: 'started_waitlist_closure_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  await runEmptySessionChecks();
-  await runStartedSessionWaitlists();
-  const sessionStartCheckTimer = setInterval(() => {
-    void runEmptySessionChecks().then(runStartedSessionWaitlists);
-  }, sessionStartCheckIntervalMs);
-
-  // Housekeeping for rows past their provisional retention (BE-008); hourly
-  // keeps each batch small.
-  const runRetentionSweeps = () =>
-    dependencies.retentionSweeps.execute().catch(() => {
-      dependencies.emit({
-        event: 'retention_sweep_failed',
-        serviceVersion: dependencies.serviceVersion,
-      });
-    });
-  await runRetentionSweeps();
-  const retentionSweepTimer = setInterval(() => {
-    void runRetentionSweeps();
-  }, retentionSweepIntervalMs);
 
   const getQueueCounts = async (queue: string) => {
     const snapshots = await dependencies.boss.getQueueStats(queue, {
@@ -246,25 +238,32 @@ export const startWorker = async (
     };
   };
 
+  // The authentication email queue fills on purpose while email is disabled.
+  const watchedQueues =
+    dependencies.authenticationEmail === null
+      ? [FINALIZE_UPLOAD_QUEUE]
+      : [FINALIZE_UPLOAD_QUEUE, AUTHENTICATION_EMAIL_QUEUE];
+
   const stopHeartbeat = startWorkerHeartbeat({
     serviceVersion: dependencies.serviceVersion,
     getAuthenticationEmailCounts: () =>
       getQueueCounts(AUTHENTICATION_EMAIL_QUEUE),
     getFinalizeUploadCounts: () => getQueueCounts(FINALIZE_UPLOAD_QUEUE),
+    findStalls: async () =>
+      findProgressStalls({
+        now: new Date(),
+        oldestReadyJobs: await readOldestReadyJobs(
+          dependencies.boss.getDb(),
+          watchedQueues,
+        ),
+        sweeps: sweeps.progress(),
+      }),
     emit: (record) => dependencies.emit(record),
     ping: dependencies.pingHeartbeat,
   });
 
   return async () => {
-    clearInterval(pendingAccountCleanupTimer);
-    clearInterval(imageUploadCleanupTimer);
-    clearInterval(subscriptionReminderTimer);
-    clearInterval(purchaseIntentExpiryTimer);
-    clearInterval(sessionScheduleTimer);
-    clearInterval(evaluationSlotTimer);
-    clearInterval(evaluationReminderTimer);
-    clearInterval(sessionStartCheckTimer);
-    clearInterval(retentionSweepTimer);
+    sweeps.stop();
     stopHeartbeat();
     await dependencies.boss.stop({ graceful: true });
   };

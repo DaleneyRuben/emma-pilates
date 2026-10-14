@@ -52,6 +52,7 @@ describe('worker entrypoint', () => {
       start,
       work,
       getQueueStats,
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop,
     };
     const emit = jest.fn();
@@ -111,6 +112,7 @@ describe('worker entrypoint', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work: jest.fn().mockResolvedValue('worker-id'),
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const pendingAccountCleanup = {
@@ -177,6 +179,7 @@ describe('worker entrypoint', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work: jest.fn().mockResolvedValue('worker-id'),
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const emit = jest.fn();
@@ -231,6 +234,7 @@ describe('worker entrypoint', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work: jest.fn().mockResolvedValue('worker-id'),
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const pendingAccountCleanup = {
@@ -288,6 +292,7 @@ describe('worker entrypoint', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work: jest.fn().mockResolvedValue('worker-id'),
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const imageUploadCleanup = {
@@ -345,6 +350,7 @@ describe('worker entrypoint', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work: jest.fn().mockResolvedValue('worker-id'),
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const sessionSchedules = {
@@ -412,6 +418,7 @@ describe('worker entrypoint', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work: jest.fn().mockResolvedValue('worker-id'),
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const counts = {
@@ -478,6 +485,7 @@ describe('worker entrypoint', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work: jest.fn().mockResolvedValue('worker-id'),
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const order: string[] = [];
@@ -570,6 +578,7 @@ describe('worker entrypoint', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work: jest.fn().mockResolvedValue('worker-id'),
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const evaluationSlots = {

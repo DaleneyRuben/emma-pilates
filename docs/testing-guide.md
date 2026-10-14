@@ -3590,3 +3590,119 @@ refuses to start without an HTTPS storage endpoint and `BACKUP_HEARTBEAT_URL`.
 4. The weekly check and the restore drill run from the Mac with the
    read-only token, as the
    [runbook](./runbooks/backups-and-restore-drills.md) shows.
+
+## Test 44: check worker and admin-web error reporting and the progress-gated heartbeat
+
+Since EXT-011 the worker reports to Better Stack like the API: every failed
+scheduled sweep and every finalize-upload job that fails unexpectedly or is
+dead-lettered, as service `worker` with a `job` tag (the sweep's name, such
+as `evaluation_reminders`, or the queue `uploads.finalize.v1`) and the error
+code; never the message or job data. The admin web reports uncaught errors,
+unhandled rejections, and render errors (including the startup error page)
+as service `admin-web`, only when `VITE_ERROR_REPORTING_DSN` is set at build
+time (Vercel Production only); 4xx API answers are never reported, and no
+message, page URL, user, or breadcrumbs leave the browser. Stacks are
+minified: no source maps are uploaded.
+
+The worker's 30-second heartbeat pings Better Stack «Worker heartbeat» only
+while the worker makes progress (ADR-0066): the oldest ready
+`uploads.finalize.v1` job (and the authentication email job, once email is
+enabled) is under 5 minutes old, and every sweep succeeded within twice its
+interval plus 2 minutes (4 minutes for the every-minute sweeps, 12 for
+purchase-intent expiry, 2 hours 2 minutes for the hourly ones). Otherwise it
+logs `worker_progress_stalled` with the reasons once per change, skips the
+ping, and logs `worker_progress_resumed` when they clear.
+
+### A. Locally, against a receiver on the Mac
+
+1. Save this receiver as `receiver.mjs` outside the repository and start it;
+   it prints each error event and each ping:
+
+   ```js
+   import { createServer } from 'node:http';
+   import { createServer as createTls } from 'node:https';
+   import { readFileSync } from 'node:fs';
+   const handler = (req, res) => {
+     const chunks = [];
+     req.on('data', (chunk) => chunks.push(chunk));
+     req.on('end', () => {
+       const body = Buffer.concat(chunks).toString();
+       if (req.url.startsWith('/ping')) console.log('ping', new Date().toISOString());
+       else for (const line of body.split('\n').slice(1)) if (line.includes('"exception"')) console.log(line);
+       res.writeHead(200, { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*' });
+       res.end('{}');
+     });
+   };
+   createServer(handler).listen(8799);
+   createTls({ key: readFileSync('key.pem'), cert: readFileSync('cert.pem') }, handler).listen(8800);
+   ```
+
+   The heartbeat URL must be HTTPS, so make a throwaway certificate next to
+   it first:
+   `openssl req -x509 -newkey rsa:2048 -nodes -keyout key.pem -out cert.pem -days 2 -subj "/CN=localhost" -addext "subjectAltName=IP:127.0.0.1"`.
+2. Copy the simulation database, build, and start the worker on the copy:
+
+   ```sh
+   createdb -T pilates_dev_sim pilates_test_monitoring
+   cd apps/backend && pnpm build
+   NODE_EXTRA_CA_CERTS=<dir>/cert.pem \
+   DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_monitoring" \
+   ERROR_REPORTING_DSN=http://publickey@127.0.0.1:8799/1 \
+   WORKER_HEARTBEAT_URL=https://127.0.0.1:8800/ping \
+   RELEASE_ID=monitoring-local \
+   node --env-file=.env dist/src/worker-main.js
+   ```
+
+   The receiver prints a ping every 30 seconds.
+3. **A failing sweep.** Break the every-minute reminder sweep:
+   `psql -d pilates_test_monitoring -c "alter table booking.evaluations rename column hour_reminder_recorded_at to hour_reminder_recorded_at_broken"`.
+   Within a minute the worker logs `evaluation_reminders_failed` and the
+   receiver prints an event with type `PrismaClientKnownRequestError`, tags
+   `service` `worker`, `error_code` `P2022`, `job` `evaluation_reminders`,
+   and no message. About 4 minutes after the sweep's last success the worker
+   logs `worker_progress_stalled` with `sweep_stale:evaluation_reminders`
+   and the pings stop. Rename the column back; within a minute it logs
+   `worker_progress_resumed` and the pings return.
+4. **A stuck queue.** Pause the worker (`kill -STOP <node pid>`), add an
+   upload job that has waited 10 minutes, and hold a lock on it so the
+   worker skips it:
+
+   ```sh
+   psql -d pilates_test_monitoring -Atc "insert into pgboss.job (name, data, state, start_after) values ('uploads.finalize.v1', '{\"version\":1,\"imageAssetId\":\"0ae2701e-f8ac-4c8a-8cf0-65182ee0fc1d\"}', 'created', now() - interval '10 minutes') returning id"
+   psql -d pilates_test_monitoring -c "begin; select id from pgboss.job where id = '<id>' for update; select pg_sleep(120); commit;" &
+   kill -CONT <node pid>
+   ```
+
+   At the next heartbeat the worker logs `worker_progress_stalled` with
+   `queue_stuck:uploads.finalize.v1` and skips the ping. When the lock ends,
+   the worker completes the job, logs `worker_progress_resumed`, and pings
+   again.
+5. **The admin web.** Start the API on the same copy (`PORT=3100`) and the
+   admin web with a local DSN:
+   `VITE_ERROR_REPORTING_DSN=http://publickey@127.0.0.1:8799/2 pnpm dev:admin`.
+   At 1440 and 420 px the login page and, after logging in as
+   `paola.mendoza@example.com`, the schedule look exactly as before. A wrong
+   password shows «El correo o la contraseña no son correctos.» and nothing
+   reaches the receiver. In the browser console, run
+   `setTimeout(() => { throw new TypeError('x') }); Promise.reject(new RangeError('y'))`:
+   two events arrive (`TypeError` from `onerror`, `RangeError` from
+   `onunhandledrejection`), tagged `service` `admin-web`, without the
+   message or the page URL. Stop the API and reload `/`: the startup error
+   page appears and one `ApiError` event arrives through React's root error
+   handler.
+6. Stop everything and `dropdb pilates_test_monitoring`.
+
+Verified on 2026-10-14 (EXT-011): every step above as described, with 7
+events in all and none holding an email, a message, a URL, or request data.
+
+### B. In production
+
+1. The worker inherits `ERROR_REPORTING_DSN` from Northflank's `production`
+   group, so its events go to `emma-pilates-api` in Better Stack with the
+   `service` tag `worker`.
+2. The admin web reports only when Vercel Production has
+   `VITE_ERROR_REPORTING_DSN`; a change to it needs a redeploy, because Vite
+   inlines it at build time.
+3. «Worker heartbeat» goes Down when the worker stops making progress, not
+   only when it stops; the worker's logs in Northflank show
+   `worker_progress_stalled` with the reasons.
