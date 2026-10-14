@@ -10,15 +10,27 @@ is released separately with its own `eas.json` and store identity
 ## Gated: accounts that must exist first
 
 These steps cannot run until the owner sets up the accounts listed in the
-backlog's "External accounts and provider gates" table:
+backlog's "External accounts and provider gates" table. Done on 2026-10-14
+(REL-001, gate 6): the Expo organization `emma-pilates` with one EAS project
+per app (`extra.eas.projectId` and `owner` in each `app.json`), and
+`expo-updates` with each project's update URL. Still to come:
 
-- an Expo organization with one EAS project per app (`eas init` writes each
-  `extra.eas.projectId` into `app.json`), and `expo-updates` installed with the
-  project's update URL;
 - an Apple Developer team and App Store Connect records for both bundle IDs;
 - a Google Play Console app entry and upload key for both packages;
 - EAS environment variables `EXPO_PUBLIC_API_URL` for the `preview` and
   `production` environments (the https API hosts from EXT-003).
+
+## Development builds (EAS, no store account needed)
+
+`eas build --platform all --profile development --non-interactive --no-wait`
+from the app folder builds the development client for the iOS Simulator and
+an Android `.apk` (testing guide, Test 45). Run `eas whoami` first: it must be
+`daleneyfernando`, because this Mac also has a work Expo login. Every profile
+extends `base` (Node 24.13.0, the workspace's pnpm, and
+`SHARP_IGNORE_GLOBAL_LIBVIPS=1`, without which the backend's `sharp` tries to
+compile on the macOS builder and the install fails). Each build spends one of
+the free plan's monthly builds (15 iOS and 15 Android); a JavaScript change
+needs none, a native change needs a new one per app and platform.
 
 ## Before every release (local, no account needed)
 
