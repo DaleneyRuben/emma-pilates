@@ -24,6 +24,7 @@ export * from "./ingress/verified-link";
 export * from "./money/bolivianos";
 export * from "./notifications/notification-time";
 export * from "./notifications/notifications-screen";
+export * from "./notifications/memory-push-platform";
 export * from "./notifications/pending-open";
 export type { PushPayload } from "./notifications/push-payload";
 export {
