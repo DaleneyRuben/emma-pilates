@@ -1,8 +1,8 @@
 import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, createMemoryPushPlatform } from "@pilates/mobile-core";
 
 import App from "../../App";
-import { createClientRuntime, fakePushPlatform, jsonResponse, routeFetcher } from "../test-support";
+import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
 
 jest.setTimeout(30_000);
 
@@ -43,13 +43,13 @@ function clientFetcher() {
   });
 }
 
-async function renderSignedIn(platform = fakePushPlatform()) {
+async function renderSignedIn(device = createMemoryPushPlatform()) {
   const fetcher = clientFetcher();
   const screen = await render(
     <App
       runtime={createClientRuntime(fetcher, {
         installationIdentifier: () => Promise.resolve("installation-1"),
-        pushPlatform: platform.platform,
+        pushPlatform: device.platform,
       })}
     />,
   );
@@ -57,7 +57,7 @@ async function renderSignedIn(platform = fakePushPlatform()) {
     () => expect(screen.getByRole("button", { name: /Reservar, tab/ })).toBeOnTheScreen(),
     { timeout: 10_000 },
   );
-  return { fetcher, screen, ...platform };
+  return { device, fetcher, screen };
 }
 
 describe("Client push notifications (NOT-002)", () => {
@@ -78,9 +78,9 @@ describe("Client push notifications (NOT-002)", () => {
   });
 
   it("opens a tapped push's destination and marks it read", async () => {
-    const { fetcher, listeners, screen } = await renderSignedIn();
+    const { device, fetcher, screen } = await renderSignedIn();
 
-    await act(async () => listeners.tap.forEach((listener) => listener(subscriptionPush)));
+    await act(async () => device.tap(subscriptionPush));
 
     await waitFor(() => expect(screen.getByText("Mi plan")).toBeOnTheScreen());
     expect(fetcher).toHaveBeenCalledWith(
@@ -90,28 +90,23 @@ describe("Client push notifications (NOT-002)", () => {
   });
 
   it("opens the push that launched the app once navigation is ready", async () => {
-    const platform = fakePushPlatform();
-    (platform.platform.takeLaunchTap as jest.Mock).mockResolvedValue(subscriptionPush);
-
-    const { screen } = await renderSignedIn(platform);
+    const { screen } = await renderSignedIn(
+      createMemoryPushPlatform("granted", { launchTap: subscriptionPush }),
+    );
 
     await waitFor(() => expect(screen.getByText("Mi plan")).toBeOnTheScreen());
   });
 
   it("keeps the app badge on the unread count", async () => {
-    const { platform } = await renderSignedIn();
+    const { device } = await renderSignedIn();
 
-    await waitFor(() => expect(platform.setBadgeCount).toHaveBeenLastCalledWith(3));
+    await waitFor(() => expect(device.state.badgeCounts.at(-1)).toBe(3));
   });
 
   it("stays on Home for a push whose destination it does not know", async () => {
-    const { listeners, screen } = await renderSignedIn();
+    const { device, screen } = await renderSignedIn();
 
-    await act(async () =>
-      listeners.tap.forEach((listener) =>
-        listener({ ...subscriptionPush, destinationType: "trainer_schedule" }),
-      ),
-    );
+    await act(async () => device.tap({ ...subscriptionPush, destinationType: "trainer_schedule" }));
     await fireEvent.press(screen.getByRole("button", { name: /Reservar, tab/ }));
 
     expect(screen.queryByText("Mi plan")).toBeNull();

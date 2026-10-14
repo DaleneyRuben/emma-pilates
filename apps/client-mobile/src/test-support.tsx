@@ -1,4 +1,4 @@
-import type { MobileRuntime, PushPlatform } from "@pilates/mobile-core";
+import type { MobileRuntime } from "@pilates/mobile-core";
 
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -55,40 +55,4 @@ export function createClientRuntime(
     },
     ...overrides,
   };
-}
-
-type Listener<Argument = void> = (argument: Argument) => void;
-
-// The device's notification capabilities, with its listeners exposed so a
-// spec can deliver a token change, a received push, or a tap.
-export function fakePushPlatform(status: "granted" | "denied" | "undetermined" = "granted") {
-  let current = status;
-  const listeners = {
-    received: [] as Listener[],
-    tap: [] as Listener<unknown>[],
-    token: [] as Listener[],
-  };
-  const subscribe =
-    <Item,>(list: Item[]) =>
-    (listener: Item) => {
-      list.push(listener);
-      return () => void list.splice(list.indexOf(listener), 1);
-    };
-  const platform: PushPlatform = {
-    os: "ios",
-    getPermissionStatus: jest.fn(() => Promise.resolve(current)),
-    requestPermission: jest.fn(() => {
-      current = "granted";
-      return Promise.resolve(current);
-    }),
-    prepareChannels: jest.fn(() => Promise.resolve()),
-    getPushToken: jest.fn(() => Promise.resolve("ExponentPushToken[client]")),
-    onPushTokenChange: subscribe(listeners.token),
-    onNotificationReceived: subscribe(listeners.received),
-    onNotificationTap: subscribe(listeners.tap),
-    takeLaunchTap: jest.fn(() => Promise.resolve(null)),
-    setBadgeCount: jest.fn(() => Promise.resolve()),
-    openSettings: jest.fn(() => Promise.resolve()),
-  };
-  return { listeners, platform };
 }

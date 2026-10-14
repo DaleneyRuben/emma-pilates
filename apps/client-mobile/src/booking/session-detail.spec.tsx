@@ -1,8 +1,8 @@
 import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, createMemoryPushPlatform } from "@pilates/mobile-core";
 
 import App from "../../App";
-import { createClientRuntime, fakePushPlatform, jsonResponse, routeFetcher } from "../test-support";
+import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
 import { boliviaCivilDate, civilDateRange } from "@pilates/mobile-core";
 
 jest.setTimeout(20_000);
@@ -170,7 +170,7 @@ describe("Client Session detail", () => {
 
   // ADR-0067: the explanation follows the action that makes push useful.
   it("offers notifications once the Booking is confirmed", async () => {
-    const { platform } = fakePushPlatform("undetermined");
+    const { platform } = createMemoryPushPlatform("undetermined");
     const { screen } = await openDetail(
       {
         "POST /api/v1/sessions/session-1/bookings": () => jsonResponse({ id: "booking-1" }, 201),
@@ -188,7 +188,7 @@ describe("Client Session detail", () => {
   });
 
   it("offers notifications once the Client joins the Waitlist", async () => {
-    const { platform } = fakePushPlatform("undetermined");
+    const { platform } = createMemoryPushPlatform("undetermined");
     const { screen } = await openDetail(
       {
         "POST /api/v1/sessions/session-1/waitlist-entries": () =>

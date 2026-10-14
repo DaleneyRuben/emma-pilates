@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, createMemoryPushPlatform } from "@pilates/mobile-core";
 
-import { fakePushPlatform, jsonResponse, routeFetcher } from "../test-support";
+import { jsonResponse, routeFetcher } from "../test-support";
 import {
   availability,
   baseRoutes,
@@ -85,7 +85,7 @@ describe("Client Evaluations", () => {
   });
 
   it("offers notifications once the Evaluation is confirmed", async () => {
-    const { platform } = fakePushPlatform("undetermined");
+    const { platform } = createMemoryPushPlatform("undetermined");
     const bookedStart = boliviaInstant(firstDay, "09:45");
     const fetcher = routeFetcher(
       baseRoutes({
