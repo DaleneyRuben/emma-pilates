@@ -2850,7 +2850,7 @@ one file per variant (`readable` and `thumbnail` for a receipt, `display` and
 the `pending/<purpose>/<id>` original is gone. A Promotion image smaller than
 1200×675 ends `failed` with `image_dimensions_too_small`; an animated image
 with `image_animated_not_allowed`. Failed originals stay under `pending/` until
-the 24-hour cleanup (Test 13's worker) removes them.
+the three-day cleanup (Test 13's worker, ADR-0089) removes them.
 
 ### B. The receipt variants in the review screens
 
@@ -2950,7 +2950,7 @@ crop).
 
 Deleted Promotions stay archived in `booking.promotions`; the fixtures
 command does not remove them. A refused upload leaves nothing behind; one the
-worker refused waits under `pending/` for the 24-hour cleanup (Test 13).
+worker refused waits under `pending/` for the three-day cleanup (Test 13).
 
 ## What you cannot test yet
 

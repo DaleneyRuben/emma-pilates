@@ -1,6 +1,6 @@
 # Delete abandoned uploads after one day
 
-Status: accepted
+Status: accepted; the one-day window is replaced by three days in [ADR-0089](./0089-delete-abandoned-uploads-after-three-days.md)
 
 A pending upload intent and every object or failed processing artifact owned by it are eligible for deletion 24 hours after the intent was created unless finalization has successfully attached the resulting image to its intended resource. Renewing an expired signed URL does not extend this cleanup deadline. The cleanup process is idempotent, treats an already-missing object as success, and removes both the pending object and its obsolete database state.
 

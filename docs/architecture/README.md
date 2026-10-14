@@ -56,7 +56,7 @@ Accepted architecture decisions:
 - [x] Limit signed upload URLs to 15 minutes and private-view URLs to five minutes.
 - [x] Accept JPEG, PNG, and WebP with purpose-specific dimensions and 10 MB receipt, 5 MB profile-photo, and 20 MB Promotion limits.
 - [x] Asynchronously decode and rebuild safe image variants, remove metadata and temporary originals, and omit a separate antivirus service initially.
-- [x] Delete pending uploads and failed processing artifacts that remain unattached after 24 hours.
+- [x] Delete pending uploads and failed processing artifacts that remain unattached after three days, matching R2's `pending/` lifecycle rule (ADR-0089).
 - [x] Retain a transfer receipt while its Payment is pending, then delete it at the later of 45 days after upload or seven days after the decision.
 - [x] Delete profile-photo and Promotion-image variants immediately after removal, replacement, or owner deletion.
 - [x] Never physically delete a database row; every removal is a soft delete, and only object-storage bytes are erased (ADR-0086).
