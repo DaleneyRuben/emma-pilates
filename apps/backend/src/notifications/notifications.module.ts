@@ -21,6 +21,10 @@ import {
   deviceRegistration,
 } from './devices/devices.controller';
 import { createPrismaAccountDevices } from './devices/prisma-account-devices';
+import {
+  notificationRecorderProvider,
+  NOTIFICATION_RECORDER,
+} from './notification-recorder.provider';
 import { createNotificationStore } from './prisma-notification-store';
 
 const notificationStore = Symbol('notificationStore');
@@ -32,7 +36,9 @@ type Devices = ReturnType<typeof createPrismaAccountDevices>;
 @Module({
   imports: [SystemIdentityModule],
   controllers: [NotificationsController, DevicesController],
+  exports: [NOTIFICATION_RECORDER],
   providers: [
+    notificationRecorderProvider,
     {
       provide: accountDevices,
       inject: [PRISMA_CLIENT],
