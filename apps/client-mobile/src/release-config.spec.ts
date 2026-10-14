@@ -10,6 +10,20 @@ describe("client release configuration", () => {
     expect(appConfig.expo.runtimeVersion).toEqual({ policy: "appVersion" });
   });
 
+  it("is linked to its own EAS project in the studio's Expo organization", () => {
+    expect(appConfig.expo).toMatchObject({
+      owner: "emma-pilates",
+      slug: "emma-pilates-client",
+      extra: {
+        eas: {
+          projectId: expect.stringMatching(
+            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+          ),
+        },
+      },
+    });
+  });
+
   it("builds a development client, an internal preview, and a store production binary on separate update channels", () => {
     const { build } = easConfig;
 
