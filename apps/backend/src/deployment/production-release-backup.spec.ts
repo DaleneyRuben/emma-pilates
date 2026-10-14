@@ -2,13 +2,25 @@ import {
   build,
   fakeNorthflank,
   fakeReadiness,
+  minute,
   release,
   sha,
 } from './production-release-test-support';
 
 const ready = () => fakeReadiness([{ status: 200, release: sha }]);
 
+// The API and the worker release as in EXT-002's spec, so the backup stage
+// is reached.
 const backupAnswers = {
+  startServiceBuild: [
+    build('api-build-1', 'PENDING'),
+    build('worker-build-1', 'PENDING'),
+  ],
+  getServiceBuild: [
+    build('api-build-1', 'SUCCESS'),
+    build('worker-build-1', 'SUCCESS'),
+  ],
+  getServiceDeployment: [{ status: 'COMPLETED', transitionedAt: minute }],
   startJobBuild: [
     build('job-build-1', 'PENDING'),
     build('backup-build-1', 'PENDING'),
@@ -51,7 +63,7 @@ describe('releaseProduction with the backup job (EXT-009)', () => {
   });
 
   it('skips the backup job while none is configured', async () => {
-    const { northflank, journal } = fakeNorthflank();
+    const { northflank, journal } = fakeNorthflank(backupAnswers);
 
     const { result, log } = release(northflank, ready().fetch, sha, 'worker');
 
