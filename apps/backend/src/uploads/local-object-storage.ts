@@ -1,10 +1,9 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, resolve, sep } from 'node:path';
+import { assertStorageKey, type ObjectStorage } from './object-storage';
 
 const resolveKey = (root: string, key: string): string => {
-  if (!/^[a-z0-9][a-z0-9/_-]*$/.test(key)) {
-    throw new Error('storage_key_invalid');
-  }
+  assertStorageKey(key);
 
   const resolvedRoot = resolve(root);
   const path = resolve(resolvedRoot, key);
@@ -14,7 +13,7 @@ const resolveKey = (root: string, key: string): string => {
   return path;
 };
 
-export class LocalObjectStorage {
+export class LocalObjectStorage implements ObjectStorage {
   constructor(private readonly root: string) {}
 
   async put(key: string, bytes: Buffer): Promise<void> {
