@@ -194,7 +194,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `TRUSTED_PROXY_HOPS` | Northflank `api` service (1) | Render (3) | 0 | Measured, never assumed (ADR-0087) |
 | `ERROR_REPORTING_DSN` | Northflank `production` | Render | commented in `.env` | Write-only; one Better Stack application for every environment |
 | `WORKER_HEARTBEAT_URL` | not set (no worker) | not set | commented in `.env` | Better Stack heartbeat, paused |
-| `TRANSFER_*` | Northflank `production`: `PENDIENTE` texts, QR file path | defaults | defaults | PAY-003 makes the QR the only instruction |
+| `TRANSFER_QR_IMAGE_PATH` | Northflank `production` (`/etc/secrets/transfer-qr.png`) | default | default (`.data/transfer-qr.png`) | The only transfer instruction since PAY-003; the three bank-detail variables were deleted from `production` on 2026-10-14 after release `5642443a` |
 | `NODE_ENV` | `production` (image default) | Render (`development`) | `.env` | |
 | `RELEASE_ID` | from `NF_GIT_SHA` at build | unset (`local`) | unset | |
 | `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | Vercel Preview | — | Lets Vercel use the pinned pnpm |
