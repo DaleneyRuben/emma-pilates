@@ -1,0 +1,79 @@
+name: release production
+
+# EXT-008 (ADR-0052, ADR-0080): once ci passes on a push to main, build that
+# commit for Northflank's migrate job, run it, build the same commit on the api
+# service, wait for /health/ready to report it, and smoke check it. Northflank
+# keeps CI off on both, so nothing else deploys a push.
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full commit hash on main with a green ci run (empty for main's head)
+        required: false
+
+permissions:
+  contents: read
+  actions: read
+
+# A running release is never cancelled mid-migration; GitHub keeps only the
+# newest pending run, and the release command skips a commit that is no longer
+# main's head.
+concurrency:
+  group: production-release
+  cancel-in-progress: false
+
+env:
+  # prisma generate in the setup action reads it; nothing connects to it
+  DATABASE_URL: postgresql://nobody@127.0.0.1:1/pilates_ci_unreachable
+  PRODUCTION_API_URL: https://p01--api--mmps25fn9k9x.code.run
+
+jobs:
+  release:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Choose the commit
+        id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          DISPATCH_SHA: ${{ inputs.sha }}
+        run: |
+          main_head=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          sha=${RUN_SHA:-${DISPATCH_SHA:-$main_head}}
+          # a hand-started release still needs ci to have passed on main
+          green=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$sha&branch=main&event=push&status=success" --jq .total_count)
+          if [ "$green" = 0 ]; then
+            echo "::error::no successful ci run on main for $sha"
+            exit 1
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "main_head=$main_head" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.commit.outputs.sha }}
+      - uses: ./.github/actions/setup
+      - name: Migrate, then release the API
+        id: release
+        env:
+          NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_API_TOKEN }}
+          NORTHFLANK_PROJECT_ID: default
+          NORTHFLANK_JOB_ID: migrate
+          NORTHFLANK_SERVICE_ID: api
+          RELEASE_SHA: ${{ steps.commit.outputs.sha }}
+          MAIN_HEAD: ${{ steps.commit.outputs.main_head }}
+        run: pnpm --filter @pilates/backend release:production
+      - name: Smoke check the release
+        if: steps.release.outputs.outcome == 'released'
+        env:
+          SMOKE_BASE_URL: ${{ env.PRODUCTION_API_URL }}
+          SMOKE_EXPECTED_RELEASE: ${{ steps.commit.outputs.sha }}
+        run: pnpm --filter @pilates/backend smoke
