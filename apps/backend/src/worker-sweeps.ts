@@ -13,10 +13,11 @@ export type SweepGroup = {
 type SweepDependencies = {
   serviceVersion: string;
   emit(record: unknown): void;
+  reportError(error: unknown, context: { job: string }): void;
 };
 
 // Each group runs once at startup, then on its interval. A failed step is
-// logged and the worker keeps running (EXT-002).
+// logged and reported, and the worker keeps running (EXT-002, EXT-011).
 export const startSweeps = async (
   groups: SweepGroup[],
   dependencies: SweepDependencies,
@@ -24,7 +25,8 @@ export const startSweeps = async (
   const runStep = (step: SweepStep) =>
     step.execute().then(
       () => undefined,
-      () => {
+      (error: unknown) => {
+        dependencies.reportError(error, { job: step.job });
         dependencies.emit({
           event: `${step.job}_failed`,
           serviceVersion: dependencies.serviceVersion,

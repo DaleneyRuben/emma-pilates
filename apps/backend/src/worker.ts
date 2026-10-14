@@ -15,6 +15,10 @@ import {
   type StartablePgBoss,
 } from './jobs/pg-boss-runtime';
 import { startWorkerHeartbeat } from './jobs/worker-heartbeat';
+import {
+  noErrorReporting,
+  type ErrorReporter,
+} from './monitoring/error-reporting';
 import { startSweeps } from './worker-sweeps';
 
 const pendingAccountCleanupIntervalMs = 60 * 60 * 1_000;
@@ -86,12 +90,14 @@ type WorkerDependencies = {
   };
   serviceVersion: string;
   emit(record: unknown): void;
+  errorReporter?: ErrorReporter;
   pingHeartbeat?: () => Promise<void>;
 };
 
 export const startWorker = async (
   dependencies: WorkerDependencies,
 ): Promise<() => Promise<void>> => {
+  const errorReporter = dependencies.errorReporter ?? noErrorReporting;
   await startInstalledPgBoss(dependencies.boss);
   if (dependencies.authenticationEmail === null) {
     dependencies.emit({
@@ -206,7 +212,11 @@ export const startWorker = async (
         ],
       },
     ],
-    dependencies,
+    {
+      serviceVersion: dependencies.serviceVersion,
+      emit: (record) => dependencies.emit(record),
+      reportError: (error, context) => errorReporter.report(error, context),
+    },
   );
 
   const getQueueCounts = async (queue: string) => {
