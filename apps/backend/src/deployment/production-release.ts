@@ -225,6 +225,24 @@ export async function releaseProduction(
     log(`${workerServiceId} runs ${sha}`);
   }
 
+  // The scheduled backup job (EXT-009) runs the last released commit's image;
+  // a release builds it and never runs it.
+  async function buildBackupJob(): Promise<void> {
+    const { backupJobId } = input;
+    if (backupJobId === null) {
+      log('no backup job configured; backup skipped');
+      return;
+    }
+    const backupBuild = await start(
+      'backup_build',
+      `${backupJobId} build`,
+      () => northflank.startJobBuild(backupJobId, sha),
+    );
+    await awaitBuild('backup_build', backupJobId, backupBuild, (buildId) =>
+      northflank.getJobBuild(backupJobId, buildId),
+    );
+  }
+
   try {
     const jobBuild = await start('migrate_build', `${jobId} build`, () =>
       northflank.startJobBuild(jobId, sha),
@@ -282,6 +300,7 @@ export async function releaseProduction(
     log(`readiness reports ${sha}`);
 
     await releaseWorker();
+    await buildBackupJob();
     return { outcome: 'released' };
   } catch (error) {
     if (error instanceof ReleaseStopped) {
