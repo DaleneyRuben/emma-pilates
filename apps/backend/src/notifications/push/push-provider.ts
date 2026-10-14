@@ -1,4 +1,7 @@
 // The project-owned push interface (ADR-0025); Expo stays in its adapter.
+export const maxMessagesPerRequest = 100;
+export const maxReceiptIdsPerRequest = 1000;
+
 export type PushData = {
   notificationId: string;
   type: string;

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import {
+  maxMessagesPerRequest,
+  maxReceiptIdsPerRequest,
   PermanentPushError,
   TransientPushError,
   type PushMessage,
@@ -10,8 +12,6 @@ import {
 
 const sendUrl = 'https://exp.host/--/api/v2/push/send';
 const receiptsUrl = 'https://exp.host/--/api/v2/push/getReceipts';
-export const maxMessagesPerRequest = 100;
-export const maxReceiptIdsPerRequest = 1000;
 
 const errorDetail = z.object({
   status: z.literal('error'),
