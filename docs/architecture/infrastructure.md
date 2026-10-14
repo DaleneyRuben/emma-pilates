@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-13** (gate 4). This page holds **no secret values**:
+Last verified **2026-10-14** (EXT-008). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -25,7 +25,8 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
             (DigitalOcean US West)                            (AWS US East 2, Ohio)
 
  Better Stack: production readiness every 3 min, API error reports from both APIs, worker heartbeat (paused)
- GitHub Actions: CI on every pull request and main, preview cleanup, preview-origin registration
+ GitHub Actions: CI on every pull request and main, production release after CI on main,
+                 preview cleanup, preview-origin registration
 ```
 
 ## Environments
@@ -40,7 +41,7 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
 | `NODE_ENV` | `production` | `development` | `development` |
 | Email | none (no worker) | none (no worker) | `LocalEmailCapture` under `apps/backend/.data/email-capture` |
 | Images | upload refused (`501`) | local disk, lost on redeploy | `apps/backend/.data/uploads` |
-| Release | by hand, [runbook](../runbooks/production-release.md) | Render auto-deploys every push to `main` | — |
+| Release | automatic after CI on `main` (`release production` workflow), [runbook](../runbooks/production-release.md) | Render auto-deploys every push to `main` | — |
 
 Every environment runs PostgreSQL 18: production (Aiven 18.6), shared
 development (Neon 18.6), CI (`postgres:18-alpine`), the integration suite's
@@ -73,7 +74,8 @@ Every account belongs to the project owner and is shared with no one else.
 - **Service `api`:** combined service (builds and runs), repository
   `DaleneyRuben/emma-pilates`, branch `main`, Dockerfile
   `/apps/backend/Dockerfile`, build context `/`; **CI off** (pushes never
-  build), **CD on** (a finished build deploys). Plan nf-compute-20
+  build; the `release production` workflow starts builds), **CD on** (a
+  finished build deploys). Plan nf-compute-20
   (0.2 vCPU, 512 MB, the largest free plan), 1 instance, uses about 290 MB.
   Port 3100 public HTTP as `p01` → https://p01--api--mmps25fn9k9x.code.run.
   Readiness probe `/health/ready` (delay 10 s, period 10 s, timeout 5 s, 3
@@ -82,7 +84,13 @@ Every account belongs to the project owner and is shared with no one else.
   (its own HTTPS address until the domain exists) and `TRUSTED_PROXY_HOPS=1`.
 - **Job `migrate`:** manual job, same repository, branch, and Dockerfile
   (Northflank cannot point a job at a combined service's image), nf-compute-20,
-  command `node_modules/.bin/prisma migrate deploy`, retry limit 0, CI off.
+  command `node_modules/.bin/prisma migrate deploy`, retry limit 0, CI off,
+  CD on (a finished build becomes the image the next run uses).
+- **API token `github-actions-release`:** team-level, role
+  `github-production-release` (project `default` only; Services → General
+  Read and Update; Jobs → General Read, Update, Run Job), 1-year lifetime
+  from 2026-10-14. It is the GitHub secret `NORTHFLANK_API_TOKEN`; rotation
+  is in the [runbook](../runbooks/production-release.md#the-deploy-token).
 - **Secret group `production`:** runtime scope, unrestricted (every service
   and job in the project receives it). Holds everything in the «Settings»
   table below marked Northflank, plus two files:
@@ -169,6 +177,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `NODE_ENV` | `production` (image default) | Render (`development`) | `.env` | |
 | `RELEASE_ID` | from `NF_GIT_SHA` at build | unset (`local`) | unset | |
 | `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | Vercel Preview | — | Lets Vercel use the pinned pnpm |
+| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `release production` workflow; expires around 2027-10-14 |
 | `RENDER_API_KEY` | — | GitHub repository secret | — | `preview-origins` workflow |
 | `VERCEL_TOKEN`, `VERCEL_PROJECT_ID` | — | GitHub repository secrets | — | `preview-origins` and `cleanup-preview` workflows |
 
@@ -182,9 +191,13 @@ Values never go in the repository or a chat. «Mac» means the user's own
   origins and writes them to Render's `ADMIN_WEB_TRUSTED_ORIGINS` (WEB-019).
 - **`.github/workflows/cleanup-preview.yml`:** deletes a closed pull
   request's Vercel previews (EXT-007).
+- **`.github/workflows/release-production.yml`:** after `ci` passes on a
+  push to `main` (or by hand with a commit), builds and runs Northflank's
+  `migrate` job, then builds `api`, waits for `/health/ready` to report the
+  commit, and runs the smoke check (EXT-008).
 - **Deployments:** Vercel deploys previews and `main`; Render deploys `main`;
-  Northflank deploys only when a build is started by hand (EXT-008 automates
-  it).
+  Northflank deploys `main` through the `release production` workflow, never
+  on a push by itself.
 
 ## Monitoring
 
@@ -206,7 +219,6 @@ Values never go in the repository or a chat. «Mac» means the user's own
   (gates 5 and 7).
 - No portable backup or restore drill (EXT-009): no real Client data before
   the first drill passes.
-- Releases are manual (EXT-008).
 - No domain: production uses the providers' hostnames.
 
 ## Keeping this current

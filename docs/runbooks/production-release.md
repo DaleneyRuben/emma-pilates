@@ -2,8 +2,9 @@
 
 How a backend commit reaches production on Northflank with its migrations
 first ([ADR-0052](../adr/0052-run-backend-processes-from-one-deployable-package.md),
-[ADR-0080](../adr/0080-separate-health-and-deployment-checks.md)). Until the
-deploy workflow exists (EXT-008), every release is these steps by hand.
+[ADR-0080](../adr/0080-separate-health-and-deployment-checks.md)). Since
+EXT-008 (2026-10-14) a merge to `main` releases itself through the
+`release production` workflow; the steps by hand below are the fallback.
 
 ## What runs where
 
@@ -16,10 +17,80 @@ deploy workflow exists (EXT-008), every release is these steps by hand.
 | Admin web | Vercel project `emma-pilates-admin`, production alias https://emma-pilates-admin.vercel.app | `vercel.json` sends that host's `/api/v1` to the Northflank API |
 | Monitoring | Better Stack «Production API readiness», every 3 minutes | Error tracking `emma-pilates-api` through `ERROR_REPORTING_DSN` |
 
-CI is **off** on both the service and the job, so a push never deploys. CD is
-on for the service, which means a finished build of `api` deploys at once.
+CI is **off** on both the service and the job, so a push never builds by
+itself; only the workflow (or a person) starts a build. CD is **on** for both:
+a finished build of `api` deploys at once, and a finished build of `migrate`
+becomes the image its next run uses. Leave all four toggles as they are.
 
-## Release a commit
+## Release a commit (automatic)
+
+Merge the pull request. When `ci` passes on the push to `main`,
+[`.github/workflows/release-production.yml`](../../.github/workflows/release-production.yml)
+starts within seconds and runs
+`pnpm --filter @pilates/backend release:production`
+(`apps/backend/src/deployment/`), which:
+
+1. skips the commit as **superseded** if `main` has moved on (its own release
+   carries these changes, and an older commit must never roll production
+   back);
+2. builds the commit on the `migrate` job and waits for it (at most 20 min);
+3. runs `migrate` and waits for `SUCCESS` (at most 10 min);
+4. only then builds the same commit on the `api` service (at most 20 min);
+   CD deploys it and the readiness probe keeps the old instance serving
+   until the new one is ready;
+5. waits until `/health/ready` reports the commit (at most 10 min);
+6. runs `pnpm smoke` with `SMOKE_EXPECTED_RELEASE` set to the commit.
+
+Every step starts only after the one before it succeeded, and the first
+failure stops the release. The job's own limit is 60 minutes. Releases queue
+under the `production-release` concurrency group without cancelling: a
+release in progress is never interrupted mid-migration, and of several
+pending merges only the newest is released. The run's summary names the
+outcome; GitHub emails the operator when it fails. The first automatic
+release (`87fe95d2`, 2026-10-14) took 5 m 6 s: migrate build 1 m 22 s, run
+31 s, api build 1 m 22 s, readiness 31 s, smoke 10 s.
+
+To watch one: `gh run list --workflow release-production.yml --limit 3`, then
+`gh run view <id> --log | grep -E "migrate|api build|readiness|outcome|passed"`.
+
+## When a release fails
+
+The log line names the stage, the Northflank build or run, and its status
+(and Northflank's message for a failed build). Nothing is rolled back
+automatically (ADR-0080):
+
+| Failed at | Production is running | What to do |
+| --- | --- | --- |
+| migrate build | the previous release, schema untouched | Read the build's log in Northflank (Jobs → `migrate` → Builds), fix, merge again |
+| migrate run | the previous release; the schema may be partly migrated | Read the run's Logs; fix the migration forward, never edit an applied one |
+| api build | the previous release on the new schema | Read the build's log (Services → `api` → Builds); fix and merge again |
+| readiness | the previous release, or a new one that never became ready | Read `api`'s Logs: a `ZodError` names a missing setting, and readiness stays `503` until every migration shipped in the image is applied |
+| smoke | the new release, marked unsuccessful | Read the smoke JSON in the run's log; decide on a fix forward or the incident runbook |
+| any stage with `Northflank answered 401` or `403` | unchanged | The token expired or lost a permission; see «The deploy token» |
+
+To release again without a new merge, run the workflow by hand: Actions →
+`release production` → **Run workflow** (or
+`gh workflow run release-production.yml -f sha=<full hash>`). The commit must
+have a green `ci` run from a push to `main`; an empty `sha` means main's head.
+
+## The deploy token
+
+The workflow authenticates with the repository secret `NORTHFLANK_API_TOKEN`:
+Northflank API token `github-actions-release` (team `emma-pilates`, created
+2026-10-14, lifetime 1 year, so it expires around **2027-10-14**). It carries
+the access role `github-production-release`, limited to project `default`
+with Services → General Read and Update, and Jobs → General Read, Update,
+and Run Job; nothing on secrets, addons, or the team. A token can only use a
+role its creator belongs to, so the user is a member of that role.
+
+To rotate it: Northflank → Team → **API tokens** → create a token with the
+same role and lifetime; copy it with its copy icon; run
+`gh secret set NORTHFLANK_API_TOKEN --repo DaleneyRuben/emma-pilates` and
+paste at the hidden prompt; then delete the old token. Never print it.
+
+## Release a commit by hand
+
+Only when the workflow cannot run (GitHub Actions down, token lapsed):
 
 1. Merge the pull request; wait for CI on `main` to pass.
 2. **Migrations first.** Northflank → Jobs → `migrate` → Latest commits → on
@@ -27,9 +98,9 @@ on for the service, which means a finished build of `api` deploys at once.
    build is green, **Run**. Open the run's Logs: it must end with «All
    migrations have been successfully applied.» or «No pending migrations to
    apply.». If it fails, stop: the API is still on the previous release.
-3. **Then the API.** Services → `api` → Latest commits → **Rebuild** on the
-   same commit. CD deploys it when the build finishes; the readiness probe
-   keeps the old instance serving until the new one is ready.
+3. **Then the API.** Services → `api` → Commits → **Rebuild** on the same
+   commit. CD deploys it when the build finishes; the readiness probe keeps
+   the old instance serving until the new one is ready.
 4. **Check the release** from the repository root:
 
    ```sh
@@ -42,7 +113,7 @@ on for the service, which means a finished build of `api` deploys at once.
    `release` because Northflank passes it to the image as `NF_GIT_SHA`.
 
 Every migration must keep the previous API release working (expand first,
-contract in a later release), because step 2 runs while that release still
+contract in a later release), because migrations run while that release still
 serves traffic.
 
 ## Change a setting
