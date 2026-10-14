@@ -3577,3 +3577,16 @@ and against a TLS PostgreSQL 18 signed by a throwaway CA, with production's
 `/etc/secrets/emma-ca.pem` and both the row count (node-pg) and `pg_dump`
 refused a wrong CA (`certificate verify failed`). In production the image
 refuses to start without an HTTPS storage endpoint and `BACKUP_HEARTBEAT_URL`.
+
+### E. Production
+
+1. Northflank → job `backup` → **Run**. The run ends Success in under 30 s,
+   and its log has one `database_backup_succeeded` line with the key, the
+   size, the SHA-256, and the row counts (the first run, 2026-10-14: 286,411
+   bytes).
+2. Cloudflare → R2 → `emma-pilates-prod-backups` shows the dump under
+   `daily/` and the month's copy under `monthly/`, both the logged size.
+3. Better Stack «Database backup» shows the heartbeat a minute later.
+4. The weekly check and the restore drill run from the Mac with the
+   read-only token, as the
+   [runbook](./runbooks/backups-and-restore-drills.md) shows.
