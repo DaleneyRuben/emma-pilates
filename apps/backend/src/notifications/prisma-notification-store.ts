@@ -22,6 +22,11 @@ export type NotificationRecorder = (
   notification: NewNotification,
 ) => Promise<void>;
 
+export const createNotificationRecorder =
+  (boss: unknown): NotificationRecorder =>
+  () =>
+    Promise.reject(new Error(`not implemented ${typeof boss}`));
+
 const categories: Record<NotificationCategory, PrismaNotificationCategory> = {
   booking_schedule: PrismaNotificationCategory.BOOKING_SCHEDULE,
   reminder: PrismaNotificationCategory.REMINDER,
