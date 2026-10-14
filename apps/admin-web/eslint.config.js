@@ -33,8 +33,14 @@ export default tseslint.config(
     },
   },
   {
-    // The Playwright suite, its config, and the Vercel middleware run in Node.
-    files: ["e2e/**/*.ts", "playwright.config.ts", "middleware.ts"],
+    // The Playwright suite, its config, and the Vercel middleware and
+    // functions run in Node.
+    files: [
+      "e2e/**/*.ts",
+      "playwright.config.ts",
+      "middleware.ts",
+      "api/**/*.ts",
+    ],
     languageOptions: { globals: globals.node },
     rules: { "react-refresh/only-export-components": "off" },
   },

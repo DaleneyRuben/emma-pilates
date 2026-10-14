@@ -109,6 +109,8 @@ export function startErrorReporting(
   }
   sdk.init({
     dsn: settings.dsn,
+    // Same origin (EXT-012): content blockers refuse the ingest host itself.
+    tunnel: "/api/monitoring/envelope",
     environment: settings.environment,
     release: settings.release,
     // No replay, breadcrumbs, console capture, or page context: only errors

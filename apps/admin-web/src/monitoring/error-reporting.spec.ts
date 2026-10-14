@@ -36,6 +36,8 @@ describe("admin web error reporting (EXT-011)", () => {
 
     expect(sdk.init).toHaveBeenCalledWith({
       dsn: settings.dsn,
+      // EXT-012: same origin, so content blockers let the events through.
+      tunnel: "/api/monitoring/envelope",
       environment: "production",
       release: "e991a5aa",
       defaultIntegrations: false,

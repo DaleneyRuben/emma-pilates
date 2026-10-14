@@ -3613,7 +3613,13 @@ unhandled rejections, and render errors (including the startup error page)
 as service `admin-web`, only when `VITE_ERROR_REPORTING_DSN` is set at build
 time (Vercel Production only); 4xx API answers are never reported, and no
 message, page URL, user, or breadcrumbs leave the browser. Stacks are
-minified: no source maps are uploaded.
+minified: no source maps are uploaded. Since EXT-012 the browser sends its
+events to its own origin, `/api/monitoring/envelope`, and a Vercel Function
+(the dev server locally) forwards them to the DSN's ingest, so Brave Shields
+and ad blockers no longer drop them. The function forwards only envelopes
+addressed to the configured DSN (403 otherwise), only POST (405), only up to
+64 KB (413), and nothing at all without a DSN (404); it sends the body alone,
+without cookies, browser headers, or the client's address.
 
 The worker's 30-second heartbeat pings Better Stack «Worker heartbeat» only
 while the worker makes progress (ADR-0066): the oldest ready
@@ -3698,13 +3704,25 @@ ping, and logs `worker_progress_resumed` when they clear.
    `setTimeout(() => { throw new TypeError('x') }); Promise.reject(new RangeError('y'))`:
    two events arrive (`TypeError` from `onerror`, `RangeError` from
    `onunhandledrejection`), tagged `service` `admin-web`, without the
-   message or the page URL. Stop the API and reload `/`: the startup error
-   page appears and one `ApiError` event arrives through React's root error
-   handler.
-6. Stop everything and `dropdb pilates_test_monitoring`.
+   message or the page URL. The receiver logs each request with
+   `user-agent` `node` and `content-type` `application/x-sentry-envelope`
+   and no `origin` or `referer`: the dev server's tunnel sent it, not the
+   browser, whose network panel shows only
+   `POST http://localhost:5173/api/monitoring/envelope`. Stop the API and
+   reload `/`: the startup error page appears and one `ApiError` event
+   arrives through React's root error handler.
+6. **The tunnel refuses other destinations.** With the dev server still up:
+   `curl -s -o /dev/null -w "%{http_code}\n" http://localhost:5173/api/monitoring/envelope`
+   prints `405`, and
+   `curl -s -o /dev/null -w "%{http_code}\n" -X POST --data-binary $'{"dsn":"http://publickey@evil.example/2"}\n{}' http://localhost:5173/api/monitoring/envelope`
+   prints `403`; the receiver prints nothing for either.
+7. Stop everything and `dropdb pilates_test_monitoring`.
 
 Verified on 2026-10-14 (EXT-011): every step above as described, with 7
 events in all and none holding an email, a message, a URL, or request data.
+Step 5 through the tunnel and step 6 verified on 2026-10-14 (EXT-012) at
+1440 and 420 px: 4 events, all sent by the dev server, none holding an
+email, a message, or a URL.
 
 ### B. In production
 
@@ -3713,7 +3731,14 @@ events in all and none holding an email, a message, a URL, or request data.
    `service` tag `worker`.
 2. The admin web reports only when Vercel Production has
    `VITE_ERROR_REPORTING_DSN`; a change to it needs a redeploy, because Vite
-   inlines it at build time.
+   inlines it at build time and the tunnel function reads it at deploy time.
+   With Brave Shields **up** on https://emma-pilates-admin.vercel.app, run
+   `setTimeout(() => { throw new TypeError('tunnel check') })` in the
+   console: the Network tab shows `POST /api/monitoring/envelope` answered
+   `200` (nothing to `betterstackdata.com`), and the error appears in
+   `emma-pilates-admin` within a minute, environment `production`, Users 0,
+   no message. `curl -s -o /dev/null -w "%{http_code}\n" -X POST --data-binary $'{"dsn":"https://k@evil.example/1"}\n{}' https://emma-pilates-admin.vercel.app/api/monitoring/envelope`
+   prints `403`.
 3. «Worker heartbeat» goes Down when the worker stops making progress, not
    only when it stops; the worker's logs in Northflank show
    `worker_progress_stalled` with the reasons.
