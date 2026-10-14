@@ -14,6 +14,7 @@ import {
   startInstalledPgBoss,
   type StartablePgBoss,
 } from './jobs/pg-boss-runtime';
+import type { SqlExecutor } from './jobs/oldest-ready-jobs';
 import { startWorkerHeartbeat } from './jobs/worker-heartbeat';
 import {
   noErrorReporting,
@@ -44,6 +45,7 @@ export interface WorkerBoss extends StartablePgBoss {
     name: string,
     options: { force: true },
   ): Promise<QueueStatsSnapshot[]>;
+  getDb(): SqlExecutor;
   stop(options: { graceful: true }): Promise<void>;
 }
 

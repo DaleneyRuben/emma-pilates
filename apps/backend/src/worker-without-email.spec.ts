@@ -20,6 +20,7 @@ describe('worker without an email provider', () => {
       start: jest.fn().mockResolvedValue(undefined),
       work,
       getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
       stop: jest.fn().mockResolvedValue(undefined),
     };
     const emit = jest.fn();
