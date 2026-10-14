@@ -1,8 +1,7 @@
 import type { Provider } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { Environment } from '../../config/environment';
 import type { PrismaClient } from '../../generated/prisma/client';
-import { LocalObjectStorage } from '../../uploads/local-object-storage';
+import type { ObjectStorage } from '../../uploads/object-storage';
+import { OBJECT_STORAGE } from '../../uploads/object-storage.module';
 import { createPrismaPromotionCommands } from './prisma-promotion-commands';
 import {
   promotionControllers,
@@ -17,14 +16,12 @@ export const promotionsWiring = {
   providers: (prismaToken: symbol): Provider[] => [
     {
       provide: promotionObjectStorage,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        new LocalObjectStorage(config.getOrThrow('UPLOADS_LOCAL_STORAGE_ROOT')),
+      useExisting: OBJECT_STORAGE,
     },
     {
       provide: promotionOperations,
       inject: [prismaToken, promotionObjectStorage],
-      useFactory: (prisma: PrismaClient, storage: LocalObjectStorage) =>
+      useFactory: (prisma: PrismaClient, storage: ObjectStorage) =>
         createPrismaPromotionCommands(prisma, storage, {
           now: () => new Date(),
         }),

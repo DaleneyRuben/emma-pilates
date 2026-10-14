@@ -13,11 +13,13 @@ import {
 import { BookingModule } from './booking/booking.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SystemIdentityModule } from './system-identity/system-identity.module';
+import { ObjectStorageModule } from './uploads/object-storage.module';
 import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
     DatabaseModule,
+    ObjectStorageModule,
     HealthModule,
     SystemIdentityModule,
     BookingModule,

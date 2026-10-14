@@ -1,8 +1,6 @@
 import type { Provider } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { Environment } from '../../config/environment';
 import type { PrismaClient } from '../../generated/prisma/client';
-import { LocalObjectStorage } from '../../uploads/local-object-storage';
+import { OBJECT_STORAGE } from '../../uploads/object-storage.module';
 import {
   readClientPhoto,
   removeClientPhoto,
@@ -23,9 +21,7 @@ export const clientPhotoWiring = {
   providers: (prismaToken: symbol): Provider[] => [
     {
       provide: clientPhotoObjectStorage,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        new LocalObjectStorage(config.getOrThrow('UPLOADS_LOCAL_STORAGE_ROOT')),
+      useExisting: OBJECT_STORAGE,
     },
     {
       provide: clientPhotoOperations,

@@ -15,7 +15,7 @@ import {
   type ImagePurpose,
 } from './image-purpose';
 import { buildImageVariants } from './image-variants';
-import type { LocalObjectStorage } from './local-object-storage';
+import type { ObjectStorage } from './object-storage';
 import { processFinalizeUploadJob } from './process-finalize-upload-job';
 import { putPendingUploadObject } from './put-pending-upload-object';
 import {
@@ -61,7 +61,7 @@ const stateFromPrisma: Record<
 
 export function createPrismaUploadCommands(
   prisma: Prisma.TransactionClient,
-  storage: LocalObjectStorage,
+  storage: ObjectStorage,
   now: () => Date,
   boss: Pick<PgBoss, 'send'>,
 ) {
@@ -163,7 +163,7 @@ export function createPrismaUploadCommands(
 
 export function createFinalizeUploadJobCommands(
   prisma: Prisma.TransactionClient,
-  storage: LocalObjectStorage,
+  storage: ObjectStorage,
   now: () => Date,
 ) {
   return {
@@ -265,7 +265,7 @@ const isFinalizeUploadResponse = (
 
 export function createFinalizeUploadIdempotent(
   prisma: PrismaClient,
-  storage: LocalObjectStorage,
+  storage: ObjectStorage,
   now: () => Date,
   boss: Pick<PgBoss, 'send'>,
 ) {

@@ -16,7 +16,7 @@ import { CleanupExpiredPendingAccounts } from './system-identity/registration/cl
 import { PrismaClientRegistrationUnitOfWork } from './system-identity/registration/prisma-client-registration-unit-of-work';
 import { AuthenticationLinkCipher } from './system-identity/security/authentication-link-cipher';
 import { cleanupAbandonedUploads } from './uploads/cleanup-abandoned-uploads';
-import { LocalObjectStorage } from './uploads/local-object-storage';
+import { createObjectStorage } from './uploads/create-object-storage';
 import { createUploadCleanupGateway } from './uploads/prisma-upload-cleanup-gateway';
 import { createFinalizeUploadJobCommands } from './uploads/prisma-upload-commands';
 import { startWorker } from './worker';
@@ -32,9 +32,7 @@ async function bootstrap(): Promise<void> {
 
   const now = () => new Date();
   const { prisma, boss } = createDatabaseClients('worker', environment);
-  const storage = new LocalObjectStorage(
-    environment.UPLOADS_LOCAL_STORAGE_ROOT,
-  );
+  const storage = createObjectStorage(environment);
 
   const digestEmail = (email: string) =>
     createHmac('sha256', environment.AUTHENTICATION_EMAIL_DIGEST_KEY)

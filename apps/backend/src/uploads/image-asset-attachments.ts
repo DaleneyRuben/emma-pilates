@@ -8,7 +8,7 @@ import {
 } from '../generated/prisma/enums';
 import type { ImagePurpose } from './image-purpose';
 import type { ImageVariantKind } from './image-variants';
-import type { LocalObjectStorage } from './local-object-storage';
+import type { ObjectStorage } from './object-storage';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -104,7 +104,7 @@ const kindName = (kind: string): ImageVariantKind =>
 // meaning (ADR-0077); the previous public copies are retired first.
 export const publishImageVariants = async (
   tx: Transaction,
-  storage: Pick<LocalObjectStorage, 'get' | 'replace'>,
+  storage: Pick<ObjectStorage, 'get' | 'replace'>,
   input: { imageAssetId: string; now: Date },
 ): Promise<void> => {
   await unpublishImageVariants(tx, input);

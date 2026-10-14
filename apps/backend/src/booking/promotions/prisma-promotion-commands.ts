@@ -16,7 +16,7 @@ import {
   publishImageVariants,
   unpublishImageVariants,
 } from '../../uploads/image-asset-attachments';
-import type { LocalObjectStorage } from '../../uploads/local-object-storage';
+import type { ObjectStorage } from '../../uploads/object-storage';
 import {
   requireAdministrator,
   type AdministratorActor,
@@ -36,7 +36,7 @@ import {
 
 type Transaction = Prisma.TransactionClient;
 type PromotionInput = PromotionValues & { imageAssetId: string | null };
-type PromotionStorage = Pick<LocalObjectStorage, 'get' | 'replace'>;
+type PromotionStorage = Pick<ObjectStorage, 'get' | 'replace'>;
 
 const serializable = { isolationLevel: 'Serializable' } as const;
 const civil = (date: Date): string => date.toISOString().slice(0, 10);
