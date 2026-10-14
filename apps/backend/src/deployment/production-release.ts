@@ -16,7 +16,8 @@ export type ReleaseStage =
   | 'api_build'
   | 'readiness'
   | 'worker_build'
-  | 'worker_deploy';
+  | 'worker_deploy'
+  | 'backup_build';
 
 export type ReleaseResult =
   | { outcome: 'released' }
@@ -52,6 +53,8 @@ type ReleaseInput = {
   serviceId: string;
   // Null until Northflank's worker service exists (EXT-002).
   workerServiceId: string | null;
+  // Null until Northflank's backup job exists (EXT-009).
+  backupJobId: string | null;
   readinessUrl: string;
   northflank: NorthflankClient;
   fetch: ReleaseFetch;

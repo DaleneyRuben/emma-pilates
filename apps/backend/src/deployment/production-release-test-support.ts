@@ -6,7 +6,7 @@ import {
 } from './northflank-client';
 import { releaseProduction, type ReleaseClock } from './production-release';
 
-// Fakes shared by the production release specs (EXT-008, EXT-002).
+// Fakes shared by the production release specs (EXT-008, EXT-002, EXT-009).
 
 export const sha = 'd9ff2e02ec0db4d23d4bceb7eca59730f96f48e9';
 export const minute = 60_000;
@@ -123,6 +123,7 @@ export function release(
   fetch: ReleaseFetch,
   mainHead: string = sha,
   workerServiceId: string | null = null,
+  backupJobId: string | null = null,
 ) {
   const log: string[] = [];
   const result = releaseProduction({
@@ -131,6 +132,7 @@ export function release(
     jobId: 'migrate',
     serviceId: 'api',
     workerServiceId,
+    backupJobId,
     readinessUrl: 'https://api.example.com/health/ready',
     northflank,
     fetch,
