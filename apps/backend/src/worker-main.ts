@@ -24,12 +24,6 @@ import { startWorker } from './worker';
 async function bootstrap(): Promise<void> {
   const environment = validateEnvironment(process.env);
 
-  if (environment.NODE_ENV === 'production') {
-    throw new Error(
-      'worker-main is a local-development entrypoint only: it depends on LocalEmailCapture and LocalObjectStorage, neither of which is production-ready. See ADR-0046.',
-    );
-  }
-
   const now = () => new Date();
   const { prisma, boss } = createDatabaseClients('worker', environment);
   const storage = createObjectStorage(environment);
@@ -70,17 +64,22 @@ async function bootstrap(): Promise<void> {
 
   const stopWorker = await startWorker({
     boss,
-    authenticationEmail: {
-      stateReader: new PrismaAuthenticationEmailStateReader(prisma),
-      decryptor: linkCipher,
-      renderer: new SpanishAuthenticationEmailRenderer({
-        linkBaseUrl: environment.AUTHENTICATION_LINK_BASE_URL,
-      }),
-      delivery: new LocalEmailCapture(
-        environment.NODE_ENV,
-        environment.EMAIL_CAPTURE_DIRECTORY,
-      ),
-    },
+    // Production sends no email until EXT-001 adds a provider; local capture
+    // refuses production.
+    authenticationEmail:
+      environment.NODE_ENV === 'production'
+        ? null
+        : {
+            stateReader: new PrismaAuthenticationEmailStateReader(prisma),
+            decryptor: linkCipher,
+            renderer: new SpanishAuthenticationEmailRenderer({
+              linkBaseUrl: environment.AUTHENTICATION_LINK_BASE_URL,
+            }),
+            delivery: new LocalEmailCapture(
+              environment.NODE_ENV,
+              environment.EMAIL_CAPTURE_DIRECTORY,
+            ),
+          },
     finalizeUpload: createFinalizeUploadJobCommands(prisma, storage, now),
     pendingAccountCleanup: {
       execute: () => pendingAccountCleanupUseCase.execute(),
