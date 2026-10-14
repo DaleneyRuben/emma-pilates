@@ -61,6 +61,7 @@ Accepted architecture decisions:
 - [x] Delete profile-photo and Promotion-image variants immediately after removal, replacement, or owner deletion.
 - [x] Never physically delete a database row; every removal is a soft delete, and only object-storage bytes are erased (ADR-0086).
 - [x] Take the throttling network address from a measured per-environment proxy hop count, plus Vercel's hop only with a secret proof header (ADR-0087).
+- [x] Send upload bytes through the API to the configured object store until a store release reads `uploadUrl` (ADR-0088).
 - [x] Deliver active Promotion images through public, versioned, cacheable R2 URLs while every other image purpose remains private.
 - [x] Run serialized, backward-compatible production migrations before API and worker rollout, stopping the release on failure.
 - [x] Keep runtime secrets in environment-specific provider stores and give CI only narrowly scoped deployment credentials.

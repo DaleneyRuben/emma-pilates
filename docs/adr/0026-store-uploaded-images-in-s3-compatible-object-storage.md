@@ -1,6 +1,6 @@
 # Store uploaded images in S3-compatible object storage
 
-Status: accepted
+Status: accepted; the direct presigned upload is replaced by [ADR-0088](./0088-proxy-upload-bytes-through-the-api.md), which proxies the bytes through the API
 
 Uploaded image bytes will live in S3-compatible object storage rather than PostgreSQL or the backend filesystem. PostgreSQL, selected in [ADR-0011](./0011-use-postgresql-with-schema-per-bounded-context.md), remains the authoritative store for each object's opaque storage key, purpose, ownership, media type, byte size, checksum, lifecycle state, and relationship to the owning record. Provider URLs are derived at delivery time and are never canonical database identifiers.
 
