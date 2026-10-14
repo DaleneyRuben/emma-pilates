@@ -3345,3 +3345,44 @@ names itself in `application_name`.
 **In production**, with the Aiven URL exported from a hidden prompt (never
 printed), the same query against the database `emma` (with
 `datname = 'emma'`) shows the `api` service's two pools within 4.
+
+## Test 40: watch a merge release itself to production
+
+Since EXT-008 a push to `main` whose `ci` run passes starts the
+`release production` workflow, which builds and runs Northflank's `migrate`
+job, then builds the `api` service, waits for `/health/ready` to report the
+commit, and runs the smoke check ([runbook](./runbooks/production-release.md)).
+It only reads production and starts builds; it needs no local setup.
+
+1. After a pull request merges, find the merge's release:
+
+   ```sh
+   gh run list --repo DaleneyRuben/emma-pilates --workflow release-production.yml --limit 3
+   ```
+
+   A run for the merge commit appears a few seconds after its `ci` run
+   passes (none appears while `ci` fails).
+2. When it completes, read its stages:
+
+   ```sh
+   gh run view <run id> --repo DaleneyRuben/emma-pilates --log | grep -E "migrate (build|run)|api build|readiness reports|outcome|passed"
+   ```
+
+   In order: `migrate build <name> started` and `succeeded`, `migrate run
+   <id> started` and `succeeded`, `api build <name> started` and
+   `succeeded`, `readiness reports <full hash>`, `{"outcome":"released"}`,
+   and the smoke JSON with `"passed":true`. The first release (`87fe95d2`,
+   2026-10-14) took 5 m 6 s.
+3. Check production yourself:
+
+   ```sh
+   curl -s https://p01--api--mmps25fn9k9x.code.run/health/ready
+   ```
+
+   answers `{"status":"ready","release":"<the merge's full hash>"}`.
+4. In Northflank, Jobs → `migrate` shows the build for that commit as
+   «Currently deployed» and a successful run started after it; Services →
+   `api` shows the same commit deployed. CI stays off and CD on for both.
+5. Two merges in quick succession: the first release finishes, then only the
+   newest pending one runs; a release whose commit is no longer main's head
+   ends `superseded` and deploys nothing.
