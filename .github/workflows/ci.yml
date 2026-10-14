@@ -138,7 +138,8 @@ jobs:
 
   # the Prisma repositories and PostgreSQL behaviour on a service container;
   # the suite runs through TEST_DATABASE_URL on a pilates_test_ci admin
-  # database that lives and dies with the runner
+  # database that lives and dies with the runner; the S3 adapter runs against
+  # S3Mock (ADR-0088)
   api-integration:
     needs: [contracts, api-unit]
     runs-on: ubuntu-24.04
@@ -155,6 +156,12 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      s3:
+        image: adobe/s3mock:5.2.3
+        env:
+          COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: pilates-test
+        ports:
+          - 9090:9090
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
@@ -162,6 +169,9 @@ jobs:
       - run: pnpm --filter @pilates/backend test:integration
         env:
           TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/pilates_test_ci
+          OBJECT_STORAGE_TEST_ENDPOINT: http://localhost:9090
+          OBJECT_STORAGE_TEST_ACCESS_KEY_ID: s3mock
+          OBJECT_STORAGE_TEST_SECRET_ACCESS_KEY: s3mock
           # the in-band ESM run grows past Node's default heap on the runner
           NODE_OPTIONS: --max-old-space-size=4096
 
