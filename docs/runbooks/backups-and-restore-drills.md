@@ -102,7 +102,7 @@ alters or drops columns or constraints on existing tables, or backfills data.
 
    ```sh
    read -rs AWS_ACCESS_KEY_ID && read -rs AWS_SECRET_ACCESS_KEY && \
-   export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_DEFAULT_REGION=auto \
+   export AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_DEFAULT_REGION=auto AWS_PAGER= \
      AWS_REQUEST_CHECKSUM_CALCULATION=when_required \
      AWS_RESPONSE_CHECKSUM_VALIDATION=when_required
    R2=https://1121636a866de46f92544db1a7ebe310.r2.cloudflarestorage.com
@@ -114,6 +114,9 @@ alters or drops columns or constraints on existing tables, or backfills data.
    ```
 
    The digest must equal the metadata's `sha256`; keep its `row-counts`.
+   (`AWS_PAGER=` keeps the AWS CLI from stopping at `(END)` in its pager. The
+   restore token `mac-backup-restore` is Object Read only on this bucket; if
+   it was not kept, create a new one in R2 → Manage API tokens.)
 2. Create a disposable database **outside production**, on the Mac's
    PostgreSQL 18 (port 5433), named `pilates_restore_drill_YYYYMMDD`. Never
    restore into the production database for a drill.
@@ -210,4 +213,4 @@ how to switch the API and worker to the restored database.
 
 | Date | Dump used | Restored in | Migrate status | Smoke check | Fixture-free checks | Done by |
 | --- | --- | --- | --- | --- | --- | --- |
-| | | | | | | |
+| 2026-10-14 | `daily/emma-20261014T160924Z.dump` (first run, 286,411 bytes, SHA-256 equal to the metadata; row counts 1/0/0/0/3 equal after restore; `pgboss` schema present) | 0.36 s, `pg_restore --no-owner --no-acl --exit-on-error`, Mac PostgreSQL 18.6 on 5433 | Up to date (22 migrations) | Passed (API on port 3199) | Passed: 2 audit guards, 4 ledger triggers, 0 negative balances, 0 Clients without one live Account, newest audit 2026-10-14 14:25 UTC; `backup:check` passed | Owner (token, download) and Claude (restore, checks); first drill, lifts the «no real Client data» gate |
