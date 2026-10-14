@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-14** (EXT-009). This page holds **no secret values**:
+Last verified **2026-10-14** (EXT-009; Expo/EAS added by REL-001). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -32,6 +32,8 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
                database-backup heartbeats
  GitHub Actions: CI on every pull request and main, production release after CI on main,
                  preview cleanup, preview-origin registration
+ Expo EAS: organization emma-pilates builds the development clients of both apps
+           (iOS Simulator and Android); no store builds until gates 8–9
 ```
 
 ## What we use from each provider
@@ -49,11 +51,11 @@ Details are in the sections below.
 | **Render** | One Free web service, `emma-pilates-dev-api` (native Node, auto-deploy from `main`); an API key for the `preview-origins` workflow | Runs the **shared development API** that previews and Expo Go talk to | Workers, Render databases, paid plans |
 | **Neon** | One Free project, `emma-pilates-dev`: one branch, database `pilates_dev`, direct connection | The **shared development database** | Connection pooling, per-pull-request branches |
 | **Cloudflare** | R2 only: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production | Domains and DNS (gate 7), public buckets and custom domains, Workers, every other product |
+| **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` profile; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`) that NOT-002's push needs, since Expo Go cannot receive remote push | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
 | **Better Stack** | Uptime monitor «Production API readiness»; error tracking app `emma-pilates-api` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
 
 Not created yet, in the order the gates open (backlog, «Order to open the
-gates»): **Expo/EAS** for
-mobile builds (gate 6), a **domain** with **SendPulse** for email (gate 7),
+gates»): a **domain** with **SendPulse** for email (gate 7),
 **Google Play** (gate 8), **Apple Developer** (gate 9).
 
 ## Environments
@@ -91,7 +93,8 @@ Every account belongs to the project owner and is shared with no one else.
 | Render | service `emma-pilates-dev-api` (`srv-db4ivt6i0phs73cru2p0`) | Free | — | Shared development API |
 | Neon | project `emma-pilates-dev` (`winter-paper-96646104`) | Free | No | Shared development database |
 | Better Stack | team `t614177` | Free | No | Uptime, error tracking, heartbeat, email alerts |
-| Expo, Apple, Google Play, SendPulse, domain | not created yet | — | — | Gates 6–9 |
+| Expo | user `daleneyfernando` (Google sign-in), organization `emma-pilates`; projects `emma-pilates-client` (`c9271277-f815-4e36-97db-63a584a85957`) and `emma-pilates-staff` (`885d3272-da0a-49f7-b8cd-33092de7662a`) | Free: 15 iOS and 15 Android builds a month | No | Mobile development builds since 2026-10-14 (gate 6); push and updates later |
+| Apple, Google Play, SendPulse, domain | not created yet | — | — | Gates 7–9 |
 
 ## Production in detail
 
@@ -238,6 +241,18 @@ Every account belongs to the project owner and is shared with no one else.
   (unpooled) connection because Prisma migrations and pg-boss need session
   locks. Migrations and fixtures are applied from the user's Mac
   ([testing guide](../testing-guide.md), Test 36).
+- **Expo EAS:** each app's `eas.json` builds every profile on Node 24.13.0
+  and the workspace's pnpm 11.19.0 (a shared `base` profile). EAS uploads the
+  whole repository (tracked files only, about 7 MB compressed) and installs it
+  from the root lockfile, so the workspace packages resolve as they do
+  locally. A config plugin listed in an app's `app.json` must be a direct
+  dependency of that app (`expo-secure-store` is): EAS resolves plugins
+  without the `NODE_PATH` that pnpm's bin shims add. The `development`
+  profile builds a development client with `ios.simulator: true`, so it
+  installs on the Simulators without an Apple account; Android builds are
+  internal `.apk` files signed with the EAS-held keystore. The Mac's `eas`
+  CLI must be logged in as `daleneyfernando` (`eas whoami`); the same Mac
+  also has a work Expo login, so check before every `eas` command.
 - **Vercel previews:** one per pull request, behind Vercel Authentication;
   only the branch alias (`emma-pilates-admin-git-<branch>-fernando-daleney-s-projects.vercel.app`)
   is trusted, registered on Render by the `preview-origins` workflow and
@@ -348,6 +363,9 @@ Values never go in the repository or a chat. «Mac» means the user's own
 - No email (gate 7): Clients cannot register or recover passwords in
   production; the first Administrator's link was read from the `api` shell.
 - No domain: production uses the providers' hostnames.
+- The Android keystores live only on EAS: download a copy
+  (`eas credentials`, Android, «Download») before the first store build
+  (gate 8), so release credentials stay recoverable (ADR-0038).
 
 ## Keeping this current
 
