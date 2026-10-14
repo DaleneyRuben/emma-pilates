@@ -53,7 +53,11 @@ describe('createPgDump (EXT-009)', () => {
       run,
     })();
 
-    expect(JSON.stringify(run.mock.calls[0][1])).not.toContain('secret');
+    expect(run).not.toHaveBeenCalledWith(
+      expect.anything(),
+      expect.arrayContaining([expect.stringContaining('secret')]),
+      expect.anything(),
+    );
   });
 
   it('fails with the exit code and the end of pg_dump’s error output', async () => {
