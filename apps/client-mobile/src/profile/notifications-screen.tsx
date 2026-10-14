@@ -2,13 +2,14 @@ import { NotificationsScreen } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 
 import { useClientFetcher } from "../client-fetcher";
+import {
+  clientNotificationDestination,
+  type ClientNotificationRoute,
+} from "../notifications/notification-destinations";
 
 type NotificationsNavigation = {
   goBack: () => void;
-  navigate: (
-    screen: "Subscription" | "Bookings" | "PaymentStatus" | "MyEvaluations",
-    params?: { screen: "MyBookings" },
-  ) => void;
+  navigate: (...route: ClientNotificationRoute) => void;
 };
 
 export function ClientNotificationsScreen() {
@@ -21,19 +22,8 @@ export function ClientNotificationsScreen() {
       fetcher={fetcher}
       onBack={() => navigation.goBack()}
       onOpen={(notification) => {
-        if (notification.destinationType === "subscription") {
-          navigation.navigate("Subscription");
-        } else if (notification.destinationType === "evaluation") {
-          navigation.navigate("MyEvaluations");
-        } else if (
-          notification.destinationType === "booking" ||
-          // A cancelled Session has no detail to open; its Bookings do.
-          notification.destinationType === "session"
-        ) {
-          navigation.navigate("Bookings", { screen: "MyBookings" });
-        } else if (notification.destinationType === "payment") {
-          navigation.navigate("PaymentStatus");
-        }
+        const route = clientNotificationDestination(notification.destinationType ?? null);
+        if (route !== null) navigation.navigate(...route);
       }}
     />
   );
