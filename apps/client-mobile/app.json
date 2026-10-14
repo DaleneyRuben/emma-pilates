@@ -34,6 +34,12 @@
           "faceIDPermission": "Permite que Emma Pilates use Face ID para proteger tu sesión."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "c9271277-f815-4e36-97db-63a584a85957"
+      }
+    },
+    "owner": "emma-pilates"
   }
 }
