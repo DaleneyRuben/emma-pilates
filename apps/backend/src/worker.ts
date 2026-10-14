@@ -10,6 +10,13 @@ import {
   type FinalizeUploadWorkerBoss,
   type FinalizeUploadWorkerDependencies,
 } from './jobs/finalize-upload/finalize-upload-worker';
+import { PUSH_DISPATCH_QUEUE } from './jobs/push-dispatch/push-dispatch-job';
+import {
+  registerPushDispatchWorker,
+  type PushDispatchWorkerBoss,
+  type PushDispatchWorkerDependencies,
+} from './jobs/push-dispatch/push-dispatch-worker';
+import type { CheckPushReceiptsResult } from './notifications/push/check-push-receipts';
 import {
   startInstalledPgBoss,
   type StartablePgBoss,
@@ -35,6 +42,7 @@ const evaluationSlotIntervalMs = 60 * 60 * 1_000;
 const evaluationReminderIntervalMs = 60 * 1_000;
 const sessionStartCheckIntervalMs = 60 * 1_000;
 const retentionSweepIntervalMs = 60 * 60 * 1_000;
+const pushReceiptIntervalMs = 5 * 60 * 1_000;
 
 type QueueStatsSnapshot = {
   readyCount: number;
@@ -44,7 +52,8 @@ type QueueStatsSnapshot = {
 
 export interface WorkerBoss extends StartablePgBoss {
   work: AuthenticationEmailWorkerBoss['work'] &
-    FinalizeUploadWorkerBoss['work'];
+    FinalizeUploadWorkerBoss['work'] &
+    PushDispatchWorkerBoss['work'];
   getQueueStats(
     name: string,
     options: { force: true },
@@ -86,9 +95,10 @@ type WorkerDependencies = {
   startedSessionWaitlists: {
     execute(): Promise<{ closed: number }>;
   };
-  // NOT-002: stub until the push worker is registered.
-  pushDispatch?: { dispatch: (job: unknown) => Promise<unknown> };
-  pushReceipts?: { execute(): Promise<unknown> };
+  pushDispatch: Pick<PushDispatchWorkerDependencies, 'dispatch'>;
+  pushReceipts: {
+    execute(): Promise<CheckPushReceiptsResult>;
+  };
   retentionSweeps: {
     execute(): Promise<{
       idempotencyRecords: number;
@@ -121,6 +131,10 @@ export const startWorker = async (
   }
   await registerFinalizeUploadWorker(dependencies.boss, {
     process: (job) => dependencies.finalizeUpload.process(job),
+    reportError: (error, context) => errorReporter.report(error, context),
+  });
+  await registerPushDispatchWorker(dependencies.boss, {
+    dispatch: (job) => dependencies.pushDispatch.dispatch(job),
     reportError: (error, context) => errorReporter.report(error, context),
   });
   const sweeps = await startSweeps(
@@ -209,6 +223,17 @@ export const startWorker = async (
           },
         ],
       },
+      // Expo keeps receipts for a day and has most within fifteen minutes
+      // (NOT-002).
+      {
+        intervalMs: pushReceiptIntervalMs,
+        steps: [
+          {
+            job: 'push_receipts',
+            execute: () => dependencies.pushReceipts.execute(),
+          },
+        ],
+      },
       // Housekeeping for rows past their provisional retention (BE-008);
       // hourly keeps each batch small.
       {
@@ -244,8 +269,12 @@ export const startWorker = async (
   // The authentication email queue fills on purpose while email is disabled.
   const watchedQueues =
     dependencies.authenticationEmail === null
-      ? [FINALIZE_UPLOAD_QUEUE]
-      : [FINALIZE_UPLOAD_QUEUE, AUTHENTICATION_EMAIL_QUEUE];
+      ? [FINALIZE_UPLOAD_QUEUE, PUSH_DISPATCH_QUEUE]
+      : [
+          FINALIZE_UPLOAD_QUEUE,
+          PUSH_DISPATCH_QUEUE,
+          AUTHENTICATION_EMAIL_QUEUE,
+        ];
 
   const stopHeartbeat = startWorkerHeartbeat({
     serviceVersion: dependencies.serviceVersion,

@@ -50,9 +50,14 @@ describe('worker without an email provider', () => {
       emit,
     });
 
-    expect(work).toHaveBeenCalledTimes(1);
+    expect(work).toHaveBeenCalledTimes(2);
     expect(work).toHaveBeenCalledWith(
       'uploads.finalize.v1',
+      expect.anything(),
+      expect.any(Function),
+    );
+    expect(work).toHaveBeenCalledWith(
+      'notifications.push-dispatch.v1',
       expect.anything(),
       expect.any(Function),
     );
