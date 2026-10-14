@@ -20,6 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Email request limits         | Fill the device or network budget for registration, resend, email correction, and recovery: the API answers `429` `authentication_email_throttled` with `Retry-After`, and the apps and admin web show «Demasiadas solicitudes…» with the wait (Test 5 G) | Every admitted request counts, even one for an unknown address or a suppressed email; reset by marking your local `email_requested` rows deleted |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
+| Mobile development builds    | Install the EAS development builds of both apps on the iPhone 16 Pro and iPad Simulators and the Android emulator, run them against Metro, and run the Maestro journeys on them (Test 45) | Each new native build spends one of the free plan's monthly builds; push notifications arrive with NOT-002 |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); sign in through a Vercel preview against the shared development API (Test 36); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
@@ -3745,3 +3746,59 @@ email, a message, or a URL.
 3. «Worker heartbeat» goes Down when the worker stops making progress, not
    only when it stops; the worker's logs in Northflank show
    `worker_progress_stalled` with the reasons.
+
+## Test 45: install and run the EAS development builds
+
+Expo Go cannot receive remote push notifications, so push work (NOT-002) runs
+on **development builds**: each app's own native binary with the Expo
+development client, built by EAS from the `development` profile (REL-001,
+gate 6). They load JavaScript from your Metro server like Expo Go does, so a
+JavaScript change needs no new build; a native change (a new native module,
+permission, or plugin) does, and each build spends one of the free plan's
+monthly builds (15 iOS and 15 Android).
+
+**Get the builds.** List them with
+`cd apps/client-mobile && eas build:list --profile development --limit 4`
+(the same in `apps/staff-mobile`); `eas whoami` must print `daleneyfernando`
+first (the Mac also has a work Expo login). Each finished build has an
+artifact URL: a `.tar.gz` holding `EmmaPilates.app` (or
+`EmmaPilatesStaff.app`) for the iOS Simulator, and an `.apk` for Android.
+Building again is
+`eas build --platform all --profile development --non-interactive --no-wait`
+from the app folder, only after a native change.
+
+**Install.** iOS:
+`curl -sL <tar.gz url> | tar -xz -C <folder>` and
+`xcrun simctl install <udid> <folder>/EmmaPilates.app` on the iPhone 16 Pro
+(`49C1E5FE-…`) and the iPad Pro 11 (`57B2FBC4-…`). Android: boot the
+emulator (`~/Library/Android/sdk/emulator/emulator -avd Medium_Phone_API_36.1`),
+then `adb install -r client.apk` and `adb reverse tcp:3100 tcp:3100` (and
+`tcp:8082`, `tcp:8083`) so the emulator reaches the API and Metro at
+`127.0.0.1`.
+
+**Run.** Start the API on `pilates_dev_sim` and each Metro with
+`EXPO_PUBLIC_API_URL=http://127.0.0.1:3100/api/v1 ./node_modules/.bin/expo start --dev-client --port 8083`
+(client) or `--port 8082` (staff). Open the app: its launcher lists both
+Metro servers; tap the app's own server, or open
+`emmapilates-client://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8083`
+(`xcrun simctl openurl <udid> …` or
+`adb shell am start -a android.intent.action.VIEW -d … com.emmapilates.client`;
+`emmapilates-staff://` and port 8082 for the Staff app). iOS asks «Open in
+"Emma Pilates"?» first; the first launch shows the developer-menu intro
+(«Continue»), and the floating «Tools» gear opens the menu afterwards.
+
+**Maestro on a development build.** Maestro needs a Java runtime; the Mac has
+none on its `PATH`, so use Android Studio's:
+`export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"`.
+Then pass the installed app instead of Expo Go:
+
+```sh
+cd apps/client-mobile
+maestro --udid <udid> test -e APP_ID=com.emmapilates.client \
+  -e "APP_LINK=emmapilates-client://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8083" \
+  -e PASSWORD=emma-local-2026 .maestro/book-and-cancel-class.yaml
+```
+
+For Android, `--device emulator-5554` instead of `--udid`. The login subflows
+answer iOS's «Open» prompt and the developer-menu intro, so the flows of
+Test 19 run unchanged.
