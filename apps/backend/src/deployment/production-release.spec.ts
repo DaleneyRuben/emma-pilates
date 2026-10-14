@@ -42,6 +42,7 @@ describe('releaseProduction', () => {
       `api build api-build-1 started for ${sha}`,
       'api build api-build-1 succeeded',
       `readiness reports ${sha}`,
+      'no worker service configured; worker skipped',
     ]);
   });
 

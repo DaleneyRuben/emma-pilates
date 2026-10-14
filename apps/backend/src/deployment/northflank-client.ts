@@ -71,6 +71,26 @@ function toBuild(data: Record<string, unknown>): NorthflankBuild {
   };
 }
 
+function toDeployment(data: Record<string, unknown>): NorthflankDeployment {
+  const status =
+    typeof data.status === 'object' && data.status !== null
+      ? (data.status as Record<string, unknown>)
+      : {};
+  const deployment =
+    typeof status.deployment === 'object' && status.deployment !== null
+      ? (status.deployment as Record<string, unknown>)
+      : {};
+  const transition =
+    typeof deployment.lastTransitionTime === 'string'
+      ? Date.parse(deployment.lastTransitionTime)
+      : Number.NaN;
+  return {
+    status:
+      typeof deployment.status === 'string' ? deployment.status : 'UNKNOWN',
+    transitionedAt: Number.isNaN(transition) ? null : transition,
+  };
+}
+
 function toRun(data: Record<string, unknown>): NorthflankRun {
   return {
     id: String(data.id),
@@ -147,7 +167,7 @@ export function createNorthflankClient(input: {
           `${project}/services/${serviceId}/build/${buildId}`,
         ),
       ),
-    getServiceDeployment: (serviceId) =>
-      Promise.reject(new Error(`not implemented ${serviceId}`)),
+    getServiceDeployment: async (serviceId) =>
+      toDeployment(await request('GET', `${project}/services/${serviceId}`)),
   };
 }

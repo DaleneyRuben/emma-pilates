@@ -182,6 +182,46 @@ export async function releaseProduction(
     return { status: response.status, release };
   }
 
+  // The worker follows the API on the same commit (ADR-0027). A combined
+  // service reports no deployed commit, so its rollout counts once it has
+  // completed after this build started.
+  async function releaseWorker(): Promise<void> {
+    const { workerServiceId } = input;
+    if (workerServiceId === null) {
+      log('no worker service configured; worker skipped');
+      return;
+    }
+    const buildStartedAt = clock.now();
+    const workerBuild = await start(
+      'worker_build',
+      `${workerServiceId} build`,
+      () => northflank.startServiceBuild(workerServiceId, sha),
+    );
+    await awaitBuild('worker_build', workerServiceId, workerBuild, (buildId) =>
+      northflank.getServiceBuild(workerServiceId, buildId),
+    );
+    await waitFor(
+      'worker_deploy',
+      `${workerServiceId} rollout`,
+      readinessLimitMs,
+      () => northflank.getServiceDeployment(workerServiceId),
+      (deployment) => {
+        if (deployment.status === 'FAILED') {
+          throw new ReleaseStopped(
+            'worker_deploy',
+            `${workerServiceId} rollout ended FAILED`,
+          );
+        }
+        const fresh =
+          deployment.transitionedAt !== null &&
+          deployment.transitionedAt >= buildStartedAt;
+        return deployment.status === 'COMPLETED' && fresh ? true : undefined;
+      },
+      () => 'still on the previous release',
+    );
+    log(`${workerServiceId} runs ${sha}`);
+  }
+
   try {
     const jobBuild = await start('migrate_build', `${jobId} build`, () =>
       northflank.startJobBuild(jobId, sha),
@@ -237,6 +277,8 @@ export async function releaseProduction(
       `, expected ${sha}`,
     );
     log(`readiness reports ${sha}`);
+
+    await releaseWorker();
     return { outcome: 'released' };
   } catch (error) {
     if (error instanceof ReleaseStopped) {
