@@ -15,9 +15,9 @@ export type BackupCheckReport = {
 
 const hour = 60 * 60 * 1_000;
 const day = 24 * hour;
-// The R2 lifecycle rules (runbook): `daily/` after 35 days, `monthly/` after
+// The R2 lifecycle rules (runbook): `daily/` after 30 days, `monthly/` after
 // 365. R2 applies a rule within about a day, so two days of slack.
-const dailyDays = 35;
+const dailyDays = 30;
 const monthlyDays = 365;
 const lifecycleSlackMs = 2 * day;
 // The job runs once a day; a little more than a day allows for a slow run.
@@ -97,7 +97,7 @@ export const checkBackups = (input: {
       problems.push({ code: 'latest_daily_shrank', detail: latest.object.key });
     }
 
-    // Every La Paz day from the first kept dump (at most 35 days back) up to
+    // Every La Paz day from the first kept dump (at most 30 days back) up to
     // yesterday has one; today's run is what the staleness check covers.
     const today = boliviaDate(now);
     const windowStart = addCivilDays(today, -(dailyDays - 1));
