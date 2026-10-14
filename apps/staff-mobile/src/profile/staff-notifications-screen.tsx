@@ -1,17 +1,19 @@
-import { NotificationsScreen } from "@pilates/mobile-core";
+import { NotificationsScreen, useMobileIdentity } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 
+import {
+  staffNotificationDestination,
+  type StaffNotificationRoute,
+} from "../notifications/notification-destinations";
 import { useStaffFetcher } from "../staff-fetcher";
-
-// Mi agenda is the root of the Trainer and Nutritionist stacks.
-const agendaDestinations = new Set(["trainer_schedule", "nutritionist_agenda"]);
 
 export function StaffNotificationsScreen() {
   const navigation = useNavigation<{
     goBack: () => void;
-    popToTop: () => void;
+    navigate: (...route: StaffNotificationRoute) => void;
   }>();
   const fetcher = useStaffFetcher();
+  const role = useMobileIdentity().session?.role;
 
   return (
     <NotificationsScreen
@@ -19,9 +21,13 @@ export function StaffNotificationsScreen() {
       fetcher={fetcher}
       onBack={() => navigation.goBack()}
       onOpen={(notification) => {
-        if (agendaDestinations.has(notification.destinationType ?? "")) {
-          navigation.popToTop();
-        }
+        if (role === undefined || role === "client") return;
+        const route = staffNotificationDestination(
+          role,
+          notification.destinationType ?? null,
+          notification.destinationId ?? null,
+        );
+        if (route !== null) navigation.navigate(...route);
       }}
     />
   );
