@@ -12,7 +12,6 @@ import {
   Screen,
   spacing,
   surfaces,
-  type AppRole,
   type MobileNavigationProps,
   typography,
   useMountedAt,
@@ -40,6 +39,8 @@ import { NewClientScreen } from "./assistant/new-client-screen";
 import { SelectPlanScreen } from "./assistant/select-plan-screen";
 import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-form-screen";
 import { AvailabilityScreen } from "./nutritionist/availability-screen";
+import type { StaffRole } from "./notifications/notification-destinations";
+import { StaffPushNotifications } from "./notifications/staff-push-notifications";
 import { NutritionistAgendaScreen } from "./nutritionist/nutritionist-agenda-screen";
 import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
@@ -48,7 +49,6 @@ import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
 import { StaffFetcherContext, unavailableFetcher, useStaffFetcher } from "./staff-fetcher";
 import { createTrainerApi } from "./trainer-api";
 
-type StaffRole = Exclude<AppRole, "client">;
 type AttendanceOutcome = "attended" | "no_show";
 type TrainerRosterNavigation = { goBack: () => void };
 
@@ -237,9 +237,11 @@ export function StaffNavigation({
   apiFetcher,
   authenticationApi,
   authenticationIntent,
+  installationIdentifier,
   onBiometricUnlock,
   onLogin,
   onRecoveryCredential,
+  pushPlatform,
   role,
 }: MobileNavigationProps) {
   if (role !== undefined && role !== "client") {
@@ -248,7 +250,14 @@ export function StaffNavigation({
       <MobileQueryProvider accountId={accountId}>
         <StaffFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
           <AssistantWorkspaceProvider>
-            <AuthenticatedStaffNavigation />
+            <StaffPushNotifications
+              fetcher={apiFetcher ?? unavailableFetcher}
+              installationIdentifier={installationIdentifier}
+              platform={pushPlatform}
+              role={role}
+            >
+              {({ onReady, ref }) => <AuthenticatedStaffNavigation onReady={onReady} ref={ref} />}
+            </StaffPushNotifications>
           </AssistantWorkspaceProvider>
         </StaffFetcherContext.Provider>
       </MobileQueryProvider>
