@@ -1,6 +1,6 @@
 # NOT-002 push notifications proposal
 
-Status: proposed 2026-10-14, waiting for the user's approval. No migration is created or applied before the user's explicit yes.
+Status: approved by the user on 2026-10-14, including the one pg-boss queue migration and committing `google-services.json`.
 
 Governing decisions: [ADR-0016](../adr/0016-support-current-and-previous-mobile-releases.md) (additive API), [ADR-0024](../adr/0024-use-pg-boss-for-durable-background-jobs.md) (pg-boss, jobs in the caller's transaction), [ADR-0025](../adr/0025-use-expo-push-service-for-mobile-notifications.md) (Expo Push Service, Account-owned endpoints), [ADR-0036](../adr/0036-use-verified-https-links-through-a-central-mobile-ingress.md) (central mobile ingress), [ADR-0058](../adr/0058-reconcile-due-work-into-pg-boss.md), [ADR-0064](../adr/0064-use-bounded-retry-policies-by-job-family.md), [ADR-0065](../adr/0065-retain-failed-jobs-for-thirty-days.md), [ADR-0066](../adr/0066-monitor-workers-with-actionable-signals.md), [ADR-0067](../adr/0067-request-notification-permission-in-context.md), [ADR-0068](../adr/0068-enable-all-initial-notification-categories.md), [ADR-0069](../adr/0069-drive-badges-from-account-unread-count.md), [ADR-0070](../adr/0070-use-sound-only-for-actionable-notifications.md), [ADR-0078](../adr/0078-stage-production-database-migrations.md), [ADR-0079](../adr/0079-keep-runtime-secrets-in-environment-providers.md), [ADR-0086](../adr/0086-soft-delete-every-database-row.md).
 
