@@ -49,7 +49,6 @@ export const putPendingUploadObjectCommand = Symbol(
   'putPendingUploadObjectCommand',
 );
 export const finalizeUploadCommand = Symbol('finalizeUploadCommand');
-export const uploadsNodeEnv = Symbol('uploadsNodeEnv');
 export const readUploadStatusCommand = Symbol('readUploadStatusCommand');
 
 type ReadUploadStatusHandler = (
@@ -174,7 +173,6 @@ export class UploadsController {
     private readonly readUploadStatus: ReadUploadStatusHandler,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
-    @Inject(uploadsNodeEnv) private readonly nodeEnv: string,
   ) {}
 
   @Post()

@@ -14,7 +14,6 @@ import {
   readUploadStatusCommand,
   putPendingUploadObjectCommand,
   UploadsController,
-  uploadsNodeEnv,
 } from '../src/uploads/uploads.controller';
 
 describe('uploads (e2e)', () => {
@@ -61,7 +60,6 @@ describe('uploads (e2e)', () => {
         { provide: finalizeUploadCommand, useValue: finalizeUpload },
         { provide: readUploadStatusCommand, useValue: readUploadStatus },
         { provide: authenticatedPrincipalResolver, useValue: resolvePrincipal },
-        { provide: uploadsNodeEnv, useValue: 'test' },
         { provide: APP_FILTER, useClass: ProblemDetailsFilter },
       ],
     }).compile();

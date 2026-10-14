@@ -23,7 +23,6 @@ describe('UploadsController', () => {
     finalizeUpload,
     readUploadStatus,
     resolvePrincipal,
-    'test',
   );
 
   beforeEach(() => {
@@ -124,33 +123,6 @@ describe('UploadsController', () => {
         '11111111-1111-4111-8111-111111111111',
         validAuthorization,
         source,
-      ),
-    ).resolves.toBeUndefined();
-
-    expect(putPendingUploadObject).toHaveBeenCalledWith(
-      {
-        imageAssetId: '11111111-1111-4111-8111-111111111111',
-        bytes: Buffer.from('bytes'),
-      },
-      'account-id',
-    );
-  });
-
-  it('stores the bytes through the API in production too (ADR-0088)', async () => {
-    const productionController = new UploadsController(
-      createPendingUpload,
-      putPendingUploadObject,
-      finalizeUpload,
-      readUploadStatus,
-      resolvePrincipal,
-      'production',
-    );
-
-    await expect(
-      productionController.putObject(
-        '11111111-1111-4111-8111-111111111111',
-        validAuthorization,
-        Readable.from([Buffer.from('bytes')]),
       ),
     ).resolves.toBeUndefined();
 

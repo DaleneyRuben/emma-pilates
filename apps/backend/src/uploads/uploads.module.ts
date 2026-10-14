@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import type { Environment } from '../config/environment';
 import { PG_BOSS, PRISMA_CLIENT } from '../database/database.module';
 import type { PgBoss } from 'pg-boss';
 import { PrismaClient } from '../generated/prisma/client';
@@ -17,7 +15,6 @@ import {
   putPendingUploadObjectCommand,
   UploadsController,
   readUploadStatusCommand,
-  uploadsNodeEnv,
 } from './uploads.controller';
 import { createReadUploadStatus } from './prisma-upload-commands';
 
@@ -29,12 +26,6 @@ import { createReadUploadStatus } from './prisma-upload-commands';
       provide: readUploadStatusCommand,
       inject: [PRISMA_CLIENT],
       useFactory: (prisma: PrismaClient) => createReadUploadStatus(prisma),
-    },
-    {
-      provide: uploadsNodeEnv,
-      inject: [ConfigService],
-      useFactory: (config: ConfigService<Environment, true>) =>
-        config.getOrThrow<string>('NODE_ENV'),
     },
     {
       provide: createPendingUploadCommand,
