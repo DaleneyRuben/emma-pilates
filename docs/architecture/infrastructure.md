@@ -29,6 +29,27 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
                  preview cleanup, preview-origin registration
 ```
 
+## What we use from each provider
+
+One line per provider, so you can tell at a glance which console to open and
+what you will find there. Everything else each provider offers is unused.
+Details are in the sections below.
+
+| Provider | What we use | What it does for us | Not used (on purpose) |
+| --- | --- | --- | --- |
+| **GitHub** | Private repository `emma-pilates`; Actions (4 workflows); 4 repository secrets | Holds the code; runs CI on every pull request and `main`; starts the production release; registers and cleans up admin-web previews | Branch protection (needs Pro), Packages, Pages |
+| **Northflank** | Project `default` (US Central): service `api`, job `migrate`, secret group `production` (9 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API**; runs **database migrations** before each release; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), the second service slot (kept for the worker) and second job slot (kept for backups) |
+| **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb); its CA certificate | The **production database** | The $50 trial credit, point-in-time restore, any paid plan |
+| **Vercel** | Project `emma-pilates-admin` (Hobby): production deploys, one preview per pull request, Vercel Authentication on previews, `vercel.json` rewrites, `middleware.ts`, 2 environment variables | Hosts the **admin web** (production and previews) and forwards its `/api/v1` calls to the right API with the proxy proof | Vercel Pro, custom domain (gate 7), serverless functions beyond the middleware |
+| **Render** | One Free web service, `emma-pilates-dev-api` (native Node, auto-deploy from `main`); an API key for the `preview-origins` workflow | Runs the **shared development API** that previews and Expo Go talk to | Workers, Render databases, paid plans |
+| **Neon** | One Free project, `emma-pilates-dev`: one branch, database `pilates_dev`, direct connection | The **shared development database** | Connection pooling, per-pull-request branches |
+| **Better Stack** | Uptime monitor «Production API readiness»; error tracking app `emma-pilates-api` with the Incidents email integration; heartbeat «Worker heartbeat» (paused) | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
+
+Not created yet, in the order the gates open (backlog, «Order to open the
+gates»): **Cloudflare R2** for uploaded images (gate 5), **Expo/EAS** for
+mobile builds (gate 6), a **domain** with **SendPulse** for email (gate 7),
+**Google Play** (gate 8), **Apple Developer** (gate 9).
+
 ## Environments
 
 | | Production | Shared development | Local |
