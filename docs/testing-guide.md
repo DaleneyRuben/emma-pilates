@@ -3738,7 +3738,10 @@ email, a message, or a URL.
    `200` (nothing to `betterstackdata.com`), and the error appears in
    `emma-pilates-admin` within a minute, environment `production`, Users 0,
    no message. `curl -s -o /dev/null -w "%{http_code}\n" -X POST --data-binary $'{"dsn":"https://k@evil.example/1"}\n{}' https://emma-pilates-admin.vercel.app/api/monitoring/envelope`
-   prints `403`.
+   prints `403`. Verified on 2026-10-14 (EXT-012, release `a5832790`): with
+   Shields up («0 trackers, ads, and more blocked») the `envelope` fetch
+   answered `200` and the `TypeError` reappeared in `emma-pilates-admin`,
+   `production`, Users 0; `GET` answered `405` and garbage `400`.
 3. «Worker heartbeat» goes Down when the worker stops making progress, not
    only when it stops; the worker's logs in Northflank show
    `worker_progress_stalled` with the reasons.
