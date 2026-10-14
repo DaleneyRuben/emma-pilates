@@ -1,7 +1,7 @@
 import { createPendingUpload } from './create-pending-upload';
 
 describe('createPendingUpload', () => {
-  it('validates the declaration, then records a pending upload with a 15-minute URL and a 24-hour cleanup deadline', async () => {
+  it('validates the declaration, then records a pending upload with a 15-minute URL and a 3-day cleanup deadline (ADR-0089)', async () => {
     const save = jest.fn().mockResolvedValue({ id: 'asset-id' });
 
     await expect(
@@ -34,7 +34,7 @@ describe('createPendingUpload', () => {
       declaredChecksum: new Uint8Array(32),
       createdAt: new Date('2026-09-18T12:00:00Z'),
       expiresAt: new Date('2026-09-18T12:15:00Z'),
-      deletionDueAt: new Date('2026-09-19T12:00:00Z'),
+      deletionDueAt: new Date('2026-09-21T12:00:00Z'),
     });
   });
 
