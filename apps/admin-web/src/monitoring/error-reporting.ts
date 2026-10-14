@@ -1,4 +1,9 @@
-import * as Sentry from "@sentry/react";
+import {
+  dedupeIntegration,
+  globalHandlersIntegration,
+  init,
+  reactErrorHandler,
+} from "@sentry/react";
 import type {
   BrowserOptions,
   ErrorEvent,
@@ -91,7 +96,13 @@ export function sanitizeErrorEvent(
 // a DSN nothing starts, so local runs, tests, and previews send nothing.
 export function startErrorReporting(
   settings: ErrorReportingSettings,
-  sdk: ErrorReportingSdk = Sentry,
+  // Named imports, not the namespace, so the bundle keeps only these.
+  sdk: ErrorReportingSdk = {
+    init,
+    globalHandlersIntegration: () => globalHandlersIntegration(),
+    dedupeIntegration,
+    reactErrorHandler: () => reactErrorHandler(),
+  },
 ): RootErrorHandlers {
   if (settings.dsn === undefined || settings.dsn === "") {
     return {};
