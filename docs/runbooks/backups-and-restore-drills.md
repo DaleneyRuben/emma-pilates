@@ -50,13 +50,15 @@ scheduled run uses the released code.
 
 ## Retention of dumps
 
-- Keep the **35 most recent daily dumps** and the **last dump of each of the
-  last 12 months**.
+- Keep the **30 most recent daily dumps** and the **last dump of each of the
+  last 12 months**. (BE-007 G9 said 35 daily dumps; the owner chose 30 on
+  2026-10-14 when the rules were created.)
 - R2 lifecycle rules do it by age, so the job never deletes anything:
-  `daily/` objects are deleted 35 days after upload, and `monthly/` objects
+  `daily/` objects are deleted 30 days after upload, and `monthly/` objects
   365 days after their last overwrite (12 complete months plus the current
   one). A bucket lock keeps every `daily/` object from being deleted or
-  overwritten for 30 days, even with the job's own token.
+  overwritten for 25 days, even with the job's own token (shorter than
+  the 30-day rule, since R2 cannot delete a locked object).
   Deleting an old *dump file* is not deleting database rows, so ADR-0086 does
   not apply to it.
 - The bucket `emma-pilates-prod-backups` is private. Only the job's token
@@ -84,7 +86,7 @@ scheduled run uses the released code.
 
   It prints `"passed": true` with the latest dump's size and age, or lists the
   problems: no dump, the latest older than 26 hours or under half the
-  previous one, a missing day in the last 35, a month without its copy, or a
+  previous one, a missing day in the last 30, a month without its copy, or a
   dump the lifecycle rules should have deleted.
 
 Do not launch with real Client data before the first drill in the log below

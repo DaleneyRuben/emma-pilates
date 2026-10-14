@@ -3496,7 +3496,7 @@ counts the five tables the restore drill compares, writes a custom-format
 as `daily/<database>-<UTC time>.dump`, copies it over
 `monthly/<database>-<La Paz month>.dump`, and pings Better Stack («Database
 backup»), or `…/fail` when a step failed or the dump is under half the size of
-the one before. R2's lifecycle rules delete `daily/` after 35 days and
+the one before. R2's lifecycle rules delete `daily/` after 30 days and
 `monthly/` after 365; the job never deletes
 ([runbook](./runbooks/backups-and-restore-drills.md)).
 
