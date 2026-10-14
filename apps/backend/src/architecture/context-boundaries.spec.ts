@@ -46,6 +46,7 @@ const sharedContextSlices = [
 const sharedKernel = [
   'config',
   'database',
+  'deployment',
   'generated',
   'health',
   'http',
