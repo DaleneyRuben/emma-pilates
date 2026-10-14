@@ -86,6 +86,9 @@ type WorkerDependencies = {
   startedSessionWaitlists: {
     execute(): Promise<{ closed: number }>;
   };
+  // NOT-002: stub until the push worker is registered.
+  pushDispatch?: { dispatch: (job: unknown) => Promise<unknown> };
+  pushReceipts?: { execute(): Promise<unknown> };
   retentionSweeps: {
     execute(): Promise<{
       idempotencyRecords: number;

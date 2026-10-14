@@ -53,6 +53,13 @@ describe('worker startup sweeps (EXT-002)', () => {
         evaluationReminders: idle({ sent: 0 }),
         emptySessionChecks: idle({ checked: 0, cancelled: 0 }),
         startedSessionWaitlists: idle({ closed: 0 }),
+        pushDispatch: { dispatch: jest.fn() },
+        pushReceipts: idle({
+          discarded: 0,
+          checked: 0,
+          delivered: 0,
+          failed: 0,
+        }),
         retentionSweeps: idle({
           idempotencyRecords: 0,
           authenticationSessions: 0,
