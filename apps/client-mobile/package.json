@@ -17,6 +17,7 @@
     "expo-image-manipulator": "~57.0.19",
     "expo-image-picker": "~57.0.19",
     "expo-secure-store": "~57.0.2",
+    "expo-updates": "~57.0.26",
     "react": "19.2.3",
     "react-hook-form": "^7.87.0",
     "react-native": "0.86.3",
