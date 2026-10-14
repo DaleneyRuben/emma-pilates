@@ -107,44 +107,52 @@ export const startWorker = async (
     dependencies.boss,
     dependencies.finalizeUpload,
   );
-  await dependencies.pendingAccountCleanup.execute();
-  const pendingAccountCleanupTimer = setInterval(() => {
-    void dependencies.pendingAccountCleanup.execute().catch(() => {
+  const runPendingAccountCleanup = () =>
+    dependencies.pendingAccountCleanup.execute().catch(() => {
       dependencies.emit({
         event: 'pending_account_cleanup_failed',
         serviceVersion: dependencies.serviceVersion,
       });
     });
+  await runPendingAccountCleanup();
+  const pendingAccountCleanupTimer = setInterval(() => {
+    void runPendingAccountCleanup();
   }, pendingAccountCleanupIntervalMs);
 
-  await dependencies.imageUploadCleanup.execute();
-  const imageUploadCleanupTimer = setInterval(() => {
-    void dependencies.imageUploadCleanup.execute().catch(() => {
+  const runImageUploadCleanup = () =>
+    dependencies.imageUploadCleanup.execute().catch(() => {
       dependencies.emit({
         event: 'image_upload_cleanup_failed',
         serviceVersion: dependencies.serviceVersion,
       });
     });
+  await runImageUploadCleanup();
+  const imageUploadCleanupTimer = setInterval(() => {
+    void runImageUploadCleanup();
   }, imageUploadCleanupIntervalMs);
 
-  await dependencies.subscriptionReminders.execute();
-  const subscriptionReminderTimer = setInterval(() => {
-    void dependencies.subscriptionReminders.execute().catch(() => {
+  const runSubscriptionReminders = () =>
+    dependencies.subscriptionReminders.execute().catch(() => {
       dependencies.emit({
         event: 'subscription_reminders_failed',
         serviceVersion: dependencies.serviceVersion,
       });
     });
+  await runSubscriptionReminders();
+  const subscriptionReminderTimer = setInterval(() => {
+    void runSubscriptionReminders();
   }, subscriptionReminderIntervalMs);
 
-  await dependencies.purchaseIntentExpiry.execute();
-  const purchaseIntentExpiryTimer = setInterval(() => {
-    void dependencies.purchaseIntentExpiry.execute().catch(() => {
+  const runPurchaseIntentExpiry = () =>
+    dependencies.purchaseIntentExpiry.execute().catch(() => {
       dependencies.emit({
         event: 'purchase_intent_expiry_failed',
         serviceVersion: dependencies.serviceVersion,
       });
     });
+  await runPurchaseIntentExpiry();
+  const purchaseIntentExpiryTimer = setInterval(() => {
+    void runPurchaseIntentExpiry();
   }, purchaseIntentExpiryIntervalMs);
 
   // The Session horizon moves only at Bolivia midnight, so an hourly pass
