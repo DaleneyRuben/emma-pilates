@@ -13,15 +13,17 @@ EXT-008 (2026-10-14) a merge to `main` releases itself through the
 | API | Northflank project `default`, team `emma-pilates`, combined service `api`, region US Central (Council Bluffs) | Developer Sandbox, nf-compute-20 (0.2 vCPU, 512 MB), 1 instance; public at https://p01--api--mmps25fn9k9x.code.run, port 3100 HTTP |
 | Worker | Northflank combined service `worker` | Same image as `api`, command `node dist/src/worker-main.js`, no ports, nf-compute-20; watched by the Better Stack «Worker heartbeat» |
 | Migrations | Northflank manual job `migrate` | Same repository, branch, and `apps/backend/Dockerfile`; command `node_modules/.bin/prisma migrate deploy`; retry limit 0 |
+| Backups | Northflank cron job `backup` | Same repository and Dockerfile, build argument `POSTGRESQL_CLIENT_MAJOR=18`; command `node dist/src/database-backup-main.js` daily at 03:00 La Paz; writes to R2 `emma-pilates-prod-backups` ([backups runbook](./backups-and-restore-drills.md)) |
 | Database | Aiven project `emma-pilates-prod`, service `emma-pilates-prod-db`, database `emma` | Free plan, PostgreSQL 18, DigitalOcean US West (Santa Clara), 20 connections, 1 GB disk |
 | Settings | Northflank secret group `production` (runtime, unrestricted) | Every variable both pieces share, plus the files `/etc/secrets/emma-ca.pem` (Aiven's CA) and `/etc/secrets/transfer-qr.png` |
 | Admin web | Vercel project `emma-pilates-admin`, production alias https://emma-pilates-admin.vercel.app | `vercel.json` sends that host's `/api/v1` to the Northflank API |
 | Monitoring | Better Stack «Production API readiness», every 3 minutes | Error tracking `emma-pilates-api` through `ERROR_REPORTING_DSN` |
 
-CI is **off** on both the service and the job, so a push never builds by
-itself; only the workflow (or a person) starts a build. CD is **on** for both:
-a finished build of `api` deploys at once, and a finished build of `migrate`
-becomes the image its next run uses. Leave all four toggles as they are.
+CI is **off** on every service and job, so a push never builds by itself;
+only the workflow (or a person) starts a build. CD is **on** for all of them:
+a finished build of `api` or `worker` deploys at once, and a finished build of
+`migrate` or `backup` becomes the image its next run uses. Leave the toggles
+as they are.
 
 ## Release a commit (automatic)
 
@@ -44,7 +46,11 @@ starts within seconds and runs
    until its rollout completes after that build started (at most 10 min);
    the repository variable `NORTHFLANK_WORKER_SERVICE_ID` names the service,
    and an empty value skips this step (EXT-002);
-7. runs `pnpm smoke` with `SMOKE_EXPECTED_RELEASE` set to the commit.
+7. builds the same commit on the `backup` job without running it (at most
+   20 min), so the next scheduled dump uses it; the repository variable
+   `NORTHFLANK_BACKUP_JOB_ID` names the job, and an empty value skips this
+   step (EXT-009);
+8. runs `pnpm smoke` with `SMOKE_EXPECTED_RELEASE` set to the commit.
 
 Every step starts only after the one before it succeeded, and the first
 failure stops the release. The job's own limit is 60 minutes. Releases queue
@@ -70,6 +76,7 @@ automatically (ADR-0080):
 | migrate run | the previous release; the schema may be partly migrated | Read the run's Logs; fix the migration forward, never edit an applied one |
 | api build | the previous release on the new schema | Read the build's log (Services → `api` → Builds); fix and merge again |
 | worker build or rollout | the new API; the worker on its previous release | Read Services → `worker` → Builds or Logs (a `ZodError` names a missing setting); fix and merge again. The old worker keeps running the jobs meanwhile |
+| backup build | the new API and worker; the next dump uses the previous backup image | Read Jobs → `backup` → Builds; fix and merge again. Dumps keep running on the old image meanwhile |
 | readiness | the previous release, or a new one that never became ready | Read `api`'s Logs: a `ZodError` names a missing setting, and readiness stays `503` until every migration shipped in the image is applied |
 | smoke | the new release, marked unsuccessful | Read the smoke JSON in the run's log; decide on a fix forward or the incident runbook |
 | any stage with `Northflank answered 401` or `403` | unchanged | The token expired or lost a permission; see «The deploy token» |
@@ -110,7 +117,9 @@ Only when the workflow cannot run (GitHub Actions down, token lapsed):
 4. **Then the worker.** Services → `worker` → Commits → **Rebuild** on the
    same commit; CD deploys it. Its Logs should show JSON lines with
    `"service":"worker"` and the new `release`.
-5. **Check the release** from the repository root:
+5. **Then the backup image.** Jobs → `backup` → Builds → **Start build** on
+   the same commit. Do not run it; the schedule does.
+6. **Check the release** from the repository root:
 
    ```sh
    SMOKE_BASE_URL=https://p01--api--mmps25fn9k9x.code.run \

@@ -10,6 +10,7 @@ import {
 // NORTHFLANK_API_TOKEN=… RELEASE_SHA=<commit> MAIN_HEAD=<main's head>
 // NORTHFLANK_PROJECT_ID=default NORTHFLANK_JOB_ID=migrate
 // NORTHFLANK_SERVICE_ID=api [NORTHFLANK_WORKER_SERVICE_ID=worker]
+// [NORTHFLANK_BACKUP_JOB_ID=backup]
 // PRODUCTION_API_URL=https://… pnpm release:production
 function required(name: string): string {
   const value = process.env[name];
@@ -44,6 +45,8 @@ async function main(): Promise<void> {
     serviceId: required('NORTHFLANK_SERVICE_ID'),
     // Empty until Northflank's worker service exists (EXT-002).
     workerServiceId: process.env.NORTHFLANK_WORKER_SERVICE_ID || null,
+    // Empty until Northflank's backup job exists (EXT-009).
+    backupJobId: process.env.NORTHFLANK_BACKUP_JOB_ID || null,
     readinessUrl: new URL('/health/ready', required('PRODUCTION_API_URL')).href,
     northflank,
     fetch: (url, init) => fetch(url, init),

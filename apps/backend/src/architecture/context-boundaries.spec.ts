@@ -44,6 +44,7 @@ const sharedContextSlices = [
 ];
 // Shared kernel folders may depend on each other but never on a context.
 const sharedKernel = [
+  'backup',
   'config',
   'database',
   'deployment',

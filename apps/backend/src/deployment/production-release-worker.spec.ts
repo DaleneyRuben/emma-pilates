@@ -45,7 +45,7 @@ describe('releaseProduction with the worker (EXT-002)', () => {
       { operation: 'getServiceDeployment', args: ['worker'] },
       { operation: 'getServiceDeployment', args: ['worker'] },
     ]);
-    expect(log.slice(-4)).toEqual([
+    expect(log.slice(-5, -1)).toEqual([
       `readiness reports ${sha}`,
       `worker build worker-build-1 started for ${sha}`,
       'worker build worker-build-1 succeeded',
@@ -63,7 +63,7 @@ describe('releaseProduction with the worker (EXT-002)', () => {
     expect(journal().filter((step) => step === 'startServiceBuild')).toEqual([
       'startServiceBuild',
     ]);
-    expect(log.at(-1)).toBe('no worker service configured; worker skipped');
+    expect(log).toContain('no worker service configured; worker skipped');
   });
 
   it('reports a failed worker build while the API already runs the commit', async () => {

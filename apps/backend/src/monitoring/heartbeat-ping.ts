@@ -1,7 +1,7 @@
 const heartbeatPingTimeoutMs = 10_000;
 
 type HeartbeatPingRecord = {
-  event: 'worker_heartbeat_ping_failed';
+  event: string;
   status?: number;
 };
 
@@ -20,6 +20,7 @@ export const createHeartbeatPing =
   (
     url: string | null,
     dependencies: HeartbeatPingDependencies,
+    failureEvent = 'worker_heartbeat_ping_failed',
   ): (() => Promise<void>) =>
   async () => {
     if (url === null) {
@@ -31,12 +32,9 @@ export const createHeartbeatPing =
         signal: AbortSignal.timeout(heartbeatPingTimeoutMs),
       });
       if (!response.ok) {
-        dependencies.emit({
-          event: 'worker_heartbeat_ping_failed',
-          status: response.status,
-        });
+        dependencies.emit({ event: failureEvent, status: response.status });
       }
     } catch {
-      dependencies.emit({ event: 'worker_heartbeat_ping_failed' });
+      dependencies.emit({ event: failureEvent });
     }
   };

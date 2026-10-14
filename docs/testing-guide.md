@@ -20,6 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Email request limits         | Fill the device or network budget for registration, resend, email correction, and recovery: the API answers `429` `authentication_email_throttled` with `Retry-After`, and the apps and admin web show «Demasiadas solicitudes…» with the wait (Test 5 G) | Every admitted request counts, even one for an unknown address or a suppressed email; reset by marking your local `email_requested` rows deleted |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
+| Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); sign in through a Vercel preview against the shared development API (Test 36); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 
@@ -3485,3 +3486,94 @@ It prints `activation_link_found` with a link to the admin web's
 current link is queued. Locally, on a disposable database after
 `admin:bootstrap`, `POST /api/v1/authentication-links/inspection` with the
 printed token answers `{"status":"current","purpose":"activation"}`.
+
+## Test 43: back up the database and restore the dump
+
+Since EXT-009 Northflank's scheduled `backup` job runs
+`node dist/src/database-backup-main.js` every day at 03:00 in La Paz: it
+counts the five tables the restore drill compares, writes a custom-format
+`pg_dump` (version 18, over TLS verified against Aiven's CA), uploads it once
+as `daily/<database>-<UTC time>.dump`, copies it over
+`monthly/<database>-<La Paz month>.dump`, and pings Better Stack («Database
+backup»), or `…/fail` when a step failed or the dump is under half the size of
+the one before. R2's lifecycle rules delete `daily/` after 30 days and
+`monthly/` after 365; the job never deletes
+([runbook](./runbooks/backups-and-restore-drills.md)).
+
+### A. Run the job locally against MinIO
+
+1. Start MinIO as in Test 42 A and create a bucket for the dumps (the
+   console at http://127.0.0.1:9101, or
+   `aws --endpoint-url http://127.0.0.1:9100 s3 mb s3://pilates-backups` with
+   the MinIO user and password as `AWS_ACCESS_KEY_ID` and
+   `AWS_SECRET_ACCESS_KEY`).
+2. Run the job on `pilates_dev_sim` with PostgreSQL 18's `pg_dump`:
+
+   ```sh
+   cd apps/backend
+   DATABASE_URL="postgresql://$USER@localhost:5433/pilates_dev_sim" \
+   BACKUP_STORAGE_ENDPOINT=http://127.0.0.1:9100 \
+   BACKUP_STORAGE_BUCKET=pilates-backups \
+   BACKUP_STORAGE_ACCESS_KEY_ID=pilateslocal \
+   BACKUP_STORAGE_SECRET_ACCESS_KEY=pilateslocalsecret \
+   BACKUP_PG_DUMP_PATH=/opt/homebrew/opt/postgresql@18/bin/pg_dump \
+   pnpm backup:run
+   ```
+
+   It prints one `database_backup_succeeded` line with the key, the monthly
+   key, `sizeBytes` (about 300 KB for the fixtures), `sha256`, and
+   `rowCounts`, and exits 0. The bucket holds the daily key and the monthly
+   copy. A second run reports the first one's size as `previousSizeBytes`.
+   With PostgreSQL 14's `pg_dump` the run prints `database_backup_failed`
+   with `stage` `dump` and the server version mismatch, and exits 1.
+3. Check the bucket against the retention rules:
+
+   ```sh
+   BACKUP_STORAGE_ENDPOINT=http://127.0.0.1:9100 \
+   BACKUP_STORAGE_BUCKET=pilates-backups \
+   BACKUP_STORAGE_ACCESS_KEY_ID=pilateslocal \
+   BACKUP_STORAGE_SECRET_ACCESS_KEY=pilateslocalsecret \
+   BACKUP_DATABASE=pilates_dev_sim pnpm backup:check
+   ```
+
+   It prints `"passed": true` with the counts and the latest dump, and lists
+   `problems` otherwise (`no_daily_dump`, `latest_daily_stale`,
+   `latest_daily_shrank`, `daily_missing`, `monthly_missing`,
+   `daily_kept_too_long`, `monthly_kept_too_long`), exiting 1.
+
+### B. Restore the dump into a throwaway database
+
+Follow the drill in the
+[runbook](./runbooks/backups-and-restore-drills.md#restore-drill) with the
+MinIO bucket in place of R2. On 2026-10-14 the `pilates_dev_sim` dump restored
+in 1.1 s with `pg_restore --no-owner --no-acl --exit-on-error`; its SHA-256
+matched the object's `sha256` metadata, `prisma migrate status` said «Database
+schema is up to date!», the five row counts equalled the job's `rowCounts`,
+the API on port 3199 against the copy passed `pnpm smoke`, and the
+fixture-free checks gave 2 audit guards, 4 ledger triggers, no negative
+balance, and no Client without exactly one live Account.
+
+### C. The automated checks
+
+- `pnpm --filter @pilates/backend test` covers the key names, the retention
+  check, the run's order and failures, the `pg_dump` arguments and settings,
+  the bucket adapter, and the release's backup build stage.
+- The integration suite's `test/storage/s3-backup-store` spec runs against
+  MinIO (and S3Mock in CI) when `OBJECT_STORAGE_TEST_ENDPOINT` is set;
+  `test/backup` counts the drill tables on a disposable database and, when
+  `BACKUP_TEST_PG_DUMP_PATH=/opt/homebrew/opt/postgresql@18/bin/pg_dump` is
+  set, writes a real dump (CI's runner has no `pg_dump` 18, so it skips that
+  case).
+
+### D. The job's image
+
+`apps/backend/Dockerfile` installs `postgresql-client-18` from PostgreSQL's
+repository only when built with `--build-arg POSTGRESQL_CLIENT_MAJOR=18`
+(Northflank's `backup` job sets it); the API, worker, and `migrate` images
+build without it and have no `pg_dump`. Checked on 2026-10-14: the backup
+image is 274 MB compressed against 256 MB, `pg_dump --version` reports 18.6,
+and against a TLS PostgreSQL 18 signed by a throwaway CA, with production's
+`DATABASE_URL` shape, the job succeeded with the right CA mounted at
+`/etc/secrets/emma-ca.pem` and both the row count (node-pg) and `pg_dump`
+refused a wrong CA (`certificate verify failed`). In production the image
+refuses to start without an HTTPS storage endpoint and `BACKUP_HEARTBEAT_URL`.

@@ -7,6 +7,8 @@
   "license": "UNLICENSED",
   "scripts": {
     "admin:bootstrap": "nest build && node dist/src/administrator-bootstrap-main.js",
+    "backup:check": "nest build && node dist/src/backup-check-main.js",
+    "backup:run": "nest build && node dist/src/database-backup-main.js",
     "build": "nest build",
     "db:fixtures": "nest build && node dist/src/development-fixtures-main.js",
     "db:migrate:deploy": "prisma migrate deploy",

@@ -1,5 +1,6 @@
 import { S3Client, type S3ClientConfig } from '@aws-sdk/client-s3';
 import type { Environment } from '../config/environment';
+import { s3ClientConfig } from '../config/s3-client-config';
 import { LocalObjectStorage } from './local-object-storage';
 import type { ObjectStorage } from './object-storage';
 import { S3ObjectStorage } from './s3-object-storage';
@@ -31,13 +32,13 @@ export function createObjectStorage(
     return new LocalObjectStorage(settings.UPLOADS_LOCAL_STORAGE_ROOT);
   }
 
-  const client = newClient({
-    endpoint: s3Setting(
-      settings.OBJECT_STORAGE_ENDPOINT,
-      'OBJECT_STORAGE_ENDPOINT',
-    ),
-    region: settings.OBJECT_STORAGE_REGION,
-    credentials: {
+  const client = newClient(
+    s3ClientConfig({
+      endpoint: s3Setting(
+        settings.OBJECT_STORAGE_ENDPOINT,
+        'OBJECT_STORAGE_ENDPOINT',
+      ),
+      region: settings.OBJECT_STORAGE_REGION,
       accessKeyId: s3Setting(
         settings.OBJECT_STORAGE_ACCESS_KEY_ID,
         'OBJECT_STORAGE_ACCESS_KEY_ID',
@@ -46,11 +47,8 @@ export function createObjectStorage(
         settings.OBJECT_STORAGE_SECRET_ACCESS_KEY,
         'OBJECT_STORAGE_SECRET_ACCESS_KEY',
       ),
-    },
-    forcePathStyle: true,
-    requestChecksumCalculation: 'WHEN_REQUIRED',
-    responseChecksumValidation: 'WHEN_REQUIRED',
-  });
+    }),
+  );
 
   return new S3ObjectStorage(
     client,
