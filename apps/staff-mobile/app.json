@@ -40,6 +40,9 @@
         "projectId": "885d3272-da0a-49f7-b8cd-33092de7662a"
       }
     },
-    "owner": "emma-pilates"
+    "owner": "emma-pilates",
+    "updates": {
+      "url": "https://u.expo.dev/885d3272-da0a-49f7-b8cd-33092de7662a"
+    }
   }
 }
