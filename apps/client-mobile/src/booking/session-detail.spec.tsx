@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-nati
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 
 import App from "../../App";
-import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
+import { createClientRuntime, fakePushPlatform, jsonResponse, routeFetcher } from "../test-support";
 import { boliviaCivilDate, civilDateRange } from "@pilates/mobile-core";
 
 jest.setTimeout(20_000);
@@ -71,6 +71,7 @@ async function openDetail(
   routes: Parameters<typeof routeFetcher>[0],
   remaining = 5,
   availableSeats = 3,
+  runtime: Parameters<typeof createClientRuntime>[1] = {},
 ) {
   let subscriptionRemaining = remaining;
   const fetcher = routeFetcher({
@@ -82,7 +83,7 @@ async function openDetail(
     "/api/v1/sessions/session-1": () => jsonResponse(detail(availableSeats)),
     ...routes,
   });
-  const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+  const screen = await render(<App runtime={createClientRuntime(fetcher, runtime)} />);
 
   await waitFor(
     () => {
@@ -165,6 +166,44 @@ describe("Client Session detail", () => {
       expect(screen.getByText("Ya estás en la lista de espera.")).toBeOnTheScreen();
     });
     expect(joined).toHaveBeenCalled();
+  });
+
+  // ADR-0067: the explanation follows the action that makes push useful.
+  it("offers notifications once the Booking is confirmed", async () => {
+    const { platform } = fakePushPlatform("undetermined");
+    const { screen } = await openDetail(
+      {
+        "POST /api/v1/sessions/session-1/bookings": () => jsonResponse({ id: "booking-1" }, 201),
+      },
+      5,
+      3,
+      { pushPlatform: platform },
+    );
+
+    await fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Activar notificaciones" })).toBeOnTheScreen();
+    });
+  });
+
+  it("offers notifications once the Client joins the Waitlist", async () => {
+    const { platform } = fakePushPlatform("undetermined");
+    const { screen } = await openDetail(
+      {
+        "POST /api/v1/sessions/session-1/waitlist-entries": () =>
+          jsonResponse({ id: "entry-1" }, 201),
+      },
+      5,
+      0,
+      { pushPlatform: platform },
+    );
+
+    await fireEvent.press(screen.getByRole("button", { name: "Unirme a la lista de espera" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Activar notificaciones" })).toBeOnTheScreen();
+    });
   });
 
   it("disables booking without remaining classes and links to the Plans", async () => {

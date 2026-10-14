@@ -117,8 +117,9 @@ export function baseRoutes(overrides: Parameters<typeof routeFetcher>[0] = {}) {
 export async function openProfileRow(
   fetcher: typeof globalThis.fetch,
   row: "Evaluación nutricional" | "Mis evaluaciones",
+  runtime: Parameters<typeof createClientRuntime>[1] = {},
 ) {
-  const screen = await render(<App runtime={createClientRuntime(fetcher)} />);
+  const screen = await render(<App runtime={createClientRuntime(fetcher, runtime)} />);
   await waitFor(
     () => {
       expect(screen.getByRole("button", { name: /^Perfil, .*tab/ })).toBeOnTheScreen();
