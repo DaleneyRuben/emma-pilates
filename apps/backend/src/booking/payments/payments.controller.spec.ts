@@ -274,19 +274,16 @@ describe('TransferInstructionsController', () => {
   const resolvePrincipal = jest.fn().mockResolvedValue(principal);
   const controller = new TransferInstructionsController(
     {
-      beneficiaryName: 'Emma Pilates Studio',
-      bankName: 'Banco Local',
-      accountNumber: '0000000000',
       qrImagePath: '.data/transfer-qr.png',
     },
     resolvePrincipal,
   );
 
-  it('serves the fixed studio transfer instructions with a backend QR route', async () => {
+  it('serves the backend QR route with the deprecated bank details left empty', async () => {
     await expect(controller.read(bearer)).resolves.toEqual({
-      beneficiaryName: 'Emma Pilates Studio',
-      bankName: 'Banco Local',
-      accountNumber: '0000000000',
+      beneficiaryName: '',
+      bankName: '',
+      accountNumber: '',
       qrImageUrl: '/api/v1/transfer-instructions/qr',
     });
   });

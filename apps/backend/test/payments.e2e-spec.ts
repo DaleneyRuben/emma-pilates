@@ -130,9 +130,6 @@ describe('client payments (e2e)', () => {
         {
           provide: transferInstructions,
           useValue: {
-            beneficiaryName: 'Emma Pilates Studio',
-            bankName: 'Banco Local',
-            accountNumber: '0000000000',
             qrImagePath,
           },
         },
@@ -278,16 +275,16 @@ describe('client payments (e2e)', () => {
       });
   });
 
-  it('serves the transfer instructions and streams the QR image without caching', async () => {
+  it('serves the QR-only transfer instructions and streams the QR image without caching', async () => {
     await request(app.getHttpServer())
       .get('/api/v1/transfer-instructions')
       .set('authorization', bearer)
       .expect(200)
       .expect('Cache-Control', 'no-store')
       .expect({
-        beneficiaryName: 'Emma Pilates Studio',
-        bankName: 'Banco Local',
-        accountNumber: '0000000000',
+        beneficiaryName: '',
+        bankName: '',
+        accountNumber: '',
         qrImageUrl: '/api/v1/transfer-instructions/qr',
       });
     await request(app.getHttpServer())

@@ -4,7 +4,6 @@ import {
   getGetTransferQrImageUrl,
   submitPurchaseIntentTransfer,
   useGetCurrentPurchaseIntent,
-  useGetTransferInstructions,
 } from "@pilates/api-contracts";
 import {
   BodyText,
@@ -70,7 +69,6 @@ export function PaymentScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const instructions = useGetTransferInstructions({ fetcher });
   const qrUri = useQrImage(fetcher);
   const [receipt, setReceipt] = useState<AttachedReceipt | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -104,7 +102,6 @@ export function PaymentScreen() {
   }
 
   const current = intent.data.data;
-  const details = instructions.data?.status === 200 ? instructions.data.data : null;
 
   const attach = async () => {
     setError(null);
@@ -170,12 +167,6 @@ export function PaymentScreen() {
           <BodyText style={styles.centered}>
             Escanea el código con tu app bancaria y transfiere el monto exacto.
           </BodyText>
-          {details === null ? null : (
-            <View style={styles.instructions}>
-              <Text style={styles.beneficiary}>{details.beneficiaryName}</Text>
-              <BodyText>{`${details.bankName} · Cuenta ${details.accountNumber}`}</BodyText>
-            </View>
-          )}
         </View>
         <Pressable
           accessibilityLabel={
@@ -234,12 +225,10 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     padding: spacing.lg,
   },
-  beneficiary: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   centered: { textAlign: "center" },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   credit: { color: colors.successText },
   error: { color: colors.errorText },
-  instructions: { alignItems: "center", gap: spacing.xxs },
   qr: { height: 220, width: 220 },
   qrCard: {
     ...surfaces.card,

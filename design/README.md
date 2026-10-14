@@ -221,7 +221,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `07` | Historial de clases | Past classes |
 | `08` | Elegir plan | Plan catalog |
 | `09` | Detalle del plan | Plan detail; the total is the price drawn minus the Credit applied, never below zero |
-| `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash) |
+| `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash); the QR is the only transfer instruction, with no beneficiary, bank, or account line |
 | `11` | Estado del pago | Pending/confirmed/rejected states |
 | `12` | Mi plan | Active plan, sessions left, expiry |
 | `13` | Evaluación nutricional | Book a nutrition assessment: only days of months not yet used in the next 30 days, the Branch (and Nutritionist) per turno when there are several, turnos close 3 h before they start; used-month state only when no unused month has turnos, and a no-active-plan state with «Ver planes» (`08`); the used-month title names the used month («de este mes» or «de septiembre») |

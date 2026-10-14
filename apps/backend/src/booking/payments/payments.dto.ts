@@ -239,13 +239,25 @@ export class SessionCancellationDto {
 }
 
 export class TransferInstructionsDto {
-  @ApiProperty()
+  @ApiProperty({
+    deprecated: true,
+    description:
+      'Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it.',
+  })
   beneficiaryName!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    deprecated: true,
+    description:
+      'Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it.',
+  })
   bankName!: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    deprecated: true,
+    description:
+      'Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it.',
+  })
   accountNumber!: string;
 
   @ApiProperty({ description: 'Backend route serving the studio QR image' })

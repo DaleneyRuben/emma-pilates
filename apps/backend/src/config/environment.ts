@@ -3,12 +3,7 @@ import { z } from 'zod';
 const localLinkEncryptionKey = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=';
 const localLinkEncryptionKeyId = 'local-development-v1';
 const localEmailDigestKey = 'local-development-email-digest-key';
-const localTransferInstructions = {
-  TRANSFER_BENEFICIARY_NAME: 'Emma Pilates Studio',
-  TRANSFER_BANK_NAME: 'Banco de desarrollo local',
-  TRANSFER_ACCOUNT_NUMBER: '0000000000',
-  TRANSFER_QR_IMAGE_PATH: '.data/transfer-qr.png',
-} as const;
+const localTransferQrImagePath = '.data/transfer-qr.png';
 const localAdminWebOrigin = 'http://localhost:5173';
 // The HTTPS host the apps accept for authentication links (ADR-0036); the
 // real domain is LNK-001's, so production must set it explicitly.
@@ -93,22 +88,8 @@ const environmentSchema = z
         `REFERRAL_REWARD_CENTAVOS must be ${approvedReferralRewardCentavos}`,
       )
       .default(approvedReferralRewardCentavos),
-    TRANSFER_ACCOUNT_NUMBER: z
-      .string()
-      .min(1)
-      .default(localTransferInstructions.TRANSFER_ACCOUNT_NUMBER),
-    TRANSFER_BANK_NAME: z
-      .string()
-      .min(1)
-      .default(localTransferInstructions.TRANSFER_BANK_NAME),
-    TRANSFER_BENEFICIARY_NAME: z
-      .string()
-      .min(1)
-      .default(localTransferInstructions.TRANSFER_BENEFICIARY_NAME),
-    TRANSFER_QR_IMAGE_PATH: z
-      .string()
-      .min(1)
-      .default(localTransferInstructions.TRANSFER_QR_IMAGE_PATH),
+    // PAY-003: the studio's QR image is the only transfer instruction.
+    TRANSFER_QR_IMAGE_PATH: z.string().min(1).default(localTransferQrImagePath),
     UPLOADS_LOCAL_STORAGE_ROOT: z.string().min(1).default('.data/uploads'),
     // ADR-0081: Better Stack's error-tracking DSN; unset reports nothing.
     ERROR_REPORTING_DSN: z.url().nullable().default(null),
@@ -138,10 +119,7 @@ const environmentSchema = z
       ['AUTHENTICATION_LINK_ENCRYPTION_KEY', localLinkEncryptionKey],
       ['AUTHENTICATION_LINK_ENCRYPTION_KEY_ID', localLinkEncryptionKeyId],
       ['AUTHENTICATION_LINK_BASE_URL', localLinkBaseUrl],
-      ...(Object.entries(localTransferInstructions) as [
-        keyof typeof localTransferInstructions,
-        string,
-      ][]),
+      ['TRANSFER_QR_IMAGE_PATH', localTransferQrImagePath],
     ];
 
     const origins = environment.ADMIN_WEB_TRUSTED_ORIGINS;

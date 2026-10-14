@@ -582,9 +582,6 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
       useFactory: (
         config: ConfigService<Environment, true>,
       ): TransferInstructions => ({
-        beneficiaryName: config.getOrThrow('TRANSFER_BENEFICIARY_NAME'),
-        bankName: config.getOrThrow('TRANSFER_BANK_NAME'),
-        accountNumber: config.getOrThrow('TRANSFER_ACCOUNT_NUMBER'),
         qrImagePath: config.getOrThrow('TRANSFER_QR_IMAGE_PATH'),
       }),
     },

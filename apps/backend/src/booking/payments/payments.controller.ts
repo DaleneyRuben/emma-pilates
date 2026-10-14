@@ -52,9 +52,6 @@ export const paymentCommands = Symbol('paymentCommands');
 export const transferInstructions = Symbol('transferInstructions');
 
 export type TransferInstructions = {
-  beneficiaryName: string;
-  bankName: string;
-  accountNumber: string;
   qrImagePath: string;
 };
 
@@ -370,9 +367,10 @@ export class TransferInstructionsController {
   ): Promise<TransferInstructionsDto> {
     await authenticateBearer(this.principalResolver, authorization);
     return {
-      beneficiaryName: this.instructions.beneficiaryName,
-      bankName: this.instructions.bankName,
-      accountNumber: this.instructions.accountNumber,
+      // Deprecated by PAY-003; kept empty for older mobile releases.
+      beneficiaryName: '',
+      bankName: '',
+      accountNumber: '',
       qrImageUrl: transferQrRoute,
     };
   }

@@ -9195,13 +9195,19 @@
         "type": "object",
         "properties": {
           "beneficiaryName": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true,
+            "description": "Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it."
           },
           "bankName": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true,
+            "description": "Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it."
           },
           "accountNumber": {
-            "type": "string"
+            "type": "string",
+            "deprecated": true,
+            "description": "Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it."
           },
           "qrImageUrl": {
             "type": "string",

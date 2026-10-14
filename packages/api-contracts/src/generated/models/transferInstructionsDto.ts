@@ -6,8 +6,20 @@
  */
 
 export interface TransferInstructionsDto {
+  /**
+   * Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it.
+   * @deprecated
+   */
   beneficiaryName: string;
+  /**
+   * Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it.
+   * @deprecated
+   */
   bankName: string;
+  /**
+   * Always empty since PAY-003: the QR image is the only transfer instruction. Removed once no supported mobile release reads it.
+   * @deprecated
+   */
   accountNumber: string;
   /** Backend route serving the studio QR image */
   qrImageUrl: string;

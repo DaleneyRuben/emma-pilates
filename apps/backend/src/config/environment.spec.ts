@@ -35,33 +35,60 @@ describe('environment configuration', () => {
     ).toThrow('AUTHENTICATION_LINK_ENCRYPTION_KEY');
   });
 
-  it('defaults the transfer instructions and referral reward for local development', () => {
+  it('defaults the transfer QR and referral reward for local development', () => {
     const environment = validateEnvironment({
       DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
       NODE_ENV: 'test',
     });
 
     expect(environment).toMatchObject({
-      TRANSFER_BENEFICIARY_NAME: 'Emma Pilates Studio',
-      TRANSFER_BANK_NAME: 'Banco de desarrollo local',
-      TRANSFER_ACCOUNT_NUMBER: '0000000000',
       TRANSFER_QR_IMAGE_PATH: '.data/transfer-qr.png',
       REFERRAL_REWARD_CENTAVOS: 6000,
     });
   });
 
-  it('requires explicit transfer instructions in production', () => {
-    expect(() =>
-      validateEnvironment({
-        DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
-        NODE_ENV: 'production',
-        AUTHENTICATION_EMAIL_DIGEST_KEY: 'x'.repeat(32),
-        AUTHENTICATION_LINK_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString(
-          'base64',
-        ),
-        AUTHENTICATION_LINK_ENCRYPTION_KEY_ID: 'prod-v1',
-      }),
-    ).toThrow('TRANSFER_BENEFICIARY_NAME');
+  describe('transfer instructions in production', () => {
+    const production = {
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'production',
+      AUTHENTICATION_EMAIL_DIGEST_KEY: 'x'.repeat(32),
+      AUTHENTICATION_LINK_ENCRYPTION_KEY: Buffer.alloc(32, 1).toString(
+        'base64',
+      ),
+      AUTHENTICATION_LINK_ENCRYPTION_KEY_ID: 'prod-v1',
+      AUTHENTICATION_LINK_BASE_URL: 'https://links.emmapilates.bo',
+      ADMIN_WEB_TRUSTED_ORIGINS: 'https://admin.emmapilates.bo',
+    };
+
+    it('requires an explicit transfer QR image path', () => {
+      expect(() => validateEnvironment(production)).toThrow(
+        'TRANSFER_QR_IMAGE_PATH',
+      );
+    });
+
+    it('starts with the QR image path as the only transfer setting', () => {
+      const environment = validateEnvironment({
+        ...production,
+        TRANSFER_QR_IMAGE_PATH: '/srv/transfer-qr.png',
+      });
+
+      expect(environment.TRANSFER_QR_IMAGE_PATH).toBe('/srv/transfer-qr.png');
+      expect(environment).not.toHaveProperty('TRANSFER_BENEFICIARY_NAME');
+      expect(environment).not.toHaveProperty('TRANSFER_BANK_NAME');
+      expect(environment).not.toHaveProperty('TRANSFER_ACCOUNT_NUMBER');
+    });
+
+    it('ignores the retired bank-detail variables while they are still set', () => {
+      const environment = validateEnvironment({
+        ...production,
+        TRANSFER_QR_IMAGE_PATH: '/srv/transfer-qr.png',
+        TRANSFER_BENEFICIARY_NAME: 'PENDIENTE',
+        TRANSFER_BANK_NAME: 'PENDIENTE',
+        TRANSFER_ACCOUNT_NUMBER: 'PENDIENTE',
+      });
+
+      expect(environment).not.toHaveProperty('TRANSFER_BENEFICIARY_NAME');
+    });
   });
 
   it('accepts only the approved Bs 60 referral reward', () => {
@@ -97,9 +124,6 @@ describe('environment configuration', () => {
       ),
       AUTHENTICATION_LINK_ENCRYPTION_KEY_ID: 'prod-v1',
       AUTHENTICATION_LINK_BASE_URL: 'https://links.emmapilates.bo',
-      TRANSFER_BENEFICIARY_NAME: 'Studio',
-      TRANSFER_BANK_NAME: 'Bank',
-      TRANSFER_ACCOUNT_NUMBER: '123',
       TRANSFER_QR_IMAGE_PATH: '/qr.png',
     };
 

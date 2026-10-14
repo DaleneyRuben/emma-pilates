@@ -1582,10 +1582,11 @@ As Sofía, tap **Comprar un plan** on Home (her Plan is expired), pick
 **Crédito aplicado** line with `−Bs 60`, and **Total a pagar** `Bs 500`. Tap
 **Continuar al pago**.
 
-**Pago por transferencia** shows the amount, the studio QR (locally the
-placeholder image from `apps/backend/.data/transfer-qr.png`), the beneficiary,
-bank, and account number from `TRANSFER_*`, and the line "Escanea el código con
-tu app bancaria y transfiere el monto exacto.". Tap **Sube tu comprobante de
+**Pago por transferencia** shows the amount, then a card with the studio QR
+(locally the placeholder image from `apps/backend/.data/transfer-qr.png`) and
+the line "Escanea el código con tu app bancaria y transfiere el monto exacto."
+and nothing else: since PAY-003 the QR is the only transfer instruction, with no
+beneficiary, bank, or account line (Test 41 checks the endpoint). Tap **Sube tu comprobante de
 transferencia**: iOS asks for photo access the first time, then opens the
 library (the Simulator ships with sample photos). Picking one uploads it
 through `/api/v1/uploads` (hash, PUT, finalize, wait until `READY`) and attaches
@@ -3386,3 +3387,31 @@ It only reads production and starts builds; it needs no local setup.
 5. Two merges in quick succession: the first release finishes, then only the
    newest pending one runs; a release whose commit is no longer main's head
    ends `superseded` and deploys nothing.
+
+## Test 41: check that the QR is the only transfer instruction
+
+Since PAY-003 the backend no longer reads `TRANSFER_BENEFICIARY_NAME`,
+`TRANSFER_BANK_NAME`, or `TRANSFER_ACCOUNT_NUMBER`; only
+`TRANSFER_QR_IMAGE_PATH` remains, and production refuses to start without it.
+`GET /transfer-instructions` keeps its three bank fields, always empty and
+marked deprecated in the contract, so app builds from before PAY-003 keep
+working until no supported release reads them. Start the API on
+`pilates_dev_sim` with fixtures loaded (Test 5A).
+
+1. Log in as Sofía and read the instructions:
+
+   ```sh
+   TOKEN=$(curl -s -X POST http://127.0.0.1:3100/api/v1/authentication-sessions -H 'content-type: application/json' -d '{"email":"sofia@example.com","password":"emma-local-2026"}' | python3 -c "import sys,json;print(json.load(sys.stdin)['credential'])")
+   curl -s -i http://127.0.0.1:3100/api/v1/transfer-instructions -H "authorization: Bearer $TOKEN"
+   ```
+
+   The answer is `200` with `Cache-Control: no-store` and
+   `{"beneficiaryName":"","bankName":"","accountNumber":"","qrImageUrl":"/api/v1/transfer-instructions/qr"}`.
+2. `curl -s -o /dev/null -w "%{http_code} %{content_type}\n" http://127.0.0.1:3100/api/v1/transfer-instructions/qr -H "authorization: Bearer $TOKEN"`
+   prints `200 image/png`; without the header both routes answer `401`.
+3. In the Client app (Test 10 B), open **Pago por transferencia**: the QR card
+   holds the QR and the "Escanea el código…" line only. The app no longer
+   calls `GET /transfer-instructions` (the API's request log shows
+   `/purchase-intents/current` and `/transfer-instructions/qr` only).
+4. Setting the three retired variables changes nothing: the API starts and
+   the answer above stays empty.
