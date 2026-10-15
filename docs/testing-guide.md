@@ -3980,6 +3980,9 @@ crashes need a build that has it.
 Verified on 2026-10-15 (EXT-013) on the EAS development builds from Metro:
 both apps on the iPhone 16 Pro, the iPad Pro 11, and the Android emulator,
 12 events in all, none holding the email, the message, or a URL.
+Step C 1–2 verified the same day against `emma-pilates-mobile`: 12
+exceptions in 4 groups (each error type once per bundle name), all
+`development`, Users 0, no message.
 
 ### B. Source maps (release builds only)
 

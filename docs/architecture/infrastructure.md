@@ -56,7 +56,7 @@ Details are in the sections below.
 | **Cloudflare** | R2 only: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production | Domains and DNS (gate 7), public buckets and custom domains, Workers, every other product |
 | **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` profile; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
 | **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
-| **Better Stack** | Uptime monitor «Production API readiness»; error tracking app `emma-pilates-api` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
+| **Better Stack** | Uptime monitor «Production API readiness»; error tracking apps `emma-pilates-api`, `emma-pilates-admin`, and `emma-pilates-mobile` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
 
 Not created yet, in the order the gates open (backlog, «Order to open the
 gates»): a **domain** with **SendPulse** for email (gate 7),
@@ -363,7 +363,8 @@ Values never go in the repository or a chat. «Mac» means the user's own
   alerts. The worker has no probes: Northflank restarts it only when its
   process exits, and the heartbeat catches anything else.
 - **Northflank:** logs (JSON lines), metrics, container restarts.
-- **Better Stack error tracking `emma-pilates-mobile`** (React Native): both
+- **Better Stack error tracking `emma-pilates-mobile`** (React Native, US
+  region, created 2026-10-15): both
   apps report uncaught errors, unhandled rejections, and render errors a
   screen's boundary caught (no message, user, breadcrumbs, device context,
   screenshots, sessions, or tracing; 4xx answers never), tagged `service`
