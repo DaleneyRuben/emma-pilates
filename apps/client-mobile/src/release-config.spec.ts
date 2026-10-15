@@ -101,6 +101,9 @@ describe("client release configuration", () => {
   it("reports errors and uploads source maps from release builds", () => {
     expect(packageJson.dependencies).toHaveProperty("@sentry/react-native");
     expect(appConfig.expo.plugins).toContain("@sentry/react-native/expo");
+    // The plugin's Gradle step runs the app's own node_modules/@sentry/cli,
+    // which pnpm links only for a direct dependency.
+    expect(packageJson.devDependencies).toHaveProperty("@sentry/cli");
   });
 
   it("submits only the production profile", () => {
