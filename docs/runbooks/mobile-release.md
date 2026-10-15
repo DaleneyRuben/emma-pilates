@@ -39,9 +39,10 @@ needs none, a native change needs a new one per app and platform.
 
 - **Android:** each app's `google-services.json` (Firebase project
   `emma-pilates`, committed, not a secret) is wired by `googleServicesFile`
-  and the `expo-notifications` plugin in `app.json`; the FCM V1 service
-  account key sits in each EAS project's Android credentials. A change to
-  either needs a new native build.
+  and the `expo-notifications` plugin in `app.json`, so a change to either
+  needs a new native build. The FCM V1 service account key sits in each EAS
+  project's Android credentials and is used by Expo's servers, so replacing
+  it needs no build.
 - **iOS:** waits for the APNs key (gate 9). Development builds still register
   and show pushes sent with `xcrun simctl push` (testing guide, Test 46).
 - **Sending:** the worker sends through Expo Push Service with the
