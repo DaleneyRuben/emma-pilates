@@ -21,6 +21,7 @@ you are starting with no project knowledge.
 | Email request limits         | Fill the device or network budget for registration, resend, email correction, and recovery: the API answers `429` `authentication_email_throttled` with `Retry-After`, and the apps and admin web show «Demasiadas solicitudes…» with the wait (Test 5 G) | Every admitted request counts, even one for an unknown address or a suppressed email; reset by marking your local `email_requested` rows deleted |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
 | Mobile development builds    | Install the EAS development builds of both apps on the iPhone 16 Pro and iPad Simulators and the Android emulator, run them against Metro, and run the Maestro journeys on them (Test 45) | Each new native build spends one of the free plan's monthly builds; push notifications are Test 46 |
+| Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); sign in through a Vercel preview against the shared development API (Test 36); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
@@ -3933,3 +3934,74 @@ count (Perfil's count): check it on the iOS Home Screen. Stock Android
 launchers show a dot, not a number, so the badge call there is best-effort.
 Sign out: the badge clears, and the device row becomes
 `deactivation_reason = 'logout'`.
+
+## Test 47: check mobile error reporting
+
+Since EXT-013 both apps report to Better Stack through `@sentry/react-native`
+when the bundle was built with `EXPO_PUBLIC_ERROR_REPORTING_DSN`: uncaught
+errors, unhandled promise rejections, and render errors a screen's
+«Algo salió mal» boundary caught, tagged `service` `client-mobile` or
+`staff-mobile`. The environment is `development` for any bundle Metro
+serves, otherwise the build's update channel (`preview`, `production`). No
+message, breadcrumbs, user, device context, screenshot, session, or tracing
+leaves the device, and 4xx API answers are never reported. Without the DSN
+nothing starts. A development build made before EXT-013 has no Sentry native
+module: JavaScript errors still arrive (without a release), and native
+crashes need a build that has it.
+
+### A. Locally, against a receiver on the Mac
+
+1. Save Test 44's receiver (the HTTP half is enough) and start it on port
+   8799. For the emulator, `adb reverse tcp:8799 tcp:8799`.
+2. Add a temporary probe at the end of the app's `index.ts` (never commit
+   it):
+
+   ```ts
+   setTimeout(() => {
+     throw new TypeError("probe lucia@example.com");
+   }, 15000);
+   setTimeout(() => {
+     void Promise.reject(new RangeError("rejection lucia@example.com"));
+   }, 16000);
+   ```
+
+3. Start Metro with a local DSN, for example
+   `EXPO_PUBLIC_ERROR_REPORTING_DSN=http://publickey@127.0.0.1:8799/3 ./node_modules/.bin/expo start --dev-client --port 8091`,
+   and open the development build on it (Test 45). Fifteen seconds after
+   the bundle loads the red «Uncaught Error» screen shows the probe, and the
+   receiver prints two events: `TypeError` (mechanism `onerror`, level
+   `fatal`) and `RangeError` (`onunhandledrejection`), environment
+   `development`, the app's `service` tag, frames named
+   `app:///main.jsbundle` (iOS) or `app:///index.android.bundle` (Android),
+   and no message, email, user, breadcrumbs, or contexts. No «Sentry»
+   alert appears, and «Dismiss» shows the login screen as usual.
+4. Remove the probe.
+
+Verified on 2026-10-15 (EXT-013) on the EAS development builds from Metro:
+both apps on the iPhone 16 Pro, the iPad Pro 11, and the Android emulator,
+12 events in all, none holding the email, the message, or a URL.
+
+### B. Source maps (release builds only)
+
+Release builds name their source map by a debug id that Metro injects (the
+apps' `metro.config.js`). Check it without a build:
+`expo export --platform ios --source-maps --output-dir <dir>` in an app
+folder; the `.hbc.map` has a `debugId` and the `.hbc` holds the same id as
+`sentry-dbid-<id>`. An EAS `preview` or `production` build uploads the map
+when its EAS environment has `SENTRY_URL`, `SENTRY_ORG`, `SENTRY_PROJECT`,
+and `SENTRY_AUTH_TOKEN` (see the mobile release runbook); without them the
+build log shows a failed upload and the build still succeeds. Development
+builds never upload.
+
+### C. In Better Stack
+
+1. Start Metro with the real DSN instead of the local one
+   (`EXPO_PUBLIC_ERROR_REPORTING_DSN=<emma-pilates-mobile DSN>`), add the
+   probe, and open each app.
+2. In Better Stack (Brave), Errors → `emma-pilates-mobile`: a `TypeError`
+   and a `RangeError` appear within a minute for each app, environment
+   `development`, tag `service` `client-mobile` or `staff-mobile`, Users 0,
+   and no message.
+3. After the next native build (Test 45), repeat with the build itself: the
+   event also carries the release (`com.emmapilates.client@1.0.0+<build>`),
+   and an EAS release build with the upload variables shows readable frames.
