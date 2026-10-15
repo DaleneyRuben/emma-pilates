@@ -1,7 +1,10 @@
 import { fireEvent, render } from "@testing-library/react-native";
 import { Text } from "react-native";
 
+import { reportCaughtRenderError } from "../monitoring/error-reporting";
 import { RenderErrorBoundary } from "./render-error-boundary";
+
+jest.mock("../monitoring/error-reporting", () => ({ reportCaughtRenderError: jest.fn() }));
 
 const note =
   "No pudimos mostrar esta pantalla. Inténtalo de nuevo; si vuelve a pasar, cierra la app y ábrela otra vez.";
@@ -22,6 +25,7 @@ describe("RenderErrorBoundary", () => {
 
   afterEach(() => {
     consoleError.mockRestore();
+    jest.mocked(reportCaughtRenderError).mockClear();
   });
 
   it("shows the recovery screen instead of crashing when a child throws while rendering", async () => {
@@ -48,6 +52,19 @@ describe("RenderErrorBoundary", () => {
       expect.any(String),
       expect.objectContaining({ message: "mob-053 probe" }),
       expect.stringContaining("render-error-boundary.spec.tsx"),
+    );
+  });
+
+  // EXT-013: the screen recovers, so nothing else would tell Better Stack.
+  it("reports the caught error to error reporting", async () => {
+    await render(
+      <RenderErrorBoundary>
+        <Child fails />
+      </RenderErrorBoundary>,
+    );
+
+    expect(reportCaughtRenderError).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "mob-053 probe" }),
     );
   });
 
