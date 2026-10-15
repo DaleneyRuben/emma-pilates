@@ -2,7 +2,8 @@
   "name": "@pilates/mobile-core",
   "version": "0.0.0",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./launch-tap-plugin": "./src/notifications/launch-tap-plugin.js"
   },
   "dependencies": {
     "@expo-google-fonts/lora": "^0.4.2",
