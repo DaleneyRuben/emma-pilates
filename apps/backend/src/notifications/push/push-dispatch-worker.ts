@@ -1,13 +1,10 @@
-import type { DispatchPushResult } from '../../notifications/push/dispatch-push';
-import {
-  PermanentPushError,
-  TransientPushError,
-} from '../../notifications/push/push-provider';
+import type { DispatchPushResult } from './dispatch-push';
 import {
   PUSH_DISPATCH_QUEUE,
   parsePushDispatchJob,
   type PushDispatchJob,
-} from './push-dispatch-job';
+} from '../../jobs/push-dispatch/push-dispatch-job';
+import { PermanentPushError, TransientPushError } from './push-provider';
 
 type PushDispatchWorkerJob = { id: string; data: unknown };
 

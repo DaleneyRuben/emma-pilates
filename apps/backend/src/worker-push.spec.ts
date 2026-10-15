@@ -1,4 +1,4 @@
-import type { PushDispatchWorkerHandler } from './jobs/push-dispatch/push-dispatch-worker';
+import type { PushDispatchWorkerHandler } from './notifications/push/push-dispatch-worker';
 import { startWorker, type WorkerBoss } from './worker';
 
 const idle = (result: unknown) => ({

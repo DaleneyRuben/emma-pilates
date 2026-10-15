@@ -15,7 +15,7 @@ import {
   registerPushDispatchWorker,
   type PushDispatchWorkerBoss,
   type PushDispatchWorkerDependencies,
-} from './jobs/push-dispatch/push-dispatch-worker';
+} from './notifications/push/push-dispatch-worker';
 import type { CheckPushReceiptsResult } from './notifications/push/check-push-receipts';
 import {
   startInstalledPgBoss,

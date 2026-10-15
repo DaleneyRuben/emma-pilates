@@ -1,8 +1,5 @@
-import {
-  PermanentPushError,
-  TransientPushError,
-} from '../../notifications/push/push-provider';
-import { PUSH_DISPATCH_QUEUE } from './push-dispatch-job';
+import { PUSH_DISPATCH_QUEUE } from '../../jobs/push-dispatch/push-dispatch-job';
+import { PermanentPushError, TransientPushError } from './push-provider';
 import {
   registerPushDispatchWorker,
   type PushDispatchWorkerBoss,
