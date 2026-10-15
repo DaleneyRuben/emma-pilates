@@ -6,7 +6,7 @@ import { createStaffRuntime, jsonResponse, routeFetcher } from "./test-support";
 
 jest.setTimeout(30_000);
 
-const notice = (destinationType: string, message: string) => ({
+const notice = (destinationType: string, message: string, destinationId: string | null = null) => ({
   items: [
     {
       id: "n1",
@@ -15,7 +15,7 @@ const notice = (destinationType: string, message: string) => ({
       title: "Aviso",
       message,
       destinationType,
-      destinationId: null,
+      destinationId,
       createdAt: new Date(Date.now() - 60_000).toISOString(),
       readAt: null,
     },
@@ -34,15 +34,19 @@ const profile = (role: string) => ({
 });
 
 async function openNoticeAndTap(
-  role: "trainer" | "nutritionist",
+  role: "trainer" | "nutritionist" | "administrator",
   destinationType: string,
   agendaMarker: string,
+  destinationId: string | null = null,
 ) {
   const fetcher = routeFetcher({
     "/api/v1/staff-members/current": () => jsonResponse(profile(role)),
     "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 1 }),
     "/api/v1/notifications": () =>
-      jsonResponse(notice(destinationType, "Tu clase de Mat Pilates de hoy 07:00 se canceló.")),
+      jsonResponse(
+        notice(destinationType, "Tu clase de Mat Pilates de hoy 07:00 se canceló.", destinationId),
+      ),
+    "/api/v1/administrator/payments/pending": () => jsonResponse([]),
     "/api/v1/trainer/sessions": () => jsonResponse([]),
     "/api/v1/nutritionist/evaluations": () =>
       jsonResponse({ items: [], hasMore: false, nextCursor: null }),
@@ -80,6 +84,15 @@ describe("Staff notification destinations", () => {
       "nutritionist",
       "nutritionist_agenda",
       "No tienes evaluaciones agendadas.",
+    );
+  });
+
+  it("opens the submitted payment from an Administrator's payment notice", async () => {
+    await openNoticeAndTap(
+      "administrator",
+      "payment",
+      "Revisar pago",
+      "22222222-2222-4222-8222-222222222222",
     );
   });
 });

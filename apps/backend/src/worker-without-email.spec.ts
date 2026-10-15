@@ -38,6 +38,8 @@ describe('worker without an email provider', () => {
       evaluationReminders: idle({ sent: 0 }),
       emptySessionChecks: idle({ checked: 0, cancelled: 0 }),
       startedSessionWaitlists: idle({ closed: 0 }),
+      pushDispatch: { dispatch: jest.fn() },
+      pushReceipts: idle({ discarded: 0, checked: 0, delivered: 0, failed: 0 }),
       retentionSweeps: idle({
         idempotencyRecords: 0,
         authenticationSessions: 0,
@@ -48,9 +50,14 @@ describe('worker without an email provider', () => {
       emit,
     });
 
-    expect(work).toHaveBeenCalledTimes(1);
+    expect(work).toHaveBeenCalledTimes(2);
     expect(work).toHaveBeenCalledWith(
       'uploads.finalize.v1',
+      expect.anything(),
+      expect.any(Function),
+    );
+    expect(work).toHaveBeenCalledWith(
+      'notifications.push-dispatch.v1',
       expect.anything(),
       expect.any(Function),
     );

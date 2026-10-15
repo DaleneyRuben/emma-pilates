@@ -25,6 +25,7 @@ import { BookEvaluationScreen } from "./evaluations/book-evaluation-screen";
 import { EvaluationAvailabilityScreen } from "./evaluations/evaluation-availability-screen";
 import { MyEvaluationsScreen } from "./evaluations/my-evaluations-screen";
 import { HomeScreen } from "./home/home-screen";
+import { ClientPushNotifications } from "./notifications/client-push-notifications";
 import { CreditScreen } from "./payments/credit-screen";
 import { PaymentScreen } from "./payments/payment-screen";
 import { ReferralsScreen } from "./payments/referrals-screen";
@@ -173,10 +174,12 @@ export function ClientNavigation({
   apiFetcher,
   authenticationApi,
   authenticationIntent,
+  installationIdentifier,
   onBiometricUnlock,
   onLogin,
   onRecoveryCredential,
   pendingRegistrationStore,
+  pushPlatform,
   role,
   signOutNotice,
 }: MobileNavigationProps) {
@@ -192,15 +195,23 @@ export function ClientNavigation({
       <MobileQueryProvider accountId={accountId}>
         <ClientFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
           <ClientApiBaseUrlContext.Provider value={apiBaseUrl}>
-            {emailChangeToken === null ? (
-              <AuthenticatedClientNavigation />
-            ) : (
-              <SignedInEmailChangeLink
-                api={authenticationApi}
-                onDone={() => setHandledLink(emailChangeToken)}
-                token={emailChangeToken}
-              />
-            )}
+            <ClientPushNotifications
+              fetcher={apiFetcher ?? unavailableFetcher}
+              installationIdentifier={installationIdentifier}
+              platform={pushPlatform}
+            >
+              {({ onReady, ref }) =>
+                emailChangeToken === null ? (
+                  <AuthenticatedClientNavigation onReady={onReady} ref={ref} />
+                ) : (
+                  <SignedInEmailChangeLink
+                    api={authenticationApi}
+                    onDone={() => setHandledLink(emailChangeToken)}
+                    token={emailChangeToken}
+                  />
+                )
+              }
+            </ClientPushNotifications>
           </ClientApiBaseUrlContext.Provider>
         </ClientFetcherContext.Provider>
       </MobileQueryProvider>

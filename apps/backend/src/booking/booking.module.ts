@@ -4,22 +4,20 @@ import { ConfigService } from '@nestjs/config';
 import type { Environment } from '../config/environment';
 import { PRISMA_CLIENT } from '../database/database.module';
 import { PrismaClient } from '../generated/prisma/client';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { NOTIFICATION_RECORDER } from '../notifications/notification-recorder.provider';
+import type { NotificationRecorder } from '../notifications/prisma-notification-store';
 import { SystemIdentityModule } from '../system-identity/system-identity.module';
 import {
   BookingController,
   BookingCancellationController,
-  cancelBookingCommand,
   BookingRescheduleController,
   ClassHistoryController,
   TrainerAttendanceController,
   TrainerScheduleController,
   TrainerSessionRosterController,
-  recordAttendanceCommand,
   classHistory,
-  createBookingCommand,
-  joinWaitlistCommand,
   sessionAvailability,
-  rescheduleBookingCommand,
   trainerSchedule,
   trainerSessionRoster,
 } from './booking.controller';
@@ -45,12 +43,11 @@ import {
   ClientBookingsController,
   WaitlistEntriesController,
   clientBookings,
-  leaveWaitlistCommand,
 } from './client/client-bookings.controller';
 import { loadClientProfile } from './client/client-profile';
 import { loadClientSubscription } from './client/client-subscription';
 import { updateClientProfile } from './client/update-client-profile';
-import { PrismaBookingCommands } from './commands/prisma-booking-commands';
+import { bookingCommandProviders } from './commands/booking-command-providers';
 import { OBJECT_STORAGE } from '../uploads/object-storage.module';
 import { createAssistantClientOperations } from './assistant/assistant-operations';
 import {
@@ -62,7 +59,6 @@ import {
   AdministratorSessionsController,
   administratorSessionSearch,
   type AdministratorSessionSearch,
-  cancelSessionCommand,
   receiptObjectStorage,
 } from './payments/administrator.controller';
 import {
@@ -151,7 +147,7 @@ import { promotionsWiring } from './promotions/promotions-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 
 @Module({
-  imports: [SystemIdentityModule],
+  imports: [SystemIdentityModule, NotificationsModule],
   controllers: [
     BookingController,
     BookingCancellationController,
@@ -190,38 +186,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     NutritionistAvailabilityBlocksController,
   ],
   providers: [
-    {
-      provide: createBookingCommand,
-      inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient) => {
-        const commands = new PrismaBookingCommands(prisma, () => new Date());
-        return commands.createIdempotent.bind(commands);
-      },
-    },
-    {
-      provide: joinWaitlistCommand,
-      inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient) => {
-        const commands = new PrismaBookingCommands(prisma, () => new Date());
-        return commands.joinWaitlistIdempotent.bind(commands);
-      },
-    },
-    {
-      provide: cancelBookingCommand,
-      inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient) => {
-        const commands = new PrismaBookingCommands(prisma, () => new Date());
-        return commands.cancel.bind(commands);
-      },
-    },
-    {
-      provide: rescheduleBookingCommand,
-      inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient) => {
-        const commands = new PrismaBookingCommands(prisma, () => new Date());
-        return commands.reschedule.bind(commands);
-      },
-    },
+    ...bookingCommandProviders,
     {
       provide: classHistory,
       inject: [PRISMA_CLIENT],
@@ -234,14 +199,6 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
             findAttendedBookings: (clientId) =>
               createCatalogRepository(prisma).findAttendedBookings(clientId),
           }),
-    },
-    {
-      provide: recordAttendanceCommand,
-      inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient) => {
-        const commands = new PrismaBookingCommands(prisma, () => new Date());
-        return commands.recordAttendance.bind(commands);
-      },
     },
     {
       provide: trainerSchedule,
@@ -449,14 +406,6 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
           }),
     },
     {
-      provide: leaveWaitlistCommand,
-      inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient) => {
-        const commands = new PrismaBookingCommands(prisma, () => new Date());
-        return commands.leaveWaitlist.bind(commands);
-      },
-    },
-    {
       provide: clientProfileUpdate,
       inject: [PRISMA_CLIENT],
       useFactory:
@@ -539,14 +488,16 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     },
     {
       provide: paymentCommands,
-      inject: [PRISMA_CLIENT, ConfigService],
+      inject: [PRISMA_CLIENT, ConfigService, NOTIFICATION_RECORDER],
       useFactory: (
         prisma: PrismaClient,
         config: ConfigService<Environment, true>,
+        recordNotification: NotificationRecorder,
       ) =>
         createPrismaPaymentCommands(prisma, {
           now: () => new Date(),
           referralRewardCentavos: config.getOrThrow('REFERRAL_REWARD_CENTAVOS'),
+          recordNotification,
         }),
     },
     {
@@ -567,14 +518,6 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
       useExisting: OBJECT_STORAGE,
     },
     {
-      provide: cancelSessionCommand,
-      inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient) => {
-        const commands = new PrismaBookingCommands(prisma, () => new Date());
-        return commands.cancelSession.bind(commands);
-      },
-    },
-    {
       provide: transferInstructions,
       inject: [ConfigService],
       useFactory: (
@@ -585,21 +528,31 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     },
     {
       provide: evaluationCommands,
-      inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient) =>
-        createPrismaEvaluationCommands(prisma, { now: () => new Date() }),
+      inject: [PRISMA_CLIENT, NOTIFICATION_RECORDER],
+      useFactory: (
+        prisma: PrismaClient,
+        recordNotification: NotificationRecorder,
+      ) =>
+        createPrismaEvaluationCommands(prisma, {
+          now: () => new Date(),
+          recordNotification,
+        }),
     },
     {
       provide: administrationOperations,
-      inject: [PRISMA_CLIENT, evaluationCommands],
+      inject: [PRISMA_CLIENT, evaluationCommands, NOTIFICATION_RECORDER],
       useFactory: (
         prisma: PrismaClient,
         evaluations: EvaluationCommands,
+        recordNotification: NotificationRecorder,
       ): AdministrationOperations => {
         const now = () => new Date();
         return {
           catalog: createPrismaCatalogAdministration(prisma, { now }),
-          schedules: createPrismaScheduleAdministration(prisma, { now }),
+          schedules: createPrismaScheduleAdministration(prisma, {
+            now,
+            recordNotification,
+          }),
           oversight: createPrismaOversight(prisma, { now }),
           cancelEvaluation: (evaluationId, principal) =>
             evaluations.cancelEvaluationAsStaff(evaluationId, principal),

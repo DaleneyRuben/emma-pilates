@@ -1,0 +1,13 @@
+# NOT-002: the notification permission sheet («¿Te avisamos?») follows a
+# booking, a Waitlist join, or a confirmed Evaluation in the Client app and a
+# Staff role's first home. The journeys do not test it (Test 46 does), so
+# they answer «Ahora no» whenever it shows and carry on.
+appId: ${APP_ID}
+---
+- extendedWaitUntil:
+    visible: "¿Te avisamos?"
+    timeout: 5000
+    optional: true
+- tapOn:
+    text: "Ahora no"
+    optional: true

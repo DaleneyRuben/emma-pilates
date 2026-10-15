@@ -12,6 +12,8 @@ import { createPrismaSessionMaterializer } from './booking/sessions/prisma-sessi
 import { createPrismaSessionStartChecks } from './booking/sessions/prisma-session-start-checks';
 import { createPrismaRetentionSweeps } from './system-identity/retention/prisma-retention-sweeps';
 import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-intent-expiry-job';
+import { createNotificationRecorder } from './notifications/prisma-notification-store';
+import { createPushDeliveryRuntime } from './notifications/push/push-delivery-runtime';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
 import { PrismaClientRegistrationUnitOfWork } from './system-identity/registration/prisma-client-registration-unit-of-work';
@@ -54,9 +56,16 @@ async function bootstrap(): Promise<void> {
     Buffer.from(environment.AUTHENTICATION_LINK_ENCRYPTION_KEY, 'base64'),
   );
 
-  const evaluations = createPrismaEvaluationCommands(prisma, { now });
+  const recordNotification = createNotificationRecorder(boss);
+  const evaluations = createPrismaEvaluationCommands(prisma, {
+    now,
+    recordNotification,
+  });
   const sessionMaterializer = createPrismaSessionMaterializer(prisma, { now });
-  const sessionStartChecks = createPrismaSessionStartChecks(prisma, { now });
+  const sessionStartChecks = createPrismaSessionStartChecks(prisma, {
+    now,
+    recordNotification,
+  });
 
   const emit = createWorkerLog({
     environment: environment.NODE_ENV,
@@ -88,11 +97,16 @@ async function bootstrap(): Promise<void> {
     imageUploadCleanup: {
       execute: () => cleanupAbandonedUploads({ ...uploadCleanupGateway, now }),
     },
-    subscriptionReminders: createSubscriptionReminderJob(prisma, now),
+    subscriptionReminders: createSubscriptionReminderJob(
+      prisma,
+      now,
+      recordNotification,
+    ),
     purchaseIntentExpiry: createPurchaseIntentExpiryJob(
       prisma,
       now,
       environment.REFERRAL_REWARD_CENTAVOS,
+      recordNotification,
     ),
     sessionSchedules: {
       execute: () => sessionMaterializer.materializeSessions(),
@@ -107,6 +121,12 @@ async function bootstrap(): Promise<void> {
     startedSessionWaitlists: {
       execute: () => sessionStartChecks.closeStartedWaitlists(),
     },
+    ...createPushDeliveryRuntime({
+      prisma,
+      fetch,
+      expoAccessToken: environment.EXPO_ACCESS_TOKEN,
+      now,
+    }),
     retentionSweeps: createPrismaRetentionSweeps(prisma, { now }),
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit,

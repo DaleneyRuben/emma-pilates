@@ -1,0 +1,93 @@
+import * as Notifications from "expo-notifications";
+import { Linking, Platform } from "react-native";
+
+import { toPushPermissionStatus } from "./permission-status";
+import { onlyChangedTokens } from "./token-changes";
+import type { PushPlatform } from "./push-platform";
+
+// A launch tap can reach both the listener and the last-response read.
+const handledResponses = new Set<string>();
+
+const tapData = (response: Notifications.NotificationResponse): unknown => {
+  const identifier = response.notification.request.identifier;
+  if (
+    response.actionIdentifier !== Notifications.DEFAULT_ACTION_IDENTIFIER ||
+    handledResponses.has(identifier)
+  ) {
+    return null;
+  }
+  handledResponses.add(identifier);
+  return response.notification.request.content.data;
+};
+
+let handlerInstalled = false;
+
+// The real device capabilities (expo-notifications, ADR-0025).
+export function createExpoPushPlatform(): PushPlatform {
+  if (!handlerInstalled) {
+    handlerInstalled = true;
+    // While the app is open a push still shows, with its own sound or none
+    // (ADR-0070), and the badge follows its count.
+    Notifications.setNotificationHandler({
+      handleNotification: async (notification) => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: Boolean(notification.request.content.sound),
+        shouldSetBadge: true,
+      }),
+    });
+  }
+
+  return {
+    os: Platform.OS === "ios" ? "ios" : "android",
+    getPermissionStatus: async () =>
+      toPushPermissionStatus(await Notifications.getPermissionsAsync()),
+    requestPermission: async () =>
+      toPushPermissionStatus(await Notifications.requestPermissionsAsync()),
+    // ADR-0070: standard sound for actionable pushes, none for updates; the
+    // backend picks the channel per notification type.
+    prepareChannels: async () => {
+      if (Platform.OS !== "android") return;
+      await Notifications.setNotificationChannelAsync("actionable", {
+        name: "Avisos importantes",
+        importance: Notifications.AndroidImportance.HIGH,
+        // Leaving the sound out keeps the system's default; a name would be
+        // looked up as a bundled sound file.
+      });
+      await Notifications.setNotificationChannelAsync("updates", {
+        name: "Novedades",
+        importance: Notifications.AndroidImportance.DEFAULT,
+        sound: null,
+      });
+    },
+    getPushToken: async () => (await Notifications.getExpoPushTokenAsync()).data,
+    onPushTokenChange: (listener) => {
+      const deliver = onlyChangedTokens(listener);
+      const subscription = Notifications.addPushTokenListener(({ data }) => deliver(String(data)));
+      return () => subscription.remove();
+    },
+    onNotificationReceived: (listener) => {
+      const subscription = Notifications.addNotificationReceivedListener(() => listener());
+      return () => subscription.remove();
+    },
+    onNotificationTap: (listener) => {
+      const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
+        const data = tapData(response);
+        if (data !== null) listener(data);
+      });
+      return () => subscription.remove();
+    },
+    takeLaunchTap: async () => {
+      const response = await Notifications.getLastNotificationResponseAsync();
+      if (response === null) return null;
+      await Notifications.clearLastNotificationResponseAsync();
+      return tapData(response);
+    },
+    // Launchers without numeric badges (stock Android shows a dot) reject the
+    // count; the inbox count stays authoritative, so that is not an error.
+    setBadgeCount: async (count) => {
+      await Notifications.setBadgeCountAsync(count).catch(() => false);
+    },
+    openSettings: () => Linking.openSettings(),
+  };
+}

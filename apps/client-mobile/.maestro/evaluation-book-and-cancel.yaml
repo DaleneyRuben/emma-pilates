@@ -32,6 +32,7 @@ env:
 - assertVisible: "Si necesitas cambiarla, puedes cancelarla desde Mis evaluaciones hasta 3 horas antes."
 - takeScreenshot: client-evaluation-3-confirmar
 - tapOn: "Confirmar"
+- runFlow: subflows/dismiss-push-permission.yaml
 - extendedWaitUntil:
     visible: "Evaluación confirmada"
     timeout: 15000

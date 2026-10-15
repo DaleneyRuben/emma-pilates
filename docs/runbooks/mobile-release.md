@@ -19,6 +19,9 @@ per app (`extra.eas.projectId` and `owner` in each `app.json`), and
 - a Google Play Console app entry and upload key for both packages;
 - EAS environment variables `EXPO_PUBLIC_API_URL` for the `preview` and
   `production` environments (the https API hosts from EXT-003).
+- for iOS push, an APNs key from the Apple Developer team, added to each EAS
+  project with `eas credentials` (iOS → Push Notifications) before the first
+  iOS store build; Android push already works (below).
 
 ## Development builds (EAS, no store account needed)
 
@@ -31,6 +34,22 @@ extends `base` (Node 24.13.0, the workspace's pnpm, and
 compile on the macOS builder and the install fails). Each build spends one of
 the free plan's monthly builds (15 iOS and 15 Android); a JavaScript change
 needs none, a native change needs a new one per app and platform.
+
+## Push credentials (NOT-002)
+
+- **Android:** each app's `google-services.json` (Firebase project
+  `emma-pilates`, committed, not a secret) is wired by `googleServicesFile`
+  and the `expo-notifications` plugin in `app.json`, so a change to either
+  needs a new native build. The FCM V1 service account key sits in each EAS
+  project's Android credentials and is used by Expo's servers, so replacing
+  it needs no build.
+- **iOS:** waits for the APNs key (gate 9). Development builds still register
+  and show pushes sent with `xcrun simctl push` (testing guide, Test 46).
+- **Sending:** the worker sends through Expo Push Service with the
+  `push-sender` robot's `EXPO_ACCESS_TOKEN`; enhanced push security is on, so
+  a release whose worker lacks the token sends nothing (each push fails and is
+  reported). Where each credential lives and how to rotate it is in
+  [infrastructure](../architecture/infrastructure.md).
 
 ## Before every release (local, no account needed)
 

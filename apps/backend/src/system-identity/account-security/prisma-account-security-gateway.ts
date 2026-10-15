@@ -1,3 +1,4 @@
+import { revokeAuthenticationSessions } from '../authentication/revoke-authentication-sessions';
 import { randomUUID } from 'node:crypto';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import { toPrismaBytes } from '../../database/prisma-bytes';
@@ -233,18 +234,17 @@ export class PrismaAccountSecurityGateway
           passwordChangedAt: input.changedAt,
         },
       });
-      await transaction.authenticationSession.updateMany({
-        where: {
+      await revokeAuthenticationSessions(
+        transaction,
+        {
           accountId: input.accountId,
           id: { not: input.authenticationSessionId },
-          revokedAt: null,
         },
-        data: {
+        {
           revokedAt: input.changedAt,
-          revocationReason:
-            AuthenticationSessionRevocationReason.PASSWORD_CHANGED,
+          reason: AuthenticationSessionRevocationReason.PASSWORD_CHANGED,
         },
-      });
+      );
       await cancelPendingEmailChange(
         transaction,
         input.accountId,
@@ -303,14 +303,14 @@ export class PrismaAccountSecurityGateway
           passwordChangedAt: input.completedAt,
         },
       });
-      await transaction.authenticationSession.updateMany({
-        where: { accountId: token.accountId, revokedAt: null },
-        data: {
+      await revokeAuthenticationSessions(
+        transaction,
+        { accountId: token.accountId },
+        {
           revokedAt: input.completedAt,
-          revocationReason:
-            AuthenticationSessionRevocationReason.PASSWORD_RECOVERED,
+          reason: AuthenticationSessionRevocationReason.PASSWORD_RECOVERED,
         },
-      });
+      );
       await cancelPendingEmailChange(
         transaction,
         token.accountId,

@@ -1,0 +1,32 @@
+import { staffNotificationDestination } from "./notification-destinations";
+
+const paymentId = "22222222-2222-4222-8222-222222222222";
+
+describe("staffNotificationDestination", () => {
+  it("opens Mi agenda for the Trainer's and Nutritionist's schedule notices", () => {
+    expect(staffNotificationDestination("trainer", "trainer_schedule", null)).toEqual(["Agenda"]);
+    expect(staffNotificationDestination("nutritionist", "nutritionist_agenda", null)).toEqual([
+      "Agenda",
+    ]);
+  });
+
+  it("opens the submitted payment for the Administrator", () => {
+    expect(staffNotificationDestination("administrator", "payment", paymentId)).toEqual([
+      "ReviewPayment",
+      { paymentId },
+    ]);
+  });
+
+  it("opens the pending payments when the payment is not named", () => {
+    expect(staffNotificationDestination("administrator", "payment", null)).toEqual(["Payments"]);
+  });
+
+  it.each([
+    ["assistant", "payment"],
+    ["trainer", "nutritionist_agenda"],
+    ["administrator", "trainer_schedule"],
+    ["trainer", null],
+  ] as const)("opens nothing for a %s notice about %s", (role, destinationType) => {
+    expect(staffNotificationDestination(role, destinationType, paymentId)).toBeNull();
+  });
+});

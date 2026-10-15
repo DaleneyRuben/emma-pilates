@@ -16,6 +16,7 @@ import {
   spacing,
   surfaces,
   typography,
+  usePushNotifications,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -56,6 +57,7 @@ export function BookEvaluationScreen({
   const { slot } = route.params;
   const navigation = useNavigation<BookNavigation>();
   const fetcher = useClientFetcher();
+  const { offerPermission: offerPushPermission } = usePushNotifications();
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -78,6 +80,7 @@ export function BookEvaluationScreen({
             queryKey: getListEvaluationsQueryKey({ scope: "upcoming" }),
           }),
         ]);
+        offerPushPermission();
         navigation.navigate("MyEvaluations", { confirmed: response.data });
         return;
       }

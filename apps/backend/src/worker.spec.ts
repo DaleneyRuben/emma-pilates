@@ -2,6 +2,12 @@ import { WORKER_HEARTBEAT_INTERVAL_MS } from './jobs/worker-heartbeat';
 import { startWorker, type WorkerBoss } from './worker';
 
 const occurrenceJobs = () => ({
+  pushDispatch: { dispatch: jest.fn() },
+  pushReceipts: {
+    execute: jest
+      .fn()
+      .mockResolvedValue({ discarded: 0, checked: 0, delivered: 0, failed: 0 }),
+  },
   sessionSchedules: {
     execute: jest
       .fn()
@@ -88,7 +94,7 @@ describe('worker entrypoint', () => {
     expect(isInstalled).toHaveBeenCalledTimes(1);
     expect(schemaVersion).toHaveBeenCalledTimes(1);
     expect(start).toHaveBeenCalledTimes(1);
-    expect(work).toHaveBeenCalledTimes(2);
+    expect(work).toHaveBeenCalledTimes(3);
 
     await jest.advanceTimersByTimeAsync(WORKER_HEARTBEAT_INTERVAL_MS);
     expect(getQueueStats).toHaveBeenCalledWith(

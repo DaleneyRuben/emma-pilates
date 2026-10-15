@@ -257,6 +257,30 @@ describe('environment configuration', () => {
     });
   });
 
+  describe('NOT-002 Expo push access token', () => {
+    const base = {
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+    };
+
+    it('sends pushes without a token by default', () => {
+      expect(validateEnvironment(base).EXPO_ACCESS_TOKEN).toBeNull();
+    });
+
+    it('reads the access token for enhanced push security', () => {
+      expect(
+        validateEnvironment({ ...base, EXPO_ACCESS_TOKEN: 'expo-token' })
+          .EXPO_ACCESS_TOKEN,
+      ).toBe('expo-token');
+    });
+
+    it('rejects an empty token', () => {
+      expect(() =>
+        validateEnvironment({ ...base, EXPO_ACCESS_TOKEN: '' }),
+      ).toThrow('EXPO_ACCESS_TOKEN');
+    });
+  });
+
   describe('database pool size', () => {
     const base = {
       DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',

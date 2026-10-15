@@ -1,3 +1,5 @@
+import type { MobileRuntime } from "@pilates/mobile-core";
+
 export function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     headers: { "Content-Type": "application/json" },
@@ -18,7 +20,10 @@ export function routeFetcher(routes: Record<string, Route>): typeof globalThis.f
   }) as unknown as typeof globalThis.fetch;
 }
 
-export function createClientRuntime(fetcher: typeof globalThis.fetch) {
+export function createClientRuntime(
+  fetcher: typeof globalThis.fetch,
+  overrides: Pick<MobileRuntime, "installationIdentifier" | "pushPlatform"> = {},
+) {
   return {
     allowedLinkHosts: ["links.emmapilates.test"],
     apiBaseUrl: "https://api.test/api/v1",
@@ -48,5 +53,6 @@ export function createClientRuntime(fetcher: typeof globalThis.fetch) {
       start: jest.fn(),
       unlockWithBiometrics: jest.fn(),
     },
+    ...overrides,
   };
 }

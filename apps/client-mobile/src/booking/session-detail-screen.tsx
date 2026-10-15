@@ -19,6 +19,7 @@ import {
   surfaces,
   TextButton,
   typography,
+  usePushNotifications,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -65,6 +66,7 @@ function problemMessage(body: unknown): string | null {
 export function SessionDetailScreen({ route }: { route: { params: { sessionId: string } } }) {
   const navigation = useNavigation<DetailNavigation>();
   const fetcher = useClientFetcher();
+  const { offerPermission: offerPushPermission } = usePushNotifications();
   const queryClient = useQueryClient();
   const session = useGetSession(route.params.sessionId, {
     fetcher,
@@ -132,6 +134,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
         await queryClient.invalidateQueries({
           queryKey: getGetCurrentClientSubscriptionQueryKey(),
         });
+        offerPushPermission();
         navigation.navigate("Bookings", {
           screen: "MyBookings",
           params: {
@@ -179,6 +182,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
 
       if (response.status === 201) {
         setWaitlisted(true);
+        offerPushPermission();
         return;
       }
       if ((response.data as { code?: string }).code === "active_waitlist_entry_exists") {

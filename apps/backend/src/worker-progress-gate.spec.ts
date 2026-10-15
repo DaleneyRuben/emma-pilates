@@ -43,6 +43,8 @@ const startWithJobs = async ({
     evaluationReminders,
     emptySessionChecks: idle({ checked: 0, cancelled: 0 }),
     startedSessionWaitlists: idle({ closed: 0 }),
+    pushDispatch: { dispatch: jest.fn() },
+    pushReceipts: idle({ discarded: 0, checked: 0, delivered: 0, failed: 0 }),
     retentionSweeps: idle({
       idempotencyRecords: 0,
       authenticationSessions: 0,
@@ -78,13 +80,13 @@ describe('worker progress gate (EXT-011)', () => {
   });
 
   // Production has no email provider yet, so its queue fills on purpose.
-  it('reads only the uploads queue while email is disabled', async () => {
+  it('reads the uploads and push queues while email is disabled', async () => {
     const { executeSql, stopWorker } = await startWithJobs();
 
     await jest.advanceTimersByTimeAsync(WORKER_HEARTBEAT_INTERVAL_MS);
 
     expect(executeSql).toHaveBeenCalledWith(expect.any(String), [
-      ['uploads.finalize.v1'],
+      ['uploads.finalize.v1', 'notifications.push-dispatch.v1'],
     ]);
     await stopWorker();
   });
@@ -97,7 +99,11 @@ describe('worker progress gate (EXT-011)', () => {
     await jest.advanceTimersByTimeAsync(WORKER_HEARTBEAT_INTERVAL_MS);
 
     expect(executeSql).toHaveBeenCalledWith(expect.any(String), [
-      ['uploads.finalize.v1', 'system.authentication-email.v1'],
+      [
+        'uploads.finalize.v1',
+        'notifications.push-dispatch.v1',
+        'system.authentication-email.v1',
+      ],
     ]);
     await stopWorker();
   });

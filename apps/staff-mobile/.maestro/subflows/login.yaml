@@ -70,3 +70,4 @@ appId: ${APP_ID}
 - tapOn:
     text: "Not Now"
     optional: true
+- runFlow: dismiss-push-permission.yaml

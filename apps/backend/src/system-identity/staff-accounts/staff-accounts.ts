@@ -1,3 +1,4 @@
+import { revokeAuthenticationSessions } from '../authentication/revoke-authentication-sessions';
 import type { PgBoss } from 'pg-boss';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
@@ -186,14 +187,14 @@ export const createStaffAccountOperations = (
         where: { id: input.accountId },
         data: { disabledAt: input.now },
       });
-      await transaction.authenticationSession.updateMany({
-        where: { accountId: input.accountId, revokedAt: null },
-        data: {
+      await revokeAuthenticationSessions(
+        transaction,
+        { accountId: input.accountId },
+        {
           revokedAt: input.now,
-          revocationReason:
-            AuthenticationSessionRevocationReason.ACCOUNT_DISABLED,
+          reason: AuthenticationSessionRevocationReason.ACCOUNT_DISABLED,
         },
-      });
+      );
       await transaction.authenticationToken.updateMany({
         where: {
           accountId: input.accountId,
