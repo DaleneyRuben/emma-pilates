@@ -1,6 +1,17 @@
-import type { MobileErrorReportingSettings } from "./error-reporting";
+import { channel } from "expo-updates";
 
-// Red checkpoint stub: the behavior lands with the green commit.
+import {
+  errorReportingEnvironment,
+  startMobileErrorReporting,
+  type MobileErrorReportingSettings,
+} from "./error-reporting";
+
+/** Called once from each app's entry point, before the root component registers. */
 export function startErrorReporting(service: MobileErrorReportingSettings["service"]): boolean {
-  return service === undefined;
+  return startMobileErrorReporting({
+    // An EAS environment variable; Expo inlines EXPO_PUBLIC_ values at bundle time.
+    dsn: process.env.EXPO_PUBLIC_ERROR_REPORTING_DSN,
+    environment: errorReportingEnvironment({ development: __DEV__, channel }),
+    service,
+  });
 }

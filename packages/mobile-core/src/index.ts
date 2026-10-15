@@ -22,6 +22,7 @@ export * from "./history/class-history-groups";
 export * from "./history/class-history-list";
 export * from "./ingress/verified-link";
 export * from "./money/bolivianos";
+export { startErrorReporting } from "./monitoring/start-error-reporting";
 export * from "./notifications/notification-time";
 export * from "./notifications/notifications-screen";
 export * from "./notifications/memory-push-platform";
