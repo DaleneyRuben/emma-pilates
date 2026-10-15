@@ -3886,11 +3886,19 @@ destination: Mis reservas for a Session, Mi plan for a Subscription,
 - A **force-stopped** app (`am force-stop`, or «Force stop» in Settings)
   gets no FCM pushes until it is opened again. That is Android's rule. Use
   Home, or `adb shell am kill` while it is in the background, for «closed».
-- On the **development build**, tapping a push when the app process is not
-  running opens the app without routing. The development client's launcher
-  takes the launch and starts the app again without the notification. The
-  same tap routes on iOS and with the process alive, so judge cold starts on
-  a `preview` or store build.
+- **Cold starts** need a `preview` or store build. Check two cases. First,
+  the task still in Recents: Home, then `adb shell am kill com.emmapilates.client`
+  until `adb shell pidof com.emmapilates.client` prints nothing (one `am kill`
+  sometimes leaves the process alive). Android then reopens the old task
+  (`START … result code=2` in `adb logcat`) and delivers the tap through
+  `onNewIntent`, which Expo drops before the app has loaded; the
+  `@pilates/mobile-core/launch-tap-plugin` config plugin forwards it, and the
+  tap marks read and routes. Second, the task removed
+  (`adb shell am stack remove <task id>`, the id from
+  `adb shell dumpsys activity recents`): a new task (`result code=0`) routes
+  too. Checked 2026-10-15 on a release build of the Client app. The
+  development build's launcher relaunches the app without the notification,
+  so cold taps there do not route.
 
 **E. Receipts.** Fifteen minutes after a send, the worker's 5-minute sweep
 reads Expo's receipts: `delivered`, or `failed` with
