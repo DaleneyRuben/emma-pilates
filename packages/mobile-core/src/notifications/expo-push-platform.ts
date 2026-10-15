@@ -1,14 +1,8 @@
 import * as Notifications from "expo-notifications";
 import { Linking, Platform } from "react-native";
 
-import type { PushPermissionStatus, PushPlatform } from "./push-platform";
-
-const toStatus = (status: Notifications.PermissionStatus): PushPermissionStatus =>
-  status === Notifications.PermissionStatus.GRANTED
-    ? "granted"
-    : status === Notifications.PermissionStatus.DENIED
-      ? "denied"
-      : "undetermined";
+import { toPushPermissionStatus } from "./permission-status";
+import type { PushPlatform } from "./push-platform";
 
 // A launch tap can reach both the listener and the last-response read.
 const handledResponses = new Set<string>();
@@ -45,8 +39,10 @@ export function createExpoPushPlatform(): PushPlatform {
 
   return {
     os: Platform.OS === "ios" ? "ios" : "android",
-    getPermissionStatus: async () => toStatus((await Notifications.getPermissionsAsync()).status),
-    requestPermission: async () => toStatus((await Notifications.requestPermissionsAsync()).status),
+    getPermissionStatus: async () =>
+      toPushPermissionStatus(await Notifications.getPermissionsAsync()),
+    requestPermission: async () =>
+      toPushPermissionStatus(await Notifications.requestPermissionsAsync()),
     // ADR-0070: standard sound for actionable pushes, none for updates; the
     // backend picks the channel per notification type.
     prepareChannels: async () => {
