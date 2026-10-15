@@ -41,7 +41,8 @@
           "defaultChannel": "updates"
         }
       ],
-      "@pilates/mobile-core/launch-tap-plugin"
+      "@pilates/mobile-core/launch-tap-plugin",
+      "@sentry/react-native/expo"
     ],
     "extra": {
       "eas": {

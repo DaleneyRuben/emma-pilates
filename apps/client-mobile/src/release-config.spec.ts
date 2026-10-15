@@ -68,7 +68,14 @@ describe("client release configuration", () => {
       node: "24.13.0",
       pnpm: pnpmVersion,
       // The backend's sharp would otherwise compile against the macOS builder's Homebrew libvips.
-      env: { SHARP_IGNORE_GLOBAL_LIBVIPS: "1" },
+      env: {
+        SHARP_IGNORE_GLOBAL_LIBVIPS: "1",
+        // EXT-013: without the Better Stack token a build still succeeds, only
+        // without source maps; Better Stack takes no dSYMs or ProGuard mappings.
+        SENTRY_ALLOW_FAILURE: "true",
+        SENTRY_DISABLE_XCODE_DEBUG_UPLOAD: "true",
+        SENTRY_DISABLE_NATIVE_DEBUG_UPLOAD: "true",
+      },
     });
     [development, preview, production].forEach((profile) => {
       expect(profile).toMatchObject({ extends: "base" });
@@ -87,6 +94,13 @@ describe("client release configuration", () => {
     expect(
       googleServices.client.map((client) => client.client_info.android_client_info.package_name),
     ).toContain("com.emmapilates.client");
+  });
+
+  // EXT-013 (ADR-0081): errors reach Better Stack through the Sentry SDK, and
+  // release builds upload their JavaScript source maps through the plugin.
+  it("reports errors and uploads source maps from release builds", () => {
+    expect(packageJson.dependencies).toHaveProperty("@sentry/react-native");
+    expect(appConfig.expo.plugins).toContain("@sentry/react-native/expo");
   });
 
   it("submits only the production profile", () => {

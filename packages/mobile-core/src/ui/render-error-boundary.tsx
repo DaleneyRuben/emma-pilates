@@ -1,5 +1,6 @@
 import { Component, type ErrorInfo, type ReactNode } from "react";
 
+import { reportCaughtRenderError } from "../monitoring/error-reporting";
 import { RecoveryScreen } from "./recovery-screen";
 
 type RenderErrorBoundaryProps = { children: ReactNode };
@@ -9,7 +10,8 @@ type RenderErrorBoundaryState = { failed: boolean };
  * The one class in the mobile packages: React exposes recovery from a render
  * error only through getDerivedStateFromError and componentDidCatch (MOB-053).
  * Reintentar mounts the children again from scratch; the error is reported
- * through console.error, which Expo shows as a LogBox notice in development.
+ * through console.error, which Expo shows as a LogBox notice in development,
+ * and to error reporting (EXT-013).
  */
 export class RenderErrorBoundary extends Component<
   RenderErrorBoundaryProps,
@@ -23,6 +25,7 @@ export class RenderErrorBoundary extends Component<
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
     console.error("A screen failed while rendering", error, info.componentStack);
+    reportCaughtRenderError(error);
   }
 
   retry = (): void => {
