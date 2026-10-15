@@ -2,6 +2,7 @@ import * as Notifications from "expo-notifications";
 import { Linking, Platform } from "react-native";
 
 import { toPushPermissionStatus } from "./permission-status";
+import { onlyChangedTokens } from "./token-changes";
 import type { PushPlatform } from "./push-platform";
 
 // A launch tap can reach both the listener and the last-response read.
@@ -60,7 +61,8 @@ export function createExpoPushPlatform(): PushPlatform {
     },
     getPushToken: async () => (await Notifications.getExpoPushTokenAsync()).data,
     onPushTokenChange: (listener) => {
-      const subscription = Notifications.addPushTokenListener(() => listener());
+      const deliver = onlyChangedTokens(listener);
+      const subscription = Notifications.addPushTokenListener(({ data }) => deliver(String(data)));
       return () => subscription.remove();
     },
     onNotificationReceived: (listener) => {
