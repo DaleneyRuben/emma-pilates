@@ -83,8 +83,10 @@ export function createExpoPushPlatform(): PushPlatform {
       await Notifications.clearLastNotificationResponseAsync();
       return tapData(response);
     },
+    // Launchers without numeric badges (stock Android shows a dot) reject the
+    // count; the inbox count stays authoritative, so that is not an error.
     setBadgeCount: async (count) => {
-      await Notifications.setBadgeCountAsync(count);
+      await Notifications.setBadgeCountAsync(count).catch(() => false);
     },
     openSettings: () => Linking.openSettings(),
   };
