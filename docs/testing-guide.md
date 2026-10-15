@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications are not built yet; Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
 | Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
@@ -20,7 +20,7 @@ you are starting with no project knowledge.
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Email request limits         | Fill the device or network budget for registration, resend, email correction, and recovery: the API answers `429` `authentication_email_throttled` with `Retry-After`, and the apps and admin web show «Demasiadas solicitudes…» with the wait (Test 5 G) | Every admitted request counts, even one for an unknown address or a suppressed email; reset by marking your local `email_requested` rows deleted |
 | Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
-| Mobile development builds    | Install the EAS development builds of both apps on the iPhone 16 Pro and iPad Simulators and the Android emulator, run them against Metro, and run the Maestro journeys on them (Test 45) | Each new native build spends one of the free plan's monthly builds; push notifications arrive with NOT-002 |
+| Mobile development builds    | Install the EAS development builds of both apps on the iPhone 16 Pro and iPad Simulators and the Android emulator, run them against Metro, and run the Maestro journeys on them (Test 45) | Each new native build spends one of the free plan's monthly builds; push notifications are Test 46 |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); sign in through a Vercel preview against the shared development API (Test 36); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
@@ -2094,6 +2094,14 @@ maestro --udid <udid> test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0
   -e PASSWORD=emma-local-2026 .maestro
 ```
 
+Since NOT-002 a booking, an Evaluation, and a Staff role's first home can
+raise the notification sheet «¿Te avisamos?» while the system has not asked
+yet. The flows answer «Ahora no» through `subflows/dismiss-push-permission.yaml`
+(an optional step, so a device that already answered runs as before), and they
+do it **before** asserting «Reserva confirmada» or «Evaluación confirmada»:
+the sheet hides the screen beneath it from Maestro, and those notices last
+eight seconds.
+
 The Client suite runs its six flows in the order its `config.yaml` pins
 (Maestro's own order is not the file order): `book-and-cancel-class`
 (Lucía books the first Session of the day and cancels it; Sofía's fixture
@@ -3801,4 +3809,119 @@ maestro --udid <udid> test -e APP_ID=com.emmapilates.client \
 
 For Android, `--device emulator-5554` instead of `--udid`. The login subflows
 answer iOS's «Open» prompt and the developer-menu intro, so the flows of
-Test 19 run unchanged.
+Test 19 run unchanged. Since NOT-002 the apps also offer notifications
+(«¿Te avisamos?») after a booking or an Evaluation and on a Staff role's first
+home; the journeys answer «Ahora no» through each app's
+`subflows/dismiss-push-permission.yaml`, and Test 46 tests the sheet itself.
+A development build installed since NOT-002 has `expo-notifications` and the
+Firebase configuration; an older one cannot receive push, so reinstall from
+the latest `development` build.
+
+## Test 46: push notifications on the development builds
+
+Push (NOT-002) runs only on the development builds of Test 45: Expo Go cannot
+receive remote push. Android receives real pushes through Firebase on the
+emulator. iOS registers on the Simulators, but real delivery needs the APNs
+key (gate 9), so the Simulators are checked with `xcrun simctl push`.
+
+**Before you begin.**
+
+- Load the fixtures on `pilates_dev_sim` (Test 19, «Before a run»). Start the
+  API (port 3100) and the **worker**, both with `apps/backend/.env`:
+  `DATABASE_URL="postgresql://$USER@localhost:5433/pilates_dev_sim" node --env-file=.env dist/src/worker-main.js`
+  after `pnpm --filter @pilates/backend build`. The worker sends the pushes,
+  and `.env` holds `EXPO_ACCESS_TOKEN`: enhanced push security is on for
+  `emma-pilates`, so Expo refuses a push without the token
+  ([infrastructure](./architecture/infrastructure.md), «Settings and
+  secrets»). Ask the user to add the line if it is missing; never paste the
+  value into a chat.
+- Install the latest development builds (Test 45) on the Android emulator,
+  the iPhone 16 Pro, and the iPad Pro 11, and start both Metro servers.
+- On Android, `adb reverse` ports 3100, 8082, and 8083 as in Test 45.
+
+**A. The permission sheet (all three devices).**
+
+1. Client: sign in as `lucia@example.com`, open Reservar, book a class.
+   After «Reserva confirmada» the sheet «¿Te avisamos?» rises with the Client
+   text. It does **not** show at sign-in. It also follows a Waitlist join
+   and «Evaluación confirmada».
+2. Tap «Activar notificaciones»: only now does the system prompt appear
+   («Allow Emma Pilates to send you notifications?» on Android, «"Emma
+   Pilates" Would Like to Send You Notifications» on iOS). Allow it. The API
+   log shows `PUT /api/v1/notifications/devices/current` 204 once or twice,
+   then no more. A steady stream of them is a token-listener loop. The
+   database has an active row:
+   `select platform, deactivated_at from system.account_devices;`.
+3. Staff: sign in as `paola.mendoza@example.com`. The sheet shows on
+   «Pagos pendientes» with the Staff text.
+4. «Ahora no» hides the sheet for 30 days. A reinstall resets it (iOS) or
+   clears the app's data (Android).
+5. Deny on one device (iOS «Don't Allow»): the API logs
+   `POST …/devices/current/deactivate` 204, and Perfil → Notificaciones shows
+   «Las notificaciones están desactivadas en este dispositivo…» with «Abrir
+   Ajustes», which opens the system Settings.
+
+**B. A real push on Android, with sound.** Send the app to the background
+(Home), then, as Paola, cancel a Session Lucía has booked:
+`POST /api/v1/administrator/sessions/{id}/cancel` with an `idempotency-key`
+(sign in with `POST /api/v1/authentication-sessions`, header
+`x-client-identifier`). Within seconds the shade shows «Clase cancelada»
+with the full inbox text and the bell icon on channel `actionable`
+(`adb shell dumpsys notification --noredact | grep emmapilates`).
+`pgboss.job` has a completed `notifications.push-dispatch.v1` job, and
+`system.notification_deliveries` has a `submitted` row with a ticket.
+
+**C. A silent push.** A silent type (`payment_confirmed`,
+`subscription_expiring`, `evaluation_booked`, `evaluation_cancelled`)
+arrives on channel `updates`, with no bell, in the shade's quiet section.
+For example, confirm one of Lucía's transfer Payments as Paola (Test 10).
+Private types show generic lock-screen copy, never names, amounts, or
+reasons («Comprobante rechazado» / «Revisa tu pago en la app.»).
+
+**D. Taps.** Tap the notification. The API logs
+`POST /api/v1/notifications/{id}/read` 204, and the app opens the inbox's
+destination: Mis reservas for a Session, Mi plan for a Subscription,
+«Revisar pago» for an Administrator's payment. Two Android traps:
+
+- A **force-stopped** app (`am force-stop`, or «Force stop» in Settings)
+  gets no FCM pushes until it is opened again. That is Android's rule. Use
+  Home, or `adb shell am kill` while it is in the background, for «closed».
+- On the **development build**, tapping a push when the app process is not
+  running opens the app without routing. The development client's launcher
+  takes the launch and starts the app again without the notification. The
+  same tap routes on iOS and with the process alive, so judge cold starts on
+  a `preview` or store build.
+
+**E. Receipts.** Fifteen minutes after a send, the worker's 5-minute sweep
+reads Expo's receipts: `delivered`, or `failed` with
+`device_not_registered` and the device deactivated. That last case is what
+happens to the row left by an uninstalled app. A delivery still without a
+receipt after 24 hours becomes `discarded`.
+
+**F. iOS with `simctl push`.** Background the app and send an Expo-shaped
+payload. The identifiers go under `body`. Use a real unread entry of the
+signed-in Account so the read call succeeds:
+
+```sh
+cat > push.apns <<'JSON'
+{
+  "Simulator Target Bundle": "com.emmapilates.client",
+  "aps": { "alert": { "title": "Clase cancelada", "body": "Tu clase de Reformer Pilates fue cancelada." },
+           "sound": "default", "badge": 2 },
+  "body": { "notificationId": "<unread notification id>", "type": "session_cancelled",
+            "destinationType": "session", "destinationId": "<session id>" }
+}
+JSON
+xcrun simctl push <udid> com.emmapilates.client push.apns
+```
+
+Tap the banner while it shows (Notification Center taps do not open the app
+on the Simulator). The entry is marked read and Mis reservas opens. This
+works from a cold start too (`xcrun simctl terminate` first). Leave out
+`sound` for a silent push.
+
+**G. Badge and sign-out.** The app-icon badge equals the inbox's unread
+count (Perfil's count): check it on the iOS Home Screen. Stock Android
+launchers show a dot, not a number, so the badge call there is best-effort.
+Sign out: the badge clears, and the device row becomes
+`deactivation_reason = 'logout'`.
