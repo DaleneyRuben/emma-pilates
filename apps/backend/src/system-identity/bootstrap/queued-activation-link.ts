@@ -1,8 +1,7 @@
-import { parseAuthenticationEmailJob } from '../../jobs/authentication-email/authentication-email-job';
-import {
-  processAuthenticationEmail,
-  type AuthenticationEmailStateReader,
-  type AuthenticationLinkDecryptor,
+import { readQueuedLinkSecret } from '../../jobs/authentication-email/queued-link-secret';
+import type {
+  AuthenticationEmailStateReader,
+  AuthenticationLinkDecryptor,
 } from '../../jobs/authentication-email/process-authentication-email';
 
 type QueuedActivationLinkDependencies = {
@@ -14,41 +13,19 @@ type QueuedActivationLinkDependencies = {
 };
 
 // Until EXT-001 sends email, the first production Administrator (ADR-0083)
-// opens their queued Activation Link from an operator shell. The worker's
-// own checks decide which link is still current; nothing is delivered.
+// opens their queued Activation Link from an operator shell.
 export async function readQueuedActivationLink(
   dependencies: QueuedActivationLinkDependencies,
 ): Promise<string | null> {
-  const jobs = await dependencies.queuedActivationJobs();
-  const newestFirst = [...jobs].sort(
-    (left, right) => right.createdOn.getTime() - left.createdOn.getTime(),
-  );
+  const secret = await readQueuedLinkSecret({
+    purpose: 'activation',
+    queuedJobs: () => dependencies.queuedActivationJobs(),
+    stateReader: dependencies.stateReader,
+    decryptor: dependencies.decryptor,
+    now: dependencies.now,
+  });
 
-  for (const queued of newestFirst) {
-    const job = parseAuthenticationEmailJob(queued.data);
-    if (job.purpose !== 'activation') continue;
-    let secret: string | null = null;
-    const outcome = await processAuthenticationEmail(job, dependencies.now, {
-      stateReader: dependencies.stateReader,
-      decryptor: dependencies.decryptor,
-      renderer: {
-        render: (input) => {
-          secret = input.linkSecret;
-          return {
-            recipient: input.recipient,
-            purpose: input.purpose,
-            subject: '',
-            link: null,
-            text: '',
-            html: '',
-          };
-        },
-      },
-      delivery: { deliver: () => Promise.resolve() },
-    });
-    if (outcome === 'delivered' && secret !== null) {
-      return `${dependencies.adminWebOrigin}/crear-contrasena?token=${encodeURIComponent(secret)}`;
-    }
-  }
-  return null;
+  return secret === null
+    ? null
+    : `${dependencies.adminWebOrigin}/crear-contrasena?token=${encodeURIComponent(secret)}`;
 }
