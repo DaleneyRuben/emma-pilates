@@ -1,4 +1,5 @@
 import appConfig from "../app.json";
+import googleServices from "../google-services.json";
 import easConfig from "../eas.json";
 import packageJson from "../package.json";
 import workspacePackageJson from "../../../package.json";
@@ -72,6 +73,20 @@ describe("client release configuration", () => {
     [development, preview, production].forEach((profile) => {
       expect(profile).toMatchObject({ extends: "base" });
     });
+  });
+
+  // NOT-002: remote push through expo-notifications; Android delivers it through
+  // FCM, whose public client configuration is committed (it holds no secret).
+  it("receives push notifications, through Firebase on Android", () => {
+    expect(packageJson.dependencies).toHaveProperty("expo-notifications");
+    expect(appConfig.expo.plugins).toContainEqual([
+      "expo-notifications",
+      { defaultChannel: "updates" },
+    ]);
+    expect(appConfig.expo.android).toMatchObject({ googleServicesFile: "./google-services.json" });
+    expect(
+      googleServices.client.map((client) => client.client_info.android_client_info.package_name),
+    ).toContain("com.emmapilates.client");
   });
 
   it("submits only the production profile", () => {

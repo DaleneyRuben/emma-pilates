@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "6780476264",
+    "project_id": "emma-pilates",
+    "storage_bucket": "emma-pilates.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6780476264:android:dc092fdf515b17562254dd",
+        "android_client_info": {
+          "package_name": "com.emmapilates.client"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLW0B39WZV45qEU-z_d0jhdYAbxZVUf4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6780476264:android:aae425fa426d97a82254dd",
+        "android_client_info": {
+          "package_name": "com.emmapilates.staff"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLW0B39WZV45qEU-z_d0jhdYAbxZVUf4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
