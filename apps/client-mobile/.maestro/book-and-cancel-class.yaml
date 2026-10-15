@@ -40,6 +40,7 @@ env:
 - tapOn:
     text: "Reservar"
     index: 0
+- runFlow: subflows/dismiss-push-permission.yaml
 - extendedWaitUntil:
     visible: "Reserva confirmada"
     timeout: 15000
