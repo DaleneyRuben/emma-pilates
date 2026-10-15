@@ -5,10 +5,10 @@ type QueuedClientVerificationDependencies = {
   verify(token: string): Promise<ClientEmailVerificationStatus>;
 };
 
-export function verifyQueuedClientEmail(
+export async function verifyQueuedClientEmail(
   dependencies: QueuedClientVerificationDependencies,
 ): Promise<ClientEmailVerificationStatus | 'not_found'> {
-  return Promise.reject(
-    new Error(`Not implemented: ${typeof dependencies.verify}`),
-  );
+  const secret = await dependencies.readSecret();
+
+  return secret === null ? 'not_found' : dependencies.verify(secret);
 }
