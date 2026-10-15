@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-14** (EXT-009; Expo/EAS added by REL-001). This page holds **no secret values**:
+Last verified **2026-10-14** (EXT-009; Expo/EAS added by REL-001; push added by NOT-002). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -34,6 +34,9 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
                  preview cleanup, preview-origin registration
  Expo EAS: organization emma-pilates builds the development clients of both apps
            (iOS Simulator and Android); no store builds until gates 8–9
+ Expo Push Service: the worker sends pushes with the push-sender robot's token;
+           Android through Firebase Cloud Messaging (project emma-pilates),
+           iOS through APNs once gate 9 brings the key
 ```
 
 ## What we use from each provider
@@ -45,13 +48,14 @@ Details are in the sections below.
 | Provider | What we use | What it does for us | Not used (on purpose) |
 | --- | --- | --- | --- |
 | **GitHub** | Private repository `emma-pilates`; Actions (4 workflows); 4 repository secrets; 2 repository variables | Holds the code; runs CI on every pull request and `main`; starts the production release; registers and cleans up admin-web previews | Branch protection (needs Pro), Packages, Pages |
-| **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (14 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
+| **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (15 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
 | **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb); its CA certificate | The **production database** | The $50 trial credit, point-in-time restore, any paid plan |
 | **Vercel** | Project `emma-pilates-admin` (Hobby): production deploys, one preview per pull request, Vercel Authentication on previews, `vercel.json` rewrites, `middleware.ts`, 2 environment variables | Hosts the **admin web** (production and previews) and forwards its `/api/v1` calls to the right API with the proxy proof | Vercel Pro, custom domain (gate 7), serverless functions beyond the middleware |
 | **Render** | One Free web service, `emma-pilates-dev-api` (native Node, auto-deploy from `main`); an API key for the `preview-origins` workflow | Runs the **shared development API** that previews and Expo Go talk to | Workers, Render databases, paid plans |
 | **Neon** | One Free project, `emma-pilates-dev`: one branch, database `pilates_dev`, direct connection | The **shared development database** | Connection pooling, per-pull-request branches |
 | **Cloudflare** | R2 only: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production | Domains and DNS (gate 7), public buckets and custom domains, Workers, every other product |
-| **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` profile; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`) that NOT-002's push needs, since Expo Go cannot receive remote push | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
+| **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` profile; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
+| **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
 | **Better Stack** | Uptime monitor «Production API readiness»; error tracking app `emma-pilates-api` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
 
 Not created yet, in the order the gates open (backlog, «Order to open the
@@ -93,7 +97,8 @@ Every account belongs to the project owner and is shared with no one else.
 | Render | service `emma-pilates-dev-api` (`srv-db4ivt6i0phs73cru2p0`) | Free | — | Shared development API |
 | Neon | project `emma-pilates-dev` (`winter-paper-96646104`) | Free | No | Shared development database |
 | Better Stack | team `t614177` | Free | No | Uptime, error tracking, heartbeat, email alerts |
-| Expo | user `daleneyfernando` (Google sign-in), organization `emma-pilates`; projects `emma-pilates-client` (`c9271277-f815-4e36-97db-63a584a85957`) and `emma-pilates-staff` (`885d3272-da0a-49f7-b8cd-33092de7662a`) | Free: 15 iOS and 15 Android builds a month | No | Mobile development builds since 2026-10-14 (gate 6); push and updates later |
+| Expo | user `daleneyfernando` (Google sign-in), organization `emma-pilates`; projects `emma-pilates-client` (`c9271277-f815-4e36-97db-63a584a85957`) and `emma-pilates-staff` (`885d3272-da0a-49f7-b8cd-33092de7662a`) | Free: 15 iOS and 15 Android builds a month | No | Mobile development builds since 2026-10-14 (gate 6); push since NOT-002; updates later |
+| Firebase | the user's Google account, project `emma-pilates` | Spark (no cost) | No | Android push delivery (FCM) since NOT-002 |
 | Apple, Google Play, SendPulse, domain | not created yet | — | — | Gates 7–9 |
 
 ## Production in detail
@@ -277,6 +282,8 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `ERROR_REPORTING_DSN` | Northflank `production` (the API and the worker) | Render | commented in `.env` | Write-only; `emma-pilates-api`, one Better Stack application for every environment and both processes |
 | `VITE_ERROR_REPORTING_DSN` | Vercel Production (Config, readable) | unset | unset | `emma-pilates-admin`'s DSN; Vite inlines it in the browser bundle, so it is public by design and can only send errors; a change needs a redeploy |
 | `WORKER_HEARTBEAT_URL` | Northflank `worker` service | not set | commented in `.env` | Better Stack «Worker heartbeat» |
+| `EXPO_ACCESS_TOKEN` | Northflank `production` | unset | `.env` | The `push-sender` robot's token `northflank-production` (Viewer). Enhanced push security is on for `emma-pilates`, so the worker cannot push without it; to rotate, create a new token on the robot, replace the value, restart `worker`, then revoke the old one |
+| FCM V1 service account key | EAS, each project's Android credentials | same | never on the Mac | Generated in Firebase (Project settings → Service accounts); to rotate, generate a new key, upload it to both EAS projects, then delete the old key in Google Cloud |
 | `OBJECT_STORAGE` | Northflank `production` (`s3`) | default (`local`) | default (`local`) | ADR-0088; production refuses `local` |
 | `OBJECT_STORAGE_ENDPOINT`, `OBJECT_STORAGE_BUCKET` | Northflank `production` | unset | unset (MinIO for Test 42) | Default R2 endpoint, bucket `emma-pilates-prod-images` |
 | `OBJECT_STORAGE_ACCESS_KEY_ID`, `OBJECT_STORAGE_SECRET_ACCESS_KEY` | Northflank `production` | unset | unset | R2 token `northflank-production-images`; rotation under «Cloudflare R2» |
@@ -363,6 +370,13 @@ Values never go in the repository or a chat. «Mac» means the user's own
 - No email (gate 7): Clients cannot register or recover passwords in
   production; the first Administrator's link was read from the `api` shell.
 - No domain: production uses the providers' hostnames.
+- iOS push needs an APNs key (gate 9). Until then iOS installations register,
+  but Expo answers their pushes with `InvalidCredentials`, which the worker
+  records as a failed delivery; the Simulators are verified with
+  `xcrun simctl push` (testing guide, Test 46).
+- The FCM key belongs to Firebase's Admin SDK service account, which has more
+  rights than sending messages; a dedicated service account with only the
+  Firebase Cloud Messaging role would be narrower.
 - The Android keystores live only on EAS: download a copy
   (`eas credentials`, Android, «Download») before the first store build
   (gate 8), so release credentials stay recoverable (ADR-0038).
