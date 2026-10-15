@@ -63,6 +63,46 @@ needs none, a native change needs a new one per app and platform.
   reported). Where each credential lives and how to rotate it is in
   [infrastructure](../architecture/infrastructure.md).
 
+## Google Play Internal testing (REL-006)
+
+Since 2026-10-15 both apps exist in the Play Console under the personal
+developer account «Daleney Labs» (`docs/architecture/infrastructure.md`).
+
+- **Build:** `eas build --profile production --platform android
+  --non-interactive --no-wait` from each app folder spends one of the free
+  plan's monthly Android builds and bumps `expo.android.versionCode` in
+  `app.json`; commit that bump. `EXPO_PUBLIC_API_URL` comes from the EAS
+  `production` environment (the Northflank API).
+- **First upload by hand:** Google accepts an app's first bundle only through
+  the console: Test and release → Testing → Internal testing → Create new
+  release → Upload the `.aab` from the build page → release notes in
+  `<es-419>` tags → Next → Save and publish. The only expected warning is
+  the missing deobfuscation file (R8 is off). Later uploads can use
+  `eas submit` once the Play service account is stored in EAS (REL-002).
+- **Testers:** the email list «Equipo interno» is shared by both apps; each
+  app's Testers tab has the «Join on the web» link. A tester opens it in a
+  browser signed in with a listed Google account, accepts, and installs; the
+  Play Store on the device must use that same account, or it answers «item
+  not found». Until the store listing is reviewed, testers see the
+  temporary name `com.emmapilates.<app> (unreviewed)`.
+
+## Client Accounts on production before email (EXT-001)
+
+Production cannot send verification email until EXT-001, so a Client who
+registers in the app stays unverified. From the Northflank `api` shell
+(Services → `api` → Shell), confirm their queued verification by email:
+
+```sh
+node dist/src/client-email-verification-main.js <their email>
+```
+
+It prints `{"event":"client_email_verification","status":"verified"}` (exit
+0); `not_found` means no current verification is queued for that address
+(already used, expired after 24 hours, or a typo). The command reads the
+newest current link with the worker's own checks and sends it to the API's
+`POST /api/v1/client-email-verifications` on the same host; the secret is
+never printed. Then the Client logs in with their email and password.
+
 ## Before every release (local, no account needed)
 
 Run from the commit you intend to release, with CI green for it:

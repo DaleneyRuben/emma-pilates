@@ -4008,3 +4008,33 @@ builds never upload.
 3. After the next native build (Test 45), repeat with the build itself: the
    event also carries the release (`com.emmapilates.client@1.0.0+<build>`),
    and an EAS release build with the upload variables shows readable frames.
+
+## Test 48: install from Play Internal testing and use production
+
+Needs a phone or tablet whose Play Store is signed in with an account on the
+«Equipo interno» list (mobile release runbook).
+
+### A. Install
+1. Open each app's «Join on the web» link (Play Console → the app → Test and
+   release → Testing → Internal testing → Testers) in the device's browser,
+   accept, and install. Expected: the listing shows
+   `com.emmapilates.client (unreviewed)` or `com.emmapilates.staff
+   (unreviewed)`, and the app opens without a red screen.
+
+### B. Staff app on production
+1. Log in with the production Administrator. Expected: the Administrator
+   destinations, with every Branch.
+
+### C. Client app on production
+1. Register with an address you control. Expected: the «check your email»
+   screen; no email arrives (EXT-001).
+2. In the Northflank `api` shell run
+   `node dist/src/client-email-verification-main.js <that address>`.
+   Expected: `"status":"verified"`; a second run answers `not_found`.
+3. Log in with that address and password. Expected: Home.
+
+Verified locally on 2026-10-15 against `pilates_dev_sim` (API from
+`dist/`, no worker): a registration answered 202, the command answered
+`not_found` for another address, `verified` for the address in capitals,
+`not_found` on a rerun, and `POST /api/v1/authentication-sessions` then
+returned a credential.
