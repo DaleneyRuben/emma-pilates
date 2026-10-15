@@ -40,7 +40,8 @@
         {
           "defaultChannel": "updates"
         }
-      ]
+      ],
+      "@pilates/mobile-core/launch-tap-plugin"
     ],
     "extra": {
       "eas": {
