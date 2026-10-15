@@ -56,11 +56,13 @@ Details are in the sections below.
 | **Cloudflare** | R2 only: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production | Domains and DNS (gate 7), public buckets and custom domains, Workers, every other product |
 | **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` profile; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
 | **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
+| **Google Play Console** | Personal developer account «Daleney Labs» (ID `5688059300530668770`) owned by the user's Google account, identity verified 2026-10-15; draft apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»), Spanish (Latin America), free, Play App Signing accepted, automatic protection on | Distributes the **Android apps**: Internal testing first, then the Client app's closed test and production release (REL-002 to REL-007); Staff stays on a closed track | Paid apps and in-app purchases (earning money is off, which keeps the legal address private), organization verification, the developer website |
 | **Better Stack** | Uptime monitor «Production API readiness»; error tracking apps `emma-pilates-api`, `emma-pilates-admin`, and `emma-pilates-mobile` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
 
 Not created yet, in the order the gates open (backlog, «Order to open the
-gates»): a **domain** with **SendPulse** for email (gate 7),
-**Google Play** (gate 8), **Apple Developer** (gate 9).
+gates»): a **domain** with **SendPulse** for email (gate 7; Google Play
+went ahead without it by the user's decision on 2026-10-15),
+**Apple Developer** (gate 9).
 
 ## Environments
 
@@ -99,7 +101,8 @@ Every account belongs to the project owner and is shared with no one else.
 | Better Stack | team `t614177` | Free | No | Uptime, error tracking, heartbeat, email alerts |
 | Expo | user `daleneyfernando` (Google sign-in), organization `emma-pilates`; projects `emma-pilates-client` (`c9271277-f815-4e36-97db-63a584a85957`) and `emma-pilates-staff` (`885d3272-da0a-49f7-b8cd-33092de7662a`) | Free: 15 iOS and 15 Android builds a month | No | Mobile development builds since 2026-10-14 (gate 6); push since NOT-002; updates later |
 | Firebase | the user's Google account, project `emma-pilates` | Spark (no cost) | No | Android push delivery (FCM) since NOT-002 |
-| Apple, Google Play, SendPulse, domain | not created yet | — | — | Gates 7–9 |
+| Google Play Console | developer «Daleney Labs» (personal), account ID `5688059300530668770`, owned by `daleney.fernando@…` | $25 once, paid 2026-10-15 | Yes (Google payments profile) | Android distribution since 2026-10-15 (gate 8) |
+| Apple, SendPulse, domain | not created yet | — | — | Gates 7 and 9 |
 
 ## Production in detail
 
