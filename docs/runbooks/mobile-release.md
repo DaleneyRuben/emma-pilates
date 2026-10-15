@@ -19,6 +19,19 @@ per app (`extra.eas.projectId` and `owner` in each `app.json`), and
 - a Google Play Console app entry and upload key for both packages;
 - EAS environment variables `EXPO_PUBLIC_API_URL` for the `preview` and
   `production` environments (the https API hosts from EXT-003).
+- EAS environment variables for error reporting (EXT-013) in the `preview`
+  and `production` environments of both projects:
+  `EXPO_PUBLIC_ERROR_REPORTING_DSN` (plain text, the `emma-pilates-mobile`
+  DSN; set it in `development` too to report from development builds) and,
+  for readable stacks, `SENTRY_URL`, `SENTRY_ORG`, and `SENTRY_PROJECT` (plain
+  text, from the application's Advanced settings in Better Stack) with
+  `SENTRY_AUTH_TOKEN` (secret, a Telemetry API token). Every profile sets
+  `SENTRY_ALLOW_FAILURE`, so a build without them succeeds and its log shows
+  the failed upload; the native debug-file uploads are off because Better
+  Stack does not take them. An EAS Update must be published with
+  `--environment production` (or `preview`) so it carries the DSN, and its
+  maps go up with `pnpm exec sentry-expo-upload-sourcemaps dist` from the app
+  folder afterwards.
 - for iOS push, an APNs key from the Apple Developer team, added to each EAS
   project with `eas credentials` (iOS → Push Notifications) before the first
   iOS store build; Android push already works (below).

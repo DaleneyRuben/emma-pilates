@@ -281,6 +281,8 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `TRUSTED_PROXY_HOPS` | Northflank `api` service (1) | Render (3) | 0 | Measured, never assumed (ADR-0087) |
 | `ERROR_REPORTING_DSN` | Northflank `production` (the API and the worker) | Render | commented in `.env` | Write-only; `emma-pilates-api`, one Better Stack application for every environment and both processes |
 | `VITE_ERROR_REPORTING_DSN` | Vercel Production (Config, readable) | unset | unset | `emma-pilates-admin`'s DSN; Vite inlines it in the browser bundle, so it is public by design and can only send errors; a change needs a redeploy |
+| `EXPO_PUBLIC_ERROR_REPORTING_DSN` | EAS environment variables `preview` and `production`, each app's project (plain text) | same, `development` | unset (a local receiver for Test 47) | `emma-pilates-mobile`'s DSN (EXT-013); Expo inlines it in the bundle at build or update time, so it is public by design and can only send errors |
+| `SENTRY_URL`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` | EAS environment variables `preview` and `production`, each app's project (the token as a secret) | — | never | The source-map upload of release builds (EXT-013): Better Stack's upload endpoint, team ID, and `emma-pilates-mobile` ID from the application's Advanced settings, and a Telemetry API token, which is account-wide; without them a build succeeds and uploads nothing |
 | `WORKER_HEARTBEAT_URL` | Northflank `worker` service | not set | commented in `.env` | Better Stack «Worker heartbeat» |
 | `EXPO_ACCESS_TOKEN` | Northflank `production` | unset | `.env` | The `push-sender` robot's token `northflank-production` (Viewer). Enhanced push security is on for `emma-pilates`, so the worker cannot push without it; to rotate, create a new token on the robot, replace the value, restart `worker`, then revoke the old one |
 | FCM V1 service account key | EAS, each project's Android credentials | same | never on the Mac | Generated in Firebase (Project settings → Service accounts); to rotate, generate a new key, upload it to both EAS projects, then delete the old key in Google Cloud |
@@ -361,9 +363,18 @@ Values never go in the repository or a chat. «Mac» means the user's own
   alerts. The worker has no probes: Northflank restarts it only when its
   process exits, and the heartbeat catches anything else.
 - **Northflank:** logs (JSON lines), metrics, container restarts.
-- Not yet: mobile error reporting (gate 6, EAS); source maps for the admin
-  web (declined: the upload needs an account-wide Better Stack token on
-  Vercel).
+- **Better Stack error tracking `emma-pilates-mobile`** (React Native): both
+  apps report uncaught errors, unhandled rejections, and render errors a
+  screen's boundary caught (no message, user, breadcrumbs, device context,
+  screenshots, sessions, or tracing; 4xx answers never), tagged `service`
+  `client-mobile` or `staff-mobile`, when the bundle has
+  `EXPO_PUBLIC_ERROR_REPORTING_DSN` (EXT-013). The environment is the build's
+  update channel, `development` under Metro. Release builds upload their
+  JavaScript source maps, matched by debug id, when the `SENTRY_*` variables
+  are set; Better Stack takes no dSYMs or ProGuard mappings, so native
+  frames stay unsymbolicated.
+- Not yet: source maps for the admin web (declined: the upload needs an
+  account-wide Better Stack token on Vercel).
 
 ## Known gaps
 
