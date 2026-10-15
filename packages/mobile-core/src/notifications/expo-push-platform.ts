@@ -51,7 +51,8 @@ export function createExpoPushPlatform(): PushPlatform {
       await Notifications.setNotificationChannelAsync("actionable", {
         name: "Avisos importantes",
         importance: Notifications.AndroidImportance.HIGH,
-        sound: "default",
+        // Leaving the sound out keeps the system's default; a name would be
+        // looked up as a bundled sound file.
       });
       await Notifications.setNotificationChannelAsync("updates", {
         name: "Novedades",
