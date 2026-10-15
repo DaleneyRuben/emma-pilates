@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@pilates/tooling": "workspace:*",
+    "@sentry/cli": "2.58.4",
     "@testing-library/react-native": "^14.0.1",
     "@types/jest": "^30.0.0",
     "@types/react": "~19.2.2",
