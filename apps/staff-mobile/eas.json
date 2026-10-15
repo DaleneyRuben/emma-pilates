@@ -8,7 +8,10 @@
       "node": "24.13.0",
       "pnpm": "11.19.0",
       "env": {
-        "SHARP_IGNORE_GLOBAL_LIBVIPS": "1"
+        "SHARP_IGNORE_GLOBAL_LIBVIPS": "1",
+        "SENTRY_ALLOW_FAILURE": "true",
+        "SENTRY_DISABLE_XCODE_DEBUG_UPLOAD": "true",
+        "SENTRY_DISABLE_NATIVE_DEBUG_UPLOAD": "true"
       }
     },
     "development": {
