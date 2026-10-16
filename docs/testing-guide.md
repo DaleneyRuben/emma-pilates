@@ -3152,12 +3152,16 @@ goes to the production API on Northflank instead (Test 38).
    sesión desde esta dirección. Abre el panel desde su enlace habitual.». If a run failed, re-run it from the
    Actions tab or with `gh workflow run preview-origins.yml`; its log prints
    the current and desired lists.
-4. The shared database holds the development fixtures. Migrations and
-   fixtures are applied from your Mac with Neon's direct (unpooled)
-   connection string pasted into a hidden prompt, never shown:
+4. The shared database holds the development fixtures. Migrations are
+   applied by the «migrate development database» workflow (ADR-0090) on every
+   pull-request push that touches `apps/backend/prisma/migrations` and on every
+   push to `main`; check it with
+   `gh run list --workflow migrate-development.yml --limit 3`. Fixtures, and
+   a migration by hand when the workflow cannot run, use Neon's direct
+   (unpooled) connection string pasted into a hidden prompt, never shown:
    `read -rs NEON_URL && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:migrate:deploy && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:fixtures; unset NEON_URL`.
-   Run it again after a merged pull request adds a migration, because Render
-   deploys the code but never migrates. Sign in as
+   If a pull request's migration changed after it was applied, or failed,
+   reset the development database and migrate from `main`. Sign in as
    `paola.mendoza@example.com` with the fixture password. The first request
    after the Render service has slept can take about a minute.
 5. Expect Horario for Sucursal Centro. In DevTools → Network,
