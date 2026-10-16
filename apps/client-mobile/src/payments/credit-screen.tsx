@@ -2,6 +2,7 @@ import { useGetCurrentClientCredit, useGetCurrentClientReferrals } from "@pilate
 import {
   BodyText,
   colors,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   Screen,
@@ -40,7 +41,7 @@ export function CreditScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando crédito">Cargando…</BodyText>
+        <LoadingState label="Cargando crédito" />
       </Screen>
     );
   }

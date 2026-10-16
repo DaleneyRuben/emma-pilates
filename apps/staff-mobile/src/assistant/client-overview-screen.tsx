@@ -7,6 +7,7 @@ import {
   formatSessionDate,
   formatTimeRange,
   Heading,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -91,7 +92,7 @@ export function ClientOverviewScreen({
     return (
       <Screen style={styles.screen}>
         {back}
-        <BodyText accessibilityLabel="Cargando cliente">Cargando…</BodyText>
+        <LoadingState label="Cargando cliente" />
       </Screen>
     );
   }

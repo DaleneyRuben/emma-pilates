@@ -12,6 +12,7 @@ import {
   colors,
   FormField,
   FormScrollView,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   Screen,
@@ -178,7 +179,7 @@ export function EditProfileScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando perfil">Cargando…</BodyText>
+        <LoadingState label="Cargando perfil" />
       </Screen>
     );
   }

@@ -10,6 +10,7 @@ import {
   colors,
   formatTimeRange,
   hasStarted,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -121,7 +122,7 @@ export function AssistantRescheduleScreen({
       </View>
       <BodyText>Puedes cambiarla por otra clase disponible el mismo día.</BodyText>
       {alternatives.isPending ? (
-        <BodyText accessibilityLabel="Cargando alternativas">Cargando…</BodyText>
+        <LoadingState label="Cargando alternativas" />
       ) : alternatives.isError ? (
         <QueryFailure
           label="No pudimos cargar las clases del día."

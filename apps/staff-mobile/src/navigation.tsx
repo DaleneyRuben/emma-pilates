@@ -5,6 +5,8 @@ import {
   colors,
   formatTimeRange,
   Heading,
+  LoadingState,
+  type MobileNavigationProps,
   MobileQueryProvider,
   PrimaryButton,
   QueryFailure,
@@ -12,7 +14,6 @@ import {
   Screen,
   spacing,
   surfaces,
-  type MobileNavigationProps,
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
@@ -79,7 +80,7 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
   if (roster.isPending)
     return (
       <Screen style={styles.centered}>
-        <BodyText accessibilityLabel="Cargando lista">Cargando lista…</BodyText>
+        <LoadingState label="Cargando lista" />
       </Screen>
     );
   if (roster.isError || roster.data === undefined)

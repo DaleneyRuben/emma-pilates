@@ -19,6 +19,7 @@ import { TextButton } from "../ui/text-button";
 import { colors, radii, spacing, typography } from "../ui/tokens";
 import { formatNotificationTime } from "./notification-time";
 import { usePushNotifications } from "./push-notifications";
+import { LoadingState } from "../ui/loading-state";
 
 const pageSize = 50;
 
@@ -117,7 +118,7 @@ export function NotificationsScreen({
     return (
       <Screen style={styles.screen}>
         {header()}
-        <BodyText accessibilityLabel="Cargando notificaciones">Cargando…</BodyText>
+        <LoadingState label="Cargando notificaciones" />
       </Screen>
     );
   }

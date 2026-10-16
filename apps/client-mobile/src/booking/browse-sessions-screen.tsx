@@ -8,6 +8,7 @@ import {
   BranchPickerPill,
   colors,
   Heading,
+  LoadingState,
   PickerCheck,
   QueryFailure,
   radii,
@@ -196,7 +197,7 @@ export function BrowseSessionsScreen() {
         ))}
       </ScrollView>
       {loading ? (
-        <BodyText accessibilityLabel="Cargando clases">Cargando…</BodyText>
+        <LoadingState label="Cargando clases" />
       ) : failed ? (
         <QueryFailure
           label="No pudimos cargar las clases."

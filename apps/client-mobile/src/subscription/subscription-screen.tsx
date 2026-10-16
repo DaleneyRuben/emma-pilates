@@ -2,6 +2,7 @@ import { useGetCurrentClientSubscription } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -59,7 +60,7 @@ export function SubscriptionScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando plan">Cargando…</BodyText>
+        <LoadingState label="Cargando plan" />
       </Screen>
     );
   }

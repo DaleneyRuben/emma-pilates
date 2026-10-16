@@ -10,6 +10,7 @@ import {
   colors,
   confirmLogout,
   Heading,
+  LoadingState,
   QueryFailure,
   radii,
   Screen,
@@ -95,7 +96,7 @@ export function ProfileScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando perfil">Cargando…</BodyText>
+        <LoadingState label="Cargando perfil" />
       </Screen>
     );
   }

@@ -12,6 +12,7 @@ import {
 import {
   BodyText,
   colors,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   Screen,
@@ -68,7 +69,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     return (
       <Screen style={styles.screen}>
         <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Detalle del plan" />
-        <BodyText accessibilityLabel="Cargando plan">Cargando…</BodyText>
+        <LoadingState label="Cargando plan" />
       </Screen>
     );
   }

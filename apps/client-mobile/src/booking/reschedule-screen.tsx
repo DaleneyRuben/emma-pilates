@@ -8,6 +8,7 @@ import {
 import {
   BodyText,
   colors,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -131,7 +132,7 @@ export function RescheduleScreen({
       </View>
       <BodyText>Puedes cambiar a otra clase disponible el mismo día.</BodyText>
       {loading ? (
-        <BodyText accessibilityLabel="Cargando alternativas">Cargando…</BodyText>
+        <LoadingState label="Cargando alternativas" />
       ) : failed ? (
         <QueryFailure
           label="No pudimos cargar las clases del día."

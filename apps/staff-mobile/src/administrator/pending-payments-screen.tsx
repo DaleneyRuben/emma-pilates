@@ -9,6 +9,7 @@ import {
   fontFamilies,
   formatBolivianos,
   formatNotificationTime,
+  LoadingState,
   QueryFailure,
   radii,
   Screen,
@@ -64,7 +65,7 @@ export function PendingPaymentsScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando pagos">Cargando…</BodyText>
+        <LoadingState label="Cargando pagos" />
       </Screen>
     );
   }

@@ -8,6 +8,7 @@ import {
   FormScrollView,
   FullScreenImage,
   initials,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -76,7 +77,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando pago">Cargando…</BodyText>
+        <LoadingState label="Cargando pago" />
       </Screen>
     );
   }

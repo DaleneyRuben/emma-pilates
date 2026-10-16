@@ -11,6 +11,7 @@ import {
   formatSessionDate,
   formatTimeRange,
   isInsideCancellationWindow,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -198,7 +199,7 @@ export function ClientBookingsScreen({
         </BodyText>
       ) : null}
       {upcoming.isPending ? (
-        <BodyText accessibilityLabel="Cargando reservas">Cargando…</BodyText>
+        <LoadingState label="Cargando reservas" />
       ) : upcoming.isError || upcoming.data.status !== 200 ? (
         <QueryFailure
           label="No pudimos cargar las reservas."

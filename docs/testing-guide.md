@@ -4377,3 +4377,39 @@ in the database console as the timing check after a release.
 Verified on 2026-10-16: steps 1, 3, and 4 on the Android emulator (Medium
 Phone, API 36), steps 1, 3, and 4 on the iPhone 16 Pro, and steps 1, 2, and
 4 on the iPad Pro 11.
+
+## Test 54: a screen's first load shows the breathing logo
+
+While a screen loads its data for the first time, both apps show only the
+studio's logo, centred in the content area under the screen's header, with
+the tab bar kept (MOB-061, design follow-up 94): nothing for 400 ms, a 300 ms
+fade, then a slow breath every 2.8 s; 240 pt wide on phones and 300 pt from
+768 pt wide (the iPad, where the Staff split shows it in the detail panel).
+Screen readers hear the screen's own label («Cargando notificaciones»,
+«Cargando cliente», …) as progress. The plain «Cargando…» text is gone; the
+Promotions placeholder card and the receipt's «Cargando el comprobante…» stay.
+
+Run it on the development builds of Test 45 (Android emulator, iPhone 16 Pro,
+iPad Pro 11). A local API answers in well under 400 ms, so slow it down with a
+throwaway proxy (never committed) in front of it: a Node `http` server on
+3101 that waits 6 s and forwards each request to 3100, and start each Metro
+with `EXPO_PUBLIC_API_URL=http://127.0.0.1:3101/api/v1` (on Android also
+`adb reverse tcp:3101 tcp:3101`). A screen whose data an earlier screen
+already fetched (Perfil and Mi crédito after Inicio) shows its content at once.
+
+1. Client, as Lucía: Perfil → Notificaciones. Expected: the logo centred
+   under «Notificaciones» with the tab bar below, its opacity changing
+   between two screenshots a second apart, then «No tienes notificaciones.»
+   in its place.
+2. Client: Perfil → Mis evaluaciones (first visit). Expected: the same.
+3. Staff, as Camila (Assistant): search «Lucia», open her. Expected: the
+   logo under the back arrow; on the iPad, in the detail panel beside the
+   search. Then «Ver historial completo»: the logo under «Historial de
+   clases» and the «Viendo historial de» banner.
+4. Reduce Motion on (Settings → Accessibility → Motion): the logo appears
+   still at full strength after the same delay. The component's specs cover
+   this case; check it by eye when you touch the component.
+
+Verified on 2026-10-16: steps 1 and 3 on the Android emulator (Medium Phone,
+API 36), steps 1, 2, and 3 on the iPhone 16 Pro, and steps 1 and 3 on the iPad
+Pro 11; step 4 by the specs only.

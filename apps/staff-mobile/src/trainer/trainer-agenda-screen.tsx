@@ -8,6 +8,7 @@ import {
   DetailLine,
   fontFamilies,
   formatTimeRange,
+  LoadingState,
   QueryFailure,
   radii,
   Screen,
@@ -100,7 +101,7 @@ export function TrainerAgendaScreen() {
     return (
       <Screen style={styles.centered}>
         {header}
-        <BodyText accessibilityLabel="Cargando agenda">Cargando agenda…</BodyText>
+        <LoadingState label="Cargando agenda" />
       </Screen>
     );
   if (schedule.isError)

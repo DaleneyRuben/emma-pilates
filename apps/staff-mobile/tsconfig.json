@@ -4,5 +4,5 @@
     "strict": true,
     "types": ["jest"]
   },
-  "include": ["App.tsx", "index.ts", "src"]
+  "include": ["App.tsx", "index.ts", "src", "../../packages/mobile-core/src/assets.d.ts"]
 }

@@ -12,6 +12,7 @@ import {
   colors,
   FormField,
   FormScrollView,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -98,7 +99,7 @@ export function CloseAccountScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando">Cargando…</BodyText>
+        <LoadingState label="Cargando" />
       </Screen>
     );
   }

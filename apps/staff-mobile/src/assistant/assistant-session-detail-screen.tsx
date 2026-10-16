@@ -12,6 +12,7 @@ import {
   formatSessionDate,
   formatTimeRange,
   Heading,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -88,7 +89,7 @@ export function AssistantSessionDetailScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando clase">Cargando…</BodyText>
+        <LoadingState label="Cargando clase" />
       </Screen>
     );
   }

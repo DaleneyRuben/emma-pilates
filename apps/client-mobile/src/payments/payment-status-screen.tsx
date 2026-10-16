@@ -8,6 +8,7 @@ import {
   BodyText,
   colors,
   Heading,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -52,7 +53,7 @@ export function PaymentStatusScreen() {
   if (payment.isPending) {
     return (
       <Screen style={styles.screen}>
-        <BodyText accessibilityLabel="Cargando pago">Cargando…</BodyText>
+        <LoadingState label="Cargando pago" />
       </Screen>
     );
   }
