@@ -75,7 +75,13 @@ export function FullScreenImage({
             maximumZoomScale={4}
             minimumZoomScale={1}
           >
-            {light ? <View style={styles.card}>{image}</View> : image}
+            {light ? (
+              <View style={styles.card} testID="full-screen-image-card">
+                {image}
+              </View>
+            ) : (
+              image
+            )}
             {note === undefined ? null : <BodyText style={styles.note}>{note}</BodyText>}
           </ScrollView>
           {footer === undefined ? null : <View style={styles.footer}>{footer}</View>}
@@ -86,7 +92,8 @@ export function FullScreenImage({
 }
 
 const styles = StyleSheet.create({
-  card: { ...surfaces.flatCard, alignSelf: "stretch", padding: spacing.xlSm },
+  // A phone column on a tablet: the QR stays scannable without leaving the screen.
+  card: { ...surfaces.flatCard, maxWidth: 480, padding: spacing.xlSm, width: "100%" },
   close: {
     alignItems: "center",
     height: 44,
