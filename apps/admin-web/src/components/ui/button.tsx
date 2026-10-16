@@ -41,24 +41,56 @@ type ButtonProps = ComponentProps<"button"> &
     busy?: boolean;
   };
 
+// Busy (follow-up 93): fill, border, and size stay; a 16 px ring in the
+// label's colour turns where the label was (kept invisibly for width);
+// clicks and Enter are swallowed so the request is never sent twice. It is
+// not `disabled`, whose grey reads as unavailable.
 export function Button({
   className,
   variant,
   size,
   asChild = false,
   type = "button",
-  busy,
+  busy = false,
+  children,
+  onClick,
   ...props
 }: ButtonProps) {
-  void busy;
   const Component = asChild ? Slot.Root : "button";
+  const working = busy && !asChild;
 
   return (
     <Component
       data-slot="button"
       type={asChild ? undefined : type}
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        working && "relative",
+      )}
+      aria-busy={working ? true : undefined}
+      onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
+        if (working) {
+          event.preventDefault();
+          return;
+        }
+        onClick?.(event);
+      }}
       {...props}
-    />
+    >
+      {working ? (
+        <>
+          <span className="invisible inline-flex items-center gap-2">
+            {children}
+          </span>
+          <span
+            data-slot="spinner"
+            aria-hidden="true"
+            className="absolute inset-0 m-auto size-4 animate-[spin_0.8s_linear_infinite] rounded-full border-2 border-current/35 border-t-current"
+          />
+        </>
+      ) : (
+        children
+      )}
+    </Component>
   );
 }
