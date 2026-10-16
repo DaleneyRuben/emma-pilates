@@ -11,7 +11,6 @@ export type DevelopmentFixtures = {
     id: string;
     name: string;
     description: string;
-    durationMinutes: number;
     defaultCapacity: number;
     equipmentNeeds: string | null;
   }[];
@@ -44,6 +43,7 @@ export type DevelopmentFixtures = {
     trainerStaffMemberId: string;
     weekday: number;
     startsAtLocal: Date;
+    durationMinutes: number;
     capacity: number;
     effectiveFrom: Date;
   }[];
@@ -129,6 +129,7 @@ const referralRewardCentavos = 6_000;
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
 const boliviaOffsetHours = 4;
 const materializationDays = 30;
+const sessionMinutes = 50;
 
 const addDays = (date: Date, days: number): Date =>
   new Date(date.getTime() + days * dayMilliseconds);
@@ -161,7 +162,6 @@ const classTypeDefinitions = [
     name: 'Reformer Pilates',
     description:
       'Clase de Pilates con Reformer, ideal para tonificar todo el cuerpo. Trabajamos fuerza, control y movilidad con acompañamiento cercano en grupos pequeños.',
-    durationMinutes: 50,
     defaultCapacity: 12,
     equipmentNeeds: 'Reformer',
   },
@@ -170,7 +170,6 @@ const classTypeDefinitions = [
     name: 'Mat Pilates',
     description:
       'Pilates en colchoneta con énfasis en centro y respiración. Ideal para complementar tus clases de Reformer.',
-    durationMinutes: 50,
     defaultCapacity: 14,
     equipmentNeeds: null,
   },
@@ -179,7 +178,6 @@ const classTypeDefinitions = [
     name: 'Pilates Prenatal',
     description:
       'Clase suave y segura para el embarazo, con foco en respiración, movilidad y fortalecimiento del suelo pélvico.',
-    durationMinutes: 50,
     defaultCapacity: 8,
     equipmentNeeds: 'Colchoneta y pelota',
   },
@@ -509,18 +507,11 @@ export const buildDevelopmentFixtures = (input: {
         trainerStaffMemberId: staffId(definition.trainer),
         weekday,
         startsAtLocal: wallClock(definition.hours, definition.minutes),
+        durationMinutes: sessionMinutes,
         capacity: definition.capacity,
         effectiveFrom: addDays(input.today, -28),
       })),
     );
-
-  const durationMinutesOf = (id: string): number => {
-    const classType = classTypeDefinitions.find(
-      (definition) => classTypeId(definition.key) === id,
-    );
-    if (!classType) throw new Error(`Unknown class type ${id}`);
-    return classType.durationMinutes;
-  };
 
   const sessions: DevelopmentFixtures['sessions'] = sessionSchedules.flatMap(
     (schedule) =>
@@ -545,8 +536,7 @@ export const buildDevelopmentFixtures = (input: {
             trainerStaffMemberId: schedule.trainerStaffMemberId,
             startsAt,
             endsAt: new Date(
-              startsAt.getTime() +
-                durationMinutesOf(schedule.classTypeId) * 60 * 1_000,
+              startsAt.getTime() + schedule.durationMinutes * 60 * 1_000,
             ),
             capacity: schedule.capacity,
           };

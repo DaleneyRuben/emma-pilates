@@ -128,7 +128,6 @@ describe('client discovery (e2e)', () => {
                 id: planId,
                 name: 'Reformer Pilates',
                 description: 'Reformer',
-                durationMinutes: 50,
                 defaultCapacity: 12,
                 equipmentNeeds: 'Reformer',
               },
@@ -234,7 +233,7 @@ describe('client discovery (e2e)', () => {
           id: planId,
           name: 'Reformer Pilates',
           description: 'Reformer',
-          durationMinutes: 50,
+          durationMinutes: 60,
         },
       ]);
   });

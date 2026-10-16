@@ -94,7 +94,6 @@ describe('Booking catalog repository', () => {
         id: randomUUID(),
         name: 'Reformer',
         description: 'Pilates con Reformer',
-        durationMinutes: 60,
         defaultCapacity: 8,
         equipmentNeeds: 'Reformer',
       };
@@ -113,6 +112,7 @@ describe('Booking catalog repository', () => {
         ...references,
         weekday: 1,
         startsAtLocal: new Date('1970-01-01T09:00:00Z'),
+        durationMinutes: 60,
         capacity: 8,
         effectiveFrom: new Date('2026-09-01'),
         effectiveUntil: new Date('2026-10-01'),

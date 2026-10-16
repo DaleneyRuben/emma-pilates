@@ -32,10 +32,12 @@ const classType = {
   id: "class-reformer",
   name: "Reformer Pilates",
   description: "Clase de Pilates con Reformer, ideal para tonificar todo el cuerpo.",
-  durationMinutes: 50,
+  // Deprecated: the Session's own minutes come from startsAt and endsAt
+  // (WEB-027, booking ADR-0004).
+  durationMinutes: 60,
 };
 const startsAt = new Date(Date.now() + 60 * 60 * 1_000);
-const endsAt = new Date(startsAt.getTime() + 50 * 60 * 1_000);
+const endsAt = new Date(startsAt.getTime() + 75 * 60 * 1_000);
 const { from, until } = civilDateRange(boliviaCivilDate(new Date()));
 const listUrl = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
 
@@ -130,7 +132,7 @@ describe("Client Session detail", () => {
 
     expect(screen.getByText("Emma Vargas")).toBeOnTheScreen();
     expect(screen.getByText("Centro")).toBeOnTheScreen();
-    expect(screen.getByText("50 minutos")).toBeOnTheScreen();
+    expect(screen.getByText("75 minutos")).toBeOnTheScreen();
     expect(screen.getByText("3 de 12 cupos disponibles")).toBeOnTheScreen();
     expect(screen.getByText(classType.description)).toBeOnTheScreen();
     expect(screen.getByText("Se descontará 1 clase de tu paquete.")).toBeOnTheScreen();

@@ -18,6 +18,11 @@ export interface AdminSessionScheduleDto {
   weekday: number;
   /** Bolivia wall clock */
   startsAtLocal: string;
+  /**
+   * @minimum 5
+   * @maximum 240
+   */
+  durationMinutes: number;
   capacity: number;
   effectiveFrom: string;
   /**
@@ -26,5 +31,4 @@ export interface AdminSessionScheduleDto {
    */
   effectiveUntil: string | null;
   classTypeName: string;
-  durationMinutes: number;
 }

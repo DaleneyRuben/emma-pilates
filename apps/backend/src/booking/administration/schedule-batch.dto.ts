@@ -1,6 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
-import { SessionScheduleCreationDto } from './administration.dto';
+import {
+  SessionScheduleCreationDto,
+  sessionMinutes,
+} from './administration.dto';
 
 export class SessionScheduleRowDto {
   @ApiProperty({
@@ -11,6 +14,7 @@ export class SessionScheduleRowDto {
   weekday!: number;
   @ApiProperty({ example: '07:00', description: 'Bolivia wall clock' })
   startsAtLocal!: string;
+  @ApiProperty({ minimum: 5, maximum: 240 }) durationMinutes!: number;
 }
 
 export class SessionScheduleBatchInputDto {
@@ -26,7 +30,7 @@ export class SessionScheduleBatchInputDto {
     minItems: 1,
     maxItems: 7,
     description:
-      'One weekly schedule per row, all created together or none; rows may not repeat or overlap each other',
+      'One weekly schedule per row, each lasting its own minutes, all created together or none; rows may not repeat or overlap each other',
   })
   rows!: SessionScheduleRowDto[];
 }
@@ -49,6 +53,7 @@ export const parseScheduleBatchInput = (value: unknown) =>
           z.strictObject({
             weekday: z.int().min(1).max(7),
             startsAtLocal: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+            durationMinutes: sessionMinutes,
           }),
         )
         .min(1)

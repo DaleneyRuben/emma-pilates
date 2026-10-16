@@ -2414,19 +2414,23 @@ Bolivia time, whatever time zone your computer uses.
    that Branch's Sessions, never the previous Branch's under the new name.
 2. **Nueva sesión.** **+ Nueva sesión** opens the 408 px side panel. **Una sola
    vez** asks for Tipo de clase, Entrenadora (only Trainers assigned to the
-   Branch), Fecha, Hora, and Capacidad (filled from the Class Type). **Cada
-   semana** swaps Fecha and Hora for **Días y horas** and **Vigente desde**:
-   one row per day, each with its Día, its Hora, and the Class Type's
-   duration ("50 min", or "— min" before a Class Type is chosen).
-   **Agregar día** adds a row for the next day at the last row's time (up to
-   seven); the × button removes a row (there is none while only one row is
+   Branch), Fecha, Hora, **Duración** (60 minutes to start, 5 to 240, with a
+   fixed "min" inside the box), and Capacidad (filled from the Class Type).
+   A Class Type has no duration (WEB-027): every Session chooses its own, so
+   a one-off Saturday 18:00 Mat Pilates of 75 minutes shows 18:00 – 19:15 on
+   the grid. **Cada semana** swaps Fecha and Hora for **Días y horas** and
+   **Vigente desde**: one row per day, each with its Día, its Hora, and its
+   own Duración box (60 to start). **Agregar día** adds a row for the next
+   day at the last row's time and minutes (up to seven); the × button removes a row (there is none while only one row is
    left). For example Martes 06:00, Jueves 06:00, and Sábado 08:00 from next
    Monday: **Guardar** creates the three weekly schedules together and the
    page says "3 series semanales creadas: 12 sesiones en los próximos 30
    días." (one row keeps "Serie semanal creada: …"). Two rows on the same day
    and time are refused before anything is sent ("Ya está el jueves a las
    06:00." under the second row, both of its fields in red), and so is a row
-   that starts inside another's duration ("Se cruza con …"). Nothing is
+   that starts inside another row's own duration ("Se cruza con …"): Lunes
+   07:00 for 120 minutes and Lunes 08:00 clash, Lunes 07:00 for 45 and
+   Lunes 08:00 do not. Nothing is
    saved if the Trainer or Class Type is refused. Each row is its own weekly
    schedule afterwards: click one of its Sessions and **Esta y las futuras**
    shows only that day and time. **Guardar** with empty fields marks each one;
@@ -2447,10 +2451,12 @@ Bolivia time, whatever time zone your computer uses.
 3. **Editar sesión.** Click a block. The panel names the day, time, and
    "N de M lugares reservados" (plus "N en lista de espera"). A Session a
    weekly schedule generated offers **Solo esta sesión** (change its Trainer,
-   date, time, or capacity; capacity cannot go below the booked seats) or
+   date, time, Duración, or capacity; Duración starts at the Session's own
+   minutes, and a new start keeps them unless you change them; capacity
+   cannot go below the booked seats) or
    **Esta y las futuras** (change the weekly schedule from a **Vigente desde**
-   date: unbooked Sessions move, booked ones stay, and the page says how many
-   of each). **Terminar la serie** stops the schedule from a date after asking.
+   date, with the series' own Duración: unbooked Sessions move, booked ones
+   stay, and the page says how many of each). **Terminar la serie** stops the schedule from a date after asking.
 4. **Cancelar sesión.** Only a Session with Bookings offers it (an empty one
    says it cancels itself 2 hours before). The confirmation says every
    Booking is refunded even inside the 2 h 30 window and that the waitlist is
@@ -2463,6 +2469,10 @@ Bolivia time, whatever time zone your computer uses.
    show prices as `Bs 1.050,00`, last 1, 3, 6, or 12 months, and always carry
    a class count; **Ocultar en la app** hides one from the Client catalog.
    A Class Type needs a description, and a taken name is marked on its field.
+   Tipos de clase has no Duración column and its form no Duración field: the
+   length of a class is chosen in Horario. Both apps' Session detail shows
+   the Session's own minutes («90 minutos» for an 18:00 – 19:30 class), on
+   the Client's 04 and the Assistant's S08 alike.
    **Archivar sucursal** / **Archivar tipo de clase** ask first; Centro is
    refused ("No puedes archivarla: tiene sesiones programadas…") because it
    has upcoming Sessions.

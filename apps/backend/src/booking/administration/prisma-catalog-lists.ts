@@ -59,7 +59,6 @@ export const createPrismaCatalogLists = (prisma: PrismaClient) => ({
           id: true,
           name: true,
           description: true,
-          durationMinutes: true,
           defaultCapacity: true,
           equipmentNeeds: true,
           archivedAt: true,

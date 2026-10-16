@@ -37,6 +37,7 @@ describe('Prisma schedule administration', () => {
     trainerStaffMemberId: staff('daniela'),
     weekday: 3,
     startsAtLocal: '12:00',
+    durationMinutes: 50,
     capacity: 10,
   };
 
@@ -232,13 +233,14 @@ describe('Prisma schedule administration', () => {
     ).resolves.toBe('session_overlap');
   });
 
-  it('creates a one-off Session with the Class Type duration', async () => {
+  it('creates a one-off Session for the minutes given', async () => {
     const session = await schedules().createSession(
       {
         branchId: centro,
         classTypeId: mat,
         trainerStaffMemberId: staff('daniela'),
         startsAt: bolivia('2026-09-26', '15:00'),
+        durationMinutes: 50,
         capacity: 8,
       },
       await administrator(),

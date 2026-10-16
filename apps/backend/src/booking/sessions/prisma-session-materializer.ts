@@ -23,10 +23,10 @@ export type MaterializableSchedule = {
   trainerStaffMemberId: string;
   weekday: number;
   startsAtLocal: Date;
+  durationMinutes: number;
   capacity: number;
   effectiveFrom: Date;
   effectiveUntil: Date | null;
-  classType: { durationMinutes: number };
 };
 
 // Inserts one schedule's missing occurrences across the horizon. ON CONFLICT
@@ -42,7 +42,7 @@ export const materializeSchedule = async (
     {
       weekday: schedule.weekday,
       startMinutes: minutesOf(schedule.startsAtLocal),
-      durationMinutes: schedule.classType.durationMinutes,
+      durationMinutes: schedule.durationMinutes,
       effectiveFrom: schedule.effectiveFrom,
       effectiveUntil: schedule.effectiveUntil,
     },
@@ -95,10 +95,10 @@ export const createPrismaSessionMaterializer = (
         trainerStaffMemberId: true,
         weekday: true,
         startsAtLocal: true,
+        durationMinutes: true,
         capacity: true,
         effectiveFrom: true,
         effectiveUntil: true,
-        classType: { select: { durationMinutes: true } },
         trainer: {
           select: {
             branchAssignments: {

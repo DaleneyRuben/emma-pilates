@@ -14,4 +14,9 @@ export interface SessionScheduleRowDto {
   weekday: number;
   /** Bolivia wall clock */
   startsAtLocal: string;
+  /**
+   * @minimum 5
+   * @maximum 240
+   */
+  durationMinutes: number;
 }

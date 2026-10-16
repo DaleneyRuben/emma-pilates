@@ -109,7 +109,7 @@ describe('Client discovery reads', () => {
       expect.objectContaining({ name: 'Urubó' }),
     ]);
     await expect(repository.listClassTypes()).resolves.toEqual([
-      expect.objectContaining({ name: 'Mat Pilates', durationMinutes: 50 }),
+      expect.objectContaining({ name: 'Mat Pilates' }),
       expect.objectContaining({ name: 'Pilates Prenatal' }),
       expect.objectContaining({ name: 'Reformer Pilates' }),
     ]);

@@ -43,7 +43,8 @@ model ClassType {
   id              String            @id @default(uuid()) @db.Uuid
   name            String
   description     String
-  durationMinutes Int               @map("duration_minutes") @db.SmallInt
+  // Deprecated (booking ADR-0004): nothing writes it; dropped after old apps.
+  durationMinutes Int?              @map("duration_minutes") @db.SmallInt
   defaultCapacity Int               @map("default_capacity") @db.SmallInt
   equipmentNeeds  String?           @map("equipment_needs")
   archivedAt      DateTime?         @map("archived_at") @db.Timestamptz(3)
@@ -63,6 +64,7 @@ model SessionSchedule {
   trainerStaffMemberId String      @map("trainer_staff_member_id") @db.Uuid
   weekday              Int         @db.SmallInt
   startsAtLocal        DateTime    @map("starts_at_local") @db.Time(0)
+  durationMinutes      Int         @map("duration_minutes") @db.SmallInt
   capacity             Int         @db.SmallInt
   effectiveFrom        DateTime    @map("effective_from") @db.Date
   effectiveUntil       DateTime?   @map("effective_until") @db.Date

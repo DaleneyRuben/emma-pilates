@@ -50,6 +50,9 @@ export const clientProfileUpdate = Symbol('clientProfileUpdate');
 export const planCatalog = Symbol('planCatalog');
 export const branchCatalog = Symbol('branchCatalog');
 export const classTypeCatalog = Symbol('classTypeCatalog');
+
+// Released apps still read it; a Class Type has no duration (booking ADR-0004).
+const deprecatedClassTypeMinutes = 60;
 export const sessionDetail = Symbol('sessionDetail');
 
 type ClientProfileHandler = (
@@ -270,7 +273,7 @@ export class ClassTypeCatalogController {
       id: classType.id,
       name: classType.name,
       description: classType.description,
-      durationMinutes: classType.durationMinutes,
+      durationMinutes: deprecatedClassTypeMinutes,
     }));
   }
 }

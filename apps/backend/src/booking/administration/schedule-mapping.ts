@@ -10,10 +10,11 @@ type ScheduleRow = {
   trainerStaffMemberId: string;
   weekday: number;
   startsAtLocal: Date;
+  durationMinutes: number;
   capacity: number;
   effectiveFrom: Date;
   effectiveUntil: Date | null;
-  classType: { durationMinutes: number; name: string };
+  classType: { name: string };
 };
 
 export const toScheduleDto = (
@@ -29,5 +30,5 @@ export const toScheduleDto = (
   effectiveFrom: civil(schedule.effectiveFrom)!,
   effectiveUntil: civil(schedule.effectiveUntil),
   classTypeName: schedule.classType.name,
-  durationMinutes: schedule.classType.durationMinutes,
+  durationMinutes: schedule.durationMinutes,
 });

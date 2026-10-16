@@ -85,6 +85,7 @@ describe("AW02 empty slots on a desktop browser", () => {
         classTypeId: reformer.id,
         trainerStaffMemberId: valeria.id,
         startsAt: boliviaInstant(dayOfNextWeek(1), "10:30"),
+        durationMinutes: 60,
         capacity: 10,
       }),
     );

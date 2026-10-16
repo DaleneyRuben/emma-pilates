@@ -56,6 +56,7 @@ describe('booking catalog concurrent writes', () => {
         classTypeId,
         weekday: 1,
         startsAtLocal: new Date('1970-01-01T09:00:00Z'),
+        durationMinutes: 60,
         capacity: 8,
         effectiveFrom: new Date('2026-09-01'),
       },

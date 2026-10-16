@@ -25,8 +25,8 @@ INSERT INTO booking.plans (id, name, duration_months, class_allowance, price_cen
  ('00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 1, 8, 30000, 0, now());
 INSERT INTO booking.class_types (id, name, description, duration_minutes, default_capacity, updated_at) VALUES
  ('00000000-0000-0000-0000-000000000001', 'Reformer Pilates', 'Pilates con Reformer', 60, 8, now());
-INSERT INTO booking.session_schedules (id, branch_id, class_type_id, trainer_staff_member_id, weekday, starts_at_local, capacity, effective_from, updated_at) VALUES
- ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 1, '09:00', 8, '2026-09-01', now());
+INSERT INTO booking.session_schedules (id, branch_id, class_type_id, trainer_staff_member_id, weekday, starts_at_local, duration_minutes, capacity, effective_from, updated_at) VALUES
+ ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 1, '09:00', 60, 8, '2026-09-01', now());
 INSERT INTO booking.sessions (id, session_schedule_id, branch_id, class_type_id, trainer_staff_member_id, starts_at, ends_at, capacity, updated_at) VALUES
  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '2026-09-14 09:00-04', '2026-09-14 10:00-04', 8, now());
 
@@ -43,6 +43,9 @@ SELECT pg_temp.expect_failure('UPDATE booking.session_schedules SET weekday = 0'
 SELECT pg_temp.expect_failure('UPDATE booking.session_schedules SET weekday = 8', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.session_schedules SET effective_until = effective_from', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.session_schedules SET capacity = 0', '23514');
+SELECT pg_temp.expect_failure('UPDATE booking.session_schedules SET duration_minutes = 4', '23514');
+SELECT pg_temp.expect_failure('UPDATE booking.session_schedules SET duration_minutes = 241', '23514');
+SELECT pg_temp.expect_failure('UPDATE booking.session_schedules SET duration_minutes = NULL', '23502');
 SELECT pg_temp.expect_failure('UPDATE booking.sessions SET ends_at = starts_at', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.sessions SET capacity = 0', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.sessions SET state = ''cancelled''', '23514');

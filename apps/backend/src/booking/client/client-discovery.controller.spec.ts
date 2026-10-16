@@ -191,6 +191,7 @@ describe('catalog list controllers', () => {
     await expect(controller.list(bearer)).resolves.toEqual(branches);
   });
 
+  // A Class Type has no duration; released apps still read 60 (WEB-027).
   it('lists Class Types with only client-facing fields', async () => {
     const controller = new ClassTypeCatalogController(
       jest.fn().mockResolvedValue([
@@ -198,7 +199,6 @@ describe('catalog list controllers', () => {
           id: 'class-type-id',
           name: 'Mat Pilates',
           description: 'Pilates en colchoneta',
-          durationMinutes: 50,
           defaultCapacity: 14,
           equipmentNeeds: null,
         },
@@ -211,7 +211,7 @@ describe('catalog list controllers', () => {
         id: 'class-type-id',
         name: 'Mat Pilates',
         description: 'Pilates en colchoneta',
-        durationMinutes: 50,
+        durationMinutes: 60,
       },
     ]);
   });

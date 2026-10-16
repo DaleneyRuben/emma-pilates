@@ -23,7 +23,6 @@ export type BranchInput = { name: string; address: string };
 export type ClassTypeInput = {
   name: string;
   description: string;
-  durationMinutes: number;
   defaultCapacity: number;
   equipmentNeeds: string | null;
 };
@@ -48,7 +47,6 @@ const classTypeSelect = {
   id: true,
   name: true,
   description: true,
-  durationMinutes: true,
   defaultCapacity: true,
   equipmentNeeds: true,
   archivedAt: true,
@@ -232,8 +230,8 @@ export const createPrismaCatalogAdministration = (
       );
     },
 
-    // Existing Sessions keep their facts; new durations apply to Sessions
-    // materialized afterwards (follow-up 39 §2).
+    // Existing Sessions keep their facts (follow-up 39 §2); a Class Type has
+    // no duration (booking ADR-0004).
     updateClassType: async (
       input: ClassTypeInput & { classTypeId: string },
       principal: AuthenticatedPrincipal,
@@ -243,7 +241,6 @@ export const createPrismaCatalogAdministration = (
         classTypeId,
         name,
         description,
-        durationMinutes,
         defaultCapacity,
         equipmentNeeds,
       } = trimmed(input);
@@ -253,7 +250,6 @@ export const createPrismaCatalogAdministration = (
           data: {
             name,
             description,
-            durationMinutes,
             defaultCapacity,
             equipmentNeeds,
           },

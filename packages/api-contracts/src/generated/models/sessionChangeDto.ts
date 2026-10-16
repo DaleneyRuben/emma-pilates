@@ -8,5 +8,10 @@
 export interface SessionChangeDto {
   trainerStaffMemberId?: string;
   startsAt?: string;
+  /**
+   * @minimum 5
+   * @maximum 240
+   */
+  durationMinutes?: number;
   capacity?: number;
 }

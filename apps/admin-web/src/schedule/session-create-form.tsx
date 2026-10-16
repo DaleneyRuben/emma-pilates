@@ -2,7 +2,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
 import { ChoiceChips } from "../components/form/choice-chips";
 import {
   Form,
@@ -13,7 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from "../components/form/form";
-import { wholeNumberField } from "../components/form/number-field";
 import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -27,89 +25,14 @@ import { scheduleProblem } from "./schedule-problems";
 import { ClassTypeOptions, TrainerOptions } from "./session-options";
 import { createdNotice } from "./schedule-notices";
 import { useScheduleChange } from "./use-schedule-change";
+import { DurationField } from "./duration-field";
+import { startingMinutes } from "./duration-minutes";
+import {
+  createSchema,
+  type CreateInput,
+  type CreateOutput,
+} from "./session-create-schema";
 import { WeeklyRowsField } from "./weekly-rows-field";
-import { rowClash } from "./weekly-rows";
-
-// Both frequencies share one flat shape; which date fields are required
-// depends on the choice, checked after the field rules.
-const wallClock = /^\d{2}:\d{2}$/;
-
-const createSchema = (
-  today: string,
-  durationOf: (classTypeId: string) => number | undefined,
-) =>
-  z
-    .object({
-      frequency: z.enum(["once", "weekly"]),
-      classTypeId: z.string().min(1, "Elige un tipo de clase."),
-      trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
-      time: z.string(),
-      capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares."),
-      date: z.string(),
-      rows: z.array(z.object({ weekday: z.string(), time: z.string() })),
-      effectiveFrom: z.string(),
-    })
-    .superRefine((values, context) => {
-      const requireDate = (path: "date" | "effectiveFrom", missing: string) => {
-        const value = values[path];
-        if (value === "") {
-          context.addIssue({ code: "custom", path: [path], message: missing });
-        } else if (value < today) {
-          context.addIssue({
-            code: "custom",
-            path: [path],
-            message: "Elige una fecha desde hoy.",
-          });
-        }
-      };
-      if (values.frequency === "once") {
-        requireDate("date", "Elige la fecha.");
-        if (!wallClock.test(values.time)) {
-          context.addIssue({
-            code: "custom",
-            path: ["time"],
-            message: "Elige la hora.",
-          });
-        }
-        return;
-      }
-      let complete = true;
-      values.rows.forEach((row, index) => {
-        if (!/^[1-7]$/.test(row.weekday)) {
-          complete = false;
-          context.addIssue({
-            code: "custom",
-            path: ["rows", index, "weekday"],
-            message: "Elige un día.",
-          });
-        }
-        if (!wallClock.test(row.time)) {
-          complete = false;
-          context.addIssue({
-            code: "custom",
-            path: ["rows", index, "time"],
-            message: "Elige la hora.",
-          });
-        }
-      });
-      const clash = complete
-        ? rowClash(
-            values.rows,
-            Math.max(1, durationOf(values.classTypeId) ?? 0),
-          )
-        : null;
-      if (clash !== null) {
-        context.addIssue({
-          code: "custom",
-          path: ["rows", clash.index, "time"],
-          message: clash.message,
-        });
-      }
-      requireDate("effectiveFrom", "Elige desde qué fecha rige.");
-    });
-
-type CreateInput = z.input<ReturnType<typeof createSchema>>;
-type CreateOutput = z.output<ReturnType<typeof createSchema>>;
 
 /** A Bolivia date and wall clock picked from an empty AW02 slot. */
 export type SessionStart = { date: string; time: string };
@@ -133,29 +56,27 @@ export function SessionCreateForm({
   const classTypes = useQuery(activeClassTypesQueryOptions());
   const trainers = useQuery(branchTrainersQueryOptions(branchId));
   const [failure, setFailure] = useState<string | null>(null);
-  const durationOf = (classTypeId: string) =>
-    classTypes.data?.find((classType) => classType.id === classTypeId)
-      ?.durationMinutes;
   const form = useForm<CreateInput, unknown, CreateOutput>({
-    resolver: zodResolver(createSchema(today, durationOf)),
+    resolver: zodResolver(createSchema(today)),
     defaultValues: {
       frequency: "once",
       classTypeId: "",
       trainerStaffMemberId: "",
       time: start?.time ?? "",
+      durationMinutes: startingMinutes,
       capacity: "",
       date: start?.date ?? "",
       rows: [
         {
           weekday: start === undefined ? "" : String(weekdayOf(start.date)),
           time: start?.time ?? "",
+          durationMinutes: startingMinutes,
         },
       ],
       effectiveFrom: start?.date ?? "",
     },
   });
   const frequency = useWatch({ control: form.control, name: "frequency" });
-  const classTypeId = useWatch({ control: form.control, name: "classTypeId" });
 
   const submit = form.handleSubmit(async (values) => {
     setFailure(null);
@@ -173,6 +94,7 @@ export function SessionCreateForm({
               input: {
                 ...shared,
                 startsAt: boliviaInstant(values.date, values.time),
+                durationMinutes: Number(values.durationMinutes),
               },
             }
           : {
@@ -183,6 +105,7 @@ export function SessionCreateForm({
                 rows: values.rows.map((row) => ({
                   weekday: Number(row.weekday),
                   startsAtLocal: row.time,
+                  durationMinutes: Number(row.durationMinutes),
                 })),
               },
             },
@@ -305,8 +228,11 @@ export function SessionCreateForm({
               />
             </div>
           ) : (
-            <WeeklyRowsField durationMinutes={durationOf(classTypeId)} />
+            <WeeklyRowsField />
           )}
+          {frequency === "once" ? (
+            <DurationField description="Empieza en 60 minutos; cámbiala si esta clase dura distinto." />
+          ) : null}
           <FormField
             control={form.control}
             name="capacity"

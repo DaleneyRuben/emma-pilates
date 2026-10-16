@@ -27,7 +27,6 @@ import { useClassTypeChange } from "./class-type-queries";
 const classTypeSchema = z.object({
   name: z.string().trim().min(1, "Escribe el nombre.").max(80),
   description: z.string().trim().min(1, "Escribe una descripción.").max(280),
-  durationMinutes: wholeNumberField(5, 240, "Entre 5 y 240 minutos."),
   defaultCapacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares."),
   equipmentNeeds: z
     .string()
@@ -58,13 +57,11 @@ const failureMessage = (error: unknown): string => {
 
 const textFields = [
   ["name", "Nombre", "Reformer Pilates"],
-  ["durationMinutes", "Duración", "50"],
   ["defaultCapacity", "Capacidad", "10"],
   ["equipmentNeeds", "Equipo necesario", "Reformer"],
 ] as const;
 
 const helpers: Partial<Record<keyof ClassTypeInput, string>> = {
-  durationMinutes: "En minutos.",
   defaultCapacity:
     "Capacidad por defecto; cada sesión puede ajustarla desde el horario.",
 };
@@ -87,8 +84,6 @@ export function ClassTypePanelForm({
     defaultValues: {
       name: classType?.name ?? "",
       description: classType?.description ?? "",
-      durationMinutes:
-        classType === undefined ? "" : String(classType.durationMinutes),
       defaultCapacity:
         classType === undefined ? "" : String(classType.defaultCapacity),
       equipmentNeeds: classType?.equipmentNeeds ?? "",

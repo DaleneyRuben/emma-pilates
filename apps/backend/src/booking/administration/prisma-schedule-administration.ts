@@ -22,6 +22,7 @@ import {
 } from './administration-errors';
 import {
   createAndMaterialize,
+  isSessionLength,
   requireAssignable,
   scheduleSelect,
   scheduleTransaction,
@@ -57,7 +58,12 @@ export const createPrismaScheduleAdministration = (
   const transact = scheduleTransaction(prisma);
 
   const requireScheduleValues = (input: ScheduleInput) => {
-    if (input.weekday < 1 || input.weekday > 7 || input.capacity < 1) {
+    if (
+      input.weekday < 1 ||
+      input.weekday > 7 ||
+      input.capacity < 1 ||
+      !isSessionLength(input.durationMinutes)
+    ) {
       throw new AdministrationError('invalid_schedule');
     }
   };
@@ -250,6 +256,7 @@ export const createPrismaScheduleAdministration = (
         classTypeId: string;
         trainerStaffMemberId: string;
         startsAt: Date;
+        durationMinutes: number;
         capacity?: number;
       },
       principal: AuthenticatedPrincipal,
@@ -259,8 +266,11 @@ export const createPrismaScheduleAdministration = (
       if (input.startsAt <= now) {
         throw new AdministrationError('effective_date_invalid');
       }
+      if (!isSessionLength(input.durationMinutes)) {
+        throw new AdministrationError('invalid_schedule');
+      }
       return transact(async (transaction) => {
-        const classType = await requireAssignable(transaction, input);
+        await requireAssignable(transaction, input);
         const defaults = await transaction.classType.findUniqueOrThrow({
           where: { id: input.classTypeId },
           select: { defaultCapacity: true },
@@ -274,7 +284,7 @@ export const createPrismaScheduleAdministration = (
             trainerStaffMemberId: input.trainerStaffMemberId,
             startsAt: input.startsAt,
             endsAt: new Date(
-              input.startsAt.getTime() + classType.durationMinutes * minuteMs,
+              input.startsAt.getTime() + input.durationMinutes * minuteMs,
             ),
             capacity,
             isException: true,
@@ -285,13 +295,15 @@ export const createPrismaScheduleAdministration = (
     },
 
     // Solo esta sesión: a future scheduled Session changes its Trainer (the
-    // swap), start, or capacity and becomes an exception. A new start keeps
-    // the duration and reopens the 2-hour empty check (BOOK-004).
+    // swap), start, duration, or capacity and becomes an exception. A new
+    // start keeps the duration unless one is given and reopens the 2-hour
+    // empty check (BOOK-004).
     updateSession: async (
       input: {
         sessionId: string;
         trainerStaffMemberId?: string;
         startsAt?: Date;
+        durationMinutes?: number;
         capacity?: number;
       },
       principal: AuthenticatedPrincipal,
@@ -342,20 +354,24 @@ export const createPrismaScheduleAdministration = (
         ) {
           throw new AdministrationError('capacity_below_bookings');
         }
-        if (input.capacity !== undefined && input.capacity < 1) {
+        if (
+          (input.capacity !== undefined && input.capacity < 1) ||
+          (input.durationMinutes !== undefined &&
+            !isSessionLength(input.durationMinutes))
+        ) {
           throw new AdministrationError('invalid_schedule');
         }
         const startsAt = startChanged ? input.startsAt! : session.startsAt;
+        const previousMinutes =
+          (session.endsAt.getTime() - session.startsAt.getTime()) / minuteMs;
+        const durationMinutes = input.durationMinutes ?? previousMinutes;
         const updated = await transaction.session.update({
           where: { id: session.id },
           data: {
             trainerStaffMemberId: input.trainerStaffMemberId,
             capacity: input.capacity,
             startsAt,
-            endsAt: new Date(
-              startsAt.getTime() +
-                (session.endsAt.getTime() - session.startsAt.getTime()),
-            ),
+            endsAt: new Date(startsAt.getTime() + durationMinutes * minuteMs),
             isException: true,
             ...(startChanged ? { emptyBookingCheckCompletedAt: null } : {}),
           },
@@ -421,6 +437,9 @@ export const createPrismaScheduleAdministration = (
                     previousStartsAt: session.startsAt.toISOString(),
                     startsAt: startsAt.toISOString(),
                   }
+                : {}),
+              ...(durationMinutes !== previousMinutes
+                ? { previousDurationMinutes: previousMinutes, durationMinutes }
                 : {}),
               ...(input.capacity !== undefined
                 ? {

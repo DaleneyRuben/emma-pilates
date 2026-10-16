@@ -22,6 +22,8 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
 import { boliviaParts, boliviaToday } from "../lib/bolivia-time";
+import { DurationField } from "./duration-field";
+import { sessionMinutesField } from "./duration-minutes";
 import { firstChangeDate } from "./schedule-dates";
 import { EndSeriesAction } from "./end-series-action";
 import { branchTrainersQueryOptions } from "./schedule-queries";
@@ -35,6 +37,7 @@ const seriesSchema = (earliest: string) =>
     trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
     weekday: z.string().regex(/^[1-7]$/, "Elige un día."),
     time: z.string().regex(/^\d{2}:\d{2}$/, "Elige la hora."),
+    durationMinutes: sessionMinutesField,
     capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares."),
     effectiveFrom: z
       .string()
@@ -81,6 +84,7 @@ export function SeriesForm({
       trainerStaffMemberId: schedule.trainerStaffMemberId,
       weekday: String(schedule.weekday),
       time: schedule.startsAtLocal,
+      durationMinutes: String(schedule.durationMinutes),
       capacity: String(schedule.capacity),
       effectiveFrom: defaultDate,
     },
@@ -98,6 +102,7 @@ export function SeriesForm({
           trainerStaffMemberId: values.trainerStaffMemberId,
           weekday: Number(values.weekday),
           startsAtLocal: values.time,
+          durationMinutes: values.durationMinutes,
           capacity: values.capacity,
           effectiveFrom: values.effectiveFrom,
         },
@@ -176,6 +181,7 @@ export function SeriesForm({
               )}
             />
           </div>
+          <DurationField />
           <FormField
             control={form.control}
             name="capacity"
