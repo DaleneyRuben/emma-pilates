@@ -30,10 +30,12 @@ hear «Duración, en minutos».
 ## 1. AW03 one-off frames
 
 In **«Escritorio · Nueva sesión»**, **«Escritorio · Nueva sesión desde un
-espacio libre»**, and **«Escritorio · Editar sesión»**, add «Duración»
+espacio libre»**, **«Escritorio · Editar sesión»**, and the **«Navegador
+angosto · 420 px»** edit sheet (there with its 48 px controls), add «Duración»
 between «Hora» and «Capacidad», full width like its neighbours. Both «Nueva
-sesión» frames show **60**. «Editar sesión» shows the Session's current
-**50**. Under it in the two create frames, the 11.5 px `#7A716D` helper
+sesión» frames show **60**. Both edit frames show the Session's current
+**50**. Make the «Editar sesión» panel 40 px taller (780 px) so nothing is
+cut. Under it in the two create frames, the 11.5 px `#7A716D` helper
 «Empieza en 60 minutos; cámbiala si esta clase dura distinto.». In «Editar
 sesión», the existing line «Si cambias el día o la hora, avisamos a las
 clientas con reserva.» stays where it is; a new duration alone sends no
@@ -43,9 +45,10 @@ notice.
 
 In **«Escritorio · Nueva sesión · Cada semana»** and its **«día repetido»**
 frame, each row of «Días y horas» swaps the read-only «50 min» text for a
-compact Duración control: the row grid becomes `minmax(0,1fr) 96px 96px
-30px`, and the third cell is the same 44 px box with the input and «min»
-suffix (no label of its own; screen readers hear «Duración, fila 1, en
+compact Duración control: the row grid becomes `minmax(0,1fr) 84px 104px
+30px` (Hora narrows so «Miércoles» still fits), and the third cell is the
+same 44 px box with the input (padding `0 8px 0 10px`) and an 8 px-padded
+«min» suffix (no label of its own; screen readers hear «Duración, fila 1, en
 minutos»). «+ Agregar día» copies
 the last row's duration along with its time. Draw **Lunes 07:00 · 60**,
 **Miércoles 07:00 · 60**, **Viernes 18:30 · 90**. The helper under the group
@@ -57,26 +60,30 @@ su duración · genera 30 días hacia adelante».
 
 ## 3. AW03 «Escritorio · Editar sesión · Esta y las futuras»
 
-Add «Duración» between «Hora» and «Capacidad», showing the series' **50**.
-Nothing else in the frame changes.
+Add «Duración» between «Hora» and «Capacidad», showing the series' **50**,
+and make the panel 80 px taller (880 px) so nothing is cut. Nothing else in
+the frame changes.
 
 ## 4. AW06 Tipos de Clase
 
 Remove the «Duración» column header and every row's «45 min / 50 min / 55
 min» cell. The grid becomes `2fr 1fr 1.9fr` (Nombre, Capacidad, Equipo
-necesario) with everything else as drawn.
+necesario) with everything else as drawn. In the narrow frame's cards, drop
+the «NN min» and its dot so only «N personas» remains. The header line
+becomes «… cada tipo aporta su capacidad por defecto y el equipo que
+necesita la sala; la duración se elige al programar cada sesión.», and the
+«Base del horario» note «Al crear una sesión en AW03, el tipo aporta la
+capacidad por defecto; la duración se elige ahí.».
 
 ## 5. AW07 Formulario de Tipo de Clase
 
 In **«Escritorio · Nuevo tipo de clase»**, **«Escritorio · Editar tipo de
-clase»**, and the narrow frame, remove «Duración». «Capacidad» keeps its
+clase»**, and the narrow frame, remove «Duración», and drop the Duración
+column from the AW06 table drawn behind the panel. «Capacidad» keeps its
 control and «pers.» suffix and takes the whole row. In the notes column,
 replace «Duración y capacidad juntas» with **«Sin duración»**: «Cada clase
 define su duración al programarla en el horario (AW03); el tipo de clase
-solo sugiere la capacidad.». Change «Sesiones ya creadas» to «No se
-reescriben: los cambios se aplican a las sesiones que se generen desde
-ahora. Un tipo se archiva, nunca se borra…», dropping any word about
-durations if the note has one; keep the rest of the note as written.
+solo sugiere la capacidad.». The «Sesiones ya creadas» note stays as written.
 
 ## 6. Generated handoff `design/README.md`
 
