@@ -1,11 +1,6 @@
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  type GestureResponderEvent,
-} from "react-native";
+import { Pressable, StyleSheet, type GestureResponderEvent } from "react-native";
 
+import { ButtonLabel } from "./button-label";
 import { colors, radii, spacing, typography } from "./tokens";
 
 type PrimaryButtonProps = {
@@ -36,18 +31,13 @@ export function PrimaryButton({
       onPress={onPress}
       style={[styles.button, size === "compact" && styles.compact, greyed && styles.disabledButton]}
     >
-      {/* The hidden label keeps the button's size while the spinner shows. */}
-      <Text style={[styles.label, greyed && styles.disabledLabel, busy && styles.hiddenLabel]}>
-        {label}
-      </Text>
-      {busy ? (
-        <ActivityIndicator
-          color={colors.white}
-          size="small"
-          style={styles.spinner}
-          testID="primary-button-spinner"
-        />
-      ) : null}
+      <ButtonLabel
+        busy={busy}
+        label={label}
+        spinnerColor={colors.white}
+        style={[styles.label, greyed && styles.disabledLabel]}
+        testID="primary-button-spinner"
+      />
     </Pressable>
   );
 }
@@ -67,9 +57,6 @@ const styles = StyleSheet.create({
   disabledButton: {
     backgroundColor: colors.disabledBackground,
   },
-  hiddenLabel: {
-    opacity: 0,
-  },
   label: {
     color: colors.white,
     fontSize: typography.body,
@@ -77,12 +64,5 @@ const styles = StyleSheet.create({
   },
   disabledLabel: {
     color: colors.disabledText,
-  },
-  spinner: {
-    bottom: 0,
-    left: 0,
-    position: "absolute",
-    right: 0,
-    top: 0,
   },
 });
