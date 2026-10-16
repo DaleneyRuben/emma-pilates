@@ -6,15 +6,18 @@ import {
   fontFamilies,
   FullScreenImage,
   LineIcon,
+  PrimaryButton,
   radii,
   spacing,
   surfaces,
 } from "@pilates/mobile-core";
 import { useEffect, useState, type ReactNode } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import { Polyline } from "react-native-svg";
+import { Path, Polyline } from "react-native-svg";
 
 import { imageSizeFromBytes } from "./image-size";
+import { QrSaveFailure, QrSavedNotice } from "./qr-save-outcome";
+import { useSaveQr } from "./save-qr";
 
 const qrBox = 190;
 
@@ -72,13 +75,15 @@ function QrAction({
 /**
  * Client 10's studio QR (follow-up 95): drawn whole at its own proportions
  * (a non-square bank QR loses its edges when cropped), and enlarged on a
- * light full-screen view from the QR itself or «Ampliar».
+ * light full-screen view from the QR itself or «Ampliar». «Guardar QR», under
+ * the QR and in the view, adds it to the photo library (MOB-063).
  */
 export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }) {
   const qr = useQrImage(fetcher);
   const uri = qr?.uri ?? null;
   const ratio = qr?.ratio ?? 1;
   const [enlarged, setEnlarged] = useState(false);
+  const { failedAt, save, savedAt, saving } = useSaveQr(uri);
   const size =
     ratio >= 1 ? { height: qrBox / ratio, width: qrBox } : { height: qrBox, width: qrBox * ratio };
 
@@ -107,7 +112,14 @@ export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }
               <Polyline points="20,15 20,20 15,20" />
               <Polyline points="9,20 4,20 4,15" />
             </QrAction>
+            <QrAction label="Guardar QR" onPress={() => void save("card")}>
+              <Path d="M12 4v11" />
+              <Polyline points="7.5,10.5 12,15 16.5,10.5" />
+              <Path d="M4.5 15v3.5A1.5 1.5 0 0 0 6 20h12a1.5 1.5 0 0 0 1.5-1.5V15" />
+            </QrAction>
           </View>
+          {savedAt === "card" ? <QrSavedNotice /> : null}
+          {failedAt === "card" ? <QrSaveFailure /> : null}
         </>
       )}
       <BodyText style={styles.centered}>
@@ -115,6 +127,13 @@ export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }
       </BodyText>
       <FullScreenImage
         aspectRatio={ratio}
+        banner={savedAt === "view" ? <QrSavedNotice /> : undefined}
+        footer={
+          <View style={styles.footer}>
+            <PrimaryButton busy={saving} label="Guardar QR" onPress={() => void save("view")} />
+            {failedAt === "view" ? <QrSaveFailure /> : null}
+          </View>
+        }
         label="Código QR ampliado"
         note="Guárdalo para elegirlo desde la galería en tu app bancaria."
         onClose={() => setEnlarged(false)}
@@ -148,6 +167,7 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
   },
   centered: { textAlign: "center" },
+  footer: { gap: spacing.md },
   placeholder: {
     backgroundColor: colors.divider,
     borderRadius: radii.control,
