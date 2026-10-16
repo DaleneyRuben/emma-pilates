@@ -40,10 +40,6 @@ const classTypeColumns = (open: (row: AdminClassTypeDto) => void) => [
       </span>
     ),
   }),
-  columns.accessor("durationMinutes", {
-    header: "Duración",
-    cell: ({ getValue }) => <span className="tabular">{getValue()} min</span>,
-  }),
   columns.accessor("defaultCapacity", {
     header: "Capacidad",
     cell: ({ getValue }) => <span className="tabular">{getValue()}</span>,

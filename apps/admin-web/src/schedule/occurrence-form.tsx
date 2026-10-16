@@ -23,6 +23,8 @@ import {
   boliviaParts,
   boliviaToday,
 } from "../lib/bolivia-time";
+import { DurationField } from "./duration-field";
+import { sessionMinutesField } from "./duration-minutes";
 import { branchTrainersQueryOptions } from "./schedule-queries";
 import { scheduleProblem } from "./schedule-problems";
 import { TrainerOptions } from "./session-options";
@@ -38,6 +40,7 @@ const occurrenceSchema = (today: string, booked: number) =>
       .min(1, "Elige la fecha.")
       .refine((date) => date >= today, "Elige una fecha desde hoy."),
     time: z.string().regex(/^\d{2}:\d{2}$/, "Elige la hora."),
+    durationMinutes: sessionMinutesField,
     capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares.").refine(
       (capacity) => capacity >= booked,
       `Debe ser al menos ${booked}.`,
@@ -48,8 +51,9 @@ type OccurrenceInput = z.input<ReturnType<typeof occurrenceSchema>>;
 type OccurrenceOutput = z.output<ReturnType<typeof occurrenceSchema>>;
 
 // "Solo esta sesión" (follow-up 39 §1): one occurrence changes its Trainer
-// (the Trainer swap), start, or capacity and becomes an exception; only what
-// changed is sent, and capacity never drops below the booked seats.
+// (the Trainer swap), start, duration (follow-up 98), or capacity and becomes
+// an exception; only what changed is sent, and capacity never drops below the
+// booked seats.
 export function OccurrenceForm({
   session,
   branchId,
@@ -67,6 +71,10 @@ export function OccurrenceForm({
 }) {
   const today = boliviaToday();
   const start = boliviaParts(session.startsAt);
+  const minutes =
+    (new Date(session.endsAt).getTime() -
+      new Date(session.startsAt).getTime()) /
+    60_000;
   const change = useScheduleChange(branchId);
   const trainers = useQuery(branchTrainersQueryOptions(branchId));
   const form = useForm<OccurrenceInput, unknown, OccurrenceOutput>({
@@ -75,6 +83,7 @@ export function OccurrenceForm({
       trainerStaffMemberId: session.trainerStaffMemberId,
       date: start.date,
       time: start.time,
+      durationMinutes: String(minutes),
       capacity: String(session.capacity),
     },
   });
@@ -89,6 +98,9 @@ export function OccurrenceForm({
       ...(new Date(startsAt).getTime() === new Date(session.startsAt).getTime()
         ? {}
         : { startsAt }),
+      ...(values.durationMinutes === minutes
+        ? {}
+        : { durationMinutes: values.durationMinutes }),
       ...(values.capacity === session.capacity
         ? {}
         : { capacity: values.capacity }),
@@ -173,6 +185,7 @@ export function OccurrenceForm({
           <p className="text-ayuda text-texto-tenue">
             Si cambias el día o la hora, avisamos a las clientas con reserva.
           </p>
+          <DurationField />
           <FormField
             control={form.control}
             name="capacity"
