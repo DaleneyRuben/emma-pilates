@@ -14,12 +14,15 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { Polyline } from "react-native-svg";
 
+import { imageSizeFromBytes } from "./image-size";
+
 const qrBox = 190;
 
 // The studio QR is a backend-owned, authenticated image; it is loaded through
-// the API fetcher and rendered inline instead of exposing a bucket URL.
-function useQrImage(fetcher: typeof globalThis.fetch): string | null {
-  const [uri, setUri] = useState<string | null>(null);
+// the API fetcher and rendered inline instead of exposing a bucket URL. Its
+// proportions come from its own header: Android does not measure a data URI.
+function useQrImage(fetcher: typeof globalThis.fetch): { ratio: number; uri: string } | null {
+  const [qr, setQr] = useState<{ ratio: number; uri: string } | null>(null);
 
   useEffect(() => {
     let active = true;
@@ -28,7 +31,9 @@ function useQrImage(fetcher: typeof globalThis.fetch): string | null {
         if (!response.ok) return;
         const bytes = new Uint8Array(await response.arrayBuffer());
         const type = response.headers.get("Content-Type") ?? "image/png";
-        if (active) setUri(`data:${type};base64,${encodeBase64(bytes)}`);
+        const size = imageSizeFromBytes(bytes);
+        const ratio = size === null || size.height === 0 ? 1 : size.width / size.height;
+        if (active) setQr({ ratio, uri: `data:${type};base64,${encodeBase64(bytes)}` });
       })
       .catch(() => undefined);
     return () => {
@@ -36,29 +41,7 @@ function useQrImage(fetcher: typeof globalThis.fetch): string | null {
     };
   }, [fetcher]);
 
-  return uri;
-}
-
-/** Width over height of an image, or null until it is known. */
-function useAspectRatio(uri: string | null): number | null {
-  const [ratio, setRatio] = useState<{ ratio: number; uri: string } | null>(null);
-
-  useEffect(() => {
-    if (uri === null) return undefined;
-    let active = true;
-    Image.getSize(
-      uri,
-      (width, height) => {
-        if (active && width > 0 && height > 0) setRatio({ ratio: width / height, uri });
-      },
-      () => undefined,
-    );
-    return () => {
-      active = false;
-    };
-  }, [uri]);
-
-  return ratio !== null && ratio.uri === uri ? ratio.ratio : null;
+  return qr;
 }
 
 /** «Ampliar» and «Guardar QR»: quiet text actions with a line icon (follow-up 95). */
@@ -92,8 +75,9 @@ function QrAction({
  * light full-screen view from the QR itself or «Ampliar».
  */
 export function TransferQrCard({ fetcher }: { fetcher: typeof globalThis.fetch }) {
-  const uri = useQrImage(fetcher);
-  const ratio = useAspectRatio(uri) ?? 1;
+  const qr = useQrImage(fetcher);
+  const uri = qr?.uri ?? null;
+  const ratio = qr?.ratio ?? 1;
   const [enlarged, setEnlarged] = useState(false);
   const size =
     ratio >= 1 ? { height: qrBox / ratio, width: qrBox } : { height: qrBox, width: qrBox * ratio };
