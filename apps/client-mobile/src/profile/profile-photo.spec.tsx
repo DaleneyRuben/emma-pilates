@@ -2,6 +2,7 @@ import type { ClientProfileDto } from "@pilates/api-contracts";
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache, encodeBase64 } from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
+import * as ImageManipulator from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -23,6 +24,9 @@ const pickedPhoto = () => {
     canceled: false,
     assets: [{ uri: "file:///me.png", mimeType: "image/png", width: 10, height: 10 }],
   } as never);
+  jest
+    .mocked(ImageManipulator.manipulateAsync)
+    .mockResolvedValue({ uri: "file:///me.jpg", width: 10, height: 10 });
   jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(encodeBase64(pngBytes));
 };
 
