@@ -2401,6 +2401,19 @@ Bolivia time, whatever time zone your computer uses.
    creates the weekly schedule; the page then says how many Sessions it
    created for the next 30 days. **Guardar** with empty fields marks each one;
    a Session that overlaps another says "Se cruza con otra sesión…".
+   **From an empty slot** (desktop width only): point at an empty hour of a
+   day column, for example Friday at 10:00. It shows a pale fill, a dashed
+   rose border, and "+ 10:00"; click it and **Nueva sesión** opens with
+   **Una sola vez**, that Fecha, and Hora `10:00` already filled in, in the
+   Branch from the top bar, and every other field empty as with the button.
+   Every field can still be changed; **Cada semana** starts on that weekday
+   with **Vigente desde** on that date. An hour a Session covers completely
+   has no slot, and a block still opens **Editar sesión**. With the keyboard,
+   **Tab** from a block moves to the next empty hour of that day (the dashed
+   border and a dark focus ring) and **Enter** opens the panel. A slot on a
+   past day opens the form too, and **Guardar** says "Elige una fecha desde
+   hoy." under Fecha. At a phone width the day list has no slots: only
+   **+ Nueva sesión** creates there.
 3. **Editar sesión.** Click a block. The panel names the day, time, and
    "N de M lugares reservados" (plus "N en lista de espera"). A Session a
    weekly schedule generated offers **Solo esta sesión** (change its Trainer,

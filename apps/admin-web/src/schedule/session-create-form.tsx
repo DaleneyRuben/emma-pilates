@@ -18,7 +18,7 @@ import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
-import { boliviaInstant, boliviaToday } from "../lib/bolivia-time";
+import { boliviaInstant, boliviaToday, weekdayOf } from "../lib/bolivia-time";
 import {
   activeClassTypesQueryOptions,
   branchTrainersQueryOptions,
@@ -76,14 +76,21 @@ const createSchema = (today: string) =>
 type CreateInput = z.input<ReturnType<typeof createSchema>>;
 type CreateOutput = z.output<ReturnType<typeof createSchema>>;
 
+/** A Bolivia date and wall clock picked from an empty AW02 slot. */
+export type SessionStart = { date: string; time: string };
+
 // AW03 create mode with follow-up 39 §1: "Una sola vez" makes one exception
 // Session on a date; "Cada semana" makes a weekly Session Schedule from a
 // Bolivia "Vigente desde" date, materialized 30 days ahead (ADR-0059).
+// Opened from an empty slot (follow-up 96), the slot's day and hour fill
+// Fecha and Hora, and the day carries into «Cada semana».
 export function SessionCreateForm({
   branchId,
+  start,
   onDone,
 }: {
   branchId: string;
+  start?: SessionStart;
   onDone: (notice: string) => void;
 }) {
   const today = boliviaToday();
@@ -97,11 +104,11 @@ export function SessionCreateForm({
       frequency: "once",
       classTypeId: "",
       trainerStaffMemberId: "",
-      time: "",
+      time: start?.time ?? "",
       capacity: "",
-      date: "",
-      weekday: "",
-      effectiveFrom: "",
+      date: start?.date ?? "",
+      weekday: start === undefined ? "" : String(weekdayOf(start.date)),
+      effectiveFrom: start?.date ?? "",
     },
   });
   const frequency = useWatch({ control: form.control, name: "frequency" });

@@ -1,7 +1,10 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
-import { addDays, boliviaParts, formatDayTab } from "../lib/bolivia-time";
+import { addDays, formatDayTab } from "../lib/bolivia-time";
 import { cn } from "../lib/cn";
+import type { SessionStart } from "./session-create-form";
 import { SessionBlock } from "./session-block";
+import { EmptySlot } from "./empty-slot";
+import { dayItems, hourLabel, sessionSpan } from "./week-slots";
 
 type Session = AdministratorSessionAvailabilityDto;
 
@@ -12,14 +15,9 @@ function hourRange(sessions: readonly Session[]) {
   let first = 6;
   let last = 22;
   for (const session of sessions) {
-    first = Math.min(
-      first,
-      Math.floor(boliviaParts(session.startsAt).minutes / 60),
-    );
-    const end = boliviaParts(session.endsAt);
-    const endMinutes =
-      end.date === boliviaParts(session.startsAt).date ? end.minutes : 24 * 60;
-    last = Math.max(last, Math.ceil(endMinutes / 60));
+    const { start, end } = sessionSpan(session);
+    first = Math.min(first, Math.floor(start / 60));
+    last = Math.max(last, Math.ceil(end / 60));
   }
   return { first, last };
 }
@@ -31,11 +29,13 @@ export function WeekGrid({
   today,
   sessions,
   onOpen,
+  onCreate,
 }: {
   monday: string;
   today: string;
   sessions: readonly Session[];
   onOpen: (session: Session) => void;
+  onCreate: (start: SessionStart) => void;
 }) {
   const days = Array.from({ length: 7 }, (_, index) => addDays(monday, index));
   const { first, last } = hourRange(sessions);
@@ -86,7 +86,7 @@ export function WeekGrid({
               className="absolute right-2 -translate-y-1/2 text-ayuda text-texto-muy-tenue tabular"
               style={{ top: index * hourHeight }}
             >
-              {index === 0 ? null : `${String(hour).padStart(2, "0")}:00`}
+              {index === 0 ? null : hourLabel(hour)}
             </span>
           ))}
         </div>
@@ -103,27 +103,39 @@ export function WeekGrid({
               backgroundImage: `repeating-linear-gradient(to bottom, transparent 0, transparent ${hourHeight - 1}px, var(--color-divisor) ${hourHeight - 1}px, var(--color-divisor) ${hourHeight}px)`,
             }}
           >
-            {sessions
-              .filter((session) => boliviaParts(session.startsAt).date === day)
-              .map((session) => {
-                const start = boliviaParts(session.startsAt).minutes;
-                const minutes =
-                  (new Date(session.endsAt).getTime() -
-                    new Date(session.startsAt).getTime()) /
-                  60_000;
+            {dayItems(day, hours, sessions).map((item) => {
+              if (item.kind === "slot") {
                 return (
-                  <SessionBlock
-                    key={session.id}
-                    session={session}
-                    onOpen={onOpen}
-                    className="absolute inset-x-1"
+                  <EmptySlot
+                    key={item.hour}
+                    day={day}
+                    hour={item.hour}
+                    onCreate={onCreate}
                     style={{
-                      top: ((start - first * 60) / 60) * hourHeight + 1,
-                      height: Math.max((minutes / 60) * hourHeight - 2, 44),
+                      top: (item.hour - first) * hourHeight + 1,
+                      height: hourHeight - 2,
                     }}
                   />
                 );
-              })}
+              }
+              const { session } = item;
+              const minutes =
+                (new Date(session.endsAt).getTime() -
+                  new Date(session.startsAt).getTime()) /
+                60_000;
+              return (
+                <SessionBlock
+                  key={session.id}
+                  session={session}
+                  onOpen={onOpen}
+                  className="absolute inset-x-1"
+                  style={{
+                    top: ((item.minutes - first * 60) / 60) * hourHeight + 1,
+                    height: Math.max((minutes / 60) * hourHeight - 2, 44),
+                  }}
+                />
+              );
+            })}
           </div>
         ))}
       </div>
