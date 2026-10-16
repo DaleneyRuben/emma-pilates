@@ -221,20 +221,14 @@ describe("Client My Bookings", () => {
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toBeOnTheScreen();
     });
-    expect(screen.getByRole("button", { name: "Confirmar cambio" })).toHaveProp(
-      "accessibilityState",
-      { disabled: true },
-    );
+    expect(screen.getByRole("button", { name: "Confirmar cambio" })).toBeDisabled();
     await fireEvent.press(screen.getByRole("button", { name: /^Reformer Pilates \d/ }));
     await waitFor(() => {
       expect(screen.getByRole("button", { name: /^Reformer Pilates \d/ })).toHaveProp(
         "accessibilityState",
         { selected: true },
       );
-      expect(screen.getByRole("button", { name: "Confirmar cambio" })).toHaveProp(
-        "accessibilityState",
-        { disabled: false },
-      );
+      expect(screen.getByRole("button", { name: "Confirmar cambio" })).toBeEnabled();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar cambio" }));
 

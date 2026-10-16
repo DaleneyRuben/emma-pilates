@@ -91,7 +91,8 @@ export function SelfRegisteredNotice({
         />
       ) : null}
       <PrimaryButton
-        disabled={sending || waitSeconds > 0}
+        busy={sending}
+        disabled={waitSeconds > 0}
         label="Enviar enlace de verificación"
         onPress={() => void send()}
         size={surface === "card" ? "compact" : "regular"}

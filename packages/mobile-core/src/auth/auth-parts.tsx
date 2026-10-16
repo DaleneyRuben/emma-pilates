@@ -1,6 +1,7 @@
 import type { PropsWithChildren } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import { ButtonLabel } from "../ui/button-label";
 import { ClockIcon } from "../ui/clock-icon";
 import { fontFamilies } from "../ui/fonts";
 import { colors, spacing, typography } from "../ui/tokens";
@@ -51,11 +52,13 @@ export function WaitNotice({
 
 /** An outlined action under the primary one, such as «Reenviar correo». */
 export function SecondaryButton({
+  busy = false,
   disabled = false,
   label,
   onPress,
   tone = "neutral",
 }: {
+  busy?: boolean;
   disabled?: boolean;
   label: string;
   onPress: () => void;
@@ -65,20 +68,21 @@ export function SecondaryButton({
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ busy, disabled: disabled || busy }}
+      disabled={disabled || busy}
       onPress={onPress}
       style={[styles.secondary, tone === "error" && styles.secondaryError]}
     >
-      <Text
+      <ButtonLabel
+        busy={busy}
+        label={label}
+        spinnerColor={tone === "error" ? colors.error : colors.text}
         style={[
           styles.secondaryLabel,
           tone === "error" && styles.secondaryLabelError,
-          disabled && styles.disabledLabel,
+          disabled && !busy && styles.disabledLabel,
         ]}
-      >
-        {label}
-      </Text>
+      />
     </Pressable>
   );
 }

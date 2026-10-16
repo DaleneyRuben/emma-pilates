@@ -7,6 +7,7 @@ import {
 import {
   BackLink,
   BodyText,
+  ButtonLabel,
   colors,
   formatSessionDate,
   formatTimeRange,
@@ -215,12 +216,17 @@ export function AssistantSessionDetailScreen({
                 <Pressable
                   accessibilityLabel="Unirme a la lista de espera"
                   accessibilityRole="button"
-                  accessibilityState={{ disabled: submitting }}
+                  accessibilityState={{ busy: submitting, disabled: submitting }}
                   disabled={submitting}
                   onPress={() => void joinWaitlist()}
                   style={styles.outlinedButton}
                 >
-                  <Text style={styles.outlinedLabel}>Unirme a la lista de espera</Text>
+                  <ButtonLabel
+                    busy={submitting}
+                    label="Unirme a la lista de espera"
+                    spinnerColor={colors.primaryDeep}
+                    style={styles.outlinedLabel}
+                  />
                 </Pressable>
                 <BodyText style={styles.note}>
                   Clase llena. Se avisará al cliente si se libera un cupo.
@@ -229,7 +235,7 @@ export function AssistantSessionDetailScreen({
             )
           ) : hasAllowance ? (
             <>
-              <PrimaryButton disabled={submitting} label="Reservar" onPress={() => void book()} />
+              <PrimaryButton busy={submitting} label="Reservar" onPress={() => void book()} />
               <BodyText style={styles.note}>Se descontará 1 clase de su plan.</BodyText>
             </>
           ) : (

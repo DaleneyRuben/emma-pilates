@@ -187,7 +187,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
           </BodyText>
         )}
         <PrimaryButton
-          disabled={busy}
+          busy={busy}
           label="Continuar al pago"
           onPress={() => void continueToPayment()}
         />

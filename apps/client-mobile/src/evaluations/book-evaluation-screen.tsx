@@ -127,7 +127,7 @@ export function BookEvaluationScreen({
           </BodyText>
         ) : null}
       </ScrollView>
-      <PrimaryButton disabled={submitting} label="Confirmar" onPress={() => void confirm()} />
+      <PrimaryButton busy={submitting} label="Confirmar" onPress={() => void confirm()} />
     </Screen>
   );
 }

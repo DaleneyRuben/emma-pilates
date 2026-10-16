@@ -1,11 +1,14 @@
-import { Pressable, StyleSheet, Text, type GestureResponderEvent } from "react-native";
+import { Pressable, StyleSheet, type GestureResponderEvent } from "react-native";
 
+import { ButtonLabel } from "./button-label";
 import { colors, radii, spacing, typography } from "./tokens";
 
 type PrimaryButtonProps = {
   label: string;
   onPress?: (event: GestureResponderEvent) => void;
   disabled?: boolean;
+  /** A request it sent is in flight (follow-up 93). */
+  busy?: boolean;
   /** «compact» for the 48 pt action inside a card. */
   size?: "compact" | "regular";
 };
@@ -14,22 +17,27 @@ export function PrimaryButton({
   label,
   onPress,
   disabled = false,
+  busy = false,
   size = "regular",
 }: PrimaryButtonProps) {
+  // Busy keeps the fill: grey would read as unavailable, not as working.
+  const greyed = disabled && !busy;
   return (
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ busy, disabled: disabled || busy }}
+      disabled={disabled || busy}
       onPress={onPress}
-      style={[
-        styles.button,
-        size === "compact" && styles.compact,
-        disabled && styles.disabledButton,
-      ]}
+      style={[styles.button, size === "compact" && styles.compact, greyed && styles.disabledButton]}
     >
-      <Text style={[styles.label, disabled && styles.disabledLabel]}>{label}</Text>
+      <ButtonLabel
+        busy={busy}
+        label={label}
+        spinnerColor={colors.white}
+        style={[styles.label, greyed && styles.disabledLabel]}
+        testID="primary-button-spinner"
+      />
     </Pressable>
   );
 }

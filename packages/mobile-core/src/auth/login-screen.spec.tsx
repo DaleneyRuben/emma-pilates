@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react-native";
+import { fireEvent, render, waitFor } from "@testing-library/react-native";
 
 import { LoginScreen } from "./login-screen";
 
@@ -38,6 +38,31 @@ describe("LoginScreen", () => {
     ).toBeOnTheScreen();
     expect(screen.getByText("Podrás intentarlo en 0:30.")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeDisabled();
+  });
+
+  // MOB-060: the button shows it is working while the request is in flight.
+  it("shows Iniciar sesión busy while the login is in flight", async () => {
+    let answer: (value: { status: "rejected" }) => void = () => undefined;
+    const onSubmit = jest.fn(
+      () =>
+        new Promise<{ status: "rejected" }>((resolve) => {
+          answer = resolve;
+        }),
+    );
+    const screen = await render(<LoginScreen onSubmit={onSubmit} />);
+    await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "local password");
+
+    const pressed = fireEvent.press(screen.getByRole("button", { name: "Iniciar sesión" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeBusy();
+    });
+
+    answer({ status: "rejected" });
+    await pressed;
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Iniciar sesión" })).not.toBeBusy();
+    });
   });
 
   it("formats a long server wait as minutes and seconds", async () => {

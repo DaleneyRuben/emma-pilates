@@ -41,6 +41,7 @@ export * from "./ui/back-link";
 export * from "./ui/branch-picker-pill";
 export * from "./ui/card-footer";
 export * from "./ui/body-text";
+export * from "./ui/button-label";
 export * from "./ui/chevron";
 export * from "./ui/detail-line";
 export * from "./ui/empty-state";

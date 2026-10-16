@@ -82,7 +82,8 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
         footer={
           <View style={styles.footer}>
             <PrimaryButton
-              disabled={!isValid || isSubmitting}
+              busy={isSubmitting}
+              disabled={!isValid}
               label="Guardar contraseña"
               onPress={() => void save()}
             />

@@ -146,6 +146,23 @@ describe("Cerrar mi cuenta", () => {
     expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeOnTheScreen();
   });
 
+  // MOB-060: the destructive button shows it is working while closing.
+  it("shows Cerrar mi cuenta busy while the closure is in flight", async () => {
+    const { screen } = await openClosure(
+      closureRoutes({
+        "POST /api/v1/accounts/current/closure": () =>
+          new Promise<Response>(() => undefined) as unknown as Response,
+      }),
+    );
+
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeBusy();
+    });
+  });
+
   it("shows a wrong password under the field and keeps the screen", async () => {
     const { screen } = await openClosure(
       closureRoutes({

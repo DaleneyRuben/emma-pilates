@@ -129,7 +129,8 @@ export function LoginScreen({
             )}
           />
           <PrimaryButton
-            disabled={isSubmitting || retryAfterSeconds > 0}
+            busy={isSubmitting}
+            disabled={retryAfterSeconds > 0}
             label="Iniciar sesión"
             onPress={submitLogin}
           />

@@ -204,7 +204,8 @@ export function PaymentScreen() {
           </BodyText>
         )}
         <PrimaryButton
-          disabled={receipt === null || uploading || submitting}
+          busy={submitting}
+          disabled={receipt === null || uploading}
           label="Enviar comprobante"
           onPress={() => void submit()}
         />

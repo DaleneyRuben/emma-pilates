@@ -134,7 +134,7 @@ export function PaymentStatusScreen() {
             </BodyText>
           )}
           <PrimaryButton
-            disabled={retrying}
+            busy={retrying}
             label="Subir un nuevo comprobante"
             onPress={() => void startAgain()}
           />

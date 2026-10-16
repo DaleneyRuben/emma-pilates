@@ -165,7 +165,8 @@ export function RegistrationScreen({
         </Pressable>
       )}
       <PrimaryButton
-        disabled={submitting || waitSeconds > 0}
+        busy={submitting}
+        disabled={waitSeconds > 0}
         label="Crear cuenta"
         onPress={submit}
       />

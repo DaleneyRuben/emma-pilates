@@ -191,7 +191,8 @@ export function PendingInvitationCard({
             value={email}
           />
           <PrimaryButton
-            disabled={busy || accountWaiting}
+            busy={busy}
+            disabled={accountWaiting}
             label="Guardar correo"
             onPress={() => void changeEmail()}
           />
@@ -200,6 +201,7 @@ export function PendingInvitationCard({
       ) : (
         <View style={styles.pendingActions}>
           <OutlinedButton
+            busy={busy && !confirmingCancel}
             disabled={busy || waitSeconds > 0}
             label="Reenviar enlace"
             onPress={() => void resend()}
@@ -227,6 +229,7 @@ export function PendingInvitationCard({
               desaparecerá.
             </BodyText>
             <OutlinedButton
+              busy={busy}
               label="Sí, cancelar invitación"
               onPress={() => void cancel()}
               tone="error"

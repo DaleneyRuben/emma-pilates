@@ -4076,3 +4076,41 @@ Pro, and the iPad Pro 11 (Staff login included; iOS was never affected and
 still behaves), except the Administrator's rejection reason (not run: it
 needs a pending transfer). On iOS the keyboard appears a few seconds after
 the tap; wait for it before judging the screen.
+
+## Test 50: submit buttons show they are working
+
+From the tap until the request answers, the button that sent it keeps its
+colour and size, shows a spinner in place of its label, ignores further
+taps, and screen readers hear it as busy (MOB-060, design follow-up 93).
+Primary buttons spin white on Palo de rosa; the Error-outline destructive
+buttons («Cerrar mi cuenta», «Quitar horario») spin in Error; the solid
+Error buttons of `S12` and `S14` spin white; the outlined ones («Unirme a la
+lista de espera», «Reenviar correo», «Reenviar enlace») spin in their label
+colour. A disabled button that is not busy still turns grey.
+
+On the local API the answer is too quick to see, so slow it down: a small
+Node proxy on port 3101 that holds every non-GET request for 8 seconds and
+forwards it to 3100 (any `http.createServer` that waits, then pipes to
+`127.0.0.1:3100`), and start each Metro with
+`EXPO_PUBLIC_API_URL=http://127.0.0.1:3101/api/v1` (add
+`adb reverse tcp:3101 tcp:3101` on Android). Run it on the development
+builds of Test 45 on the Android emulator, the iPhone 16 Pro, and the iPad
+Pro 11, in both apps.
+
+1. Client login as `lucia@example.com`: tap «Iniciar sesión». Expected: the
+   same rose button with a white spinner and no text until Home opens.
+2. Perfil → Editar → «Guardar cambios»: the same.
+3. Perfil → «Cerrar mi cuenta», type a **wrong** password (a right one
+   closes the Account), tap «Cerrar mi cuenta». Expected: the white button
+   with its Error outline and an Error spinner, then the wrong-password
+   message.
+4. Staff login as `camila.rojas@example.com`: as step 1.
+
+Maestro's `clearKeychain` (the login subflows) clears the Simulator's whole
+keychain, so the other app on the same Simulator is signed out too; its
+screens then fail to load until it signs in again.
+
+Verified on 2026-10-15: steps 1 and 4 on the emulator, the iPhone 16 Pro,
+and the iPad Pro 11; step 2 on the emulator; step 3 on the emulator and the
+iPhone 16 Pro. Screen readers heard «Iniciar sesión, busy» and «Cerrar mi
+cuenta, busy» on Android.

@@ -169,7 +169,8 @@ export function RescheduleScreen({
       ) : null}
       {!loading && !failed && options.length > 0 ? (
         <PrimaryButton
-          disabled={selectedId === null || submitting}
+          busy={submitting}
+          disabled={selectedId === null}
           label="Confirmar cambio"
           onPress={() => void confirm()}
         />

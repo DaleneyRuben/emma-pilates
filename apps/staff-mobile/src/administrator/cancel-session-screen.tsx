@@ -1,5 +1,6 @@
 import {
   BodyText,
+  ButtonLabel,
   colors,
   formatSessionDate,
   formatTimeRange,
@@ -99,12 +100,17 @@ export function CancelSessionScreen({
       <Pressable
         accessibilityLabel="Sí, cancelar sesión"
         accessibilityRole="button"
-        accessibilityState={{ disabled: submitting }}
+        accessibilityState={{ busy: submitting, disabled: submitting }}
         disabled={submitting}
         onPress={() => void cancel()}
-        style={[styles.destructive, submitting && styles.destructiveDisabled]}
+        style={styles.destructive}
       >
-        <Text style={styles.destructiveLabel}>Sí, cancelar sesión</Text>
+        <ButtonLabel
+          busy={submitting}
+          label="Sí, cancelar sesión"
+          spinnerColor={colors.white}
+          style={styles.destructiveLabel}
+        />
       </Pressable>
       <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
     </Screen>
@@ -125,7 +131,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 52,
   },
-  destructiveDisabled: { opacity: 0.6 },
   destructiveLabel: { color: colors.white, fontSize: typography.body, fontWeight: "500" },
   failure: { color: colors.errorText },
   receipt: {

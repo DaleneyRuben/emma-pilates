@@ -233,19 +233,13 @@ describe("Administrator payments and Session cancellation", () => {
     expect(
       screen.getByText("La clienta verá este mensaje para corregir y volver a enviar."),
     ).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Confirmar rechazo" })).toHaveProp(
-      "accessibilityState",
-      { disabled: true },
-    );
+    expect(screen.getByRole("button", { name: "Confirmar rechazo" })).toBeDisabled();
 
     await fireEvent.changeText(
       screen.getByLabelText("Motivo del rechazo"),
       "El monto no coincide con la transferencia recibida.",
     );
-    expect(screen.getByRole("button", { name: "Confirmar rechazo" })).toHaveProp(
-      "accessibilityState",
-      { disabled: false },
-    );
+    expect(screen.getByRole("button", { name: "Confirmar rechazo" })).toBeEnabled();
     await fireEvent.press(screen.getByRole("button", { name: "Confirmar rechazo" }));
 
     await waitFor(() => {

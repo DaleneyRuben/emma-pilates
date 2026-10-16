@@ -176,7 +176,8 @@ export function NewClientScreen() {
                 </BodyText>
               ) : null}
               <PrimaryButton
-                disabled={submitting || waitSeconds > 0}
+                busy={submitting}
+                disabled={waitSeconds > 0}
                 label="Crear cuenta"
                 onPress={() => void create()}
               />

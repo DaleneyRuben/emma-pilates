@@ -204,6 +204,10 @@
             <button disabled="{{ yes }}" style="min-width:210px;min-height:52px;padding:0 28px;border:none;border-radius:8px;background:#E7DCD8;color:#B3A9A5;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:500;cursor:not-allowed;">Reservar clase</button>
             <div style="font-size:12px;color:#766D69;">Deshabilitado</div>
           </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <button aria-busy="true" aria-label="Reservar clase" style="position:relative;min-width:210px;min-height:52px;padding:0 28px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:500;letter-spacing:0.01em;cursor:default;box-shadow:0 2px 6px rgba(183,131,128,0.22);"><span style="visibility:hidden;">Reservar clase</span><span aria-hidden="true" style="position:absolute;top:50%;left:50%;width:20px;height:20px;margin:-10px 0 0 -10px;box-sizing:border-box;border-radius:999px;border:2px solid rgba(255,255,255,0.35);border-top-color:#FFFFFF;"></span></button>
+            <div style="font-size:12px;color:#766D69;">Ocupado · spinner en lugar del texto, mismo tamaño</div>
+          </div>
         </div>
       </div>
       <div style="height:1px;background:#EFE7DE;"></div>
@@ -216,6 +220,10 @@
           <button style="width:52px;height:52px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           </button>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <button aria-busy="true" aria-label="Cerrar mi cuenta" style="position:relative;min-width:210px;height:54px;padding:0 28px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-family:'Work Sans',sans-serif;font-size:16px;font-weight:500;cursor:default;"><span style="visibility:hidden;">Cerrar mi cuenta</span><span aria-hidden="true" style="position:absolute;top:50%;left:50%;width:20px;height:20px;margin:-10px 0 0 -10px;box-sizing:border-box;border-radius:999px;border:2px solid rgba(178,93,75,0.25);border-top-color:#B25D4B;"></span></button>
+            <div style="font-size:12px;color:#766D69;">Destructivo ocupado</div>
+          </div>
         </div>
       </div>
     </div>

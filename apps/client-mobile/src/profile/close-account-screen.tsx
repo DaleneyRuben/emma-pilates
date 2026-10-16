@@ -8,6 +8,7 @@ import {
 } from "@pilates/api-contracts";
 import {
   BodyText,
+  ButtonLabel,
   colors,
   FormField,
   FormScrollView,
@@ -32,11 +33,13 @@ import { describeAccountClosure } from "./close-account-consequences";
 export const closedAccountNotice = "Cerramos tu cuenta. Gracias por entrenar con nosotras.";
 
 function DestructiveButton({
+  busy,
   disabled,
   label,
   onPress,
   testID,
 }: {
+  busy: boolean;
   disabled: boolean;
   label: string;
   onPress: () => void;
@@ -47,18 +50,21 @@ function DestructiveButton({
       testID={testID}
       accessibilityLabel={label}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ busy, disabled: disabled || busy }}
+      disabled={disabled || busy}
       onPress={onPress}
       style={({ pressed }) => [
         styles.destructive,
-        disabled && styles.destructiveDisabled,
+        disabled && !busy && styles.destructiveDisabled,
         pressed && styles.destructivePressed,
       ]}
     >
-      <Text style={[styles.destructiveLabel, disabled && styles.destructiveLabelDisabled]}>
-        {label}
-      </Text>
+      <ButtonLabel
+        busy={busy}
+        label={label}
+        spinnerColor={colors.error}
+        style={[styles.destructiveLabel, disabled && !busy && styles.destructiveLabelDisabled]}
+      />
     </Pressable>
   );
 }
@@ -182,7 +188,8 @@ export function CloseAccountScreen() {
               </View>
             ) : null}
             <DestructiveButton
-              disabled={password === "" || submitting}
+              busy={submitting}
+              disabled={password === ""}
               label="Cerrar mi cuenta"
               onPress={() => void close()}
               testID="close-account-confirm"

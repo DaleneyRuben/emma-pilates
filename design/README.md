@@ -108,6 +108,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - Tertiary/link: text only. Client and Staff screens use `#8A5D59` (hover `#7A4F4B`), and `#7A4F4B` on Palo de rosa tinte; the admin web keeps `#B78380` (hover `#9C6764`).
 - Compact neutral: 1px `#D8C9BB`, `#FAF7F2` fill, `#4A4A4A` text, height 30–38; hover border `#B78380`.
 - Destructive: Error `#B25D4B` text/border, hover text `#94493A`, hover tint `rgba(178,93,75,0.10)`.
+- Busy (from the tap until the request answers): the button keeps its fill, border, shadow, width, and height; a spinner replaces the label (the native small activity indicator on mobile, a 16px ring turning every 0.8s on the admin web), white on the primary fill and Error `#B25D4B` on the destructive outline; taps are ignored, screen readers hear the label as busy, and it never uses the Deshabilitado colours.
 - **One solid button per view.**
 - Mobile hit targets never below 44px.
 

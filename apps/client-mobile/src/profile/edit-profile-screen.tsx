@@ -103,11 +103,7 @@ function EditProfileForm({
       contentContainerStyle={styles.form}
       footer={
         <View style={styles.footer}>
-          <PrimaryButton
-            disabled={isSubmitting}
-            label="Guardar cambios"
-            onPress={() => void save()}
-          />
+          <PrimaryButton busy={isSubmitting} label="Guardar cambios" onPress={() => void save()} />
         </View>
       }
       keyboardVerticalOffset={spacing.xxl}

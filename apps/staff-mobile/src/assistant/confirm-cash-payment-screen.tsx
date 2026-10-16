@@ -211,7 +211,8 @@ export function ConfirmCashPaymentScreen({
             </BodyText>
           ) : null}
           <PrimaryButton
-            disabled={submitting || branchId === null}
+            busy={submitting}
+            disabled={branchId === null}
             label="Confirmar pago recibido"
             onPress={() => void confirm()}
           />

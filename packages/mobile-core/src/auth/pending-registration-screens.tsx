@@ -148,6 +148,7 @@ export function CheckEmailScreen({
         />
       ) : null}
       <SecondaryButton
+        busy={submitting && !confirmingCancel}
         disabled={submitting || waitSeconds > 0}
         label="Reenviar correo"
         onPress={resend}
@@ -178,7 +179,7 @@ export function CheckEmailScreen({
               podrás registrarte de nuevo desde cero.
             </BodyText>
             <SecondaryButton
-              disabled={submitting}
+              busy={submitting}
               label="Sí, cancelar registro"
               onPress={cancel}
               tone="error"
@@ -263,7 +264,8 @@ export function CorrectEmailScreen({
         />
       ) : null}
       <PrimaryButton
-        disabled={submitting || waitSeconds > 0}
+        busy={submitting}
+        disabled={waitSeconds > 0}
         label="Guardar correo"
         onPress={submit}
       />

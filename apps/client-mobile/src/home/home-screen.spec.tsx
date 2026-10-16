@@ -48,10 +48,7 @@ describe("Client Home", () => {
     expect(screen.getByText("5 de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("Pagado hasta el 11 de octubre")).toBeOnTheScreen();
     expect(screen.getByText("Activa")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar una clase" })).toHaveProp(
-      "accessibilityState",
-      { disabled: false },
-    );
+    expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeEnabled();
     // MOB-041: 02 ends its full-width «Reservar una clase» shortcut in a Palo
     // de rosa chevron; its two tiles carry none.
     const chevrons = screen.getAllByTestId("chevron", { includeHiddenElements: true });
@@ -86,10 +83,7 @@ describe("Client Home", () => {
       expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
     });
     expect(screen.getByText("Necesitas un plan activo para reservar")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Reservar una clase" })).toHaveProp(
-      "accessibilityState",
-      { disabled: true },
-    );
+    expect(screen.getByRole("button", { name: "Reservar una clase" })).toBeDisabled();
     expect(screen.queryByText("Activa")).not.toBeOnTheScreen();
     // MOB-041: the disabled shortcut ends in the quiet lock instead of the chevron.
     const lock = screen.getByTestId("shortcut-lock", { includeHiddenElements: true });
