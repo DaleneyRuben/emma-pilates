@@ -106,6 +106,12 @@ describe("staff release configuration", () => {
     expect(packageJson.devDependencies).toHaveProperty("@sentry/cli");
   });
 
+  // REL-010: App Store Connect asks about export compliance on every build
+  // unless the binary declares it; the app only uses HTTPS and the OS's crypto.
+  it("declares that it uses no non-exempt encryption", () => {
+    expect(appConfig.expo.ios).toMatchObject({ config: { usesNonExemptEncryption: false } });
+  });
+
   it("submits only the production profile", () => {
     expect(Object.keys(easConfig.submit)).toEqual(["production"]);
   });

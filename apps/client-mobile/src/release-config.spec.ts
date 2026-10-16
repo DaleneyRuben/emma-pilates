@@ -106,6 +106,26 @@ describe("client release configuration", () => {
     expect(packageJson.devDependencies).toHaveProperty("@sentry/cli");
   });
 
+  // REL-010: App Store Connect asks about export compliance on every build
+  // unless the binary declares it; the apps only use HTTPS and the OS's crypto.
+  it("declares that it uses no non-exempt encryption", () => {
+    expect(appConfig.expo.ios).toMatchObject({ config: { usesNonExemptEncryption: false } });
+  });
+
+  // REL-010: App Review rejects vague or English-only purpose strings, and the
+  // app only picks photos from the library (receipts and profile photos).
+  it("explains its photo library access in Spanish and asks for no camera or microphone", () => {
+    expect(appConfig.expo.plugins).toContainEqual([
+      "expo-image-picker",
+      {
+        photosPermission:
+          "Permite que Emma Pilates acceda a tus fotos para subir tu foto de perfil y los comprobantes de tus transferencias.",
+        cameraPermission: false,
+        microphonePermission: false,
+      },
+    ]);
+  });
+
   it("submits only the production profile", () => {
     expect(Object.keys(easConfig.submit)).toEqual(["production"]);
   });
