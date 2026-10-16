@@ -10,6 +10,7 @@ import {
   BodyText,
   colors,
   Heading,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -149,7 +150,7 @@ export function HomeScreen() {
       <Screen>
         <Heading accessibilityLabel="Inicio">Inicio</Heading>
         <View style={styles.centered}>
-          <BodyText accessibilityLabel="Cargando inicio">Cargando…</BodyText>
+          <LoadingState label="Cargando inicio" />
         </View>
       </Screen>
     );

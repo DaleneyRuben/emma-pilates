@@ -7,6 +7,7 @@ import {
 import {
   BodyText,
   colors,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -60,7 +61,7 @@ export function PaymentScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando pago">Cargando…</BodyText>
+        <LoadingState label="Cargando pago" />
       </Screen>
     );
   }

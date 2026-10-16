@@ -2,6 +2,7 @@ import { useListPlans, type PlanDto } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  LoadingState,
   QueryFailure,
   Screen,
   ScreenTopBar,
@@ -49,7 +50,7 @@ export function PlansScreen() {
     <Screen style={styles.screen}>
       <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Elige tu plan" />
       {plans.isPending ? (
-        <BodyText accessibilityLabel="Cargando planes">Cargando…</BodyText>
+        <LoadingState label="Cargando planes" />
       ) : plans.isError || plans.data.status !== 200 ? (
         <QueryFailure label="No pudimos cargar los planes." onRetry={() => void plans.refetch()} />
       ) : plans.data.data.length === 0 ? (

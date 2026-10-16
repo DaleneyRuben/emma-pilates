@@ -8,6 +8,7 @@ import {
 import {
   BodyText,
   colors,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -148,7 +149,7 @@ export function MyEvaluationsScreen({
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando evaluaciones">Cargando…</BodyText>
+        <LoadingState label="Cargando evaluaciones" />
       </Screen>
     );
   }

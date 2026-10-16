@@ -9,6 +9,7 @@ import {
   colors,
   dayChipLabel,
   initials,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -131,7 +132,7 @@ export function EvaluationAvailabilityScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando disponibilidad">Cargando…</BodyText>
+        <LoadingState label="Cargando disponibilidad" />
       </Screen>
     );
   }

@@ -8,6 +8,7 @@ import {
   Chevron,
   colors,
   initials,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -78,7 +79,7 @@ export function ReferralsScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando referidos">Cargando…</BodyText>
+        <LoadingState label="Cargando referidos" />
       </Screen>
     );
   }
