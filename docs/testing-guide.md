@@ -4118,3 +4118,37 @@ Verified on 2026-10-15: steps 1 and 4 on the emulator, the iPhone 16 Pro,
 and the iPad Pro 11; step 2 on the emulator; step 3 on the emulator and the
 iPhone 16 Pro. Screen readers heard «Iniciar sesión, busy» and «Cerrar mi
 cuenta, busy» on Android.
+
+## Test 51: the studio QR is drawn whole and opens full screen
+
+`10`'s studio QR (MOB-062, design follow-up 95) keeps its own proportions
+inside a 190 pt box, so a bank QR that is not square is never cropped;
+tapping it or «Ampliar» opens «QR del estudio», a light full-screen view
+closed by «Cerrar» (and by Android's back gesture). The app reads the QR's
+size from the image's own PNG or JPEG header, because Android does not
+measure an inline image.
+
+The local QR is square, so serve a taller one: start the API with
+`TRANSFER_QR_IMAGE_PATH=<a PNG about 420 × 600, for example a bank export
+with a header band>` (any path; the variable overrides
+`.data/transfer-qr.png`). Run it in the Client app on the Android emulator,
+the iPhone 16 Pro, and the iPad Pro 11.
+
+1. Sign in as `sofia@example.com` (expired Plan), tap «Comprar un plan» →
+   «Paquete de 8 clases» → «Continuar al pago». Expected: the whole QR,
+   header band and bottom edge included, about 133 × 190 pt, with «Ampliar»
+   under it.
+2. Tap the QR. Expected: «QR del estudio» on Superficie with a close «✕»,
+   the QR whole on a white card (as wide as the phone allows, at most a
+   480 pt column on the iPad), and «Guárdalo para elegirlo desde la galería
+   en tu app bancaria.» under it.
+3. Tap «Cerrar» (on Android also try the back gesture). Expected: back on
+   «Pago». «Ampliar» opens the same view.
+
+In a development build the Expo developer gear floats over the top-right
+corner, where «Cerrar» is; drag the gear aside first.
+
+Verified on 2026-10-15 with a 420 × 600 test QR: steps 1–3 on the emulator
+(the QR drawn 350 × 499 px, the back gesture and «Cerrar» both close); steps
+1–2 on the iPhone 16 Pro; steps 1–3 on the iPad Pro 11 (the card capped at
+480 pt). «Guardar QR» is MOB-063.

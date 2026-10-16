@@ -1,7 +1,6 @@
 import {
   getGetCurrentPaymentQueryKey,
   getGetCurrentPurchaseIntentQueryKey,
-  getGetTransferQrImageUrl,
   submitPurchaseIntentTransfer,
   useGetCurrentPurchaseIntent,
 } from "@pilates/api-contracts";
@@ -20,13 +19,13 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { randomUUID } from "expo-crypto";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { formatBolivianos } from "../plans/plan-format";
-import { encodeBase64 } from "@pilates/mobile-core";
 import { pickReceipt, uploadReceipt, type AttachedReceipt } from "./receipt-upload";
+import { TransferQrCard } from "./transfer-qr-card";
 
 type PaymentNavigation = {
   goBack: () => void;
@@ -38,29 +37,6 @@ const uploadErrorCopy: Record<string, string> = {
   upload_rejected: "No pudimos leer esa imagen. Prueba con otra captura.",
 };
 
-// The studio QR is a backend-owned, authenticated image; it is loaded through
-// the API fetcher and rendered inline instead of exposing a bucket URL.
-function useQrImage(fetcher: typeof globalThis.fetch): string | null {
-  const [uri, setUri] = useState<string | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    void fetcher(getGetTransferQrImageUrl())
-      .then(async (response) => {
-        if (!response.ok) return;
-        const bytes = new Uint8Array(await response.arrayBuffer());
-        const type = response.headers.get("Content-Type") ?? "image/png";
-        if (active) setUri(`data:${type};base64,${encodeBase64(bytes)}`);
-      })
-      .catch(() => undefined);
-    return () => {
-      active = false;
-    };
-  }, [fetcher]);
-
-  return uri;
-}
-
 export function PaymentScreen() {
   const navigation = useNavigation<PaymentNavigation>();
   const fetcher = useClientFetcher();
@@ -69,7 +45,6 @@ export function PaymentScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
-  const qrUri = useQrImage(fetcher);
   const [receipt, setReceipt] = useState<AttachedReceipt | null>(null);
   const [uploading, setUploading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -154,20 +129,7 @@ export function PaymentScreen() {
             </BodyText>
           ) : null}
         </View>
-        <View style={styles.qrCard}>
-          {qrUri === null ? (
-            <View style={styles.qrPlaceholder} />
-          ) : (
-            <Image
-              accessibilityLabel="Código QR del estudio"
-              source={{ uri: qrUri }}
-              style={styles.qr}
-            />
-          )}
-          <BodyText style={styles.centered}>
-            Escanea el código con tu app bancaria y transfiere el monto exacto.
-          </BodyText>
-        </View>
+        <TransferQrCard fetcher={fetcher} />
         <Pressable
           accessibilityLabel={
             receipt === null
@@ -226,23 +188,9 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     padding: spacing.lg,
   },
-  centered: { textAlign: "center" },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   credit: { color: colors.successText },
   error: { color: colors.errorText },
-  qr: { height: 220, width: 220 },
-  qrCard: {
-    ...surfaces.card,
-    alignItems: "center",
-    gap: spacing.md,
-    padding: spacing.lg,
-  },
-  qrPlaceholder: {
-    backgroundColor: colors.divider,
-    borderRadius: radii.control,
-    height: 220,
-    width: 220,
-  },
   screen: { gap: spacing.lg },
   thumbnail: { borderRadius: radii.control, height: 120, width: 90 },
   upload: {
