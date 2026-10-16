@@ -146,6 +146,14 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - The «Sucursal:» picker of `03`, `S07`, and `S13` ends in a 16px `#766D69` chevron pointing down (`6,9.5 12,15.5 18,9.5`); `02`'s disabled shortcut ends in a 19px `#C4BAB6` lock instead of the chevron.
 - Rows between rules (`07`, `S22`) and the notification rows of `19` and `S20` carry no chevron.
 
+### Loading state (Client and Staff)
+
+- A screen's first load shows only `emma-logo.png` (transparent, 800 × 333), centred in the content area between the header and the tab bar on Marfil: 240px wide on phones, 300px on tablets. No text, card, or spinner; the header and tab bar stay usable.
+- Nothing for the first 400ms, then a 300ms ease-out fade-in, then an endless breath of 2.8s (1.4s in, 1.4s out, ease-in-out) between opacity 0.55 / scale 0.96 and opacity 1 / scale 1. Content replaces it with no exit animation.
+- Reduce Motion: no fade and no breath; the still logo appears after the same 400ms.
+- Announced as progress with the screen's Spanish label («Cargando clases»); the image itself is not read.
+- Not for busy buttons, pull-to-refresh, the Promotions placeholder card, image placeholders, or errors.
+
 ### Home shortcuts (`02`)
 
 - Under an 11px uppercase `0.16em` `#766D69` «Accesos rápidos» eyebrow, a full-width «Reservar una clase» card (padding 18, gap 14) holds a 44px tile on `rgba(216,189,184,0.28)` at radius 12 with a 22px `#B78380` calendar (stroke 1.3), the title in Lora 17 weight 500 over a 13px `#766D69` note, and the 19px chevron.
@@ -396,7 +404,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 - **Fonts**: Lora and Work Sans from Google Fonts.
 - **Icons**: inline SVG, 24×24 viewBox, `stroke="currentColor"`-style strokes at 1.4–2.1 weight, rendered at 11–22px. Substitute your icon library, matching stroke weight and size.
-- **Images**: none shipped. Promotion thumbnails and the upload preview are `#EFE0DC` placeholder blocks with a photo glyph — real imagery comes from the studio (promotion images should be horizontal, min 1200×675).
+- **Images**: one shipped, `emma-logo.png` (the studio's logo, transparent, used by the loading state); the rest are placeholders. Promotion thumbnails and the upload preview are `#EFE0DC` placeholder blocks with a photo glyph — real imagery comes from the studio (promotion images should be horizontal, min 1200×675).
 - **Avatars**: initials on `#EFE0DC`/`#D8BDB8`. The header account avatar («Tu cuenta») is never a photo; only the Client's own profile (`18` summary card, `22`) shows her photo, centre-cropped into the circle, with the initials as fallback (follow-up 67 amends checklist 30 §9). The unread dot on the staff header avatar is a state mark, not a border (follow-up 73 amends §9).
 
 ## Files
