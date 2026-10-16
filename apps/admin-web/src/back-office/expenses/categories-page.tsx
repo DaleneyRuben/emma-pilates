@@ -139,7 +139,7 @@ export function ExpenseCategoriesPage() {
         }}
         title={`¿Eliminar «${deleting?.name ?? ""}»?`}
         confirmLabel="Eliminar"
-        pending={change.isPending}
+        busy={change.isPending}
         onConfirm={() => {
           if (deleting !== null) void remove(deleting);
         }}

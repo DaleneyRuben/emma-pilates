@@ -18,32 +18,35 @@ import { SidePanelBody, SidePanelFooter } from "../components/panel/side-panel";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Select } from "../components/ui/select";
-import { boliviaInstant, boliviaToday } from "../lib/bolivia-time";
+import { boliviaInstant, boliviaToday, weekdayOf } from "../lib/bolivia-time";
 import {
   activeClassTypesQueryOptions,
   branchTrainersQueryOptions,
 } from "./schedule-queries";
 import { scheduleProblem } from "./schedule-problems";
-import {
-  ClassTypeOptions,
-  TrainerOptions,
-  WeekdayOptions,
-} from "./session-options";
+import { ClassTypeOptions, TrainerOptions } from "./session-options";
 import { createdNotice } from "./schedule-notices";
 import { useScheduleChange } from "./use-schedule-change";
+import { WeeklyRowsField } from "./weekly-rows-field";
+import { rowClash } from "./weekly-rows";
 
 // Both frequencies share one flat shape; which date fields are required
 // depends on the choice, checked after the field rules.
-const createSchema = (today: string) =>
+const wallClock = /^\d{2}:\d{2}$/;
+
+const createSchema = (
+  today: string,
+  durationOf: (classTypeId: string) => number | undefined,
+) =>
   z
     .object({
       frequency: z.enum(["once", "weekly"]),
       classTypeId: z.string().min(1, "Elige un tipo de clase."),
       trainerStaffMemberId: z.string().min(1, "Elige una entrenadora."),
-      time: z.string().regex(/^\d{2}:\d{2}$/, "Elige la hora."),
+      time: z.string(),
       capacity: wholeNumberField(1, 100, "Entre 1 y 100 lugares."),
       date: z.string(),
-      weekday: z.string(),
+      rows: z.array(z.object({ weekday: z.string(), time: z.string() })),
       effectiveFrom: z.string(),
     })
     .superRefine((values, context) => {
@@ -61,13 +64,45 @@ const createSchema = (today: string) =>
       };
       if (values.frequency === "once") {
         requireDate("date", "Elige la fecha.");
+        if (!wallClock.test(values.time)) {
+          context.addIssue({
+            code: "custom",
+            path: ["time"],
+            message: "Elige la hora.",
+          });
+        }
         return;
       }
-      if (!/^[1-7]$/.test(values.weekday)) {
+      let complete = true;
+      values.rows.forEach((row, index) => {
+        if (!/^[1-7]$/.test(row.weekday)) {
+          complete = false;
+          context.addIssue({
+            code: "custom",
+            path: ["rows", index, "weekday"],
+            message: "Elige un día.",
+          });
+        }
+        if (!wallClock.test(row.time)) {
+          complete = false;
+          context.addIssue({
+            code: "custom",
+            path: ["rows", index, "time"],
+            message: "Elige la hora.",
+          });
+        }
+      });
+      const clash = complete
+        ? rowClash(
+            values.rows,
+            Math.max(1, durationOf(values.classTypeId) ?? 0),
+          )
+        : null;
+      if (clash !== null) {
         context.addIssue({
           code: "custom",
-          path: ["weekday"],
-          message: "Elige un día.",
+          path: ["rows", clash.index, "time"],
+          message: clash.message,
         });
       }
       requireDate("effectiveFrom", "Elige desde qué fecha rige.");
@@ -76,14 +111,21 @@ const createSchema = (today: string) =>
 type CreateInput = z.input<ReturnType<typeof createSchema>>;
 type CreateOutput = z.output<ReturnType<typeof createSchema>>;
 
+/** A Bolivia date and wall clock picked from an empty AW02 slot. */
+export type SessionStart = { date: string; time: string };
+
 // AW03 create mode with follow-up 39 §1: "Una sola vez" makes one exception
 // Session on a date; "Cada semana" makes a weekly Session Schedule from a
 // Bolivia "Vigente desde" date, materialized 30 days ahead (ADR-0059).
+// Opened from an empty slot (follow-up 96), the slot's day and hour fill
+// Fecha and Hora, and the day carries into «Cada semana».
 export function SessionCreateForm({
   branchId,
+  start,
   onDone,
 }: {
   branchId: string;
+  start?: SessionStart;
   onDone: (notice: string) => void;
 }) {
   const today = boliviaToday();
@@ -91,20 +133,29 @@ export function SessionCreateForm({
   const classTypes = useQuery(activeClassTypesQueryOptions());
   const trainers = useQuery(branchTrainersQueryOptions(branchId));
   const [failure, setFailure] = useState<string | null>(null);
+  const durationOf = (classTypeId: string) =>
+    classTypes.data?.find((classType) => classType.id === classTypeId)
+      ?.durationMinutes;
   const form = useForm<CreateInput, unknown, CreateOutput>({
-    resolver: zodResolver(createSchema(today)),
+    resolver: zodResolver(createSchema(today, durationOf)),
     defaultValues: {
       frequency: "once",
       classTypeId: "",
       trainerStaffMemberId: "",
-      time: "",
+      time: start?.time ?? "",
       capacity: "",
-      date: "",
-      weekday: "",
-      effectiveFrom: "",
+      date: start?.date ?? "",
+      rows: [
+        {
+          weekday: start === undefined ? "" : String(weekdayOf(start.date)),
+          time: start?.time ?? "",
+        },
+      ],
+      effectiveFrom: start?.date ?? "",
     },
   });
   const frequency = useWatch({ control: form.control, name: "frequency" });
+  const classTypeId = useWatch({ control: form.control, name: "classTypeId" });
 
   const submit = form.handleSubmit(async (values) => {
     setFailure(null);
@@ -125,12 +176,14 @@ export function SessionCreateForm({
               },
             }
           : {
-              kind: "create-schedule",
+              kind: "create-schedules",
               input: {
                 ...shared,
-                weekday: Number(values.weekday),
-                startsAtLocal: values.time,
                 effectiveFrom: values.effectiveFrom,
+                rows: values.rows.map((row) => ({
+                  weekday: Number(row.weekday),
+                  startsAtLocal: row.time,
+                })),
               },
             },
       );
@@ -222,8 +275,8 @@ export function SessionCreateForm({
               </FormItem>
             )}
           />
-          <div className="grid grid-cols-2 gap-3">
-            {frequency === "once" ? (
+          {frequency === "once" ? (
+            <div className="grid grid-cols-2 gap-3">
               <FormField
                 control={form.control}
                 name="date"
@@ -237,37 +290,23 @@ export function SessionCreateForm({
                   </FormItem>
                 )}
               />
-            ) : (
               <FormField
                 control={form.control}
-                name="weekday"
+                name="time"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Día de la semana</FormLabel>
+                    <FormLabel>Hora</FormLabel>
                     <FormControl>
-                      <Select {...field}>
-                        <WeekdayOptions />
-                      </Select>
+                      <Input type="time" step={300} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            )}
-            <FormField
-              control={form.control}
-              name="time"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Hora</FormLabel>
-                  <FormControl>
-                    <Input type="time" step={300} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+            </div>
+          ) : (
+            <WeeklyRowsField durationMinutes={durationOf(classTypeId)} />
+          )}
           <FormField
             control={form.control}
             name="capacity"
@@ -308,7 +347,7 @@ export function SessionCreateForm({
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" disabled={change.isPending}>
+          <Button type="submit" size="lg" busy={change.isPending}>
             Guardar
           </Button>
         </SidePanelFooter>

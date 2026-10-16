@@ -125,7 +125,8 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
         <Button
           type="submit"
           size="lg"
-          disabled={throttled || form.formState.isSubmitting}
+          disabled={throttled}
+          busy={form.formState.isSubmitting}
         >
           Iniciar sesión
         </Button>

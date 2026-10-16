@@ -20,6 +20,15 @@ const partsFormat = new Intl.DateTimeFormat("en-US", {
 
 const weekdays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const shortWeekdays = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+const longWeekdays = [
+  "lunes",
+  "martes",
+  "miércoles",
+  "jueves",
+  "viernes",
+  "sábado",
+  "domingo",
+];
 const months = [
   "enero",
   "febrero",
@@ -109,6 +118,16 @@ export const formatDayTab = (date: string) => ({
   weekday: shortWeekdays[weekdayOf(date) - 1],
   day: String(Number(date.slice(8, 10))),
 });
+
+/** "jueves" for ISO weekday 4 (Monday = 1). */
+export const weekdayName = (weekday: number): string =>
+  longWeekdays[weekday - 1] ?? "";
+
+/** "jueves 13 de agosto", as a screen reader hears an AW02 slot's day. */
+export function formatLongDay(date: string): string {
+  const { day, month } = dayMonth(date);
+  return `${weekdayName(weekdayOf(date))} ${day} de ${month}`;
+}
 
 export function formatSessionMoment(instant: string): string {
   const parts = boliviaParts(instant);

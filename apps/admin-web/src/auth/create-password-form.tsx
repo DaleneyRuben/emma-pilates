@@ -75,7 +75,7 @@ export function CreatePasswordForm({
             minutos.
           </p>
         ) : null}
-        <Button type="submit" size="lg" disabled={!isValid || isSubmitting}>
+        <Button type="submit" size="lg" disabled={!isValid} busy={isSubmitting}>
           Guardar contraseña
         </Button>
       </form>

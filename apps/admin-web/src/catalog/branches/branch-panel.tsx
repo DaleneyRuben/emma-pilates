@@ -141,7 +141,7 @@ export function BranchPanelForm({
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" disabled={change.isPending}>
+          <Button type="submit" size="lg" busy={change.isPending}>
             Guardar
           </Button>
           {branch === undefined || archived ? null : (
@@ -161,7 +161,7 @@ export function BranchPanelForm({
           onOpenChange={setConfirming}
           title={`¿Archivar ${branch.name}?`}
           confirmLabel="Archivar"
-          pending={change.isPending}
+          busy={change.isPending}
           onConfirm={() => void archive()}
         >
           <p>

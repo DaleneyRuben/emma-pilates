@@ -119,7 +119,8 @@ export function RecoverPasswordPage() {
           <Button
             type="submit"
             size="lg"
-            disabled={throttled || form.formState.isSubmitting}
+            disabled={throttled}
+            busy={form.formState.isSubmitting}
           >
             Enviar enlace
           </Button>

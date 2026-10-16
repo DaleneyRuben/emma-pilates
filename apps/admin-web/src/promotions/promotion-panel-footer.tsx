@@ -8,10 +8,14 @@ import { Button } from "../components/ui/button";
  * published Promotion keeps «Guardar cambios» and «Dejar de publicar».
  * One solid button per view: «Publicar» or «Guardar cambios».
  */
+/** The footer button whose request is in flight spins (follow-up 93). */
+export type FooterAction = "draft" | "changes" | "publish" | "unpublish";
+
 export function PromotionPanelFooter({
   published,
   publishable,
   pending,
+  sending,
   editing,
   onSaveDraft,
   onPublish,
@@ -22,6 +26,7 @@ export function PromotionPanelFooter({
   published: boolean;
   publishable: boolean;
   pending: boolean;
+  sending: FooterAction | null;
   /** An existing Promotion can also be deleted. */
   editing: boolean;
   onSaveDraft: () => void;
@@ -38,6 +43,7 @@ export function PromotionPanelFooter({
             type="submit"
             size="lg"
             disabled={pending}
+            busy={sending === "changes"}
             onClick={(event) => {
               event.preventDefault();
               onSaveChanges();
@@ -49,6 +55,7 @@ export function PromotionPanelFooter({
             variant="destructive"
             size="lg"
             disabled={pending}
+            busy={sending === "unpublish"}
             onClick={onUnpublish}
           >
             Dejar de publicar
@@ -61,6 +68,7 @@ export function PromotionPanelFooter({
             variant="secondary"
             size="lg"
             disabled={pending}
+            busy={sending === "draft"}
             onClick={(event) => {
               event.preventDefault();
               onSaveDraft();
@@ -71,6 +79,7 @@ export function PromotionPanelFooter({
           <Button
             size="lg"
             disabled={!publishable || pending}
+            busy={sending === "publish"}
             onClick={onPublish}
           >
             Publicar

@@ -47,7 +47,7 @@ export function DeactivateAction({
         onOpenChange={setConfirming}
         title={`¿Desactivar a ${member.name}?`}
         confirmLabel="Desactivar"
-        pending={change.isPending}
+        busy={change.isPending}
         onConfirm={() => void deactivate()}
       >
         <p>

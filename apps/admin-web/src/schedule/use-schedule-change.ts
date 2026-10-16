@@ -1,7 +1,7 @@
 import {
   cancelSession,
   createOneOffSession,
-  createSessionSchedule,
+  createSessionSchedules,
   endSessionSchedule,
   getListSessionSchedulesQueryKey,
   replaceSessionSchedule,
@@ -9,7 +9,8 @@ import {
   type SessionCancellationDto,
   type SessionChangeDto,
   type SessionInputDto,
-  type SessionScheduleCreationDto,
+  type SessionScheduleBatchDto,
+  type SessionScheduleBatchInputDto,
   type SessionScheduleEndDto,
   type SessionScheduleInputDto,
   type SessionScheduleReplacementDto,
@@ -20,7 +21,7 @@ import { isBranchSessionsKey } from "./schedule-queries";
 
 export type ScheduleChange =
   | { kind: "create-session"; input: SessionInputDto }
-  | { kind: "create-schedule"; input: SessionScheduleInputDto }
+  | { kind: "create-schedules"; input: SessionScheduleBatchInputDto }
   | { kind: "update-session"; sessionId: string; input: SessionChangeDto }
   | {
       kind: "replace-schedule";
@@ -32,7 +33,7 @@ export type ScheduleChange =
 
 export type ScheduleChangeResult =
   | { kind: "create-session" }
-  | { kind: "create-schedule"; result: SessionScheduleCreationDto }
+  | { kind: "create-schedules"; result: SessionScheduleBatchDto }
   | { kind: "update-session" }
   | { kind: "replace-schedule"; result: SessionScheduleReplacementDto }
   | { kind: "end-schedule"; result: SessionScheduleEndDto }
@@ -43,12 +44,12 @@ async function send(change: ScheduleChange): Promise<ScheduleChangeResult> {
     case "create-session":
       await createOneOffSession(change.input, undefined, adminFetch);
       return { kind: change.kind };
-    case "create-schedule":
+    case "create-schedules":
       return {
         kind: change.kind,
         result: (
-          await createSessionSchedule(change.input, undefined, adminFetch)
-        ).data as SessionScheduleCreationDto,
+          await createSessionSchedules(change.input, undefined, adminFetch)
+        ).data as SessionScheduleBatchDto,
       };
     case "update-session":
       await updateSession(

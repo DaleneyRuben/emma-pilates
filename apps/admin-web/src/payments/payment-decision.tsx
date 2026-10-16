@@ -169,7 +169,8 @@ export function PaymentDecision({
                 type="submit"
                 size="lg"
                 className="flex-1"
-                disabled={reason.trim() === "" || mutation.isPending}
+                disabled={reason.trim() === ""}
+                busy={mutation.isPending}
               >
                 Confirmar rechazo
               </Button>
@@ -216,7 +217,7 @@ export function PaymentDecision({
         title={`¿Confirmar el pago de ${review.clientName}?`}
         confirmLabel="Confirmar pago"
         tone="primary"
-        pending={mutation.isPending}
+        busy={mutation.isPending}
         onConfirm={() => void decide({ kind: "confirm" })}
       >
         <p>
