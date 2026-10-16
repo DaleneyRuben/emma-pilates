@@ -4151,6 +4151,33 @@ and the iPad Pro 11; step 2 on the emulator; step 3 on the emulator and the
 iPhone 16 Pro. Screen readers heard «Iniciar sesión, busy» and «Cerrar mi
 cuenta, busy» on Android.
 
+### The admin web (WEB-023)
+
+The admin web follows the same rule. A 16 px ring turns once every 0.8
+seconds in place of the label: white on Palo de rosa, Error on the Error
+outline. The button keeps its colour, width, and height, its label stays
+readable to screen readers (`aria-busy`), and a second click or Enter sends
+nothing. Only the button that sent the request spins. In a panel with two
+actions, such as «Ocultar en la app» beside «Guardar» on a Plan, the other
+one only turns grey. The confirming button of every «¿…?» dialog spins too.
+
+To see it, put the same kind of proxy on port 3111 in front of the API on
+3110 (non-GET requests held 4 seconds) and start the admin web with
+`ADMIN_API_PROXY_TARGET=http://127.0.0.1:3111 pnpm dev:admin`. At 1440 and
+420 px:
+
+1. «Tu cuenta» → «Cerrar sesión» → «Cerrar sesión»: the outlined Error
+   button spins in Error until the Login page opens.
+2. Log in as `paola.mendoza@example.com`: «Iniciar sesión» spins white
+   until Horario opens.
+3. Planes → a Plan → «Ocultar en la app»: the link spins and «Guardar» is
+   grey; click «Mostrar en la app» afterwards to put it back.
+4. «Nueva sesión» at an hour another Session already takes: «Guardar» spins,
+   ignores a second click, then shows "Se cruza con otra sesión…".
+
+Verified on 2026-10-16 in the built-in browser: step 1 and step 3 at 1440
+px; step 2 at 1440 px; step 4 at 420 px.
+
 ## Test 51: the studio QR is drawn whole and opens full screen
 
 `10`'s studio QR (MOB-062, design follow-up 95) keeps its own proportions
