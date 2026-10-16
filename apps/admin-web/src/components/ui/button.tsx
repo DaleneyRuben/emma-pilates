@@ -44,7 +44,8 @@ type ButtonProps = ComponentProps<"button"> &
 // Busy (follow-up 93): fill, border, and size stay; a 16 px ring in the
 // label's colour turns where the label was (kept invisibly for width);
 // clicks and Enter are swallowed so the request is never sent twice. It is
-// not `disabled`, whose grey reads as unavailable.
+// not `disabled` (even when the caller also disables it), whose grey reads
+// as unavailable.
 export function Button({
   className,
   variant,
@@ -52,6 +53,7 @@ export function Button({
   asChild = false,
   type = "button",
   busy = false,
+  disabled,
   children,
   onClick,
   ...props
@@ -67,6 +69,7 @@ export function Button({
         buttonVariants({ variant, size, className }),
         working && "relative",
       )}
+      disabled={working ? false : disabled}
       aria-busy={working ? true : undefined}
       onClick={(event: React.MouseEvent<HTMLButtonElement>) => {
         if (working) {

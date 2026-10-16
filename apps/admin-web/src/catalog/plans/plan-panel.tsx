@@ -183,13 +183,19 @@ export function PlanPanelForm({
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" disabled={change.isPending}>
+          <Button
+            type="submit"
+            size="lg"
+            busy={change.isPending && change.variables?.kind !== "visibility"}
+            disabled={change.isPending}
+          >
             Guardar
           </Button>
           {plan === undefined ? null : (
             <Button
               variant="link"
               className="self-center"
+              busy={change.isPending && change.variables?.kind === "visibility"}
               disabled={change.isPending}
               onClick={() =>
                 void run(() =>

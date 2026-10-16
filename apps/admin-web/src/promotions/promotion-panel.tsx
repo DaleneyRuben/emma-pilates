@@ -32,7 +32,10 @@ import {
   type AttachedImage,
 } from "./promotion-image-field";
 import { imageUrlFor } from "./promotion-format";
-import { PromotionPanelFooter } from "./promotion-panel-footer";
+import {
+  PromotionPanelFooter,
+  type FooterAction,
+} from "./promotion-panel-footer";
 import { promotionFailureMessage } from "./promotion-problems";
 import { usePromotionChange } from "./promotion-queries";
 
@@ -84,6 +87,7 @@ export function PromotionPanelForm({
   const [image, setImage] = useState(attachedImage(promotion));
   const [failure, setFailure] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [sending, setSending] = useState<FooterAction | null>(null);
   const form = useForm<PromotionInput, unknown, PromotionOutput>({
     resolver: zodResolver(promotionSchema),
     defaultValues: {
@@ -115,6 +119,7 @@ export function PromotionPanelForm({
       setFailure(promotionFailureMessage(error));
     } finally {
       setDeleting(false);
+      setSending(null);
     }
   };
 
@@ -140,22 +145,25 @@ export function PromotionPanelForm({
   };
 
   const save = (outcome: Outcome) =>
-    form.handleSubmit((values) =>
-      run(async () => {
+    form.handleSubmit((values) => {
+      setSending(outcome);
+      return run(async () => {
         const row = await persist(values);
         if (outcome === "publish") {
           await change.mutateAsync({ kind: "publish", promotionId: row.id });
         }
         return `Promoción «${row.headline}» ${notices[outcome]}`;
-      }),
-    )();
+      });
+    })();
 
-  const unpublish = () =>
-    run(async () => {
+  const unpublish = () => {
+    setSending("unpublish");
+    return run(async () => {
       if (saved === undefined) throw new Error("unsaved");
       await change.mutateAsync({ kind: "unpublish", promotionId: saved.id });
       return `Promoción «${saved.headline}» ya no se publica en la app.`;
     });
+  };
 
   // Delete archives the row and releases its image (BKM-001, ADR-0076).
   const remove = () =>
@@ -259,6 +267,7 @@ export function PromotionPanelForm({
           published={published}
           publishable={publishable}
           pending={change.isPending}
+          sending={sending}
           editing={saved !== undefined}
           onSaveDraft={() => void save("draft")}
           onPublish={() => void save("publish")}
@@ -273,7 +282,7 @@ export function PromotionPanelForm({
           onOpenChange={setDeleting}
           title={`¿Eliminar la promoción «${saved.headline}»?`}
           confirmLabel="Eliminar"
-          pending={change.isPending}
+          busy={change.isPending}
           onConfirm={() => void remove()}
         >
           <p>

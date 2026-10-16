@@ -220,7 +220,8 @@ export function SupplyMovementForm({
           <Button
             type="submit"
             size="lg"
-            disabled={movement.isPending || empty || over}
+            disabled={empty || over}
+            busy={movement.isPending}
           >
             Registrar
           </Button>

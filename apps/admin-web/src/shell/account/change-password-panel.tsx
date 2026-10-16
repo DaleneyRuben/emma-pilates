@@ -135,7 +135,8 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
                 type="submit"
                 size="lg"
                 className="w-full"
-                disabled={!isValid || isSubmitting}
+                disabled={!isValid}
+                busy={isSubmitting}
               >
                 Guardar contraseña
               </Button>

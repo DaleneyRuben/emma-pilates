@@ -128,7 +128,8 @@ function StaffCreateForm({ onDone }: { onDone: (notice?: string) => void }) {
           <Button
             type="submit"
             size="lg"
-            disabled={change.isPending || accountWait > 0}
+            disabled={accountWait > 0}
+            busy={change.isPending}
           >
             Guardar
           </Button>
