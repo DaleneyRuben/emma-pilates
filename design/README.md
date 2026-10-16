@@ -201,6 +201,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - Header: 18px 22px, bottom border `#EFE6DC`; Lora 22 title + 11.5px context line; 30px square close button (1px `#E4D8CC`, `#FAF7F2`, hover border `#B78380`).
 - Body: padding 20px 22px, 18px gaps. Field = 10.5px uppercase label + 44px control (48px on mobile) + optional 11.5px `#7A716D` helper.
 - Inputs: 1px `#D8C9BB`, radius 8, white, 14px text; focus ring as above. Unit suffixes ("min", "pers.", "unid.") and currency prefixes ("Bs") are fixed segments inside the control with a `#EFE6DC` divider and `#FDFAF6` fill.
+- Password inputs carry an eye button inside the right end (20px outline eye, 1.3px stroke, `#766D69`; 44px touch target on mobile, 40px on the admin web; right padding 52px/48px). Every field starts hidden; a tap shows the text with the eye-off and a second tap hides it, keeping the value and the cursor. Its label is the action: «Mostrar contraseña» / «Ocultar contraseña» (a real `button type="button"` with `aria-pressed` on the web).
 - Two short numeric fields share a row via `grid-template-columns:minmax(0,1fr) minmax(0,1fr)` (prevents overflow).
 - Read-only values render as a `#FAF7F2` row with 1px `#EFE6DC`, a padlock icon, and an explanation.
 - Footer: padding 18px 22px, top border `#EFE6DC`, full-width primary button (46px).

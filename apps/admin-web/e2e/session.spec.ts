@@ -99,7 +99,9 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
     await page
       .getByLabel("Correo electrónico")
       .fill(fixtures.administrator.email);
-    await page.getByLabel("Contraseña").fill(fixtures.password);
+    await page
+      .getByLabel("Contraseña", { exact: true })
+      .fill(fixtures.password);
     await page.getByRole("button", { name: "Iniciar sesión" }).click();
 
     await expect(

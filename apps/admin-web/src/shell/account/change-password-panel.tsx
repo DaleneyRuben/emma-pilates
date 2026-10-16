@@ -18,7 +18,7 @@ import {
   FormMessage,
 } from "../../components/form/form";
 import { Button } from "../../components/ui/button";
-import { Input } from "../../components/ui/input";
+import { PasswordInput } from "../../components/ui/password-input";
 import {
   SheetContent,
   SheetDescription,
@@ -113,11 +113,7 @@ export function ChangePasswordPanel({ narrow }: { narrow: boolean }) {
                     <FormItem>
                       <FormLabel>{label}</FormLabel>
                       <FormControl>
-                        <Input
-                          type="password"
-                          autoComplete={autoComplete}
-                          {...field}
-                        />
+                        <PasswordInput autoComplete={autoComplete} {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
