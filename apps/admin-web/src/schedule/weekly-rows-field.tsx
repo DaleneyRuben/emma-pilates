@@ -35,7 +35,7 @@ export function WeeklyRowsField() {
           name={`rows.${index}.time`}
           render={({ field: time, fieldState }) => (
             <FormItem>
-              <div className="grid grid-cols-[minmax(0,1fr)_96px_96px_30px] items-center gap-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_84px_104px_30px] items-center gap-2">
                 <FormField
                   control={control}
                   name={`rows.${index}.weekday`}
@@ -72,6 +72,7 @@ export function WeeklyRowsField() {
                     <FormItem>
                       <FormControl>
                         <MinutesInput
+                          compact
                           aria-label={`Duración, fila ${index + 1}, en minutos`}
                           {...minutes}
                         />

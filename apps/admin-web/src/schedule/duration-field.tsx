@@ -11,8 +11,12 @@ import {
 import { cn } from "../lib/cn";
 
 // Follow-up 98: AW07's former Duración box, with the fixed «min» suffix
-// inside the control.
-export function MinutesInput({ className, ...props }: ComponentProps<"input">) {
+// inside the control; a weekly row uses the compact padding.
+export function MinutesInput({
+  className,
+  compact = false,
+  ...props
+}: ComponentProps<"input"> & { compact?: boolean }) {
   return (
     <div
       className={cn(
@@ -22,12 +26,18 @@ export function MinutesInput({ className, ...props }: ComponentProps<"input">) {
     >
       <input
         inputMode="numeric"
-        className="h-full min-w-0 flex-1 bg-transparent px-3 text-cuerpo text-texto tabular outline-none"
+        className={cn(
+          "h-full min-w-0 flex-1 bg-transparent text-cuerpo text-texto tabular outline-none",
+          compact ? "pr-2 pl-2.5" : "px-3",
+        )}
         {...props}
       />
       <span
         aria-hidden="true"
-        className="flex h-full items-center border-l border-divisor bg-superficie px-3 text-nota text-texto-tenue"
+        className={cn(
+          "flex h-full items-center border-l border-divisor bg-superficie text-nota text-texto-tenue",
+          compact ? "px-2" : "px-3",
+        )}
       >
         min
       </span>
