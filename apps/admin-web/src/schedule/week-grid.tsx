@@ -1,14 +1,10 @@
 import type { AdministratorSessionAvailabilityDto } from "@pilates/api-contracts";
-import { Plus } from "lucide-react";
-import {
-  addDays,
-  boliviaParts,
-  formatDayTab,
-  formatLongDay,
-} from "../lib/bolivia-time";
+import { addDays, formatDayTab } from "../lib/bolivia-time";
 import { cn } from "../lib/cn";
 import type { SessionStart } from "./session-create-form";
 import { SessionBlock } from "./session-block";
+import { EmptySlot } from "./empty-slot";
+import { dayItems, hourLabel, sessionSpan } from "./week-slots";
 
 type Session = AdministratorSessionAvailabilityDto;
 
@@ -19,56 +15,11 @@ function hourRange(sessions: readonly Session[]) {
   let first = 6;
   let last = 22;
   for (const session of sessions) {
-    first = Math.min(
-      first,
-      Math.floor(boliviaParts(session.startsAt).minutes / 60),
-    );
-    const end = boliviaParts(session.endsAt);
-    const endMinutes =
-      end.date === boliviaParts(session.startsAt).date ? end.minutes : 24 * 60;
-    last = Math.max(last, Math.ceil(endMinutes / 60));
+    const { start, end } = sessionSpan(session);
+    first = Math.min(first, Math.floor(start / 60));
+    last = Math.max(last, Math.ceil(end / 60));
   }
   return { first, last };
-}
-
-const pad = (hour: number) => `${String(hour).padStart(2, "0")}:00`;
-
-/** Minutes of a Session on its Bolivia start day, clipped at midnight. */
-function span(session: Session) {
-  const start = boliviaParts(session.startsAt);
-  const end = boliviaParts(session.endsAt);
-  return {
-    start: start.minutes,
-    end: end.date === start.date ? end.minutes : 24 * 60,
-  };
-}
-
-// Follow-up 96: every hour of a day that no Session fully covers is an empty
-// slot that opens «Nueva sesión» there. Slots sit before the blocks of the
-// same start in the DOM, so Tab follows the day and blocks paint on top.
-function dayItems(day: string, hours: number[], sessions: readonly Session[]) {
-  const ofDay = sessions.filter(
-    (session) => boliviaParts(session.startsAt).date === day,
-  );
-  const spans = ofDay.map(span);
-  const slots = hours
-    .filter(
-      (hour) =>
-        !spans.some(
-          ({ start, end }) => start <= hour * 60 && end >= (hour + 1) * 60,
-        ),
-    )
-    .map((hour) => ({ kind: "slot" as const, hour, minutes: hour * 60 }));
-  const blocks = ofDay.map((session, index) => ({
-    kind: "session" as const,
-    session,
-    minutes: spans[index]?.start ?? 0,
-  }));
-  return [...slots, ...blocks].sort(
-    (a, b) =>
-      a.minutes - b.minutes ||
-      (a.kind === b.kind ? 0 : a.kind === "slot" ? -1 : 1),
-  );
 }
 
 // AW02 desktop: seven day columns on a shared Bolivia time axis. A Branch
@@ -135,7 +86,7 @@ export function WeekGrid({
               className="absolute right-2 -translate-y-1/2 text-ayuda text-texto-muy-tenue tabular"
               style={{ top: index * hourHeight }}
             >
-              {index === 0 ? null : pad(hour)}
+              {index === 0 ? null : hourLabel(hour)}
             </span>
           ))}
         </div>
@@ -154,27 +105,17 @@ export function WeekGrid({
           >
             {dayItems(day, hours, sessions).map((item) => {
               if (item.kind === "slot") {
-                const time = pad(item.hour);
                 return (
-                  <button
-                    key={time}
-                    type="button"
-                    aria-label={`Nueva sesión el ${formatLongDay(day)} a las ${time}`}
-                    onClick={() => onCreate({ date: day, time })}
-                    className="group absolute inset-x-1 flex items-start gap-1 rounded-control border border-dashed border-transparent px-2 py-1 text-ayuda font-medium text-primario-profundo hover:border-primario hover:bg-hover-fila focus-visible:border-primario focus-visible:bg-hover-fila focus-visible:shadow-foco"
+                  <EmptySlot
+                    key={item.hour}
+                    day={day}
+                    hour={item.hour}
+                    onCreate={onCreate}
                     style={{
                       top: (item.hour - first) * hourHeight + 1,
                       height: hourHeight - 2,
                     }}
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="flex items-center gap-1 opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100"
-                    >
-                      <Plus size={14} strokeWidth={1.8} />
-                      {time}
-                    </span>
-                  </button>
+                  />
                 );
               }
               const { session } = item;
