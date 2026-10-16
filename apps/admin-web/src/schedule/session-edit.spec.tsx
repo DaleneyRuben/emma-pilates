@@ -166,6 +166,7 @@ describe("AW03 Editar sesión on a desktop browser", () => {
         trainerStaffMemberId: valeria.id,
         weekday: 1,
         startsAtLocal: "07:30",
+        durationMinutes: 50,
         capacity: 10,
         effectiveFrom: dayOfNextWeek(0),
       }),

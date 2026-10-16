@@ -22,7 +22,6 @@ export const reformer: AdminClassTypeDto = {
   id: "5d0c7a4e-3b1f-5b7a-8c2d-000000000001",
   name: "Reformer Pilates",
   description: "Fuerza y control en la máquina.",
-  durationMinutes: 50,
   defaultCapacity: 10,
   equipmentNeeds: "Reformer",
   archivedAt: null,
@@ -31,7 +30,6 @@ export const mat: AdminClassTypeDto = {
   id: "5d0c7a4e-3b1f-5b7a-8c2d-000000000002",
   name: "Mat Pilates",
   description: "Clase en colchoneta.",
-  durationMinutes: 45,
   defaultCapacity: 14,
   equipmentNeeds: null,
   archivedAt: null,
@@ -75,6 +73,7 @@ const session = (
     bookedCount: number;
     waitlistCount: number;
     sessionScheduleId: string | null;
+    minutes: number;
   }> = {},
 ) => {
   const startsAt = boliviaInstant(date, time);
@@ -90,7 +89,7 @@ const session = (
     trainerName: trainerMember.name,
     startsAt,
     endsAt: new Date(
-      new Date(startsAt).getTime() + classType.durationMinutes * 60_000,
+      new Date(startsAt).getTime() + (extra.minutes ?? 50) * 60_000,
     ).toISOString(),
     capacity,
     bookedCount,
@@ -115,7 +114,7 @@ export const wednesdayMat = session(
   daniela,
   dayOfNextWeek(2),
   "16:00",
-  { capacity: 10, bookedCount: 10, waitlistCount: 3 },
+  { capacity: 10, bookedCount: 10, waitlistCount: 3, minutes: 45 },
 );
 export const saturdayEmpty = session(
   "1e000000-0000-5000-8000-000000000003",
@@ -138,7 +137,7 @@ export const mondaySchedule = {
   effectiveFrom: addDays(nextMonday, -14),
   effectiveUntil: null,
   classTypeName: reformer.name,
-  durationMinutes: reformer.durationMinutes,
+  durationMinutes: 50,
 };
 
 // What the Session form reads: active Class Types, the Branch's Trainers,

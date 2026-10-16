@@ -103,6 +103,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
         classTypeId: reformer.id,
         trainerStaffMemberId: valeria.id,
         startsAt: boliviaInstant(dayOfNextWeek(3), "18:30"),
+        durationMinutes: 60,
         capacity: 10,
       }),
     );
@@ -157,7 +158,7 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
         trainerStaffMemberId: daniela.id,
         capacity: 12,
         effectiveFrom: nextMonday,
-        rows: [{ weekday: 3, startsAtLocal: "19:00" }],
+        rows: [{ weekday: 3, startsAtLocal: "19:00", durationMinutes: 60 }],
       }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(

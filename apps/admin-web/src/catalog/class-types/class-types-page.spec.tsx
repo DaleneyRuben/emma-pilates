@@ -18,7 +18,6 @@ const reformer = {
   id: "5d0c7a4e-3b1f-5b7a-8c2d-000000000001",
   name: "Reformer Pilates",
   description: "Trabajo de fuerza y control en la máquina.",
-  durationMinutes: 50,
   defaultCapacity: 10,
   equipmentNeeds: "Reformer",
   archivedAt: null,
@@ -27,7 +26,6 @@ const mat = {
   id: "5d0c7a4e-3b1f-5b7a-8c2d-000000000002",
   name: "Mat Pilates",
   description: "Clase en colchoneta.",
-  durationMinutes: 45,
   defaultCapacity: 14,
   equipmentNeeds: null,
   archivedAt: null,
@@ -48,7 +46,7 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
     server.use(...signedInHandlers());
   });
 
-  it("lists Class Types with duration, capacity, and equipment, filtered from the address", async () => {
+  it("lists Class Types with capacity and equipment but no duration, filtered from the address", async () => {
     server.use(classTypeTable(() => jsonResponse(page([mat, reformer]))));
     const { router, user } = renderAdmin("/catalogo/tipos-de-clase");
 
@@ -58,10 +56,8 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
     expect(screen.getByText("Cargando tipos de clase…")).toBeInTheDocument();
     const row = (await screen.findByRole("cell", { name: /Reformer Pilates/ }))
       .parentElement as HTMLElement;
-    expect(within(row).getByRole("cell", { name: "50 min" })).toHaveAttribute(
-      "data-label",
-      "Duración",
-    );
+    // A Class Type has no duration (WEB-027, booking ADR-0004).
+    expect(screen.queryByRole("columnheader", { name: "Duración" })).toBeNull();
     expect(within(row).getByRole("cell", { name: "10" })).toBeInTheDocument();
     expect(
       within(row).getByText("Trabajo de fuerza y control en la máquina."),
@@ -144,8 +140,8 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
       name: "Nuevo tipo de clase",
     });
     await user.type(within(panel).getByLabelText("Nombre"), "Mat Pilates");
-    await user.type(within(panel).getByLabelText("Duración"), "3");
-    await user.type(within(panel).getByLabelText("Capacidad"), "14");
+    expect(within(panel).queryByLabelText("Duración")).toBeNull();
+    await user.type(within(panel).getByLabelText("Capacidad"), "0");
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     expect(
@@ -154,24 +150,23 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
       expect.stringContaining("Escribe una descripción."),
     );
     expect(
-      within(panel).getByLabelText("Duración"),
+      within(panel).getByLabelText("Capacidad"),
     ).toHaveAccessibleDescription(
-      expect.stringContaining("Entre 5 y 240 minutos."),
+      expect.stringContaining("Entre 1 y 100 lugares."),
     );
 
     await user.type(
       within(panel).getByLabelText("Descripción"),
       "Clase en colchoneta.",
     );
-    await user.clear(within(panel).getByLabelText("Duración"));
-    await user.type(within(panel).getByLabelText("Duración"), "45");
+    await user.clear(within(panel).getByLabelText("Capacidad"));
+    await user.type(within(panel).getByLabelText("Capacidad"), "14");
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
     await waitFor(() =>
       expect(body).toEqual({
         name: "Mat Pilates",
         description: "Clase en colchoneta.",
-        durationMinutes: 45,
         defaultCapacity: 14,
         equipmentNeeds: null,
       }),
@@ -201,7 +196,6 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
 
     await user.type(within(panel).getByLabelText("Nombre"), "Reformer Pilates");
     await user.type(within(panel).getByLabelText("Descripción"), "Otra.");
-    await user.type(within(panel).getByLabelText("Duración"), "50");
     await user.type(within(panel).getByLabelText("Capacidad"), "10");
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
@@ -268,7 +262,6 @@ describe("AW06 Tipos de clase on a desktop browser", () => {
       expect(body).toEqual({
         name: "Reformer Pilates",
         description: "Trabajo de fuerza y control en la máquina.",
-        durationMinutes: 50,
         defaultCapacity: 8,
         equipmentNeeds: "Reformer",
       }),

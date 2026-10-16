@@ -58,7 +58,7 @@ describe("AW03 Cada semana with several days", () => {
     );
   });
 
-  it("creates every row together with the Class Type's duration and counts them in one notice", async () => {
+  it("creates every row together with its own duration and counts them in one notice", async () => {
     let body: unknown;
     server.use(
       http.post(apiUrl(batchPath), async ({ request }) => {
@@ -96,9 +96,13 @@ describe("AW03 Cada semana with several days", () => {
     await user.selectOptions(day(panel, 3), "5");
     await user.clear(hour(panel, 3));
     await user.type(hour(panel, 3), "18:30");
-    expect(within(panel).getAllByText("45 min")).toHaveLength(3);
     expect(
-      within(panel).getByText("Cada día usa la duración del tipo de clase."),
+      within(panel).getByLabelText("Duración, fila 3, en minutos"),
+    ).toHaveValue("60");
+    expect(
+      within(panel).getByText(
+        "Cada día puede durar distinto; empieza en 60 minutos.",
+      ),
     ).toBeInTheDocument();
 
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
@@ -111,9 +115,9 @@ describe("AW03 Cada semana with several days", () => {
         capacity: mat.defaultCapacity,
         effectiveFrom: nextMonday,
         rows: [
-          { weekday: 1, startsAtLocal: "07:00" },
-          { weekday: 3, startsAtLocal: "07:00" },
-          { weekday: 5, startsAtLocal: "18:30" },
+          { weekday: 1, startsAtLocal: "07:00", durationMinutes: 60 },
+          { weekday: 3, startsAtLocal: "07:00", durationMinutes: 60 },
+          { weekday: 5, startsAtLocal: "18:30", durationMinutes: 60 },
         ],
       }),
     );
