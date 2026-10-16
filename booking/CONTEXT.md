@@ -13,15 +13,15 @@ A client's access to a Plan over a fixed date range (start date to a paid-throug
 _Avoid_: Membership
 
 **Class Type**:
-The catalog definition of a kind of class — e.g. "Reformer Pilates", "Mat Pilates" — with a short client-facing description, duration, capacity, and equipment needs.
+The catalog definition of a kind of class — e.g. "Reformer Pilates", "Mat Pilates" — with a short client-facing description, a default capacity, and equipment needs. A Class Type has no duration: how long a class lasts belongs to each Session and Session Schedule ([ADR-0004](./docs/adr/0004-session-owns-its-duration.md)).
 _Avoid_: Class (when referring to the catalog entry)
 
 **Session**:
-A specific scheduled, bookable occurrence of a Class Type, at a given time, with an assigned Trainer and a capacity. A Trainer cannot lead overlapping Sessions, even at different Branches. Capacity defaults from the Class Type but can be overridden per Session (e.g. reduced due to equipment being out of service). Clients book Sessions, not Class Types. A Session is cancelled automatically by the system via a one-time check at 2 hours before its start time: if it has zero Bookings at that point, it's cancelled — the Trainer does not cancel it manually, and a Session that drops to zero Bookings earlier stays normally bookable until that check runs. An Administrator can also cancel a Session that has Bookings, as a last resort when no substitute Trainer can cover it: every Booking on it is cancelled, each client's allowance unit is refunded even inside the Cancellation Window, and the clients are notified.
+A specific scheduled, bookable occurrence of a Class Type, at a given time and for its own duration, with an assigned Trainer and a capacity. A Trainer cannot lead overlapping Sessions, even at different Branches. Capacity defaults from the Class Type but can be overridden per Session (e.g. reduced due to equipment being out of service). Clients book Sessions, not Class Types. A Session is cancelled automatically by the system via a one-time check at 2 hours before its start time: if it has zero Bookings at that point, it's cancelled — the Trainer does not cancel it manually, and a Session that drops to zero Bookings earlier stays normally bookable until that check runs. An Administrator can also cancel a Session that has Bookings, as a last resort when no substitute Trainer can cover it: every Booking on it is cancelled, each client's allowance unit is refunded even inside the Cancellation Window, and the clients are notified.
 _Avoid_: Class (when referring to a specific occurrence)
 
 **Session Schedule**:
-An Administrator-defined weekly pattern for a Class Type, Branch, Trainer, time, and normal capacity that generates concrete Sessions up to 30 days ahead. A change takes effect from a selected future date and updates only unbooked future Sessions; Sessions that already have Bookings remain unchanged unless an Administrator explicitly edits or cancels them.
+An Administrator-defined weekly pattern for a Class Type, Branch, Trainer, time, duration, and normal capacity that generates concrete Sessions up to 30 days ahead. A change takes effect from a selected future date and updates only unbooked future Sessions; Sessions that already have Bookings remain unchanged unless an Administrator explicitly edits or cancels them.
 _Avoid_: Recurring Session, schedule template
 
 **Booking**:
