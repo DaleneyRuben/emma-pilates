@@ -1,9 +1,8 @@
 import { cleanup, fireEvent, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
-import { Image } from "react-native";
 
 import { jsonResponse, routeFetcher } from "../test-support";
-import { baseRoutes, intent, openPlanDetail } from "./purchase-test-support";
+import { baseRoutes, intent, openPlanDetail, pngHeader } from "./purchase-test-support";
 
 jest.setTimeout(30_000);
 
@@ -11,6 +10,9 @@ async function openPayment() {
   const screen = await openPlanDetail(
     routeFetcher({
       ...baseRoutes(0),
+      // A bank QR exported wider than tall.
+      "/api/v1/transfer-instructions/qr": () =>
+        new Response(pngHeader(400, 200), { headers: { "Content-Type": "image/png" } }),
       "POST /api/v1/purchase-intents": () => jsonResponse(intent, 201),
     }),
   );
@@ -23,19 +25,9 @@ async function openPayment() {
 
 // MOB-062, design follow-up 95: the studio QR on 10.
 describe("Client payment QR", () => {
-  beforeEach(() => {
-    // A bank QR exported wider than tall.
-    jest
-      .spyOn(Image, "getSize")
-      .mockImplementation((_uri: string, success: (width: number, height: number) => void) =>
-        success(400, 200),
-      );
-  });
-
   afterEach(async () => {
     await cleanup();
     clearMobileQueryCache();
-    jest.restoreAllMocks();
   });
 
   it("draws the QR whole at its own proportions", async () => {
