@@ -37,7 +37,6 @@ describe('Prisma catalog lists', () => {
       data: {
         name: 'Barre archivado',
         description: 'Ya no se dicta.',
-        durationMinutes: 50,
         defaultCapacity: 8,
         archivedAt: fixtureNow,
       },

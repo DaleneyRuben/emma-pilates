@@ -15,7 +15,6 @@ const classTypeSelect = {
   id: true,
   name: true,
   description: true,
-  durationMinutes: true,
   defaultCapacity: true,
   equipmentNeeds: true,
 } as const;
@@ -124,7 +123,6 @@ export function createCatalogRepository(
                 id: true,
                 name: true,
                 description: true,
-                durationMinutes: true,
               },
             },
             trainer: { select: { name: true } },
@@ -142,7 +140,12 @@ export function createCatalogRepository(
             : {
                 id: session.id,
                 branch: session.branch,
-                classType: session.classType,
+                classType: {
+                  ...session.classType,
+                  durationMinutes:
+                    (session.endsAt.getTime() - session.startsAt.getTime()) /
+                    60_000,
+                },
                 trainerName: session.trainer.name,
                 startsAt: session.startsAt,
                 endsAt: session.endsAt,
@@ -286,6 +289,7 @@ export function createCatalogRepository(
           trainerStaffMemberId: true,
           weekday: true,
           startsAtLocal: true,
+          durationMinutes: true,
           capacity: true,
           effectiveFrom: true,
           effectiveUntil: true,

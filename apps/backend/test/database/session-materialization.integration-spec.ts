@@ -30,6 +30,7 @@ describe('Prisma Session materialization', () => {
       trainer: string;
       weekday: number;
       startsAtLocal: Date;
+      durationMinutes?: number;
       capacity?: number;
       effectiveFrom?: Date;
       effectiveUntil?: Date;
@@ -44,6 +45,7 @@ describe('Prisma Session materialization', () => {
         trainerStaffMemberId: idOf(`staff:${values.trainer}`),
         weekday: values.weekday,
         startsAtLocal: values.startsAtLocal,
+        durationMinutes: values.durationMinutes ?? 50,
         capacity: values.capacity ?? 10,
         effectiveFrom: values.effectiveFrom ?? civil('2026-09-01'),
         effectiveUntil: values.effectiveUntil,
@@ -82,17 +84,16 @@ describe('Prisma Session materialization', () => {
         },
       });
     }
-    for (const [key, durationMinutes, archivedAt] of [
-      ['reformer', 50, null],
-      ['mat', 45, null],
-      ['retired', 45, at('2026-09-01T12:00:00.000Z')],
+    for (const [key, archivedAt] of [
+      ['reformer', null],
+      ['mat', null],
+      ['retired', at('2026-09-01T12:00:00.000Z')],
     ] as const) {
       await prisma.classType.create({
         data: {
           id: idOf(`class-type:${key}`),
           name: key,
           description: `${key} description`,
-          durationMinutes,
           defaultCapacity: 12,
           archivedAt,
         },

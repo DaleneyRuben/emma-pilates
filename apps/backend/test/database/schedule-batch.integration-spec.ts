@@ -54,8 +54,8 @@ describe('Prisma weekly schedule batch (WEB-025)', () => {
       {
         ...shared,
         rows: [
-          { weekday: 2, startsAtLocal: '06:00' },
-          { weekday: 4, startsAtLocal: '20:30' },
+          { weekday: 2, startsAtLocal: '06:00', durationMinutes: 50 },
+          { weekday: 4, startsAtLocal: '20:30', durationMinutes: 50 },
         ],
       },
       await administrator(),
@@ -92,8 +92,8 @@ describe('Prisma weekly schedule batch (WEB-025)', () => {
           {
             ...shared,
             rows: [
-              { weekday: 6, startsAtLocal: '06:00' },
-              { weekday: 6, startsAtLocal: '06:30' },
+              { weekday: 6, startsAtLocal: '06:00', durationMinutes: 50 },
+              { weekday: 6, startsAtLocal: '06:30', durationMinutes: 50 },
             ],
           },
           admin,
@@ -106,7 +106,7 @@ describe('Prisma weekly schedule batch (WEB-025)', () => {
           {
             ...shared,
             trainerStaffMemberId: staff('andrea'),
-            rows: [{ weekday: 6, startsAtLocal: '06:00' }],
+            rows: [{ weekday: 6, startsAtLocal: '06:00', durationMinutes: 50 }],
           },
           admin,
         ),
@@ -118,7 +118,7 @@ describe('Prisma weekly schedule batch (WEB-025)', () => {
           {
             ...shared,
             effectiveFrom: civil('2026-09-01'),
-            rows: [{ weekday: 6, startsAtLocal: '06:00' }],
+            rows: [{ weekday: 6, startsAtLocal: '06:00', durationMinutes: 50 }],
           },
           admin,
         ),
@@ -127,7 +127,10 @@ describe('Prisma weekly schedule batch (WEB-025)', () => {
     await expect(
       codeOf(
         batch().createSchedules(
-          { ...shared, rows: [{ weekday: 6, startsAtLocal: '06:00' }] },
+          {
+            ...shared,
+            rows: [{ weekday: 6, startsAtLocal: '06:00', durationMinutes: 50 }],
+          },
           await world.principalOf('camila.rojas@example.com'),
         ),
       ),

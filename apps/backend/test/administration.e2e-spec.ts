@@ -28,7 +28,8 @@ const schedule = {
   capacity: 10,
   effectiveFrom: new Date('2026-09-22T00:00:00.000Z'),
   effectiveUntil: null,
-  classType: { durationMinutes: 50, name: 'Mat Pilates' },
+  durationMinutes: 50,
+  classType: { name: 'Mat Pilates' },
 };
 const session = {
   id,
@@ -201,6 +202,7 @@ describe('administration endpoints (e2e)', () => {
         trainerStaffMemberId: other,
         weekday: 3,
         startsAtLocal: '12:00',
+        durationMinutes: 50,
         capacity: 10,
         effectiveFrom: '2026-09-22',
       })
@@ -238,8 +240,8 @@ describe('administration endpoints (e2e)', () => {
       ],
     });
     const rows = [
-      { weekday: 3, startsAtLocal: '12:00' },
-      { weekday: 5, startsAtLocal: '12:00' },
+      { weekday: 3, startsAtLocal: '12:00', durationMinutes: 50 },
+      { weekday: 5, startsAtLocal: '12:00', durationMinutes: 50 },
     ];
     await request(app.getHttpServer())
       .post('/api/v1/administrator/session-schedules/batch')
@@ -344,6 +346,7 @@ describe('administration endpoints (e2e)', () => {
         classTypeId: other,
         trainerStaffMemberId: other,
         startsAt: '2026-09-26T19:00:00.000Z',
+        durationMinutes: 50,
       })
       .expect(201);
   });

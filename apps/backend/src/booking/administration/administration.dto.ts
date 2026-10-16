@@ -24,7 +24,6 @@ export class AdminClassTypeDto {
   @ApiProperty({ format: 'uuid' }) id!: string;
   @ApiProperty() name!: string;
   @ApiProperty() description!: string;
-  @ApiProperty() durationMinutes!: number;
   @ApiProperty() defaultCapacity!: number;
   @ApiProperty({ type: String, nullable: true }) equipmentNeeds!: string | null;
   @ApiProperty({ type: String, format: 'date-time', nullable: true })
@@ -34,7 +33,6 @@ export class AdminClassTypeDto {
 export class ClassTypeInputDto {
   @ApiProperty({ maxLength: 80 }) name!: string;
   @ApiProperty({ maxLength: 280 }) description!: string;
-  @ApiProperty({ minimum: 5, maximum: 240 }) durationMinutes!: number;
   @ApiProperty({ minimum: 1, maximum: 100 }) defaultCapacity!: number;
   @ApiProperty({ type: String, nullable: true, required: false })
   equipmentNeeds?: string | null;
@@ -72,7 +70,6 @@ export const parseClassTypeInput = (value: unknown) =>
     .strictObject({
       name: text(80),
       description: text(280),
-      durationMinutes: z.int().min(5).max(240),
       defaultCapacity: z.int().min(1).max(100),
       equipmentNeeds: z.string().trim().max(160).nullable().optional(),
     })
@@ -116,6 +113,7 @@ export class AdminSessionScheduleDto {
   weekday!: number;
   @ApiProperty({ example: '09:00', description: 'Bolivia wall clock' })
   startsAtLocal!: string;
+  @ApiProperty({ minimum: 5, maximum: 240 }) durationMinutes!: number;
   @ApiProperty() capacity!: number;
   @ApiProperty({ format: 'date' }) effectiveFrom!: string;
   @ApiProperty({
@@ -126,7 +124,6 @@ export class AdminSessionScheduleDto {
   })
   effectiveUntil!: string | null;
   @ApiProperty() classTypeName!: string;
-  @ApiProperty() durationMinutes!: number;
 }
 
 export class SessionScheduleInputDto {
@@ -135,6 +132,7 @@ export class SessionScheduleInputDto {
   @ApiProperty({ format: 'uuid' }) trainerStaffMemberId!: string;
   @ApiProperty({ minimum: 1, maximum: 7 }) weekday!: number;
   @ApiProperty({ example: '09:00' }) startsAtLocal!: string;
+  @ApiProperty({ minimum: 5, maximum: 240 }) durationMinutes!: number;
   @ApiProperty({ minimum: 1 }) capacity!: number;
   @ApiProperty({ format: 'date', description: 'Vigente desde, today or later' })
   effectiveFrom!: string;
@@ -193,6 +191,7 @@ export class SessionInputDto {
   @ApiProperty({ format: 'uuid' }) classTypeId!: string;
   @ApiProperty({ format: 'uuid' }) trainerStaffMemberId!: string;
   @ApiProperty({ format: 'date-time' }) startsAt!: string;
+  @ApiProperty({ minimum: 5, maximum: 240 }) durationMinutes!: number;
   @ApiProperty({
     required: false,
     description: 'Defaults to the Class Type capacity',
@@ -204,8 +203,13 @@ export class SessionChangeDto {
   @ApiProperty({ format: 'uuid', required: false })
   trainerStaffMemberId?: string;
   @ApiProperty({ format: 'date-time', required: false }) startsAt?: string;
+  @ApiProperty({ minimum: 5, maximum: 240, required: false })
+  durationMinutes?: number;
   @ApiProperty({ required: false }) capacity?: number;
 }
+
+// How long a Session or weekly row lasts (booking ADR-0004).
+export const sessionMinutes = z.int().min(5).max(240);
 
 const toCivilDate = (value: string) => new Date(`${value}T00:00:00.000Z`);
 
@@ -215,6 +219,7 @@ const scheduleFields = {
   trainerStaffMemberId: uuid,
   weekday: z.int().min(1).max(7),
   startsAtLocal: z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),
+  durationMinutes: sessionMinutes,
   capacity: z.int().min(1).max(100),
 };
 
@@ -240,6 +245,7 @@ export const parseSessionInput = (value: unknown) =>
       classTypeId: uuid,
       trainerStaffMemberId: uuid,
       startsAt: z.iso.datetime(),
+      durationMinutes: sessionMinutes,
       capacity: z.int().min(1).max(100).optional(),
     })
     .transform(({ startsAt, ...input }) => ({
@@ -253,6 +259,7 @@ export const parseSessionChange = (value: unknown) =>
     .strictObject({
       trainerStaffMemberId: uuid.optional(),
       startsAt: z.iso.datetime().optional(),
+      durationMinutes: sessionMinutes.optional(),
       capacity: z.int().min(1).max(100).optional(),
     })
     .refine((input) => Object.keys(input).length > 0, 'Nothing to change')

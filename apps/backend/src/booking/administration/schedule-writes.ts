@@ -14,10 +14,15 @@ export type ScheduleInput = {
   trainerStaffMemberId: string;
   weekday: number;
   startsAtLocal: string;
+  durationMinutes: number;
   capacity: number;
 };
 
 const serializable = { isolationLevel: 'Serializable' } as const;
+
+// How long a Session or weekly row may last (booking ADR-0004).
+export const isSessionLength = (minutes: number): boolean =>
+  Number.isInteger(minutes) && minutes >= 5 && minutes <= 240;
 
 export const scheduleSelect = {
   id: true,
@@ -26,10 +31,11 @@ export const scheduleSelect = {
   trainerStaffMemberId: true,
   weekday: true,
   startsAtLocal: true,
+  durationMinutes: true,
   capacity: true,
   effectiveFrom: true,
   effectiveUntil: true,
-  classType: { select: { durationMinutes: true, name: true } },
+  classType: { select: { name: true } },
 } satisfies Prisma.SessionScheduleSelect;
 
 const wallClock = (localTime: string): Date => {
@@ -82,7 +88,7 @@ export const requireAssignable = async (
     }),
     transaction.classType.findUnique({
       where: { id: input.classTypeId },
-      select: { archivedAt: true, durationMinutes: true, name: true },
+      select: { archivedAt: true, name: true },
     }),
     transaction.staffMember.findUnique({
       where: { id: input.trainerStaffMemberId },
@@ -125,6 +131,7 @@ export const createAndMaterialize = async (
       trainerStaffMemberId: input.trainerStaffMemberId,
       weekday: input.weekday,
       startsAtLocal: wallClock(input.startsAtLocal),
+      durationMinutes: input.durationMinutes,
       capacity: input.capacity,
       effectiveFrom: input.effectiveFrom,
       effectiveUntil: input.effectiveUntil,

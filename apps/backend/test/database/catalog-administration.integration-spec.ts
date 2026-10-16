@@ -123,7 +123,6 @@ describe('Prisma catalog administration', () => {
       {
         name: 'Barre',
         description: 'Tonificación con barra.',
-        durationMinutes: 45,
         defaultCapacity: 10,
         equipmentNeeds: null,
       },
@@ -135,7 +134,6 @@ describe('Prisma catalog administration', () => {
           {
             name: ' barre ',
             description: 'Otra',
-            durationMinutes: 45,
             defaultCapacity: 10,
             equipmentNeeds: null,
           },
@@ -145,10 +143,10 @@ describe('Prisma catalog administration', () => {
     ).resolves.toBe('class_type_name_taken');
     await expect(
       catalog().updateClassType(
-        { ...barre, classTypeId: barre.id, durationMinutes: 50 },
+        { ...barre, classTypeId: barre.id, defaultCapacity: 12 },
         await administrator(),
       ),
-    ).resolves.toMatchObject({ durationMinutes: 50 });
+    ).resolves.toMatchObject({ defaultCapacity: 12 });
     await expect(
       codeOf(
         catalog().archiveClassType(

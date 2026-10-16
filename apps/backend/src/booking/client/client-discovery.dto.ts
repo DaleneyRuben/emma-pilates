@@ -136,7 +136,12 @@ export class ClassTypeDto {
   @ApiProperty()
   description!: string;
 
-  @ApiProperty({ minimum: 1 })
+  @ApiProperty({
+    minimum: 1,
+    deprecated: true,
+    description:
+      'A Class Type has no duration: on a Session it is that Session’s length; in the catalog it is always 60. Read the Session’s startsAt and endsAt instead.',
+  })
   durationMinutes!: number;
 }
 

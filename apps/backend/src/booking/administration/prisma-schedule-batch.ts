@@ -42,8 +42,8 @@ export const createPrismaScheduleBatch = (
         throw new AdministrationError('effective_date_invalid');
       }
       return transact(async (transaction) => {
-        const classType = await requireAssignable(transaction, input);
-        const clash = findRowClash(input.rows, classType.durationMinutes);
+        await requireAssignable(transaction, input);
+        const clash = findRowClash(input.rows);
         if (clash !== null) {
           throw new AdministrationError(
             'schedule_rows_overlap',
@@ -62,6 +62,7 @@ export const createPrismaScheduleBatch = (
                 capacity: input.capacity,
                 weekday: row.weekday,
                 startsAtLocal: row.startsAtLocal,
+                durationMinutes: row.durationMinutes,
                 effectiveFrom: input.effectiveFrom,
                 effectiveUntil: null,
               },

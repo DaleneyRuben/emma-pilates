@@ -11,7 +11,6 @@ export type ClassTypeSummary = {
   id: string;
   name: string;
   description: string;
-  durationMinutes: number;
   defaultCapacity: number;
   equipmentNeeds: string | null;
 };
@@ -33,6 +32,7 @@ export type SessionScheduleRecord = {
   trainerStaffMemberId: string;
   weekday: number;
   startsAtLocal: Date;
+  durationMinutes: number;
   capacity: number;
   effectiveFrom: Date;
   effectiveUntil: Date | null;
@@ -83,6 +83,7 @@ export type SessionDetail = {
     id: string;
     name: string;
     description: string;
+    // The Session's own length (booking ADR-0004).
     durationMinutes: number;
   };
   trainerName: string;
