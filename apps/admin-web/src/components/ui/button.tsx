@@ -88,7 +88,7 @@ export function Button({
           <span
             data-slot="spinner"
             aria-hidden="true"
-            className="absolute inset-0 m-auto size-4 animate-[spin_0.8s_linear_infinite] rounded-full border-2 border-current/35 border-t-current"
+            className="absolute inset-0 m-auto size-[16px] animate-[spin_0.8s_linear_infinite] rounded-full border-2 border-current/35 border-t-current"
           />
         </>
       ) : (
