@@ -49,6 +49,22 @@ describe("PasswordInput (follow-up 92)", () => {
     expect([input.selectionStart, input.selectionEnd]).toEqual([5, 5]);
   });
 
+  it("puts the caret back when Chrome moves it again just after the click", async () => {
+    const user = userEvent.setup();
+    render(<PasswordInput aria-label="Contraseña" />);
+    const input = screen.getByLabelText("Contraseña") as HTMLInputElement;
+    await user.type(input, "Calma2026");
+    input.setSelectionRange(5, 5);
+
+    await user.click(
+      screen.getByRole("button", { name: "Mostrar contraseña" }),
+    );
+    input.setSelectionRange(0, 0);
+    document.dispatchEvent(new Event("selectionchange"));
+
+    expect([input.selectionStart, input.selectionEnd]).toEqual([5, 5]);
+  });
+
   it("is reachable by keyboard and never submits its form", async () => {
     const user = userEvent.setup();
     const onSubmit = jest.fn((event: { preventDefault: () => void }) =>
