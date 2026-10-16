@@ -167,6 +167,8 @@ import type {
   SessionChangeDto,
   SessionDetailDto,
   SessionInputDto,
+  SessionScheduleBatchDto,
+  SessionScheduleBatchInputDto,
   SessionScheduleCreationDto,
   SessionScheduleEndDto,
   SessionScheduleEndInputDto,
@@ -11097,6 +11099,133 @@ export const useEndSessionSchedule = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(
     getEndSessionScheduleMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type createSessionSchedulesResponse201 = {
+  data: SessionScheduleBatchDto;
+  status: 201;
+};
+
+export type createSessionSchedulesResponseSuccess =
+  createSessionSchedulesResponse201 & {
+    headers: Headers;
+  };
+export type createSessionSchedulesResponse =
+  createSessionSchedulesResponseSuccess;
+
+export const getCreateSessionSchedulesUrl = () => {
+  return `/api/v1/administrator/session-schedules/batch`;
+};
+
+export const createSessionSchedules = async (
+  sessionScheduleBatchInputDto: SessionScheduleBatchInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<createSessionSchedulesResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getCreateSessionSchedulesUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(sessionScheduleBatchInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createSessionSchedulesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createSessionSchedulesResponse;
+};
+
+export const getCreateSessionSchedulesMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof createSessionSchedules>>,
+    TError,
+    CreateSessionSchedulesMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof createSessionSchedules>>,
+  TError,
+  CreateSessionSchedulesMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["createSessionSchedules"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof createSessionSchedules>>,
+    CreateSessionSchedulesMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return createSessionSchedules(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CreateSessionSchedulesMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createSessionSchedules>>
+>;
+export type CreateSessionSchedulesMutationBody = SessionScheduleBatchInputDto;
+export type CreateSessionSchedulesMutationError = unknown;
+export type CreateSessionSchedulesMutationVariables = {
+  data: SessionScheduleBatchInputDto;
+};
+
+export const useCreateSessionSchedules = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof createSessionSchedules>>,
+      TError,
+      CreateSessionSchedulesMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof createSessionSchedules>>,
+  TError,
+  CreateSessionSchedulesMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCreateSessionSchedulesMutationOptions(options),
     queryClient,
   );
 };

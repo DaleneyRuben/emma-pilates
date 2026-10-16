@@ -2897,6 +2897,43 @@
         ]
       }
     },
+    "/api/v1/administrator/session-schedules/batch": {
+      "post": {
+        "operationId": "createSessionSchedules",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionScheduleBatchInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionScheduleBatchDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorScheduleBatch"
+        ]
+      }
+    },
     "/api/v1/administrator/sessions": {
       "post": {
         "operationId": "createOneOffSession",
@@ -8455,6 +8492,83 @@
           "schedule",
           "cancelledSessions",
           "keptSessions"
+        ]
+      },
+      "SessionScheduleRowDto": {
+        "type": "object",
+        "properties": {
+          "weekday": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 7,
+            "description": "ISO weekday, Monday = 1"
+          },
+          "startsAtLocal": {
+            "type": "string",
+            "example": "07:00",
+            "description": "Bolivia wall clock"
+          }
+        },
+        "required": [
+          "weekday",
+          "startsAtLocal"
+        ]
+      },
+      "SessionScheduleBatchInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classTypeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trainerStaffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "capacity": {
+            "type": "number",
+            "minimum": 1
+          },
+          "effectiveFrom": {
+            "type": "string",
+            "format": "date",
+            "description": "Vigente desde, today or later"
+          },
+          "rows": {
+            "minItems": 1,
+            "maxItems": 7,
+            "description": "One weekly schedule per row, all created together or none; rows may not repeat or overlap each other",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionScheduleRowDto"
+            }
+          }
+        },
+        "required": [
+          "branchId",
+          "classTypeId",
+          "trainerStaffMemberId",
+          "capacity",
+          "effectiveFrom",
+          "rows"
+        ]
+      },
+      "SessionScheduleBatchDto": {
+        "type": "object",
+        "properties": {
+          "schedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SessionScheduleCreationDto"
+            }
+          }
+        },
+        "required": [
+          "schedules"
         ]
       },
       "SessionInputDto": {
