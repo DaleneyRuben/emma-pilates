@@ -35,7 +35,7 @@ export function WeeklyRowsField() {
           name={`rows.${index}.time`}
           render={({ field: time, fieldState }) => (
             <FormItem>
-              <div className="grid grid-cols-[minmax(0,1fr)_84px_104px_30px] items-center gap-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_104px_88px_30px] items-center gap-2">
                 <FormField
                   control={control}
                   name={`rows.${index}.weekday`}
