@@ -1,7 +1,8 @@
 import type { PropsWithChildren, ReactNode } from "react";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
+import { FormScrollView } from "../ui/form-scroll-view";
 import { fontFamilies } from "../ui/fonts";
 import { Heading } from "../ui/heading";
 import { OutcomeBadge, type OutcomeBadgeProps } from "../ui/outcome-badge";
@@ -66,25 +67,21 @@ export function AuthenticationScreen({
   return (
     <Screen style={[styles.screen, topBar !== undefined && styles.screenWithBar]}>
       {topBar === undefined ? null : <ScreenTopBar onBack={topBar.onBack} title={topBar.title} />}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={[styles.flex, topBar !== undefined && styles.inset]}
+      <FormScrollView
+        contentContainerStyle={styles.content}
+        style={topBar === undefined ? undefined : styles.inset}
       >
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          {brand ? <BrandHeader tagline={tagline} teamAccess={teamAccess} /> : null}
-          <View style={styles.panel}>
-            {eyebrow === undefined ? null : <Text style={styles.eyebrow}>{eyebrow}</Text>}
-            {badge === undefined ? null : <OutcomeBadge {...badge} />}
-            {title === undefined ? null : (
-              <Heading style={badge === undefined ? undefined : authStyles.centered}>
-                {title}
-              </Heading>
-            )}
-            {children}
-          </View>
-          {footer}
-        </ScrollView>
-      </KeyboardAvoidingView>
+        {brand ? <BrandHeader tagline={tagline} teamAccess={teamAccess} /> : null}
+        <View style={styles.panel}>
+          {eyebrow === undefined ? null : <Text style={styles.eyebrow}>{eyebrow}</Text>}
+          {badge === undefined ? null : <OutcomeBadge {...badge} />}
+          {title === undefined ? null : (
+            <Heading style={badge === undefined ? undefined : authStyles.centered}>{title}</Heading>
+          )}
+          {children}
+        </View>
+        {footer}
+      </FormScrollView>
     </Screen>
   );
 }
@@ -128,9 +125,6 @@ const styles = StyleSheet.create({
     fontSize: 11,
     letterSpacing: 1.98,
     textTransform: "uppercase",
-  },
-  flex: {
-    flex: 1,
   },
   inset: {
     paddingHorizontal: spacing.xlLg,

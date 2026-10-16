@@ -1,6 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -8,6 +8,7 @@ import { TeamAccessBadge } from "./auth-layout";
 import { emailPlaceholder, FooterPrompt, FormAlert, WaitNotice } from "./auth-parts";
 import { useCountdown } from "./countdown";
 import { BiometricLoginButton } from "../ui/biometric-login-button";
+import { FormScrollView } from "../ui/form-scroll-view";
 import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
 import { FormField } from "../ui/form-field";
@@ -72,86 +73,77 @@ export function LoginScreen({
 
   return (
     <Screen style={styles.screen}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={styles.flex}
-      >
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          {notice === null ? null : (
-            <View accessibilityRole="summary" style={styles.notice}>
-              <BodyText style={styles.noticeText}>{notice}</BodyText>
-            </View>
-          )}
-          <View style={styles.brand}>
-            <Text style={styles.wordmark}>Emma</Text>
-            <View style={styles.brandRule} />
-            <BodyText style={styles.tagline}>Movimiento · Equilibrio · Bienestar</BodyText>
-            {teamAccess ? <TeamAccessBadge /> : null}
+      <FormScrollView contentContainerStyle={styles.content}>
+        {notice === null ? null : (
+          <View accessibilityRole="summary" style={styles.notice}>
+            <BodyText style={styles.noticeText}>{notice}</BodyText>
           </View>
+        )}
+        <View style={styles.brand}>
+          <Text style={styles.wordmark}>Emma</Text>
+          <View style={styles.brandRule} />
+          <BodyText style={styles.tagline}>Movimiento · Equilibrio · Bienestar</BodyText>
+          {teamAccess ? <TeamAccessBadge /> : null}
+        </View>
 
-          <View style={styles.form}>
-            {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
-            {retryAfterSeconds > 0 ? (
-              <WaitNotice
-                message="Demasiados intentos. Intenta de nuevo en un momento."
-                remainingSeconds={retryAfterSeconds}
-                waitLabel="Podrás intentarlo en"
+        <View style={styles.form}>
+          {rejected ? <FormAlert>El correo o la contraseña no son correctos.</FormAlert> : null}
+          {retryAfterSeconds > 0 ? (
+            <WaitNotice
+              message="Demasiados intentos. Intenta de nuevo en un momento."
+              remainingSeconds={retryAfterSeconds}
+              waitLabel="Podrás intentarlo en"
+            />
+          ) : null}
+          <Controller
+            control={control}
+            name="email"
+            render={({ field: { onBlur, onChange, value } }) => (
+              <FormField
+                autoCapitalize="none"
+                autoComplete="email"
+                error={errors.email?.message}
+                keyboardType="email-address"
+                label="Correo electrónico"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                placeholder={emailPlaceholder(teamAccess)}
+                value={value}
               />
-            ) : null}
-            <Controller
-              control={control}
-              name="email"
-              render={({ field: { onBlur, onChange, value } }) => (
-                <FormField
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  error={errors.email?.message}
-                  keyboardType="email-address"
-                  label="Correo electrónico"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  placeholder={emailPlaceholder(teamAccess)}
-                  value={value}
-                />
-              )}
-            />
-            <Controller
-              control={control}
-              name="password"
-              render={({ field: { onBlur, onChange, value } }) => (
-                <FormField
-                  autoComplete="current-password"
-                  error={errors.password?.message}
-                  label="Contraseña"
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                  placeholder="••••••••"
-                  secureTextEntry
-                  value={value}
-                />
-              )}
-            />
-            <PrimaryButton
-              disabled={isSubmitting || retryAfterSeconds > 0}
-              label="Iniciar sesión"
-              onPress={submitLogin}
-            />
-            {onBiometricUnlock === undefined ? null : (
-              <BiometricLoginButton onPress={onBiometricUnlock} />
             )}
-            {onForgotPassword === undefined ? null : (
-              <TextButton label="¿Olvidaste tu contraseña?" onPress={onForgotPassword} />
+          />
+          <Controller
+            control={control}
+            name="password"
+            render={({ field: { onBlur, onChange, value } }) => (
+              <FormField
+                autoComplete="current-password"
+                error={errors.password?.message}
+                label="Contraseña"
+                onBlur={onBlur}
+                onChangeText={onChange}
+                placeholder="••••••••"
+                secureTextEntry
+                value={value}
+              />
             )}
-          </View>
-          {onRegister === undefined ? null : (
-            <FooterPrompt
-              action="Regístrate"
-              onPress={onRegister}
-              prompt="¿No tienes una cuenta?"
-            />
+          />
+          <PrimaryButton
+            disabled={isSubmitting || retryAfterSeconds > 0}
+            label="Iniciar sesión"
+            onPress={submitLogin}
+          />
+          {onBiometricUnlock === undefined ? null : (
+            <BiometricLoginButton onPress={onBiometricUnlock} />
           )}
-        </ScrollView>
-      </KeyboardAvoidingView>
+          {onForgotPassword === undefined ? null : (
+            <TextButton label="¿Olvidaste tu contraseña?" onPress={onForgotPassword} />
+          )}
+        </View>
+        {onRegister === undefined ? null : (
+          <FooterPrompt action="Regístrate" onPress={onRegister} prompt="¿No tienes una cuenta?" />
+        )}
+      </FormScrollView>
     </Screen>
   );
 }
@@ -185,9 +177,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     paddingBottom: spacing.xl,
     paddingTop: spacing.xxxl,
-  },
-  flex: {
-    flex: 1,
   },
   form: {
     gap: spacing.lgXl,

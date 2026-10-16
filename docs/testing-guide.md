@@ -4043,3 +4043,36 @@ Verified on production on 2026-10-15 by the user on an Android phone with
 the Play Internal testing builds (versionCode 2): A, B, and C, then a full
 booking run (Plan bought, receipt uploaded and approved in the Staff app,
 class booked) with push notifications, including a tap with the app closed.
+
+## Test 49: forms stay above the keyboard on Android
+
+Android draws edge to edge since Expo 57, so the window no longer shrinks for
+the keyboard; every form now lifts itself above it (MOB-058). Run it on the
+development builds of Test 45 on the Android emulator, and on the iPhone 16
+Pro and iPad Pro 11 to check that iOS still behaves as before. Type with the
+on-screen keyboard: `adb shell input text` switches Gboard to its floating
+hardware-keyboard toolbar, which covers nothing and proves nothing
+(`adb shell pm clear com.google.android.inputmethod.latin` puts it back).
+
+1. Client login: tap «Contraseña». Expected: the form slides up so the field
+   and «Iniciar sesión» are both above the keyboard.
+2. «Regístrate»: tap «Confirmar contraseña». Expected: the field stays above
+   the keyboard, and a swipe up brings «Crear cuenta» into view with the
+   keyboard still open.
+3. Signed in as `lucia@example.com`: Perfil → Editar → tap «Nombre».
+   Expected: «Guardar cambios», pinned under the form, rises above the
+   keyboard. Perfil → «Cambiar contraseña» and «Cerrar mi cuenta» behave the
+   same way with their own buttons.
+4. Staff, signed in as `camila.rojas@example.com`: «+ Nuevo cliente» → tap
+   «Teléfono (opcional)». Expected: the field and «Crear cuenta» stay above
+   the keypad. As the Administrator, «Revisar pago» → «Rechazar» lifts its
+   reason field the same way.
+
+Verified on 2026-10-15 on the Android emulator (Medium Phone, API 36) with
+the development builds: before the fix the keyboard's top edge (y 1500 of
+2400) hid «Iniciar sesión» (y 1376–1512); after it the button sat at
+y 1085–1221. Steps 1–4 passed in both apps on the emulator, the iPhone 16
+Pro, and the iPad Pro 11 (Staff login included; iOS was never affected and
+still behaves), except the Administrator's rejection reason (not run: it
+needs a pending transfer). On iOS the keyboard appears a few seconds after
+the tap; wait for it before judging the screen.

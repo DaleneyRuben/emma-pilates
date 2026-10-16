@@ -11,6 +11,7 @@ import {
   BodyText,
   colors,
   FormField,
+  FormScrollView,
   PrimaryButton,
   QueryFailure,
   Screen,
@@ -21,14 +22,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Keyboard, StyleSheet, View } from "react-native";
 import { z } from "zod";
 
 import { useClientFetcher } from "../client-fetcher";
@@ -105,72 +99,71 @@ function EditProfileForm({
   });
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
+    <FormScrollView
+      contentContainerStyle={styles.form}
+      footer={
+        <View style={styles.footer}>
+          <PrimaryButton
+            disabled={isSubmitting}
+            label="Guardar cambios"
+            onPress={() => void save()}
+          />
+        </View>
+      }
       keyboardVerticalOffset={spacing.xxl}
-      style={styles.flex}
     >
-      <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-        <ProfilePhotoSection client={client} />
-        <Controller
-          control={control}
-          name="name"
-          render={({ field }) => (
-            <FormField
-              autoCapitalize="words"
-              error={errors.name?.message}
-              label="Nombre"
-              onBlur={field.onBlur}
-              onChangeText={field.onChange}
-              value={field.value}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="email"
-          render={({ field }) => (
-            <FormField
-              autoCapitalize="none"
-              autoCorrect={false}
-              error={errors.email?.message}
-              keyboardType="email-address"
-              label="Correo electrónico"
-              onBlur={field.onBlur}
-              onChangeText={field.onChange}
-              value={field.value}
-            />
-          )}
-        />
-        <EmailChangeSection />
-        <Controller
-          control={control}
-          name="phone"
-          render={({ field }) => (
-            <FormField
-              keyboardType="phone-pad"
-              label="Teléfono"
-              onBlur={field.onBlur}
-              onChangeText={field.onChange}
-              placeholder="+591 7xxxxxxx"
-              value={field.value}
-            />
-          )}
-        />
-        {failed ? (
-          <BodyText accessibilityRole="alert" style={styles.error}>
-            No pudimos guardar los cambios. Inténtalo de nuevo.
-          </BodyText>
-        ) : null}
-      </ScrollView>
-      <View style={styles.footer}>
-        <PrimaryButton
-          disabled={isSubmitting}
-          label="Guardar cambios"
-          onPress={() => void save()}
-        />
-      </View>
-    </KeyboardAvoidingView>
+      <ProfilePhotoSection client={client} />
+      <Controller
+        control={control}
+        name="name"
+        render={({ field }) => (
+          <FormField
+            autoCapitalize="words"
+            error={errors.name?.message}
+            label="Nombre"
+            onBlur={field.onBlur}
+            onChangeText={field.onChange}
+            value={field.value}
+          />
+        )}
+      />
+      <Controller
+        control={control}
+        name="email"
+        render={({ field }) => (
+          <FormField
+            autoCapitalize="none"
+            autoCorrect={false}
+            error={errors.email?.message}
+            keyboardType="email-address"
+            label="Correo electrónico"
+            onBlur={field.onBlur}
+            onChangeText={field.onChange}
+            value={field.value}
+          />
+        )}
+      />
+      <EmailChangeSection />
+      <Controller
+        control={control}
+        name="phone"
+        render={({ field }) => (
+          <FormField
+            keyboardType="phone-pad"
+            label="Teléfono"
+            onBlur={field.onBlur}
+            onChangeText={field.onChange}
+            placeholder="+591 7xxxxxxx"
+            value={field.value}
+          />
+        )}
+      />
+      {failed ? (
+        <BodyText accessibilityRole="alert" style={styles.error}>
+          No pudimos guardar los cambios. Inténtalo de nuevo.
+        </BodyText>
+      ) : null}
+    </FormScrollView>
   );
 }
 
@@ -219,7 +212,6 @@ export function EditProfileScreen() {
 
 const styles = StyleSheet.create({
   error: { color: colors.errorText },
-  flex: { flex: 1 },
   footer: { paddingTop: spacing.md },
   form: { gap: spacing.lg, paddingBottom: spacing.lg },
   screen: { gap: spacing.lg },

@@ -4,6 +4,7 @@ import {
   colors,
   formatBolivianos,
   FormField,
+  FormScrollView,
   initials,
   PrimaryButton,
   QueryFailure,
@@ -106,7 +107,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content}>
+      <FormScrollView contentContainerStyle={styles.content}>
         <View style={styles.client}>
           <View style={styles.avatar}>
             <Text style={styles.avatarText}>{initials(payment.clientName)}</Text>
@@ -206,7 +207,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
             </Pressable>
           </View>
         )}
-      </ScrollView>
+      </FormScrollView>
       <Modal
         animationType="fade"
         onRequestClose={() => setEnlarged(false)}

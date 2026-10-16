@@ -2,10 +2,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { changeCurrentAccountPassword } from "@pilates/api-contracts";
 import { useState } from "react";
 import { Controller, useForm } from "react-hook-form";
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { z } from "zod";
 
 import { BodyText } from "../ui/body-text";
+import { FormScrollView } from "../ui/form-scroll-view";
 import { FormField } from "../ui/form-field";
 import { PrimaryButton } from "../ui/primary-button";
 import { Screen } from "../ui/screen";
@@ -76,84 +77,82 @@ export function ChangePasswordScreen({ fetcher, onBack, onSaved }: ChangePasswor
   return (
     <Screen style={styles.screen}>
       <ScreenTopBar fullBleed onBack={onBack} title="Cambiar contraseña" />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+      <FormScrollView
+        contentContainerStyle={styles.form}
+        footer={
+          <View style={styles.footer}>
+            <PrimaryButton
+              disabled={!isValid || isSubmitting}
+              label="Guardar contraseña"
+              onPress={() => void save()}
+            />
+          </View>
+        }
         keyboardVerticalOffset={spacing.xxl}
-        style={styles.flex}
       >
-        <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
-          <Controller
-            control={control}
-            name="currentPassword"
-            render={({ field }) => (
-              <FormField
-                autoCapitalize="none"
-                error={currentPasswordError}
-                label="Contraseña actual"
-                onBlur={field.onBlur}
-                onChangeText={(value) => {
-                  setCurrentPasswordError(undefined);
-                  field.onChange(value);
-                }}
-                placeholder="••••••••"
-                secureTextEntry
-                value={field.value}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="newPassword"
-            render={({ field }) => (
-              <FormField
-                autoCapitalize="none"
-                error={errors.newPassword?.message}
-                label="Contraseña nueva"
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                placeholder="••••••••"
-                secureTextEntry
-                value={field.value}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="confirmPassword"
-            render={({ field }) => (
-              <FormField
-                autoCapitalize="none"
-                error={errors.confirmPassword?.message}
-                label="Confirmar contraseña"
-                onBlur={field.onBlur}
-                onChangeText={field.onChange}
-                placeholder="••••••••"
-                secureTextEntry
-                value={field.value}
-              />
-            )}
-          />
-          {failed ? (
-            <BodyText accessibilityRole="alert" style={styles.failure}>
-              No pudimos cambiar la contraseña. Inténtalo de nuevo.
-            </BodyText>
-          ) : null}
-        </ScrollView>
-        <View style={styles.footer}>
-          <PrimaryButton
-            disabled={!isValid || isSubmitting}
-            label="Guardar contraseña"
-            onPress={() => void save()}
-          />
-        </View>
-      </KeyboardAvoidingView>
+        <Controller
+          control={control}
+          name="currentPassword"
+          render={({ field }) => (
+            <FormField
+              autoCapitalize="none"
+              error={currentPasswordError}
+              label="Contraseña actual"
+              onBlur={field.onBlur}
+              onChangeText={(value) => {
+                setCurrentPasswordError(undefined);
+                field.onChange(value);
+              }}
+              placeholder="••••••••"
+              secureTextEntry
+              value={field.value}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="newPassword"
+          render={({ field }) => (
+            <FormField
+              autoCapitalize="none"
+              error={errors.newPassword?.message}
+              label="Contraseña nueva"
+              onBlur={field.onBlur}
+              onChangeText={field.onChange}
+              placeholder="••••••••"
+              secureTextEntry
+              value={field.value}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormField
+              autoCapitalize="none"
+              error={errors.confirmPassword?.message}
+              label="Confirmar contraseña"
+              onBlur={field.onBlur}
+              onChangeText={field.onChange}
+              placeholder="••••••••"
+              secureTextEntry
+              value={field.value}
+            />
+          )}
+        />
+        {failed ? (
+          <BodyText accessibilityRole="alert" style={styles.failure}>
+            No pudimos cambiar la contraseña. Inténtalo de nuevo.
+          </BodyText>
+        ) : null}
+      </FormScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
   failure: { color: colors.errorText },
-  flex: { flex: 1 },
   footer: { paddingTop: spacing.md },
   form: { gap: spacing.lg, paddingBottom: spacing.lg },
   screen: { gap: spacing.lg },
