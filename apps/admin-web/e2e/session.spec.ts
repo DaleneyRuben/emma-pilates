@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { fixtures, webOrigin } from "./support/environment";
-import { sidebar, signIn } from "./support/session";
+import { sidebar, signIn, trackApiRequests } from "./support/session";
 
 const sessionPath = "/api/v1/admin-web/authentication-sessions/current";
 
@@ -69,10 +69,18 @@ test.describe("Administrator sessions (AW01, AW33, ADR-0084)", () => {
   test("returns to Login with a notice when the session ends and comes back to the same page", async ({
     page,
   }) => {
+    const api = trackApiRequests(page);
     await signIn(page, "/back-office/gastos");
     await expect(
       page.getByRole("heading", { level: 1, name: "Gastos" }),
     ).toBeVisible();
+    // The heading shows while the Branches still load; Gastos and the
+    // sidebar ask for the rest only then, and a 401 on any of them would
+    // reach Login before the click below (WEB-026).
+    await expect(
+      page.getByText(/^(Sin resultados|Mostrando .+)$/),
+    ).toBeVisible();
+    await api.settled();
 
     // The session is revoked behind the browser's back (the backend ends it
     // the same way after 30 idle minutes); the cookie jar is shared.
