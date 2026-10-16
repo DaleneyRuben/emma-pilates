@@ -12,10 +12,12 @@ import { colors, spacing, surfaces, typography } from "./tokens";
  * An image over the whole screen, drawn whole and pinch-zoomable, closed by
  * «Cerrar» or the back gesture. «dark» is the photo viewer of a receipt
  * (S12); «light» is the studio QR on Superficie (follow-up 95), which scans
- * best dark on light and sits on a card with an optional note and action.
+ * best dark on light and sits on a card with an optional note and action;
+ * `banner` sits under the top row for an action's outcome (MOB-063).
  */
 export function FullScreenImage({
   aspectRatio = 1,
+  banner,
   footer,
   label,
   note,
@@ -26,6 +28,7 @@ export function FullScreenImage({
   visible,
 }: {
   aspectRatio?: number;
+  banner?: ReactNode;
   footer?: ReactNode;
   label: string;
   note?: string;
@@ -70,6 +73,7 @@ export function FullScreenImage({
               </LineIcon>
             </Pressable>
           </View>
+          {banner === undefined ? null : <View style={styles.banner}>{banner}</View>}
           <ScrollView
             contentContainerStyle={light ? styles.lightContent : styles.darkContent}
             maximumZoomScale={4}
@@ -92,6 +96,7 @@ export function FullScreenImage({
 }
 
 const styles = StyleSheet.create({
+  banner: { paddingHorizontal: spacing.xlSm, paddingTop: spacing.sm },
   // A phone column on a tablet: the QR stays scannable without leaving the screen.
   card: { ...surfaces.flatCard, maxWidth: 480, padding: spacing.xlSm, width: "100%" },
   close: {

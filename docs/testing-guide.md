@@ -4178,7 +4178,7 @@ To see it, put the same kind of proxy on port 3111 in front of the API on
 Verified on 2026-10-16 in the built-in browser: step 1 and step 3 at 1440
 px; step 2 at 1440 px; step 4 at 420 px.
 
-## Test 51: the studio QR is drawn whole and opens full screen
+## Test 51: the studio QR is drawn whole, opens full screen, and saves to the photos
 
 `10`'s studio QR (MOB-062, design follow-up 95) keeps its own proportions
 inside a 190 pt box, so a bank QR that is not square is never cropped;
@@ -4210,4 +4210,71 @@ corner, where «Cerrar» is; drag the gear aside first.
 Verified on 2026-10-15 with a 420 × 600 test QR: steps 1–3 on the emulator
 (the QR drawn 350 × 499 px, the back gesture and «Cerrar» both close); steps
 1–2 on the iPhone 16 Pro; steps 1–3 on the iPad Pro 11 (the card capped at
-480 pt). «Guardar QR» is MOB-063.
+480 pt).
+
+### Saving the QR (MOB-063)
+
+«Guardar QR» (under the QR and as the view's button) adds the QR to the
+photo library with `expo-media-library`, a native module, so it needs a
+build of the Client app at version 1.0.1 or later; the 1.0.0 development
+builds and Expo Go do not have it. To test without spending an EAS build,
+build the Client app locally against the local API:
+
+```sh
+cd apps/client-mobile
+export EXPO_PUBLIC_API_URL=http://127.0.0.1:3100/api/v1
+npx expo start --dev-client --port 8081
+```
+
+and, in a second Terminal with the same `EXPO_PUBLIC_API_URL`:
+
+```sh
+cd apps/client-mobile
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+adb reverse tcp:3100 tcp:3100 && adb reverse tcp:8081 tcp:8081
+npx expo run:android --no-bundler --device Medium_Phone_API_36.1
+```
+
+For iOS, CocoaPods needs a UTF-8 locale and Sentry's upload step needs to be
+switched off locally:
+
+```sh
+cd apps/client-mobile
+export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8
+export SENTRY_DISABLE_AUTO_UPLOAD=true SENTRY_ALLOW_FAILURE=true
+npx expo run:ios --no-bundler --device <iPhone 16 Pro UDID>
+xcrun simctl install <iPad UDID> ~/Library/Developer/Xcode/DerivedData/EmmaPilates-*/Build/Products/Debug-iphonesimulator/EmmaPilates.app
+```
+
+The local builds land in the ignored `apps/client-mobile/android` and `ios`
+folders and are signed for debugging only; they replace the EAS development
+build on that device. Run `./gradlew --stop` in `android` afterwards.
+
+On iOS, reset the app's photo access first so the prompt appears
+(`xcrun simctl privacy <UDID> reset photos com.emmapilates.client` and the
+same with `photos-add`); an earlier `simctl privacy grant all` hides it.
+
+4. On «Pago», tap «Guardar QR» under the QR. Expected on iOS: «“Emma
+   Pilates” Would Like to Add to Your Photos» with «Permite que Emma Pilates
+   guarde el QR del estudio en tus fotos.» (add access only, never «access
+   your photos»); on Android 13 or later no prompt at all. Allow it. Expected:
+   the green «QR guardado en tus fotos.» strip under the two actions, gone
+   after about eight seconds, and the QR whole in the device's photos (on the
+   emulator, `adb shell content query --uri
+   content://media/external/images/media` lists `DCIM/emma-pilates-qr.png`
+   at the image's own size).
+5. Tap «Ampliar», then the «Guardar QR» button. Expected: a spinner in the
+   button while it saves, then the same strip under «QR del estudio».
+6. Refusal (iOS): reset the photo access, tap «Guardar QR», and choose
+   «Don't Allow». Expected: the Error line «No pudimos guardar el QR.
+   Permite que Emma Pilates agregue fotos en Ajustes.» under the actions
+   (under the button in the full-screen view) and no new photo. Android 13
+   and later never refuse: adding a photo needs no permission there.
+
+Verified on 2026-10-15 with the 420 × 600 test QR, local debug builds of
+version 1.0.1: steps 4–5 on the emulator (two `DCIM/` PNGs at 420 × 600, no
+prompt, the strip faded); steps 4 and 6 on the iPhone 16 Pro (the photo
+landed at 420 × 600; the refusal line under the actions and under the
+view's button); step 5 on the iPad Pro 11, allowing the prompt (spinner, then
+the strip, the photo at 420 × 600; only the add-photos access granted).
