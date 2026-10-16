@@ -9,6 +9,10 @@ export interface ClassTypeDto {
   id: string;
   name: string;
   description: string;
-  /** @minimum 1 */
+  /**
+   * A Class Type has no duration: on a Session it is that Session’s length; in the catalog it is always 60. Read the Session’s startsAt and endsAt instead.
+   * @deprecated
+   * @minimum 1
+   */
   durationMinutes: number;
 }

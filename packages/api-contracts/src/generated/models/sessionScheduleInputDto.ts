@@ -15,6 +15,11 @@ export interface SessionScheduleInputDto {
    */
   weekday: number;
   startsAtLocal: string;
+  /**
+   * @minimum 5
+   * @maximum 240
+   */
+  durationMinutes: number;
   /** @minimum 1 */
   capacity: number;
   /** Vigente desde, today or later */

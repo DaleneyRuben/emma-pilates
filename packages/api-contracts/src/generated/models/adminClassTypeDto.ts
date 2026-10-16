@@ -9,7 +9,6 @@ export interface AdminClassTypeDto {
   id: string;
   name: string;
   description: string;
-  durationMinutes: number;
   defaultCapacity: number;
   /** @nullable */
   equipmentNeeds: string | null;

@@ -7725,7 +7725,9 @@
           },
           "durationMinutes": {
             "type": "number",
-            "minimum": 1
+            "minimum": 1,
+            "deprecated": true,
+            "description": "A Class Type has no duration: on a Session it is that Session’s length; in the catalog it is always 60. Read the Session’s startsAt and endsAt instead."
           }
         },
         "required": [
@@ -8148,11 +8150,6 @@
             "type": "string",
             "maxLength": 280
           },
-          "durationMinutes": {
-            "type": "number",
-            "minimum": 5,
-            "maximum": 240
-          },
           "defaultCapacity": {
             "type": "number",
             "minimum": 1,
@@ -8166,7 +8163,6 @@
         "required": [
           "name",
           "description",
-          "durationMinutes",
           "defaultCapacity"
         ]
       },
@@ -8182,9 +8178,6 @@
           },
           "description": {
             "type": "string"
-          },
-          "durationMinutes": {
-            "type": "number"
           },
           "defaultCapacity": {
             "type": "number"
@@ -8203,7 +8196,6 @@
           "id",
           "name",
           "description",
-          "durationMinutes",
           "defaultCapacity",
           "equipmentNeeds",
           "archivedAt"
@@ -8333,6 +8325,11 @@
             "example": "09:00",
             "description": "Bolivia wall clock"
           },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 5,
+            "maximum": 240
+          },
           "capacity": {
             "type": "number"
           },
@@ -8348,9 +8345,6 @@
           },
           "classTypeName": {
             "type": "string"
-          },
-          "durationMinutes": {
-            "type": "number"
           }
         },
         "required": [
@@ -8360,11 +8354,11 @@
           "trainerStaffMemberId",
           "weekday",
           "startsAtLocal",
+          "durationMinutes",
           "capacity",
           "effectiveFrom",
           "effectiveUntil",
-          "classTypeName",
-          "durationMinutes"
+          "classTypeName"
         ]
       },
       "SessionScheduleInputDto": {
@@ -8391,6 +8385,11 @@
             "type": "string",
             "example": "09:00"
           },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 5,
+            "maximum": 240
+          },
           "capacity": {
             "type": "number",
             "minimum": 1
@@ -8407,6 +8406,7 @@
           "trainerStaffMemberId",
           "weekday",
           "startsAtLocal",
+          "durationMinutes",
           "capacity",
           "effectiveFrom"
         ]
@@ -8507,11 +8507,17 @@
             "type": "string",
             "example": "07:00",
             "description": "Bolivia wall clock"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 5,
+            "maximum": 240
           }
         },
         "required": [
           "weekday",
-          "startsAtLocal"
+          "startsAtLocal",
+          "durationMinutes"
         ]
       },
       "SessionScheduleBatchInputDto": {
@@ -8541,7 +8547,7 @@
           "rows": {
             "minItems": 1,
             "maxItems": 7,
-            "description": "One weekly schedule per row, all created together or none; rows may not repeat or overlap each other",
+            "description": "One weekly schedule per row, each lasting its own minutes, all created together or none; rows may not repeat or overlap each other",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/SessionScheduleRowDto"
@@ -8590,6 +8596,11 @@
             "type": "string",
             "format": "date-time"
           },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 5,
+            "maximum": 240
+          },
           "capacity": {
             "type": "number",
             "description": "Defaults to the Class Type capacity"
@@ -8599,7 +8610,8 @@
           "branchId",
           "classTypeId",
           "trainerStaffMemberId",
-          "startsAt"
+          "startsAt",
+          "durationMinutes"
         ]
       },
       "AdminSessionDto": {
@@ -8671,6 +8683,11 @@
           "startsAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "durationMinutes": {
+            "type": "number",
+            "minimum": 5,
+            "maximum": 240
           },
           "capacity": {
             "type": "number"

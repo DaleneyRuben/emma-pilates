@@ -10,6 +10,11 @@ export interface SessionInputDto {
   classTypeId: string;
   trainerStaffMemberId: string;
   startsAt: string;
+  /**
+   * @minimum 5
+   * @maximum 240
+   */
+  durationMinutes: number;
   /** Defaults to the Class Type capacity */
   capacity?: number;
 }

@@ -11,11 +11,6 @@ export interface ClassTypeInputDto {
   /** @maxLength 280 */
   description: string;
   /**
-   * @minimum 5
-   * @maximum 240
-   */
-  durationMinutes: number;
-  /**
    * @minimum 1
    * @maximum 100
    */
