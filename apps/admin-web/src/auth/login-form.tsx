@@ -19,6 +19,7 @@ import {
 } from "../components/form/form";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
+import { PasswordInput } from "../components/ui/password-input";
 import { useStartSession } from "../session/use-start-session";
 import { emailField } from "./auth-fields";
 import { ThrottledNotice } from "./throttled-notice";
@@ -98,11 +99,7 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
             <FormItem>
               <FormLabel>Contraseña</FormLabel>
               <FormControl>
-                <Input
-                  type="password"
-                  autoComplete="current-password"
-                  {...field}
-                />
+                <PasswordInput autoComplete="current-password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -128,7 +125,8 @@ export function LoginForm({ redirect }: { redirect: string | undefined }) {
         <Button
           type="submit"
           size="lg"
-          disabled={throttled || form.formState.isSubmitting}
+          disabled={throttled}
+          busy={form.formState.isSubmitting}
         >
           Iniciar sesión
         </Button>

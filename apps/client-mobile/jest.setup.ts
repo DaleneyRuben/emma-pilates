@@ -91,6 +91,13 @@ jest.mock("expo-image-manipulator", () => ({
 }));
 
 jest.mock("expo-file-system/legacy", () => ({
+  cacheDirectory: "file:///cache/",
   EncodingType: { Base64: "base64" },
   readAsStringAsync: jest.fn().mockResolvedValue(""),
+  writeAsStringAsync: jest.fn().mockResolvedValue(undefined),
+}));
+
+jest.mock("expo-media-library/legacy", () => ({
+  requestPermissionsAsync: jest.fn().mockResolvedValue({ granted: true }),
+  saveToLibraryAsync: jest.fn().mockResolvedValue(undefined),
 }));

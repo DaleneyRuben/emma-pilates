@@ -3,7 +3,7 @@
     "name": "Emma Pilates",
     "slug": "emma-pilates-client",
     "scheme": "emmapilates-client",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "runtimeVersion": {
       "policy": "appVersion"
     },
@@ -17,14 +17,17 @@
     "android": {
       "package": "com.emmapilates.client",
       "adaptiveIcon": {
-        "backgroundColor": "#DABDB8",
+        "backgroundColor": "#F3E9E7",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
-      "versionCode": 2
+      "versionCode": 3,
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,6 +43,13 @@
         "expo-notifications",
         {
           "defaultChannel": "updates"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "Permite que Emma Pilates guarde el QR del estudio en tus fotos.",
+          "granularPermissions": []
         }
       ],
       "@pilates/mobile-core/launch-tap-plugin",

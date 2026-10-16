@@ -7,7 +7,7 @@ export async function signIn(page: Page, path = "/"): Promise<void> {
   await page
     .getByLabel("Correo electrónico")
     .fill(fixtures.administrator.email);
-  await page.getByLabel("Contraseña").fill(fixtures.password);
+  await page.getByLabel("Contraseña", { exact: true }).fill(fixtures.password);
   await page.getByRole("button", { name: "Iniciar sesión" }).click();
   await expect(
     page.getByRole("button", {

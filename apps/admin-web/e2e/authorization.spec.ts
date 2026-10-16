@@ -10,7 +10,9 @@ test.describe("authorization at the backend boundary", () => {
   }) => {
     await page.goto("/");
     await page.getByLabel("Correo electrónico").fill(fixtures.assistant.email);
-    await page.getByLabel("Contraseña").fill(fixtures.password);
+    await page
+      .getByLabel("Contraseña", { exact: true })
+      .fill(fixtures.password);
     await page.getByRole("button", { name: "Iniciar sesión" }).click();
 
     await expect(page.getByRole("alert")).toHaveText(

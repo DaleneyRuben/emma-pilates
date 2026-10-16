@@ -115,6 +115,10 @@ function BranchSchedule({
               today={today}
               sessions={sessions.data}
               onOpen={openSession}
+              onCreate={(start) => {
+                setNotice(null);
+                setPanel({ mode: "create", start });
+              }}
             />
           )}
         </>
