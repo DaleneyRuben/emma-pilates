@@ -24,7 +24,10 @@
       },
       "predictiveBackGestureEnabled": false,
       "googleServicesFile": "./google-services.json",
-      "versionCode": 2
+      "versionCode": 2,
+      "blockedPermissions": [
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -40,6 +43,13 @@
         "expo-notifications",
         {
           "defaultChannel": "updates"
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "savePhotosPermission": "Permite que Emma Pilates guarde el QR del estudio en tus fotos.",
+          "granularPermissions": []
         }
       ],
       "@pilates/mobile-core/launch-tap-plugin",
