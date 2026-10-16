@@ -17,7 +17,10 @@ reservas, the plans, the payments, Perfil, Notificaciones, the Evaluations,
 and the Staff screens) show the plain grey text «Cargando…» while their data
 loads. On a phone network that text sits on screen for a second or more and
 reads as unfinished. The user asked for a loading state that uses the
-studio's logo.
+studio's logo. Before export the user compared four placements on Inicio,
+Mis reservas, and the Staff Mi agenda (the whole screen, the content area,
+in-place placeholder cards, and a logo near the top) and chose the content
+area, with the logo at 240 px on phones and 300 px on tablets.
 
 ## 1. The logo
 
@@ -37,8 +40,8 @@ shows **only the logo**:
   between the screen's header and the tab bar (or the bottom edge where there
   is no tab bar), on the screen's own Marfil background. The header, the back
   arrow, and the tab bar stay drawn and usable.
-- **Size:** 192 px wide on phones (80 px tall) and 240 px on tablets
-  (100 px), whatever the screen.
+- **Size:** 240 px wide on phones (100 px tall) and 300 px on tablets
+  (125 px), whatever the screen.
 - **No text, no card, no spinner** beside it. The plain «Cargando…» text is
   gone.
 - **Delay:** nothing appears for the first **400 ms**, so a fast answer never
@@ -68,10 +71,10 @@ card (1 px Arena cálida border, radius 16) that holds:
 
 - **A phone content area,** 360 × 480 px, Marfil, radius 12, with a
   thin header strip at the top (the title «Mis reservas» in the heading
-  serif, 56 px tall, an Arena cálida rule under it). The logo is 192 px wide
+  serif, 56 px tall, an Arena cálida rule under it). The logo is 240 px wide
   and centred in the remaining space. This sample **breathes** as §2
   describes (a CSS animation, so the file shows the real motion), captioned
-  «En pantalla · 192 px en teléfono, 240 px en tableta, centrado en el
+  «En pantalla · 240 px en teléfono, 300 px en tableta, centrado en el
   contenido».
 - **Four still samples** in a row, each the logo at 120 px wide on a Marfil
   tile (160 × 110 px, radius 12) with a caption under it:
@@ -93,7 +96,7 @@ Under «Design tokens», after «Row chevrons (Client and Staff)», add:
 >
 > - A screen's first load shows only `emma-logo.png` (transparent, 800 ×
 >   333), centred in the content area between the header and the tab bar on
->   Marfil: 192px wide on phones, 240px on tablets. No text, card, or
+>   Marfil: 240px wide on phones, 300px on tablets. No text, card, or
 >   spinner; the header and tab bar stay usable.
 > - Nothing for the first 400ms, then a 300ms ease-out fade-in, then an
 >   endless breath of 2.8s (1.4s in, 1.4s out, ease-in-out) between opacity
