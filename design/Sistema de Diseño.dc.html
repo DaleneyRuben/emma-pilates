@@ -16,6 +16,7 @@
   body { margin: 0; background: #FAF7F2; -webkit-font-smoothing: antialiased; }
   a { color: #B78380; text-decoration: none; }
   a:hover { color: #9C6764; }
+  @keyframes emma-breath { 0%, 100% { opacity: 0.55; transform: scale(0.96); } 50% { opacity: 1; transform: scale(1); } }
 </style>
 </helmet>
 <div style="background:#FAF7F2;color:#4A4A4A;font-family:'Work Sans',system-ui,sans-serif;padding:64px 48px 96px;">
@@ -560,6 +561,49 @@
           <span style="font-size:12px;color:#766D69;">Visible · Ocultar contraseña</span>
         </div>
         <div style="font-size:13px;color:#766D69;line-height:1.5;">Ojo de 20 px dentro del campo, área táctil de 44 px (40 px en la web). Empieza oculta; el valor y el cursor se mantienen.</div>
+      </div>
+    </div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:28px;">
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#7A716D;font-weight:500;">08</div>
+      <h2 style="font-family:Lora,Georgia,serif;font-weight:500;font-size:30px;margin:0;">Carga</h2>
+      <p style="margin:0;font-size:15px;line-height:1.6;color:#766D69;max-width:620px;">Mientras una pantalla carga por primera vez, solo el logo, respirando con calma. Sin texto ni spinner.</p>
+    </div>
+    <div style="background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:40px;display:flex;flex-direction:column;gap:36px;">
+      <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+          <div role="progressbar" aria-label="Cargando tus reservas" style="width:360px;height:480px;border-radius:12px;background:#FAF7F2;border:1px solid #EFE7DE;display:flex;flex-direction:column;overflow:hidden;">
+            <div style="height:56px;flex-shrink:0;display:flex;align-items:center;padding:0 20px;border-bottom:1px solid #D8C9BB;font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;color:#4A4A4A;">Mis reservas</div>
+            <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+              <img src="./emma-logo.png" alt="" style="width:240px;height:auto;display:block;opacity:0.55;transform:scale(0.96);animation:emma-breath 2.8s ease-in-out 0.7s infinite;" />
+            </div>
+          </div>
+          <div style="font-size:12px;color:#766D69;text-align:center;max-width:360px;">En pantalla · 240 px en teléfono, 300 px en tableta, centrado en el contenido</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:24px;flex:1;min-width:340px;">
+          <div style="font-size:12px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#7A716D;">Momentos</div>
+          <div style="display:grid;grid-template-columns:repeat(2,160px);gap:24px 28px;">
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <div style="width:160px;height:110px;border-radius:12px;background:#FAF7F2;border:1px solid #EFE7DE;display:flex;align-items:center;justify-content:center;position:relative;"></div>
+            <div style="font-size:12px;color:#766D69;text-align:center;max-width:160px;">0–400 ms · nada todavía</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <div style="width:160px;height:110px;border-radius:12px;background:#FAF7F2;border:1px solid #EFE7DE;display:flex;align-items:center;justify-content:center;position:relative;"><img src="./emma-logo.png" alt="" style="width:120px;height:auto;display:block;opacity:0.55;transform:scale(0.96);" /></div>
+            <div style="font-size:12px;color:#766D69;text-align:center;max-width:160px;">En reposo · opacidad 0,55</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <div style="width:160px;height:110px;border-radius:12px;background:#FAF7F2;border:1px solid #EFE7DE;display:flex;align-items:center;justify-content:center;position:relative;"><img src="./emma-logo.png" alt="" style="width:120px;height:auto;display:block;opacity:1;" /></div>
+            <div style="font-size:12px;color:#766D69;text-align:center;max-width:160px;">Inhala · opacidad 1, 1,4 s</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <div style="width:160px;height:110px;border-radius:12px;background:#FAF7F2;border:1px solid #EFE7DE;display:flex;align-items:center;justify-content:center;position:relative;"><img src="./emma-logo.png" alt="" style="width:120px;height:auto;display:block;opacity:1;" /><span style="position:absolute;top:8px;left:8px;padding:2px 8px;border-radius:999px;background:#EFE0DC;color:#6E6663;font-size:10px;letter-spacing:0.04em;">Reducir movimiento</span></div>
+            <div style="font-size:12px;color:#766D69;text-align:center;max-width:160px;">Reducir movimiento · quieto, sin respirar</div>
+          </div>
+          </div>
+          <div style="font-size:13px;color:#766D69;line-height:1.6;max-width:380px;">Aparece a los 400 ms con un fundido de 300 ms. Una respiración dura 2,8 s (ease-in-out). El lector de pantalla anuncia la etiqueta de la pantalla, como «Cargando clases».</div>
+        </div>
       </div>
     </div>
   </section>
