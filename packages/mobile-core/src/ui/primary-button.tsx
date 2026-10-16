@@ -6,6 +6,8 @@ type PrimaryButtonProps = {
   label: string;
   onPress?: (event: GestureResponderEvent) => void;
   disabled?: boolean;
+  /** A request it sent is in flight (follow-up 93). */
+  busy?: boolean;
   /** «compact» for the 48 pt action inside a card. */
   size?: "compact" | "regular";
 };
