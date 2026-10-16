@@ -4038,3 +4038,34 @@ Verified locally on 2026-10-15 against `pilates_dev_sim` (API from
 `not_found` for another address, `verified` for the address in capitals,
 `not_found` on a rerun, and `POST /api/v1/authentication-sessions` then
 returned a credential.
+
+## Test 49: forms stay above the keyboard on Android
+
+Android draws edge to edge since Expo 57, so the window no longer shrinks for
+the keyboard; every form now lifts itself above it (MOB-058). Run it on the
+development builds of Test 45 on the Android emulator, and on the iPhone 16
+Pro and iPad Pro 11 to check that iOS still behaves as before. Type with the
+on-screen keyboard: `adb shell input text` switches Gboard to its floating
+hardware-keyboard toolbar, which covers nothing and proves nothing
+(`adb shell pm clear com.google.android.inputmethod.latin` puts it back).
+
+1. Client login: tap «Contraseña». Expected: the form slides up so the field
+   and «Iniciar sesión» are both above the keyboard.
+2. «Regístrate»: tap «Confirmar contraseña». Expected: the field stays above
+   the keyboard, and a swipe up brings «Crear cuenta» into view with the
+   keyboard still open.
+3. Signed in as `lucia@example.com`: Perfil → Editar → tap «Nombre».
+   Expected: «Guardar cambios», pinned under the form, rises above the
+   keyboard. Perfil → «Cambiar contraseña» and «Cerrar mi cuenta» behave the
+   same way with their own buttons.
+4. Staff, signed in as `camila.rojas@example.com`: «+ Nuevo cliente» → tap
+   «Teléfono (opcional)». Expected: the field and «Crear cuenta» stay above
+   the keypad. As the Administrator, «Revisar pago» → «Rechazar» lifts its
+   reason field the same way.
+
+Verified on 2026-10-15 on the Android emulator (Medium Phone, API 36) with
+the development builds: before the fix the keyboard's top edge (y 1500 of
+2400) hid «Iniciar sesión» (y 1376–1512); after it the button sat at
+y 1085–1221. Steps 1–4 passed, the Administrator's rejection reason
+excepted (not run: it needs a pending transfer), and step 1 on both iOS
+Simulators was unchanged.
