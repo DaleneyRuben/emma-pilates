@@ -37,6 +37,8 @@ export const buttonVariants = cva(
 type ButtonProps = ComponentProps<"button"> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean;
+    /** Follow-up 93: a request this button sent is in flight. */
+    busy?: boolean;
   };
 
 export function Button({
@@ -45,8 +47,10 @@ export function Button({
   size,
   asChild = false,
   type = "button",
+  busy,
   ...props
 }: ButtonProps) {
+  void busy;
   const Component = asChild ? Slot.Root : "button";
 
   return (
