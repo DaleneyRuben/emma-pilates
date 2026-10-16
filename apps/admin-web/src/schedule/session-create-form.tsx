@@ -347,7 +347,7 @@ export function SessionCreateForm({
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" disabled={change.isPending}>
+          <Button type="submit" size="lg" busy={change.isPending}>
             Guardar
           </Button>
         </SidePanelFooter>

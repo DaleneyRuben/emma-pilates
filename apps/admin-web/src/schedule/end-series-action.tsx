@@ -57,7 +57,8 @@ export function EndSeriesAction({
       onOpenChange={onOpenChange}
       title="¿Terminar esta serie semanal?"
       confirmLabel="Terminar serie"
-      pending={change.isPending || !valid}
+      busy={change.isPending}
+      pending={!valid}
       onConfirm={() => void end()}
     >
       <p>

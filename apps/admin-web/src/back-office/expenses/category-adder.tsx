@@ -72,7 +72,7 @@ export function CategoryAdder({
               <Button
                 variant="neutral"
                 className="h-[44px]"
-                disabled={change.isPending}
+                busy={change.isPending}
                 onClick={() => void add()}
               >
                 Agregar

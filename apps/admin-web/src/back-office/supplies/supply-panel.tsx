@@ -189,7 +189,7 @@ export function SupplyPanelForm({
           )}
         </SidePanelBody>
         <SidePanelFooter>
-          <Button type="submit" size="lg" disabled={change.isPending}>
+          <Button type="submit" size="lg" busy={change.isPending}>
             Guardar
           </Button>
           {supply === undefined ? null : (
@@ -210,7 +210,7 @@ export function SupplyPanelForm({
           title="¿Archivar este insumo?"
           confirmLabel="Archivar"
           cancelLabel="Volver"
-          pending={change.isPending}
+          busy={change.isPending}
           onConfirm={() => void archive()}
         >
           <p>

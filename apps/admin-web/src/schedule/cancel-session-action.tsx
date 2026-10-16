@@ -77,7 +77,7 @@ export function CancelSessionAction({
         onOpenChange={setConfirming}
         title="¿Cancelar esta sesión?"
         confirmLabel="Cancelar sesión"
-        pending={change.isPending}
+        busy={change.isPending}
         onConfirm={() => void cancel()}
       >
         <p>{refundCopy(session)}</p>
