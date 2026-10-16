@@ -1,5 +1,6 @@
 import * as matchers from "@testing-library/react-native/matchers";
 import { notifyManager, timeoutManager } from "@tanstack/react-query";
+import { Image } from "react-native";
 
 expect.extend(matchers);
 
@@ -94,3 +95,10 @@ jest.mock("expo-file-system/legacy", () => ({
   EncodingType: { Base64: "base64" },
   readAsStringAsync: jest.fn().mockResolvedValue(""),
 }));
+
+// MOB-062: jest-expo mocks the native ImageLoader's getSize with a callback,
+// but React Native 0.86 calls it for a promise, so the mock throws on its next
+// tick. Images measure as a square unless a spec says otherwise.
+Image.getSize = jest.fn((_uri: string, success?: (width: number, height: number) => void) => {
+  success?.(1, 1);
+}) as unknown as typeof Image.getSize;
