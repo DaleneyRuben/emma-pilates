@@ -1,6 +1,7 @@
 import { useGetPaymentReview } from "@pilates/api-contracts";
 import {
   BodyText,
+  ButtonLabel,
   colors,
   formatBolivianos,
   FormField,
@@ -176,24 +177,32 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
             <Pressable
               accessibilityLabel="Confirmar rechazo"
               accessibilityRole="button"
-              accessibilityState={{ disabled: trimmedReason === "" || submitting }}
+              accessibilityState={{
+                busy: submitting,
+                disabled: trimmedReason === "" || submitting,
+              }}
               disabled={trimmedReason === "" || submitting}
               onPress={() =>
                 void decide(() => api.rejectPayment(payment.id, trimmedReason), "Pago rechazado")
               }
               style={[
                 styles.destructive,
-                (trimmedReason === "" || submitting) && styles.destructiveDisabled,
+                trimmedReason === "" && !submitting && styles.destructiveDisabled,
               ]}
             >
-              <Text style={styles.destructiveLabel}>Confirmar rechazo</Text>
+              <ButtonLabel
+                busy={submitting}
+                label="Confirmar rechazo"
+                spinnerColor={colors.white}
+                style={styles.destructiveLabel}
+              />
             </Pressable>
             <TextButton label="Cancelar" onPress={() => setRejecting(false)} />
           </View>
         ) : (
           <View style={styles.actions}>
             <PrimaryButton
-              disabled={submitting}
+              busy={submitting}
               label="Confirmar pago"
               onPress={() => void decide(() => api.confirmPayment(payment.id), "Pago confirmado")}
             />

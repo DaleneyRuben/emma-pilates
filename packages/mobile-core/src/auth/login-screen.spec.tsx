@@ -60,7 +60,9 @@ describe("LoginScreen", () => {
 
     answer({ status: "rejected" });
     await pressed;
-    expect(screen.getByRole("button", { name: "Iniciar sesión" })).not.toBeBusy();
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Iniciar sesión" })).not.toBeBusy();
+    });
   });
 
   it("formats a long server wait as minutes and seconds", async () => {

@@ -1,12 +1,14 @@
-import { colors, radii, typography } from "@pilates/mobile-core";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { ButtonLabel, colors, radii, typography } from "@pilates/mobile-core";
+import { Pressable, StyleSheet } from "react-native";
 
 export function OutlinedButton({
+  busy = false,
   disabled = false,
   label,
   onPress,
   tone = "primary",
 }: {
+  busy?: boolean;
   disabled?: boolean;
   label: string;
   onPress: () => void;
@@ -16,24 +18,25 @@ export function OutlinedButton({
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ busy, disabled: disabled || busy }}
+      disabled={disabled || busy}
       onPress={onPress}
       style={[
         styles.outlined,
         tone === "error" && styles.outlinedError,
-        disabled && styles.outlinedDisabled,
+        disabled && !busy && styles.outlinedDisabled,
       ]}
     >
-      <Text
+      <ButtonLabel
+        busy={busy}
+        label={label}
+        spinnerColor={tone === "error" ? colors.errorText : colors.primaryDeep}
         style={[
           styles.outlinedLabel,
           tone === "error" && styles.outlinedLabelError,
-          disabled && styles.disabledLabel,
+          disabled && !busy && styles.disabledLabel,
         ]}
-      >
-        {label}
-      </Text>
+      />
     </Pressable>
   );
 }

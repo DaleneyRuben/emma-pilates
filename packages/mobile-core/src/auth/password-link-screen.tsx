@@ -222,7 +222,8 @@ export function PasswordLinkScreen({
         )}
       />
       <PrimaryButton
-        disabled={!isValid || isSubmitting}
+        busy={isSubmitting}
+        disabled={!isValid}
         label={activation ? "Activar cuenta" : "Guardar contraseña"}
         onPress={submit}
       />

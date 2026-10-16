@@ -40,6 +40,7 @@ import {
   turnosIn,
   weekdayNames,
 } from "./nutritionist-format";
+import { RemoveBlockButton } from "./remove-block-button";
 
 type FormNavigation = { goBack: () => void };
 type TimeField = "start" | "end";
@@ -279,7 +280,7 @@ export function AvailabilityBlockFormScreen({
             {message}
           </BodyText>
         ) : null}
-        <PrimaryButton disabled={!valid || submitting} label="Guardar" onPress={save} />
+        <PrimaryButton busy={submitting} disabled={!valid} label="Guardar" onPress={save} />
         {editing ? (
           <Pressable
             accessibilityLabel="Eliminar horario"
@@ -348,17 +349,9 @@ export function AvailabilityBlockFormScreen({
             </BodyText>
             {booked > 0 ? <BodyText>{keptLine(booked)}</BodyText> : null}
             {confirming === "end" ? (
-              <Pressable
-                accessibilityLabel="Quitar horario"
-                accessibilityRole="button"
-                disabled={submitting}
-                onPress={remove}
-                style={styles.destructive}
-              >
-                <Text style={styles.destructiveText}>Quitar horario</Text>
-              </Pressable>
+              <RemoveBlockButton busy={submitting} onPress={remove} />
             ) : (
-              <PrimaryButton disabled={submitting} label="Aplicar cambio" onPress={save} />
+              <PrimaryButton busy={submitting} label="Aplicar cambio" onPress={save} />
             )}
             <TextButton label="Volver" onPress={() => setConfirming(null)} />
           </View>
@@ -371,15 +364,6 @@ export function AvailabilityBlockFormScreen({
 const styles = StyleSheet.create({
   content: { gap: spacing.md, paddingBottom: spacing.xxl },
   dateStrip: { flexGrow: 0 },
-  destructive: {
-    alignItems: "center",
-    borderColor: colors.error,
-    borderRadius: radii.control,
-    borderWidth: 1,
-    justifyContent: "center",
-    minHeight: 44,
-  },
-  destructiveText: { color: colors.errorText, fontSize: typography.body },
   failure: { color: colors.errorText },
   label: {
     color: colors.textMuted,

@@ -209,9 +209,7 @@ describe("Client Session detail", () => {
   it("disables booking without remaining classes and links to the Plans", async () => {
     const { screen } = await openDetail({}, 0, 3);
 
-    expect(screen.getByRole("button", { name: "Reservar" })).toHaveProp("accessibilityState", {
-      disabled: true,
-    });
+    expect(screen.getByRole("button", { name: "Reservar" })).toBeDisabled();
     expect(screen.getByText("No te quedan clases en tu plan.")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Comprar un plan" }));

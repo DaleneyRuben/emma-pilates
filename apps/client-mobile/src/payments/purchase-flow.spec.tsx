@@ -143,10 +143,7 @@ describe("Client purchase flow", () => {
     expect(instructionsRequested).not.toHaveBeenCalled();
     expect(screen.queryByText("Emma Pilates Studio")).toBeNull();
     expect(screen.queryByText(/Cuenta/)).toBeNull();
-    expect(screen.getByRole("button", { name: "Enviar comprobante" })).toHaveProp(
-      "accessibilityState",
-      { disabled: true },
-    );
+    expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeDisabled();
   });
 
   it("uploads the chosen receipt, waits for verification, attaches it, and submits the transfer", async () => {
@@ -219,10 +216,7 @@ describe("Client purchase flow", () => {
 
     await waitFor(
       () => {
-        expect(screen.getByRole("button", { name: "Enviar comprobante" })).toHaveProp(
-          "accessibilityState",
-          { disabled: false },
-        );
+        expect(screen.getByRole("button", { name: "Enviar comprobante" })).toBeEnabled();
       },
       { timeout: 10_000 },
     );

@@ -24,10 +24,7 @@ describe("ChangePasswordScreen", () => {
       <ChangePasswordScreen fetcher={jest.fn()} onBack={jest.fn()} onSaved={jest.fn()} />,
     );
 
-    expect(screen.getByRole("button", { name: "Guardar contraseña" })).toHaveProp(
-      "accessibilityState",
-      { disabled: true },
-    );
+    expect(screen.getByRole("button", { name: "Guardar contraseña" })).toBeDisabled();
 
     await fillForm(screen, {
       current: "Emma2026lucia",
@@ -36,10 +33,7 @@ describe("ChangePasswordScreen", () => {
     });
 
     expect(screen.getByText("Las contraseñas no coinciden.")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Guardar contraseña" })).toHaveProp(
-      "accessibilityState",
-      { disabled: true },
-    );
+    expect(screen.getByRole("button", { name: "Guardar contraseña" })).toBeDisabled();
   });
 
   it("changes the password through the API and reports success", async () => {

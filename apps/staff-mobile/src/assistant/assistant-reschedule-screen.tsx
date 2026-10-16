@@ -159,7 +159,8 @@ export function AssistantRescheduleScreen({
       ) : null}
       {!alternatives.isPending && !alternatives.isError && options.length > 0 ? (
         <PrimaryButton
-          disabled={selectedId === null || submitting}
+          busy={submitting}
+          disabled={selectedId === null}
           label="Confirmar cambio"
           onPress={() => void confirm()}
         />

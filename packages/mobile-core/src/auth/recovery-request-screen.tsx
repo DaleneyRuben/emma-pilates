@@ -102,7 +102,7 @@ export function RecoveryRequestScreen({
         value={email}
       />
       {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
-      <PrimaryButton disabled={submitting || limited} label="Enviar enlace" onPress={submit} />
+      <PrimaryButton busy={submitting} disabled={limited} label="Enviar enlace" onPress={submit} />
       {limited ? <TextButton label="Volver a iniciar sesión" onPress={onBack} /> : null}
     </AuthenticationScreen>
   );
