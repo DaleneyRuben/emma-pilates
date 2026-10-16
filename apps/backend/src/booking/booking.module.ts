@@ -140,6 +140,7 @@ import { createPrismaCatalogAdministration } from './administration/prisma-catal
 import { createPrismaCatalogLists } from './administration/prisma-catalog-lists';
 import { createPrismaOversight } from './administration/prisma-oversight';
 import { createPrismaScheduleAdministration } from './administration/prisma-schedule-administration';
+import { createPrismaScheduleBatch } from './administration/prisma-schedule-batch';
 import { accountClosure } from './account-closure/account-closure-provider';
 import { adminWebReads } from './admin-web-reads';
 import { receiptReadProvider } from './payments/prisma-receipt-read';
@@ -549,10 +550,13 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
         const now = () => new Date();
         return {
           catalog: createPrismaCatalogAdministration(prisma, { now }),
-          schedules: createPrismaScheduleAdministration(prisma, {
-            now,
-            recordNotification,
-          }),
+          schedules: {
+            ...createPrismaScheduleAdministration(prisma, {
+              now,
+              recordNotification,
+            }),
+            ...createPrismaScheduleBatch(prisma, { now }),
+          },
           oversight: createPrismaOversight(prisma, { now }),
           cancelEvaluation: (evaluationId, principal) =>
             evaluations.cancelEvaluationAsStaff(evaluationId, principal),
