@@ -85,7 +85,7 @@ export function WeeklyRowsField() {
                     type="button"
                     variant="neutral"
                     className="size-[30px] p-0"
-                    aria-label={`Quitar ${rowLabel(rows[index] ?? { weekday: "", time: "" }, index + 1)}`}
+                    aria-label={`Quitar ${rowLabel(rows[index] ?? { weekday: "", time: "", durationMinutes: "" }, index + 1)}`}
                     onClick={() => remove(index)}
                   >
                     <X size={13} strokeWidth={1.9} aria-hidden="true" />
