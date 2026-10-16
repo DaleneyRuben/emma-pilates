@@ -10,6 +10,7 @@ import {
   Chevron,
   colors,
   fontFamilies,
+  LoadingState,
   QueryFailure,
   radii,
   Screen,
@@ -130,7 +131,7 @@ export function NutritionistAgendaScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando agenda">Cargando agenda…</BodyText>
+        <LoadingState label="Cargando agenda" />
       </Screen>
     );
   }

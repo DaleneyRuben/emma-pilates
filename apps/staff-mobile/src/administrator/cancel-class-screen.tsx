@@ -14,6 +14,7 @@ import {
   dayChipLabel,
   formatSessionDate,
   hasStarted,
+  LoadingState,
   QueryFailure,
   radii,
   Screen,
@@ -107,7 +108,7 @@ export function CancelClassScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando sucursales">Cargando…</BodyText>
+        <LoadingState label="Cargando sucursales" />
       </Screen>
     );
   }
@@ -215,7 +216,7 @@ export function CancelClassScreen() {
         <BodyText>{describeCount(visible.length, "clase", "clases")}</BodyText>
       </View>
       {sessions.isPending ? (
-        <BodyText accessibilityLabel="Cargando clases">Cargando…</BodyText>
+        <LoadingState label="Cargando clases" />
       ) : sessions.isError ? (
         <QueryFailure
           label="No pudimos cargar las clases."

@@ -8,6 +8,7 @@ import {
   colors,
   confirmLogout,
   initials,
+  LoadingState,
   QueryFailure,
   radii,
   Screen,
@@ -84,7 +85,7 @@ export function StaffProfileScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando perfil">Cargando…</BodyText>
+        <LoadingState label="Cargando perfil" />
       </Screen>
     );
   }

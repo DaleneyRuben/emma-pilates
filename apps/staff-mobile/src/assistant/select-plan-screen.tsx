@@ -5,6 +5,7 @@ import {
   colors,
   formatBolivianos,
   Heading,
+  LoadingState,
   QueryFailure,
   radii,
   Screen,
@@ -52,7 +53,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando planes">Cargando…</BodyText>
+        <LoadingState label="Cargando planes" />
       </Screen>
     );
   }

@@ -7,8 +7,8 @@ import {
 import {
   BackLink,
   BodyText,
-  BranchPickerPill,
   boliviaCivilDate,
+  BranchPickerPill,
   civilDateRange,
   colors,
   dayChipLabel,
@@ -16,6 +16,7 @@ import {
   formatTimeRange,
   hasStarted,
   Heading,
+  LoadingState,
   QueryFailure,
   radii,
   Screen,
@@ -105,7 +106,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando sucursales">Cargando…</BodyText>
+        <LoadingState label="Cargando sucursales" />
       </Screen>
     );
   }
@@ -202,7 +203,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
       </ScrollView>
       <Text style={styles.dayTitle}>{formatSessionDate(`${selectedDate}T12:00:00.000Z`)}</Text>
       {sessions.isPending ? (
-        <BodyText accessibilityLabel="Cargando clases">Cargando…</BodyText>
+        <LoadingState label="Cargando clases" />
       ) : sessions.isError ? (
         <QueryFailure
           label="No pudimos cargar las clases."

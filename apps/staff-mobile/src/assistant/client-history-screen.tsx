@@ -1,8 +1,8 @@
 import { useListAssistantClientHistory } from "@pilates/api-contracts";
 import {
-  BodyText,
   ClassHistoryList,
   EmptyState,
+  LoadingState,
   QueryFailure,
   Screen,
   ScreenTopBar,
@@ -35,7 +35,7 @@ export function ClientHistoryScreen({ route }: { route: { params: ClientContext 
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando historial">Cargando…</BodyText>
+        <LoadingState label="Cargando historial" />
       </Screen>
     );
   }

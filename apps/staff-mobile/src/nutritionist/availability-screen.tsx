@@ -3,6 +3,7 @@ import {
   BodyText,
   Chevron,
   colors,
+  LoadingState,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -81,7 +82,7 @@ export function AvailabilityScreen() {
     return (
       <Screen style={styles.screen}>
         {header}
-        <BodyText accessibilityLabel="Cargando horarios">Cargando…</BodyText>
+        <LoadingState label="Cargando horarios" />
       </Screen>
     );
   }
