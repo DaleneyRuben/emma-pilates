@@ -9,6 +9,7 @@ import { AdministrationError } from './administration-errors';
 import type { CatalogAdministration } from './prisma-catalog-administration';
 import type { Oversight } from './prisma-oversight';
 import type { ScheduleAdministration } from './prisma-schedule-administration';
+import type { ScheduleBatch } from './prisma-schedule-batch';
 
 // The Administrator controllers' shared HTTP helpers, kept apart so each
 // controller file can import them without importing the others.
@@ -16,7 +17,7 @@ export const administrationOperations = Symbol('administrationOperations');
 
 export type AdministrationOperations = {
   catalog: CatalogAdministration;
-  schedules: ScheduleAdministration;
+  schedules: ScheduleAdministration & ScheduleBatch;
   oversight: Oversight;
   cancelEvaluation: (
     evaluationId: string,

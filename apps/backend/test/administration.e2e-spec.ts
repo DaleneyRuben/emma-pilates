@@ -70,6 +70,7 @@ describe('administration endpoints (e2e)', () => {
   const schedules = {
     listSchedules: operation(),
     createSchedule: operation(),
+    createSchedules: operation(),
     replaceSchedule: operation(),
     endSchedule: operation(),
     createSession: operation(),
@@ -227,6 +228,77 @@ describe('administration endpoints (e2e)', () => {
       .set('authorization', bearer)
       .send({ weekday: 9 })
       .expect(400);
+  });
+
+  it('creates several weekly rows together and maps a repeated row to a conflict', async () => {
+    schedules.createSchedules.mockResolvedValueOnce({
+      schedules: [
+        { schedule, created: 5, skipped: 0 },
+        { schedule: { ...schedule, weekday: 5 }, created: 4, skipped: 1 },
+      ],
+    });
+    const rows = [
+      { weekday: 3, startsAtLocal: '12:00' },
+      { weekday: 5, startsAtLocal: '12:00' },
+    ];
+    await request(app.getHttpServer())
+      .post('/api/v1/administrator/session-schedules/batch')
+      .set('authorization', bearer)
+      .send({
+        branchId: id,
+        classTypeId: other,
+        trainerStaffMemberId: other,
+        capacity: 10,
+        effectiveFrom: '2026-09-22',
+        rows,
+      })
+      .expect(201)
+      .expect(({ body }: { body: { schedules: unknown[] } }) =>
+        expect(body.schedules).toMatchObject([
+          { schedule: { weekday: 3, startsAtLocal: '12:00' }, created: 5 },
+          { schedule: { weekday: 5 }, created: 4, skipped: 1 },
+        ]),
+      );
+    expect(schedules.createSchedules).toHaveBeenCalledWith(
+      expect.objectContaining({
+        rows,
+        effectiveFrom: new Date('2026-09-22T00:00:00.000Z'),
+      }),
+      expect.anything(),
+    );
+
+    const base = {
+      branchId: id,
+      classTypeId: other,
+      trainerStaffMemberId: other,
+      capacity: 10,
+      effectiveFrom: '2026-09-22',
+    };
+    await request(app.getHttpServer())
+      .post('/api/v1/administrator/session-schedules/batch')
+      .set('authorization', bearer)
+      .send({ ...base, rows: [] })
+      .expect(400);
+    await request(app.getHttpServer())
+      .post('/api/v1/administrator/session-schedules/batch')
+      .set('authorization', bearer)
+      .send({ ...base, rows: Array.from({ length: 8 }, () => rows[0]) })
+      .expect(400);
+
+    schedules.createSchedules.mockRejectedValueOnce(
+      new AdministrationError('schedule_rows_overlap', 'Row 2 repeats row 1'),
+    );
+    await request(app.getHttpServer())
+      .post('/api/v1/administrator/session-schedules/batch')
+      .set('authorization', bearer)
+      .send({ ...base, rows: [rows[0], rows[0]] })
+      .expect(409)
+      .expect(({ body }: { body: { code: string; detail: string } }) =>
+        expect(body).toMatchObject({
+          code: 'schedule_rows_overlap',
+          detail: 'Row 2 repeats row 1',
+        }),
+      );
   });
 
   it('edits one Session and maps overlaps to a conflict', async () => {

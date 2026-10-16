@@ -28,7 +28,7 @@ function LogoutConfirmation({ onCancel }: { onCancel: () => void }) {
       <Button
         variant="destructive"
         size="sm"
-        disabled={pending}
+        busy={pending}
         onClick={() => void logout()}
       >
         Cerrar sesión

@@ -137,6 +137,7 @@ export function PendingInvitation({
             variant="neutral"
             className={cn(cardButton, "flex-1")}
             disabled={change.isPending || accountWaiting}
+            busy={change.isPending && change.variables?.kind === "correctEmail"}
             onClick={() => void correct()}
           >
             Guardar correo
@@ -154,6 +155,7 @@ export function PendingInvitation({
           variant="neutral"
           className={cardButton}
           disabled={change.isPending || waiting}
+          busy={change.isPending && change.variables?.kind === "resend"}
           onClick={() => void resend()}
         >
           Reenviar enlace
@@ -213,7 +215,7 @@ export function CancelInvitationAction({
         onOpenChange={setConfirming}
         title={`¿Cancelar la invitación de ${member.name}?`}
         confirmLabel="Sí, cancelar invitación"
-        pending={change.isPending}
+        busy={change.isPending}
         onConfirm={() => void cancel()}
       >
         <p>

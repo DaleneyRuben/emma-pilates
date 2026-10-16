@@ -16,6 +16,7 @@ export function ConfirmDialog({
   confirmLabel,
   cancelLabel = "Volver",
   pending = false,
+  busy = false,
   tone = "destructive",
   onConfirm,
 }: {
@@ -25,7 +26,10 @@ export function ConfirmDialog({
   children: ReactNode;
   confirmLabel: string;
   cancelLabel?: string;
+  /** Not available for another reason; the confirming button is grey. */
   pending?: boolean;
+  /** The confirmation's own request is in flight (follow-up 93). */
+  busy?: boolean;
   tone?: "destructive" | "primary";
   onConfirm: () => void;
 }) {
@@ -46,7 +50,12 @@ export function ConfirmDialog({
             <AlertDialog.Cancel asChild>
               <Button variant="neutral">{cancelLabel}</Button>
             </AlertDialog.Cancel>
-            <Button variant={tone} disabled={pending} onClick={onConfirm}>
+            <Button
+              variant={tone}
+              busy={busy}
+              disabled={pending}
+              onClick={onConfirm}
+            >
               {confirmLabel}
             </Button>
           </div>

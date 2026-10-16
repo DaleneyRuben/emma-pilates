@@ -68,7 +68,8 @@ export function CloseClientAccountAction({
         onOpenChange={setOpen}
         title={`¿Cerrar la cuenta de ${client.name}?`}
         confirmLabel="Cerrar cuenta"
-        pending={close.isPending || refused}
+        busy={close.isPending}
+        pending={refused}
         onConfirm={() => void confirm()}
       >
         <ul className="flex list-disc flex-col gap-1.5 pl-4 text-texto">

@@ -2167,7 +2167,14 @@ Roles get `403 administration_access_denied`.
    reports how many Sessions it created. `POST …/{id}/replacement` changes the
    time, Trainer, or capacity from an effective date: unbooked future Sessions
    move or change, booked ones stay, and the worker does not recreate the old
-   start. `POST …/{id}/end` stops it from a date. A reassigned Trainer gets a
+   start. `POST …/{id}/end` stops it from a date. `POST …/batch` takes the
+   same Branch, Class Type, Trainer, capacity, and `effectiveFrom` once, plus
+   `rows` (1 to 7 of `{"weekday": 2, "startsAtLocal": "06:00"}`), and creates
+   one schedule per row in one transaction, answering `{"schedules": [...]}`
+   with each row's counts; rows that repeat or overlap each other answer
+   `409 schedule_rows_overlap` with the row named in `detail` ("Row 2
+   repeats row 1") and nothing is saved, as with `trainer_not_assignable`.
+   A reassigned Trainer gets a
    notice such as "Se te asignó una clase: Mat Pilates, sábado 26 de
    septiembre, 16:00.".
 3. **Single Sessions**: `POST /api/v1/administrator/sessions` adds a one-off
@@ -2397,9 +2404,21 @@ Bolivia time, whatever time zone your computer uses.
 2. **Nueva sesión.** **+ Nueva sesión** opens the 408 px side panel. **Una sola
    vez** asks for Tipo de clase, Entrenadora (only Trainers assigned to the
    Branch), Fecha, Hora, and Capacidad (filled from the Class Type). **Cada
-   semana** swaps Fecha for **Día de la semana** and **Vigente desde** and
-   creates the weekly schedule; the page then says how many Sessions it
-   created for the next 30 days. **Guardar** with empty fields marks each one;
+   semana** swaps Fecha and Hora for **Días y horas** and **Vigente desde**:
+   one row per day, each with its Día, its Hora, and the Class Type's
+   duration ("50 min", or "— min" before a Class Type is chosen).
+   **Agregar día** adds a row for the next day at the last row's time (up to
+   seven); the × button removes a row (there is none while only one row is
+   left). For example Martes 06:00, Jueves 06:00, and Sábado 08:00 from next
+   Monday: **Guardar** creates the three weekly schedules together and the
+   page says "3 series semanales creadas: 12 sesiones en los próximos 30
+   días." (one row keeps "Serie semanal creada: …"). Two rows on the same day
+   and time are refused before anything is sent ("Ya está el jueves a las
+   06:00." under the second row, both of its fields in red), and so is a row
+   that starts inside another's duration ("Se cruza con …"). Nothing is
+   saved if the Trainer or Class Type is refused. Each row is its own weekly
+   schedule afterwards: click one of its Sessions and **Esta y las futuras**
+   shows only that day and time. **Guardar** with empty fields marks each one;
    a Session that overlaps another says "Se cruza con otra sesión…".
    **From an empty slot** (desktop width only): point at an empty hour of a
    day column, for example Friday at 10:00. It shows a pale fill, a dashed
@@ -4131,6 +4150,33 @@ Verified on 2026-10-15: steps 1 and 4 on the emulator, the iPhone 16 Pro,
 and the iPad Pro 11; step 2 on the emulator; step 3 on the emulator and the
 iPhone 16 Pro. Screen readers heard «Iniciar sesión, busy» and «Cerrar mi
 cuenta, busy» on Android.
+
+### The admin web (WEB-023)
+
+The admin web follows the same rule. A 16 px ring turns once every 0.8
+seconds in place of the label: white on Palo de rosa, Error on the Error
+outline. The button keeps its colour, width, and height, its label stays
+readable to screen readers (`aria-busy`), and a second click or Enter sends
+nothing. Only the button that sent the request spins. In a panel with two
+actions, such as «Ocultar en la app» beside «Guardar» on a Plan, the other
+one only turns grey. The confirming button of every «¿…?» dialog spins too.
+
+To see it, put the same kind of proxy on port 3111 in front of the API on
+3110 (non-GET requests held 4 seconds) and start the admin web with
+`ADMIN_API_PROXY_TARGET=http://127.0.0.1:3111 pnpm dev:admin`. At 1440 and
+420 px:
+
+1. «Tu cuenta» → «Cerrar sesión» → «Cerrar sesión»: the outlined Error
+   button spins in Error until the Login page opens.
+2. Log in as `paola.mendoza@example.com`: «Iniciar sesión» spins white
+   until Horario opens.
+3. Planes → a Plan → «Ocultar en la app»: the link spins and «Guardar» is
+   grey; click «Mostrar en la app» afterwards to put it back.
+4. «Nueva sesión» at an hour another Session already takes: «Guardar» spins,
+   ignores a second click, then shows "Se cruza con otra sesión…".
+
+Verified on 2026-10-16 in the built-in browser: step 1 and step 3 at 1440
+px; step 2 at 1440 px; step 4 at 420 px.
 
 ## Test 51: the studio QR is drawn whole, opens full screen, and saves to the photos
 
