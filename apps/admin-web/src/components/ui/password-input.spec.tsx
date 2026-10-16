@@ -25,6 +25,30 @@ describe("PasswordInput (follow-up 92)", () => {
     expect(input).toHaveValue("Calma2026");
   });
 
+  it("keeps the cursor where it was when the type changes", async () => {
+    const user = userEvent.setup();
+    render(<PasswordInput aria-label="Contraseña" />);
+    const input = screen.getByLabelText("Contraseña") as HTMLInputElement;
+    await user.type(input, "Calma2026");
+    input.setSelectionRange(5, 5);
+    // Chrome moves the caret to the start when an input's type changes.
+    const type = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "type",
+    );
+    jest.spyOn(input, "type", "set").mockImplementation((value: string) => {
+      type?.set?.call(input, value);
+      input.setSelectionRange(0, 0);
+    });
+
+    await user.click(
+      screen.getByRole("button", { name: "Mostrar contraseña" }),
+    );
+
+    expect(input).toHaveAttribute("type", "text");
+    expect([input.selectionStart, input.selectionEnd]).toEqual([5, 5]);
+  });
+
   it("is reachable by keyboard and never submits its form", async () => {
     const user = userEvent.setup();
     const onSubmit = jest.fn((event: { preventDefault: () => void }) =>
