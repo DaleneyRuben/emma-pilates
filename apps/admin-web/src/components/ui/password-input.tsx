@@ -15,12 +15,32 @@ export function PasswordInput({
   const input = useRef<HTMLInputElement | null>(null);
   const caret = useRef<[number | null, number | null] | null>(null);
 
-  // Browsers move the caret to the start when the type changes; put it back.
+  // Browsers move the caret to the start when the type changes, and Chrome
+  // does it again shortly after a real click; for a moment after the toggle
+  // every such move is put back.
   useLayoutEffect(() => {
     const field = input.current;
     const kept = caret.current;
     caret.current = null;
-    if (field !== null && kept !== null) field.setSelectionRange(...kept);
+    if (field === null || kept === null) return undefined;
+    const restore = () => {
+      if (
+        document.activeElement === field &&
+        (field.selectionStart !== kept[0] || field.selectionEnd !== kept[1])
+      ) {
+        field.setSelectionRange(...kept);
+      }
+    };
+    restore();
+    document.addEventListener("selectionchange", restore);
+    const stop = setTimeout(
+      () => document.removeEventListener("selectionchange", restore),
+      300,
+    );
+    return () => {
+      clearTimeout(stop);
+      document.removeEventListener("selectionchange", restore);
+    };
   }, [shown]);
 
   return (
