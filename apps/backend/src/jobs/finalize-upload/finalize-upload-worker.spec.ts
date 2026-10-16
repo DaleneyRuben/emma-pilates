@@ -30,9 +30,11 @@ const register = async (
 
   await registerFinalizeUploadWorker(boss, { process, reportError });
 
+  // UPL-003: a Client waits on this queue, so it is polled every half
+  // second instead of pg-boss's default two.
   expect(work).toHaveBeenCalledWith(
     FINALIZE_UPLOAD_QUEUE,
-    { perJobResults: true },
+    { perJobResults: true, pollingIntervalSeconds: 0.5 },
     expect.any(Function),
   );
 
