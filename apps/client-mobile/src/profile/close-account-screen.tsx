@@ -10,6 +10,7 @@ import {
   BodyText,
   colors,
   FormField,
+  FormScrollView,
   PrimaryButton,
   QueryFailure,
   radii,
@@ -23,15 +24,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { describeAccountClosure } from "./close-account-consequences";
@@ -177,65 +170,62 @@ export function CloseAccountScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={spacing.xxl}
-        style={styles.flex}
-      >
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <BodyText style={styles.lead}>
-            Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:
-          </BodyText>
-          <View style={styles.card}>
-            {closure.lines.map((line, index) => (
-              <View
-                key={line}
-                style={[styles.line, index < closure.lines.length - 1 && styles.lineDivider]}
-              >
-                <View style={styles.bullet} />
-                <BodyText style={styles.lineText}>{line}</BodyText>
+      <FormScrollView
+        contentContainerStyle={styles.content}
+        footer={
+          <View style={styles.footer}>
+            {failed ? (
+              <View accessibilityRole="alert" style={styles.failure}>
+                <BodyText style={styles.failureText}>
+                  No pudimos cerrar tu cuenta. Inténtalo de nuevo.
+                </BodyText>
               </View>
-            ))}
-          </View>
-          <BodyText style={styles.note}>
-            El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la
-            app y en las listas del estudio.
-          </BodyText>
-          <View style={styles.field}>
-            <FormField
-              autoCapitalize="none"
-              error={passwordError}
-              label="Contraseña"
-              onChangeText={(value) => {
-                setPasswordError(undefined);
-                setPassword(value);
-              }}
-              placeholder="Tu contraseña"
-              secureTextEntry
-              value={password}
+            ) : null}
+            <DestructiveButton
+              disabled={password === "" || submitting}
+              label="Cerrar mi cuenta"
+              onPress={() => void close()}
+              testID="close-account-confirm"
             />
-            <BodyText style={styles.note}>
-              Escribe tu contraseña para confirmar que eres tú.
-            </BodyText>
+            <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
           </View>
-        </ScrollView>
-        <View style={styles.footer}>
-          {failed ? (
-            <View accessibilityRole="alert" style={styles.failure}>
-              <BodyText style={styles.failureText}>
-                No pudimos cerrar tu cuenta. Inténtalo de nuevo.
-              </BodyText>
+        }
+        keyboardVerticalOffset={spacing.xxl}
+      >
+        <BodyText style={styles.lead}>
+          Al cerrar tu cuenta dejas de usar Emma Pilates Studio. Esto es lo que va a pasar:
+        </BodyText>
+        <View style={styles.card}>
+          {closure.lines.map((line, index) => (
+            <View
+              key={line}
+              style={[styles.line, index < closure.lines.length - 1 && styles.lineDivider]}
+            >
+              <View style={styles.bullet} />
+              <BodyText style={styles.lineText}>{line}</BodyText>
             </View>
-          ) : null}
-          <DestructiveButton
-            disabled={password === "" || submitting}
-            label="Cerrar mi cuenta"
-            onPress={() => void close()}
-            testID="close-account-confirm"
-          />
-          <TextButton label="Cancelar" onPress={() => navigation.goBack()} />
+          ))}
         </View>
-      </KeyboardAvoidingView>
+        <BodyText style={styles.note}>
+          El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la app
+          y en las listas del estudio.
+        </BodyText>
+        <View style={styles.field}>
+          <FormField
+            autoCapitalize="none"
+            error={passwordError}
+            label="Contraseña"
+            onChangeText={(value) => {
+              setPasswordError(undefined);
+              setPassword(value);
+            }}
+            placeholder="Tu contraseña"
+            secureTextEntry
+            value={password}
+          />
+          <BodyText style={styles.note}>Escribe tu contraseña para confirmar que eres tú.</BodyText>
+        </View>
+      </FormScrollView>
     </Screen>
   );
 }
@@ -277,7 +267,6 @@ const styles = StyleSheet.create({
   },
   failureText: { color: colors.errorText, fontSize: typography.note },
   field: { gap: spacing.sm },
-  flex: { flex: 1 },
   footer: { gap: spacing.xs, paddingTop: spacing.md },
   lead: { color: colors.text },
   line: {

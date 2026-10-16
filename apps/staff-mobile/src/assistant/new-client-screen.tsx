@@ -4,6 +4,7 @@ import {
   colors,
   formatCountdown,
   FormField,
+  FormScrollView,
   Heading,
   PrimaryButton,
   Screen,
@@ -14,7 +15,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
-import { ScrollView, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { CenteredCard } from "./assistant-layout";
@@ -114,7 +115,7 @@ export function NewClientScreen() {
       <CenteredCard maxWidth={560}>
         <BackLink onPress={() => navigation.goBack()} />
         <Heading accessibilityLabel="Nuevo cliente">Nuevo cliente</Heading>
-        <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
+        <FormScrollView contentContainerStyle={styles.form}>
           {selfRegistered !== null ? (
             <SelfRegisteredNotice
               clientId={selfRegistered.clientId}
@@ -181,7 +182,7 @@ export function NewClientScreen() {
               />
             </>
           )}
-        </ScrollView>
+        </FormScrollView>
       </CenteredCard>
     </Screen>
   );
