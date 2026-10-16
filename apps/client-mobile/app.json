@@ -55,6 +55,14 @@
           "granularPermissions": []
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Permite que Emma Pilates acceda a tus fotos para subir tu foto de perfil y los comprobantes de tus transferencias.",
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       "@pilates/mobile-core/launch-tap-plugin",
       "@sentry/react-native/expo"
     ],
