@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, waitFor, within } from "@testing-library/react-native";
-import { clearMobileQueryCache } from "@pilates/mobile-core";
+import { clearMobileQueryCache, encodeBase64 } from "@pilates/mobile-core";
 import * as FileSystem from "expo-file-system/legacy";
 import * as MediaLibrary from "expo-media-library/legacy";
 
@@ -49,7 +49,7 @@ describe("Client payment QR saving", () => {
     expect(MediaLibrary.requestPermissionsAsync).toHaveBeenCalledWith(true, ["photo"]);
     expect(FileSystem.writeAsStringAsync).toHaveBeenCalledWith(
       "file:///cache/emma-pilates-qr.png",
-      Buffer.from(qrBytes).toString("base64"),
+      encodeBase64(qrBytes),
       { encoding: "base64" },
     );
     expect(MediaLibrary.saveToLibraryAsync).toHaveBeenCalledWith(
