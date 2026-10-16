@@ -1,0 +1,54 @@
+name: migrate development database
+
+# ADR-0090: apply committed migrations to the shared development database
+# (Neon, behind the Render API) as soon as a pull request pushes them, and again
+# on main so a merge never deploys ahead of its schema.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - apps/backend/prisma/migrations/**
+  push:
+    branches: [main]
+    paths:
+      - apps/backend/prisma/migrations/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# One migration at a time across every pull request and main; a running
+# migration is never cancelled.
+concurrency:
+  group: migrate-development
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    # Forks never receive the secret.
+    if: >-
+      github.event_name != 'pull_request' ||
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Refuse to run without the development database
+        run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "::error::The DEV_DATABASE_URL secret is not set"
+            exit 1
+          fi
+          # ADR-0045: development tooling refuses production credentials.
+          case "$DATABASE_URL" in
+            *.neon.tech/*) ;;
+            *)
+              echo "::error::DEV_DATABASE_URL is not a Neon development database"
+              exit 1
+              ;;
+          esac
+      - name: Apply migrations
+        run: pnpm --filter @pilates/backend db:migrate:deploy
