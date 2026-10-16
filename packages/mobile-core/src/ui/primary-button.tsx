@@ -1,4 +1,10 @@
-import { Pressable, StyleSheet, Text, type GestureResponderEvent } from "react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  StyleSheet,
+  Text,
+  type GestureResponderEvent,
+} from "react-native";
 
 import { colors, radii, spacing, typography } from "./tokens";
 
@@ -16,22 +22,32 @@ export function PrimaryButton({
   label,
   onPress,
   disabled = false,
+  busy = false,
   size = "regular",
 }: PrimaryButtonProps) {
+  // Busy keeps the fill: grey would read as unavailable, not as working.
+  const greyed = disabled && !busy;
   return (
     <Pressable
       accessibilityLabel={label}
       accessibilityRole="button"
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ busy, disabled: disabled || busy }}
+      disabled={disabled || busy}
       onPress={onPress}
-      style={[
-        styles.button,
-        size === "compact" && styles.compact,
-        disabled && styles.disabledButton,
-      ]}
+      style={[styles.button, size === "compact" && styles.compact, greyed && styles.disabledButton]}
     >
-      <Text style={[styles.label, disabled && styles.disabledLabel]}>{label}</Text>
+      {/* The hidden label keeps the button's size while the spinner shows. */}
+      <Text style={[styles.label, greyed && styles.disabledLabel, busy && styles.hiddenLabel]}>
+        {label}
+      </Text>
+      {busy ? (
+        <ActivityIndicator
+          color={colors.white}
+          size="small"
+          style={styles.spinner}
+          testID="primary-button-spinner"
+        />
+      ) : null}
     </Pressable>
   );
 }
@@ -51,6 +67,9 @@ const styles = StyleSheet.create({
   disabledButton: {
     backgroundColor: colors.disabledBackground,
   },
+  hiddenLabel: {
+    opacity: 0,
+  },
   label: {
     color: colors.white,
     fontSize: typography.body,
@@ -58,5 +77,12 @@ const styles = StyleSheet.create({
   },
   disabledLabel: {
     color: colors.disabledText,
+  },
+  spinner: {
+    bottom: 0,
+    left: 0,
+    position: "absolute",
+    right: 0,
+    top: 0,
   },
 });
