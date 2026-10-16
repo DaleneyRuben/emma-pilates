@@ -6,6 +6,7 @@ import {
   formatBolivianos,
   FormField,
   FormScrollView,
+  FullScreenImage,
   initials,
   PrimaryButton,
   QueryFailure,
@@ -19,9 +20,8 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import { useEffect, useMemo, useState } from "react";
-import { Image, Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { createAdministratorApi } from "./administrator-api";
@@ -217,39 +217,12 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
           </View>
         )}
       </FormScrollView>
-      <Modal
-        animationType="fade"
-        onRequestClose={() => setEnlarged(false)}
-        visible={enlarged && receiptUri !== null}
-      >
-        <SafeAreaProvider>
-          <SafeAreaView style={styles.viewer}>
-            <Pressable
-              accessibilityLabel="Cerrar"
-              accessibilityRole="button"
-              hitSlop={spacing.md}
-              onPress={() => setEnlarged(false)}
-              style={styles.close}
-            >
-              <Text style={styles.closeLabel}>✕</Text>
-            </Pressable>
-            <ScrollView
-              contentContainerStyle={styles.viewerContent}
-              maximumZoomScale={4}
-              minimumZoomScale={1}
-            >
-              {receiptUri === null ? null : (
-                <Image
-                  accessibilityLabel="Comprobante ampliado"
-                  resizeMode="contain"
-                  source={{ uri: receiptUri }}
-                  style={styles.enlarged}
-                />
-              )}
-            </ScrollView>
-          </SafeAreaView>
-        </SafeAreaProvider>
-      </Modal>
+      <FullScreenImage
+        label="Comprobante ampliado"
+        onClose={() => setEnlarged(false)}
+        uri={receiptUri}
+        visible={enlarged}
+      />
     </Screen>
   );
 }
@@ -291,8 +264,6 @@ const styles = StyleSheet.create({
   badgeText: { color: colors.warningText, fontSize: typography.note, fontWeight: "500" },
   client: { alignItems: "center", flexDirection: "row", gap: spacing.md },
   clientBody: { flex: 1, gap: spacing.xxs },
-  close: { alignSelf: "flex-end", padding: spacing.lg },
-  closeLabel: { color: colors.white, fontSize: typography.titleSecondary },
   content: { gap: spacing.lg, paddingBottom: spacing.xxl },
   destructive: {
     alignItems: "center",
@@ -303,7 +274,6 @@ const styles = StyleSheet.create({
   },
   destructiveDisabled: { backgroundColor: colors.disabledBackground },
   destructiveLabel: { color: colors.white, fontSize: typography.body, fontWeight: "500" },
-  enlarged: { height: "100%", width: "100%" },
   failure: { color: colors.errorText },
   helper: { color: colors.textMuted, fontSize: typography.note },
   meta: { color: colors.textMuted, fontSize: typography.note },
@@ -332,6 +302,4 @@ const styles = StyleSheet.create({
   rejectLabel: { color: colors.errorText, fontSize: typography.body, fontWeight: "500" },
   screen: { gap: spacing.md },
   sectionTitle: { color: colors.text, fontSize: typography.bodyLarge, fontWeight: "500" },
-  viewer: { backgroundColor: "#1B1716", flex: 1 },
-  viewerContent: { flexGrow: 1 },
 });
