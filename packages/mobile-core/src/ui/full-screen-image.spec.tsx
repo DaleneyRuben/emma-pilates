@@ -1,5 +1,6 @@
 import { fireEvent, render as renderScreen } from "@testing-library/react-native";
 import type { ReactElement } from "react";
+import { Text } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { FullScreenImage } from "./full-screen-image";
@@ -42,5 +43,25 @@ describe("FullScreenImage", () => {
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar" }));
 
     expect(onClose).toHaveBeenCalled();
+  });
+
+  it("shows a banner between the top row and the image", async () => {
+    const screen = await render(
+      <FullScreenImage
+        banner={<Text>QR guardado en tus fotos.</Text>}
+        label="Código QR ampliado"
+        onClose={jest.fn()}
+        title="QR del estudio"
+        tone="light"
+        uri="data:image/png;base64,AA=="
+        visible
+      />,
+    );
+
+    const order = screen
+      .getAllByText(/QR del estudio|QR guardado en tus fotos\./)
+      .map((node) => node.props.children as string);
+    expect(order).toEqual(["QR del estudio", "QR guardado en tus fotos."]);
+    expect(screen.getByLabelText("Código QR ampliado")).toBeOnTheScreen();
   });
 });
