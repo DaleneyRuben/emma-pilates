@@ -2344,6 +2344,16 @@ pnpm dev:admin
    session of the Account (the Staff app, for example) is signed out, and you
    must use the new password next time; run the fixtures command again to
    restore `emma-local-2026`.
+5. **Show the password** (WEB-022, design follow-up 92). Every password
+   field (**Contraseña** on the Login card, the three fields of **Cambiar
+   contraseña**, and both fields of the emailed **Crear contraseña** page)
+   starts hidden, with an eye inside its right end. Click the eye: the typed
+   text appears, the icon gets a slash, and its label becomes **Ocultar
+   contraseña**. The value and the caret stay where they were, and the focus
+   stays in the field. Click again to hide it. Each field toggles on its own.
+   With the keyboard, **Tab** from a field reaches its eye (focus ring) and
+   **Space** or **Enter** toggles it without submitting. Logging in works
+   the same with the password shown.
 5. **Log out.** Open the menu, choose **Cerrar sesión**: it first asks
    "¿Cerrar sesión?" with **Cancelar**, which has focus (press Enter to keep
    your session). Confirm, and you are back on Login;
