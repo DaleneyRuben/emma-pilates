@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-14** (EXT-009; Expo/EAS added by REL-001; push added by NOT-002). This page holds **no secret values**:
+Last verified **2026-10-15** (EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -37,6 +37,8 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
  Expo Push Service: the worker sends pushes with the push-sender robot's token;
            Android through Firebase Cloud Messaging (project emma-pilates),
            iOS through APNs once gate 9 brings the key
+ Cloudflare domain emmapilatesstudio.com: Email Routing forwards soporte@ and
+           no-responder@ to the owner's inbox; no web hostnames yet
 ```
 
 ## What we use from each provider
@@ -53,16 +55,16 @@ Details are in the sections below.
 | **Vercel** | Project `emma-pilates-admin` (Hobby): production deploys, one preview per pull request, Vercel Authentication on previews, `vercel.json` rewrites, `middleware.ts`, 2 environment variables | Hosts the **admin web** (production and previews) and forwards its `/api/v1` calls to the right API with the proxy proof | Vercel Pro, custom domain (gate 7), serverless functions beyond the middleware |
 | **Render** | One Free web service, `emma-pilates-dev-api` (native Node, auto-deploy from `main`); an API key for the `preview-origins` workflow | Runs the **shared development API** that previews and Expo Go talk to | Workers, Render databases, paid plans |
 | **Neon** | One Free project, `emma-pilates-dev`: one branch, database `pilates_dev`, direct connection | The **shared development database** | Connection pooling, per-pull-request branches |
-| **Cloudflare** | R2 only: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production | Domains and DNS (gate 7), public buckets and custom domains, Workers, every other product |
+| **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email** | Hostnames on the domain (WEB-021, LNK-001, a custom API or admin host), Email Sending (SendPulse sends instead, ADR-0031), public buckets and custom bucket domains, Workers, every other product |
 | **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` profile; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
 | **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
 | **Google Play Console** | Personal developer account «Daleney Labs» (ID `5688059300530668770`) owned by the user's Google account, identity verified 2026-10-15; draft apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»), Spanish (Latin America), free, Play App Signing accepted, automatic protection on | Distributes the **Android apps**: Internal testing first, then the Client app's closed test and production release (REL-002 to REL-007); Staff stays on a closed track | Paid apps and in-app purchases (earning money is off, which keeps the legal address private), organization verification, the developer website |
+| **SendPulse** | Account signed in with the owner's Google account; free SMTP plan; profile under SendPulse's manual review since 2026-10-15 | Will send the **authentication emails** from `no-responder@emmapilatesstudio.com` (EXT-001) | Email marketing, chatbots, every other product |
 | **Better Stack** | Uptime monitor «Production API readiness»; error tracking apps `emma-pilates-api`, `emma-pilates-admin`, and `emma-pilates-mobile` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
 
 Not created yet, in the order the gates open (backlog, «Order to open the
-gates»): a **domain** with **SendPulse** for email (gate 7; Google Play
-went ahead without it by the user's decision on 2026-10-15),
-**Apple Developer** (gate 9).
+gates»): **Apple Developer** (gate 9). The domain (gate 7) arrived on
+2026-10-15; SendPulse's account exists but sends nothing until EXT-001.
 
 ## Environments
 
@@ -93,7 +95,7 @@ Every account belongs to the project owner and is shared with no one else.
 | --- | --- | --- | --- | --- |
 | GitHub | `DaleneyRuben`, repository `emma-pilates` (private) | Free | — | Code, CI, deploy automation; `main` protected by convention only |
 | Northflank | team `emma-pilates`, project `default` | Developer Sandbox | Yes, for verification only | Production API, worker, migration job, and backup job |
-| Cloudflare | `daleney.fernando@…`, account ID `1121636a866de46f92544db1a7ebe310` | Free; R2 subscription (free allowance) since 2026-10-14 | Yes | R2 image storage and database dumps |
+| Cloudflare | `daleney.fernando@…`, account ID `1121636a866de46f92544db1a7ebe310` | Free; R2 subscription (free allowance) since 2026-10-14; domain `emmapilatesstudio.com` registered 2026-10-15 for $10.46, expires 2027-10-15, auto-renew on (the `.com` price becomes $11.17 on 2026-11-01) | Yes | R2 image storage and database dumps; the domain, its DNS, and Email Routing |
 | Aiven | organization «My Organization», project `emma-pilates-prod` | Free (a $50 trial runs beside it, unused) | No | Production database |
 | Vercel | `fernando-daleney-s-projects`, project `emma-pilates-admin` | Hobby, also for production by decision | — | Admin web previews and production, `/api/v1` proxy |
 | Render | service `emma-pilates-dev-api` (`srv-db4ivt6i0phs73cru2p0`) | Free | — | Shared development API |
@@ -102,7 +104,8 @@ Every account belongs to the project owner and is shared with no one else.
 | Expo | user `daleneyfernando` (Google sign-in), organization `emma-pilates`; projects `emma-pilates-client` (`c9271277-f815-4e36-97db-63a584a85957`) and `emma-pilates-staff` (`885d3272-da0a-49f7-b8cd-33092de7662a`) | Free: 15 iOS and 15 Android builds a month | No | Mobile development builds since 2026-10-14 (gate 6); push since NOT-002; updates later |
 | Firebase | the user's Google account, project `emma-pilates` | Spark (no cost) | No | Android push delivery (FCM) since NOT-002 |
 | Google Play Console | developer «Daleney Labs» (personal), account ID `5688059300530668770`, owned by `daleney.fernando@…` | $25 once, paid 2026-10-15 | Yes (Google payments profile) | Android distribution since 2026-10-15 (gate 8) |
-| Apple, SendPulse, domain | not created yet | — | — | Gates 7 and 9 |
+| SendPulse | Google sign-in as `daleney.fernando@…`; account email `soporte@emmapilatesstudio.com` (verified 2026-10-15) | SMTP Free: 12,000 emails a month, 50 an hour, 2 sender addresses | No | Authentication email once EXT-001 finishes; SMTP profile under manual review since 2026-10-15 |
+| Apple | not created yet | — | — | Gate 9 |
 
 ## Production in detail
 
@@ -384,7 +387,9 @@ Values never go in the repository or a chat. «Mac» means the user's own
 
 - No email (gate 7): Clients cannot register or recover passwords in
   production; the first Administrator's link was read from the `api` shell.
-- No domain: production uses the providers' hostnames.
+- The domain only receives email so far: production still uses the providers'
+  hostnames, and replies sent from the owner's Gmail show that address until
+  Gmail «Send mail as» `soporte@` goes through SendPulse's SMTP (EXT-001).
 - iOS push needs an APNs key (gate 9). Until then iOS installations register,
   but Expo answers their pushes with `InvalidCredentials`, which the worker
   records as a failed delivery; the Simulators are verified with
