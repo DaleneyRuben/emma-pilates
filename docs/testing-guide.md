@@ -4039,6 +4039,11 @@ Verified locally on 2026-10-15 against `pilates_dev_sim` (API from
 `not_found` on a rerun, and `POST /api/v1/authentication-sessions` then
 returned a credential.
 
+Verified on production on 2026-10-15 by the user on an Android phone with
+the Play Internal testing builds (versionCode 2): A, B, and C, then a full
+booking run (Plan bought, receipt uploaded and approved in the Staff app,
+class booked) with push notifications, including a tap with the app closed.
+
 ## Test 49: forms stay above the keyboard on Android
 
 Android draws edge to edge since Expo 57, so the window no longer shrinks for
