@@ -4071,6 +4071,8 @@ hardware-keyboard toolbar, which covers nothing and proves nothing
 Verified on 2026-10-15 on the Android emulator (Medium Phone, API 36) with
 the development builds: before the fix the keyboard's top edge (y 1500 of
 2400) hid «Iniciar sesión» (y 1376–1512); after it the button sat at
-y 1085–1221. Steps 1–4 passed, the Administrator's rejection reason
-excepted (not run: it needs a pending transfer), and step 1 on both iOS
-Simulators was unchanged.
+y 1085–1221. Steps 1–4 passed in both apps on the emulator, the iPhone 16
+Pro, and the iPad Pro 11 (Staff login included; iOS was never affected and
+still behaves), except the Administrator's rejection reason (not run: it
+needs a pending transfer). On iOS the keyboard appears a few seconds after
+the tap; wait for it before judging the screen.
