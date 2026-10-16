@@ -23,11 +23,6 @@ export type PickedImage = {
   bytes: Uint8Array<ArrayBuffer>;
 };
 
-const acceptedMediaTypes: ReadonlySet<string> = new Set<CreatePendingUploadDtoMediaType>([
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-]);
 const verificationPollMilliseconds = 700;
 const verificationPollAttempts = 40;
 
@@ -43,7 +38,8 @@ export async function pickImage(): Promise<PickedImage | null> {
   if (!permission.granted) return null;
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ["images"],
-    quality: 0.9,
+    // The original, so the photo is encoded only once, by ensureAcceptedFormat.
+    quality: 1,
   });
   const asset = result.canceled ? undefined : result.assets[0];
   if (asset === undefined) return null;
@@ -54,31 +50,31 @@ export async function pickImage(): Promise<PickedImage | null> {
   return { uri, mediaType, bytes: decodeBase64(base64) };
 }
 
-const convertedMaxWidth = 1600;
+// UPL-003: the studio's readable receipt is 2048 px on its longest side
+// (ADR-0073), so nothing larger is worth sending over a phone network. Every
+// pick, whatever its format, is re-encoded once as JPEG at that size: a
+// 12-megapixel photo or a PNG screenshot shrinks from megabytes to a few
+// hundred kilobytes, and HEIC or an unknown type becomes an accepted format.
+const uploadMaxEdge = 2048;
+const uploadJpegQuality = 0.8;
 
-// iPhone photos are usually HEIC, which the API refuses; anything outside
-// the accepted set (or without a known type) is re-encoded as JPEG and
-// downscaled so an upload takes seconds instead of minutes.
 async function ensureAcceptedFormat(asset: {
   uri: string;
-  mimeType?: string;
   width?: number;
+  height?: number;
 }): Promise<{ uri: string; mediaType: CreatePendingUploadDtoMediaType }> {
-  if (asset.mimeType !== undefined && acceptedMediaTypes.has(asset.mimeType)) {
-    return {
-      uri: asset.uri,
-      mediaType: asset.mimeType as CreatePendingUploadDtoMediaType,
-    };
-  }
-  const actions: ImageManipulator.Action[] =
-    asset.width !== undefined && asset.width > convertedMaxWidth
-      ? [{ resize: { width: convertedMaxWidth } }]
-      : [];
-  const converted = await ImageManipulator.manipulateAsync(asset.uri, actions, {
-    compress: 0.9,
+  const converted = await ImageManipulator.manipulateAsync(asset.uri, downscaleActions(asset), {
+    compress: uploadJpegQuality,
     format: ImageManipulator.SaveFormat.JPEG,
   });
   return { uri: converted.uri, mediaType: "image/jpeg" };
+}
+
+function downscaleActions({ width = 0, height = 0 }: { width?: number; height?: number }) {
+  if (Math.max(width, height) <= uploadMaxEdge) return [];
+  return width >= height
+    ? [{ resize: { width: uploadMaxEdge } }]
+    : [{ resize: { height: uploadMaxEdge } }];
 }
 
 // Declares, uploads, finalizes, and waits until the worker has verified the

@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-nati
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system/legacy";
+import * as ImageManipulator from "expo-image-manipulator";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -78,6 +79,9 @@ describe("Client purchase flow", () => {
         },
       ],
     } as never);
+    jest
+      .mocked(ImageManipulator.manipulateAsync)
+      .mockResolvedValue({ uri: "file:///receipt.jpg", width: 10, height: 10 });
     jest.mocked(FileSystem.readAsStringAsync).mockResolvedValue(encodeBase64(receiptBytes));
     const calls: string[] = [];
     let statusReads = 0;
@@ -108,7 +112,7 @@ describe("Client purchase flow", () => {
         return jsonResponse({
           id: "asset-1",
           state: statusReads < 2 ? "processing" : "ready",
-          mediaType: "image/png",
+          mediaType: "image/jpeg",
         });
       },
       "POST /api/v1/purchase-intents/intent-1/receipt": (init) => {
@@ -144,8 +148,8 @@ describe("Client purchase flow", () => {
       .update(receiptBytes)
       .digest("base64");
     expect(calls).toEqual([
-      `upload ${JSON.stringify({ purpose: "transfer_receipt", mediaType: "image/png", byteSize: 8, checksum })}`,
-      "put image/png",
+      `upload ${JSON.stringify({ purpose: "transfer_receipt", mediaType: "image/jpeg", byteSize: 8, checksum })}`,
+      "put image/jpeg",
       "finalize",
       `attach ${JSON.stringify({ imageAssetId: "asset-1" })}`,
     ]);

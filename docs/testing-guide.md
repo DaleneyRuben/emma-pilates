@@ -1591,7 +1591,8 @@ the line "Escanea el código con tu app bancaria y transfiere el monto exacto."
 and nothing else: since PAY-003 the QR is the only transfer instruction, with no
 beneficiary, bank, or account line (Test 41 checks the endpoint). Tap **Sube tu comprobante de
 transferencia**: iOS asks for photo access the first time, then opens the
-library (the Simulator ships with sample photos). Picking one uploads it
+library (the Simulator ships with sample photos). Picking one re-encodes it as
+a JPEG of at most 2048 px on its longest side (UPL-003, Test 53), uploads it
 through `/api/v1/uploads` (hash, PUT, finalize, wait until `READY`) and attaches
 it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
 **Enviar comprobante** becomes available. Tap it.
@@ -4334,3 +4335,45 @@ look empty there.
 
 Verified on 2026-10-16: steps 1–6 on the Android emulator (Medium Phone,
 API 36), the iPhone 16 Pro, and the iPad Pro 11.
+
+## Test 53: a receipt or profile photo uploads small
+
+The Client app re-encodes every picked image, whatever its format, once as a
+JPEG of at most 2048 px on its longest side at quality 0.8 before it declares
+the upload (UPL-003): 2048 px is the studio's readable receipt (ADR-0073), so
+nothing larger is worth sending over a phone network. The picker hands over
+the original (`quality: 1`) so the photo is encoded only once. The worker
+polls the `uploads.finalize.v1` queue every 0.5 s instead of pg-boss's
+default 2 s. Receipts and the profile photo share the code; the Staff app
+uploads nothing.
+
+Run it on the development builds of Test 45 (Android emulator, iPhone 16 Pro,
+iPad Pro 11) with the API **and the worker** on `pilates_dev_sim`. Seed a
+large photo and a large screenshot first: `xcrun simctl addmedia <udid>
+photo.jpg shot.png` on iOS; `adb push photo.jpg /sdcard/Pictures/` and a
+`MEDIA_SCANNER_SCAN_FILE` broadcast on Android.
+
+1. As Sofía, upload a receipt as in Test 10 B, picking the large photo
+   (for example a 4288 × 2848 JPEG of about 3 MB). Expected: «Comprobante
+   adjunto» within a couple of seconds, and the newest row of
+   `system.image_assets` is `image/jpeg`, a few hundred kilobytes, with
+   `verified_width` × `verified_height` at most 2048 on the longer side
+   (`select declared_media_type, declared_byte_size, verified_width,
+   verified_height from system.image_assets order by created_at desc limit 1`).
+2. Repeat with the large PNG screenshot. Expected: `image/jpeg`, the height
+   2048 for a tall screenshot, and the `readable` variant under
+   `apps/backend/.data/uploads/private/transfer_receipt/<id>/` still sharp
+   to read.
+3. As Lucía, Perfil → «Editar» → «Cambiar foto» with the large photo.
+   Expected: the photo in the circle and «Quitar foto», the row again a
+   JPEG of at most 2048 px.
+4. Timings: `processing_started_at - created_at` is the PUT (declare to
+   finalize) and `finalized_at - processing_started_at` the queue pickup plus
+   the worker; locally the second is under a second for a 2048 px JPEG.
+
+On production the same query answers the real numbers for a phone; read it
+in the database console as the timing check after a release.
+
+Verified on 2026-10-16: steps 1, 3, and 4 on the Android emulator (Medium
+Phone, API 36), steps 1, 3, and 4 on the iPhone 16 Pro, and steps 1, 2, and
+4 on the iPad Pro 11.

@@ -25,7 +25,7 @@ export type FinalizeUploadWorkerHandler = (
 export interface FinalizeUploadWorkerBoss {
   work(
     name: string,
-    options: { perJobResults: true },
+    options: { perJobResults: true; pollingIntervalSeconds: number },
     handler: FinalizeUploadWorkerHandler,
   ): Promise<string>;
 }
@@ -71,9 +71,11 @@ export const registerFinalizeUploadWorker = async (
   boss: FinalizeUploadWorkerBoss,
   dependencies: FinalizeUploadWorkerDependencies,
 ): Promise<void> => {
+  // A Client is waiting for READY (UPL-003), so this queue is polled every
+  // half second, pg-boss's minimum, instead of the default two.
   await boss.work(
     FINALIZE_UPLOAD_QUEUE,
-    { perJobResults: true },
+    { perJobResults: true, pollingIntervalSeconds: 0.5 },
     async (jobs) =>
       Promise.all(jobs.map((job) => processJob(job, dependencies))),
   );
