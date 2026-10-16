@@ -118,10 +118,10 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
   it("creates a weekly schedule from a Vigente desde date and reports its occurrences", async () => {
     let body: unknown;
     server.use(
-      http.post(apiUrl(schedulesPath), async ({ request }) => {
+      http.post(apiUrl(`${schedulesPath}/batch`), async ({ request }) => {
         body = await request.json();
         return jsonResponse(
-          { schedule: mondaySchedule, created: 4, skipped: 1 },
+          { schedules: [{ schedule: mondaySchedule, created: 4, skipped: 1 }] },
           201,
         );
       }),
@@ -143,11 +143,8 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
       within(panel).getByLabelText("Entrenadora"),
       daniela.id,
     );
-    await user.selectOptions(
-      within(panel).getByLabelText("Día de la semana"),
-      "3",
-    );
-    await user.type(within(panel).getByLabelText("Hora"), "19:00");
+    await user.selectOptions(within(panel).getByLabelText("Día, fila 1"), "3");
+    await user.type(within(panel).getByLabelText("Hora, fila 1"), "19:00");
     await user.clear(within(panel).getByLabelText("Capacidad"));
     await user.type(within(panel).getByLabelText("Capacidad"), "12");
     await user.type(within(panel).getByLabelText("Vigente desde"), nextMonday);
@@ -158,10 +155,9 @@ describe("AW03 Nueva sesión on a desktop browser", () => {
         branchId: centro.id,
         classTypeId: mat.id,
         trainerStaffMemberId: daniela.id,
-        weekday: 3,
-        startsAtLocal: "19:00",
         capacity: 12,
         effectiveFrom: nextMonday,
+        rows: [{ weekday: 3, startsAtLocal: "19:00" }],
       }),
     );
     expect(await screen.findByRole("status")).toHaveTextContent(

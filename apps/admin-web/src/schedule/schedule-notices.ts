@@ -3,16 +3,6 @@ import type { ScheduleChangeResult } from "./use-schedule-change";
 
 // What the page says after a change, so the Administrator sees how many
 // Sessions a weekly schedule touched (ADR-0059 keeps booked ones).
-export const createdNotice = (outcome: ScheduleChangeResult): string => {
-  if (outcome.kind !== "create-schedule") return "Sesión creada.";
-  const { created, skipped } = outcome.result;
-  const made = `Serie semanal creada: ${created} ${created === 1 ? "sesión" : "sesiones"} en los próximos 30 días.`;
-  if (skipped === 0) return made;
-  return skipped === 1
-    ? `${made} 1 se omitió porque se cruzaba con otra sesión.`
-    : `${made} ${skipped} se omitieron porque se cruzaban con otras sesiones.`;
-};
-
 const count = (n: number, one: string, many: string) =>
   `${n} ${n === 1 ? one : many}`;
 
@@ -31,6 +21,20 @@ const keptNote = (kept: number, suffix: string): string =>
 // Only the groups of Sessions that exist are named.
 const clauses = (parts: (string | false)[]): string =>
   parts.filter((part): part is string => part !== false).join(" y ");
+
+// One row keeps the single schedule's wording; several rows are counted
+// together (WEB-025).
+export const createdNotice = (outcome: ScheduleChangeResult): string => {
+  if (outcome.kind !== "create-schedules") return "Sesión creada.";
+  const { schedules } = outcome.result;
+  const created = schedules.reduce((sum, row) => sum + row.created, 0);
+  const skipped = schedules.reduce((sum, row) => sum + row.skipped, 0);
+  const made =
+    schedules.length === 1
+      ? "Serie semanal creada"
+      : `${schedules.length} series semanales creadas`;
+  return `${made}: ${count(created, "sesión", "sesiones")} en los próximos 30 días.${skippedNote(skipped)}`;
+};
 
 export const replacedNotice = (
   result: {

@@ -119,10 +119,14 @@ export const formatDayTab = (date: string) => ({
   day: String(Number(date.slice(8, 10))),
 });
 
+/** "jueves" for ISO weekday 4 (Monday = 1). */
+export const weekdayName = (weekday: number): string =>
+  longWeekdays[weekday - 1] ?? "";
+
 /** "jueves 13 de agosto", as a screen reader hears an AW02 slot's day. */
 export function formatLongDay(date: string): string {
   const { day, month } = dayMonth(date);
-  return `${longWeekdays[weekdayOf(date) - 1]} ${day} de ${month}`;
+  return `${weekdayName(weekdayOf(date))} ${day} de ${month}`;
 }
 
 export function formatSessionMoment(instant: string): string {

@@ -100,8 +100,8 @@ describe("AW02 empty slots on a desktop browser", () => {
     const panel = await screen.findByRole("dialog", { name: "Nueva sesión" });
     await user.click(within(panel).getByLabelText("Cada semana"));
 
-    expect(within(panel).getByLabelText("Día de la semana")).toHaveValue("4");
-    expect(within(panel).getByLabelText("Hora")).toHaveValue("18:00");
+    expect(within(panel).getByLabelText("Día, fila 1")).toHaveValue("4");
+    expect(within(panel).getByLabelText("Hora, fila 1")).toHaveValue("18:00");
     expect(within(panel).getByLabelText("Vigente desde")).toHaveValue(
       dayOfNextWeek(3),
     );

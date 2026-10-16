@@ -16,6 +16,7 @@ export type AdministrationErrorCode =
   | 'invalid_schedule'
   | 'trainer_not_assignable'
   | 'session_overlap'
+  | 'schedule_rows_overlap'
   | 'session_not_editable'
   | 'capacity_below_bookings'
   | 'effective_date_invalid';
@@ -36,6 +37,7 @@ const statuses: Record<AdministrationErrorCode, number> = {
   invalid_schedule: 400,
   trainer_not_assignable: 409,
   session_overlap: 409,
+  schedule_rows_overlap: 409,
   session_not_editable: 409,
   capacity_below_bookings: 409,
   effective_date_invalid: 400,
@@ -44,8 +46,11 @@ const statuses: Record<AdministrationErrorCode, number> = {
 export class AdministrationError extends Error {
   readonly status: number;
 
-  constructor(readonly code: AdministrationErrorCode) {
-    super(code);
+  constructor(
+    readonly code: AdministrationErrorCode,
+    detail?: string,
+  ) {
+    super(detail ?? code);
     this.name = 'AdministrationError';
     this.status = statuses[code];
   }

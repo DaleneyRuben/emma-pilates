@@ -2167,7 +2167,14 @@ Roles get `403 administration_access_denied`.
    reports how many Sessions it created. `POST …/{id}/replacement` changes the
    time, Trainer, or capacity from an effective date: unbooked future Sessions
    move or change, booked ones stay, and the worker does not recreate the old
-   start. `POST …/{id}/end` stops it from a date. A reassigned Trainer gets a
+   start. `POST …/{id}/end` stops it from a date. `POST …/batch` takes the
+   same Branch, Class Type, Trainer, capacity, and `effectiveFrom` once, plus
+   `rows` (1 to 7 of `{"weekday": 2, "startsAtLocal": "06:00"}`), and creates
+   one schedule per row in one transaction, answering `{"schedules": [...]}`
+   with each row's counts; rows that repeat or overlap each other answer
+   `409 schedule_rows_overlap` with the row named in `detail` ("Row 2
+   repeats row 1") and nothing is saved, as with `trainer_not_assignable`.
+   A reassigned Trainer gets a
    notice such as "Se te asignó una clase: Mat Pilates, sábado 26 de
    septiembre, 16:00.".
 3. **Single Sessions**: `POST /api/v1/administrator/sessions` adds a one-off
@@ -2397,9 +2404,21 @@ Bolivia time, whatever time zone your computer uses.
 2. **Nueva sesión.** **+ Nueva sesión** opens the 408 px side panel. **Una sola
    vez** asks for Tipo de clase, Entrenadora (only Trainers assigned to the
    Branch), Fecha, Hora, and Capacidad (filled from the Class Type). **Cada
-   semana** swaps Fecha for **Día de la semana** and **Vigente desde** and
-   creates the weekly schedule; the page then says how many Sessions it
-   created for the next 30 days. **Guardar** with empty fields marks each one;
+   semana** swaps Fecha and Hora for **Días y horas** and **Vigente desde**:
+   one row per day, each with its Día, its Hora, and the Class Type's
+   duration ("50 min", or "— min" before a Class Type is chosen).
+   **Agregar día** adds a row for the next day at the last row's time (up to
+   seven); the × button removes a row (there is none while only one row is
+   left). For example Martes 06:00, Jueves 06:00, and Sábado 08:00 from next
+   Monday: **Guardar** creates the three weekly schedules together and the
+   page says "3 series semanales creadas: 12 sesiones en los próximos 30
+   días." (one row keeps "Serie semanal creada: …"). Two rows on the same day
+   and time are refused before anything is sent ("Ya está el jueves a las
+   06:00." under the second row, both of its fields in red), and so is a row
+   that starts inside another's duration ("Se cruza con …"). Nothing is
+   saved if the Trainer or Class Type is refused. Each row is its own weekly
+   schedule afterwards: click one of its Sessions and **Esta y las futuras**
+   shows only that day and time. **Guardar** with empty fields marks each one;
    a Session that overlaps another says "Se cruza con otra sesión…".
    **From an empty slot** (desktop width only): point at an empty hour of a
    day column, for example Friday at 10:00. It shows a pale fill, a dashed
