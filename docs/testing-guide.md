@@ -4288,3 +4288,49 @@ prompt, the strip faded); steps 4 and 6 on the iPhone 16 Pro (the photo
 landed at 420 × 600; the refusal line under the actions and under the
 view's button); step 5 on the iPad Pro 11, allowing the prompt (spinner, then
 the strip, the photo at 420 × 600; only the add-photos access granted).
+
+## Test 52: show the password on mobile
+
+Every password field in both apps carries an eye inside its right end
+(MOB-059, design follow-up 92): login, registration, the password link
+(activation and recovery), change password, and the Client's close
+account. It starts hidden; a tap shows the typed text with the eye crossed
+out («Ocultar contraseña»), a second tap hides it again («Mostrar
+contraseña»), and the value and cursor stay. Each field toggles on its own.
+The admin web side is WEB-022 (Test 24, step 5).
+
+Run it on the development builds of Test 45 on the Android emulator, the
+iPhone 16 Pro, and the iPad Pro 11, in both apps.
+
+1. Client login: type `lucia@example.com` and the fixture password, tap the
+   eye. Expected: the password in plain text and the crossed-out eye; tap
+   again for the dots, then «Iniciar sesión» signs in with it.
+2. «Regístrate»: type different passwords in «Contraseña» and «Confirmar
+   contraseña» and open only the second eye. Expected: only that field
+   shows its text.
+3. Perfil → «Cambiar contraseña»: fill two fields and open the middle eye.
+   Expected: only «Contraseña nueva» shows its text.
+4. Perfil → «Cerrar mi cuenta»: type a **wrong** password and open the eye.
+   Expected: the text with the cursor at its end. Do not submit a right one.
+5. A password link: send `POST /api/v1/password-recovery-requests` for a
+   fixture, take the `token` from the newest `password_recovery` file in
+   `apps/backend/.data/email-capture/` (the worker must be running), and
+   open the form (see below). Both fields carry the eye.
+6. Staff login as `camila.rojas@example.com`, then «Tu cuenta» → «Cambiar
+   contraseña», and the Staff password link: as steps 1, 3, and 5.
+
+A development build cannot receive the https link (LNK-001), so step 5 needs
+a temporary, never-committed line in `parseVerifiedLink`
+(`packages/mobile-core/src/ingress/verified-link.ts`) that turns
+`emmapilates-client://` or `emmapilates-staff://` into `https://`, then
+`emmapilates-client://127.0.0.1/authentication/recover-password?token=…`
+(the allowed host is the API's, `127.0.0.1`). Revert it afterwards.
+
+The developer gear sits on the Staff «Tu cuenta» avatar on Android, and a
+swipe from it opens the developer menu; drag it away with
+`adb shell input swipe 970 172 200 1800 800`. The iOS Simulator does not draw
+the dots of a hidden field in Maestro screenshots, so a hidden field may
+look empty there.
+
+Verified on 2026-10-16: steps 1–6 on the Android emulator (Medium Phone,
+API 36), the iPhone 16 Pro, and the iPad Pro 11.

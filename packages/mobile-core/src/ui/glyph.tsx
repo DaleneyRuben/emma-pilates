@@ -39,6 +39,20 @@ export const glyphShapes = {
       <Line x1={3.5} x2={20.5} y1={11} y2={11} />
     </>
   ),
+  // Follow-up 92's password eye (MOB-059): open while the field is hidden.
+  eye: (
+    <>
+      <Path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <Circle cx={12} cy={12} r={3} />
+    </>
+  ),
+  eyeOff: (
+    <>
+      <Path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z" />
+      <Circle cx={12} cy={12} r={3} />
+      <Line x1={4} x2={20} y1={4} y2={20} />
+    </>
+  ),
   leaf: (
     <>
       <Path d="M5.5 18.5c0-7.5 5-12.5 13-13.5-.6 8.3-5.6 13.5-13 13.5z" />
