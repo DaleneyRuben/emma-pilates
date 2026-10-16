@@ -10,6 +10,7 @@ import {
   ButtonLabel,
   colors,
   formatSessionDate,
+  formatSessionMinutes,
   formatTimeRange,
   Heading,
   LoadingState,
@@ -194,7 +195,7 @@ export function AssistantSessionDetailScreen({
             </View>
             <View style={styles.factRow}>
               <BodyText style={styles.factLabel}>Duración</BodyText>
-              <Text style={styles.factValue}>{`${detail.classType.durationMinutes} minutos`}</Text>
+              <Text style={styles.factValue}>{formatSessionMinutes(detail.startsAt, detail.endsAt)}</Text>
             </View>
           </View>
           <CapacitySummary

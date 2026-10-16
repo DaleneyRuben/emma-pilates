@@ -61,6 +61,12 @@ export function formatTimeRange(startsAt: string, endsAt: string): string {
   return `${timeFormatter.format(new Date(startsAt))} – ${timeFormatter.format(new Date(endsAt))}`;
 }
 
+// A Session owns its duration (WEB-027, booking ADR-0004): «75 minutos».
+export function formatSessionMinutes(startsAt: string, endsAt: string): string {
+  const minutes = Math.round((new Date(endsAt).getTime() - new Date(startsAt).getTime()) / 60_000);
+  return `${minutes} minutos`;
+}
+
 // A Session that has started takes no Booking and cannot be cancelled, so
 // the lists that lead to either leave it out (03, S07, S13).
 export function hasStarted(startsAt: string, now: Date): boolean {

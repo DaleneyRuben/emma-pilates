@@ -31,7 +31,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { CapacityBlock } from "./capacity-block";
-import { formatSessionDate, formatTimeRange } from "@pilates/mobile-core";
+import { formatSessionDate, formatSessionMinutes, formatTimeRange } from "@pilates/mobile-core";
 
 export type ConfirmedBooking = {
   bookingId: string;
@@ -228,7 +228,7 @@ export function SessionDetailScreen({ route }: { route: { params: { sessionId: s
           </View>
           <View style={styles.factRow}>
             <BodyText style={styles.factLabel}>Duración</BodyText>
-            <Text style={styles.factValue}>{`${detail.classType.durationMinutes} minutos`}</Text>
+            <Text style={styles.factValue}>{formatSessionMinutes(detail.startsAt, detail.endsAt)}</Text>
           </View>
         </View>
         <CapacityBlock
