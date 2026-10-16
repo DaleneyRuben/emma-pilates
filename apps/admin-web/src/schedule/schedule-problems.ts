@@ -23,6 +23,9 @@ const problems: Record<string, Problem> = {
     field: "date",
     message: "Elige una fecha desde hoy.",
   },
+  schedule_rows_overlap: {
+    message: "Dos días se repiten o se cruzan. Revisa las filas.",
+  },
   session_not_editable: {
     message: "Esta sesión ya empezó o fue cancelada; ya no se puede cambiar.",
   },
