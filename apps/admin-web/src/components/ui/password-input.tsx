@@ -1,4 +1,4 @@
-import { useState, type ComponentProps } from "react";
+import { useLayoutEffect, useRef, useState, type ComponentProps } from "react";
 import { cn } from "../../lib/cn";
 import { Input } from "./input";
 
@@ -8,14 +8,31 @@ import { Input } from "./input";
 export function PasswordInput({
   className,
   disabled,
+  ref,
   ...props
 }: Omit<ComponentProps<"input">, "type">) {
   const [shown, setShown] = useState(false);
+  const input = useRef<HTMLInputElement | null>(null);
+  const caret = useRef<[number | null, number | null] | null>(null);
+
+  // Browsers move the caret to the start when the type changes; put it back.
+  useLayoutEffect(() => {
+    const field = input.current;
+    const kept = caret.current;
+    caret.current = null;
+    if (field !== null && kept !== null) field.setSelectionRange(...kept);
+  }, [shown]);
 
   return (
     <div className="relative">
       <Input
         {...props}
+        ref={(node) => {
+          input.current = node;
+          if (typeof ref === "function") return ref(node);
+          if (ref) ref.current = node;
+          return undefined;
+        }}
         type={shown ? "text" : "password"}
         disabled={disabled}
         className={cn("pr-[48px]", className)}
@@ -26,7 +43,12 @@ export function PasswordInput({
         aria-pressed={shown}
         disabled={disabled}
         onMouseDown={(event) => event.preventDefault()}
-        onClick={() => setShown((current) => !current)}
+        onClick={() => {
+          const field = input.current;
+          caret.current =
+            field === null ? null : [field.selectionStart, field.selectionEnd];
+          setShown((current) => !current);
+        }}
         className="absolute top-1/2 right-[2px] flex size-[40px] -translate-y-1/2 items-center justify-center rounded-control text-texto-tenue focus-visible:shadow-foco disabled:text-deshabilitado-texto"
       >
         <svg
