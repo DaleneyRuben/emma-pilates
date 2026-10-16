@@ -222,7 +222,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `07` | Historial de clases | Past classes |
 | `08` | Elegir plan | Plan catalog |
 | `09` | Detalle del plan | Plan detail; the total is the price drawn minus the Credit applied, never below zero |
-| `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash); the QR is the only transfer instruction, with no beneficiary, bank, or account line |
+| `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash); the QR is the only transfer instruction, drawn whole and tappable, with «Ampliar» and «Guardar QR» under it and a light full-screen «QR ampliado» view |
 | `11` | Estado del pago | Pending/confirmed/rejected states |
 | `12` | Mi plan | Active plan, sessions left, expiry |
 | `13` | Evaluación nutricional | Book a nutrition assessment: only days of months not yet used in the next 30 days, the Branch (and Nutritionist) per turno when there are several, turnos close 3 h before they start; used-month state only when no unused month has turnos, and a no-active-plan state with «Ver planes» (`08`); the used-month title names the used month («de este mes» or «de septiembre») |
@@ -328,6 +328,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `18→22` (Editar perfil) and `18→23` (Cambiar contraseña); both return to `18`.
 - `18→24` (Cerrar mi cuenta) through the quiet Error-tone link under «Cerrar sesión»; the back arrow and «Cancelar» return to `18`, and a completed closure signs the client out onto `01` with the notice «Cerramos tu cuenta. Gracias por entrenar con nosotras.»
 - Booking and assessment confirmations are acknowledged on arrival, not on a result screen: `04→05` and `14→15` land with a transient Éxito-tinted notice strip under the header (check glyph + "Reserva confirmada" / "Evaluación confirmada" and the class, day and time in the Nota style). It fades after a few seconds or on first scroll and never returns for that record; while it shows, the new card carries a 3px Éxito left edge so it can be found in the list. No button, no dismiss control. `05` adds one muted balance line ("Te quedan 7 clases en tu plan."); `15` has none — an assessment consumes no class allowance.
+- `10`'s QR is drawn whole at its own proportions (never cropped). Tapping it or «Ampliar» opens «QR ampliado», a light full-screen view closed by «Cerrar» or the back gesture. «Guardar QR» (on `10` and in the view) adds the image to the photo library, asking only for permission to add photos, so the Client can pick it with their bank app's «QR desde galería»; it confirms with «QR guardado en tus fotos.» or explains a refusal.
 
 **Navigation — staff app**
 - No tab bar for any role. Each role lands on its own root — `S02` Trainer, `S04` Front desk, `S11` Administration, `S15` Nutritionist — and navigates in depth from a header with a back arrow.
