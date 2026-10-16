@@ -115,6 +115,10 @@ describe("pickReceipt", () => {
   });
 
   it("asks the picker for the original so the photo is encoded only once", async () => {
+    jest
+      .mocked(ImagePicker.launchImageLibraryAsync)
+      .mockResolvedValue({ canceled: true, assets: null } as never);
+
     await pickReceipt();
 
     expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledWith(
