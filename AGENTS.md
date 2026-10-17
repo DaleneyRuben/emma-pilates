@@ -19,3 +19,12 @@ This is the tool-neutral entrypoint for any AI-assisted work in this repository.
 ## Generated design output
 
 **Never edit or revert anything under `design/` by hand.** It is generated output. Every screen change goes through a prompt or follow-up in `docs/design/prompts/` according to the `design-workflow` skill.
+
+## Staging costs money while it runs
+
+Staging's Northflank team (`emma-pilates-staging`) is on Pay as you go: its `api` and `worker` services cost about $0.015 an hour together while they run ([ADR-0092](./docs/adr/0092-release-to-staging-before-promoting-to-production.md)). Until real Clients use production, staging stays **paused** when nobody is testing:
+
+- **Before** testing on staging or promoting to production, resume `api` and `worker` (and release `main` again if a merge landed while paused).
+- **After** testing or promoting, pause both again, and say so to the user if you cannot.
+
+The steps are in the [release runbook](./docs/runbooks/production-release.md#pause-and-resume-staging).
