@@ -91,7 +91,7 @@ gates»): **Apple Developer** (gate 9). The domain (gate 7) arrived on
 | `NODE_ENV` | `production` | `production` (errors tagged `staging` through `ERROR_REPORTING_ENVIRONMENT`) | `development` |
 | Email | none: the worker leaves authentication emails queued until EXT-001 | none, as production | `LocalEmailCapture` under `apps/backend/.data/email-capture` |
 | Images | Cloudflare R2 `emma-pilates-prod-images` (`OBJECT_STORAGE=s3`) | R2 `emma-pilates-staging-images` | `apps/backend/.data/uploads` |
-| Release | started by hand (`release production`), promotes a commit staging passed, [runbook](../runbooks/production-release.md) | automatic after CI on `main` (`release staging`) | — |
+| Release | started by hand (`Release Production`), promotes a commit staging passed, [runbook](../runbooks/production-release.md) | automatic after CI on `main` (`Release Staging`) | — |
 | Running | always | paused when nobody is testing (Pay as you go) | — |
 
 CI runs disposable databases per job (`postgres:18-alpine`). The shared
@@ -135,7 +135,7 @@ Every account belongs to the project owner and is shared with no one else.
 - **Service `api`:** combined service (builds and runs), repository
   `DaleneyRuben/emma-pilates`, branch `main`, Dockerfile
   `/apps/backend/Dockerfile`, build context `/`; **CI off** (pushes never
-  build; the `release production` workflow starts builds), **CD on** (a
+  build; the `Release Production` workflow starts builds), **CD on** (a
   finished build deploys). Plan nf-compute-20
   (0.2 vCPU, 512 MB, the largest free plan), 1 instance, uses about 290 MB.
   Port 3100 public HTTP as `p01` → https://p01--api--mmps25fn9k9x.code.run.
@@ -247,7 +247,7 @@ Every account belongs to the project owner and is shared with no one else.
   from Git: no previews (ADR-0091) and no merge deployments (ADR-0092).
 - `middleware.ts` adds `x-pilates-proxy-proof` from `ADMIN_WEB_PROXY_SECRET`
   to every forwarded `/api/v1` request (ADR-0087).
-- Production is deployed only by the `release production` workflow
+- Production is deployed only by the `Release Production` workflow
   (`vercel deploy --prebuilt --prod` of the promoted commit).
 - A production deployment opened through any address other than
   `emma-pilates-admin.vercel.app` (its per-deployment URL, the `git-main`
@@ -372,10 +372,10 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `NODE_ENV` | `production` (image default) | — | `.env` | |
 | `RELEASE_ID` | from `NF_GIT_SHA` at build | unset (`local`) | unset | |
 | `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | — | — | Lets Vercel use the pinned pnpm |
-| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `release production` workflow; expires around 2027-10-14 |
-| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `release staging` workflow; expires around 2027-10-17 |
-| `VERCEL_ORG_ID`, `VERCEL_PRODUCTION_PROJECT_ID`, `VERCEL_PRODUCTION_TOKEN` | GitHub repository secrets | — | — | `release production` deploys the admin web; the token is scoped to `emma-pilates-admin` |
-| `VERCEL_STAGING_PROJECT_ID`, `VERCEL_STAGING_TOKEN` | GitHub repository secrets | — | — | `release staging` deploys the staging admin web; the token is scoped to `emma-pilates-admin-staging` |
+| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `Release Production` workflow; expires around 2027-10-14 |
+| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `Release Staging` workflow; expires around 2027-10-17 |
+| `VERCEL_ORG_ID`, `VERCEL_PRODUCTION_PROJECT_ID`, `VERCEL_PRODUCTION_TOKEN` | GitHub repository secrets | — | — | `Release Production` deploys the admin web; the token is scoped to `emma-pilates-admin` |
+| `VERCEL_STAGING_PROJECT_ID`, `VERCEL_STAGING_TOKEN` | GitHub repository secrets | — | — | `Release Staging` deploys the staging admin web; the token is scoped to `emma-pilates-admin-staging` |
 | `STAGING_API_URL`, `STAGING_NORTHFLANK_WORKER_SERVICE_ID` | GitHub repository **variables** | — | — | The staging API and worker; the staging workflow does nothing while `STAGING_API_URL` is empty |
 | `ERROR_REPORTING_ENVIRONMENT` | unset (reports `production`) | — | unset | Northflank `staging` group (`staging`); names the environment in error reports (EXT-017) |
 | Staging settings | — | — | — | Northflank `staging` group, listed under «Staging in detail» |
@@ -385,7 +385,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 - **`.github/workflows/ci.yml`:** every pull request and push to `main`;
   quality, unit, contract, e2e, and integration jobs per surface, the
   database jobs on `postgres:18-alpine`. Deploys nothing.
-- **`.github/workflows/release-staging.yml`:** after `ci` passes on a push
+- **`.github/workflows/release-staging.yml`:** after `CI` passes on a push
   to `main` (or by hand with a commit), releases it to the staging team
   (migrate, `api` readiness, `worker`, smoke check), deploys the staging
   admin web with the Vercel CLI, and records the commit status

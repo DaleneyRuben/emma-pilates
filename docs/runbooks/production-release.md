@@ -5,8 +5,8 @@ migrations first ([ADR-0052](../adr/0052-run-backend-processes-from-one-deployab
 [ADR-0080](../adr/0080-separate-health-and-deployment-checks.md),
 [ADR-0092](../adr/0092-release-to-staging-before-promoting-to-production.md)).
 Since EXT-017 a merge to `main` releases itself to **staging** through the
-`release staging` workflow, and **production** is released only when a person
-starts the `release production` workflow, which promotes a commit staging
+`Release Staging` workflow, and **production** is released only when a person
+starts the `Release Production` workflow, which promotes a commit staging
 already released and smoke-checked. From EXT-008 (2026-10-14) until EXT-017 a
 merge released production directly. The steps by hand below are the fallback.
 
@@ -40,7 +40,7 @@ as they are.
 
 ## Release to staging (automatic)
 
-Merge the pull request. When `ci` passes on the push to `main`,
+Merge the pull request. When `CI` passes on the push to `main`,
 [`.github/workflows/release-staging.yml`](../../.github/workflows/release-staging.yml)
 starts within seconds (once the repository variable `STAGING_API_URL` is set)
 and runs `pnpm --filter @pilates/backend release` with
@@ -109,7 +109,7 @@ Once real Clients use production, staging stays resumed.
 ## Promote to production (by hand)
 
 When a commit has proved itself on staging, start the production release:
-Actions → `release production` → **Run workflow**, or
+Actions → `Release Production` → **Run workflow**, or
 
 ```sh
 gh workflow run release-production.yml
@@ -155,9 +155,9 @@ automatically (ADR-0080):
 | admin web (production) | the new backend; the admin web on its previous deployment | Read the job's log (`vercel build` prints the failing step); fix and promote again, or promote the previous deployment in Vercel → Deployments |
 
 To release staging again without a new merge, run its workflow by hand:
-Actions → `release staging` → **Run workflow** (or
+Actions → `Release Staging` → **Run workflow** (or
 `gh workflow run release-staging.yml -f sha=<full hash>`). The commit must
-have a green `ci` run from a push to `main`; an empty `sha` means main's head.
+have a green `CI` run from a push to `main`; an empty `sha` means main's head.
 
 ## The deploy tokens
 
