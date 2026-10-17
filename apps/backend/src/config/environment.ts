@@ -111,6 +111,9 @@ const environmentSchema = z
       .default(null),
     // ADR-0081: Better Stack's error-tracking DSN; unset reports nothing.
     ERROR_REPORTING_DSN: z.url().nullable().default(null),
+    // EXT-017: staging runs with NODE_ENV=production like production itself,
+    // so it names its environment here; unset reports NODE_ENV.
+    ERROR_REPORTING_ENVIRONMENT: z.string().min(1).nullable().default(null),
     // ADR-0066: Better Stack's heartbeat URL for the worker; unset pings
     // nothing.
     WORKER_HEARTBEAT_URL: z
@@ -192,7 +195,12 @@ const environmentSchema = z
         });
       }
     });
-  });
+  })
+  .transform((environment) => ({
+    ...environment,
+    ERROR_REPORTING_ENVIRONMENT:
+      environment.ERROR_REPORTING_ENVIRONMENT ?? environment.NODE_ENV,
+  }));
 
 export type Environment = z.infer<typeof environmentSchema>;
 

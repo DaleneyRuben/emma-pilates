@@ -132,7 +132,7 @@ async function bootstrap(): Promise<void> {
     emit,
     errorReporter: createErrorReporter({
       dsn: environment.ERROR_REPORTING_DSN,
-      environment: environment.NODE_ENV,
+      environment: environment.ERROR_REPORTING_ENVIRONMENT,
       release: environment.RELEASE_ID,
       service: 'worker',
     }),
