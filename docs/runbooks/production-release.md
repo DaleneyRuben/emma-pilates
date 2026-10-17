@@ -11,9 +11,10 @@ already released and smoke-checked. From EXT-008 (2026-10-14) until EXT-017 a
 merge released production directly. The steps by hand below are the fallback.
 
 Staging is the same Northflank setup in its own team, `emma-pilates-staging`
-(project `default`, services `api` and `worker`, jobs `migrate` and `backup`,
-secret group `staging`), with the database `emma_staging` on the production
-Aiven service, its own R2 buckets, and the admin web project
+(Pay as you go, project `default` in US Central, services `api` and `worker`,
+job `migrate`, secret group `staging`; no `backup` job), with the database
+`emma_staging` on the production Aiven service, its own R2 bucket
+`emma-pilates-staging-images`, and the admin web project
 `emma-pilates-admin-staging`. Every section below applies to both
 environments with the staging names; [infrastructure](../architecture/infrastructure.md)
 lists the staging values.
@@ -65,8 +66,10 @@ and runs `pnpm --filter @pilates/backend release` with
    step (EXT-009); the staging variables are `STAGING_NORTHFLANK_WORKER_SERVICE_ID`
    and `STAGING_NORTHFLANK_BACKUP_JOB_ID`;
 8. runs `pnpm smoke` with `SMOKE_EXPECTED_RELEASE` set to the commit;
-9. records the commit status `release/staging` on the commit: `success` when
-   the smoke check passed, `failure` when any step failed. A superseded commit
+9. deploys the admin web to `emma-pilates-admin-staging` with the Vercel CLI;
+10. records the commit status `release/staging` on the commit: `success` when
+   the smoke check and the admin web deployment passed, `failure` when any
+   step failed. A superseded commit
    gets no status, so it can never be promoted.
 
 Every step starts only after the one before it succeeded, and the first
@@ -78,11 +81,30 @@ outcome; GitHub emails the operator when it fails. The first automatic
 release (`87fe95d2`, 2026-10-14) took 5 m 6 s: migrate build 1 m 22 s, run
 31 s, api build 1 m 22 s, readiness 31 s, smoke 10 s.
 
-The admin web's staging project, `emma-pilates-admin-staging`, deploys the
-same push from Git by itself.
+The release then deploys the same commit to the admin web's staging
+project, `emma-pilates-admin-staging`, with the Vercel CLI, and the commit
+counts as passed only when that deployment succeeds too.
 
 To watch one: `gh run list --workflow release-staging.yml --limit 3`, then
 `gh run view <id> --log | grep -E "migrate|api build|readiness|outcome|passed"`.
+
+## Pause and resume staging
+
+Staging's team pays for every hour its services run (about $0.015 an hour for
+`api` and `worker` together), so it is paused when nobody is testing.
+
+- **Resume:** Northflank, team `emma-pilates-staging` → Services → `api` →
+  **Resume**, then the same on `worker`. Wait until
+  `curl -s https://p01--api--jmys6w5p8vlk.code.run/health/ready` answers
+  `ready`. If a merge landed while staging was paused, its release failed at
+  readiness: run `gh workflow run release-staging.yml` to release main's head.
+- **Pause:** Services → `api` → **Pause**, then `worker`. Merges while paused
+  fail their staging release (GitHub emails the failure), so production
+  cannot be promoted until staging is resumed and released again.
+- **Cost check:** team → Billing → Usage. A $3 billing alert emails the
+  owner when the month passes it.
+
+Once real Clients use production, staging stays resumed.
 
 ## Promote to production (by hand)
 
@@ -110,8 +132,8 @@ the superseded check: production may lag `main` by design), the production
 smoke check, and finally deploys the admin web: it checks out the promoted
 commit and runs `vercel pull`, `vercel build --prod`, and
 `vercel deploy --prebuilt --prod` with the CLI version pinned in the
-workflow. The production Vercel project is disconnected from Git, so nothing
-else deploys it. Releases queue under the `production-release` concurrency
+workflow, the same commands the staging release ran. `vercel.json` turns
+Vercel's Git deployments off, so nothing else deploys either project. Releases queue under the `production-release` concurrency
 group without cancelling.
 
 ## When a release fails
@@ -141,13 +163,16 @@ have a green `ci` run from a push to `main`; an empty `sha` means main's head.
 
 Staging's workflow authenticates with `NORTHFLANK_STAGING_API_TOKEN`, a token
 of the same shape in the team `emma-pilates-staging` (role
-`github-staging-release`, project `default` only). The production workflow's
-admin web job uses `VERCEL_PRODUCTION_TOKEN` (Vercel token
+`github-staging-release`, project `default` only). Each admin web deployment uses
+a Vercel token scoped to its own project: staging's `VERCEL_STAGING_TOKEN`
+(`github-actions-staging-release`) with `VERCEL_STAGING_PROJECT_ID`, and
+production's `VERCEL_PRODUCTION_TOKEN` (Vercel token
 `github-actions-production-release`, scoped to the production project
 `emma-pilates-admin`), with `VERCEL_ORG_ID` (the team) and
-`VERCEL_PRODUCTION_PROJECT_ID`; rotate it in Vercel → Account Settings →
-Tokens and `gh secret set VERCEL_PRODUCTION_TOKEN`. The staging admin web
-deploys from Git and needs no token.
+`VERCEL_PRODUCTION_PROJECT_ID`. Rotate either in Vercel → Account Settings
+→ Tokens, then `gh secret set` the same name. The Northflank staging token
+was created on 2026-10-17 with a 1-year lifetime (expires around
+2027-10-17).
 
 The production workflow authenticates with the repository secret `NORTHFLANK_API_TOKEN`:
 Northflank API token `github-actions-release` (team `emma-pilates`, created
