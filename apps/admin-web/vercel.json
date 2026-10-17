@@ -13,6 +13,13 @@
       "destination": "https://p01--api--mmps25fn9k9x.code.run/api/v1/:path*"
     },
     {
+      "source": "/api/v1/:path*",
+      "has": [
+        { "type": "host", "value": "emma-pilates-admin-staging.vercel.app" }
+      ],
+      "destination": "https://p01--api--jmys6w5p8vlk.code.run/api/v1/:path*"
+    },
+    {
       "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
