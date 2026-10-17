@@ -1,6 +1,6 @@
 # Trust forwarded addresses only from known hosting proxies
 
-Status: accepted
+Status: accepted; Render's measured hop count no longer applies since [ADR-0091](./0091-retire-the-shared-development-environment.md) retired the development API
 
 [ADR-0029](./0029-manage-authentication-in-nestjs-backend.md) takes the network address for throttling from the direct connection or explicitly trusted hosting proxies. This decision says which proxies are trusted and how the backend proves it.
 

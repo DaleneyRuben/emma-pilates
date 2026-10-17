@@ -1,6 +1,6 @@
 # Host shared development on Render and Neon
 
-Status: accepted
+Status: superseded by [ADR-0091](./0091-retire-the-shared-development-environment.md)
 
 The persistent shared development API established in [ADR-0045](./0045-maintain-a-shared-development-api-and-database.md) will run as one Render Free web service, and its isolated PostgreSQL database will use one Neon Free project. The NestJS API remains the same containerized application used elsewhere; Render and Neon are development infrastructure adapters, not application or domain dependencies.
 
