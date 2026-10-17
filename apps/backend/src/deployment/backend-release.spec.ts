@@ -63,6 +63,19 @@ describe('releaseBackend', () => {
     expect(journal()).toEqual([]);
   });
 
+  it('releases a promoted commit main has moved past when no head is given (EXT-017)', async () => {
+    const { northflank, journal } = fakeNorthflank();
+
+    const { result } = release(
+      northflank,
+      fakeReadiness([{ status: 200, release: sha }]).fetch,
+      null,
+    );
+
+    await expect(result).resolves.toEqual({ outcome: 'released' });
+    expect(journal()).toContain('startServiceBuild');
+  });
+
   it('stops before running migrations when the job build fails', async () => {
     const { northflank, journal } = fakeNorthflank({
       getJobBuild: [build('job-build-1', 'FAILURE')],

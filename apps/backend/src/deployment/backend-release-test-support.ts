@@ -121,7 +121,7 @@ export function fakeReadiness(
 export function release(
   northflank: NorthflankClient,
   fetch: ReleaseFetch,
-  mainHead: string = sha,
+  mainHead: string | null = sha,
   workerServiceId: string | null = null,
   backupJobId: string | null = null,
 ) {
