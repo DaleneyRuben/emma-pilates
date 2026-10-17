@@ -4,7 +4,8 @@ name: release staging
 # staging the way production is released (EXT-008, ADR-0052, ADR-0080): build
 # and run Northflank's migrate job, build the api service and wait for
 # /health/ready to report the commit, build the worker, build the backup job
-# without running it, then smoke check. The commit status release/staging
+# without running it, smoke check, then deploy the admin web to the staging
+# Vercel project with the Vercel CLI. The commit status release/staging
 # records the outcome; release production promotes only a commit whose status
 # is success. Nothing runs until the repository variable STAGING_API_URL names
 # the staging API.
@@ -35,6 +36,7 @@ env:
   # prisma generate in the setup action reads it; nothing connects to it
   DATABASE_URL: postgresql://nobody@127.0.0.1:1/pilates_ci_unreachable
   STAGING_API_URL: ${{ vars.STAGING_API_URL }}
+  VERCEL_CLI: vercel@62.2.0
 
 jobs:
   release:
@@ -88,17 +90,30 @@ jobs:
           SMOKE_BASE_URL: ${{ env.STAGING_API_URL }}
           SMOKE_EXPECTED_RELEASE: ${{ steps.commit.outputs.sha }}
         run: pnpm --filter @pilates/backend smoke
+      # The same Vercel CLI deploy the production release runs, so a broken
+      # admin web build or deploy fails here first.
+      - name: Deploy the admin web to staging
+        id: admin_web
+        if: steps.smoke.outcome == 'success'
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STAGING_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_STAGING_TOKEN }}
+        run: |
+          pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          pnpm dlx "$VERCEL_CLI" build --prod --token="$VERCEL_TOKEN"
+          pnpm dlx "$VERCEL_CLI" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
       # A superseded commit gets no status, so it can never be promoted.
       - name: Record whether the commit passed staging
         if: always() && steps.release.outputs.outcome != 'superseded' && steps.commit.outputs.sha != ''
         env:
           GH_TOKEN: ${{ github.token }}
           SHA: ${{ steps.commit.outputs.sha }}
-          PASSED: ${{ steps.smoke.outcome == 'success' }}
+          PASSED: ${{ steps.smoke.outcome == 'success' && steps.admin_web.outcome == 'success' }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if [ "$PASSED" = true ]; then
-            state=success description="released to staging and smoke checked"
+            state=success description="released to staging, smoke checked, admin web deployed"
           else
             state=failure description="staging release or smoke check failed"
           fi

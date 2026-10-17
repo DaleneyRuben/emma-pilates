@@ -82,8 +82,8 @@ jobs:
         with:
           ref: ${{ needs.backend.outputs.sha }}
       - uses: ./.github/actions/setup
-      # The production project is disconnected from Git, so this is the only
-      # way a commit reaches emma-pilates-admin.vercel.app.
+      # vercel.json turns Git deployments off, so this is the only way a commit
+      # reaches emma-pilates-admin.vercel.app.
       - name: Build the admin web for Vercel production
         run: |
           pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token="$VERCEL_TOKEN"
