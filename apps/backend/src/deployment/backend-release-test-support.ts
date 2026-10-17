@@ -4,7 +4,7 @@ import {
   type NorthflankRun,
   type ReleaseFetch,
 } from './northflank-client';
-import { releaseProduction, type ReleaseClock } from './production-release';
+import { releaseBackend, type ReleaseClock } from './backend-release';
 
 // Fakes shared by the production release specs (EXT-008, EXT-002, EXT-009).
 
@@ -126,7 +126,7 @@ export function release(
   backupJobId: string | null = null,
 ) {
   const log: string[] = [];
-  const result = releaseProduction({
+  const result = releaseBackend({
     sha,
     mainHead,
     jobId: 'migrate',

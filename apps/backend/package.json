@@ -16,7 +16,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
-    "release:production": "nest build && node dist/src/production-release-main.js",
+    "release": "nest build && node dist/src/backend-release-main.js",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",

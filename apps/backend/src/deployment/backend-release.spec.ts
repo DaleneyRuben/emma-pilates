@@ -7,9 +7,9 @@ import {
   fakeNorthflank,
   fakeReadiness,
   release,
-} from './production-release-test-support';
+} from './backend-release-test-support';
 
-describe('releaseProduction', () => {
+describe('releaseBackend', () => {
   it('migrates, then builds the API, then waits until readiness reports the commit', async () => {
     const { northflank, calls } = fakeNorthflank();
     const readiness = fakeReadiness([

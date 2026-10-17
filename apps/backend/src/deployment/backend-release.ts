@@ -65,7 +65,7 @@ type ReleaseInput = {
 // EXT-008 (ADR-0052, ADR-0080): migrations first, the API only after they
 // succeeded, then readiness must report the released commit. Each step starts
 // only once the one before it concluded; the first failure stops the release.
-export async function releaseProduction(
+export async function releaseBackend(
   input: ReleaseInput,
 ): Promise<ReleaseResult> {
   const { sha, mainHead, jobId, serviceId, northflank, clock, log } = input;
