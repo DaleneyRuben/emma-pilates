@@ -1,0 +1,122 @@
+name: release staging
+
+# EXT-017 (ADR-0092): once ci passes on a push to main, release that commit to
+# staging the way production is released (EXT-008, ADR-0052, ADR-0080): build
+# and run Northflank's migrate job, build the api service and wait for
+# /health/ready to report the commit, build the worker, build the backup job
+# without running it, smoke check, then deploy the admin web to the staging
+# Vercel project with the Vercel CLI. The commit status release/staging
+# records the outcome; release production promotes only a commit whose status
+# is success. Nothing runs until the repository variable STAGING_API_URL names
+# the staging API.
+on:
+  workflow_run:
+    workflows: [ci]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: Full commit hash on main with a green ci run (empty for main's head)
+        required: false
+
+permissions:
+  contents: read
+  actions: read
+  statuses: write
+
+# A running release is never cancelled mid-migration; GitHub keeps only the
+# newest pending run, and the release command skips a commit that is no longer
+# main's head.
+concurrency:
+  group: staging-release
+  cancel-in-progress: false
+
+env:
+  # prisma generate in the setup action reads it; nothing connects to it
+  DATABASE_URL: postgresql://nobody@127.0.0.1:1/pilates_ci_unreachable
+  STAGING_API_URL: ${{ vars.STAGING_API_URL }}
+  VERCEL_CLI: vercel@62.2.0
+
+jobs:
+  release:
+    if: >-
+      vars.STAGING_API_URL != '' &&
+      (github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'))
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Choose the commit
+        id: commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_SHA: ${{ github.event.workflow_run.head_sha }}
+          DISPATCH_SHA: ${{ inputs.sha }}
+        run: |
+          main_head=$(gh api "repos/$GITHUB_REPOSITORY/commits/main" --jq .sha)
+          sha=${RUN_SHA:-${DISPATCH_SHA:-$main_head}}
+          # a hand-started release still needs ci to have passed on main
+          green=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?head_sha=$sha&branch=main&event=push&status=success" --jq .total_count)
+          if [ "$green" = 0 ]; then
+            echo "::error::no successful ci run on main for $sha"
+            exit 1
+          fi
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "main_head=$main_head" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ steps.commit.outputs.sha }}
+      - uses: ./.github/actions/setup
+      - name: Migrate, then release the API, the worker, and the backup image
+        id: release
+        env:
+          RELEASE_ENVIRONMENT: staging
+          API_URL: ${{ env.STAGING_API_URL }}
+          NORTHFLANK_API_TOKEN: ${{ secrets.NORTHFLANK_STAGING_API_TOKEN }}
+          NORTHFLANK_PROJECT_ID: default
+          NORTHFLANK_JOB_ID: migrate
+          NORTHFLANK_SERVICE_ID: api
+          NORTHFLANK_WORKER_SERVICE_ID: ${{ vars.STAGING_NORTHFLANK_WORKER_SERVICE_ID }}
+          NORTHFLANK_BACKUP_JOB_ID: ${{ vars.STAGING_NORTHFLANK_BACKUP_JOB_ID }}
+          RELEASE_SHA: ${{ steps.commit.outputs.sha }}
+          MAIN_HEAD: ${{ steps.commit.outputs.main_head }}
+        run: pnpm --filter @pilates/backend release
+      - name: Smoke check the release
+        id: smoke
+        if: steps.release.outputs.outcome == 'released'
+        env:
+          SMOKE_BASE_URL: ${{ env.STAGING_API_URL }}
+          SMOKE_EXPECTED_RELEASE: ${{ steps.commit.outputs.sha }}
+        run: pnpm --filter @pilates/backend smoke
+      # The same Vercel CLI deploy the production release runs, so a broken
+      # admin web build or deploy fails here first.
+      - name: Deploy the admin web to staging
+        id: admin_web
+        if: steps.smoke.outcome == 'success'
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_STAGING_PROJECT_ID }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_STAGING_TOKEN }}
+        run: |
+          pnpm dlx "$VERCEL_CLI" pull --yes --environment=production --token="$VERCEL_TOKEN"
+          pnpm dlx "$VERCEL_CLI" build --prod --token="$VERCEL_TOKEN"
+          pnpm dlx "$VERCEL_CLI" deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+      # A superseded commit gets no status, so it can never be promoted.
+      - name: Record whether the commit passed staging
+        if: always() && steps.release.outputs.outcome != 'superseded' && steps.commit.outputs.sha != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ steps.commit.outputs.sha }}
+          PASSED: ${{ steps.smoke.outcome == 'success' && steps.admin_web.outcome == 'success' }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if [ "$PASSED" = true ]; then
+            state=success description="released to staging, smoke checked, admin web deployed"
+          else
+            state=failure description="staging release or smoke check failed"
+          fi
+          gh api "repos/$GITHUB_REPOSITORY/statuses/$SHA" \
+            -f state="$state" -f context=release/staging \
+            -f description="$description" -f target_url="$RUN_URL" > /dev/null

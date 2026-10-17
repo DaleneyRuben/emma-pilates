@@ -5,7 +5,7 @@ import {
   minute,
   release,
   sha,
-} from './production-release-test-support';
+} from './backend-release-test-support';
 
 const ready = () => fakeReadiness([{ status: 200, release: sha }]);
 
@@ -32,7 +32,7 @@ const backupAnswers = {
   ],
 };
 
-describe('releaseProduction with the backup job (EXT-009)', () => {
+describe('releaseBackend with the backup job (EXT-009)', () => {
   // The scheduled job runs the image of the last released commit; the
   // release only builds it, never runs it.
   it('builds the backup job on the commit after the worker, without running it', async () => {

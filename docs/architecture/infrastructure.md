@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-17** (EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
+Last verified **2026-10-17** (EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -27,13 +27,25 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
             (DigitalOcean US West)
 
  No shared development environment since 2026-10-17 (ADR-0091): local and CI
- cover development; staging arrives before real users (EXT-017).
+ cover development.
+
+                    STAGING (EXT-017, ADR-0092; paused when idle)
+ Browser ─► emma-pilates-admin-staging.vercel.app
+              │ /api/v1 + staging's proxy proof
+              ▼
+ Mobile ──► p01--api--jmys6w5p8vlk.code.run   (staging builds of both apps)
+            (Northflank team emma-pilates-staging, US Central) ─► R2
+            Northflank worker (no ports)                       ─► R2
+              │ TLS, Aiven CA verified
+              ▼
+            database emma_staging on the same Aiven service
 
  Cloudflare R2: private buckets emma-pilates-prod-images (uploaded images) and
                emma-pilates-prod-backups (daily database dumps)
  Better Stack: production readiness every 3 min, API error reports from the API, worker and
                database-backup heartbeats
- GitHub Actions: CI on every pull request and main, production release after CI on main
+ GitHub Actions: CI on every pull request and main, staging release after CI on main,
+                production release started by hand (promotes a commit staging passed)
  Expo EAS: organization emma-pilates builds the development clients of both apps
            (iOS Simulator and Android); no store builds until gates 8–9
  Expo Push Service: the worker sends pushes with the push-sender robot's token;
@@ -51,13 +63,13 @@ Details are in the sections below.
 
 | Provider | What we use | What it does for us | Not used (on purpose) |
 | --- | --- | --- | --- |
-| **GitHub** | Private repository `emma-pilates`; Actions (2 workflows); repository secrets; 2 repository variables | Holds the code; runs CI on every pull request and `main`; starts the production release | Branch protection (needs Pro), Packages, Pages |
+| **GitHub** | Private repository `emma-pilates`; Actions (3 workflows); repository secrets; 4 repository variables; commit status `release/staging` | Holds the code; runs CI on every pull request and `main`; releases `main` to staging; promotes to production when started by hand | Branch protection (needs Pro), Packages, Pages |
 | **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (15 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
-| **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb); its CA certificate | The **production database** | The $50 trial credit, point-in-time restore, any paid plan |
-| **Vercel** | Project `emma-pilates-admin` (Hobby): production deploys of `main` only, `vercel.json` rewrites, `middleware.ts`, the error-envelope Function, Production environment variables | Hosts the **admin web** and forwards its `/api/v1` calls to the production API with the proxy proof | Vercel Pro, pull-request previews (off since ADR-0091), custom domain (gate 7) |
-| **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email** | Hostnames on the domain (WEB-021, LNK-001, a custom API or admin host), Email Sending (SendPulse sends instead, ADR-0031), public buckets and custom bucket domains, Workers, every other product |
-| **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` profile; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
-| **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
+| **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb), holding the databases `emma` (production) and `emma_staging` (staging, its own role); its CA certificate | The **production and staging databases** | The $50 trial credit, point-in-time restore, any paid plan |
+| **Vercel** | Projects `emma-pilates-admin` and `emma-pilates-admin-staging` (Hobby), each deployed only by its release workflow with the Vercel CLI (Git deployments off in `vercel.json`); `vercel.json` rewrites, `middleware.ts`, the error-envelope Function, Production environment variables; one project-scoped token per project | Hosts the **admin web** and forwards its `/api/v1` calls to the matching API with that environment's proxy proof | Vercel Pro, Git deployments and pull-request previews (off since ADR-0091 and ADR-0092), custom domain (gate 7) |
+| **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-staging-images` with the same rule and its own token `northflank-staging-images` (EXT-017); private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email** | Hostnames on the domain (WEB-021, LNK-001, a custom API or admin host), Email Sending (SendPulse sends instead, ADR-0031), public buckets and custom bucket domains, Workers, every other product |
+| **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` and `staging` profiles; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
+| **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates»), `com.emmapilates.staff` («Emma Pilates Staff»), and their staging variants `com.emmapilates.client.staging` and `com.emmapilates.staff.staging` (EXT-017); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
 | **Google Play Console** | Personal developer account «Daleney Labs» (ID `5688059300530668770`) owned by the user's Google account, identity verified 2026-10-15; draft apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»), Spanish (Latin America), free, Play App Signing accepted, automatic protection on | Distributes the **Android apps**: Internal testing first, then the Client app's closed test and production release (REL-002 to REL-007); Staff stays on a closed track | Paid apps and in-app purchases (earning money is off, which keeps the legal address private), organization verification, the developer website |
 | **SendPulse** | Account signed in with the owner's Google account; free SMTP plan; profile under SendPulse's manual review since 2026-10-15 | Will send the **authentication emails** from `no-responder@emmapilatesstudio.com` (EXT-001) | Email marketing, chatbots, every other product |
 | **Better Stack** | Uptime monitor «Production API readiness»; error tracking apps `emma-pilates-api`, `emma-pilates-admin`, and `emma-pilates-mobile` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
@@ -68,23 +80,25 @@ gates»): **Apple Developer** (gate 9). The domain (gate 7) arrived on
 
 ## Environments
 
-| | Production | Local |
-| --- | --- | --- |
-| API | Northflank `api` | `pnpm dev:backend` on port 3100 |
-| Worker | Northflank `worker` (no email until gate 7) | `node dist/src/worker-main.js` |
-| Database | Aiven `emma-pilates-prod-db`, database `emma`, PostgreSQL 18 | Homebrew `postgresql@18` (18.6) on 5433: `emma_pilates`, `pilates_dev_sim`, `pilates_test_fixtures` |
-| Admin web | https://emma-pilates-admin.vercel.app | `pnpm dev:admin` on 5173 |
-| Data | Real; one Administrator (Fernando Daleney) since 2026-10-14, no Clients; dumped daily to R2, restore drill passed 2026-10-14 | Fixtures |
-| `NODE_ENV` | `production` | `development` |
-| Email | none: the worker leaves authentication emails queued until EXT-001 | `LocalEmailCapture` under `apps/backend/.data/email-capture` |
-| Images | Cloudflare R2 `emma-pilates-prod-images` (`OBJECT_STORAGE=s3`) | `apps/backend/.data/uploads` |
-| Release | automatic after CI on `main` (`release production` workflow), [runbook](../runbooks/production-release.md) | — |
+| | Production | Staging | Local |
+| --- | --- | --- | --- |
+| API | Northflank `api` | Northflank team `emma-pilates-staging`, `api` (https://p01--api--jmys6w5p8vlk.code.run) | `pnpm dev:backend` on port 3100 |
+| Worker | Northflank `worker` (no email until gate 7) | `worker` in the staging team | `node dist/src/worker-main.js` |
+| Database | Aiven `emma-pilates-prod-db`, database `emma`, PostgreSQL 18 | the same Aiven service, database `emma_staging`, role `emma_staging` | Homebrew `postgresql@18` (18.6) on 5433: `emma_pilates`, `pilates_dev_sim`, `pilates_test_fixtures` |
+| Admin web | https://emma-pilates-admin.vercel.app | https://emma-pilates-admin-staging.vercel.app | `pnpm dev:admin` on 5173 |
+| Mobile | store builds (gates 8–9) | `staging` EAS profile: `com.emmapilates.client.staging`, `com.emmapilates.staff.staging` | development builds and Metro |
+| Data | Real; one Administrator (Fernando Daleney) since 2026-10-14, no Clients; dumped daily to R2, restore drill passed 2026-10-14 | Synthetic only, never copied from production; not backed up | Fixtures |
+| `NODE_ENV` | `production` | `production` (errors tagged `staging` through `ERROR_REPORTING_ENVIRONMENT`) | `development` |
+| Email | none: the worker leaves authentication emails queued until EXT-001 | none, as production | `LocalEmailCapture` under `apps/backend/.data/email-capture` |
+| Images | Cloudflare R2 `emma-pilates-prod-images` (`OBJECT_STORAGE=s3`) | R2 `emma-pilates-staging-images` | `apps/backend/.data/uploads` |
+| Release | started by hand (`release production`), promotes a commit staging passed, [runbook](../runbooks/production-release.md) | automatic after CI on `main` (`release staging`) | — |
+| Running | always | paused when nobody is testing (Pay as you go) | — |
 
 CI runs disposable databases per job (`postgres:18-alpine`). The shared
 development environment (Render and Neon, with pull-request previews) was
 retired on 2026-10-17 ([ADR-0091](../adr/0091-retire-the-shared-development-environment.md));
-a staging environment that mirrors production comes before real users
-(EXT-017).
+staging, which mirrors production, arrived the same day
+([ADR-0092](../adr/0092-release-to-staging-before-promoting-to-production.md)).
 
 Every environment runs PostgreSQL 18: production (Aiven 18.6), CI
 (`postgres:18-alpine`), the integration suite's Docker fallback
@@ -101,9 +115,10 @@ Every account belongs to the project owner and is shared with no one else.
 | --- | --- | --- | --- | --- |
 | GitHub | `DaleneyRuben`, repository `emma-pilates` (private) | Free | — | Code, CI, deploy automation; `main` protected by convention only |
 | Northflank | team `emma-pilates`, project `default` | Developer Sandbox | Yes, for verification only | Production API, worker, migration job, and backup job |
+| Northflank | team `emma-pilates-staging` (same login), project `default` | Pay as you go: about $2 a month paused when idle, about $12 running all month; billing alert at $3 | Yes, charged monthly | Staging API, worker, and migration job (EXT-017) |
 | Cloudflare | `daleney.fernando@…`, account ID `1121636a866de46f92544db1a7ebe310` | Free; R2 subscription (free allowance) since 2026-10-14; domain `emmapilatesstudio.com` registered 2026-10-15 for $10.46, expires 2027-10-15, auto-renew on (the `.com` price becomes $11.17 on 2026-11-01) | Yes | R2 image storage and database dumps; the domain, its DNS, and Email Routing |
 | Aiven | organization «My Organization», project `emma-pilates-prod` | Free (a $50 trial runs beside it, unused) | No | Production database |
-| Vercel | `fernando-daleney-s-projects`, project `emma-pilates-admin` | Hobby, also for production by decision | — | Admin web production, `/api/v1` proxy |
+| Vercel | `fernando-daleney-s-projects` (team ID `team_bre2bUZY2GoIVshYTqLctJEs`), projects `emma-pilates-admin` (`prj_ioO6RZptzJICWAM0zVwg3uN19bd8`) and `emma-pilates-admin-staging` (`prj_Tga3WGsCOMB1val88ri5xR0v40a4`) | Hobby (200 projects, 100 deployments a day), also for production by decision | — | Admin web production and staging, `/api/v1` proxy |
 | Better Stack | team `t614177` | Free | No | Uptime, error tracking, heartbeat, email alerts |
 | Expo | user `daleneyfernando` (Google sign-in), organization `emma-pilates`; projects `emma-pilates-client` (`c9271277-f815-4e36-97db-63a584a85957`) and `emma-pilates-staff` (`885d3272-da0a-49f7-b8cd-33092de7662a`) | Free: 15 iOS and 15 Android builds a month | No | Mobile development builds since 2026-10-14 (gate 6); push since NOT-002; updates later |
 | Firebase | the user's Google account, project `emma-pilates` | Spark (no cost) | No | Android push delivery (FCM) since NOT-002 |
@@ -159,7 +174,7 @@ Every account belongs to the project owner and is shared with no one else.
   `github-production-release` (project `default` only; Services → General
   Read and Update; Jobs → General Read, Update, Run Job), 1-year lifetime
   from 2026-10-14. It is the GitHub secret `NORTHFLANK_API_TOKEN`; rotation
-  is in the [runbook](../runbooks/production-release.md#the-deploy-token).
+  is in the [runbook](../runbooks/production-release.md#the-deploy-tokens).
 - **Secret group `production`:** runtime scope, unrestricted (every service
   and job in the project receives it). Holds everything in the «Settings»
   table below marked Northflank, plus two files:
@@ -227,11 +242,13 @@ Every account belongs to the project owner and is shared with no one else.
 
 - `vercel.json` routes `/api/v1/:path*` on the host
   `emma-pilates-admin.vercel.app` to the Northflank API (no other host gets
-  an API) and every non-API path to `index.html`; `git.deploymentEnabled`
-  deploys only `main`, so pull requests build no previews (ADR-0091).
+  an API; the staging host has its own rule) and every non-API path to
+  `index.html`; `git.deploymentEnabled` is `false`, so Vercel deploys nothing
+  from Git: no previews (ADR-0091) and no merge deployments (ADR-0092).
 - `middleware.ts` adds `x-pilates-proxy-proof` from `ADMIN_WEB_PROXY_SECRET`
   to every forwarded `/api/v1` request (ADR-0087).
-- Production deploys every push to `main`.
+- Production is deployed only by the `release production` workflow
+  (`vercel deploy --prebuilt --prod` of the promoted commit).
 - A production deployment opened through any address other than
   `emma-pilates-admin.vercel.app` (its per-deployment URL, the `git-main`
   alias) answers `404` on `/api/v1`. When the domain arrives (gate 7), its
@@ -239,6 +256,64 @@ Every account belongs to the project owner and is shared with no one else.
 - `src/vercel/compiled-alone.spec.ts` fails CI when `middleware.ts` or a
   Function under `api/` imports a local file, which Vercel's separate
   compilation cannot resolve.
+
+## Staging in detail
+
+[ADR-0092](../adr/0092-release-to-staging-before-promoting-to-production.md);
+how to release, pause, and resume it is in the
+[runbook](../runbooks/production-release.md).
+
+- **Northflank team `emma-pilates-staging`** (same login as production, Pay
+  as you go: the free Sandbox is once per login), project `default`, US
+  Central. Service `api`: combined, `main`, `/apps/backend/Dockerfile`,
+  context `/`, nf-compute-20, 1 instance, CI off, CD on, port 3100 public
+  HTTP as `p01` → https://p01--api--jmys6w5p8vlk.code.run, readiness
+  `/health/ready` (10/10/5/3) and liveness `/health/live` (60/10/3/3),
+  service variables `TRUSTED_PROXY_HOPS=1` and `AUTHENTICATION_LINK_BASE_URL`
+  (its own address). Service `worker`: combined, same source, nf-compute-20,
+  no ports, no probes, command `node dist/src/worker-main.js`, variable
+  `AUTHENTICATION_LINK_BASE_URL`. Job `migrate`: manual, same source,
+  nf-compute-20, command `node_modules/.bin/prisma migrate deploy`, retry
+  limit 0, run on image change Never. Builds use nf-compute-400-16, the
+  smallest builder offered (about a cent per build). No `backup` job: the
+  data is synthetic.
+- **Secret group `staging`** (runtime, unrestricted): `DATABASE_URL`
+  (`emma_staging` on the Aiven service, verify-full with the CA),
+  `DATABASE_POOL_MAX=2`, fresh authentication keys with key ID
+  `northflank-staging-v1`, `ADMIN_WEB_TRUSTED_ORIGINS` (the staging admin
+  web), its own `ADMIN_WEB_PROXY_SECRET`, `ERROR_REPORTING_DSN` (the same
+  `emma-pilates-api` application) with `ERROR_REPORTING_ENVIRONMENT=staging`,
+  the `OBJECT_STORAGE_*` settings for `emma-pilates-staging-images`, and
+  `TRANSFER_QR_IMAGE_PATH`; files `/etc/secrets/emma-ca.pem` and
+  `/etc/secrets/transfer-qr.png`. No `EXPO_ACCESS_TOKEN` yet: staging sends
+  no push until a staging robot token is added.
+- **API token `github-actions-staging-release`:** role
+  `github-staging-release` (project `default`; Services → General Read and
+  Update; Jobs → General Read, Update, Run Job), 1 year from 2026-10-17;
+  GitHub secret `NORTHFLANK_STAGING_API_TOKEN`.
+- **Aiven:** database `emma_staging` owned by the role `emma_staging`
+  (connection limit 8), created on 2026-10-17; `CONNECT` on `emma`,
+  `defaultdb`, and `emma_staging` is revoked from `PUBLIC`, so the staging
+  role cannot open production's database (checked the same day; `avnadmin`
+  owns `emma` and still connects). Aiven cannot rename a service, so the
+  shared service keeps its `-prod-db` name.
+- **Cloudflare R2:** bucket `emma-pilates-staging-images` (Standard,
+  automatic location, private, lifecycle rule `delete-stale-pending-uploads`
+  after 3 days) and token `northflank-staging-images` (Object Read & Write on
+  that bucket only).
+- **Vercel:** project `emma-pilates-admin-staging` (root `apps/admin-web`,
+  Vite, Production variables `ENABLE_EXPERIMENTAL_COREPACK=1` and staging's
+  `ADMIN_WEB_PROXY_SECRET`); `vercel.json` routes its host's `/api/v1` to the
+  staging API; token `github-actions-staging-release` scoped to the project.
+- **Expo EAS:** both projects' `preview` environment holds
+  `EXPO_PUBLIC_API_URL` (the staging API) and the mobile DSN; the `staging`
+  build profile sets `APP_VARIANT=staging` (channel `staging`, internal
+  Android `.apk`), which `app.config.js` turns into the `.staging` IDs, the
+  «Staging» name, and the marked icons. Each staging app has its own
+  EAS-generated keystore.
+- **Not used for staging, by decision:** Better Stack uptime monitors and
+  heartbeats (paused most of the time; each release's smoke check proves
+  it), backups, email, the domain.
 
 ## Development in detail
 
@@ -298,21 +373,34 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `RELEASE_ID` | from `NF_GIT_SHA` at build | unset (`local`) | unset | |
 | `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | — | — | Lets Vercel use the pinned pnpm |
 | `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `release production` workflow; expires around 2027-10-14 |
+| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `release staging` workflow; expires around 2027-10-17 |
+| `VERCEL_ORG_ID`, `VERCEL_PRODUCTION_PROJECT_ID`, `VERCEL_PRODUCTION_TOKEN` | GitHub repository secrets | — | — | `release production` deploys the admin web; the token is scoped to `emma-pilates-admin` |
+| `VERCEL_STAGING_PROJECT_ID`, `VERCEL_STAGING_TOKEN` | GitHub repository secrets | — | — | `release staging` deploys the staging admin web; the token is scoped to `emma-pilates-admin-staging` |
+| `STAGING_API_URL`, `STAGING_NORTHFLANK_WORKER_SERVICE_ID` | GitHub repository **variables** | — | — | The staging API and worker; the staging workflow does nothing while `STAGING_API_URL` is empty |
+| `ERROR_REPORTING_ENVIRONMENT` | unset (reports `production`) | — | unset | Northflank `staging` group (`staging`); names the environment in error reports (EXT-017) |
+| Staging settings | — | — | — | Northflank `staging` group, listed under «Staging in detail» |
 
 ## Automation
 
 - **`.github/workflows/ci.yml`:** every pull request and push to `main`;
   quality, unit, contract, e2e, and integration jobs per surface, the
   database jobs on `postgres:18-alpine`. Deploys nothing.
-- **`.github/workflows/release-production.yml`:** after `ci` passes on a
-  push to `main` (or by hand with a commit), builds and runs Northflank's
-  `migrate` job, then builds `api`, waits for `/health/ready` to report the
-  commit, builds the same commit on `worker` and waits for its rollout
-  (EXT-002), builds it on the `backup` job without running it (EXT-009), and
-  runs the smoke check (EXT-008).
-- **Deployments:** Vercel deploys `main`;
-  Northflank deploys `main` through the `release production` workflow, never
-  on a push by itself.
+- **`.github/workflows/release-staging.yml`:** after `ci` passes on a push
+  to `main` (or by hand with a commit), releases it to the staging team
+  (migrate, `api` readiness, `worker`, smoke check), deploys the staging
+  admin web with the Vercel CLI, and records the commit status
+  `release/staging` (EXT-017).
+- **`.github/workflows/release-production.yml`:** started by hand only;
+  `pnpm promotion` picks the commit staging runs (or the one named) and
+  refuses one without a successful `release/staging` status or behind
+  production; then builds and runs Northflank's `migrate` job, builds `api`,
+  waits for `/health/ready` to report the commit, builds `worker` and waits
+  for its rollout (EXT-002), builds the `backup` job without running it
+  (EXT-009), runs the smoke check (EXT-008), and deploys the production
+  admin web with the Vercel CLI.
+- **Deployments:** only these two workflows deploy. Vercel's Git
+  deployments are off in `vercel.json`, and Northflank's CI is off on every
+  service and job.
 
 ## Monitoring
 
