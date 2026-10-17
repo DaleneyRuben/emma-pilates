@@ -1,4 +1,4 @@
-name: release production
+name: Release Production
 
 # EXT-017 (ADR-0092): started by hand only. Promotes the commit staging runs
 # (or the one named), refusing any commit whose release/staging status is not

@@ -3384,8 +3384,8 @@ printed), the same query against the database `emma` (with
 ## Test 40: release a merge to staging, then promote it to production
 
 Since EXT-017 ([ADR-0092](./adr/0092-release-to-staging-before-promoting-to-production.md))
-a push to `main` whose `ci` run passes starts the `release staging`
-workflow; production changes only when you start `release production`
+a push to `main` whose `CI` run passes starts the `Release Staging`
+workflow; production changes only when you start `Release Production`
 ([runbook](./runbooks/production-release.md)). Staging must be resumed
 first if it is paused (runbook, «Pause and resume staging»).
 
@@ -3395,8 +3395,8 @@ first if it is paused (runbook, «Pause and resume staging»).
    gh run list --repo DaleneyRuben/emma-pilates --workflow release-staging.yml --limit 3
    ```
 
-   A run for the merge commit appears a few seconds after its `ci` run
-   passes (none while `ci` fails).
+   A run for the merge commit appears a few seconds after its `CI` run
+   passes (none while `CI` fails).
 2. When it completes, read its stages:
 
    ```sh

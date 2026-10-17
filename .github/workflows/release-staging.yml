@@ -1,4 +1,4 @@
-name: release staging
+name: Release Staging
 
 # EXT-017 (ADR-0092): once ci passes on a push to main, release that commit to
 # staging the way production is released (EXT-008, ADR-0052, ADR-0080): build
@@ -11,7 +11,7 @@ name: release staging
 # the staging API.
 on:
   workflow_run:
-    workflows: [ci]
+    workflows: [CI]
     types: [completed]
     branches: [main]
   workflow_dispatch:
