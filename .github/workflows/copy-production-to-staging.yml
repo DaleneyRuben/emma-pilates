@@ -98,8 +98,14 @@ jobs:
             -d "$PGDATABASE" "$RUNNER_TEMP/production.dump"
           psql -XtAc "select 'staging now holds ' || count(*) || ' migrations' from public._prisma_migrations" | tee -a "$GITHUB_STEP_SUMMARY"
       # A dump can be older than the code staging runs; the release migrates
-      # it forward and restarts the API and worker on the copied data.
+      # it forward and restarts the API and worker on the copied data. It
+      # takes main's newest commit whose CI already passed, because the
+      # release refuses a commit whose CI is still running.
       - name: Release main to staging again
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh workflow run release-staging.yml --repo "$GITHUB_REPOSITORY" --ref main
+        run: |
+          sha=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/ci.yml/runs?branch=main&event=push&status=success&per_page=1" \
+            --jq '.workflow_runs[0].head_sha')
+          gh workflow run release-staging.yml --repo "$GITHUB_REPOSITORY" --ref main -f sha="$sha"
+          echo "Releasing $sha to staging" | tee -a "$GITHUB_STEP_SUMMARY"
