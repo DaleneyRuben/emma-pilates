@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); sign in through a Vercel preview against the shared development API (Test 36); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 
 ## Before you begin
 
@@ -499,9 +499,8 @@ The running worker also cancels, once and for good, every fixture Session that
 still has no Bookings two hours before it starts, and tells its Trainer. Book
 a class first if you want to keep it for a manual test (Test 13).
 
-These fixtures are for your local databases and the shared development
-database on Neon (Test 36), whose data is public and resettable. Never load
-them into production.
+These fixtures are for your local databases only, whose data is public and
+resettable. Never load them into production.
 
 ### B. Log in from the mobile app
 
@@ -3034,9 +3033,6 @@ The following are not ready for manual product testing:
   works, see Test 10; the Promotion API works through Swagger, see Test 32,
   the admin web manages Promotions, see Test 33, and the Client app shows
   them, see Test 18);
-- signing in to production (Test 38): no Administrator can be activated
-  until real email exists (EXT-001), so production's signed-in cookies and
-  pages are proved only on the Vercel preview (Test 36);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
 - real SendPulse email, Expo push notifications, store builds, or a
   production worker (the production API runs without one, Test 38).
@@ -3177,66 +3173,28 @@ once and links to Pagos.
 
 Drop the copy afterwards: `dropdb pilates_test_closure`.
 
-## Test 36: sign in through a Vercel preview
+## Test 36: Vercel previews (retired)
 
-Every push to a pull request's branch builds a preview of the admin web on
-Vercel. `apps/admin-web/vercel.json` proxies the preview's `/api/v1` to the
-shared development API (https://emma-pilates-dev-api.onrender.com, on the Neon
-project `emma-pilates-dev`, PostgreSQL 18) and serves `index.html` for every other path that
-is not under `api/`, so the browser only ever talks to the preview's own origin
-(ADR-0084). The production alias `emma-pilates-admin.vercel.app` is left out
-of that rule, so production never reaches development data: its `/api/v1`
-goes to the production API on Northflank instead (Test 38).
+Pull-request previews of the admin web and the shared development API on
+Render and Neon they called were retired on 2026-10-17 (EXT-016,
+[ADR-0091](./adr/0091-retire-the-shared-development-environment.md)). Vercel
+now deploys only `main` (`git.deploymentEnabled` in
+`apps/admin-web/vercel.json`), and only the production host proxies
+`/api/v1`; any other Vercel address of a deployment answers `404` there.
 
-1. Open the pull request's **branch** preview address, the
-   `emma-pilates-admin-git-<branch>-fernando-daleney-s-projects.vercel.app`
-   link in Vercel's comment on the pull request. It stays the same on every
-   push to the branch; the per-deployment `emma-pilates-admin-<hash>-…`
-   address changes on every push and is not trusted.
-2. Sign in to Vercel when it asks (previews are behind Vercel
-   Authentication).
-3. The **register preview origins** workflow
-   (`.github/workflows/preview-origins.yml`, WEB-019) adds that exact origin
-   to the development API's `ADMIN_WEB_TRUSTED_ORIGINS` on Render when the
-   preview finishes, and removes it when the pull request closes; Render then
-   redeploys, so give it about two minutes after the preview is ready. Until
-   then, or on the per-deployment address, signing in answers `403`
-   `untrusted_origin` in RFC 9457 form, and the form says «No podemos iniciar
-   sesión desde esta dirección. Abre el panel desde su enlace habitual.». If a run failed, re-run it from the
-   Actions tab or with `gh workflow run preview-origins.yml`; its log prints
-   the current and desired lists.
-4. The shared database holds the development fixtures. Migrations are
-   applied by the «migrate development database» workflow (ADR-0090) on every
-   pull-request push that touches `apps/backend/prisma/migrations` and on every
-   push to `main`; check it with
-   `gh run list --workflow migrate-development.yml --limit 3`. Fixtures, and
-   a migration by hand when the workflow cannot run, use Neon's direct
-   (unpooled) connection string pasted into a hidden prompt, never shown:
-   `read -rs NEON_URL && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:migrate:deploy && DATABASE_URL="$NEON_URL" pnpm --filter @pilates/backend db:fixtures; unset NEON_URL`.
-   If a pull request's migration changed after it was applied, or failed,
-   reset the development database and migrate from `main`. Sign in as
-   `paola.mendoza@example.com` with the fixture password. The first request
-   after the Render service has slept can take about a minute.
-5. Expect Horario for Sucursal Centro. In DevTools → Network,
-   `authentication-sessions` is `201` and the reads after it are `200`; in
-   Application → Cookies, both `__Host-` cookies are HttpOnly, Secure,
-   SameSite Lax, and Path `/` with no Domain (host-only).
-6. Open Planes and reload: the page loads again (the fallback), not a `404`.
+What the preview used to prove is covered elsewhere:
 
-Every `/api/v1` request through the preview passes the admin web's Vercel
-middleware (`apps/admin-web/middleware.ts`), which adds the
-`x-pilates-proxy-proof` header from the Preview variable
-`ADMIN_WEB_PROXY_SECRET`. The development API holds the same secret and
-`TRUSTED_PROXY_HOPS=3` (ADR-0087), so its throttling sees the visitor's
-address, not Vercel's or Render's. To re-measure Render's hops, send
-`curl https://emma-pilates-dev-api.onrender.com/api/v1/hop-probe` with no
-`X-Forwarded-For` and read `forwardedFor` on that path's line in Render's
-Logs; a request through the preview shows one more. If the preview answers
-`500 MIDDLEWARE_INVOCATION_FAILED`, read the deployment's Logs in Vercel: the
-middleware must import nothing local, because Vercel compiles it alone.
+- everything the admin web does, locally against `pilates_dev_sim`
+  (Tests 23–33) and in the Playwright journeys (Test 31);
+- that `middleware.ts` and the Vercel Functions under `api/` import nothing
+  local, which Vercel's separate compilation needs, by
+  `src/vercel/compiled-alone.spec.ts` in the admin-web Jest suite (CI's
+  web-unit job);
+- the deployed proxy, the `__Host-` cookies over HTTPS, and the origin
+  check, on production after every merge (Test 38).
 
-The fixture password is public in the repository, so anyone who finds the
-development API can sign in to its fake data; never put real data there.
+If the production admin web answers `500 MIDDLEWARE_INVOCATION_FAILED`, read
+the deployment's Logs in Vercel: the middleware failed to load or run.
 
 
 ## Test 37: check the Better Stack monitors fire and recover
@@ -3249,10 +3207,8 @@ hosts' environments, never in the repository.
 
 **Production API readiness** (Uptime → Monitors) checks
 https://p01--api--mmps25fn9k9x.code.run/health/ready every 3 minutes. It was
-the paused «Dev API readiness» monitor until 2026-10-13; the Render API is no
-longer monitored, because each check would keep Render and Neon awake past
-Neon Free's 100 compute hours. Northflank and Aiven never sleep, so the check
-costs nothing. To test it:
+the paused «Dev API readiness» monitor until 2026-10-13. Northflank and Aiven
+never sleep, so the check costs nothing. To test it:
 
 1. In Northflank, open the `api` service and click **Pause**.
    `curl -s -o /dev/null -w "%{http_code}\n" https://p01--api--mmps25fn9k9x.code.run/health/ready`
@@ -3296,10 +3252,9 @@ environment `production` and the commit as release.
 a one-minute grace. The worker pings `WORKER_HEARTBEAT_URL` after every
 30-second heartbeat whose queue counts it could read; a failed read logs
 `worker_heartbeat_failed` and skips the ping, and a failed ping logs
-`worker_heartbeat_ping_failed` without the URL. No worker runs on Render, and
-production has no worker until R2 (gate 5) and real email (gate 7) exist,
-because `worker-main` refuses `NODE_ENV=production`; the heartbeat stays
-**paused**. To test it:
+`worker_heartbeat_ping_failed` without the URL. Before EXT-002
+production had no worker, because `worker-main` refused
+`NODE_ENV=production`, and the heartbeat stayed **paused**. To test it:
 
 1. **Resume** the heartbeat and uncomment `WORKER_HEARTBEAT_URL`.
 2. From `apps/backend`, run the worker on `pilates_dev_sim`:
@@ -3499,8 +3454,8 @@ working until no supported release reads them. Start the API on
 
 Since EXT-002 the API and the worker keep uploaded images in one object store
 chosen by `OBJECT_STORAGE` ([ADR-0088](./adr/0088-proxy-upload-bytes-through-the-api.md)):
-`local` (the default: `UPLOADS_LOCAL_STORAGE_ROOT` on disk, used locally, in
-CI, and on Render) or `s3` (production, on Cloudflare R2). The apps still send
+`local` (the default: `UPLOADS_LOCAL_STORAGE_ROOT` on disk, used locally and in
+CI) or `s3` (production, on Cloudflare R2). The apps still send
 the bytes to `PUT /api/v1/uploads/{id}/object`; the API writes them to the
 store, so no contract changed. Production refuses to start unless
 `OBJECT_STORAGE=s3` and the four `OBJECT_STORAGE_*` settings are set, with an

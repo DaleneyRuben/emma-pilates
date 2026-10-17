@@ -156,8 +156,9 @@ No new account is needed for the next local slices.
   integration testing.
 - Use the local notification inbox until Expo Push Service is tested on a real
   development build.
-- Configure shared development and production hosting only when local critical
-  journeys are stable enough to deploy.
+- Configure production hosting only when local critical journeys are stable
+  enough to deploy (the shared development environment was retired by
+  ADR-0091; staging comes before real users, EXT-017).
 
 ## First execution queue
 

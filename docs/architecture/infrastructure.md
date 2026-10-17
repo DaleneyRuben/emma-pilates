@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-15** (EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
+Last verified **2026-10-17** (EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -11,27 +11,29 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
 ## At a glance
 
 ```text
-                    PRODUCTION                                   DEVELOPMENT (shared)
- Browser ─► emma-pilates-admin.vercel.app          Browser ─► emma-pilates-admin-git-<branch>-….vercel.app
-            (Vercel Hobby, production)                        (Vercel Hobby, preview, Vercel Authentication)
-              │ /api/v1 + x-pilates-proxy-proof                 │ /api/v1 + x-pilates-proxy-proof
-              ▼                                                 ▼
- Mobile ──► p01--api--mmps25fn9k9x.code.run         emma-pilates-dev-api.onrender.com ◄── Mobile (Expo Go)
- (none yet) (Northflank api, US Central) ─► R2      (Render Free, Ohio, sleeps when idle)
-            Northflank worker (no ports)  ─► R2       images on local disk, no worker
+                    PRODUCTION
+ Browser ─► emma-pilates-admin.vercel.app
+            (Vercel Hobby, production; Vercel deploys only main)
+              │ /api/v1 + x-pilates-proxy-proof
+              ▼
+ Mobile ──► p01--api--mmps25fn9k9x.code.run
+            (Northflank api, US Central) ─► R2
+            Northflank worker (no ports)  ─► R2
             Northflank cron job backup    ─► R2 (daily pg_dump, 03:00 La Paz)
-              │ TLS, Aiven CA verified                          │ TLS
-              ▼                                                 ▼
-            Aiven Free PostgreSQL 18                          Neon Free PostgreSQL 18
-            emma-pilates-prod-db / emma                       emma-pilates-dev / pilates_dev
-            (DigitalOcean US West)                            (AWS US East 2, Ohio)
+              │ TLS, Aiven CA verified
+              ▼
+            Aiven Free PostgreSQL 18
+            emma-pilates-prod-db / emma
+            (DigitalOcean US West)
+
+ No shared development environment since 2026-10-17 (ADR-0091): local and CI
+ cover development; staging arrives before real users (EXT-017).
 
  Cloudflare R2: private buckets emma-pilates-prod-images (uploaded images) and
                emma-pilates-prod-backups (daily database dumps)
- Better Stack: production readiness every 3 min, API error reports from both APIs, worker and
+ Better Stack: production readiness every 3 min, API error reports from the API, worker and
                database-backup heartbeats
- GitHub Actions: CI on every pull request and main, production release after CI on main,
-                 preview cleanup, preview-origin registration
+ GitHub Actions: CI on every pull request and main, production release after CI on main
  Expo EAS: organization emma-pilates builds the development clients of both apps
            (iOS Simulator and Android); no store builds until gates 8–9
  Expo Push Service: the worker sends pushes with the push-sender robot's token;
@@ -49,12 +51,10 @@ Details are in the sections below.
 
 | Provider | What we use | What it does for us | Not used (on purpose) |
 | --- | --- | --- | --- |
-| **GitHub** | Private repository `emma-pilates`; Actions (4 workflows); 4 repository secrets; 2 repository variables | Holds the code; runs CI on every pull request and `main`; starts the production release; registers and cleans up admin-web previews | Branch protection (needs Pro), Packages, Pages |
+| **GitHub** | Private repository `emma-pilates`; Actions (2 workflows); repository secrets; 2 repository variables | Holds the code; runs CI on every pull request and `main`; starts the production release | Branch protection (needs Pro), Packages, Pages |
 | **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (15 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
 | **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb); its CA certificate | The **production database** | The $50 trial credit, point-in-time restore, any paid plan |
-| **Vercel** | Project `emma-pilates-admin` (Hobby): production deploys, one preview per pull request, Vercel Authentication on previews, `vercel.json` rewrites, `middleware.ts`, 2 environment variables | Hosts the **admin web** (production and previews) and forwards its `/api/v1` calls to the right API with the proxy proof | Vercel Pro, custom domain (gate 7), serverless functions beyond the middleware |
-| **Render** | One Free web service, `emma-pilates-dev-api` (native Node, auto-deploy from `main`); an API key for the `preview-origins` workflow | Runs the **shared development API** that previews and Expo Go talk to | Workers, Render databases, paid plans |
-| **Neon** | One Free project, `emma-pilates-dev`: one branch, database `pilates_dev`, direct connection | The **shared development database** | Connection pooling, per-pull-request branches |
+| **Vercel** | Project `emma-pilates-admin` (Hobby): production deploys of `main` only, `vercel.json` rewrites, `middleware.ts`, the error-envelope Function, Production environment variables | Hosts the **admin web** and forwards its `/api/v1` calls to the production API with the proxy proof | Vercel Pro, pull-request previews (off since ADR-0091), custom domain (gate 7) |
 | **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email** | Hostnames on the domain (WEB-021, LNK-001, a custom API or admin host), Email Sending (SendPulse sends instead, ADR-0031), public buckets and custom bucket domains, Workers, every other product |
 | **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` profile; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
 | **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
@@ -68,22 +68,28 @@ gates»): **Apple Developer** (gate 9). The domain (gate 7) arrived on
 
 ## Environments
 
-| | Production | Shared development | Local |
-| --- | --- | --- | --- |
-| API | Northflank `api` | Render `emma-pilates-dev-api` | `pnpm dev:backend` on port 3100 |
-| Worker | Northflank `worker` (no email until gate 7) | none (Render Free cannot run one; EXT-010) | `node dist/src/worker-main.js` |
-| Database | Aiven `emma-pilates-prod-db`, database `emma`, PostgreSQL 18 | Neon `emma-pilates-dev`, database `pilates_dev`, PostgreSQL 18 | Homebrew `postgresql@18` (18.6) on 5433: `emma_pilates`, `pilates_dev_sim`, `pilates_test_fixtures` |
-| Admin web | https://emma-pilates-admin.vercel.app | Vercel preview per pull request | `pnpm dev:admin` on 5173 |
-| Data | Real; one Administrator (Fernando Daleney) since 2026-10-14, no Clients; dumped daily to R2, restore drill passed 2026-10-14 | Public development fixtures only (the fixture password is in the repository) | Fixtures |
-| `NODE_ENV` | `production` | `development` | `development` |
-| Email | none: the worker leaves authentication emails queued until EXT-001 | none (no worker) | `LocalEmailCapture` under `apps/backend/.data/email-capture` |
-| Images | Cloudflare R2 `emma-pilates-prod-images` (`OBJECT_STORAGE=s3`) | local disk, lost on redeploy, never processed (no worker) | `apps/backend/.data/uploads` |
-| Release | automatic after CI on `main` (`release production` workflow), [runbook](../runbooks/production-release.md) | Render auto-deploys every push to `main` | — |
+| | Production | Local |
+| --- | --- | --- |
+| API | Northflank `api` | `pnpm dev:backend` on port 3100 |
+| Worker | Northflank `worker` (no email until gate 7) | `node dist/src/worker-main.js` |
+| Database | Aiven `emma-pilates-prod-db`, database `emma`, PostgreSQL 18 | Homebrew `postgresql@18` (18.6) on 5433: `emma_pilates`, `pilates_dev_sim`, `pilates_test_fixtures` |
+| Admin web | https://emma-pilates-admin.vercel.app | `pnpm dev:admin` on 5173 |
+| Data | Real; one Administrator (Fernando Daleney) since 2026-10-14, no Clients; dumped daily to R2, restore drill passed 2026-10-14 | Fixtures |
+| `NODE_ENV` | `production` | `development` |
+| Email | none: the worker leaves authentication emails queued until EXT-001 | `LocalEmailCapture` under `apps/backend/.data/email-capture` |
+| Images | Cloudflare R2 `emma-pilates-prod-images` (`OBJECT_STORAGE=s3`) | `apps/backend/.data/uploads` |
+| Release | automatic after CI on `main` (`release production` workflow), [runbook](../runbooks/production-release.md) | — |
 
-Every environment runs PostgreSQL 18: production (Aiven 18.6), shared
-development (Neon 18.6), CI (`postgres:18-alpine`), the integration suite's
-Docker fallback (`postgres:18-alpine`), and local (Homebrew 18.6 on port 5433,
-beside an older PostgreSQL on 5432 that other projects on the Mac use; BE-019).
+CI runs disposable databases per job (`postgres:18-alpine`). The shared
+development environment (Render and Neon, with pull-request previews) was
+retired on 2026-10-17 ([ADR-0091](../adr/0091-retire-the-shared-development-environment.md));
+a staging environment that mirrors production comes before real users
+(EXT-017).
+
+Every environment runs PostgreSQL 18: production (Aiven 18.6), CI
+(`postgres:18-alpine`), the integration suite's Docker fallback
+(`postgres:18-alpine`), and local (Homebrew 18.6 on port 5433, beside an older
+PostgreSQL on 5432 that other projects on the Mac use; BE-019).
 The schema tests expect PostgreSQL 18's SQLSTATE 23001 for a `RESTRICT`
 violation and no longer accept older servers' 23503.
 
@@ -97,9 +103,7 @@ Every account belongs to the project owner and is shared with no one else.
 | Northflank | team `emma-pilates`, project `default` | Developer Sandbox | Yes, for verification only | Production API, worker, migration job, and backup job |
 | Cloudflare | `daleney.fernando@…`, account ID `1121636a866de46f92544db1a7ebe310` | Free; R2 subscription (free allowance) since 2026-10-14; domain `emmapilatesstudio.com` registered 2026-10-15 for $10.46, expires 2027-10-15, auto-renew on (the `.com` price becomes $11.17 on 2026-11-01) | Yes | R2 image storage and database dumps; the domain, its DNS, and Email Routing |
 | Aiven | organization «My Organization», project `emma-pilates-prod` | Free (a $50 trial runs beside it, unused) | No | Production database |
-| Vercel | `fernando-daleney-s-projects`, project `emma-pilates-admin` | Hobby, also for production by decision | — | Admin web previews and production, `/api/v1` proxy |
-| Render | service `emma-pilates-dev-api` (`srv-db4ivt6i0phs73cru2p0`) | Free | — | Shared development API |
-| Neon | project `emma-pilates-dev` (`winter-paper-96646104`) | Free | No | Shared development database |
+| Vercel | `fernando-daleney-s-projects`, project `emma-pilates-admin` | Hobby, also for production by decision | — | Admin web production, `/api/v1` proxy |
 | Better Stack | team `t614177` | Free | No | Uptime, error tracking, heartbeat, email alerts |
 | Expo | user `daleneyfernando` (Google sign-in), organization `emma-pilates`; projects `emma-pilates-client` (`c9271277-f815-4e36-97db-63a584a85957`) and `emma-pilates-staff` (`885d3272-da0a-49f7-b8cd-33092de7662a`) | Free: 15 iOS and 15 Android builds a month | No | Mobile development builds since 2026-10-14 (gate 6); push since NOT-002; updates later |
 | Firebase | the user's Google account, project `emma-pilates` | Spark (no cost) | No | Android push delivery (FCM) since NOT-002 |
@@ -222,36 +226,27 @@ Every account belongs to the project owner and is shared with no one else.
 ### Vercel (production side)
 
 - `vercel.json` routes `/api/v1/:path*` on the host
-  `emma-pilates-admin.vercel.app` to the Northflank API, every other host to
-  Render, and every non-API path to `index.html`.
+  `emma-pilates-admin.vercel.app` to the Northflank API (no other host gets
+  an API) and every non-API path to `index.html`; `git.deploymentEnabled`
+  deploys only `main`, so pull requests build no previews (ADR-0091).
 - `middleware.ts` adds `x-pilates-proxy-proof` from `ADMIN_WEB_PROXY_SECRET`
   to every forwarded `/api/v1` request (ADR-0087).
-- Production deploys every push to `main`; a branch preview can be promoted
-  to production for a test (it is rebuilt with the Production environment).
+- Production deploys every push to `main`.
 - A production deployment opened through any address other than
   `emma-pilates-admin.vercel.app` (its per-deployment URL, the `git-main`
-  alias) proxies to the **development** API, whose origin check refuses it.
-  When the domain arrives (gate 7), its host must join the production rule.
+  alias) answers `404` on `/api/v1`. When the domain arrives (gate 7), its
+  host must join the production rule.
+- `src/vercel/compiled-alone.spec.ts` fails CI when `middleware.ts` or a
+  Function under `api/` imports a local file, which Vercel's separate
+  compilation cannot resolve.
 
 ## Development in detail
 
-- **Render `emma-pilates-dev-api`:** Free (0.1 CPU, 512 MB, sleeps after
-  idling, about a minute to wake), Ohio, native Node runtime (no Docker),
-  branch `main` with auto-deploy, root `apps/backend`, start
-  `node dist/src/main.js`, health check `/health/ready`, build
-  `npx --yes pnpm@11.19.0 install --frozen-lockfile --filter @pilates/backend... && npx --yes pnpm@11.19.0 run prisma:generate && npx --yes pnpm@11.19.0 run build`.
-  Reports `release` `local` (no `RELEASE_ID`). `TRUSTED_PROXY_HOPS=3`
-  (measured 2026-10-12). Not monitored: any uptime check would keep Neon awake
-  past its 100 compute hours.
-- **Neon `emma-pilates-dev`** (`winter-paper-96646104`, created 2026-10-13 by
-  BE-019; it replaced the PostgreSQL 17 project `mute-base-19499907`, which was
-  deleted the same day because Neon cannot upgrade a project's major
-  version): Free, AWS US East 2, PostgreSQL 18, one branch
-  (Neon calls it `production`; the whole project is development), database
-  `pilates_dev`, role `pilates_dev_owner`, 0.25–2 CU scaling to zero, direct
-  (unpooled) connection because Prisma migrations and pg-boss need session
-  locks. Migrations and fixtures are applied from the user's Mac
-  ([testing guide](../testing-guide.md), Test 36).
+There is no shared development host since 2026-10-17
+([ADR-0091](../adr/0091-retire-the-shared-development-environment.md)).
+Development runs on the Mac (the [testing guide](../testing-guide.md)) and in
+CI's disposable databases.
+
 - **Expo EAS:** each app's `eas.json` builds every profile on Node 24.13.0
   and the workspace's pnpm 11.19.0 (a shared `base` profile). EAS uploads the
   whole repository (tracked files only, about 7 MB compressed) and installs it
@@ -264,28 +259,24 @@ Every account belongs to the project owner and is shared with no one else.
   internal `.apk` files signed with the EAS-held keystore. The Mac's `eas`
   CLI must be logged in as `daleneyfernando` (`eas whoami`); the same Mac
   also has a work Expo login, so check before every `eas` command.
-- **Vercel previews:** one per pull request, behind Vercel Authentication;
-  only the branch alias (`emma-pilates-admin-git-<branch>-fernando-daleney-s-projects.vercel.app`)
-  is trusted, registered on Render by the `preview-origins` workflow and
-  removed when the pull request closes.
 
 ## Settings and secrets: where each one lives
 
 Values never go in the repository or a chat. «Mac» means the user's own
 `apps/backend/.env`, which Git ignores.
 
-| Setting | Production | Development | Local / Mac | Notes |
+| Setting | Production | EAS development | Local / Mac | Notes |
 | --- | --- | --- | --- | --- |
-| `DATABASE_URL` | Northflank `production` | Render | `.env` (local), commented `# DEV_DATABASE_URL=` (Neon) | Reset in Aiven or Neon to rotate |
+| `DATABASE_URL` | Northflank `production` | — | `.env` (local) | Reset in Aiven to rotate |
 | `DATABASE_POOL_MAX` | Northflank `production` (4) | default 10 | default 10 | Most connections per process (API or worker), split between its one Prisma and one pg-boss pool; Aiven allows 20 (BE-018) |
-| `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | Render | `.env` | Fresh per environment; rotation plan still to write |
-| `AUTHENTICATION_LINK_ENCRYPTION_KEY` | Northflank `production` | Render | `.env` | 32 random bytes, base64 |
-| `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | Northflank `production` (`northflank-prod-v1`) | Render (`render-dev-v1`) | `local-development-v1` | |
+| `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | — | `.env` | Fresh per environment; rotation plan still to write |
+| `AUTHENTICATION_LINK_ENCRYPTION_KEY` | Northflank `production` | — | `.env` | 32 random bytes, base64 |
+| `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | Northflank `production` (`northflank-prod-v1`) | — | `local-development-v1` | |
 | `AUTHENTICATION_LINK_BASE_URL` | Northflank `api` **and** `worker` services (the API's address) | default | default | The link domain arrives with gate 7 |
-| `ADMIN_WEB_TRUSTED_ORIGINS` | Northflank `production` (`https://emma-pilates-admin.vercel.app`) | Render, rewritten by the `preview-origins` workflow | `http://localhost:5173` | |
-| `ADMIN_WEB_PROXY_SECRET` | Northflank `production` **and** Vercel Production | Render **and** Vercel Preview | unset | Same value on both sides of each pair, different per environment |
-| `TRUSTED_PROXY_HOPS` | Northflank `api` service (1) | Render (3) | 0 | Measured, never assumed (ADR-0087) |
-| `ERROR_REPORTING_DSN` | Northflank `production` (the API and the worker) | Render | commented in `.env` | Write-only; `emma-pilates-api`, one Better Stack application for every environment and both processes |
+| `ADMIN_WEB_TRUSTED_ORIGINS` | Northflank `production` (`https://emma-pilates-admin.vercel.app`) | — | `http://localhost:5173` | |
+| `ADMIN_WEB_PROXY_SECRET` | Northflank `production` **and** Vercel Production | — | unset | Same value on both sides |
+| `TRUSTED_PROXY_HOPS` | Northflank `api` service (1) | — | 0 | Measured, never assumed (ADR-0087) |
+| `ERROR_REPORTING_DSN` | Northflank `production` (the API and the worker) | — | commented in `.env` | Write-only; `emma-pilates-api`, one Better Stack application for every environment and both processes |
 | `VITE_ERROR_REPORTING_DSN` | Vercel Production (Config, readable) | unset | unset | `emma-pilates-admin`'s DSN; Vite inlines it in the browser bundle, so it is public by design and can only send errors; a change needs a redeploy |
 | `EXPO_PUBLIC_ERROR_REPORTING_DSN` | EAS environment variables `preview` and `production`, each app's project (plain text, set 2026-10-15) | same, `development` (set) | unset (a local receiver for Test 47) | `emma-pilates-mobile`'s DSN (EXT-013); Expo inlines it in the bundle at build or update time, so it is public by design and can only send errors |
 | `SENTRY_URL`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` | EAS environment variables `preview` and `production`, each app's project (the token as a secret) | — | never | The source-map upload of release builds (EXT-013): Better Stack's upload endpoint, team ID, and `emma-pilates-mobile` ID from the application's Advanced settings, and a Telemetry API token, which is account-wide; without them a build succeeds and uploads nothing |
@@ -303,30 +294,23 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `BACKUP_PG_DUMP_PATH` | default `pg_dump` (the image's 18) | — | `/opt/homebrew/opt/postgresql@18/bin/pg_dump` | |
 | `POSTGRESQL_CLIENT_MAJOR` | Northflank `backup` job **build argument** (`18`) | — | — | Installs `pg_dump` in the backup image only |
 | `TRANSFER_QR_IMAGE_PATH` | Northflank `production` (`/etc/secrets/transfer-qr.png`) | default | default (`.data/transfer-qr.png`) | The only transfer instruction since PAY-003; the three bank-detail variables were deleted from `production` on 2026-10-14 after release `5642443a` |
-| `NODE_ENV` | `production` (image default) | Render (`development`) | `.env` | |
+| `NODE_ENV` | `production` (image default) | — | `.env` | |
 | `RELEASE_ID` | from `NF_GIT_SHA` at build | unset (`local`) | unset | |
-| `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | Vercel Preview | — | Lets Vercel use the pinned pnpm |
+| `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | — | — | Lets Vercel use the pinned pnpm |
 | `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `release production` workflow; expires around 2027-10-14 |
-| `RENDER_API_KEY` | — | GitHub repository secret | — | `preview-origins` workflow |
-| `VERCEL_TOKEN`, `VERCEL_PROJECT_ID` | — | GitHub repository secrets | — | `preview-origins` and `cleanup-preview` workflows |
 
 ## Automation
 
 - **`.github/workflows/ci.yml`:** every pull request and push to `main`;
   quality, unit, contract, e2e, and integration jobs per surface, the
   database jobs on `postgres:18-alpine`. Deploys nothing.
-- **`.github/workflows/preview-origins.yml`:** on each successful preview
-  deployment and each closed pull request, recomputes the trusted preview
-  origins and writes them to Render's `ADMIN_WEB_TRUSTED_ORIGINS` (WEB-019).
-- **`.github/workflows/cleanup-preview.yml`:** deletes a closed pull
-  request's Vercel previews (EXT-007).
 - **`.github/workflows/release-production.yml`:** after `ci` passes on a
   push to `main` (or by hand with a commit), builds and runs Northflank's
   `migrate` job, then builds `api`, waits for `/health/ready` to report the
   commit, builds the same commit on `worker` and waits for its rollout
   (EXT-002), builds it on the `backup` job without running it (EXT-009), and
   runs the smoke check (EXT-008).
-- **Deployments:** Vercel deploys previews and `main`; Render deploys `main`;
+- **Deployments:** Vercel deploys `main`;
   Northflank deploys `main` through the `release production` workflow, never
   on a push by itself.
 
@@ -335,7 +319,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 - **Better Stack «Production API readiness»:** `/health/ready` on Northflank
   every 3 minutes, 3-minute confirmation, four regions, email alerts; verified
   to fire and recover on 2026-10-13.
-- **Better Stack error tracking `emma-pilates-api`:** both APIs and the
+- **Better Stack error tracking `emma-pilates-api`:** the API and the
   production worker report unexpected failures (no messages, no request or
   job data) when `ERROR_REPORTING_DSN` is set, tagged `service` `api` or
   `worker`; the worker adds `job` (the sweep, or `uploads.finalize.v1`).
