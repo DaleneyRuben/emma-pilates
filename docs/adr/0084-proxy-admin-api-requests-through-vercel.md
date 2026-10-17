@@ -1,6 +1,6 @@
 # Proxy admin API requests through the Vercel origin
 
-Status: accepted
+Status: accepted; [ADR-0091](./0091-retire-the-shared-development-environment.md) removes the development half of the routing, so only the production host proxies `/api/v1`
 
 The admin web will call `/api/v1` on its own Vercel origin. Environment-specific Vercel routing proxies that path to the production Northflank API or shared Render development API, so browser code uses same-origin requests instead of calling those backend origins directly. The mobile application continues to call the backend with its bearer Authentication Session and does not use this browser proxy.
 

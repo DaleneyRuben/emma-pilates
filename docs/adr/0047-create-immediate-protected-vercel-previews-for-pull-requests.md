@@ -1,6 +1,6 @@
 # Create immediate protected Vercel previews for pull requests
 
-Status: accepted
+Status: superseded by [ADR-0091](./0091-retire-the-shared-development-environment.md), which turns pull-request previews off
 
 Vercel's Git integration will create a separate admin-web Preview Deployment immediately for every push to a pull request, without waiting for GitHub Actions to finish. Each preview uses Vercel's Preview environment configuration, points only to the shared Render development API and Neon development database selected in [ADR-0046](./0046-host-shared-development-on-render-and-neon.md), and displays the development-environment indicator required by [ADR-0045](./0045-maintain-a-shared-development-api-and-database.md).
 

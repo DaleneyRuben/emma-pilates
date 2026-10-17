@@ -1,6 +1,6 @@
 # Migrate the shared development database from pull requests
 
-Status: accepted
+Status: superseded by [ADR-0091](./0091-retire-the-shared-development-environment.md)
 
 Every push to a pull request that adds or changes a file under `apps/backend/prisma/migrations` applies that branch's committed migrations to the shared development database ([ADR-0045](./0045-maintain-a-shared-development-api-and-database.md), [ADR-0046](./0046-host-shared-development-on-render-and-neon.md)) with `prisma migrate deploy`, and so does every push to `main`. A GitHub Actions workflow does it with the Neon direct connection string held in the repository secret `DEV_DATABASE_URL`; nothing else in CI receives that secret. This is the explicit deployment step ADR-0045 requires, and it settles the development deployment cadence that ADR-0045 left open.
 

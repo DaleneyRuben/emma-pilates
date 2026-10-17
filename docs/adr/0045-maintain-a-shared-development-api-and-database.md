@@ -1,6 +1,6 @@
 # Maintain a shared development API and database
 
-Status: accepted
+Status: superseded by [ADR-0091](./0091-retire-the-shared-development-environment.md)
 
 The project will maintain four isolated data environments: each developer's local PostgreSQL database, a persistent shared development PostgreSQL database, disposable PostgreSQL instances created for CI, and the production PostgreSQL database. A persistent shared development API will be the only application boundary in front of the development database. Vercel admin-web previews will call that development API and will never connect directly to PostgreSQL or use the production API.
 

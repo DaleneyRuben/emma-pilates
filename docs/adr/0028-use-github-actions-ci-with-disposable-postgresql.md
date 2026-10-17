@@ -1,6 +1,6 @@
 # Use GitHub Actions CI with disposable PostgreSQL
 
-Status: accepted
+Status: accepted; the persistent shared development environment is removed by [ADR-0091](./0091-retire-the-shared-development-environment.md), which leaves local, CI, and production environments
 
 GitHub Actions will be the repository's continuous-integration gate. Pull requests and commits intended for production must pass the configured formatting, linting, type-checking, test, architecture, migration, and API-contract checks that apply to their changes. Database-dependent checks provision isolated PostgreSQL through Testcontainers under [ADR-0049](./0049-use-jest-supertest-and-testcontainers-for-backend-tests.md) and build its schema from committed migrations; CI never connects to shared development or production data or credentials.
 
