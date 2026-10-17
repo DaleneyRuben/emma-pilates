@@ -142,10 +142,12 @@ have a green `ci` run from a push to `main`; an empty `sha` means main's head.
 Staging's workflow authenticates with `NORTHFLANK_STAGING_API_TOKEN`, a token
 of the same shape in the team `emma-pilates-staging` (role
 `github-staging-release`, project `default` only). The production workflow's
-admin web job uses `VERCEL_TOKEN` (a Vercel account token scoped to the
-`fernando-daleney-s-projects` team), with `VERCEL_ORG_ID` and
-`VERCEL_PROJECT_ID` naming the production project; rotate it in Vercel →
-Account Settings → Tokens and `gh secret set VERCEL_TOKEN`.
+admin web job uses `VERCEL_PRODUCTION_TOKEN` (Vercel token
+`github-actions-production-release`, scoped to the production project
+`emma-pilates-admin`), with `VERCEL_ORG_ID` (the team) and
+`VERCEL_PRODUCTION_PROJECT_ID`; rotate it in Vercel → Account Settings →
+Tokens and `gh secret set VERCEL_PRODUCTION_TOKEN`. The staging admin web
+deploys from Git and needs no token.
 
 The production workflow authenticates with the repository secret `NORTHFLANK_API_TOKEN`:
 Northflank API token `github-actions-release` (team `emma-pilates`, created
