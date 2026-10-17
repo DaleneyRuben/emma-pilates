@@ -48,7 +48,9 @@ function reason(error: unknown): string {
 
 type ReleaseInput = {
   sha: string;
-  mainHead: string;
+  // Null for a production promotion (EXT-017), which may lag main by design;
+  // its workflow refuses a commit behind production instead.
+  mainHead: string | null;
   jobId: string;
   serviceId: string;
   // Null until Northflank's worker service exists (EXT-002).
@@ -70,7 +72,7 @@ export async function releaseBackend(
 ): Promise<ReleaseResult> {
   const { sha, mainHead, jobId, serviceId, northflank, clock, log } = input;
   // A slower CI run for an older merge must not roll production back.
-  if (mainHead !== sha) {
+  if (mainHead !== null && mainHead !== sha) {
     return {
       outcome: 'superseded',
       detail: `main is at ${mainHead}; its own release will deploy ${sha}'s changes`,

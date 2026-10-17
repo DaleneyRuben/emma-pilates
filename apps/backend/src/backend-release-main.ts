@@ -8,7 +8,7 @@ import {
 
 // EXT-008, EXT-017: the release workflows run this for staging and production.
 // RELEASE_ENVIRONMENT=staging|production NORTHFLANK_API_TOKEN=…
-// RELEASE_SHA=<commit> MAIN_HEAD=<main's head>
+// RELEASE_SHA=<commit> [MAIN_HEAD=<main's head>]
 // NORTHFLANK_PROJECT_ID=default NORTHFLANK_JOB_ID=migrate
 // NORTHFLANK_SERVICE_ID=api [NORTHFLANK_WORKER_SERVICE_ID=worker]
 // [NORTHFLANK_BACKUP_JOB_ID=backup] API_URL=https://… pnpm release
@@ -45,7 +45,8 @@ async function main(): Promise<void> {
   });
   const result = await releaseBackend({
     sha,
-    mainHead: required('MAIN_HEAD'),
+    // Empty for a production promotion, which may lag main (EXT-017).
+    mainHead: process.env.MAIN_HEAD || null,
     jobId: required('NORTHFLANK_JOB_ID'),
     serviceId: required('NORTHFLANK_SERVICE_ID'),
     // Empty until Northflank's worker service exists (EXT-002).
