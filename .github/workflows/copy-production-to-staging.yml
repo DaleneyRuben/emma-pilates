@@ -1,0 +1,105 @@
+name: Copy Production to Staging
+
+# EXT-018 (ADR-0092, user's decision 2026-10-17): a last resort for a bug that
+# cannot be reproduced on staging's own data. Started by hand only. Replaces
+# everything in the staging database emma_staging with the newest daily dump
+# of production (the backup job's R2 object, at most a day old; run the
+# backup job in Northflank first for a fresher one), unmodified, then releases
+# main to staging again so the schema matches the code staging runs. It never
+# connects to the production database: it reads the backup bucket with a
+# read-only token and writes only as the emma_staging role, which cannot open
+# production's database.
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type «copy production to staging» to replace all staging data
+        required: true
+
+permissions:
+  contents: read
+  actions: write
+
+# Never alongside a staging release, which migrates the same database.
+concurrency:
+  group: staging-release
+  cancel-in-progress: false
+
+env:
+  R2_ENDPOINT: https://1121636a866de46f92544db1a7ebe310.r2.cloudflarestorage.com
+  BACKUP_BUCKET: emma-pilates-prod-backups
+  PGHOST: emma-pilates-prod-db-emma-pilates-prod.b.aivencloud.com
+  PGPORT: "20680"
+  PGUSER: emma_staging
+  PGDATABASE: emma_staging
+  PGSSLMODE: verify-full
+
+jobs:
+  copy:
+    if: inputs.confirm == 'copy production to staging'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.PRODUCTION_BACKUP_READ_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.PRODUCTION_BACKUP_READ_SECRET_ACCESS_KEY }}
+      AWS_DEFAULT_REGION: auto
+      AWS_PAGER: ""
+      AWS_REQUEST_CHECKSUM_CALCULATION: when_required
+      AWS_RESPONSE_CHECKSUM_VALIDATION: when_required
+      PGPASSWORD: ${{ secrets.STAGING_DATABASE_PASSWORD }}
+    steps:
+      # The dumps are written by pg_dump 18, which older clients cannot read.
+      - name: Install the PostgreSQL 18 client
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq postgresql-common > /dev/null
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y > /dev/null
+          sudo apt-get install -y -qq postgresql-client-18 > /dev/null
+          echo "/usr/lib/postgresql/18/bin" >> "$GITHUB_PATH"
+      - name: Trust Aiven's certificate authority
+        env:
+          AIVEN_CA_CERT: ${{ vars.AIVEN_CA_CERT }}
+        run: |
+          printf '%s\n' "$AIVEN_CA_CERT" > "$RUNNER_TEMP/aiven-ca.pem"
+          echo "PGSSLROOTCERT=$RUNNER_TEMP/aiven-ca.pem" >> "$GITHUB_ENV"
+      - name: Download the newest production dump and check its digest
+        run: |
+          key=$(aws --endpoint-url "$R2_ENDPOINT" s3api list-objects-v2 \
+            --bucket "$BACKUP_BUCKET" --prefix daily/ \
+            --query 'sort_by(Contents, &LastModified)[-1].Key' --output text)
+          expected=$(aws --endpoint-url "$R2_ENDPOINT" s3api head-object \
+            --bucket "$BACKUP_BUCKET" --key "$key" --query 'Metadata.sha256' --output text)
+          aws --endpoint-url "$R2_ENDPOINT" s3 cp "s3://$BACKUP_BUCKET/$key" \
+            "$RUNNER_TEMP/production.dump" --no-progress
+          actual=$(sha256sum "$RUNNER_TEMP/production.dump" | cut -d' ' -f1)
+          if [ "$actual" != "$expected" ]; then
+            echo "::error::$key digest $actual does not match its metadata $expected"
+            exit 1
+          fi
+          echo "Copying $key ($(stat -c %s "$RUNNER_TEMP/production.dump") bytes)" | tee -a "$GITHUB_STEP_SUMMARY"
+      - name: Check the target is the staging database
+        run: |
+          target=$(psql -XtAc "select current_database() || ' as ' || current_user")
+          if [ "$target" != "emma_staging as emma_staging" ]; then
+            echo "::error::refusing to restore into $target"
+            exit 1
+          fi
+      # emma_staging owns every object in its database, so it can drop them;
+      # the dump recreates the extensions it needs (all trusted ones).
+      - name: Empty the staging database
+        run: |
+          psql -X -v ON_ERROR_STOP=1 -c "set lock_timeout = '30s'" -c "
+            drop schema if exists back_office, booking, system, pgboss cascade;
+            drop schema if exists public cascade;
+            create schema public;"
+      - name: Restore the production dump into staging
+        run: |
+          pg_restore --no-owner --no-acl --exit-on-error \
+            -d "$PGDATABASE" "$RUNNER_TEMP/production.dump"
+          psql -XtAc "select 'staging now holds ' || count(*) || ' migrations' from public._prisma_migrations" | tee -a "$GITHUB_STEP_SUMMARY"
+      # A dump can be older than the code staging runs; the release migrates
+      # it forward and restarts the API and worker on the copied data.
+      - name: Release main to staging again
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run release-staging.yml --repo "$GITHUB_REPOSITORY" --ref main
