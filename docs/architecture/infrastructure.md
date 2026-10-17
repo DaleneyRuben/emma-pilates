@@ -87,7 +87,7 @@ gates»): **Apple Developer** (gate 9). The domain (gate 7) arrived on
 | Database | Aiven `emma-pilates-prod-db`, database `emma`, PostgreSQL 18 | the same Aiven service, database `emma_staging`, role `emma_staging` | Homebrew `postgresql@18` (18.6) on 5433: `emma_pilates`, `pilates_dev_sim`, `pilates_test_fixtures` |
 | Admin web | https://emma-pilates-admin.vercel.app | https://emma-pilates-admin-staging.vercel.app | `pnpm dev:admin` on 5173 |
 | Mobile | store builds (gates 8–9) | `staging` EAS profile: `com.emmapilates.client.staging`, `com.emmapilates.staff.staging` | development builds and Metro |
-| Data | Real; one Administrator (Fernando Daleney) since 2026-10-14, no Clients; dumped daily to R2, restore drill passed 2026-10-14 | Synthetic only, never copied from production; not backed up | Fixtures |
+| Data | Real; one Administrator (Fernando Daleney) since 2026-10-14, no Clients; dumped daily to R2, restore drill passed 2026-10-14 | Synthetic, or an unmodified copy of production made by hand as a last resort (`Copy Production to Staging`, ADR-0093); not backed up | Fixtures |
 | `NODE_ENV` | `production` | `production` (errors tagged `staging` through `ERROR_REPORTING_ENVIRONMENT`) | `development` |
 | Email | none: the worker leaves authentication emails queued until EXT-001 | none, as production | `LocalEmailCapture` under `apps/backend/.data/email-capture` |
 | Images | Cloudflare R2 `emma-pilates-prod-images` (`OBJECT_STORAGE=s3`) | R2 `emma-pilates-staging-images` | `apps/backend/.data/uploads` |
@@ -401,6 +401,10 @@ Values never go in the repository or a chat. «Mac» means the user's own
 - **Deployments:** only these two workflows deploy. Vercel's Git
   deployments are off in `vercel.json`, and Northflank's CI is off on every
   service and job.
+- **`.github/workflows/copy-production-to-staging.yml`:** started by hand
+  with a typed confirmation; restores the newest daily production dump from
+  R2 (digest checked) into `emma_staging` as the `emma_staging` role, then
+  starts `Release Staging` (EXT-018, ADR-0093).
 
 ## Monitoring
 
