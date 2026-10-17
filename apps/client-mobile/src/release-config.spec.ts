@@ -34,7 +34,7 @@ describe("client release configuration", () => {
     expect(packageJson.dependencies).toHaveProperty("expo-updates");
   });
 
-  it("builds a development client, an internal preview, and a store production binary on separate update channels", () => {
+  it("builds a development client, an internal staging variant, and a store production binary on separate update channels", () => {
     const { build } = easConfig;
 
     expect(build.development).toMatchObject({
@@ -42,9 +42,12 @@ describe("client release configuration", () => {
       distribution: "internal",
       channel: "development",
     });
-    expect(build.preview).toMatchObject({
+    // EXT-017: the staging variant installs beside the store app.
+    expect(build.staging).toMatchObject({
       distribution: "internal",
-      channel: "preview",
+      channel: "staging",
+      environment: "preview",
+      env: { APP_VARIANT: "staging" },
     });
     expect(build.production).toMatchObject({
       distribution: "store",
@@ -61,7 +64,7 @@ describe("client release configuration", () => {
   });
 
   it("builds every profile with the workspace's Node and pnpm versions", () => {
-    const { base, development, preview, production }: Record<string, unknown> = easConfig.build;
+    const { base, development, staging, production }: Record<string, unknown> = easConfig.build;
     const pnpmVersion = workspacePackageJson.packageManager.replace("pnpm@", "");
 
     expect(base).toEqual({
@@ -77,7 +80,7 @@ describe("client release configuration", () => {
         SENTRY_DISABLE_NATIVE_DEBUG_UPLOAD: "true",
       },
     });
-    [development, preview, production].forEach((profile) => {
+    [development, staging, production].forEach((profile) => {
       expect(profile).toMatchObject({ extends: "base" });
     });
   });

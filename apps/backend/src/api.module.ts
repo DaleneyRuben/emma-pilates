@@ -38,7 +38,9 @@ import { UploadsModule } from './uploads/uploads.module';
       useFactory: (config: ConfigService<Environment, true>) =>
         createErrorReporter({
           dsn: config.get('ERROR_REPORTING_DSN', { infer: true }),
-          environment: config.get('NODE_ENV', { infer: true }),
+          environment: config.get('ERROR_REPORTING_ENVIRONMENT', {
+            infer: true,
+          }),
           release: config.get('RELEASE_ID', { infer: true }),
           service: 'api',
         }),

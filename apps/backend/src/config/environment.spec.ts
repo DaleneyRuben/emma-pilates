@@ -247,6 +247,21 @@ describe('environment configuration', () => {
       );
     });
 
+    it('reports errors under NODE_ENV by default', () => {
+      const environment = validateEnvironment(base);
+
+      expect(environment.ERROR_REPORTING_ENVIRONMENT).toBe('test');
+    });
+
+    it('reports errors under the configured environment (EXT-017)', () => {
+      const environment = validateEnvironment({
+        ...base,
+        ERROR_REPORTING_ENVIRONMENT: 'staging',
+      });
+
+      expect(environment.ERROR_REPORTING_ENVIRONMENT).toBe('staging');
+    });
+
     it('rejects a heartbeat URL that is not HTTPS', () => {
       expect(() =>
         validateEnvironment({

@@ -26,9 +26,47 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:6780476264:android:dc93ea8887bd386c2254dd",
+        "android_client_info": {
+          "package_name": "com.emmapilates.client.staging"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLW0B39WZV45qEU-z_d0jhdYAbxZVUf4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:6780476264:android:aae425fa426d97a82254dd",
         "android_client_info": {
           "package_name": "com.emmapilates.staff"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLW0B39WZV45qEU-z_d0jhdYAbxZVUf4s"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6780476264:android:07b59563284973da2254dd",
+        "android_client_info": {
+          "package_name": "com.emmapilates.staff.staging"
         }
       },
       "oauth_client": [],

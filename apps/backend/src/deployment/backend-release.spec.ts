@@ -7,9 +7,9 @@ import {
   fakeNorthflank,
   fakeReadiness,
   release,
-} from './production-release-test-support';
+} from './backend-release-test-support';
 
-describe('releaseProduction', () => {
+describe('releaseBackend', () => {
   it('migrates, then builds the API, then waits until readiness reports the commit', async () => {
     const { northflank, calls } = fakeNorthflank();
     const readiness = fakeReadiness([
@@ -61,6 +61,19 @@ describe('releaseProduction', () => {
       detail: `main is at ${'f'.repeat(40)}; its own release will deploy ${sha}'s changes`,
     });
     expect(journal()).toEqual([]);
+  });
+
+  it('releases a promoted commit main has moved past when no head is given (EXT-017)', async () => {
+    const { northflank, journal } = fakeNorthflank();
+
+    const { result } = release(
+      northflank,
+      fakeReadiness([{ status: 200, release: sha }]).fetch,
+      null,
+    );
+
+    await expect(result).resolves.toEqual({ outcome: 'released' });
+    expect(journal()).toContain('startServiceBuild');
   });
 
   it('stops before running migrations when the job build fails', async () => {

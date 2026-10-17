@@ -5,7 +5,7 @@ import {
   minute,
   release,
   sha,
-} from './production-release-test-support';
+} from './backend-release-test-support';
 
 const ready = () => fakeReadiness([{ status: 200, release: sha }]);
 const later = 10 * 60 * minute;
@@ -22,7 +22,7 @@ const workerAnswers = {
   ],
 };
 
-describe('releaseProduction with the worker (EXT-002)', () => {
+describe('releaseBackend with the worker (EXT-002)', () => {
   it('builds the worker after the API is ready and waits for its new rollout', async () => {
     const { northflank, calls } = fakeNorthflank({
       ...workerAnswers,

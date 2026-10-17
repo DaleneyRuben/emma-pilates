@@ -48,7 +48,9 @@ function reason(error: unknown): string {
 
 type ReleaseInput = {
   sha: string;
-  mainHead: string;
+  // Null for a production promotion (EXT-017), which may lag main by design;
+  // its workflow refuses a commit behind production instead.
+  mainHead: string | null;
   jobId: string;
   serviceId: string;
   // Null until Northflank's worker service exists (EXT-002).
@@ -65,12 +67,12 @@ type ReleaseInput = {
 // EXT-008 (ADR-0052, ADR-0080): migrations first, the API only after they
 // succeeded, then readiness must report the released commit. Each step starts
 // only once the one before it concluded; the first failure stops the release.
-export async function releaseProduction(
+export async function releaseBackend(
   input: ReleaseInput,
 ): Promise<ReleaseResult> {
   const { sha, mainHead, jobId, serviceId, northflank, clock, log } = input;
   // A slower CI run for an older merge must not roll production back.
-  if (mainHead !== sha) {
+  if (mainHead !== null && mainHead !== sha) {
     return {
       outcome: 'superseded',
       detail: `main is at ${mainHead}; its own release will deploy ${sha}'s changes`,
