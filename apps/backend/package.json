@@ -17,6 +17,7 @@
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
     "release": "nest build && node dist/src/backend-release-main.js",
+    "promotion": "nest build && node dist/src/production-promotion-main.js",
     "start": "nest start",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
