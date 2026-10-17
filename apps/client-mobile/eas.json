@@ -23,11 +23,17 @@
         "simulator": true
       }
     },
-    "preview": {
+    "staging": {
       "extends": "base",
       "distribution": "internal",
-      "channel": "preview",
-      "environment": "preview"
+      "channel": "staging",
+      "environment": "preview",
+      "env": {
+        "APP_VARIANT": "staging"
+      },
+      "android": {
+        "buildType": "apk"
+      }
     },
     "production": {
       "extends": "base",
