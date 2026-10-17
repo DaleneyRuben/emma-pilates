@@ -106,6 +106,32 @@ Staging's team pays for every hour its services run (about $0.015 an hour for
 
 Once real Clients use production, staging stays resumed.
 
+## Copy production into staging (last resort)
+
+Only when a bug cannot be reproduced on staging's own data
+([ADR-0093](../adr/0093-copy-production-into-staging-as-a-last-resort.md)).
+It replaces **everything** in `emma_staging` with the newest daily dump of
+production, unmodified (personal data included), then releases `main` to
+staging again.
+
+1. Resume staging (above). For data newer than last night's dump, first run
+   the production `backup` job by hand (team `emma-pilates` → Jobs →
+   `backup` → **Run**) and wait for it to succeed.
+2. Actions → **Copy Production to Staging** → **Run workflow**, typing
+   `copy production to staging` in the confirmation field (or
+   `gh workflow run copy-production-to-staging.yml -f confirm="copy production to staging"`).
+3. The run's summary names the dump and its size; a `Release Staging` run
+   follows. When it passes, sign in to staging with your production
+   credentials.
+4. When the bug is fixed, pause staging. The copy stays until the next copy
+   or a reset; apply any personal-data request to it too.
+
+It needs the secrets `PRODUCTION_BACKUP_READ_ACCESS_KEY_ID` and
+`PRODUCTION_BACKUP_READ_SECRET_ACCESS_KEY` (R2 token
+`github-staging-copy`, Object Read only on `emma-pilates-prod-backups`) and
+`STAGING_DATABASE_PASSWORD` (the `emma_staging` role), and the repository
+variable `AIVEN_CA_CERT` (Aiven's public CA certificate).
+
 ## Promote to production (by hand)
 
 When a commit has proved itself on staging, start the production release:
