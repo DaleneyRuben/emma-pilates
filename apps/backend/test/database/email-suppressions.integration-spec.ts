@@ -25,6 +25,16 @@ describe('email suppressions (PostgreSQL)', () => {
     suppressions = createPrismaEmailSuppressions(prisma, digestEmail);
   });
 
+  const administratorAccountId = async () => {
+    const staffMember = await prisma.staffMember.create({
+      data: { name: 'Administradora', role: 'ADMINISTRATOR' },
+    });
+    const account = await prisma.account.create({
+      data: { email: 'admin@example.com', staffMemberId: staffMember.id },
+    });
+    return account.id;
+  };
+
   afterAll(async () => {
     await prisma?.$disconnect();
     await context?.stop();
@@ -76,7 +86,11 @@ describe('email suppressions (PostgreSQL)', () => {
       where: {
         emailDigest: toPrismaBytes(digestEmail('complained@example.com')),
       },
-      data: { resolvedAt: new Date(), resolutionReason: 'address_corrected' },
+      data: {
+        resolvedAt: new Date(),
+        resolvedByAccountId: await administratorAccountId(),
+        resolutionReason: 'address_corrected',
+      },
     });
 
     await expect(
