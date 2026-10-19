@@ -58,6 +58,13 @@ describe('app links', () => {
       'EE:E2:71:4C:60:D7:B8:1D:8F:49:40:9D:B0:6E:CB:1F:1C:16:5A:3C:9F:E6:E8:AA:73:4F:F1:A9:34:DC:09:C5',
       '76:B6:5F:06:31:4F:63:0E:EE:4C:F5:1D:40:3D:9E:3A:7B:67:8B:52:6C:61:BF:96:5B:2B:21:93:FE:56:48:FD',
     ]);
+    expect(
+      androidApps.find(
+        (app) => app.packageName === 'com.emmapilates.staff.staging',
+      )?.sha256CertFingerprints,
+    ).toEqual([
+      'EF:1B:60:B3:3F:35:BF:C3:FD:C6:86:AD:FD:5F:0E:2F:9C:C0:72:0C:5B:8C:A0:B7:E0:48:83:1A:22:95:42:3C',
+    ]);
   });
 
   it('claims no iOS app until the Apple Team ID exists', () => {

@@ -30,9 +30,10 @@ export const androidApps: readonly AndroidApp[] = [
     ],
   },
   {
-    // No staging Staff build exists yet; its key is added after the first.
     packageName: 'com.emmapilates.staff.staging',
-    sha256CertFingerprints: [],
+    sha256CertFingerprints: [
+      'EF:1B:60:B3:3F:35:BF:C3:FD:C6:86:AD:FD:5F:0E:2F:9C:C0:72:0C:5B:8C:A0:B7:E0:48:83:1A:22:95:42:3C',
+    ],
   },
 ];
 
