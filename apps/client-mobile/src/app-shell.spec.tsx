@@ -24,6 +24,7 @@ describe("Client App", () => {
       <App
         runtime={{
           allowedLinkHosts: ["links.emmapilates.test"],
+          linkIdentityKind: "client",
           authenticationApi: createAuthenticationApiMock(),
           linkSource: {
             addEventListener: () => ({ remove: jest.fn() }),
@@ -57,6 +58,7 @@ describe("Client App", () => {
       <App
         runtime={{
           allowedLinkHosts: ["links.emmapilates.test"],
+          linkIdentityKind: "client",
           authenticationApi: createAuthenticationApiMock(),
           linkSource: {
             addEventListener: () => ({ remove: jest.fn() }),
@@ -95,13 +97,14 @@ describe("Client App", () => {
       <App
         runtime={{
           allowedLinkHosts: ["links.emmapilates.test"],
+          linkIdentityKind: "client",
           authenticationApi: createAuthenticationApiMock({
             verifyClientEmail,
           }),
           linkSource: {
             addEventListener: () => ({ remove: jest.fn() }),
             getInitialURL: async () =>
-              "https://links.emmapilates.test/authentication/verify-email?token=verification-token",
+              "https://links.emmapilates.test/client/authentication/verify-email?token=verification-token",
           },
           login: jest.fn(),
           sessionManager: {
@@ -127,6 +130,7 @@ describe("Client App", () => {
       <App
         runtime={{
           allowedLinkHosts: ["links.emmapilates.test"],
+          linkIdentityKind: "client",
           authenticationApi: createAuthenticationApiMock(),
           linkSource: {
             addEventListener: () => ({ remove: jest.fn() }),

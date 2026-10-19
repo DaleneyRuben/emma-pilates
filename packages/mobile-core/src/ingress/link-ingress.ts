@@ -1,4 +1,8 @@
-import { type AuthenticationLinkIntent, parseVerifiedLink } from "./verified-link";
+import {
+  type AuthenticationLinkIntent,
+  type LinkIdentityKind,
+  parseVerifiedLink,
+} from "./verified-link";
 
 export type LinkSource = {
   addEventListener: (
@@ -10,6 +14,7 @@ export type LinkSource = {
 
 type VerifiedLinkIngressOptions = {
   allowedHosts: readonly string[];
+  identityKind?: LinkIdentityKind;
   onIntent: (intent: AuthenticationLinkIntent) => void;
   source: LinkSource;
 };

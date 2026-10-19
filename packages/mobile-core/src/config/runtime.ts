@@ -26,6 +26,10 @@ export async function getOrCreateInstallationIdentifier(
   return created;
 }
 
+export function getAllowedLinkHosts(apiBaseUrl: string): string[] {
+  return [new URL(apiBaseUrl).hostname];
+}
+
 export function getApiBaseUrl(environment: RuntimeEnvironment): string {
   const value = environment.EXPO_PUBLIC_API_URL;
 

@@ -14,7 +14,7 @@ const pending = {
   expiresAt: "2026-09-25T15:00:00.000Z",
 };
 const changeLink =
-  "https://links.emmapilates.test/authentication/confirm-email-change?token=change-secret";
+  "https://links.emmapilates.test/client/authentication/confirm-email-change?token=change-secret";
 
 async function openEditProfile(runtime: ReturnType<typeof createClientRuntime>) {
   const screen = await openProfile(runtime);

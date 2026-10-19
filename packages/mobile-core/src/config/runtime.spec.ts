@@ -1,4 +1,20 @@
-import { getApiBaseUrl, getMobileApiBaseUrl, getOrCreateInstallationIdentifier } from "./runtime";
+import {
+  getAllowedLinkHosts,
+  getApiBaseUrl,
+  getMobileApiBaseUrl,
+  getOrCreateInstallationIdentifier,
+} from "./runtime";
+
+// ADR-0095: the link hosts of both environments, plus the API for local links.
+describe("getAllowedLinkHosts", () => {
+  it("accepts the production and staging link hosts and the API host", () => {
+    expect(getAllowedLinkHosts("http://127.0.0.1:3100/api/v1")).toEqual([
+      "links.emmapilatesstudio.com",
+      "links-staging.emmapilatesstudio.com",
+      "127.0.0.1",
+    ]);
+  });
+});
 
 describe("getApiBaseUrl", () => {
   it("accepts an absolute HTTPS API URL", () => {

@@ -20,6 +20,7 @@ function createAuthenticationApiMock() {
 function createRuntime(role?: "client" | "trainer") {
   return {
     allowedLinkHosts: ["links.emmapilates.test"],
+    linkIdentityKind: "staff" as const,
     authenticationApi: createAuthenticationApiMock(),
     linkSource: {
       addEventListener: () => ({ remove: jest.fn() }),

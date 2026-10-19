@@ -24,6 +24,8 @@ import { RenderErrorBoundary } from "./ui/render-error-boundary";
 
 export type MobileRuntime = {
   allowedLinkHosts: readonly string[];
+  /** The Account kind whose link prefix this app claims (ADR-0095). */
+  linkIdentityKind?: "client" | "staff";
   // Where public image URLs answered as API paths resolve (ADR-0077 locally).
   apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;

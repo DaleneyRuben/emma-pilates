@@ -1,3 +1,5 @@
+export type LinkIdentityKind = "client" | "staff";
+
 export type AuthenticationLinkIntent = {
   type: "verify-email" | "activate-account" | "recover-password" | "confirm-email-change";
   token: string;
@@ -14,7 +16,9 @@ const authenticationPaths: Readonly<Record<string, AuthenticationLinkIntent["typ
 export function parseVerifiedLink(
   value: string,
   allowedHosts: readonly string[],
+  identityKind?: LinkIdentityKind,
 ): AuthenticationLinkIntent | null {
+  void identityKind;
   let url: URL;
 
   try {

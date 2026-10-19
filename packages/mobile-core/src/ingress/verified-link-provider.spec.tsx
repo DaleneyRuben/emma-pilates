@@ -14,10 +14,11 @@ describe("VerifiedLinkProvider", () => {
     const screen = await render(
       <VerifiedLinkProvider
         allowedHosts={["links.emmapilates.test"]}
+        identityKind="client"
         source={{
           addEventListener: () => ({ remove: jest.fn() }),
           getInitialURL: async () =>
-            "https://links.emmapilates.test/authentication/recover-password?token=recovery",
+            "https://links.emmapilates.test/client/authentication/recover-password?token=recovery",
         }}
       >
         <IntentProbe />
