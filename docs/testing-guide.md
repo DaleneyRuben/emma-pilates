@@ -4445,6 +4445,11 @@ fixture or owner addresses.
 5. In Resend → Emails, the message shows `Delivered`. Northflank's `worker`
    logs show the job completed and never print the link or its token.
 
+Verified on staging on 2026-10-19 (release `1fd89301`): step 1 (Gmail
+Inbox, 1 s), step 2 (SPF, DKIM, DMARC PASS, no tracking redirect), and the
+bounce check below with `bounced@resend.dev`. Step 4's link opens a 404 until
+LNK-001; production waits for it.
+
 Without `RESEND_API_KEY` the worker logs `authentication_email_disabled` at
 start and the jobs stay queued, as before EXT-001.
 
