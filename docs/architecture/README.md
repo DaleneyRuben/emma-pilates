@@ -31,6 +31,7 @@ Accepted architecture decisions:
 - [x] Use independently revocable opaque Authentication Sessions with surface-specific idle and absolute lifetimes.
 - [x] Send transactional authentication email through a project-owned interface backed by Resend (ADR-0094; SendPulse in ADR-0031 until 2026-10-19).
 - [x] Serve authentication email links from `links.emmapilatesstudio.com` (staging `links-staging.`) on the API, with an app prefix per Account, the app-link verification files, and a browser page that never consumes the token (ADR-0095).
+- [x] Publish the store-required privacy, support, and account-deletion pages as static Spanish HTML on Cloudflare Pages at `app.emmapilatesstudio.com`, keeping the apex for the studio website (ADR-0096).
 - [x] Commit authentication state and encrypted pg-boss email jobs together, then deliver asynchronously after rechecking that the link is still current.
 - [x] Limit provider attempts to ten seconds and retry eligible authentication-email failures three times with bounded backoff over about ten minutes.
 - [x] Keep public delivery status neutral while authorized staff can inspect sanitized pending-invitation status and manage hard-bounce or complaint suppression.
