@@ -25,6 +25,7 @@ you are starting with no project knowledge.
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 
 ## Before you begin
 
@@ -4509,3 +4510,38 @@ Expected: «Abre este enlace en la app» with «Descargar en Google Play»
 3. Register with a real address, tap «Confirmar mi correo» in the email on
    the phone. Expected: the staging app opens on the verification screen,
    not a browser.
+
+## Test 58: the public privacy, support, and account-deletion pages (WEB-021)
+
+The stores link to three static Spanish pages in `apps/public-site/`,
+published by Cloudflare Pages on every merge to `main` that touches that
+folder (ADR-0096):
+
+- `https://app.emmapilatesstudio.com/privacidad`
+- `https://app.emmapilatesstudio.com/soporte`
+- `https://app.emmapilatesstudio.com/eliminar-cuenta`
+
+### Locally
+
+1. `python3 -m http.server 4380 --directory apps/public-site`, then open
+   `http://localhost:4380/privacidad/`, `/soporte/`, and `/eliminar-cuenta/`.
+2. Check at 1440 px and at 420 px. Expected: no horizontal scroll, the menu
+   at the top marks the current page, and the `soporte@` button opens a new
+   email (with the subject «Eliminar mi cuenta» on the deletion page).
+3. The local server does not apply `_headers`; check those on production.
+
+### On production
+
+1. `curl -sI https://app.emmapilatesstudio.com/privacidad/`. Expected: `200`
+   with `content-security-policy: default-src 'none'; style-src 'self'; …`,
+   `referrer-policy: no-referrer`, and `x-content-type-options: nosniff`.
+   `/privacidad` without the slash answers `308` to the slashed path, and an
+   unknown path `404` with «No encontramos esta página».
+2. Open each page in a browser. Expected: no console errors, and the support
+   address shows as `soporte@emmapilatesstudio.com`, not «[email protected]».
+   Any `cloudflareinsights` or `email-decode` script means a Cloudflare zone
+   feature was switched back on (Speed → Real user monitoring, or the
+   `email_off` markers were removed); see infrastructure.md.
+3. When the policy changes, update the «Última actualización» date on
+   `/privacidad` in the same pull request, and check REL-004's Data safety
+   answers still match.

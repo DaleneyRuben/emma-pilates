@@ -7,6 +7,7 @@ Pilates is a TypeScript pnpm workspace containing the mobile app, admin web, and
 - `apps/mobile` — Expo and React Native
 - `apps/admin-web` — Vite and React
 - `apps/backend` — NestJS
+- `apps/public-site` — static Spanish privacy, support, and account-deletion pages on Cloudflare Pages (ADR-0096)
 
 ## Local setup
 
