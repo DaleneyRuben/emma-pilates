@@ -29,6 +29,7 @@ const startWithJobs = async ({
       ? {
           stateReader: { find: jest.fn() },
           decryptor: { decrypt: jest.fn() },
+          suppressions: { isSuppressed: jest.fn().mockResolvedValue(false) },
           renderer: { render: jest.fn() },
           delivery: { deliver: jest.fn() },
         }

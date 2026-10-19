@@ -4447,3 +4447,17 @@ fixture or owner addresses.
 
 Without `RESEND_API_KEY` the worker logs `authentication_email_disabled` at
 start and the jobs stay queued, as before EXT-001.
+
+### Bounces and complaints
+
+1. In Resend → Webhooks → the environment's webhook → **Send test event**
+   (or register with `bounced@resend.dev`, Resend's address that always hard
+   bounces). Expected: the delivery attempt shows `204`; for the
+   `bounced@resend.dev` registration, a row in `system.email_suppressions`
+   with `reason = 'hard_bounce'` and `provider = 'resend'`, and no raw
+   address in it.
+2. Ask for the verification email again for that address (Swagger or the
+   app's «Reenviar»). Expected: the worker completes the job with
+   `suppressed` and Resend shows no new message.
+3. A `curl` without Resend's signature to the same endpoint answers `401`;
+   with no `RESEND_WEBHOOK_SECRET` it answers `404`.

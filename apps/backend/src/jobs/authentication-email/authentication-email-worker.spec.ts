@@ -28,6 +28,7 @@ const currentState = {
 const dependencies = (deliveryError?: AuthenticationEmailDeliveryError) => ({
   stateReader: { find: jest.fn().mockResolvedValue(currentState) },
   decryptor: { decrypt: jest.fn().mockResolvedValue('link-secret') },
+  suppressions: { isSuppressed: jest.fn().mockResolvedValue(false) },
   renderer: {
     render: jest.fn().mockReturnValue({
       recipient: currentState.email,

@@ -43,18 +43,24 @@ export interface AuthenticationEmailRenderer {
   render(input: AuthenticationEmailRenderInput): AuthenticationEmailMessage;
 }
 
+// ADR-0031: an unresolved hard bounce or complaint for the address.
+export interface EmailSuppressionReader {
+  isSuppressed(email: string): Promise<boolean>;
+}
+
 export type AuthenticationEmailProcessorDependencies = {
   stateReader: AuthenticationEmailStateReader;
   decryptor: AuthenticationLinkDecryptor;
   renderer: AuthenticationEmailRenderer;
   delivery: AuthenticationEmailDelivery;
+  suppressions: EmailSuppressionReader;
 };
 
 export const processAuthenticationEmail = async (
   job: AuthenticationEmailJob,
   now: Date,
   dependencies: AuthenticationEmailProcessorDependencies,
-): Promise<'delivered' | 'stale'> => {
+): Promise<'delivered' | 'stale' | 'suppressed'> => {
   const state = await dependencies.stateReader.find(job.authenticationTokenId);
   const notice = job.purpose === 'email_change_notice';
   const linkPurpose = notice ? 'email_change' : job.purpose;
@@ -71,6 +77,15 @@ export const processAuthenticationEmail = async (
     return 'stale';
   }
 
+  // The link goes to the pending new address; the notice to the current one.
+  const recipient =
+    linkPurpose === 'email_change' && !notice
+      ? (state.pendingEmail as string)
+      : state.email;
+  if (await dependencies.suppressions.isSuppressed(recipient)) {
+    return 'suppressed';
+  }
+
   const linkSecret = notice
     ? null
     : await dependencies.decryptor.decrypt(
@@ -78,11 +93,7 @@ export const processAuthenticationEmail = async (
         job.encryptionKeyId,
       );
   const message = dependencies.renderer.render({
-    // The link goes to the pending new address; the notice to the current one.
-    recipient:
-      linkPurpose === 'email_change' && !notice
-        ? (state.pendingEmail as string)
-        : state.email,
+    recipient,
     purpose: job.purpose,
     linkSecret,
     ...(state.pendingEmail === null ? {} : { newEmail: state.pendingEmail }),

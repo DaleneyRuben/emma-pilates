@@ -64,6 +64,7 @@ import {
 import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-invitation-unit-of-work';
 import { sendClientVerification } from './invitations/client-verification-resend';
 import { emailChangeWiring } from './email-change/email-change-wiring';
+import { emailSuppressionWiring } from './email-suppression/email-suppression-wiring';
 import { emailSourceBudgetProviders } from './email-source-budget/email-source-budget-providers';
 import { staffEmailBudgetProviders } from './staff-email-budget/staff-email-budget-providers';
 import { staffEmailAdmission } from './staff-email-budget/staff-email-budget.guard';
@@ -89,11 +90,13 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     AssistantClientInvitationsController,
     AuthenticationController,
     ...emailChangeWiring.controllers,
+    ...emailSuppressionWiring.controllers,
     ClientEmailVerificationController,
     ClientRegistrationController,
   ],
   providers: [
     ...emailChangeWiring.providers(PRISMA_CLIENT),
+    ...emailSuppressionWiring.providers(PRISMA_CLIENT),
     ...emailSourceBudgetProviders(PRISMA_CLIENT),
     ...staffEmailBudgetProviders(PRISMA_CLIENT),
     {

@@ -4,6 +4,7 @@ import { validateEnvironment } from './config/environment';
 import { createAuthenticationEmailDelivery } from './jobs/authentication-email/create-authentication-email-delivery';
 import { SpanishAuthenticationEmailRenderer } from './jobs/authentication-email/spanish-authentication-email-renderer';
 import { PrismaAuthenticationEmailStateReader } from './jobs/authentication-email/prisma-authentication-email-state-reader';
+import { createPrismaEmailSuppressions } from './system-identity/email-suppression/prisma-email-suppressions';
 import { createWorkerLog } from './jobs/worker-log';
 import { createErrorReporter } from './monitoring/error-reporting';
 import { createHeartbeatPing } from './monitoring/heartbeat-ping';
@@ -86,6 +87,7 @@ async function bootstrap(): Promise<void> {
               linkBaseUrl: environment.AUTHENTICATION_LINK_BASE_URL,
             }),
             delivery: emailDelivery,
+            suppressions: createPrismaEmailSuppressions(prisma, digestEmail),
           },
     finalizeUpload: createFinalizeUploadJobCommands(prisma, storage, now),
     pendingAccountCleanup: {

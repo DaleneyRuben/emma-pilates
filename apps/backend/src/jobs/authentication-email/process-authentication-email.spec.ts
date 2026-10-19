@@ -47,6 +47,7 @@ describe('processAuthenticationEmail', () => {
       processAuthenticationEmail(job, new Date('2026-08-30T15:00:00.000Z'), {
         stateReader,
         decryptor,
+        suppressions: { isSuppressed: jest.fn().mockResolvedValue(false) },
         renderer,
         delivery,
       }),
@@ -142,6 +143,7 @@ describe('processAuthenticationEmail', () => {
       processAuthenticationEmail(job, new Date('2026-08-30T15:00:00.000Z'), {
         stateReader: { find: jest.fn().mockResolvedValue(state) },
         decryptor,
+        suppressions: { isSuppressed: jest.fn().mockResolvedValue(false) },
         renderer,
         delivery,
       }),
@@ -165,6 +167,7 @@ describe('processAuthenticationEmail', () => {
     const dependencies = () => ({
       stateReader: { find: jest.fn().mockResolvedValue(state) },
       decryptor: { decrypt: jest.fn().mockResolvedValue('link-secret') },
+      suppressions: { isSuppressed: jest.fn().mockResolvedValue(false) },
       renderer: {
         render: jest
           .fn()

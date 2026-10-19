@@ -135,6 +135,13 @@ const environmentSchema = z
       .min(1)
       .default('Emma Pilates Studio <no-responder@emmapilatesstudio.com>'),
     EMAIL_REPLY_TO: z.email().default('soporte@emmapilatesstudio.com'),
+    // ADR-0094: the signing secret of Resend's webhook; unset, the endpoint
+    // answers 404.
+    RESEND_WEBHOOK_SECRET: z
+      .string()
+      .startsWith('whsec_')
+      .nullable()
+      .default(null),
     // Where the local email capture writes each message (never production).
     EMAIL_CAPTURE_DIRECTORY: z.string().min(1).default('.data/email-capture'),
   })

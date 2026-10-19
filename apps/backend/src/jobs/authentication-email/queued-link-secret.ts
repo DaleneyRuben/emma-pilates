@@ -53,6 +53,8 @@ export async function readQueuedLinkSecret(
         },
       },
       delivery: { deliver: () => Promise.resolve() },
+      // A shell read stands in for delivery, so suppression never applies.
+      suppressions: { isSuppressed: () => Promise.resolve(false) },
     });
     if (outcome === 'delivered' && secret !== null) return secret;
   }
