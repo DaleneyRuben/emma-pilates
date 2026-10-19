@@ -4444,8 +4444,10 @@ fixture or owner addresses.
 
 Verified on staging on 2026-10-19 (release `1fd89301`): step 1 (Gmail
 Inbox, 1 s), step 2 (SPF, DKIM, DMARC PASS, no tracking redirect), and the
-bounce check below with `bounced@resend.dev`. Step 4's link opens a 404 until
-LNK-001; production waits for it.
+bounce check below with `bounced@resend.dev`. Production runs on Android and
+iOS together during the Apple release (REL-010): until store builds with
+LNK-001's intent filters reach Play, step 4's tap opens the browser page
+«Abre este enlace en la app» instead of the app.
 
 Without `RESEND_API_KEY` the worker logs `authentication_email_disabled` at
 start and the jobs stay queued, as before EXT-001.
@@ -4510,6 +4512,10 @@ Expected: «Abre este enlace en la app» with «Descargar en Google Play»
 3. Register with a real address, tap «Confirmar mi correo» in the email on
    the phone. Expected: the staging app opens on the verification screen,
    not a browser.
+
+Verified on 2026-10-19: step 1, and step 2 for both staging apps (EAS
+staging builds from `4b825e85`) on the Android emulator. Step 3 and the
+production tap run with REL-010.
 
 ## Test 58: the public privacy, support, and account-deletion pages (WEB-021)
 
