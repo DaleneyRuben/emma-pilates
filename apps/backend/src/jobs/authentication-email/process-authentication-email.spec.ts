@@ -16,6 +16,7 @@ describe('processAuthenticationEmail', () => {
       find: jest.fn().mockResolvedValue({
         accountId: job.accountId,
         email: 'client@example.com',
+        identityKind: 'client',
         purpose: job.purpose,
         expiresAt: new Date('2026-08-30T16:00:00.000Z'),
         usedAt: null,
@@ -61,6 +62,7 @@ describe('processAuthenticationEmail', () => {
     expect(renderer.render).toHaveBeenCalledWith({
       recipient: 'client@example.com',
       purpose: job.purpose,
+      identityKind: 'client',
       linkSecret: 'link-secret',
     });
     expect(delivery.deliver).toHaveBeenCalledTimes(1);
@@ -158,6 +160,7 @@ describe('processAuthenticationEmail', () => {
     const state = {
       accountId: job.accountId,
       email: 'client@example.com',
+      identityKind: 'client' as const,
       pendingEmail: 'client.nueva@example.com',
       purpose: 'email_change' as const,
       expiresAt: new Date('2026-09-25T16:00:00.000Z'),
@@ -197,6 +200,7 @@ describe('processAuthenticationEmail', () => {
       expect(deps.renderer.render).toHaveBeenCalledWith({
         recipient: 'client.nueva@example.com',
         purpose: 'email_change',
+        identityKind: 'client',
         linkSecret: 'link-secret',
         newEmail: 'client.nueva@example.com',
       });
@@ -217,6 +221,7 @@ describe('processAuthenticationEmail', () => {
       expect(deps.renderer.render).toHaveBeenCalledWith({
         recipient: 'client@example.com',
         purpose: 'email_change_notice',
+        identityKind: 'client',
         linkSecret: null,
         newEmail: 'client.nueva@example.com',
       });

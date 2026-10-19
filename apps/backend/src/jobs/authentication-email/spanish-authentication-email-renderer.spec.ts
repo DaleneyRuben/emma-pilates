@@ -11,19 +11,19 @@ describe('SpanishAuthenticationEmailRenderer', () => {
   it.each([
     [
       'verification',
-      'https://links.emmapilates.test/authentication/verify-email?token=secret-1',
+      'https://links.emmapilates.test/client/authentication/verify-email?token=secret-1',
     ],
     [
       'activation',
-      'https://links.emmapilates.test/authentication/activate-account?token=secret-1',
+      'https://links.emmapilates.test/client/authentication/activate-account?token=secret-1',
     ],
     [
       'password_recovery',
-      'https://links.emmapilates.test/authentication/recover-password?token=secret-1',
+      'https://links.emmapilates.test/client/authentication/recover-password?token=secret-1',
     ],
     [
       'email_change',
-      'https://links.emmapilates.test/authentication/confirm-email-change?token=secret-1',
+      'https://links.emmapilates.test/client/authentication/confirm-email-change?token=secret-1',
     ],
   ] as const)(
     'renders the %s email with its link as a button and a bare URL',
@@ -31,6 +31,7 @@ describe('SpanishAuthenticationEmailRenderer', () => {
       const message = renderer.render({
         recipient: 'lucia@example.com',
         purpose,
+        identityKind: 'client',
         linkSecret: 'secret-1',
         ...(purpose === 'email_change'
           ? { newEmail: 'lucia@example.com' }
@@ -52,10 +53,31 @@ describe('SpanishAuthenticationEmailRenderer', () => {
     },
   );
 
+  // ADR-0095: the prefix names the app that claims the link.
+  it.each([
+    ['activation', 'activate-account'],
+    ['password_recovery', 'recover-password'],
+  ] as const)(
+    'points the %s link of a Staff Member at the staff prefix',
+    (purpose, path) => {
+      const message = renderer.render({
+        recipient: 'paola@example.com',
+        purpose,
+        identityKind: 'staff',
+        linkSecret: 'secret-1',
+      });
+
+      expect(message.link).toBe(
+        `https://links.emmapilates.test/staff/authentication/${path}?token=secret-1`,
+      );
+    },
+  );
+
   it('renders the old-address notice without any link, naming the new address', () => {
     const message = renderer.render({
       recipient: 'lucia@example.com',
       purpose: 'email_change_notice',
+      identityKind: 'client',
       linkSecret: null,
       newEmail: 'lucia.nueva@example.com',
     });
@@ -72,6 +94,7 @@ describe('SpanishAuthenticationEmailRenderer', () => {
     const notice = renderer.render({
       recipient: 'lucia@example.com',
       purpose: 'email_change_notice',
+      identityKind: 'client',
       linkSecret: null,
       newEmail: 'x<script>@example.com',
     });
@@ -89,6 +112,7 @@ describe('SpanishAuthenticationEmailRenderer', () => {
         renderer.render({
           recipient: 'a@example.com',
           purpose: purpose as 'verification',
+          identityKind: 'client',
           linkSecret: 's',
         }).text,
       ).toContain(lifetime);
