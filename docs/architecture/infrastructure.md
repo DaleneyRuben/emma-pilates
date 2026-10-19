@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-17** (EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
+Last verified **2026-10-19** (LNK-001 added the link hosts; EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -52,7 +52,8 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
            Android through Firebase Cloud Messaging (project emma-pilates),
            iOS through APNs once gate 9 brings the key
  Cloudflare domain emmapilatesstudio.com: Email Routing forwards soporte@ and
-           no-responder@ to the owner's inbox; no web hostnames yet
+           no-responder@ to the owner's inbox; links. and links-staging.
+           point at each environment's Northflank api (LNK-001, ADR-0095)
 ```
 
 ## What we use from each provider
@@ -67,7 +68,7 @@ Details are in the sections below.
 | **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (15 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
 | **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb), holding the databases `emma` (production) and `emma_staging` (staging, its own role); its CA certificate | The **production and staging databases** | The $50 trial credit, point-in-time restore, any paid plan |
 | **Vercel** | Projects `emma-pilates-admin` and `emma-pilates-admin-staging` (Hobby), each deployed only by its release workflow with the Vercel CLI (Git deployments off in `vercel.json`); `vercel.json` rewrites, `middleware.ts`, the error-envelope Function, Production environment variables; one project-scoped token per project | Hosts the **admin web** and forwards its `/api/v1` calls to the matching API with that environment's proxy proof | Vercel Pro, Git deployments and pull-request previews (off since ADR-0091 and ADR-0092), custom domain (gate 7) |
-| **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-staging-images` with the same rule and its own token `northflank-staging-images` (EXT-017); private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off; Resend's records added through Domain Connect on 2026-10-19 (`resend._domainkey` TXT, `send` and `rsend` CNAMEs, all DNS only) and `_dmarc` TXT `v=DMARC1; p=none; rua=mailto:soporte@emmapilatesstudio.com` by hand; the root keeps its one SPF and Email Routing's MX records | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email** | Hostnames on the domain (WEB-021, LNK-001, a custom API or admin host), Email Sending (Resend sends instead, ADR-0094), public buckets and custom bucket domains, Workers, every other product |
+| **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-staging-images` with the same rule and its own token `northflank-staging-images` (EXT-017); private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off; Resend's records added through Domain Connect on 2026-10-19 (`resend._domainkey` TXT, `send` and `rsend` CNAMEs, all DNS only) and `links` and `links-staging` CNAMEs to Northflank (DNS only) with their `verify-….links` and `verify-….links-staging` TXT ownership records (LNK-001, 2026-10-19); `_dmarc` TXT `v=DMARC1; p=none; rua=mailto:soporte@emmapilatesstudio.com` by hand; the root keeps its one SPF and Email Routing's MX records | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email** | Other hostnames on the domain (WEB-021, a custom API or admin host), Email Sending (Resend sends instead, ADR-0094), public buckets and custom bucket domains, Workers, every other product |
 | **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` and `staging` profiles; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
 | **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates»), `com.emmapilates.staff` («Emma Pilates Staff»), and their staging variants `com.emmapilates.client.staging` and `com.emmapilates.staff.staging` (EXT-017); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
 | **Google Play Console** | Personal developer account «Daleney Labs» (ID `5688059300530668770`) owned by the user's Google account, identity verified 2026-10-15; draft apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»), Spanish (Latin America), free, Play App Signing accepted, automatic protection on | Distributes the **Android apps**: Internal testing first, then the Client app's closed test and production release (REL-002 to REL-007); Staff stays on a closed track | Paid apps and in-app purchases (earning money is off, which keeps the legal address private), organization verification, the developer website |
@@ -141,8 +142,11 @@ Every account belongs to the project owner and is shared with no one else.
   Port 3100 public HTTP as `p01` → https://p01--api--mmps25fn9k9x.code.run.
   Readiness probe `/health/ready` (delay 10 s, period 10 s, timeout 5 s, 3
   failures); liveness probe `/health/live` (delay 60 s, period 10 s, timeout
-  3 s, 3 failures). Service variables: `AUTHENTICATION_LINK_BASE_URL`
-  (its own HTTPS address until the domain exists) and `TRUSTED_PROXY_HOPS=1`.
+  3 s, 3 failures). Custom domain `links.emmapilatesstudio.com` on `p01`
+  (team domain grouping, Northflank's Let's Encrypt certificate, the
+  `code.run` address kept; LNK-001, ADR-0095). Service variables:
+  `AUTHENTICATION_LINK_BASE_URL=https://links.emmapilatesstudio.com` and
+  `TRUSTED_PROXY_HOPS=1`.
 - **Service `worker`:** combined service built from the same repository,
   branch, Dockerfile, and context as `api`, start command
   `node dist/src/worker-main.js`, **no ports**, no health probes (the Better
@@ -269,9 +273,10 @@ how to release, pause, and resume it is in the
   context `/`, nf-compute-20, 1 instance, CI off, CD on, port 3100 public
   HTTP as `p01` → https://p01--api--jmys6w5p8vlk.code.run, readiness
   `/health/ready` (10/10/5/3) and liveness `/health/live` (60/10/3/3),
-  service variables `TRUSTED_PROXY_HOPS=1` and `AUTHENTICATION_LINK_BASE_URL`
-  (its own address). Service `worker`: combined, same source, nf-compute-20,
-  no ports, no probes, command `node dist/src/worker-main.js`, variable
+  custom domain `links-staging.emmapilatesstudio.com` on `p01` (LNK-001),
+  service variables `TRUSTED_PROXY_HOPS=1` and
+  `AUTHENTICATION_LINK_BASE_URL=https://links-staging.emmapilatesstudio.com`.
+  Service `worker`: combined, same source, nf-compute-20, no ports, no probes, command `node dist/src/worker-main.js`, variable
   `AUTHENTICATION_LINK_BASE_URL`. Job `migrate`: manual, same source,
   nf-compute-20, command `node_modules/.bin/prisma migrate deploy`, retry
   limit 0, run on image change Never. Builds use nf-compute-400-16, the
@@ -351,7 +356,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | — | `.env` | Fresh per environment; rotation plan still to write |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY` | Northflank `production` | — | `.env` | 32 random bytes, base64 |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | Northflank `production` (`northflank-prod-v1`) | — | `local-development-v1` | |
-| `AUTHENTICATION_LINK_BASE_URL` | Northflank `api` **and** `worker` services (the API's address) | default | default | The link domain arrives with gate 7 |
+| `AUTHENTICATION_LINK_BASE_URL` | Northflank `api` **and** `worker` services (`https://links.emmapilatesstudio.com`; staging `https://links-staging.emmapilatesstudio.com`) | default | default | The link host the API serves (ADR-0095) |
 | `ADMIN_WEB_TRUSTED_ORIGINS` | Northflank `production` (`https://emma-pilates-admin.vercel.app`) | — | `http://localhost:5173` | |
 | `ADMIN_WEB_PROXY_SECRET` | Northflank `production` **and** Vercel Production | — | unset | Same value on both sides |
 | `TRUSTED_PROXY_HOPS` | Northflank `api` service (1) | — | 0 | Measured, never assumed (ADR-0087) |
