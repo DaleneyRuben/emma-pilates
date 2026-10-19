@@ -13,6 +13,7 @@ export const androidApps: readonly AndroidApp[] = [
     packageName: 'com.emmapilates.client',
     sha256CertFingerprints: [
       'F6:84:F6:15:46:56:DE:E1:DE:18:5E:4E:6F:77:3D:EA:91:95:D4:35:51:CE:09:6F:C0:1B:5C:C8:A3:1E:B2:86',
+      'AC:CB:86:F3:D7:A0:4E:EF:AB:99:96:B3:F8:8A:5B:C2:18:4F:6A:CC:0D:7E:A5:45:0E:0A:6A:73:4C:59:D1:1A',
     ],
   },
   {
