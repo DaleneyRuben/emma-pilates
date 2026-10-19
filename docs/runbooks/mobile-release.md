@@ -77,8 +77,14 @@ developer account «Daleney Labs» (`docs/architecture/infrastructure.md`).
   the console: Test and release → Testing → Internal testing → Create new
   release → Upload the `.aab` from the build page → release notes in
   `<es-419>` tags → Next → Save and publish. The only expected warning is
-  the missing deobfuscation file (R8 is off). Later uploads can use
-  `eas submit` once the Play service account is stored in EAS (REL-002).
+  the missing deobfuscation file (R8 is off). Later uploads use
+  `eas submit --profile production --platform android` with the Play service
+  account `play-submit@emma-pilates.iam.gserviceaccount.com` (REL-002), saved
+  on the Expo account and selected on both store identifiers. It may release
+  to testing tracks only; production access is added for the Client app at
+  REL-007. To replace the key: Google Cloud → IAM & Admin → Service accounts →
+  `play-submit` → Keys, create a JSON key, choose it in each app's Expo
+  credentials, then delete the old key in Google Cloud.
 - **Testers:** the email list «Equipo interno» is shared by both apps; each
   app's Testers tab has the «Join on the web» link. A tester opens it in a
   browser signed in with a listed Google account, accepts, and installs; the
