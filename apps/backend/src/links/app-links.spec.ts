@@ -26,6 +26,17 @@ describe('app links', () => {
     ]);
   });
 
+  it('leaves out a package whose signing certificate is not known yet', () => {
+    expect(
+      androidAssetLinks([
+        {
+          packageName: 'com.emmapilates.staff.staging',
+          sha256CertFingerprints: [],
+        },
+      ]),
+    ).toEqual([]);
+  });
+
   it('lists the store and staging packages of both apps', () => {
     expect(androidApps.map((app) => app.packageName)).toEqual([
       'com.emmapilates.client',
