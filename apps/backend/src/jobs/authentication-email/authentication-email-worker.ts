@@ -17,7 +17,7 @@ type AuthenticationEmailWorkerJob = {
 };
 
 type AuthenticationEmailWorkerOutput =
-  | { outcome: 'delivered' | 'stale' }
+  | { outcome: 'delivered' | 'stale' | 'suppressed' }
   | {
       failureCategory: AuthenticationEmailFailureCategory | 'invalid_payload';
     };
