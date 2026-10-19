@@ -10,7 +10,7 @@ const settings = {
 
 const message = {
   recipient: 'client@example.com',
-  purpose: 'recovery' as const,
+  purpose: 'password_recovery' as const,
   subject: 'Restablece tu contraseña',
   link: 'https://links.emmapilates.test/authentication/recover?token=s',
   text: 'text',

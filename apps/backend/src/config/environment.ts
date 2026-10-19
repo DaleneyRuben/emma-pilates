@@ -127,6 +127,14 @@ const environmentSchema = z
     // NOT-002: Expo's access token, required once enhanced push security is
     // on; unset sends pushes without one.
     EXPO_ACCESS_TOKEN: z.string().min(1).nullable().default(null),
+    // ADR-0094: Resend's sending-only API key; unset captures email locally
+    // outside production and leaves the queue untouched in production.
+    RESEND_API_KEY: z.string().min(1).nullable().default(null),
+    EMAIL_FROM: z
+      .string()
+      .min(1)
+      .default('Emma Pilates Studio <no-responder@emmapilatesstudio.com>'),
+    EMAIL_REPLY_TO: z.email().default('soporte@emmapilatesstudio.com'),
     // Where the local email capture writes each message (never production).
     EMAIL_CAPTURE_DIRECTORY: z.string().min(1).default('.data/email-capture'),
   })
