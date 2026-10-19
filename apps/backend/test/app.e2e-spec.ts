@@ -50,6 +50,14 @@ describe('operational health (e2e)', () => {
       });
   });
 
+  // ADR-0095: the link host's verification files come from the API itself.
+  it('serves the Android asset links outside the API prefix', () => {
+    return request(app.getHttpServer())
+      .get('/.well-known/assetlinks.json')
+      .expect('Content-Type', /application\/json/)
+      .expect(200);
+  });
+
   it('serves versioned application endpoints below /api/v1', () => {
     return request(app.getHttpServer())
       .get('/api/v1/probe')

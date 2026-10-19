@@ -5,6 +5,7 @@ import type { Environment } from './config/environment';
 import { BackOfficeModule } from './back-office/back-office.module';
 import { DatabaseModule } from './database/database.module';
 import { HealthModule } from './health/health.module';
+import { LinksModule } from './links/links.module';
 import { ProblemDetailsFilter } from './http/problem-details.filter';
 import {
   ERROR_REPORTER,
@@ -21,6 +22,7 @@ import { UploadsModule } from './uploads/uploads.module';
     DatabaseModule,
     ObjectStorageModule,
     HealthModule,
+    LinksModule,
     SystemIdentityModule,
     BookingModule,
     BackOfficeModule,

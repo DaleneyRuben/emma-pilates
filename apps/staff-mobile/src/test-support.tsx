@@ -29,6 +29,7 @@ export function createStaffRuntime(
 ) {
   return {
     allowedLinkHosts: ["links.emmapilates.test"],
+    linkIdentityKind: "staff" as const,
     apiFetcher: fetcher,
     authenticationApi: {
       activateAccount: jest.fn(),

@@ -12,10 +12,30 @@
     "userInterfaceStyle": "light",
     "ios": {
       "bundleIdentifier": "com.emmapilates.staff",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "associatedDomains": [
+        "applinks:links.emmapilatesstudio.com"
+      ]
     },
     "android": {
       "package": "com.emmapilates.staff",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "links.emmapilatesstudio.com",
+              "pathPrefix": "/staff/authentication/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#F3E9E7",
         "foregroundImage": "./assets/android-icon-foreground.png",

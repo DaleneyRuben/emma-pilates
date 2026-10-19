@@ -4302,12 +4302,8 @@ iPhone 16 Pro, and the iPad Pro 11, in both apps.
 6. Staff login as `camila.rojas@example.com`, then «Tu cuenta» → «Cambiar
    contraseña», and the Staff password link: as steps 1, 3, and 5.
 
-A development build cannot receive the https link (LNK-001), so step 5 needs
-a temporary, never-committed line in `parseVerifiedLink`
-(`packages/mobile-core/src/ingress/verified-link.ts`) that turns
-`emmapilates-client://` or `emmapilates-staff://` into `https://`, then
-`emmapilates-client://127.0.0.1/authentication/recover-password?token=…`
-(the allowed host is the API's, `127.0.0.1`). Revert it afterwards.
+Open the password link in a development build as Test 57 describes (the
+https link host, approved by hand for the debug key).
 
 The developer gear sits on the Staff «Tu cuenta» avatar on Android, and a
 swipe from it opens the developer menu; drag it away with
@@ -4466,3 +4462,50 @@ start and the jobs stay queued, as before EXT-001.
    `suppressed` and Resend shows no new message.
 3. A `curl` without Resend's signature to the same endpoint answers `401`;
    with no `RESEND_WEBHOOK_SECRET` it answers `404`.
+
+## Test 57: an email link opens the right app (LNK-001)
+
+Every authentication email link is
+`https://links.emmapilatesstudio.com/<client|staff>/authentication/<purpose>?token=…`
+(staging: `links-staging.`; locally the capture shows
+`links.emmapilates.test`). The prefix is the Account's: a Client's links
+open the Client app and a Staff Member's the Staff app (ADR-0095).
+
+### Locally, on the Android emulator
+
+1. Build a development build with the intent filters:
+   `ANDROID_HOME=~/Library/Android/sdk JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" env -u CI ./node_modules/.bin/expo run:android --no-bundler`
+   from `apps/client-mobile` (or `apps/staff-mobile`).
+2. A debug key can't pass Android's domain check, so approve the host by
+   hand: `adb shell pm set-app-links-user-selection --user cur --package com.emmapilates.client true links.emmapilatesstudio.com`.
+3. With the API, the worker, and Metro running on `pilates_dev_sim`, send
+   `POST /api/v1/password-recovery-requests` for `lucia@example.com` and take
+   the `token` from the newest `password_recovery` file in
+   `apps/backend/.data/email-capture/`.
+4. `adb shell am start -a android.intent.action.VIEW -c android.intent.category.BROWSABLE -d 'https://links.emmapilatesstudio.com/client/authentication/recover-password?token=<token>'`.
+   Expected: the Client app opens on «Crea una contraseña nueva»; saving a
+   new password signs Lucía in to Home.
+5. The same command with `/staff/` instead of `/client/`. Expected: Chrome
+   opens, not the Client app.
+
+### In a browser
+
+Open `http://localhost:3100/client/authentication/verify-email?token=x`.
+Expected: «Abre este enlace en la app» with «Descargar en Google Play»
+(the Client package), `Cache-Control: no-store` and
+`Referrer-Policy: no-referrer`; the token is not on the page. For
+`/staff/authentication/recover-password?token=x` the page also offers
+«Continuar en el navegador» to the admin web's `/crear-contrasena?token=x`.
+`/staff/authentication/verify-email` answers `404`.
+
+### On staging or production
+
+1. `curl -s https://links-staging.emmapilatesstudio.com/.well-known/assetlinks.json`
+   lists each package with its signing certificates.
+2. Install the staging build (Test 55), then
+   `adb shell pm verify-app-links --re-verify com.emmapilates.client.staging`
+   and `adb shell pm get-app-links com.emmapilates.client.staging`.
+   Expected: `links-staging.emmapilatesstudio.com: verified`.
+3. Register with a real address, tap «Confirmar mi correo» in the email on
+   the phone. Expected: the staging app opens on the verification screen,
+   not a browser.

@@ -20,6 +20,7 @@ const job = (tokenId: string, createdOn: string, purpose = 'verification') => ({
 const token = (overrides: object = {}) => ({
   accountId,
   email: 'clienta@example.com',
+  identityKind: 'client' as const,
   pendingEmail: null,
   purpose: 'verification' as const,
   expiresAt: new Date('2026-10-16T00:00:00.000Z'),

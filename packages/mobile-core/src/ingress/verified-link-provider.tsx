@@ -2,7 +2,7 @@ import { createContext, type PropsWithChildren, useContext, useEffect, useState 
 import { Linking } from "react-native";
 
 import { type LinkSource, subscribeToVerifiedLinks } from "./link-ingress";
-import type { AuthenticationLinkIntent } from "./verified-link";
+import type { AuthenticationLinkIntent, LinkIdentityKind } from "./verified-link";
 
 type VerifiedLinkState = {
   intent: AuthenticationLinkIntent | null;
@@ -12,12 +12,14 @@ const VerifiedLinkContext = createContext<VerifiedLinkState | undefined>(undefin
 
 type VerifiedLinkProviderProps = PropsWithChildren<{
   allowedHosts: readonly string[];
+  identityKind: LinkIdentityKind;
   source?: LinkSource;
 }>;
 
 export function VerifiedLinkProvider({
   allowedHosts,
   children,
+  identityKind,
   source = Linking,
 }: VerifiedLinkProviderProps) {
   const [intent, setIntent] = useState<AuthenticationLinkIntent | null>(null);
@@ -26,10 +28,11 @@ export function VerifiedLinkProvider({
     () =>
       subscribeToVerifiedLinks({
         allowedHosts,
+        identityKind,
         onIntent: setIntent,
         source,
       }),
-    [allowedHosts, source],
+    [allowedHosts, identityKind, source],
   );
 
   return <VerifiedLinkContext.Provider value={{ intent }}>{children}</VerifiedLinkContext.Provider>;

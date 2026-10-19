@@ -1,4 +1,8 @@
-import { type AuthenticationLinkIntent, parseVerifiedLink } from "./verified-link";
+import {
+  type AuthenticationLinkIntent,
+  type LinkIdentityKind,
+  parseVerifiedLink,
+} from "./verified-link";
 
 export type LinkSource = {
   addEventListener: (
@@ -10,12 +14,14 @@ export type LinkSource = {
 
 type VerifiedLinkIngressOptions = {
   allowedHosts: readonly string[];
+  identityKind: LinkIdentityKind;
   onIntent: (intent: AuthenticationLinkIntent) => void;
   source: LinkSource;
 };
 
 export function subscribeToVerifiedLinks({
   allowedHosts,
+  identityKind,
   onIntent,
   source,
 }: VerifiedLinkIngressOptions): () => void {
@@ -24,7 +30,7 @@ export function subscribeToVerifiedLinks({
       return;
     }
 
-    const intent = parseVerifiedLink(url, allowedHosts);
+    const intent = parseVerifiedLink(url, allowedHosts, identityKind);
 
     if (intent !== null) {
       onIntent(intent);

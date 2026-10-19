@@ -21,6 +21,7 @@ const newer = '33333333-3333-4333-8333-333333333333';
 const currentToken = (overrides: object = {}) => ({
   accountId,
   email: 'owner@example.com',
+  identityKind: 'staff' as const,
   pendingEmail: null,
   purpose: 'activation' as const,
   expiresAt: new Date('2026-10-20T00:00:00.000Z'),

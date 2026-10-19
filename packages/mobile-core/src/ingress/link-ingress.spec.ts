@@ -7,6 +7,7 @@ describe("subscribeToVerifiedLinks", () => {
     const onIntent = jest.fn();
     const stop = subscribeToVerifiedLinks({
       allowedHosts: ["links.emmapilates.test"],
+      identityKind: "client",
       onIntent,
       source: {
         addEventListener: (_event, listener) => {
@@ -14,7 +15,7 @@ describe("subscribeToVerifiedLinks", () => {
           return { remove };
         },
         getInitialURL: async () =>
-          "https://links.emmapilates.test/authentication/verify-email?token=startup",
+          "https://links.emmapilates.test/client/authentication/verify-email?token=startup",
       },
     });
 
@@ -23,7 +24,7 @@ describe("subscribeToVerifiedLinks", () => {
       url: "https://attacker.example/authentication/activate-account?token=ignored",
     });
     receiveUrl({
-      url: "https://links.emmapilates.test/authentication/activate-account?token=foreground",
+      url: "https://links.emmapilates.test/client/authentication/activate-account?token=foreground",
     });
 
     expect(onIntent).toHaveBeenNthCalledWith(1, {

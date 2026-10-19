@@ -8,7 +8,11 @@ type AuthenticationTokenRecord = {
   expiresAt: Date;
   usedAt: Date | null;
   invalidatedAt: Date | null;
-  account: { email: string };
+  account: {
+    email: string;
+    clientId: string | null;
+    staffMemberId: string | null;
+  };
   emailChange: { newEmail: string } | null;
 };
 
@@ -22,7 +26,9 @@ type AuthenticationTokenReader = {
         expiresAt: true;
         usedAt: true;
         invalidatedAt: true;
-        account: { select: { email: true } };
+        account: {
+          select: { email: true; clientId: true; staffMemberId: true };
+        };
         emailChange: { select: { newEmail: true } };
       };
     }): Promise<AuthenticationTokenRecord | null>;
@@ -43,7 +49,9 @@ export class PrismaAuthenticationEmailStateReader implements AuthenticationEmail
         expiresAt: true,
         usedAt: true,
         invalidatedAt: true,
-        account: { select: { email: true } },
+        account: {
+          select: { email: true, clientId: true, staffMemberId: true },
+        },
         emailChange: { select: { newEmail: true } },
       },
     });
@@ -61,6 +69,7 @@ export class PrismaAuthenticationEmailStateReader implements AuthenticationEmail
     return {
       accountId: token.accountId,
       email: token.account.email,
+      identityKind: token.account.staffMemberId === null ? 'client' : 'staff',
       purpose,
       expiresAt: token.expiresAt,
       usedAt: token.usedAt,

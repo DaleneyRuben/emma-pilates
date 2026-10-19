@@ -99,7 +99,8 @@ export class SpanishAuthenticationEmailRenderer implements AuthenticationEmailRe
     const link =
       template.path === null || input.linkSecret === null
         ? null
-        : `${this.options.linkBaseUrl.replace(/\/$/, '')}${template.path}?token=${encodeURIComponent(input.linkSecret)}`;
+        : // ADR-0095: the prefix names the app whose links claim the path.
+          `${this.options.linkBaseUrl.replace(/\/$/, '')}/${input.identityKind}${template.path}?token=${encodeURIComponent(input.linkSecret)}`;
     const intro = template.intro.replace('{newEmail}', input.newEmail ?? '');
 
     const textLines = [

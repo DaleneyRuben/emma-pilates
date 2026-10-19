@@ -26,6 +26,7 @@ export function createClientRuntime(
 ) {
   return {
     allowedLinkHosts: ["links.emmapilates.test"],
+    linkIdentityKind: "client" as const,
     apiBaseUrl: "https://api.test/api/v1",
     apiFetcher: fetcher,
     authenticationApi: {

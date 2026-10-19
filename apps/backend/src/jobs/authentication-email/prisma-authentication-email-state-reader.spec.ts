@@ -9,7 +9,11 @@ describe('PrismaAuthenticationEmailStateReader', () => {
       expiresAt: new Date('2026-08-30T16:00:00.000Z'),
       usedAt: null,
       invalidatedAt: null,
-      account: { email: 'client@example.com' },
+      account: {
+        email: 'client@example.com',
+        clientId: 'c1',
+        staffMemberId: null,
+      },
     });
     const reader = new PrismaAuthenticationEmailStateReader({
       authenticationToken: { findUnique },
@@ -24,6 +28,7 @@ describe('PrismaAuthenticationEmailStateReader', () => {
       usedAt: null,
       invalidatedAt: null,
       email: 'client@example.com',
+      identityKind: 'client',
       pendingEmail: null,
     });
     expect(findUnique).toHaveBeenCalledWith({
@@ -34,7 +39,9 @@ describe('PrismaAuthenticationEmailStateReader', () => {
         expiresAt: true,
         usedAt: true,
         invalidatedAt: true,
-        account: { select: { email: true } },
+        account: {
+          select: { email: true, clientId: true, staffMemberId: true },
+        },
         emailChange: { select: { newEmail: true } },
       },
     });
@@ -49,7 +56,11 @@ describe('PrismaAuthenticationEmailStateReader', () => {
           expiresAt: new Date('2026-09-25T15:00:00.000Z'),
           usedAt: null,
           invalidatedAt: null,
-          account: { email: 'client@example.com' },
+          account: {
+            email: 'client@example.com',
+            clientId: 'c1',
+            staffMemberId: null,
+          },
           emailChange: { newEmail: 'client.nueva@example.com' },
         }),
       },
@@ -62,7 +73,33 @@ describe('PrismaAuthenticationEmailStateReader', () => {
       usedAt: null,
       invalidatedAt: null,
       email: 'client@example.com',
+      identityKind: 'client',
       pendingEmail: 'client.nueva@example.com',
+    });
+  });
+
+  // ADR-0095: the link names the app of the Account's domain identity.
+  it('reads a Staff Member Account as a staff link', async () => {
+    const reader = new PrismaAuthenticationEmailStateReader({
+      authenticationToken: {
+        findUnique: jest.fn().mockResolvedValue({
+          accountId: '0ae2701e-f8ac-4c8a-8cf0-65182ee0fc1d',
+          purpose: AuthenticationTokenPurpose.ACTIVATION,
+          expiresAt: new Date('2026-09-25T15:00:00.000Z'),
+          usedAt: null,
+          invalidatedAt: null,
+          account: {
+            email: 'paola@example.com',
+            clientId: null,
+            staffMemberId: 's1',
+          },
+          emailChange: null,
+        }),
+      },
+    });
+
+    await expect(reader.find('activation-token-id')).resolves.toMatchObject({
+      identityKind: 'staff',
     });
   });
 
@@ -85,7 +122,11 @@ describe('PrismaAuthenticationEmailStateReader', () => {
           expiresAt: new Date('2026-09-06T16:00:00.000Z'),
           usedAt: null,
           invalidatedAt: null,
-          account: { email: 'client@example.com' },
+          account: {
+            email: 'client@example.com',
+            clientId: 'c1',
+            staffMemberId: null,
+          },
         }),
       },
     });

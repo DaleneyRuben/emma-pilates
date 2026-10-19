@@ -26,6 +26,17 @@ export async function getOrCreateInstallationIdentifier(
   return created;
 }
 
+// ADR-0095: email links arrive on these hosts; each build's intent filter or
+// associated domain admits only its own, and the API host serves local links.
+const authenticationLinkHosts = [
+  "links.emmapilatesstudio.com",
+  "links-staging.emmapilatesstudio.com",
+] as const;
+
+export function getAllowedLinkHosts(apiBaseUrl: string): string[] {
+  return [...authenticationLinkHosts, new URL(apiBaseUrl).hostname];
+}
+
 export function getApiBaseUrl(environment: RuntimeEnvironment): string {
   const value = environment.EXPO_PUBLIC_API_URL;
 
