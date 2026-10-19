@@ -473,6 +473,9 @@ Values never go in the repository or a chat. «Mac» means the user's own
 
 ## Known gaps
 
+- The emailed authentication links open a 404: they point at
+  `/authentication/...` on the API host, which serves nothing there, and the
+  apps have no verified app links yet (LNK-001).
 - Resend's free plan sends 100 emails a day: a launch-day burst beyond that
   fails after its retries (ADR-0094), so invitations are spread over days or
   the plan is upgraded for that month.
