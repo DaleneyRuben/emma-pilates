@@ -251,7 +251,9 @@ Every account belongs to the project owner and is shared with no one else.
   These are the URLs the store listings and Data safety forms use.
 - Connected to GitHub through the «Cloudflare Workers and Pages» app, limited
   to the `emma-pilates` repository. No build command, root directory
-  `apps/public-site`, no environment variables; preview branches off.
+  `apps/public-site`, no environment variables; preview branches off; build
+  watch path `apps/public-site/*`, so a merge that does not touch the pages
+  publishes nothing.
 - A push to the production branch publishes in about a minute. The production
   branch is `main`; it was `chore/web-021-public-policy-pages` until that
   pull request merged, so the pages went live before the merge.
