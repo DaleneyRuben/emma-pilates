@@ -12,13 +12,14 @@ const VerifiedLinkContext = createContext<VerifiedLinkState | undefined>(undefin
 
 type VerifiedLinkProviderProps = PropsWithChildren<{
   allowedHosts: readonly string[];
-  identityKind?: LinkIdentityKind;
+  identityKind: LinkIdentityKind;
   source?: LinkSource;
 }>;
 
 export function VerifiedLinkProvider({
   allowedHosts,
   children,
+  identityKind,
   source = Linking,
 }: VerifiedLinkProviderProps) {
   const [intent, setIntent] = useState<AuthenticationLinkIntent | null>(null);
@@ -27,10 +28,11 @@ export function VerifiedLinkProvider({
     () =>
       subscribeToVerifiedLinks({
         allowedHosts,
+        identityKind,
         onIntent: setIntent,
         source,
       }),
-    [allowedHosts, source],
+    [allowedHosts, identityKind, source],
   );
 
   return <VerifiedLinkContext.Provider value={{ intent }}>{children}</VerifiedLinkContext.Provider>;

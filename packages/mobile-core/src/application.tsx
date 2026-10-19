@@ -15,7 +15,11 @@ import { createExpoPushPlatform } from "./notifications/expo-push-platform";
 import type { PushPlatform } from "./notifications/push-platform";
 import type { AuthenticationLinkIntent } from "./ingress/verified-link";
 import { useVerifiedLinkIntent, VerifiedLinkProvider } from "./ingress/verified-link-provider";
-import { getMobileApiBaseUrl, getOrCreateInstallationIdentifier } from "./config/runtime";
+import {
+  getAllowedLinkHosts,
+  getMobileApiBaseUrl,
+  getOrCreateInstallationIdentifier,
+} from "./config/runtime";
 import { createApiFetcher } from "./api/fetcher";
 import { clearPersistedAccountCache } from "./query/persistence";
 import { clearMobileQueryCache, MobileQueryProvider } from "./query/provider";
@@ -25,7 +29,7 @@ import { RenderErrorBoundary } from "./ui/render-error-boundary";
 export type MobileRuntime = {
   allowedLinkHosts: readonly string[];
   /** The Account kind whose link prefix this app claims (ADR-0095). */
-  linkIdentityKind?: "client" | "staff";
+  linkIdentityKind: "client" | "staff";
   // Where public image URLs answered as API paths resolve (ADR-0077 locally).
   apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
@@ -80,7 +84,8 @@ export function createDefaultMobileRuntime({
   }
 
   return {
-    allowedLinkHosts: [new URL(apiBaseUrl).hostname],
+    allowedLinkHosts: getAllowedLinkHosts(apiBaseUrl),
+    linkIdentityKind: acceptedIdentityKind,
     apiBaseUrl,
     apiFetcher: createApiFetcher({
       baseUrl: apiBaseUrl,
@@ -191,6 +196,7 @@ export function MobileApplication({
         <MobileQueryProvider>
           <VerifiedLinkProvider
             allowedHosts={mobileRuntime.allowedLinkHosts}
+            identityKind={mobileRuntime.linkIdentityKind}
             source={mobileRuntime.linkSource}
           >
             <MobileIdentityProvider manager={mobileRuntime.sessionManager}>
