@@ -296,6 +296,45 @@ describe('environment configuration', () => {
     });
   });
 
+  describe('ADR-0094 Resend email', () => {
+    const base = {
+      DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',
+      NODE_ENV: 'test',
+    };
+
+    it('has no API key and the studio sender by default', () => {
+      const environment = validateEnvironment(base);
+
+      expect(environment.RESEND_API_KEY).toBeNull();
+      expect(environment.EMAIL_FROM).toBe(
+        'Emma Pilates Studio <no-responder@emmapilatesstudio.com>',
+      );
+      expect(environment.EMAIL_REPLY_TO).toBe('soporte@emmapilatesstudio.com');
+    });
+
+    it('reads the API key and lets the sender be overridden', () => {
+      const environment = validateEnvironment({
+        ...base,
+        RESEND_API_KEY: 're_key',
+        EMAIL_FROM: 'Prueba <prueba@example.com>',
+        EMAIL_REPLY_TO: 'ayuda@example.com',
+      });
+
+      expect(environment.RESEND_API_KEY).toBe('re_key');
+      expect(environment.EMAIL_FROM).toBe('Prueba <prueba@example.com>');
+      expect(environment.EMAIL_REPLY_TO).toBe('ayuda@example.com');
+    });
+
+    it('rejects an empty key and a reply-to that is not an address', () => {
+      expect(() =>
+        validateEnvironment({ ...base, RESEND_API_KEY: '' }),
+      ).toThrow('RESEND_API_KEY');
+      expect(() =>
+        validateEnvironment({ ...base, EMAIL_REPLY_TO: 'soporte' }),
+      ).toThrow('EMAIL_REPLY_TO');
+    });
+  });
+
   describe('database pool size', () => {
     const base = {
       DATABASE_URL: 'postgresql://unused:unused@localhost:5432/unused',

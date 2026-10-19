@@ -1,7 +1,7 @@
 import { createHmac, randomUUID } from 'node:crypto';
 import { createDatabaseClients } from './database/database-clients';
 import { validateEnvironment } from './config/environment';
-import { LocalEmailCapture } from './jobs/authentication-email/local-email-capture';
+import { createAuthenticationEmailDelivery } from './jobs/authentication-email/create-authentication-email-delivery';
 import { SpanishAuthenticationEmailRenderer } from './jobs/authentication-email/spanish-authentication-email-renderer';
 import { PrismaAuthenticationEmailStateReader } from './jobs/authentication-email/prisma-authentication-email-state-reader';
 import { createWorkerLog } from './jobs/worker-log';
@@ -72,12 +72,12 @@ async function bootstrap(): Promise<void> {
     release: environment.RELEASE_ID,
   });
 
+  const emailDelivery = createAuthenticationEmailDelivery(environment, fetch);
+
   const stopWorker = await startWorker({
     boss,
-    // Production sends no email until EXT-001 adds a provider; local capture
-    // refuses production.
     authenticationEmail:
-      environment.NODE_ENV === 'production'
+      emailDelivery === null
         ? null
         : {
             stateReader: new PrismaAuthenticationEmailStateReader(prisma),
@@ -85,10 +85,7 @@ async function bootstrap(): Promise<void> {
             renderer: new SpanishAuthenticationEmailRenderer({
               linkBaseUrl: environment.AUTHENTICATION_LINK_BASE_URL,
             }),
-            delivery: new LocalEmailCapture(
-              environment.NODE_ENV,
-              environment.EMAIL_CAPTURE_DIRECTORY,
-            ),
+            delivery: emailDelivery,
           },
     finalizeUpload: createFinalizeUploadJobCommands(prisma, storage, now),
     pendingAccountCleanup: {

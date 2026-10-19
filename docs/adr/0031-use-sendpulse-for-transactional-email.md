@@ -1,6 +1,6 @@
 # Use SendPulse for transactional email
 
-Status: accepted
+Status: accepted; the provider is replaced by Resend in [ADR-0094](./0094-use-resend-for-transactional-email.md)
 
 The initial release will send transactional email through SendPulse's managed service. The NestJS backend will depend on a project-owned email-delivery interface, with SendPulse credentials, API types, and delivery behavior confined to an infrastructure adapter. Authentication and other application modules must express the message to send without depending directly on SendPulse, so another provider can replace it without changing domain or application logic.
 
