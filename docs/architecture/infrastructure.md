@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-19** (LNK-001 added the link hosts; EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
+Last verified **2026-10-19** (WEB-021 added the public pages on Cloudflare Pages; LNK-001 added the link hosts; EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -53,7 +53,8 @@ remaining provider gates are in the [backlog](../implementation/BACKLOG.md)
            iOS through APNs once gate 9 brings the key
  Cloudflare domain emmapilatesstudio.com: Email Routing forwards soporte@ and
            no-responder@ to the owner's inbox; links. and links-staging.
-           point at each environment's Northflank api (LNK-001, ADR-0095)
+           point at each environment's Northflank api (LNK-001, ADR-0095);
+           app. serves the public pages from Cloudflare Pages (WEB-021, ADR-0096)
 ```
 
 ## What we use from each provider
@@ -68,7 +69,7 @@ Details are in the sections below.
 | **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (15 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
 | **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb), holding the databases `emma` (production) and `emma_staging` (staging, its own role); its CA certificate | The **production and staging databases** | The $50 trial credit, point-in-time restore, any paid plan |
 | **Vercel** | Projects `emma-pilates-admin` and `emma-pilates-admin-staging` (Hobby), each deployed only by its release workflow with the Vercel CLI (Git deployments off in `vercel.json`); `vercel.json` rewrites, `middleware.ts`, the error-envelope Function, Production environment variables; one project-scoped token per project | Hosts the **admin web** and forwards its `/api/v1` calls to the matching API with that environment's proxy proof | Vercel Pro, Git deployments and pull-request previews (off since ADR-0091 and ADR-0092), custom domain (gate 7) |
-| **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-staging-images` with the same rule and its own token `northflank-staging-images` (EXT-017); private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off; Resend's records added through Domain Connect on 2026-10-19 (`resend._domainkey` TXT, `send` and `rsend` CNAMEs, all DNS only) and `links` and `links-staging` CNAMEs to Northflank (DNS only) with their `verify-….links` and `verify-….links-staging` TXT ownership records (LNK-001, 2026-10-19); `_dmarc` TXT `v=DMARC1; p=none; rua=mailto:soporte@emmapilatesstudio.com` by hand; the root keeps its one SPF and Email Routing's MX records | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email** | Other hostnames on the domain (WEB-021, a custom API or admin host), Email Sending (Resend sends instead, ADR-0094), public buckets and custom bucket domains, Workers, every other product |
+| **Cloudflare** | R2: private bucket `emma-pilates-prod-images` with a 3-day `pending/` lifecycle rule; private bucket `emma-pilates-staging-images` with the same rule and its own token `northflank-staging-images` (EXT-017); private bucket `emma-pilates-prod-backups` with 30-day `daily/` and 365-day `monthly/` rules and a 25-day lock on `daily/`; Account API tokens `northflank-production-images` (Object Read & Write, images bucket), `northflank-production-backups` (Object Read & Write, backup bucket), and `mac-backup-restore` (Object Read only, backup bucket) ; Registrar: domain `emmapilatesstudio.com` (since 2026-10-15, auto-renew on) with its DNS zone; Email Routing on that zone: addresses `soporte@` and `no-responder@` forwarded to the owner's verified Gmail, catch-all off; Resend's records added through Domain Connect on 2026-10-19 (`resend._domainkey` TXT, `send` and `rsend` CNAMEs, all DNS only) and `links` and `links-staging` CNAMEs to Northflank (DNS only) with their `verify-….links` and `verify-….links-staging` TXT ownership records (LNK-001, 2026-10-19); `_dmarc` TXT `v=DMARC1; p=none; rua=mailto:soporte@emmapilatesstudio.com` by hand; the root keeps its one SPF and Email Routing's MX records; Pages: project `emma-pilates-public` (Git integration on `DaleneyRuben/emma-pilates`, root directory `apps/public-site`, no build command) with custom domain `app.emmapilatesstudio.com` and its proxied `app` CNAME (WEB-021, ADR-0096) | Stores **uploaded images** (receipts, profile photos, Promotions) and the **daily database dumps** for production; holds the project's **domain** and receives its **email**; serves the **public privacy, support, and account-deletion pages** | Other hostnames on the domain (the apex and `www` are kept for the studio's future website; a custom API or admin host), Email Sending (Resend sends instead, ADR-0094), public buckets and custom bucket domains, Workers, every other product |
 | **Expo (EAS)** | Organization `emma-pilates` (Free) with projects `emma-pilates-client` and `emma-pilates-staff`; EAS Build with the `development` and `staging` profiles; one EAS-generated Android keystore per app; each app's EAS Update URL in `app.json`; each project's FCM V1 service account key (Android credentials); **Expo Push Service** with enhanced push security on; robot user `push-sender` (role Viewer) with the access token `northflank-production` | Builds the **mobile development clients** (iOS Simulator `.app`, Android `.apk`); delivers the **push notifications** the worker sends (NOT-002) and returns their tickets and receipts | Paid plans, EAS Submit and store builds (gates 8–9), published updates, EAS Workflows, EAS Hosting, Expo's observability |
 | **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates»), `com.emmapilates.staff` («Emma Pilates Staff»), and their staging variants `com.emmapilates.client.staging` and `com.emmapilates.staff.staging` (EXT-017); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
 | **Google Play Console** | Personal developer account «Daleney Labs» (ID `5688059300530668770`) owned by the user's Google account, identity verified 2026-10-15; draft apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»), Spanish (Latin America), free, Play App Signing accepted, automatic protection on | Distributes the **Android apps**: Internal testing first, then the Client app's closed test and production release (REL-002 to REL-007); Staff stays on a closed track | Paid apps and in-app purchases (earning money is off, which keeps the legal address private), organization verification, the developer website |
@@ -241,6 +242,24 @@ Every account belongs to the project owner and is shared with no one else.
   token `mac-backup-restore` (Object Read only on this bucket, no expiry) is
   the owner's, read at hidden prompts for the weekly check and the drills.
   Rotate the same way as the images token, then update the `backup` job.
+
+### Cloudflare Pages (public pages)
+
+- Project `emma-pilates-public` (ADR-0096) serves `apps/public-site/` as
+  static files: `/privacidad`, `/soporte`, `/eliminar-cuenta`, and an index,
+  at `https://app.emmapilatesstudio.com` (also `emma-pilates-public.pages.dev`).
+  These are the URLs the store listings and Data safety forms use.
+- Connected to GitHub through the «Cloudflare Workers and Pages» app, limited
+  to the `emma-pilates` repository. No build command, root directory
+  `apps/public-site`, no environment variables; preview branches off.
+- A push to the production branch publishes in about a minute. The production
+  branch is `main`; it was `chore/web-021-public-policy-pages` until that
+  pull request merged, so the pages went live before the merge.
+- `apps/public-site/_headers` sets a CSP that allows only the page's own
+  stylesheet, `no-referrer`, and `nosniff`. The pages load no scripts,
+  fonts, or third-party resources and set no cookies.
+- Free plan: 500 builds a month and unlimited static requests; nothing to
+  pause or pay.
 
 ### Vercel (production side)
 
