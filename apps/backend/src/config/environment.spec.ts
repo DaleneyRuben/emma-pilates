@@ -325,6 +325,17 @@ describe('environment configuration', () => {
       expect(environment.EMAIL_REPLY_TO).toBe('ayuda@example.com');
     });
 
+    it('reads the webhook secret only in its whsec_ form', () => {
+      expect(validateEnvironment(base).RESEND_WEBHOOK_SECRET).toBeNull();
+      expect(
+        validateEnvironment({ ...base, RESEND_WEBHOOK_SECRET: 'whsec_abc' })
+          .RESEND_WEBHOOK_SECRET,
+      ).toBe('whsec_abc');
+      expect(() =>
+        validateEnvironment({ ...base, RESEND_WEBHOOK_SECRET: 'abc' }),
+      ).toThrow('RESEND_WEBHOOK_SECRET');
+    });
+
     it('rejects an empty key and a reply-to that is not an address', () => {
       expect(() =>
         validateEnvironment({ ...base, RESEND_API_KEY: '' }),

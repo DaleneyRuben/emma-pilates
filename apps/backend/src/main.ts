@@ -6,7 +6,11 @@ import { Environment } from './config/environment';
 import { configureApplication } from './http/configure-application';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+    // ADR-0094: the Resend webhook verifies its signature over the raw body.
+    rawBody: true,
+  });
   app.useLogger(app.get(Logger));
   configureApplication(app);
   // Readiness fails once shutdown begins (ADR-0080).
