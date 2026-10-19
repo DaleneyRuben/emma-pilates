@@ -11,9 +11,13 @@ export type AuthenticationLinkPurpose = Exclude<
   'email_change_notice'
 >;
 
+// ADR-0095: which app claims the link, from the Account's domain identity.
+export type AuthenticationLinkIdentityKind = 'client' | 'staff';
+
 export type AuthenticationEmailState = {
   accountId: string;
   email: string;
+  identityKind: AuthenticationLinkIdentityKind;
   // The address an email change is pending for (IDN-008), else null.
   pendingEmail: string | null;
   purpose: AuthenticationLinkPurpose;
@@ -33,6 +37,7 @@ export interface AuthenticationLinkDecryptor {
 export type AuthenticationEmailRenderInput = {
   recipient: string;
   purpose: AuthenticationEmailJob['purpose'];
+  identityKind: AuthenticationLinkIdentityKind;
   // Null only for the old-address notice, which carries no link.
   linkSecret: string | null;
   // The pending new address of an email change, for both of its messages.
@@ -95,6 +100,7 @@ export const processAuthenticationEmail = async (
   const message = dependencies.renderer.render({
     recipient,
     purpose: job.purpose,
+    identityKind: state.identityKind,
     linkSecret,
     ...(state.pendingEmail === null ? {} : { newEmail: state.pendingEmail }),
   });
