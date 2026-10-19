@@ -3034,7 +3034,7 @@ The following are not ready for manual product testing:
   the admin web manages Promotions, see Test 33, and the Client app shows
   them, see Test 18);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
-- real SendPulse email, Expo push notifications, store builds, or a
+- Expo push notifications, store builds, or a
   production worker (the production API runs without one, Test 38).
 
 Some underlying rules for these areas may already have unit tests or approved
@@ -4055,7 +4055,8 @@ Needs a phone or tablet whose Play Store is signed in with an account on the
 
 ### C. Client app on production
 1. Register with an address you control. Expected: the «check your email»
-   screen; no email arrives (EXT-001).
+   screen. Since EXT-001 the verification email arrives (Test 56); before
+   it, none did, and step 2 stood in for it.
 2. In the Northflank `api` shell run
    `node dist/src/client-email-verification-main.js <that address>`.
    Expected: `"status":"verified"`; a second run answers `not_found`.
@@ -4423,3 +4424,26 @@ Android builds a month, so build only when testing a release.
 3. Resume staging if paused, open the staging app, and sign in with a
    staging Account: requests go to the staging API (its Northflank logs show
    them), never production.
+
+## Test 56: real authentication email on production
+
+Production sends through Resend once the worker has `RESEND_API_KEY`
+(ADR-0094). Use an address outside the studio's domain that you can open,
+ideally one at Gmail and one at Outlook or iCloud, and never the
+fixture or owner addresses.
+
+1. In the Client app on production (Test 48), register with that address.
+   Expected: the «check your email» screen, and within a minute an email
+   «from» `Emma Pilates Studio <no-responder@emmapilatesstudio.com>` in the
+   **inbox**, not spam or Promotions.
+2. Open the message's details (Gmail: ⋮ → «Show original»). Expected: SPF,
+   DKIM, and DMARC all `PASS`, the DKIM domain `emmapilatesstudio.com`, and
+   the link points straight at the link host, with no tracking redirect.
+3. Reply to it. Expected: the reply goes to `soporte@emmapilatesstudio.com`
+   and arrives in the owner's Gmail through Email Routing.
+4. Open the link and finish verification, then log in. Expected: Home.
+5. In Resend → Emails, the message shows `Delivered`. Northflank's `worker`
+   logs show the job completed and never print the link or its token.
+
+Without `RESEND_API_KEY` the worker logs `authentication_email_disabled` at
+start and the jobs stay queued, as before EXT-001.
