@@ -19,11 +19,10 @@ Aiven, Cloudflare R2, Resend, Expo and Firebase for push, Better Stack) are not
 | Does your app collect or share any of the required user data types? | Yes | Yes |
 | Is all of the user data collected by your app encrypted in transit? | Yes: the API URL must be `https` (`packages/mobile-core/src/config/runtime.ts`), and release builds allow no cleartext | Yes |
 | Which account creation methods does your app support? | Username and password (email and password) | Username and password, accounts made by the studio only |
-| Account deletion URL | `https://app.emmapilatesstudio.com/eliminar-cuenta` | same URL; the page covers Client Accounts only, and Staff Accounts are deactivated by an Administrator, so a line for Staff Members is worth adding to it |
+| Account deletion URL | `https://app.emmapilatesstudio.com/eliminar-cuenta` | same URL; the page covers Client Accounts and says Staff Accounts are deactivated by an Administrator |
 | Do you provide a way for users to request that some or all of their data is deleted without deleting their account? | No | No |
 
-The deletion answers depend on the open question in
-[Deletion and retention](#deletion-and-retention).
+The deletion answers follow [Deletion and retention](#deletion-and-retention).
 
 ## Data types: Client app
 
@@ -32,10 +31,10 @@ ephemerally: no**.
 
 | Play category → type | What it is in the app | Required or optional | Purposes |
 | --- | --- | --- | --- |
-| Personal info → Name | Registration and profile | Required | App functionality, Account management |
-| Personal info → Email address | Login, verification, recovery | Required | App functionality, Account management |
+| Personal info → Name | Registration and profile; kept for promotions only if the Client ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
+| Personal info → Email address | Login, verification, recovery; kept for promotions only if the Client ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
 | Personal info → User IDs | Referral code entered at registration | Optional | App functionality |
-| Personal info → Phone number | Profile | Optional | App functionality, Account management |
+| Personal info → Phone number | Profile; kept for promotions only if the Client ticks the box when closing | Optional | App functionality, Account management, Advertising or marketing |
 | Financial info → Purchase history | Plans bought, Payment amount, method and state | Required | App functionality |
 | Photos and videos → Photos | Profile photo and transfer receipt, picked from the gallery | Optional (a receipt only to pay by transfer) | App functionality |
 | App activity → Other actions | Bookings, Waitlist entries, Evaluation appointments | Required | App functionality |
@@ -72,30 +71,24 @@ breadcrumbs, and request (`packages/mobile-core/src/monitoring/error-reporting.t
 
 ## Deletion and retention
 
-**Open question for the user before submitting.** The Client app closes an
-Account in Perfil → «Cerrar mi cuenta», and the privacy policy says the data
-is kept but hidden: every row is soft-deleted (ADR-0086), and name, email,
-phone, and history stay indefinitely. Google's User Data policy says closing
-an Account must delete the data linked to it, and that deactivating or hiding
-it does not count; only data with a legitimate reason to keep (security, fraud
-prevention, legal and accounting obligations) may stay, and the policy must say
-so. As built, a Play reviewer could treat closure as deactivation.
+**Decided 2026-10-19 (BE-021, [ADR-0097](../adr/0097-erase-personal-data-when-a-client-account-closes.md)).**
+Google's User Data policy says closing an Account must delete the data linked
+to it; hiding it does not count, and only data with a legitimate reason to
+stay (accounting, security, legal obligations) may remain, disclosed in the
+privacy policy. Closing a Client Account (Perfil → «Cerrar mi cuenta», or an
+Administrator from the admin web after an email request) now erases the name,
+email, phone, password, and profile photo in the closure transaction. The
+Payments, Bookings, Credit, and attendance stay, soft-deleted (ADR-0086),
+under «Cliente eliminado» for the studio's accounting, which the privacy and
+deletion pages disclose.
 
-Options, to decide before REL-004 is submitted:
+The Client app's closure screen offers an unticked «Quiero seguir recibiendo
+promociones de Emma Pilates» box. Ticking it copies the name, email, and phone
+into an unlinked Promotion Contact with the time of consent; that is the
+«Advertising or marketing» purpose on the three Personal info rows above, and
+the pages say how to ask to stop. An Administrator's closure never keeps one.
 
-1. Keep the rows (soft delete stays the rule) but **anonymise the personal
-   fields** on closure: name, email, and phone overwritten, the profile photo
-   removed, the push token already cleared. Payments and Bookings remain for
-   the studio's accounting under an anonymous Client. The privacy policy then
-   says what stays and why. Recommended: it meets Google's rule without hard
-   deletes.
-2. Keep things as built. The deletion page already says what is kept and
-   why («forman parte de su contabilidad e historial»), which Google accepts
-   for accounting records; it is weaker for the email and phone, so it risks a
-   rejection or a later policy notice.
-
-Whichever is chosen, the form's «delete» answers stay **Yes** with the
-deletion URL above.
+The form's «delete» answers are **Yes** with the deletion URL above.
 
 ## Related gaps found by the audit
 
@@ -104,9 +97,10 @@ deletion URL above.
   and the privacy policy says so. MOB-064 drops them (the `expo-image-picker`
   plugin with `cameraPermission: false` and `microphonePermission: false`);
   they leave the store build with the next one (REL-009).
-- Privacy policy wording to correct: the installation ID is stored as a
-  SHA-256 digest (not «cifrado») and stays on the device after logout; crash
-  reports carry the app version but not the OS; rows «eliminados» after 30 days
-  are soft-deleted; EAS Update (Expo) is contacted on every launch.
-- A closed Account keeps its profile photo (`prisma-account-closure.ts` does
-  not detach it), contrary to ADR-0076.
+- Privacy policy wording (WEB-028, fixed with BE-021 on 2026-10-19): the
+  installation ID is a SHA-256 digest on the server and stays on the device
+  after logout; crash reports carry the app version but not the OS; the
+  throttling digests stop being used after 30 days (rows are soft-deleted); EAS
+  Update (Expo) is contacted on every launch.
+- A closed Account kept its profile photo (BE-020, fixed with BE-021 on
+  2026-10-19: the closure detaches it, so ADR-0076's sweep deletes the bytes).
