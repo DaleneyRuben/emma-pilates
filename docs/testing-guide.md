@@ -3178,7 +3178,9 @@ por entrenar con nosotras.». The Maestro flow `.maestro/close-account.yaml`
 does the same.
 
 In the admin web, open a Client in Clientes and press «Cerrar cuenta» at the
-foot of the panel: the dialog lists what applies to her, and after
+foot of the panel: the dialog lists what applies to her and ends with «Se
+borran su nombre, correo, teléfono y foto. Sus pagos y clases se conservan
+sin sus datos, para la contabilidad del estudio.» (WEB-029), and after
 confirming the list reloads without her under «Cuenta de … cerrada.». For
 `isabel@example.com`, whose transfer awaits review, the dialog refuses at
 once and links to Pagos.
