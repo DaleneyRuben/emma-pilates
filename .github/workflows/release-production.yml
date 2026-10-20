@@ -65,6 +65,8 @@ jobs:
         env:
           SMOKE_BASE_URL: ${{ env.PRODUCTION_API_URL }}
           SMOKE_EXPECTED_RELEASE: ${{ steps.promotion.outputs.sha }}
+          # BE-025: production must not serve Swagger or /openapi.json.
+          SMOKE_API_DOCUMENTATION: hidden
         run: pnpm --filter @pilates/backend smoke
 
   admin-web:
