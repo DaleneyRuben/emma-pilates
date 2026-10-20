@@ -4273,6 +4273,34 @@ landed at 420 × 600; the refusal line under the actions and under the
 view's button); step 5 on the iPad Pro 11, allowing the prompt (spinner, then
 the strip, the photo at 420 × 600; only the add-photos access granted).
 
+### No camera or microphone (MOB-064)
+
+The Client app only picks photos from the gallery, so its build asks for
+neither the camera nor the microphone: the `expo-image-picker` plugin in
+`app.json` sets `cameraPermission` and `microphonePermission` to `false`,
+which removes the picker library's own `CAMERA` and `RECORD_AUDIO` from the
+Android manifest and leaves the iOS camera and microphone usage strings
+out. After `npx expo prebuild --clean --no-install` in `apps/client-mobile`:
+
+```sh
+grep -E "CAMERA|RECORD_AUDIO" android/app/src/main/AndroidManifest.xml
+grep -E "NSCamera|NSMicrophone" ios/EmmaPilates/Info.plist
+cd android && ./gradlew :app:processReleaseMainManifest
+grep -cE "permission\.(CAMERA|RECORD_AUDIO)" app/build/intermediates/merged_manifest/release/processReleaseMainManifest/AndroidManifest.xml
+```
+
+Expected: the first lists both only with `tools:node="remove"`, the second
+prints nothing, and the merged release manifest counts `0`. On a local build,
+`adb shell dumpsys package com.emmapilates.client` lists neither under
+«requested permissions», and the receipt picker (Test 10) and «Guardar QR»
+above still work.
+
+Verified on 2026-10-19 with a local debug build of version 1.0.1 on the
+Android emulator (API 36), as Sofía: «Guardar QR» showed the strip and saved
+`DCIM/emma-pilates-qr.png` with no prompt; «Sube tu comprobante de
+transferencia» opened the system photo picker with no prompt, and the picked
+photo uploaded to «Comprobante listo. Toca para cambiarlo.».
+
 ## Test 52: show the password on mobile
 
 Every password field in both apps carries an eye inside its right end
