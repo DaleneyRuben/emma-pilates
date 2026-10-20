@@ -84,9 +84,31 @@ describe('Account closure endpoints (e2e)', () => {
       .expect(summary);
 
     expect(close).toHaveBeenCalledWith(
-      { clientId, password: 'emma-local-2026' },
+      { clientId, password: 'emma-local-2026', keepPromotions: false },
       client,
     );
+  });
+
+  it('passes on the Client’s choice to keep receiving promotions', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/accounts/current/closure')
+      .set('authorization', bearer)
+      .send({ password: 'emma-local-2026', keepPromotions: true })
+      .expect(200);
+
+    expect(close).toHaveBeenCalledWith(
+      { clientId, password: 'emma-local-2026', keepPromotions: true },
+      client,
+    );
+  });
+
+  it('rejects a promotions choice that is not a boolean', async () => {
+    await request(app.getHttpServer())
+      .post('/api/v1/accounts/current/closure')
+      .set('authorization', bearer)
+      .send({ password: 'emma-local-2026', keepPromotions: 'sí' })
+      .expect(400);
+    expect(close).not.toHaveBeenCalled();
   });
 
   it('requires the password in the body', async () => {
