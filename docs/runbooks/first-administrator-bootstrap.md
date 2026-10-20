@@ -13,10 +13,9 @@ by that Administrator through the product (IDN-007).
 
 - The target database has every shipped migration applied (`GET /health/ready`
   returns 200, or run the migration command first).
-- The worker is deployed or will be started: it delivers the queued email.
-  Until real email delivery (EXT-001) exists, the production worker leaves
-  authentication emails queued; read the link from the shell instead
-  («Production before email» below).
+- The worker is deployed or will be started: it delivers the queued email
+  through Resend (EXT-001). If the email does not arrive, read the link from
+  the shell instead («Read the link from the shell» below).
 - You know the Administrator's real email address and name. The email becomes
   their login and cannot be changed by this command afterwards.
 - The environment has its real `DATABASE_URL`,
@@ -54,11 +53,14 @@ The command prints one JSON line and exits:
 
 Output never includes the email address, token, or link.
 
-## Production before email (EXT-001)
+## Read the link from the shell (fallback)
 
-Since EXT-002 the production worker runs without an email provider and leaves
-the Activation Link email queued. Right after the command above, in the same
-Northflank `api` shell (Services → `api` → Shell), print the link:
+From EXT-002 until EXT-001 (2026-10-14 to 2026-10-19) the production worker
+ran without an email provider and left the Activation Link email queued, so
+the link was read from the shell. Since EXT-001 the email
+arrives; keep this for one that does not (a full daily quota, a suppressed
+address). In the same Northflank `api` shell (Services → `api` → Shell),
+print the link:
 
 ```sh
 node dist/src/administrator-activation-link-main.js
@@ -71,8 +73,8 @@ production admin web's **Crear contraseña** page
 queued. The link is the credential: open it in your own browser, set the
 password there, and never paste it into a chat, ticket, or document. It lasts
 seven days; rerunning the bootstrap with the same email invalidates it and
-queues a new one. When EXT-001 starts the email queue, a stale queued email is
-skipped because its link is already used.
+queues a new one. An email still queued for a link you already used is
+skipped, because the worker rechecks that the link is current.
 
 ## After it runs
 

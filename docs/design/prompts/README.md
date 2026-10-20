@@ -110,7 +110,7 @@ Each of these was sent as the next message in the existing design session for th
 
 | Follow-up | Fixes | Status |
 |---|---|---|
-| [01](./followups/01-sidebar-remove-descuentos.md) | Drops "Descuentos" and makes the sidebar identical on every admin screen ([ADR-0007](../adr/0007-drop-descuentos-from-admin-web.md)) | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
+| [01](./followups/01-sidebar-remove-descuentos.md) | Drops "Descuentos" and makes the sidebar identical on every admin screen ([ADR-0007](../../adr/0007-drop-descuentos-from-admin-web.md)) | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
 | [02](./followups/02-plan-catalog-no-unlimited.md) | Removes unlimited plans / 15-day pass from AW04, 08, S09 | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |
 | [03](./followups/03-referral-reward-copy.md) | Fixes the referral-reward copy on `01` | ✅ applied |
 | [04](./followups/04-payment-rejected-notification.md) | Adds the missing payment-rejected notification type to `19` | ✅ applied (was reverted once; restored by [29](./followups/29-restore-reverted-followups.md)) |

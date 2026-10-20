@@ -13,12 +13,20 @@ These steps cannot run until the owner sets up the accounts listed in the
 backlog's "External accounts and provider gates" table. Done on 2026-10-14
 (REL-001, gate 6): the Expo organization `emma-pilates` with one EAS project
 per app (`extra.eas.projectId` and `owner` in each `app.json`), and
-`expo-updates` with each project's update URL. Still to come:
+`expo-updates` with each project's update URL. Also done: both Play Console
+apps with Play App Signing and the `play-submit` service account (REL-002,
+2026-10-15 and 2026-10-19), and `EXPO_PUBLIC_API_URL` in each project's EAS
+`production` environment (the Northflank production API) and `preview`
+environment (the staging API, EXT-017).
 
-- an Apple Developer team and App Store Connect records for both bundle IDs;
-- a Google Play Console app entry and upload key for both packages;
-- EAS environment variables `EXPO_PUBLIC_API_URL` for the `preview` and
-  `production` environments (the https API hosts from EXT-003).
+EAS has three fixed environment names, so the `staging` build profile and
+channel read the `preview` environment; there is no `preview` profile or
+channel.
+
+Still to come:
+
+- an Apple Developer team and App Store Connect records for both bundle IDs
+  (gate 9);
 - EAS environment variables for readable mobile stacks (EXT-013) in the
   `preview` and `production` environments of both projects (the DSN,
   `EXPO_PUBLIC_ERROR_REPORTING_DSN`, has been set as plain text in all three
@@ -28,7 +36,7 @@ per app (`extra.eas.projectId` and `owner` in each `app.json`), and
   `SENTRY_ALLOW_FAILURE`, so a build without them succeeds and its log shows
   the failed upload; the native debug-file uploads are off because Better
   Stack does not take them. An EAS Update must be published with
-  `--environment production` (or `preview`) so it carries the DSN, and its
+  `--environment production` (or `preview` for the `staging` channel) so it carries the DSN, and its
   maps go up with `pnpm exec sentry-expo-upload-sourcemaps dist` from the app
   folder afterwards.
 - for iOS push, an APNs key from the Apple Developer team, added to each EAS
@@ -92,11 +100,14 @@ developer account «Daleney Labs» (`docs/architecture/infrastructure.md`).
   not found». Until the store listing is reviewed, testers see the
   temporary name `com.emmapilates.<app> (unreviewed)`.
 
-## Client Accounts on production before email (EXT-001)
+## Confirm a Client's email by hand (fallback)
 
-Production cannot send verification email until EXT-001, so a Client who
-registers in the app stays unverified. From the Northflank `api` shell
-(Services → `api` → Shell), confirm their queued verification by email:
+Production sends verification email through Resend since EXT-001
+(2026-10-19). Before that, a Client who registered in the app stayed
+unverified, and this command was the workaround. Keep it for an email that
+does not arrive (a full daily quota, a suppressed address). From the
+Northflank `api` shell (Services → `api` → Shell), confirm their queued
+verification by email:
 
 ```sh
 node dist/src/client-email-verification-main.js <their email>
@@ -125,14 +136,14 @@ EXPO_PUBLIC_API_URL=https://<api-host> pnpm --filter @pilates/staff-mobile relea
 Android and fails if either cannot be built. Then run the Maestro critical
 journeys against freshly applied fixtures (see the testing guide, Test 19).
 
-## Native release (EAS Build and Submit) — gated
+## Native release (EAS Build and Submit)
 
 1. Confirm `expo.version` in the app's `app.json`. A native change (new
    native module, permission, or SDK upgrade) needs a new version, because the
    `appVersion` runtime policy ties OTA updates to it.
 2. `cd apps/<app> && eas build --profile production --platform all`
    (`autoIncrement` raises the build number; `appVersionSource` is `local`).
-3. Install the `preview` profile build, or the production build through
+3. Install the `staging` profile build (Test 55), or the production build through
    TestFlight/internal testing, and run the Maestro journeys with
    `APP_ID=com.emmapilates.<app>`.
 4. `eas submit --profile production --platform ios|android` and publish from
@@ -140,12 +151,12 @@ journeys against freshly applied fixtures (see the testing guide, Test 19).
 5. Once the release is live, move the API compatibility baseline to the
    release that is now previous (`apps/backend/openapi/README.md`).
 
-## Small fixes (EAS Update) — gated
+## Small fixes (EAS Update)
 
 Only JavaScript, copy, style, and asset fixes that need no native change:
 
-1. `eas update --channel preview --message "<fix>"` and verify on a preview
-   build with the same runtime version.
+1. `eas update --channel staging --environment preview --message "<fix>"` and
+   verify on a staging build with the same runtime version.
 2. `eas update --channel production --message "<fix>" --rollout-percentage 10`.
 3. Review launch and error signals; expand with `eas update:edit` or roll back
    with `eas update:republish` of the previous group. Never promote only

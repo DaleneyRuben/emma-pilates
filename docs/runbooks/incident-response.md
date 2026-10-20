@@ -24,10 +24,16 @@ delete lines; corrections are new lines.
 
 ## 2. Freeze deploys
 
-Stop new releases so the evidence and the state stay as they are: pause
-automatic deployment for the API and worker in Northflank and disable the
-deployment workflow in GitHub Actions. Do not run migrations. Resume only when
-the incident is closed.
+Stop new releases so the evidence and the state stay as they are. Since
+EXT-017 production is released only when a person starts `Release
+Production`, so do not start it, and disable it so nobody else does:
+`gh workflow disable "Release Production" --repo DaleneyRuben/emma-pilates`.
+If staging is involved too, also disable `Release Staging` (a merge to `main`
+releases it). Do not run the `migrate` job by hand and do not build the
+Northflank services from the console. Vercel deploys the admin web only
+through those workflows (Git deployments are off), and the apps change only
+through EAS, so publish no EAS Update either. When the incident is closed,
+`gh workflow enable` each workflow again.
 
 ## 3. Contain
 
@@ -78,11 +84,26 @@ worker pick up the same values:
 
 | Secret | Where | Effect of rotating |
 | --- | --- | --- |
-| `DATABASE_URL` credentials | Aiven, then Northflank | Create the new user/password first, update both services, then remove the old one |
-| R2 access keys (dumps, uploads) | Cloudflare, then Northflank | Old keys stop working at once; check the next dump succeeds |
+Each environment has its own values: production's are in Northflank's
+`production` secret group (team `emma-pilates`), staging's in the `staging`
+group (team `emma-pilates-staging`). Rotate the environment that leaked;
+[infrastructure](../architecture/infrastructure.md) lists where every value
+lives. Northflank needs a restart of `api` and `worker` after a secret group
+changes.
+
+| Secret | Where | Effect of rotating |
+| --- | --- | --- |
+| `DATABASE_URL` credentials (`avnadmin` for production, the staging role for staging) | Aiven, then Northflank (`api`, `worker`, `migrate`) | Create the new user/password first, update the group, then remove the old one |
+| R2 access keys: `OBJECT_STORAGE_*` (images) and `BACKUP_STORAGE_*` (dumps) | Cloudflare, then Northflank | Old keys stop working at once; check an upload reaches READY and the next dump succeeds |
 | `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank (API and worker, same value) | Recipient throttle history no longer matches; it restarts empty, which is harmless |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY` and `…_KEY_ID` | Northflank (API and worker, same value) | Queued but unsent links cannot be decrypted: invalidate unused links (step 3) and let people ask again |
-| Email provider key, Better Stack tokens, Northflank and Vercel deploy tokens | Each provider | Rotate in the provider, then update where it is stored |
+| `RESEND_API_KEY` | Resend (a sending-only key per environment), then Northflank | Delete the old key in Resend after the restart; queued emails retry with the new one |
+| `RESEND_WEBHOOK_SECRET` | Resend (the environment's webhook → rotate secret), then Northflank | Bounce and complaint events signed with the old secret answer 401 until the restart; Resend retries them |
+| `ADMIN_WEB_PROXY_SECRET` | Vercel (the environment's project) and Northflank, same value | Until both match, the API does not trust the admin web's forwarded address (ADR-0087); redeploy the admin web through the release workflow |
+| `EXPO_ACCESS_TOKEN` (the `push-sender` robot) | Expo, then Northflank (worker) | Pushes fail until the worker restarts with the new token |
+| `ERROR_REPORTING_DSN`, `WORKER_HEARTBEAT_URL`, `BACKUP_HEARTBEAT_URL` | Better Stack, then Northflank | Errors and heartbeats are lost until the restart; a heartbeat may alert once |
+| Deploy tokens: `NORTHFLANK_API_TOKEN`, `NORTHFLANK_STAGING_API_TOKEN`, `VERCEL_PRODUCTION_TOKEN`, `VERCEL_STAGING_TOKEN` | Northflank or Vercel, then `gh secret set` | Releases fail until the repository secret is replaced ([release runbook](./production-release.md#the-deploy-tokens)) |
+| The Play submit key (`play-submit`) and `SENTRY_AUTH_TOKEN` | Google Cloud or Better Stack, then the Expo account | Store submissions or source-map uploads fail until replaced ([mobile release runbook](./mobile-release.md)) |
 
 Never paste a secret into the incident log, a chat, or a commit.
 
