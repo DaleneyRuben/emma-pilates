@@ -62,11 +62,23 @@ export const activateAccount = async (
   }
 
   const passwordHash = await dependencies.hashPassword(command.password);
-  await dependencies.gateway.activateAccount({
-    tokenDigest,
-    passwordHash,
-    completedAt: inspectedAt,
-  });
+  try {
+    await dependencies.gateway.activateAccount({
+      tokenDigest,
+      passwordHash,
+      completedAt: inspectedAt,
+    });
+  } catch (error) {
+    if (error instanceof AuthenticationLinkStateChangedError) {
+      return { status: 'expired' };
+    }
+    throw error;
+  }
 
   return { status: 'activated' };
 };
+
+// The link was used, replaced, or expired between its inspection and the
+// write (two submissions at once, with Argon2 hashing between): the caller
+// answers as for any link that is no longer current (BE-024).
+export class AuthenticationLinkStateChangedError extends Error {}

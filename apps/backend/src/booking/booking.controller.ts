@@ -3,10 +3,7 @@ import {
   Body,
   Controller,
   Delete,
-  ForbiddenException,
   Headers,
-  HttpException,
-  HttpStatus,
   Inject,
   Param,
   Post,
@@ -43,7 +40,7 @@ import {
 } from './booking.dto';
 import type { TrainerScheduleSession } from './trainer-schedule';
 import type { TrainerSessionRosterResult } from './trainer-session-roster';
-import { BookingAccessDeniedError } from './commands/create-booking';
+import { commandProblem } from './booking-command-problems';
 import type { SessionAvailabilityHandler } from './session-availability';
 
 export const createBookingCommand = Symbol('createBookingCommand');
@@ -102,56 +99,6 @@ const parseBearerCredential = (authorization: string | undefined): string => {
 
 const invalidRequest = (detail: string): BadRequestException =>
   new BadRequestException({ code: 'invalid_request', detail });
-
-const commandProblem = (error: Error): HttpException | null => {
-  if (error instanceof BookingAccessDeniedError) {
-    return new ForbiddenException({
-      code: 'booking_access_denied',
-      detail: 'Booking access is denied',
-    });
-  }
-
-  const problems: Record<string, [string, string]> = {
-    'Session is full': ['session_full', 'Session is full'],
-    'No eligible Subscription': [
-      'no_eligible_subscription',
-      'No eligible Subscription',
-    ],
-    'Client already has an overlapping Booking': [
-      'booking_overlap',
-      'Client already has an overlapping Booking',
-    ],
-    'Session has capacity': ['session_has_capacity', 'Session has capacity'],
-    'Client already has a Booking': [
-      'active_booking_exists',
-      'Client already has a Booking',
-    ],
-    'Client already has an active Waitlist Entry': [
-      'active_waitlist_entry_exists',
-      'Client already has an active Waitlist Entry',
-    ],
-    'Idempotency Key was reused with a different request': [
-      'idempotency_key_reused',
-      'Idempotency Key was reused with a different request',
-    ],
-    'Booking is inside the Cancellation Window': [
-      'booking_cancellation_window',
-      'Booking is inside the Cancellation Window',
-    ],
-    'Booking is not cancellable': [
-      'booking_not_cancellable',
-      'Booking is not cancellable',
-    ],
-  };
-  const problem = problems[error.message];
-
-  return problem === undefined
-    ? null
-    : new HttpException(
-        { code: problem[0], detail: problem[1] },
-        HttpStatus.CONFLICT,
-      );
-};
 
 @Controller({ path: 'sessions', version: '1' })
 @ApiBearerAuth()
@@ -416,7 +363,13 @@ export class ClassHistoryController {
     @Headers('authorization') authorization: string | undefined,
   ): Promise<ClassHistoryEntryDto[]> {
     const principal = await this.authenticate(authorization);
-    return this.listClassHistory(principal);
+    try {
+      return await this.listClassHistory(principal);
+    } catch (error) {
+      const problem = error instanceof Error ? commandProblem(error) : null;
+      if (problem !== null) throw problem;
+      throw error;
+    }
   }
 
   private async authenticate(
@@ -461,10 +414,16 @@ export class TrainerAttendanceController {
     if (parsedSessionId === null || parsed === null)
       throw invalidRequest('Invalid Attendance request');
     const principal = await this.authenticate(authorization);
-    await this.recordAttendance(
-      { sessionId: parsedSessionId, outcomes: parsed.outcomes },
-      principal,
-    );
+    try {
+      await this.recordAttendance(
+        { sessionId: parsedSessionId, outcomes: parsed.outcomes },
+        principal,
+      );
+    } catch (error) {
+      const problem = error instanceof Error ? commandProblem(error) : null;
+      if (problem !== null) throw problem;
+      throw error;
+    }
   }
 
   private async authenticate(

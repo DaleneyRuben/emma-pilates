@@ -4703,6 +4703,30 @@ Clients («Cuenta cerrada»), and closing her Account ends the consent.
    the box, the consent ends the same way and no contact is kept.
 7. Drop the copy: `dropdb pilates_test_be023`.
 
+## Test 61: broken booking rules answer a problem code, not 500 (BE-024)
+
+A rule a Client or Staff Member can break answers a stable problem code. None
+of these may answer `500` or reach error reporting. On a copy of the fixtures
+(`createdb pilates_test_rules`, `db:migrate:deploy`, `db:fixtures`, the API on
+another port), log in with `POST /api/v1/authentication-sessions`:
+
+1. As `lucia@example.com`, book a Session more than 2 h 30 away
+   (`POST /sessions/{id}/bookings` with an `idempotency-key`), then
+   `POST /bookings/{id}/reschedule` to another Session that day. Expected:
+   `409` `reschedule_outside_window`. A target on another day or already
+   started answers `409` `reschedule_target_ineligible`, and a Booking
+   rescheduled or cancelled meanwhile `409` `booking_not_reschedulable`.
+2. As `emma.vargas@example.com`, `GET /bookings/history`. Expected: `403`
+   `booking_access_denied` (class history is the Client's).
+3. As the same Trainer, `POST /sessions/{id}/attendance` for a Session that
+   has not ended, or one led by another Trainer. Expected: `403`
+   `booking_access_denied`. A roster that misses or repeats a Booking answers
+   `409` `attendance_roster_incomplete`.
+4. Opening an activation or recovery link twice at once (two submissions
+   before either finishes) answers `expired` to the second one, like any used
+   link.
+5. Drop the copy: `dropdb pilates_test_rules`.
+
 ## Test 62: the admin web's security headers (WEB-030)
 
 The admin web sends a Content-Security-Policy (no framing, scripts and API
