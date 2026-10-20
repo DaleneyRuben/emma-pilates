@@ -101,9 +101,9 @@ deletion URL above.
 
 - The Client build declares `CAMERA` and `RECORD_AUDIO`, which
   `expo-image-picker` adds on its own, although the app never uses the camera
-  and the privacy policy says so. The next store build should drop them (the
-  `expo-image-picker` plugin with `cameraPermission: false` and
-  `microphonePermission: false`, or `blockedPermissions`).
+  and the privacy policy says so. MOB-064 drops them (the `expo-image-picker`
+  plugin with `cameraPermission: false` and `microphonePermission: false`);
+  they leave the store build with the next one (REL-009).
 - Privacy policy wording to correct: the installation ID is stored as a
   SHA-256 digest (not «cifrado») and stays on the device after logout; crash
   reports carry the app version but not the OS; rows «eliminados» after 30 days
