@@ -2,8 +2,19 @@ import { ApiProperty } from '@nestjs/swagger';
 import { z } from 'zod';
 
 export class AdminPromotionContactDto {
-  @ApiProperty({ format: 'uuid' })
+  @ApiProperty({
+    format: 'uuid',
+    description:
+      'The Promotion Contact, or the live Client’s open Promotions Consent',
+  })
   id!: string;
+
+  @ApiProperty({
+    enum: ['client', 'former_client'],
+    description:
+      'A live Client who agreed in Perfil, or a former Client who ticked the box when closing',
+  })
+  kind!: 'client' | 'former_client';
 
   @ApiProperty()
   name!: string;
@@ -16,7 +27,7 @@ export class AdminPromotionContactDto {
 
   @ApiProperty({
     format: 'date-time',
-    description: 'When the former Client ticked the promotions box',
+    description: 'When the Client agreed to promotions',
   })
   consentedAt!: string;
 }
