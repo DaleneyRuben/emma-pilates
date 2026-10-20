@@ -1,4 +1,5 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { BookingAccessDeniedError } from '../commands/create-booking';
 
 export type PromotionsConsentView = {
   consented: boolean;
@@ -13,16 +14,33 @@ export interface PromotionsConsentStore {
 
 type Dependencies = { store: PromotionsConsentStore; now: () => Date };
 
-const notBuilt = (...input: unknown[]): Promise<never> =>
-  Promise.reject(new Error(`not built: ${input.length}`));
+// BE-023 (ADR-0098): a live Client's own agreement to promotions, given or
+// withdrawn from Perfil. Giving an open consent again keeps its first time.
+const requireClient = (principal: AuthenticatedPrincipal): string => {
+  if (principal.identity.kind !== 'client') {
+    throw new BookingAccessDeniedError();
+  }
+  return principal.identity.clientId;
+};
 
-export const readPromotionsConsent: (
+const viewOf = (consentedAt: Date | null): PromotionsConsentView => ({
+  consented: consentedAt !== null,
+  consentedAt,
+});
+
+export const readPromotionsConsent = async (
   principal: AuthenticatedPrincipal,
-  dependencies: Dependencies,
-) => Promise<PromotionsConsentView> = notBuilt;
+  { store }: Dependencies,
+): Promise<PromotionsConsentView> =>
+  viewOf(await store.findOpen(requireClient(principal)));
 
-export const setPromotionsConsent: (
+export const setPromotionsConsent = async (
   command: { consented: boolean },
   principal: AuthenticatedPrincipal,
-  dependencies: Dependencies,
-) => Promise<PromotionsConsentView> = notBuilt;
+  { store, now }: Dependencies,
+): Promise<PromotionsConsentView> => {
+  const input = { clientId: requireClient(principal), occurredAt: now() };
+  if (command.consented) return viewOf(await store.give(input));
+  await store.withdraw(input);
+  return viewOf(null);
+};
