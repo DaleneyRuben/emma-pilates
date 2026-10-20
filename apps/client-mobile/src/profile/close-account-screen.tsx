@@ -30,6 +30,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
 import { describeAccountClosure } from "./close-account-consequences";
+import { PromotionsConsent } from "./promotions-consent";
 
 export const closedAccountNotice = "Cerramos tu cuenta. Gracias por entrenar con nosotras.";
 
@@ -83,6 +84,7 @@ export function CloseAccountScreen() {
   const credit = useGetCurrentClientCredit(queryOptions);
   const payment = useGetCurrentPayment(queryOptions);
   const [password, setPassword] = useState("");
+  const [keepPromotions, setKeepPromotions] = useState(false);
   const [passwordError, setPasswordError] = useState<string | undefined>();
   const [failed, setFailed] = useState(false);
   const [refused, setRefused] = useState(false);
@@ -152,7 +154,11 @@ export function CloseAccountScreen() {
     setPasswordError(undefined);
     setFailed(false);
     try {
-      const response = (await closeCurrentClientAccount({ password }, undefined, fetcher)) as {
+      const response = (await closeCurrentClientAccount(
+        { password, keepPromotions },
+        undefined,
+        fetcher,
+      )) as {
         status: number;
         data: unknown;
       };
@@ -215,9 +221,10 @@ export function CloseAccountScreen() {
           ))}
         </View>
         <BodyText style={styles.note}>
-          El estudio conserva el registro de tus pagos y tus clases, pero deja de aparecer en la app
-          y en las listas del estudio.
+          Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus clases
+          sin tus datos, para su contabilidad.
         </BodyText>
+        <PromotionsConsent checked={keepPromotions} onChange={setKeepPromotions} />
         <View style={styles.field}>
           <FormField
             autoCapitalize="none"
