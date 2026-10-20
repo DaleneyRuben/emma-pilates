@@ -23,7 +23,7 @@ test("serves the security headers and stays within its policy", async ({
   expect(headers["x-content-type-options"]).toBe("nosniff");
 
   await signIn(page, "/");
-  for (const section of ["Clientes", "Pagos", "Promociones", "Reporte"]) {
+  for (const section of ["Clientes", "Pagos", "Reporte", "Promociones"]) {
     await sidebar(page).getByRole("link", { name: section }).click();
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
   }
