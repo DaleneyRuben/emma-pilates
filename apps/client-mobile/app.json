@@ -72,6 +72,13 @@
           "granularPermissions": []
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": false,
+          "microphonePermission": false
+        }
+      ],
       "@pilates/mobile-core/launch-tap-plugin",
       "@sentry/react-native/expo"
     ],
