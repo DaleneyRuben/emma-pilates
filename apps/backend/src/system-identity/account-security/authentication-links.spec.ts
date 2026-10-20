@@ -1,5 +1,6 @@
 import { jest } from '@jest/globals';
 import {
+  AuthenticationLinkStateChangedError,
   activateAccount,
   inspectAuthenticationLink,
   type AuthenticationLinkGateway,
@@ -79,6 +80,23 @@ describe('authentication links', () => {
         },
       ],
     ]);
+  });
+
+  it('answers expired when the link was used while the password was hashed', async () => {
+    gateway.inspectLink.mockResolvedValue({
+      purpose: 'activation',
+      state: 'current',
+    });
+    gateway.activateAccount.mockRejectedValue(
+      new AuthenticationLinkStateChangedError(),
+    );
+
+    await expect(
+      activateAccount(
+        { token: 'activation-secret', password: 'new secure password' },
+        dependencies,
+      ),
+    ).resolves.toEqual({ status: 'expired' });
   });
 
   it('does not hash a password when the activation link cannot be used', async () => {
