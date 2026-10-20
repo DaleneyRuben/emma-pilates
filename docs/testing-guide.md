@@ -4614,6 +4614,10 @@ folder (ADR-0096):
    at the top marks the current page, and the `soporte@` button opens a new
    email (with the subject «Eliminar mi cuenta» on the deletion page).
 3. The local server does not apply `_headers`; check those on production.
+4. Promotions (WEB-033): on `/privacidad/`, «Con quién compartimos tus datos»
+   lists WhatsApp (Meta) and says the administration may export the
+   promotions contacts to a spreadsheet; `/soporte/` answers «Quiero dejar de
+   recibir promociones» (the Perfil switch, or an email to `soporte@`).
 
 ### On production
 
