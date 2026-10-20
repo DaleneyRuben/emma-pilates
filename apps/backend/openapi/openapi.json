@@ -4932,6 +4932,68 @@
         ]
       }
     },
+    "/api/v1/clients/current/promotions-consent": {
+      "get": {
+        "operationId": "getCurrentClientPromotionsConsent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionsConsentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PromotionsConsent"
+        ]
+      },
+      "put": {
+        "operationId": "setCurrentClientPromotionsConsent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPromotionsConsentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionsConsentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PromotionsConsent"
+        ]
+      }
+    },
     "/api/v1/clients/current/photo": {
       "put": {
         "operationId": "setCurrentClientPhoto",
@@ -10648,6 +10710,36 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "PromotionsConsentDto": {
+        "type": "object",
+        "properties": {
+          "consented": {
+            "type": "boolean",
+            "description": "Whether the Client agrees to promotions now"
+          },
+          "consentedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the open consent was given, or null"
+          }
+        },
+        "required": [
+          "consented",
+          "consentedAt"
+        ]
+      },
+      "SetPromotionsConsentDto": {
+        "type": "object",
+        "properties": {
+          "consented": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "consented"
         ]
       },
       "SetClientPhotoDto": {
