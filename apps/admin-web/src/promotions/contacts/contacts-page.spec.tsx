@@ -30,6 +30,14 @@ const heading = () =>
     name: "Contactos para promociones",
   });
 
+// jsdom's Blob has no text().
+const readBlob = (blob: Blob) =>
+  new Promise<string>((resolve) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsText(blob);
+  });
+
 const rowOf = async (name: string) =>
   (await screen.findByRole("cell", { name: new RegExp(name) }))
     .parentElement as HTMLElement;
@@ -240,8 +248,8 @@ describe("AW35 Contactos para promociones", () => {
         /^contactos-promociones-\d{4}-\d{2}-\d{2}\.csv$/,
       );
       expect(saved?.blob.type).toBe("text/csv;charset=utf-8");
-      const text = await saved?.blob.text();
-      expect(text?.split("\r\n")).toHaveLength(4);
+      const text = saved === undefined ? "" : await readBlob(saved.blob);
+      expect(text.split("\r\n")).toHaveLength(4);
       expect(text).toContain("Daniela Rojas,daniela@example.com,,16/10/2026");
     });
 
