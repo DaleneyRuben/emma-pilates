@@ -14,11 +14,12 @@ import {
   StaffRole,
 } from '../../generated/prisma/enums';
 import { scheduleAuthenticationEmail } from '../../jobs/authentication-email/schedule-authentication-email';
-import type { AuthenticationLinkGateway } from './authentication-links';
+import {
+  AuthenticationLinkStateChangedError,
+  type AuthenticationLinkGateway,
+} from './authentication-links';
 import type { PasswordChangeGateway } from './change-password';
 import type { PasswordRecoveryGateway } from './password-recovery';
-
-export class AuthenticationLinkStateChangedError extends Error {}
 
 export class PrismaAccountSecurityGateway
   implements

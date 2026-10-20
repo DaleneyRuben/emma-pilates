@@ -70,3 +70,8 @@ export const activateAccount = async (
 
   return { status: 'activated' };
 };
+
+// The link was used, replaced, or expired between its inspection and the
+// write (two submissions at once, with Argon2 hashing between): the caller
+// answers as for any link that is no longer current (BE-024).
+export class AuthenticationLinkStateChangedError extends Error {}

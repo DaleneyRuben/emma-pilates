@@ -1,4 +1,5 @@
 import { jest } from '@jest/globals';
+import { AuthenticationLinkStateChangedError } from './authentication-links';
 import {
   completePasswordRecovery,
   requestPasswordRecovery,
@@ -70,6 +71,20 @@ describe('password recovery', () => {
       },
       requestedAt: now,
     });
+  });
+
+  it('answers expired when the link was used while the password was hashed', async () => {
+    gateway.inspectRecoveryLink.mockResolvedValue('current');
+    gateway.completeRecovery.mockRejectedValue(
+      new AuthenticationLinkStateChangedError(),
+    );
+
+    await expect(
+      completePasswordRecovery(
+        { token: 'recovery-secret', password: 'new secure password' },
+        dependencies,
+      ),
+    ).resolves.toEqual({ status: 'expired' });
   });
 
   it('replaces the password, revokes all sessions, and returns one replacement session', async () => {
