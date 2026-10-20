@@ -3142,8 +3142,10 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
 2. `POST /api/v1/accounts/current/closure` with `{"password": "wrong"}` returns
    `400` `current_password_incorrect`; with `{}` it returns `400`
    `invalid_request`.
-3. Repeat with the fixture password. It returns `200` with the counts:
-   `forfeitedCreditCentavos: 6000` and the classes left on the ended Plan.
+3. Repeat with the fixture password and `"keepPromotions": true`. It returns
+   `200` with the counts: `forfeitedCreditCentavos: 6000` and the classes left
+   on the ended Plan. A `keepPromotions` that is not a boolean returns `400`;
+   leaving it out means `false`.
 4. The old credential now returns `401`, and logging in again with the same
    email and password returns `401`.
 5. Log in as `paola.mendoza@example.com` and
@@ -3153,7 +3155,14 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
    the Clientes list.
 6. In `psql`, see the two `account.closed` audit records (actor role empty for
    Sofía's own closure, `administrator` for Lucía's) and Sofía's
-   `account_closure` ledger entry of 6000.
+   `account_closure` ledger entry of 6000. Both closures erased the personal
+   data (BE-021, ADR-0097): `booking.clients` shows «Cliente eliminado» with no
+   phone and no `profile_image_asset_id`, and `system.accounts` shows
+   `cerrada-<account id>@cuentas-cerradas.invalid` with no `password_hash`.
+   `booking.promotion_contacts` holds one row, Sofía's name, email, and phone
+   with `consented_at` set, and none for Lucía (an Administrator's closure
+   never keeps one). Sofía's audit `metadata` says `"keptPromotionContact":
+   true`.
 7. A Client with a transfer Payment awaiting review gets `409`
    `closure_payment_pending` and nothing changes; confirm or reject the Payment
    in Pagos first (Test 27).
@@ -3161,8 +3170,10 @@ DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_closure" \
 In the Client app (API on the copy, `EXPO_PUBLIC_API_URL=http://127.0.0.1:3100/api/v1`),
 log in as `sofia@example.com`, open Perfil, scroll to the Error-tone
 «Cerrar mi cuenta» link under «Cerrar sesión», read the consequences (her
-plan ends and her Bs 60 of Credit is forfeited), type the password, and
-confirm: the app returns to Iniciar sesión with «Cerramos tu cuenta. Gracias
+plan ends and her Bs 60 of Credit is forfeited) and the note that her name,
+email, phone, and photo are erased, see the «Quiero seguir recibiendo
+promociones de Emma Pilates» box unticked, tick it (the whole row toggles it),
+type the password, and confirm: the app returns to Iniciar sesión with «Cerramos tu cuenta. Gracias
 por entrenar con nosotras.». The Maestro flow `.maestro/close-account.yaml`
 does the same.
 
