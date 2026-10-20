@@ -83,3 +83,7 @@ _Avoid_: Charge, transaction, completado (UI label for confirmed). The pending s
 **Promotion**:
 Admin-managed carousel content (image, headline, description, display date range) shown to clients. Purely informational — carries no automatic pricing or discount effect.
 _Avoid_: Offer, deal, coupon
+
+**Promotion Contact**:
+A former Client who, while closing their own Account, agreed to keep receiving the studio's promotions: their name, email, and phone as they were, and when they agreed. It has no link to the closed Client or Account, whose personal data is erased on closure (ADR-0097), and it records when the person asks to stop.
+_Avoid_: Lead, subscriber, mailing list
