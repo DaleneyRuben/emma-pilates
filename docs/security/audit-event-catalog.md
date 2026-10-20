@@ -35,7 +35,7 @@ beyond what the table below names.
 | `administrator_bootstrap.activation_resent` | System Identity | The bootstrap command reissues the pending Administrator's link | `bootstrap` | `account` | — | — |
 | `client.photo_changed` | Booking & Membership | A Client attaches or replaces their own profile photo (Client 22); a replaced photo's variants are released at once (ADR-0076) | Client Account | `client` | — | `replaced` |
 | `client.photo_removed` | Booking & Membership | A Client removes their own profile photo; its variants are released at once (ADR-0076) | Client Account | `client` | — | — |
-| `account.closed` | Booking & Membership | A Client closes their own Account (password re-entered), or an Administrator closes a Client's Account (BE-007 G2–G6): future Bookings and Evaluations are cancelled as `account_closed`, the Subscription ends, the Credit is forfeited, and every session, link, and device is revoked | Client Account, or Administrator | `account` | — | `initiatedBy` (`client` / `administrator`), `closedWaitlistEntries`, `cancelledBookings`, `cancelledEvaluations`, `forfeitedClasses`, `forfeitedCreditCentavos` |
+| `account.closed` | Booking & Membership | A Client closes their own Account (password re-entered), or an Administrator closes a Client's Account (BE-007 G2–G6): future Bookings and Evaluations are cancelled as `account_closed`, the Subscription ends, the Credit is forfeited, every session, link, and device is revoked, and the name, email, phone, password, and photo are erased (ADR-0097) | Client Account, or Administrator | `account` | — | `initiatedBy` (`client` / `administrator`), `closedWaitlistEntries`, `cancelledBookings`, `cancelledEvaluations`, `forfeitedClasses`, `forfeitedCreditCentavos`, `keptPromotionContact` (the Client ticked the promotions box, ADR-0097), `endedPromotionsConsent` (an open Promotions Consent was ended, ADR-0098) |
 | `staff_member.created` | Booking & Membership | An Administrator creates a Staff Member with a pending Account | Administrator | `account` | — | `role`, `branchIds` |
 | `staff_member.activation_resent` | Booking & Membership | An Administrator reissues a pending Staff Member's Activation Link | Administrator | `account` | — | — |
 | `staff_member.role_changed` | Booking & Membership | An Administrator changes a Staff Member's Role | Administrator | `account` | — | `previousRole`, `role` |
@@ -99,21 +99,28 @@ Back Office money records follow BKO-001 D17: Salary Payments and Expenses are a
 ## Retention
 
 Decided by BE-007 ([proposal](../implementation/BE-007-data-governance-proposal.md),
-G1 and G7; ADR-0055 reserved it there):
+G1; ADR-0055 reserved it there), with closure's erasure from
+[ADR-0097](../adr/0097-erase-personal-data-when-a-client-account-closes.md),
+which replaced G7:
 
 - **Audit records are kept indefinitely.** The append-only triggers mean no
   application path can change or delete them, BE-008's retention sweeps never
   touch this table, and [ADR-0086](../adr/0086-soft-delete-every-database-row.md)
   rules out physical deletion anyway. Indefinite retention already covers any
   Bolivian tax or accounting period, so no per-code period is set.
-- **Nothing in the metadata is redacted or anonymized**, including when an
-  Account is closed. The five codes that carry an email
-  (`client_invitation.email_corrected`, `client_invitation.cancelled`,
-  `staff_member.email_corrected`, `staff_member.invitation_cancelled`,
-  `account.email_changed`) keep it, and `account.closed` records the closure
-  without copying any personal data. A closed Account keeps its name, email,
-  phone, and history in the database, hidden from every screen and endpoint
-  (G7).
+- **Closing a Client Account erases the personal data on its rows, not in the
+  audit metadata.** The Client's name, phone, and photo, and the Account's
+  email and password, are overwritten in the closure transaction (ADR-0097).
+  The audit records keep pointing at the same Account and Client ids, which
+  now read as «Cliente eliminado». `account.closed` itself copies no personal
+  data. The five codes that carry an email (`client_invitation.email_corrected`,
+  `client_invitation.cancelled`, `staff_member.email_corrected`,
+  `staff_member.invitation_cancelled`, `account.email_changed`) keep the email
+  they recorded, because the triggers forbid rewriting a record; the
+  personal-data runbook tells the person so when they ask.
+- `promotion_contact.withdrawn` and `promotions_consent.withdrawn` record a
+  «stop promotions» request without copying the contact's name, email, or
+  phone.
 - Who may read audit records, and how a person's own records are given back to
   them, is the operator procedure in
   [personal-data-requests.md](../runbooks/personal-data-requests.md).
