@@ -76,7 +76,7 @@ describe("AW22 Cerrar cuenta", () => {
       "Su plan Paquete de 8 clases termina hoy, sin reembolso; pierde las 5 clases que le quedan.",
       "Pierde su crédito de Bs 1.050,00.",
       "Se cierra su sesión en todos sus dispositivos y su correo queda libre.",
-      "Su historial se conserva, pero deja de verse en la app y en las listas.",
+      "Se borran su nombre, correo, teléfono y foto. Sus pagos y clases se conservan sin sus datos, para la contabilidad del estudio.",
       "Esta acción no se puede deshacer.",
     ]) {
       expect(within(dialog).getByText(line)).toBeInTheDocument();
