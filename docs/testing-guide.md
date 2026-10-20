@@ -7,19 +7,19 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens in the iOS Simulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
-| Staff mobile app             | Open the separate Staff Login app in the iOS Simulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
 | API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete; production hides it (BE-025, Test 63)                                                                                                            |
-| Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions; in the app «Revisa tu correo» survives a restart until you verify, cancel, or log in (Test 5) | The worker writes every captured email under `apps/backend/.data/email-capture/` (Test 34); the link opens nothing on the Simulator until LNK-001 wires universal links, so paste its token into Swagger |
+| Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions; in the app «Revisa tu correo» survives a restart until you verify, cancel, or log in (Test 5) | The worker writes every captured email under `apps/backend/.data/email-capture/` (Test 34); on the iOS Simulator paste its token into Swagger (Universal Links wait for gate 9); on Android the link opens the app (Test 57) |
 | Pending registration actions | Correct the email, request another verification email, or cancel using the continuation returned by registration                | Resend deliberately gives the same neutral response whether it sends or suppresses an email                                                                   |
-| Email verification           | Confirm that an unknown token returns `invalid`; complete a real verification with the token from `.data/email-capture` (Test 34) | The link is a URL the Simulator cannot open yet (LNK-001)                                                                                                    |
+| Email verification           | Confirm that an unknown token returns `invalid`; complete a real verification with the token from `.data/email-capture` (Test 34) | On the iOS Simulator the link opens nothing until gate 9; on Android it opens the app (Test 57)                                                                                                    |
 | Login and logout             | Log in from the mobile app, restore the protected credential at startup, inspect identity in Swagger, and revoke it             | Log out from Perfil with a confirmation in both apps (Test 9)                                                                                                  |
 | Login throttling             | Confirm repeated failures temporarily stop password checks and return `Retry-After`                                             | Use a made-up email so you do not throttle an Account you need                                                                                                |
 | Email request limits         | Fill the device or network budget for registration, resend, email correction, and recovery: the API answers `429` `authentication_email_throttled` with `Retry-After`, and the apps and admin web show «Demasiadas solicitudes…» with the wait (Test 5 G) | Every admitted request counts, even one for an unknown address or a suppressed email; reset by marking your local `email_requested` rows deleted |
-| Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | The link screens themselves still open only through automated tests until LNK-001                                                        |
+| Account security             | Request recovery from mobile, reject expired links before password entry, and complete activation and recovery with the token captured under `.data/email-capture` (Test 34) | On Android the links open the app's screens (Test 57); on the iOS Simulator only the automated tests reach them until gate 9                                                        |
 | Mobile development builds    | Install the EAS development builds of both apps on the iPhone 16 Pro and iPad Simulators and the Android emulator, run them against Metro, and run the Maestro journeys on them (Test 45) | Each new native build spends one of the free plan's monthly builds; push notifications are Test 46 |
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
@@ -3026,23 +3026,22 @@ worker refused waits under `pending/` for the three-day cleanup (Test 13).
 
 The following are not ready for manual product testing:
 
-- opening an emailed link in the mobile apps: the captured links under
-  `apps/backend/.data/email-capture/` (Test 34) work through Swagger and the
-  admin web's link page (Test 24), but the Simulator cannot open them until
-  LNK-001, so the mobile link pages (activation, recovery, and their
-  expired and removed states) are covered by the automated tests;
+- opening an emailed link on iOS: Universal Links need the Apple Developer
+  team (gate 9), so on the iOS Simulator paste the captured token into
+  Swagger (Test 34). On Android the link opens the app with a development
+  build whose host you approve by hand, or with a staging build (Test 57);
+  the tap from a real email on a store build runs with REL-010, because the
+  current Play builds predate LNK-001's intent filters;
 - «El registro venció» on a device, which needs seven days to pass after the
   registration (the automated tests show it);
 - enforcing a SecureStore Face ID prompt in Expo Go or the iOS Simulator;
-- opening a production Universal Link or Android App Link before the public
-  mobile-link domain and native association files are configured;
-- push notifications (the in-app inbox works, see Test 9; buying a Plan
-  works, see Test 10; the Promotion API works through Swagger, see Test 32,
-  the admin web manages Promotions, see Test 33, and the Client app shows
-  them, see Test 18);
-- the Playwright journeys in Firefox or WebKit (only Chromium is installed);
-- Expo push notifications, store builds, or a
-  production worker (the production API runs without one, Test 38).
+- real push delivery on iOS, which needs the APNs key (gate 9): the
+  Simulators show pushes only through `xcrun simctl push`, while Android
+  receives real pushes on the development, staging, and Play builds
+  (Tests 46 and 48);
+- iOS store builds and TestFlight (gate 9), and the Play closed test and
+  production release (REL-003 to REL-007);
+- the Playwright journeys in Firefox or WebKit (only Chromium is installed).
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
