@@ -95,6 +95,16 @@ email, and phone she already gave for the same «Advertising or marketing»
 purpose while it is on. Turning it off, or closing the Account, ends it. The
 answers above already cover it; nothing in the form changes.
 
+Promotions go by email or WhatsApp (user's decision 2026-10-20, WEB-033). An
+Administrator exports the contacts from AW35 to a spreadsheet and sends the
+WhatsApp messages from the studio's own WhatsApp, so the phone number reaches
+Meta only after the Client turned promotions on, a consent the privacy page
+discloses together with WhatsApp (Meta) as a provider. Play does not count a
+transfer the user consented to with that disclosure as **sharing**, and the
+phone number is already declared collected for «Advertising or marketing», so
+the answers stay **not shared**. Re-check them if the studio ever sends from
+the app or the API through the WhatsApp Business Platform.
+
 The form's «delete» answers are **Yes** with the deletion URL above.
 
 ## Related gaps found by the audit
