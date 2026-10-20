@@ -8,8 +8,11 @@ import { verifyPassword } from '../security/argon2-password-hasher';
 // System Identity's side of closing a Client's Account (BE-007 G6), run
 // inside the Booking & Membership closure transaction: every Authentication
 // Session is revoked, unused links are invalidated, devices are deactivated,
-// and the Account is marked removed. Its email stays on the row and becomes
-// free for a new registration through the live-only unique index (ADR-0086).
+// and the Account is marked removed. Its email and password are erased
+// (ADR-0097); the placeholder address can never receive mail.
+export const closedAccountEmail = (accountId: string) =>
+  `cerrada-${accountId}@cuentas-cerradas.invalid`;
+
 export const createAccountClosureOperations = (
   transaction: Prisma.TransactionClient,
 ) => ({
@@ -39,9 +42,17 @@ export const createAccountClosureOperations = (
       where: { accountId, deletedAt: null },
       data: { deletedAt: occurredAt },
     });
+    await transaction.accountEmailChange.updateMany({
+      where: { accountId },
+      data: { newEmail: closedAccountEmail(accountId) },
+    });
     await transaction.account.update({
       where: { id: accountId },
-      data: { deletedAt: occurredAt },
+      data: {
+        deletedAt: occurredAt,
+        email: closedAccountEmail(accountId),
+        passwordHash: null,
+      },
     });
   },
 });

@@ -17,15 +17,17 @@ import {
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
   closeClientAccount,
+  type CloseClientAccountCommand,
   type ClosureDependencies,
   type ClosureSummary,
 } from './close-client-account';
 import { createMembershipSteps } from './closure-membership-steps';
+import { createPersonalDataSteps } from './closure-personal-data-steps';
 import { createScheduleSteps } from './closure-schedule-steps';
 
 export type AccountClosure = {
   close: (
-    command: { clientId: string; password?: string },
+    command: CloseClientAccountCommand,
     principal: AuthenticatedPrincipal,
   ) => Promise<ClosureSummary>;
 };
@@ -69,12 +71,7 @@ export const createPrismaAccountClosure = (
               ...createMembershipSteps(transaction),
               ...createScheduleSteps(transaction, recordNotification),
               ...createAccountClosureOperations(transaction),
-              removeClient: async ({ clientId, occurredAt }) => {
-                await transaction.client.update({
-                  where: { id: clientId },
-                  data: { deletedAt: occurredAt },
-                });
-              },
+              ...createPersonalDataSteps(transaction),
               recordAudit: async (audit) => {
                 await transaction.auditRecord.create({
                   data: {

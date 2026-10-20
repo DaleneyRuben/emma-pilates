@@ -50,6 +50,11 @@ export type ClosureTransaction = {
     input: Actor & { clientId: string; correlationId: string },
   ) => Promise<number>;
   promoteWaitlists: (sessionIds: string[], now: Date) => Promise<void>;
+  keepPromotionContact: (input: {
+    clientId: string;
+    accountId: string;
+    consentedAt: Date;
+  }) => Promise<void>;
   closeAccount: (input: {
     accountId: string;
     occurredAt: Date;
@@ -108,8 +113,14 @@ const requesterOf = (
   throw new AccountClosureError('closure_access_denied');
 };
 
+export type CloseClientAccountCommand = {
+  clientId: string;
+  password?: string;
+  keepPromotions?: boolean;
+};
+
 export const closeClientAccount = async (
-  command: { clientId: string; password?: string },
+  command: CloseClientAccountCommand,
   principal: AuthenticatedPrincipal,
   dependencies: ClosureDependencies,
 ): Promise<ClosureSummary> => {
@@ -153,6 +164,17 @@ export const closeClientAccount = async (
     });
     // The Client's own Bookings are gone, so freed seats reach the Waitlist.
     await transaction.promoteWaitlists(bookings.sessionIds, now);
+    // Only the Client can consent, and the contact is copied before the
+    // closure erases it (ADR-0097).
+    const keptPromotionContact =
+      requester.initiatedBy === 'client' && command.keepPromotions === true;
+    if (keptPromotionContact) {
+      await transaction.keepPromotionContact({
+        clientId: target.clientId,
+        accountId: target.accountId,
+        consentedAt: now,
+      });
+    }
     await transaction.closeAccount({
       accountId: target.accountId,
       occurredAt: now,
@@ -176,7 +198,11 @@ export const closeClientAccount = async (
       targetClientId: target.clientId,
       correlationId,
       occurredAt: now,
-      metadata: { initiatedBy: requester.initiatedBy, ...summary },
+      metadata: {
+        initiatedBy: requester.initiatedBy,
+        ...summary,
+        keptPromotionContact,
+      },
     });
     return summary;
   });
