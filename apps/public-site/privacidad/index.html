@@ -66,13 +66,14 @@
         <h3>Tu dispositivo</h3>
         <ul>
           <li>
-            Un identificador de instalación que la app crea al azar y que guardamos cifrado, y el sistema operativo
-            (Android o iOS).
+            Un identificador de instalación que la app crea al azar, y el sistema operativo (Android o iOS). En nuestros
+            servidores solo guardamos un resumen (SHA-256) que no se puede revertir; en tu teléfono el identificador se
+            queda aunque cierres sesión, hasta que desinstales la app.
           </li>
           <li>Un token de notificaciones, para poder enviarte avisos al teléfono.</li>
           <li>
-            Para limitar intentos de acceso, guardamos tu dirección de red y tu correo solo como valores cifrados que no
-            se pueden revertir, durante 30 días.
+            Para limitar intentos de acceso, guardamos tu dirección de red y tu correo solo como resúmenes que no se
+            pueden revertir, y dejamos de usarlos a los 30 días.
           </li>
         </ul>
 
@@ -111,6 +112,10 @@
           <li>Gestionar tus planes, reservas, pagos, créditos y asistencia.</li>
           <li>Enviarte correos de verificación, invitación y recuperación de contraseña.</li>
           <li>Enviarte avisos sobre tus clases, pagos y novedades del estudio.</li>
+          <li>
+            Enviarte promociones del estudio por correo o WhatsApp después de cerrar tu cuenta, solo si lo pediste al
+            cerrarla.
+          </li>
           <li>Llevar la contabilidad del estudio y cumplir nuestras obligaciones legales.</li>
           <li>Detectar y corregir fallas de las apps.</li>
         </ul>
@@ -118,8 +123,8 @@
         <h2>Informes de fallas</h2>
         <p>
           Cuando una app falla, envía un informe técnico a nuestro servicio de monitoreo: el tipo de error, el lugar del
-          código donde ocurrió, la versión de la app y el sistema operativo. Estos informes no incluyen tu nombre,
-          correo, contraseña, mensajes, comprobantes, contenido de la pantalla ni grabaciones de lo que haces en la app.
+          código donde ocurrió y la versión de la app. Estos informes no incluyen tu nombre, correo, contraseña,
+          mensajes, comprobantes, contenido de la pantalla ni grabaciones de lo que haces en la app.
         </p>
 
         <h2>Con quién compartimos tus datos</h2>
@@ -139,6 +144,10 @@
           <li>
             <strong>Expo, Google (Firebase) y Apple</strong>: entrega de notificaciones al teléfono. Reciben el token de
             notificaciones y el texto del aviso.
+          </li>
+          <li>
+            <strong>Expo (EAS Update)</strong> (Estados Unidos): cada vez que abres la app, consulta si hay una versión
+            nueva de la app y la descarga.
           </li>
           <li><strong>Better Stack</strong> (Estados Unidos): informes de fallas sin datos personales.</li>
           <li><strong>Google</strong>: el correo de soporte llega a una cuenta de Gmail del estudio.</li>
@@ -164,8 +173,17 @@
             de perfil, la anterior se elimina enseguida.
           </li>
           <li>
-            <strong>Tu cuenta, pagos, reservas y asistencia:</strong> los conservamos mientras exista el estudio, porque
-            forman parte de su historial y contabilidad. Esto incluye las cuentas cerradas (ver abajo).
+            <strong>Tu cuenta:</strong> mientras esté abierta. Al cerrarla borramos tu nombre, correo, teléfono,
+            contraseña y foto (ver abajo).
+          </li>
+          <li>
+            <strong>Pagos, reservas y asistencia:</strong> los conservamos mientras exista el estudio, porque forman
+            parte de su contabilidad; los de una cuenta cerrada quedan sin tus datos personales. Nunca se borra una fila
+            de la base de datos: lo que se elimina queda marcado como eliminado y deja de usarse.
+          </li>
+          <li>
+            <strong>Tu contacto para promociones:</strong> solo si lo pediste al cerrar tu cuenta, hasta que nos pidas
+            que paremos.
           </li>
           <li>
             <strong>Copias de seguridad:</strong> una diaria, que se guarda 30 días, y una por mes, que se guarda 12
@@ -180,13 +198,14 @@
         <h2>Cerrar o eliminar tu cuenta</h2>
         <p>
           Puedes cerrar tu cuenta desde la app (<strong>Perfil → Cerrar mi cuenta</strong>) o pedirlo por correo. Al
-          cerrarla se cierran tus sesiones, dejamos de enviarte avisos y correos, y tus datos dejan de mostrarse en las
-          apps y en las listas del estudio. Tu correo queda libre para registrarte de nuevo.
+          cerrarla se cierran tus sesiones, dejamos de enviarte avisos y correos, y borramos tu nombre, correo,
+          teléfono, contraseña y foto de perfil. Tu correo queda libre para registrarte de nuevo.
         </p>
         <p>
-          Tu nombre, correo, teléfono e historial de pagos, reservas y asistencia se conservan en nuestros registros
-          internos, sin mostrarse, porque son parte de la contabilidad del estudio. Los detalles están en
-          <a href="/eliminar-cuenta">Eliminar mi cuenta</a>.
+          Tu historial de pagos, reservas y asistencia se conserva sin tus datos personales, porque es parte de la
+          contabilidad del estudio. Si al cerrar tu cuenta en la app marcas «Quiero seguir recibiendo promociones de
+          Emma Pilates», guardamos aparte tu nombre, correo y teléfono solo para enviarte promociones, hasta que nos
+          pidas que paremos. Los detalles están en <a href="/eliminar-cuenta">Eliminar mi cuenta</a>.
         </p>
 
         <h2>Tus derechos</h2>
@@ -199,6 +218,10 @@
           </li>
           <li><strong>Cerrar tu cuenta:</strong> desde la app o por correo, como se explica arriba.</li>
           <li><strong>Dejar de recibir notificaciones:</strong> desde los ajustes de tu teléfono.</li>
+          <li>
+            <strong>Dejar de recibir promociones:</strong> escríbenos a
+            <a href="mailto:soporte@emmapilatesstudio.com">soporte@emmapilatesstudio.com</a> y borramos tu contacto.
+          </li>
         </ul>
 
         <h2>Seguridad</h2>
