@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Body,
   Controller,
-  ForbiddenException,
   Get,
   Headers,
   Inject,
@@ -30,7 +29,6 @@ import type {
   PlanSummary,
   SessionDetail,
 } from '../catalog/catalog-repository';
-import { BookingAccessDeniedError } from '../commands/create-booking';
 import type { ClientProfile } from './client-profile';
 import type { ClientSubscriptionView } from './client-subscription';
 import {
@@ -43,6 +41,7 @@ import {
   SessionDetailDto,
   UpdateClientProfileDto,
 } from './client-discovery.dto';
+import { denyNonClients } from './deny-non-clients';
 
 export const clientProfile = Symbol('clientProfile');
 export const clientSubscription = Symbol('clientSubscription');
@@ -87,20 +86,6 @@ const toPlanDto = (plan: PlanSummary): PlanDto => ({
   classAllowance: plan.classAllowance,
   priceCentavos: plan.priceCentavos,
 });
-
-const denyNonClients = async <T>(work: () => Promise<T>): Promise<T> => {
-  try {
-    return await work();
-  } catch (error) {
-    if (error instanceof BookingAccessDeniedError) {
-      throw new ForbiddenException({
-        code: 'booking_access_denied',
-        detail: 'Booking access is denied',
-      });
-    }
-    throw error;
-  }
-};
 
 @Controller({ path: 'clients/current', version: '1' })
 @ApiBearerAuth()
