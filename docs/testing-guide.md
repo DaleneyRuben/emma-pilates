@@ -4726,3 +4726,25 @@ another port), log in with `POST /api/v1/authentication-sessions`:
    before either finishes) answers `expired` to the second one, like any used
    link.
 5. Drop the copy: `dropdb pilates_test_rules`.
+
+## Test 62: the admin web's security headers (WEB-030)
+
+The admin web sends a Content-Security-Policy (no framing, scripts and API
+calls only from its own origin, fonts from Google Fonts) and the usual
+hardening headers on every path. The list lives in
+`apps/admin-web/security-headers.ts`; `vercel.json` must match it (a Jest
+spec checks), and `vite preview` sends it so the Playwright journeys run under
+the deployed policy.
+
+1. Locally: `pnpm test:admin-e2e`. Expected: «serves the security headers and
+   stays within its policy» passes, so no page logged «Refused to …».
+2. After a release: `curl -sI https://emma-pilates-admin.vercel.app/` and the
+   staging host. Expected: `content-security-policy` ending in
+   `frame-ancestors 'none'`, `x-frame-options: DENY`,
+   `x-content-type-options: nosniff`, `referrer-policy:
+   strict-origin-when-cross-origin`, and `strict-transport-security`.
+3. Open the admin web, sign in, and walk a few pages with the browser's
+   console open. Expected: no «Content Security Policy» errors; fonts are Lora
+   and Work Sans.
+4. The public site also sends `strict-transport-security` now
+   (`curl -sI https://app.emmapilatesstudio.com/privacidad/`).

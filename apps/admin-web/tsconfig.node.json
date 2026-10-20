@@ -19,5 +19,10 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["vite.config.ts", "middleware.ts", "api/**/*.ts"]
+  "include": [
+    "vite.config.ts",
+    "middleware.ts",
+    "security-headers.ts",
+    "api/**/*.ts"
+  ]
 }
