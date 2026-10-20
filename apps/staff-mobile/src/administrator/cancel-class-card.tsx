@@ -43,6 +43,7 @@ export function CancelClassCard({
       accessibilityRole="button"
       onPress={onPress}
       style={styles.card}
+      testID={`cancel-class-card-${session.id}`}
     >
       <View style={styles.header}>
         <View style={styles.titles}>

@@ -224,6 +224,7 @@ export function AssistantSessionDetailScreen({
                   disabled={submitting}
                   onPress={() => void joinWaitlist()}
                   style={styles.outlinedButton}
+                  testID="session-join-waitlist"
                 >
                   <ButtonLabel
                     busy={submitting}
@@ -239,7 +240,12 @@ export function AssistantSessionDetailScreen({
             )
           ) : hasAllowance ? (
             <>
-              <PrimaryButton busy={submitting} label="Reservar" onPress={() => void book()} />
+              <PrimaryButton
+                busy={submitting}
+                label="Reservar"
+                onPress={() => void book()}
+                testID="session-book"
+              />
               <BodyText style={styles.note}>Se descontará 1 clase de su plan.</BodyText>
             </>
           ) : (

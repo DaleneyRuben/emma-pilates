@@ -231,6 +231,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                   })
                 }
                 tag={<SeatPill full={session.availableSeats === 0}>{seatsTag(session)}</SeatPill>}
+                testID={`session-card-${session.id}`}
                 time={formatTimeRange(session.startsAt, session.endsAt)}
                 title={session.classTypeName}
                 trainerName={session.trainerName}

@@ -28,6 +28,7 @@ export function AccountAvatar() {
       hitSlop={spacing.xs}
       onPress={() => navigation.navigate("Profile")}
       style={({ pressed }) => [styles.avatar, pressed && styles.pressed]}
+      testID="account-avatar"
     >
       <Text style={styles.initials}>{initials(name)}</Text>
       {unreadCount > 0 ? <View style={styles.dot} testID="account-avatar-dot" /> : null}

@@ -136,6 +136,7 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
                       accessibilityRole="button"
                       accessibilityState={{ selected }}
                       key={outcome}
+                      testID={`roster-${outcome}-${booking.bookingId}`}
                       onPress={() =>
                         setEdits((current) => ({
                           ...current,
@@ -167,6 +168,7 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
           disabled={!complete}
           label="Guardar asistencia"
           onPress={() => void saveAttendance()}
+          testID="roster-save"
         />
       ) : null}
     </Screen>

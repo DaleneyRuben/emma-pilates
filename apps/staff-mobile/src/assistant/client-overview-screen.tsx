@@ -149,15 +149,18 @@ export function ClientOverviewScreen({
             disabled={!canBook}
             label="Reservar clase"
             onPress={() => navigation.navigate("BrowseSessions", context)}
+            testID="client-overview-book"
           />
           <OutlinedButton
             label="Registrar pago en efectivo"
             onPress={() => navigation.navigate("SelectPlan", context)}
+            testID="client-overview-cash-payment"
           />
           {hasActiveSubscription ? (
             <TextButton
               label="Ver reservas"
               onPress={() => navigation.navigate("ClientBookings", context)}
+              testID="client-overview-bookings"
             />
           ) : null}
         </View>

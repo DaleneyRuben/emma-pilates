@@ -40,6 +40,7 @@ function NewClientButton({ onPress }: { onPress: () => void }) {
       accessibilityRole="button"
       onPress={onPress}
       style={styles.newClient}
+      testID="client-search-new-client"
     >
       <Text style={styles.newClientLabel}>+ Nuevo cliente</Text>
     </Pressable>
@@ -87,6 +88,7 @@ export function ClientSearchScreen() {
         placeholder={placeholder}
         placeholderTextColor={colors.textSubtle}
         style={styles.input}
+        testID="client-search-input"
         value={text}
       />
       <NewClientButton onPress={() => navigation.navigate("NewClient")} />
@@ -111,6 +113,7 @@ export function ClientSearchScreen() {
               key={client.id}
               onPress={() => open(client.id)}
               style={[styles.row, client.id === selectedId && styles.rowSelected]}
+              testID={`client-result-${client.id}`}
             >
               <AvatarCircle fontSize={16} name={client.name} size={42} />
               <View style={styles.rowBody}>

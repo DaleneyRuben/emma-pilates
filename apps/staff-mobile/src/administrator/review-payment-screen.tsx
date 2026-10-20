@@ -170,6 +170,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
               onChangeText={setReason}
               placeholder="Ej.: El monto no coincide con la transferencia recibida."
               style={styles.reasonInput}
+              testID="review-reject-reason"
               value={reason}
             />
             <BodyText style={styles.helper}>
@@ -190,6 +191,7 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
                 styles.destructive,
                 trimmedReason === "" && !submitting && styles.destructiveDisabled,
               ]}
+              testID="review-reject-confirm"
             >
               <ButtonLabel
                 busy={submitting}
@@ -206,12 +208,14 @@ export function ReviewPaymentScreen({ route }: { route: { params: { paymentId: s
               busy={submitting}
               label="Confirmar pago"
               onPress={() => void decide(() => api.confirmPayment(payment.id), "Pago confirmado")}
+              testID="review-confirm"
             />
             <Pressable
               accessibilityLabel="Rechazar"
               accessibilityRole="button"
               onPress={() => setRejecting(true)}
               style={styles.reject}
+              testID="review-reject"
             >
               <Text style={styles.rejectLabel}>Rechazar</Text>
             </Pressable>

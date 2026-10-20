@@ -137,6 +137,7 @@ export function NewClientScreen() {
                 label="Nombre"
                 onChangeText={setName}
                 placeholder="Nombre y apellido"
+                testID="new-client-name"
                 value={name}
               />
               <FormField
@@ -150,6 +151,7 @@ export function NewClientScreen() {
                   setEmailInUse(false);
                 }}
                 placeholder="correo@ejemplo.com"
+                testID="new-client-email"
                 value={email}
               />
               <FormField
@@ -157,6 +159,7 @@ export function NewClientScreen() {
                 label="Teléfono (opcional)"
                 onChangeText={setPhone}
                 placeholder="+591 700 00000"
+                testID="new-client-phone"
                 value={phone}
               />
               <BodyText style={styles.note}>
@@ -180,6 +183,7 @@ export function NewClientScreen() {
                 disabled={waitSeconds > 0}
                 label="Crear cuenta"
                 onPress={() => void create()}
+                testID="new-client-submit"
               />
             </>
           )}
