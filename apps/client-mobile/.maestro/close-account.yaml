@@ -28,13 +28,17 @@ env:
 - swipe:
     start: "50%,55%"
     end: "50%,25%"
+# BE-021 (ADR-0097): the erasure note and the unticked promotions box.
+- assertVisible: "Borramos tu nombre, correo, teléfono y foto.*"
+- tapOn: "Quiero seguir recibiendo promociones de Emma Pilates"
+- takeScreenshot: client-close-3-promociones
 - tapOn: "Tu contraseña"
 - inputText: ${PASSWORD}
-- takeScreenshot: client-close-3-contrasena
+- takeScreenshot: client-close-4-contrasena
 - tapOn:
     id: "close-account-confirm"
 - extendedWaitUntil:
     visible: "Cerramos tu cuenta. Gracias por entrenar con nosotras."
     timeout: 15000
 - assertVisible: "Iniciar sesión"
-- takeScreenshot: client-close-4-cerrada
+- takeScreenshot: client-close-5-cerrada
