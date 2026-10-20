@@ -2,9 +2,16 @@ import { INestApplication, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import type { Environment } from '../config/environment';
 
+/**
+ * BE-025: Swagger and `/openapi.json` stay off in production. Staging runs
+ * with NODE_ENV=production too, so only its named environment turns them on;
+ * any other production-mode environment keeps them off.
+ */
 export const servesApiDocumentation = (
   environment: Pick<Environment, 'NODE_ENV' | 'ERROR_REPORTING_ENVIRONMENT'>,
-): boolean => environment.NODE_ENV.length > 0;
+): boolean =>
+  environment.NODE_ENV !== 'production' ||
+  environment.ERROR_REPORTING_ENVIRONMENT === 'staging';
 
 export function configureApplication(
   app: INestApplication,
@@ -28,7 +35,8 @@ export function configureApplication(
     .build();
   const openApiDocument = SwaggerModule.createDocument(app, openApiConfig);
 
-  if (options.serveDocumentation ?? true) {
+  // The offline generator only needs the returned document.
+  if (options.serveDocumentation ?? false) {
     SwaggerModule.setup('docs', app, openApiDocument, {
       jsonDocumentUrl: 'openapi.json',
     });

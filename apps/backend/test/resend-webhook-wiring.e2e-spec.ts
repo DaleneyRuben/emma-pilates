@@ -15,7 +15,7 @@ describe('Resend webhook wiring (e2e)', () => {
     }).compile();
     // main.ts creates the application with rawBody too.
     app = moduleFixture.createNestApplication({ rawBody: true });
-    configureApplication(app);
+    configureApplication(app, { serveDocumentation: true });
     await app.init();
   });
 

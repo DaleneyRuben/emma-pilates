@@ -27,7 +27,7 @@ describe('authentication links (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    configureApplication(app);
+    configureApplication(app, { serveDocumentation: true });
     await app.init();
   });
 

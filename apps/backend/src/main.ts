@@ -3,7 +3,10 @@ import { NestFactory } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 import { AppModule } from './app.module';
 import { Environment } from './config/environment';
-import { configureApplication } from './http/configure-application';
+import {
+  configureApplication,
+  servesApiDocumentation,
+} from './http/configure-application';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -12,10 +15,17 @@ async function bootstrap() {
     rawBody: true,
   });
   app.useLogger(app.get(Logger));
-  configureApplication(app);
+  const config = app.get(ConfigService<Environment, true>);
+  configureApplication(app, {
+    serveDocumentation: servesApiDocumentation({
+      NODE_ENV: config.get('NODE_ENV', { infer: true }),
+      ERROR_REPORTING_ENVIRONMENT: config.get('ERROR_REPORTING_ENVIRONMENT', {
+        infer: true,
+      }),
+    }),
+  });
   // Readiness fails once shutdown begins (ADR-0080).
   app.enableShutdownHooks();
-  const config = app.get(ConfigService<Environment, true>);
   await app.listen(config.get('PORT', { infer: true }));
 }
 void bootstrap();
