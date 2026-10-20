@@ -145,6 +145,7 @@ import { accountClosure } from './account-closure/account-closure-provider';
 import { adminWebReads } from './admin-web-reads';
 import { receiptReadProvider } from './payments/prisma-receipt-read';
 import { promotionContactsWiring } from './promotion-contacts/promotion-contacts-wiring';
+import { promotionsConsentWiring } from './promotions-consent/promotions-consent-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 
@@ -182,6 +183,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...accountClosure.controllers,
     ...promotionsWiring.controllers,
     ...promotionContactsWiring.controllers,
+    ...promotionsConsentWiring.controllers,
     ...clientPhotoWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
@@ -575,6 +577,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     receiptReadProvider(PRISMA_CLIENT),
     ...promotionsWiring.providers(PRISMA_CLIENT),
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
+    ...promotionsConsentWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
   ],
 })
