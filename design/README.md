@@ -313,7 +313,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW32` | Crear contraseña | Page opened by an emailed link: Desde una invitación or Restablecer contraseña, plus expired and removed-invitation states |
 | `AW33` | Menú de usuario y cambiar contraseña | Top-bar user menu overlay, change-password side panel, log-out confirm |
 | `AW34` | Selector de sucursal | Not a page: the open states of the top-bar branch control (branches come from `AW19`); picking one closes the popover and reloads the current page in that scope |
-| `AW35` | Contactos para promociones | List of the Promotion Contacts kept for former Clients who asked to keep receiving promotions (ADR-0097), newest consent first, search only; «Exportar CSV» downloads every contact (audited); a per-row «Dejar de enviar» confirmation erases the contact; reached from `AW17`, no sidebar item; empty, no-results, and after-erasing frames |
+| `AW35` | Contactos para promociones | List of the live Clients who agreed to promotions in Perfil (ADR-0098) and the Promotion Contacts kept for former Clients who asked to keep receiving them (ADR-0097), newest consent first, search only, a «Tipo» column with «Activa» and «Cuenta cerrada» pills; «Exportar CSV» downloads every contact (audited); a per-row «Dejar de enviar» confirmation closes a live Client's consent (her Account stays) or erases a former Client's contact; reached from `AW17`, no sidebar item; empty, no-results, and after-erasing frames |
 
 ---
 
