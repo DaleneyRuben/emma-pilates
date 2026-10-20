@@ -32,3 +32,14 @@ describe("PrimaryButton while busy", () => {
     expect(screen.getByRole("button", { name: "Iniciar sesión" })).not.toBeBusy();
   });
 });
+
+// MOB-066: Maestro and RNTL reach the button by a stable id, not its Spanish label.
+describe("PrimaryButton testID", () => {
+  it("puts the testID on the pressable button", async () => {
+    const screen = await render(<PrimaryButton label="Iniciar sesión" testID="login-submit" />);
+
+    expect(screen.getByTestId("login-submit")).toBe(
+      screen.getByRole("button", { name: "Iniciar sesión" }),
+    );
+  });
+});
