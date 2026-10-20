@@ -38,6 +38,7 @@ type ContactRecord = {
 
 const toRow = (record: ContactRecord): PromotionContactRow => ({
   id: record.id,
+  kind: 'former_client',
   name: record.name,
   email: record.email,
   phone: record.phone,

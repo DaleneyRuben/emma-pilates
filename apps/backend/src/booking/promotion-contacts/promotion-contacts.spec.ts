@@ -24,6 +24,7 @@ const administrator = staff('administrator');
 const now = new Date('2026-10-20T14:00:00.000Z');
 const valeria = {
   id: 'contact-id',
+  kind: 'former_client' as const,
   name: 'Valeria Quiroga',
   email: 'valeria@example.com',
   phone: '+591 70011005',

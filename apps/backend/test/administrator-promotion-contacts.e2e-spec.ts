@@ -18,6 +18,7 @@ const bearer = `Bearer ${'a'.repeat(43)}`;
 const contactId = '11111111-1111-4111-8111-111111111111';
 const valeria = {
   id: contactId,
+  kind: 'former_client' as const,
   name: 'Valeria Quiroga',
   email: 'valeria@example.com',
   phone: '+591 70011005',
