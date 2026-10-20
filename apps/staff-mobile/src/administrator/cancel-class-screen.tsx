@@ -182,6 +182,7 @@ export function CancelClassScreen() {
               key={date}
               onPress={() => setSelectedDate(date)}
               style={[styles.dayChip, selected && styles.chipSelected]}
+              testID={`cancel-class-day-${date}`}
             >
               <Text style={[styles.dayWeekday, selected && styles.chipLabelSelected]}>
                 {weekday}

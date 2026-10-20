@@ -146,6 +146,7 @@ export function ConfirmCashPaymentScreen({
                 }
                 navigation.popTo("ClientOverview", { clientId });
               }}
+              testID="cash-back-to-client"
             />
           </View>
         </CenteredCard>

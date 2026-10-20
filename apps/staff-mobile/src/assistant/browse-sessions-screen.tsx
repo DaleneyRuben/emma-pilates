@@ -171,6 +171,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
               key={date}
               onPress={() => setSelectedDate(date)}
               style={[styles.dayChip, selected && styles.chipSelected]}
+              testID={`assistant-day-${date}`}
             >
               <Text style={[styles.dayWeekday, selected && styles.chipLabelSelected]}>
                 {weekday}
