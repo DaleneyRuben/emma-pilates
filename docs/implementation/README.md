@@ -149,13 +149,14 @@ A backlog item is `done` only when its applicable conditions are met:
 
 ## External-service gates
 
-No new account is needed for the next local slices.
-
-- Use a local email-capture adapter until real SendPulse delivery is tested.
-- Use a local object-storage adapter until the transfer-receipt slice reaches R2
-  integration testing.
-- Use the local notification inbox until Expo Push Service is tested on a real
-  development build.
+Local development needs no provider account: the worker writes every email
+under `apps/backend/.data/email-capture/` instead of sending it, uploads go to
+the local object store under `.data/uploads`, and push needs a development
+build (testing guide, Tests 34 and 46). Staging and production send email
+through Resend (EXT-001), keep images in Cloudflare R2 (EXT-002), and push
+through Expo Push Service (NOT-002); the backlog's «External accounts and
+provider gates» table lists what each provider still needs, and
+[infrastructure](../architecture/infrastructure.md) says where each runs.
 - Configure production hosting only when local critical journeys are stable
   enough to deploy (the shared development environment was retired by
   ADR-0091; staging comes before real users, EXT-017).
