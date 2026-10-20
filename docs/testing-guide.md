@@ -1590,8 +1590,8 @@ As Sofía, tap **Comprar un plan** on Home (her Plan is expired), pick
 the line "Escanea el código con tu app bancaria y transfiere el monto exacto."
 and nothing else: since PAY-003 the QR is the only transfer instruction, with no
 beneficiary, bank, or account line (Test 41 checks the endpoint). Tap **Sube tu comprobante de
-transferencia**: iOS asks for photo access the first time, then opens the
-library (the Simulator ships with sample photos). Picking one re-encodes it as
+transferencia**: the system photo picker opens with no permission prompt on
+either platform (MOB-065; the Simulator ships with sample photos). Picking one re-encodes it as
 a JPEG of at most 2048 px on its longest side (UPL-003, Test 53), uploads it
 through `/api/v1/uploads` (hash, PUT, finalize, wait until `READY`) and attaches
 it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
@@ -4300,6 +4300,42 @@ Android emulator (API 36), as Sofía: «Guardar QR» showed the strip and saved
 `DCIM/emma-pilates-qr.png` with no prompt; «Sube tu comprobante de
 transferencia» opened the system photo picker with no prompt, and the picked
 photo uploaded to «Comprobante listo. Toca para cambiarlo.».
+
+### No photo library read access (MOB-065)
+
+The receipt and profile photo picks open the system photo picker
+(PHPicker on iOS, the photo picker on Android), which runs outside the app
+and needs no permission, so the app no longer asks iOS for read access to
+the library: `pickImage()` makes no permission request, and both the
+`expo-image-picker` and `expo-media-library` plugins set `photosPermission`
+to `false`, which leaves `NSPhotoLibraryUsageDescription` out of the build.
+«Guardar QR» keeps its add-only `NSPhotoLibraryAddUsageDescription`. After
+`npx expo prebuild --clean --no-install` in `apps/client-mobile`:
+
+```sh
+grep -E "NSPhotoLibrary|NSCamera|NSMicrophone" -A1 ios/EmmaPilates/Info.plist
+```
+
+Expected: only `NSPhotoLibraryAddUsageDescription` with «Permite que Emma
+Pilates guarde el QR del estudio en tus fotos.». On a local build (the
+recipe above), reset the app's photo access on iOS (`photos` and
+`photos-add`), then as Sofía:
+
+1. «Pago» → «Sube tu comprobante de transferencia». Expected: the system
+   picker at once, with iOS's own «Private Access to Photos» note and no
+   «Allow access to your photos» alert; the pick uploads to «Comprobante
+   listo. Toca para cambiarlo.».
+2. Perfil → «Editar» → «Cambiar foto». Expected: the same picker with no
+   alert; the photo appears in the circle.
+3. «Guardar QR». Expected: only the add-photos alert of step 4 above, then
+   the strip.
+
+Verified on 2026-10-19 with local debug builds of version 1.0.1 against a
+disposable database, as Sofía: steps 1–3 on the iPhone 16 Pro and the iPad
+Pro 11 after resetting `photos` and `photos-add` (the simulators' TCC
+databases then held only `kTCCServicePhotosAdd`, no read access); step 1 on
+the Android emulator (API 36), which still opened the system photo picker
+with no prompt and uploaded the receipt.
 
 ## Test 52: show the password on mobile
 
