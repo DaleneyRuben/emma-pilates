@@ -419,7 +419,10 @@ Values never go in the repository or a chat. «Mac» means the user's own
 
 - **`.github/workflows/ci.yml`:** every pull request and push to `main`;
   quality, unit, contract, e2e, and integration jobs per surface, the
-  database jobs on `postgres:18-alpine`. Deploys nothing.
+  database jobs on `postgres:18-alpine`. The API integration suite, the
+  longest, starts right after `quality-api` and runs as three shards
+  (`api-integration (1/3)` to `(3/3)`), each with its own PostgreSQL and
+  S3Mock (EXT-022). Deploys nothing.
 - **`.github/workflows/release-staging.yml`:** after `CI` passes on a push
   to `main` (or by hand with a commit), releases it to the staging team
   (migrate, `api` readiness, `worker`, smoke check), deploys the staging
