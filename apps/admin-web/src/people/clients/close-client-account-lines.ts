@@ -8,8 +8,8 @@ const evaluaciones = (count: number) =>
     ? "su evaluación nutricional"
     : `sus ${count} evaluaciones nutricionales`;
 
-// Follow-up 66: one line per consequence that applies to this Client, then
-// the two that always do.
+// Follow-ups 66 and 101: one line per consequence that applies to this
+// Client, then the two that always do.
 export const describeClosureForAdministrator = (
   client: AdminClientDetailDto,
 ): string[] => {
@@ -54,6 +54,6 @@ export const describeClosureForAdministrator = (
         ]
       : []),
     "Se cierra su sesión en todos sus dispositivos y su correo queda libre.",
-    "Su historial se conserva, pero deja de verse en la app y en las listas.",
+    "Se borran su nombre, correo, teléfono y foto. Sus pagos y clases se conservan sin sus datos, para la contabilidad del estudio.",
   ];
 };
