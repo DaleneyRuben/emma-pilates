@@ -40,8 +40,12 @@ export type NavigationItem = {
    * warning tint beside Insumos.
    */
   badge?: "pendingPayments" | "lowStock";
-  /** Its sub-pages keep it marked (AW31 is a view of Insumos). */
-  subPages?: true;
+  /**
+   * Its sub-pages keep it marked: every page under it (AW31 is a view of
+   * Insumos), or only the listed ones where siblings share its prefix
+   * (AW35 under Promociones, beside Referidos and Créditos).
+   */
+  subPages?: true | readonly string[];
   /**
    * The page brings its own Branch selector with «Todas las sucursales»
    * (AW16), so the top bar shows a note instead of the shell's.
@@ -154,7 +158,12 @@ export const navigationGroups: readonly NavigationGroup[] = [
     items: [
       // AW17 is the one list drawn as cards, unpaged, because its order is
       // what the page edits.
-      { label: "Promociones", to: "/promociones", screen: "AW17" },
+      {
+        label: "Promociones",
+        to: "/promociones",
+        screen: "AW17",
+        subPages: ["/promociones/contactos"],
+      },
       {
         label: "Referidos",
         to: "/promociones/referidos",
@@ -186,6 +195,8 @@ export const navigationItemOf = (
   pathname: string,
 ): NavigationItem | undefined =>
   findNavigationItem(pathname) ??
-  navigationItems.find(
-    (item) => item.subPages === true && pathname.startsWith(`${item.to}/`),
+  navigationItems.find((item) =>
+    item.subPages === true
+      ? pathname.startsWith(`${item.to}/`)
+      : (item.subPages?.includes(pathname) ?? false),
   );

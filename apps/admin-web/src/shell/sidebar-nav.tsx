@@ -1,6 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
-import { navigationGroups, type NavigationItem } from "../app/navigation";
+import { Link, useRouterState } from "@tanstack/react-router";
+import {
+  navigationGroups,
+  navigationItemOf,
+  type NavigationItem,
+} from "../app/navigation";
 import { branchSuppliesQueryOptions } from "../back-office/supplies/supply-queries";
 import { countFormat } from "../components/table/pagination";
 import { cn } from "../lib/cn";
@@ -80,17 +84,27 @@ function SidebarLink({
 }) {
   const badge =
     item.badge === undefined || count === 0 ? undefined : badges[item.badge];
+  // A sub-page (AW31, AW35) keeps its entry marked though the path differs.
+  const onSubPage = useRouterState({
+    select: (state) =>
+      state.location.pathname !== item.to &&
+      navigationItemOf(state.location.pathname) === item,
+  });
   return (
     <Link
       to={item.to}
       onClick={onNavigate}
-      activeOptions={{ exact: item.subPages !== true, includeSearch: false }}
+      activeOptions={{ exact: true, includeSearch: false }}
+      aria-current={onSubPage ? "page" : undefined}
       aria-label={
         badge === undefined
           ? undefined
           : `${item.label}, ${countFormat.format(count)} ${badge.label}`
       }
-      className="flex h-9 items-center rounded-control px-3 text-fila-menu text-texto-secundario hover:bg-hover-fila hover:text-texto data-[status=active]:bg-primario-tinte data-[status=active]:font-medium data-[status=active]:text-primario-profundo"
+      className={cn(
+        "flex h-9 items-center rounded-control px-3 text-fila-menu text-texto-secundario hover:bg-hover-fila hover:text-texto data-[status=active]:bg-primario-tinte data-[status=active]:font-medium data-[status=active]:text-primario-profundo",
+        onSubPage && "bg-primario-tinte font-medium text-primario-profundo",
+      )}
     >
       {item.label}
       {badge === undefined ? null : (
