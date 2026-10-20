@@ -20,6 +20,7 @@ export function SessionCard({
   onPress,
   selected,
   tag,
+  testID,
   time,
   title,
   trainerName,
@@ -29,6 +30,7 @@ export function SessionCard({
   onPress: () => void;
   selected?: boolean;
   tag?: ReactNode;
+  testID?: string;
   time: string;
   title: string;
   trainerName: string;
@@ -40,6 +42,7 @@ export function SessionCard({
       accessibilityState={selected === undefined ? undefined : { selected }}
       onPress={onPress}
       style={[styles.card, selected === true && styles.cardSelected]}
+      testID={testID}
     >
       <View style={styles.header}>
         <View style={styles.titles}>
