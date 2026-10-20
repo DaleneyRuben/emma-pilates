@@ -4,7 +4,8 @@ Status: **accepted and built 2026-09-28** (backend, contracts, runbooks; the Cli
 backlog-decision approval on top of
 [ADR-0086](../adr/0086-soft-delete-every-database-row.md): nothing in the
 application schemas is ever physically deleted. The owner confirmed G7 on
-2026-09-28.
+2026-09-28; [ADR-0097](../adr/0097-erase-personal-data-when-a-client-account-closes.md)
+superseded it on 2026-10-19.
 
 It answers the questions earlier items left for BE-007:
 
@@ -23,7 +24,7 @@ It answers the questions earlier items left for BE-007:
 | G4 | **Closure cancels what is still ahead, without penalty.** Every future Booking is cancelled with the new cause `account_closed`: it returns no class, since the Subscription ends anyway, and never counts as a late cancellation. Every future Evaluation is cancelled with the same cause, and every open Waitlist entry is closed. |
 | G5 | **Closure ends the Subscription and forfeits the Credit.** An active or upcoming Subscription is marked ended at closure, with its remaining classes forfeited and no refund. The Credit balance is forfeited through a ledger entry of kind `account_closure` (the ledger is append-only). The confirmation screen states both before the Client confirms. |
 | G6 | **What closure does to the Account.** In one Serializable transaction, the Account and Client are marked removed (`deleted_at`, ADR-0086). Every Authentication Session is revoked with the new reason `account_closed`, every unused link is invalidated, and every device is deactivated. The audit record `account.closed` has actor kind Client or Administrator. The email becomes free for a new registration through the live-only index. The Client leaves every directory, count, and referral lookup (BE-011). |
-| G7 | **No redaction or anonymization.** A closed Account keeps its name, email, phone, and history, but no screen or endpoint shows it any more. This includes the three audit codes that store an email. That is the owner's no-deletion rule applied to values as well as rows. See the open question below. |
+| G7 | **Superseded on 2026-10-19 by [ADR-0097](../adr/0097-erase-personal-data-when-a-client-account-closes.md):** closure now erases the name, email, phone, password, and profile photo, keeps the rows soft-deleted, and keeps a Promotion Contact only when the Client ticks the box. The original decision, kept for the record: ~~**No redaction or anonymization.** A closed Account keeps its name, email, phone, and history, but no screen or endpoint shows it any more. This includes the three audit codes that store an email. That is the owner's no-deletion rule applied to values as well as rows. See the open question below.~~ |
 | G8 | **Export is not self-service.** A Client's request to see their data (Bolivian Constitution art. 130, habeas data) is answered by an operator. A runbook has one read-only query per context, and the result goes to the Client by email within 15 business days. No export endpoint or screen is built now. |
 | G9 | **Backups and restore drills.** ADR-0027 already takes a daily logical `pg_dump` to private R2 storage. BE-007 adds: keep 35 daily dumps and 12 month-end dumps; run a restore drill every quarter and after every major migration into a disposable database, then run `pnpm smoke` and the fixture-free integration checks against it; record each drill in the runbook's log. Object-storage images are not backed up. Receipts expire by design (ADR-0075), and profile photos and Promotion images can be uploaded again. |
 | G10 | **An incident runbook.** Severity levels; freeze deploys; revoke sessions in bulk (all, or per Role); rotate secrets (ADR-0079); restore from the latest verified dump; tell affected Clients by email within 72 hours when personal data was exposed; write the incident in the log. |
@@ -57,4 +58,5 @@ Apple's App Store guideline 5.1.1(v) requires an app that creates accounts to
 let people delete their account from inside the app. G2–G6 give Clients
 in-app closure. On 2026-09-28 the owner confirmed that a closed Client's name,
 email, and phone stay in the database, hidden from every screen and endpoint,
-with no anonymization (G7).
+with no anonymization (G7). ADR-0097 superseded that on 2026-10-19 after the
+REL-004 audit found Google Play does not accept hidden data as deleted.
