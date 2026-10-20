@@ -33,9 +33,9 @@ export const idempotency = () => ({
   headers: { "idempotency-key": Crypto.randomUUID() },
 });
 
+// MOB-065: the system photo picker runs outside the app (PHPicker on iOS, the
+// photo picker on Android), so no photo library permission is asked for.
 export async function pickImage(): Promise<PickedImage | null> {
-  const permission = await ImagePicker.requestMediaLibraryPermissionsAsync();
-  if (!permission.granted) return null;
   const result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ["images"],
     // The original, so the photo is encoded only once, by ensureAcceptedFormat.
