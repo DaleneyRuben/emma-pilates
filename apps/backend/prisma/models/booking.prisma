@@ -28,6 +28,7 @@ model Client {
   referralsMade       Referral[]      @relation("ReferralReferrer")
   referralReceived    Referral?       @relation("ReferralReferred")
   evaluations         Evaluation[]
+  promotionsConsents  ClientPromotionsConsent[]
 
   @@map("clients")
   @@schema("booking")
@@ -106,5 +107,22 @@ model PromotionContact {
 
   @@index([email])
   @@map("promotion_contacts")
+  @@schema("booking")
+}
+
+// A live Client's agreement to promotions, one row per period (ADR-0098).
+// At most one open row per Client: a partial unique index in the BE-023
+// migration.
+model ClientPromotionsConsent {
+  id          String    @id @default(uuid()) @db.Uuid
+  clientId    String    @map("client_id") @db.Uuid
+  consentedAt DateTime  @map("consented_at") @db.Timestamptz(3)
+  withdrawnAt DateTime? @map("withdrawn_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+  client      Client    @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  @@index([clientId])
+  @@map("client_promotions_consents")
   @@schema("booking")
 }
