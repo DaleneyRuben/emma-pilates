@@ -50,6 +50,11 @@ export type ClosureTransaction = {
     input: Actor & { clientId: string; correlationId: string },
   ) => Promise<number>;
   promoteWaitlists: (sessionIds: string[], now: Date) => Promise<void>;
+  // Ends the Client's open Promotions Consent and answers when it was given.
+  endPromotionsConsent: (input: {
+    clientId: string;
+    occurredAt: Date;
+  }) => Promise<Date | null>;
   keepPromotionContact: (input: {
     clientId: string;
     accountId: string;

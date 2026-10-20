@@ -29,6 +29,7 @@ export const createPersonalDataSteps = (
       },
     });
   },
+  endPromotionsConsent: () => Promise.resolve<Date | null>(null),
   removeClient: async (input: { clientId: string; occurredAt: Date }) => {
     const { profileImageAssetId } = await transaction.client.findUniqueOrThrow({
       where: { id: input.clientId },
