@@ -309,6 +309,7 @@ describe('closing a Client Account (PostgreSQL)', () => {
         forfeitedClasses: 8,
         forfeitedCreditCentavos: 0,
         keptPromotionContact: false,
+        endedPromotionsConsent: false,
       },
     });
   });
