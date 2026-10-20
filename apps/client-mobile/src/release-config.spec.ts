@@ -115,7 +115,25 @@ describe("client release configuration", () => {
   it("asks for neither the camera nor the microphone", () => {
     expect(appConfig.expo.plugins).toContainEqual([
       "expo-image-picker",
-      { cameraPermission: false, microphonePermission: false },
+      expect.objectContaining({ cameraPermission: false, microphonePermission: false }),
+    ]);
+  });
+
+  // MOB-065: photos are picked through the system picker, which needs no read
+  // access, so neither plugin adds NSPhotoLibraryUsageDescription; «Guardar
+  // QR» keeps its add-only description.
+  it("asks iOS only for add access to the photo library", () => {
+    expect(appConfig.expo.plugins).toContainEqual([
+      "expo-image-picker",
+      { photosPermission: false, cameraPermission: false, microphonePermission: false },
+    ]);
+    expect(appConfig.expo.plugins).toContainEqual([
+      "expo-media-library",
+      {
+        photosPermission: false,
+        savePhotosPermission: "Permite que Emma Pilates guarde el QR del estudio en tus fotos.",
+        granularPermissions: [],
+      },
     ]);
   });
 
