@@ -24,7 +24,7 @@ describe('operational health (e2e)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    configureApplication(app);
+    configureApplication(app, { serveDocumentation: true });
     await app.init();
   });
 
@@ -79,6 +79,25 @@ describe('operational health (e2e)', () => {
     });
     expect(document.openapi).toMatch(/^3\./);
     expect(document.paths).toHaveProperty('/api/v1/probe');
+  });
+
+  // BE-025: production hides Swagger but still builds the document.
+  it('serves no documentation when it is switched off', async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+      controllers: [VersionedProbeController],
+    }).compile();
+    const hidden = moduleFixture.createNestApplication<INestApplication<App>>();
+    const document = configureApplication(hidden);
+    await hidden.init();
+
+    try {
+      await request(hidden.getHttpServer()).get('/openapi.json').expect(404);
+      await request(hidden.getHttpServer()).get('/docs').expect(404);
+      expect(document.paths).toHaveProperty('/api/v1/probe');
+    } finally {
+      await hidden.close();
+    }
   });
 
   it('returns the OpenAPI document for offline artifact generation', () => {

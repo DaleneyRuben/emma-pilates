@@ -1,7 +1,15 @@
 import { INestApplication, VersioningType } from '@nestjs/common';
 import { DocumentBuilder, OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
+import type { Environment } from '../config/environment';
 
-export function configureApplication(app: INestApplication): OpenAPIObject {
+export const servesApiDocumentation = (
+  environment: Pick<Environment, 'NODE_ENV' | 'ERROR_REPORTING_ENVIRONMENT'>,
+): boolean => environment.NODE_ENV.length > 0;
+
+export function configureApplication(
+  app: INestApplication,
+  options: { serveDocumentation?: boolean } = {},
+): OpenAPIObject {
   app.enableVersioning({
     type: VersioningType.URI,
     prefix: 'api/v',
@@ -20,9 +28,11 @@ export function configureApplication(app: INestApplication): OpenAPIObject {
     .build();
   const openApiDocument = SwaggerModule.createDocument(app, openApiConfig);
 
-  SwaggerModule.setup('docs', app, openApiDocument, {
-    jsonDocumentUrl: 'openapi.json',
-  });
+  if (options.serveDocumentation ?? true) {
+    SwaggerModule.setup('docs', app, openApiDocument, {
+      jsonDocumentUrl: 'openapi.json',
+    });
+  }
 
   return openApiDocument;
 }
