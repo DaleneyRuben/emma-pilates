@@ -27,6 +27,7 @@ you are starting with no project knowledge.
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
+| Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 
 ## Before you begin
 
@@ -4652,8 +4653,8 @@ ADR-0097). An Administrator sees, exports, and erases them on AW35.
    Expected: only the matching rows, and «No se encontró ningún contacto.»
    when none match.
 5. Press «Exportar CSV». Expected: `contactos-promociones-aaaa-mm-dd.csv` with
-   every contact (not only the page), columns Nombre, Correo, Teléfono, Aceptó
-   el, accents intact in a spreadsheet, and a
+   every contact (not only the page), columns Nombre, Tipo, Correo, Teléfono,
+   Aceptó el (Tipo since BE-023), accents intact in a spreadsheet, and a
    `promotion_contact.exported` audit record with `contactCount`.
 6. Press «Dejar de enviar» on a row, then «Borrar contacto». Expected:
    «Borramos el contacto de …», the row gone, and in `psql` the row kept with
@@ -4664,3 +4665,40 @@ ADR-0097). An Administrator sees, exports, and erases them on AW35.
    `404` `promotion_contact_not_found`.
 7. Check at 1440 px and 420 px, then drop the copy:
    `dropdb pilates_test_contacts`.
+
+## Test 60: a live Client's promotions consent (BE-023)
+
+A Client with an open Account agrees to promotions, or stops, from Perfil
+(follow-up 103, ADR-0098). AW35 lists her as «Activa» beside the former
+Clients («Cuenta cerrada»), and closing her Account ends the consent.
+
+1. Use a copy of the fixtures as in Test 59 (`createdb pilates_test_be023`,
+   `db:migrate:deploy`, `db:fixtures`), run the API on it, the Client app
+   (`EXPO_PUBLIC_API_URL=http://127.0.0.1:<port>/api/v1 expo start
+   --dev-client`), and the admin web (`ADMIN_API_PROXY_TARGET`; a dev server on
+   another port needs that origin in `ADMIN_WEB_TRUSTED_ORIGINS`).
+2. Log in to the Client app as `lucia@example.com` and open Perfil. Expected:
+   a «Recibir promociones de Emma Pilates» card between the menu and «Cerrar
+   sesión», with its helper and the switch off. The Maestro flow
+   `.maestro/promotions-consent.yaml` turns it on and off again.
+3. Turn it on. Expected: the switch turns Palo de rosa, and `GET
+   /api/v1/clients/current/promotions-consent` answers `consented: true` with
+   the time. Each period is its own row in
+   `booking.client_promotions_consents`; turning it on again while it is on
+   keeps the first time, and a Staff token answers `403`
+   `booking_access_denied`.
+4. In the admin web, open AW35. Expected: Lucía with an «Activa» pill, the
+   former Clients with «Cuenta cerrada», and the CSV's Tipo column.
+5. Press «Dejar de enviar» on Lucía. Expected: «¿Dejar de enviar promociones a
+   Lucía Fernández?» with «Su cuenta no cambia…», no «no se puede deshacer»
+   line, the button «Dejar de enviar», then «Lucía Fernández ya no recibirá
+   promociones.»; her consent row gets `withdrawn_at`, her Account and name stay,
+   and a `promotions_consent.withdrawn` audit record carries her `clientId`. In
+   the app her switch is off again.
+6. Turn the switch on for `sofia@example.com`, then close her Account from the
+   app with «Quiero seguir recibiendo promociones de Emma Pilates» ticked (Test
+   35). Expected: the new Promotion Contact keeps the time she turned the switch
+   on, her consent row has `withdrawn_at` and `deleted_at` set to the closure
+   time, and `account.closed` records `endedPromotionsConsent: true`. Without
+   the box, the consent ends the same way and no contact is kept.
+7. Drop the copy: `dropdb pilates_test_be023`.

@@ -156,6 +156,7 @@ import type {
   PromotionDto,
   PromotionInputDto,
   PromotionOrderDto,
+  PromotionsConsentDto,
   PurchaseIntentDto,
   ReadinessResponseDto,
   RecordCashPaymentDto,
@@ -178,6 +179,7 @@ import type {
   SessionScheduleInputDto,
   SessionScheduleReplacementDto,
   SetClientPhotoDto,
+  SetPromotionsConsentDto,
   StaffMemberDto,
   StaffMemberPageDto,
   StaffProfileDto,
@@ -19209,6 +19211,328 @@ export const useWithdrawAdminPromotionContact = <
 > => {
   return useMutation(
     getWithdrawAdminPromotionContactMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getCurrentClientPromotionsConsentResponse200 = {
+  data: PromotionsConsentDto;
+  status: 200;
+};
+
+export type getCurrentClientPromotionsConsentResponseSuccess =
+  getCurrentClientPromotionsConsentResponse200 & {
+    headers: Headers;
+  };
+export type getCurrentClientPromotionsConsentResponse =
+  getCurrentClientPromotionsConsentResponseSuccess;
+
+export const getGetCurrentClientPromotionsConsentUrl = () => {
+  return `/api/v1/clients/current/promotions-consent`;
+};
+
+export const getCurrentClientPromotionsConsent = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getCurrentClientPromotionsConsentResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetCurrentClientPromotionsConsentUrl(),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCurrentClientPromotionsConsentResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCurrentClientPromotionsConsentResponse;
+};
+
+export const getGetCurrentClientPromotionsConsentQueryKey = () => {
+  return [`/api/v1/clients/current/promotions-consent`] as const;
+};
+
+export const getGetCurrentClientPromotionsConsentQueryOptions = <
+  TData = Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetCurrentClientPromotionsConsentQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>
+  > = ({ signal }) =>
+    getCurrentClientPromotionsConsent({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetCurrentClientPromotionsConsentQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>
+>;
+export type GetCurrentClientPromotionsConsentQueryError = unknown;
+
+export function useGetCurrentClientPromotionsConsent<
+  TData = Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientPromotionsConsent<
+  TData = Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+          TError,
+          Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetCurrentClientPromotionsConsent<
+  TData = Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetCurrentClientPromotionsConsent<
+  TData = Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getCurrentClientPromotionsConsent>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetCurrentClientPromotionsConsentQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type setCurrentClientPromotionsConsentResponse200 = {
+  data: PromotionsConsentDto;
+  status: 200;
+};
+
+export type setCurrentClientPromotionsConsentResponseSuccess =
+  setCurrentClientPromotionsConsentResponse200 & {
+    headers: Headers;
+  };
+export type setCurrentClientPromotionsConsentResponse =
+  setCurrentClientPromotionsConsentResponseSuccess;
+
+export const getSetCurrentClientPromotionsConsentUrl = () => {
+  return `/api/v1/clients/current/promotions-consent`;
+};
+
+export const setCurrentClientPromotionsConsent = async (
+  setPromotionsConsentDto: SetPromotionsConsentDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setCurrentClientPromotionsConsentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getSetCurrentClientPromotionsConsentUrl(),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(setPromotionsConsentDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setCurrentClientPromotionsConsentResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setCurrentClientPromotionsConsentResponse;
+};
+
+export const getSetCurrentClientPromotionsConsentMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setCurrentClientPromotionsConsent>>,
+    TError,
+    SetCurrentClientPromotionsConsentMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setCurrentClientPromotionsConsent>>,
+  TError,
+  SetCurrentClientPromotionsConsentMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["setCurrentClientPromotionsConsent"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setCurrentClientPromotionsConsent>>,
+    SetCurrentClientPromotionsConsentMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return setCurrentClientPromotionsConsent(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetCurrentClientPromotionsConsentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setCurrentClientPromotionsConsent>>
+>;
+export type SetCurrentClientPromotionsConsentMutationBody =
+  SetPromotionsConsentDto;
+export type SetCurrentClientPromotionsConsentMutationError = unknown;
+export type SetCurrentClientPromotionsConsentMutationVariables = {
+  data: SetPromotionsConsentDto;
+};
+
+export const useSetCurrentClientPromotionsConsent = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setCurrentClientPromotionsConsent>>,
+      TError,
+      SetCurrentClientPromotionsConsentMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setCurrentClientPromotionsConsent>>,
+  TError,
+  SetCurrentClientPromotionsConsentMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getSetCurrentClientPromotionsConsentMutationOptions(options),
     queryClient,
   );
 };

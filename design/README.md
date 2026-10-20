@@ -239,7 +239,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `15` | Mis evaluaciones | Assessment history: one per month, so up to two «Próximas» across a month boundary; «Cancelar» outside the last 3 h («Ya no se puede cancelar» inside), and the sheet says the month is freed; the sheet frees «este mes» or the Evaluation's month by name; the empty state offers next month's free Evaluation once this month's took place |
 | `16` | Mis referidos | Referral code + status |
 | `17` | Mi crédito | Credit balance and movements |
-| `18` | Perfil | Profile and settings; «Evaluación nutricional» (opens `13`) sits between «Mi plan» and «Mis evaluaciones»; the «Notificaciones» row shows the unread count before its chevron; the summary card's 56 px circle shows the Client's photo (centre crop) or her initials; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24` |
+| `18` | Perfil | Profile and settings; «Evaluación nutricional» (opens `13`) sits between «Mi plan» and «Mis evaluaciones»; the «Notificaciones» row shows the unread count before its chevron; the summary card's 56 px circle shows the Client's photo (centre crop) or her initials; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24`; a «Promociones» card with the «Recibir promociones de Emma Pilates» switch (ADR-0098) sits between the menu and «Cerrar sesión» |
 | `19` | Notificaciones | Notification list — seven types, including the studio-cancelled Evaluation (opens `15`); its last sentence names the freed month («otra este mes», or «otra para octubre» when the Evaluation was in a later month) |
 | `20` | Recuperar contraseña | Request a reset link by email; neutral sent and temporary-limit states |
 | `21` | Crear contraseña | Page opened by an emailed link: Activar cuenta or Restablecer contraseña, plus expired and removed-invitation states |
@@ -313,7 +313,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW32` | Crear contraseña | Page opened by an emailed link: Desde una invitación or Restablecer contraseña, plus expired and removed-invitation states |
 | `AW33` | Menú de usuario y cambiar contraseña | Top-bar user menu overlay, change-password side panel, log-out confirm |
 | `AW34` | Selector de sucursal | Not a page: the open states of the top-bar branch control (branches come from `AW19`); picking one closes the popover and reloads the current page in that scope |
-| `AW35` | Contactos para promociones | List of the Promotion Contacts kept for former Clients who asked to keep receiving promotions (ADR-0097), newest consent first, search only; «Exportar CSV» downloads every contact (audited); a per-row «Dejar de enviar» confirmation erases the contact; reached from `AW17`, no sidebar item; empty, no-results, and after-erasing frames |
+| `AW35` | Contactos para promociones | List of the live Clients who agreed to promotions in Perfil (ADR-0098) and the Promotion Contacts kept for former Clients who asked to keep receiving them (ADR-0097), newest consent first, search only, a «Tipo» column with «Activa» and «Cuenta cerrada» pills; «Exportar CSV» downloads every contact (audited); a per-row «Dejar de enviar» confirmation closes a live Client's consent (her Account stays) or erases a former Client's contact; reached from `AW17`, no sidebar item; empty, no-results, and after-erasing frames |
 
 ---
 

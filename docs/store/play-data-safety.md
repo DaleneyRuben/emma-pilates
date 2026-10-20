@@ -31,10 +31,10 @@ ephemerally: no**.
 
 | Play category → type | What it is in the app | Required or optional | Purposes |
 | --- | --- | --- | --- |
-| Personal info → Name | Registration and profile; kept for promotions only if the Client ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
-| Personal info → Email address | Login, verification, recovery; kept for promotions only if the Client ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
+| Personal info → Name | Registration and profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
+| Personal info → Email address | Login, verification, recovery; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Required | App functionality, Account management, Advertising or marketing |
 | Personal info → User IDs | Referral code entered at registration | Optional | App functionality |
-| Personal info → Phone number | Profile; kept for promotions only if the Client ticks the box when closing | Optional | App functionality, Account management, Advertising or marketing |
+| Personal info → Phone number | Profile; used for promotions only while the Client's Perfil switch is on, or kept for them if she ticks the box when closing | Optional | App functionality, Account management, Advertising or marketing |
 | Financial info → Purchase history | Plans bought, Payment amount, method and state | Required | App functionality |
 | Photos and videos → Photos | Profile photo and transfer receipt, picked from the gallery | Optional (a receipt only to pay by transfer) | App functionality |
 | App activity → Other actions | Bookings, Waitlist entries, Evaluation appointments | Required | App functionality |
@@ -87,6 +87,13 @@ promociones de Emma Pilates» box. Ticking it copies the name, email, and phone
 into an unlinked Promotion Contact with the time of consent; that is the
 «Advertising or marketing» purpose on the three Personal info rows above, and
 the pages say how to ask to stop. An Administrator's closure never keeps one.
+
+Since BE-023 (ADR-0098) a Client with an open Account may also turn on
+«Recibir promociones de Emma Pilates» in Perfil. It collects no new data type:
+the app records only when she agreed and stopped, and the studio uses the name,
+email, and phone she already gave for the same «Advertising or marketing»
+purpose while it is on. Turning it off, or closing the Account, ends it. The
+answers above already cover it; nothing in the form changes.
 
 The form's «delete» answers are **Yes** with the deletion URL above.
 

@@ -8,8 +8,10 @@ env:
 - runFlow: subflows/login.yaml
 - tapOn:
     text: "Perfil, .*tab.*"
+# Since follow-up 103 the promotions card pushes «Cerrar sesión» below the
+# fold on a phone, so wait for the menu's last row.
 - extendedWaitUntil:
-    visible: "Cerrar sesión"
+    visible: "Cambiar contraseña"
     timeout: 15000
 # The link sits under «Cerrar sesión», below the fold on a phone.
 - swipe:

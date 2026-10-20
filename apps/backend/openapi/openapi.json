@@ -4932,6 +4932,68 @@
         ]
       }
     },
+    "/api/v1/clients/current/promotions-consent": {
+      "get": {
+        "operationId": "getCurrentClientPromotionsConsent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionsConsentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PromotionsConsent"
+        ]
+      },
+      "put": {
+        "operationId": "setCurrentClientPromotionsConsent",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPromotionsConsentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PromotionsConsentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "PromotionsConsent"
+        ]
+      }
+    },
     "/api/v1/clients/current/photo": {
       "put": {
         "operationId": "setCurrentClientPhoto",
@@ -10577,7 +10639,16 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "description": "The Promotion Contact, or the live Client’s open Promotions Consent"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "client",
+              "former_client"
+            ],
+            "description": "A live Client who agreed in Perfil, or a former Client who ticked the box when closing"
           },
           "name": {
             "type": "string"
@@ -10593,11 +10664,12 @@
           "consentedAt": {
             "type": "string",
             "format": "date-time",
-            "description": "When the former Client ticked the promotions box"
+            "description": "When the Client agreed to promotions"
           }
         },
         "required": [
           "id",
+          "kind",
           "name",
           "email",
           "phone",
@@ -10648,6 +10720,36 @@
         },
         "required": [
           "items"
+        ]
+      },
+      "PromotionsConsentDto": {
+        "type": "object",
+        "properties": {
+          "consented": {
+            "type": "boolean",
+            "description": "Whether the Client agrees to promotions now"
+          },
+          "consentedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the open consent was given, or null"
+          }
+        },
+        "required": [
+          "consented",
+          "consentedAt"
+        ]
+      },
+      "SetPromotionsConsentDto": {
+        "type": "object",
+        "properties": {
+          "consented": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "consented"
         ]
       },
       "SetClientPhotoDto": {

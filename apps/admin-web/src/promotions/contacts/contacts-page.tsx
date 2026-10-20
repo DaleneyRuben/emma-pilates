@@ -27,6 +27,7 @@ import {
   contactsCsvName,
   promotionContactsCsv,
 } from "./contacts-csv";
+import { KindPill } from "./kind-pill";
 import { WithdrawContactAction } from "./withdraw-contact-action";
 
 const contactos = (count: number) =>
@@ -40,6 +41,10 @@ const contactColumns = (onWithdrawn: (notice: string) => void) => [
     cell: ({ getValue }) => (
       <span className="font-medium text-texto">{getValue()}</span>
     ),
+  }),
+  columns.accessor("kind", {
+    header: "Tipo",
+    cell: ({ row }) => <KindPill contact={row.original} />,
   }),
   columns.accessor("email", {
     header: "Correo",
@@ -90,15 +95,16 @@ function EmptyContacts({ searching }: { searching: boolean }) {
     <span className="flex flex-col items-center gap-1">
       <span className="text-texto-secundario">Todavía no hay contactos.</span>
       <span className="text-nota text-texto-tenue">
-        Aparecen aquí cuando una clienta cierra su cuenta y marca que quiere
-        seguir recibiendo promociones.
+        Aparecen aquí cuando una clienta acepta recibir promociones en su perfil
+        o al cerrar su cuenta.
       </span>
     </span>
   );
 }
 
 // AW35 (BE-022): the Promotion Contacts ADR-0097 keeps for former Clients
-// who asked for promotions; reached from AW17, studio-wide.
+// who asked for promotions and, since BE-023, the live Clients who agreed in
+// Perfil (ADR-0098); reached from AW17, studio-wide.
 export function ContactsPage({
   search,
   onSearchChange,
@@ -132,7 +138,7 @@ export function ContactsPage({
         subtitle={
           query.data === undefined
             ? undefined
-            : `${contactos(query.data.totalItems)} · personas que cerraron su cuenta y pidieron seguir recibiendo promociones`
+            : `${contactos(query.data.totalItems)} · clientas que aceptaron recibir promociones, activas o con la cuenta cerrada`
         }
         actions={
           isForbidden(query.error) ? undefined : (

@@ -2,7 +2,6 @@ import {
   BadRequestException,
   Controller,
   Delete,
-  ForbiddenException,
   Get,
   Headers,
   HttpCode,
@@ -27,8 +26,8 @@ import {
 } from '../../system-identity/authentication/bearer-principal';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { parseUuid } from '../booking.dto';
-import { BookingAccessDeniedError } from '../commands/create-booking';
 import type { UpcomingClientBooking } from './client-bookings';
+import { denyNonClients } from './deny-non-clients';
 
 export const clientBookings = Symbol('clientBookings');
 export const leaveWaitlistCommand = Symbol('leaveWaitlistCommand');
@@ -72,20 +71,6 @@ export class UpcomingBookingDto {
   @ApiProperty({ format: 'date-time' })
   endsAt!: Date;
 }
-
-const denyNonClients = async <T>(work: () => Promise<T>): Promise<T> => {
-  try {
-    return await work();
-  } catch (error) {
-    if (error instanceof BookingAccessDeniedError) {
-      throw new ForbiddenException({
-        code: 'booking_access_denied',
-        detail: 'Booking access is denied',
-      });
-    }
-    throw error;
-  }
-};
 
 @Controller({ path: 'bookings', version: '1' })
 @ApiBearerAuth()

@@ -6,9 +6,14 @@ import {
 } from '../administration/administration-errors';
 
 // BE-022: the Promotion Contacts ADR-0097 keeps for former Clients who agreed
-// to promotions, for Administrators only (their personal data, ADR-0054).
+// to promotions, and since BE-023 the live Clients with an open Promotions
+// Consent (ADR-0098), for Administrators only (their personal data, ADR-0054).
+export type PromotionContactKind = 'client' | 'former_client';
+
 export type PromotionContactRow = {
+  // The Promotion Contact's id, or the open Promotions Consent's.
   id: string;
+  kind: PromotionContactKind;
   name: string;
   email: string;
   phone: string | null;

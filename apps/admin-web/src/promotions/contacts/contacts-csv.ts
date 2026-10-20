@@ -5,6 +5,10 @@ import {
   formatCivilDate,
 } from "../../lib/bolivia-time";
 
+/** AW35's «Tipo»: a live Client, or a former Client (follow-up 104). */
+export const kindLabel = (contact: AdminPromotionContactDto): string =>
+  contact.kind === "client" ? "Activa" : "Cuenta cerrada";
+
 /** The day a contact agreed, `dd/mm/aaaa` in Bolivia (AW35). */
 export const consentDate = (contact: AdminPromotionContactDto): string =>
   formatCivilDate(boliviaParts(contact.consentedAt).date);
@@ -29,9 +33,10 @@ export const promotionContactsCsv = (
   contacts: readonly AdminPromotionContactDto[],
 ): string =>
   `\uFEFF${[
-    ["Nombre", "Correo", "Teléfono", "Aceptó el"],
+    ["Nombre", "Tipo", "Correo", "Teléfono", "Aceptó el"],
     ...contacts.map((contact) => [
       contact.name,
+      kindLabel(contact),
       contact.email,
       contact.phone ?? "",
       consentDate(contact),

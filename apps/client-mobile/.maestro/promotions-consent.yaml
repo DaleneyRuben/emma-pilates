@@ -1,0 +1,41 @@
+# Critical journey: a live Client agrees to promotions from Perfil and stops
+# again (BE-023, follow-up 103, ADR-0098). It leaves the consent off, as the
+# fixtures have it, so the flow can run again.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runFlow: subflows/login.yaml
+- tapOn:
+    text: "Perfil, .*tab.*"
+# Since follow-up 103 the promotions card pushes «Cerrar sesión» below the
+# fold on a phone, so wait for the menu's last row.
+- extendedWaitUntil:
+    visible: "Cambiar contraseña"
+    timeout: 15000
+# The card sits between the menu and «Cerrar sesión», below the fold on a phone.
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- extendedWaitUntil:
+    visible:
+      id: "profile-promotions-switch"
+      checked: false
+    timeout: 15000
+- takeScreenshot: client-promotions-1-apagado
+- tapOn:
+    id: "profile-promotions-switch"
+- extendedWaitUntil:
+    visible:
+      id: "profile-promotions-switch"
+      checked: true
+    timeout: 15000
+- takeScreenshot: client-promotions-2-encendido
+- tapOn:
+    id: "profile-promotions-switch"
+- extendedWaitUntil:
+    visible:
+      id: "profile-promotions-switch"
+      checked: false
+    timeout: 15000
+- takeScreenshot: client-promotions-3-apagado-otra-vez

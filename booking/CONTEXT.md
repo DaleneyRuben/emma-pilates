@@ -87,3 +87,7 @@ _Avoid_: Offer, deal, coupon
 **Promotion Contact**:
 A former Client who, while closing their own Account, agreed to keep receiving the studio's promotions: their name, email, and phone as they were, and when they agreed. It has no link to the closed Client or Account, whose personal data is erased on closure (ADR-0097), and it records when the person asks to stop.
 _Avoid_: Lead, subscriber, mailing list
+
+**Promotions Consent**:
+A live Client's agreement, given or withdrawn from Perfil, to receive the studio's promotions: when they agreed and when they stopped, one record per period (ADR-0098). The name, email, and phone come from the Client while it is open. Closing the Account ends it; if the Client ticks the closure box, the Promotion Contact keeps the consent's original time.
+_Avoid_: Opt-in, subscription (a Subscription is a Plan's date range), marketing permission

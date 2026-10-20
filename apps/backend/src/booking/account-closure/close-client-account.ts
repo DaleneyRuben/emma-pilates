@@ -50,6 +50,11 @@ export type ClosureTransaction = {
     input: Actor & { clientId: string; correlationId: string },
   ) => Promise<number>;
   promoteWaitlists: (sessionIds: string[], now: Date) => Promise<void>;
+  // Ends the Client's open Promotions Consent and answers when it was given.
+  endPromotionsConsent: (input: {
+    clientId: string;
+    occurredAt: Date;
+  }) => Promise<Date | null>;
   keepPromotionContact: (input: {
     clientId: string;
     accountId: string;
@@ -164,15 +169,20 @@ export const closeClientAccount = async (
     });
     // The Client's own Bookings are gone, so freed seats reach the Waitlist.
     await transaction.promoteWaitlists(bookings.sessionIds, now);
+    const liveConsentAt = await transaction.endPromotionsConsent({
+      clientId: target.clientId,
+      occurredAt: now,
+    });
     // Only the Client can consent, and the contact is copied before the
-    // closure erases it (ADR-0097).
+    // closure erases it (ADR-0097); a live consent keeps its first time
+    // (ADR-0098).
     const keptPromotionContact =
       requester.initiatedBy === 'client' && command.keepPromotions === true;
     if (keptPromotionContact) {
       await transaction.keepPromotionContact({
         clientId: target.clientId,
         accountId: target.accountId,
-        consentedAt: now,
+        consentedAt: liveConsentAt ?? now,
       });
     }
     await transaction.closeAccount({
@@ -202,6 +212,7 @@ export const closeClientAccount = async (
         initiatedBy: requester.initiatedBy,
         ...summary,
         keptPromotionContact,
+        endedPromotionsConsent: liveConsentAt !== null,
       },
     });
     return summary;

@@ -20,6 +20,9 @@
   --color-primario-presionado: #9c6764;
   --color-primario-tinte: #efe0dc;
   --color-primario-profundo: #8a5d59;
+  /* Follow-up 104: text on Palo de rosa tinte (AW35's «Activa» pill), as the
+     mobile apps' primaryOnTint. */
+  --color-primario-sobre-tinte: #7a4f4b;
   --color-rosa-empolvado: #d8bdb8;
   --color-tinte-suave: #f6edeb;
   --color-tinte-suave-calido: #f7eee9;

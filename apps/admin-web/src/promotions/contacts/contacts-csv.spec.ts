@@ -1,12 +1,13 @@
-import { daniela, valeria } from "../../test/promotion-contact-fixtures";
+import { daniela, paula, valeria } from "../../test/promotion-contact-fixtures";
 import { contactsCsvName, promotionContactsCsv } from "./contacts-csv";
 
 describe("the Promotion Contacts CSV", () => {
   it("writes the table's columns with Bolivia dates, for a spreadsheet", () => {
-    expect(promotionContactsCsv([valeria, daniela])).toBe(
-      "\uFEFFNombre,Correo,Teléfono,Aceptó el\r\n" +
-        "Valeria Quiroga,valeria@example.com,+591 70011005,19/10/2026\r\n" +
-        "Daniela Rojas,daniela@example.com,,16/10/2026\r\n",
+    expect(promotionContactsCsv([valeria, daniela, paula])).toBe(
+      "\uFEFFNombre,Tipo,Correo,Teléfono,Aceptó el\r\n" +
+        "Valeria Quiroga,Cuenta cerrada,valeria@example.com,+591 70011005,19/10/2026\r\n" +
+        "Daniela Rojas,Cuenta cerrada,daniela@example.com,,16/10/2026\r\n" +
+        "Paula Antelo,Activa,paula@example.com,+591 76302118,08/10/2026\r\n",
     );
   });
 
@@ -15,7 +16,9 @@ describe("the Promotion Contacts CSV", () => {
       promotionContactsCsv([
         { ...valeria, name: 'Ana "Anita" Rojas, hija', phone: "a\nb" },
       ]).split("\r\n")[1],
-    ).toBe('"Ana ""Anita"" Rojas, hija",valeria@example.com,"a\nb",19/10/2026');
+    ).toBe(
+      '"Ana ""Anita"" Rojas, hija",Cuenta cerrada,valeria@example.com,"a\nb",19/10/2026',
+    );
   });
 
   it("keeps a spreadsheet from running a value as a formula", () => {
@@ -23,7 +26,9 @@ describe("the Promotion Contacts CSV", () => {
       promotionContactsCsv([{ ...valeria, name: "=HYPERLINK(1)" }]).split(
         "\r\n",
       )[1],
-    ).toBe("'=HYPERLINK(1),valeria@example.com,+591 70011005,19/10/2026");
+    ).toBe(
+      "'=HYPERLINK(1),Cuenta cerrada,valeria@example.com,+591 70011005,19/10/2026",
+    );
   });
 
   it("names the file after the Bolivia date of the export", () => {

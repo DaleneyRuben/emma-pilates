@@ -102,6 +102,7 @@ describe('Promotion Contacts (PostgreSQL)', () => {
       items: [
         {
           id: ids.valeria,
+          kind: 'former_client',
           name: 'Valeria Quiroga',
           email: 'valeria@example.com',
           phone: '+591 70011005',
@@ -109,6 +110,7 @@ describe('Promotion Contacts (PostgreSQL)', () => {
         },
         {
           id: ids.sofia,
+          kind: 'former_client',
           name: 'Sofía Guzmán',
           email: 'sofia@example.com',
           phone: null,

@@ -57,6 +57,7 @@ const fakeTransaction = (overrides: Partial<ClosureTransaction> = {}): Fake => {
     endSubscription: record('endSubscription', { forfeitedClasses: 4 }),
     forfeitCredit: record('forfeitCredit', 6000),
     promoteWaitlists: record('promoteWaitlists', undefined),
+    endPromotionsConsent: record('endPromotionsConsent', null),
     keepPromotionContact: record('keepPromotionContact', undefined),
     closeAccount: record('closeAccount', undefined),
     removeClient: record('removeClient', undefined),
@@ -118,6 +119,7 @@ describe('closeClientAccount', () => {
       'endSubscription',
       'forfeitCredit',
       'promoteWaitlists',
+      'endPromotionsConsent',
       'closeAccount',
       'removeClient',
       'recordAudit',
@@ -157,6 +159,7 @@ describe('closeClientAccount', () => {
           forfeitedClasses: 4,
           forfeitedCreditCentavos: 6000,
           keptPromotionContact: false,
+          endedPromotionsConsent: false,
         },
       },
     ]);
@@ -189,6 +192,63 @@ describe('closeClientAccount', () => {
     ]);
     expect(fake.audit[0]?.metadata).toMatchObject({
       keptPromotionContact: true,
+    });
+  });
+
+  it('ends a live Promotions Consent and carries its time into the Promotion Contact', async () => {
+    const consentedAt = new Date('2026-09-01T12:00:00.000Z');
+    const endPromotionsConsent = jest.fn(() => {
+      fake.calls.push('endPromotionsConsent');
+      return Promise.resolve(consentedAt);
+    });
+    const keepPromotionContact = jest.fn(() => Promise.resolve());
+    const fake = fakeTransaction({
+      endPromotionsConsent,
+      keepPromotionContact,
+    });
+    const { dependencies } = setup(fake);
+
+    await closeClientAccount(
+      { clientId: 'client-1', password: 'correct horse', keepPromotions: true },
+      client,
+      dependencies,
+    );
+
+    expect(endPromotionsConsent).toHaveBeenCalledWith({
+      clientId: 'client-1',
+      occurredAt: now,
+    });
+    expect(keepPromotionContact).toHaveBeenCalledWith({
+      clientId: 'client-1',
+      accountId: 'client-account',
+      consentedAt,
+    });
+    expect(fake.audit[0]?.metadata).toMatchObject({
+      keptPromotionContact: true,
+      endedPromotionsConsent: true,
+    });
+  });
+
+  it('ends a live Promotions Consent when an Administrator closes the Account', async () => {
+    const endPromotionsConsent = jest.fn(() =>
+      Promise.resolve(new Date('2026-09-01T12:00:00.000Z')),
+    );
+    const fake = fakeTransaction({ endPromotionsConsent });
+    const { dependencies } = setup(fake);
+
+    await closeClientAccount(
+      { clientId: 'client-1' },
+      staff('administrator'),
+      dependencies,
+    );
+
+    expect(endPromotionsConsent).toHaveBeenCalledWith({
+      clientId: 'client-1',
+      occurredAt: now,
+    });
+    expect(fake.audit[0]?.metadata).toMatchObject({
+      keptPromotionContact: false,
+      endedPromotionsConsent: true,
     });
   });
 
