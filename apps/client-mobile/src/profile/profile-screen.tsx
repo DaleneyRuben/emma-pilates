@@ -29,6 +29,7 @@ import { ProfileRowIcon, type ProfileRowIconName } from "./profile-row-icons";
 import { subscriptionBadge } from "../home/home-format";
 import { formatBolivianos } from "../plans/plan-format";
 import { ClientAvatar } from "./client-avatar";
+import { PromotionsSwitch } from "./promotions-switch";
 import { useClientPhoto } from "./use-client-photo";
 
 type ProfileNavigation = {
@@ -169,6 +170,7 @@ export function ProfileScreen() {
             onPress={() => navigation.navigate("ChangePassword")}
           />
         </View>
+        <PromotionsSwitch />
         <Pressable
           accessibilityLabel="Cerrar sesión"
           accessibilityRole="button"
