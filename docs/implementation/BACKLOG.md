@@ -329,16 +329,21 @@ the one below are in [`handoff-archive.md`](./handoff-archive.md).
 
 ## Production readiness checklist
 
-Nothing reaches real users until each line is done:
+Nothing reaches real users until each line is done. Refreshed 2026-10-20
+(DOC-003): production runs every merged item, and what remains is the store
+round and two operations items.
 
 - [x] Sessions materialize without fixtures (BKM-003) and empty Sessions cancel themselves (BOOK-004).
-- [x] First Administrator bootstrap command and runbook (IDN-006); a production run still needs real email (EXT-001).
-- [ ] Real email templates and Resend delivery (EML-001, EXT-001); R2 storage (EXT-002; the variants exist since UPL-002).
-- [ ] Push delivery and store builds (NOT-002, REL-001) with Universal/App Links (LNK-001).
-- [ ] Hosting, CI, secrets, staged migrations, and monitoring (EXT-003, BE-005 gaps, BE-003).
-- [ ] Data governance: Account closure, personal-data and Evaluation retention, audit retention, backups, restore drills, incident runbooks (BE-006, BE-007, BE-008).
-- [ ] Staff management and admin web for studio operation (IDN-007, ADM-001, BKO-001/002, WEB-001–WEB-010).
-- [ ] Real transfer instructions and production secrets configured (see the gate table above).
+- [x] First Administrator bootstrap command and runbook (IDN-006); production's Administrator exists and signs in (REL-006).
+- [x] Real email templates and Resend delivery (EML-001, EXT-001, 2026-10-19); R2 storage with image variants (EXT-002, UPL-002).
+- [x] Push delivery on Android and the mobile-link domain (NOT-002, LNK-001); Android store builds on Play Internal testing (REL-001, REL-006).
+- [ ] The Play closed test and the Client app's production release: listings, Data safety, app content, final icons, and builds carrying LNK-001's intent filters (REL-003 to REL-007, REL-009).
+- [ ] iOS: the Apple Developer team, APNs push, Universal Links, TestFlight, and the real-email link test on both platforms (gate 9, REL-010).
+- [x] Hosting, CI, staged migrations, and monitoring (EXT-003, EXT-004, EXT-008, EXT-011, EXT-013, BE-003, BE-005).
+- [ ] A secrets rotation plan and calendar (EXT-020; the deploy tokens expire around 2027-10-14).
+- [x] Data governance: Account closure with erasure, personal-data and Evaluation retention, audit retention, backups, the first restore drill (2026-10-14), and incident runbooks (BE-006, BE-007, BE-008, BE-021, DOC-001, EXT-009).
+- [x] Staff management and admin web for studio operation (IDN-007, ADM-001, BKO-001/002, WEB-001–WEB-010).
+- [x] The studio's transfer QR (the only transfer instruction since PAY-003) and production secrets configured (see the gate table above).
 - [x] Staging mirrors production and the staging app builds install beside the store apps (EXT-017).
 - [x] The backend suites are green with no operator-set environment (BE-014): the e2e suite boots without a database and the unit suite needs no `--experimental-vm-modules`.
 
