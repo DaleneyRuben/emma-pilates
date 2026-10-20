@@ -1,6 +1,7 @@
 import type { AdminPromotionDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
-import { Plus } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { Plus, Users } from "lucide-react";
 import { useState } from "react";
 import { isForbidden } from "../components/page/is-forbidden";
 import { PageHeader } from "../components/page/page-header";
@@ -60,10 +61,19 @@ export function PromotionsPage() {
         }
         actions={
           forbidden ? undefined : (
-            <Button onClick={() => open()}>
-              <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
-              Nueva promoción
-            </Button>
+            <>
+              {/* Follow-up 102: AW35 has no sidebar entry of its own. */}
+              <Button asChild variant="neutral">
+                <Link to="/promociones/contactos">
+                  <Users size={16} strokeWidth={1.8} aria-hidden="true" />
+                  Contactos para promociones
+                </Link>
+              </Button>
+              <Button onClick={() => open()}>
+                <Plus size={16} strokeWidth={1.8} aria-hidden="true" />
+                Nueva promoción
+              </Button>
+            </>
           )
         }
       />
