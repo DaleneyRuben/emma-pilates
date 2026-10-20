@@ -4822,6 +4822,116 @@
         ]
       }
     },
+    "/api/v1/administrator/promotion-contacts": {
+      "get": {
+        "operationId": "listAdminPromotionContacts",
+        "parameters": [
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "Name, email, or phone fragment, accents and case ignored",
+            "schema": {}
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPromotionContactPageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotionContacts"
+        ]
+      }
+    },
+    "/api/v1/administrator/promotion-contacts/export": {
+      "get": {
+        "description": "Every contact not withdrawn; audited",
+        "operationId": "exportAdminPromotionContacts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminPromotionContactExportDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotionContacts"
+        ]
+      }
+    },
+    "/api/v1/administrator/promotion-contacts/{contactId}/withdrawal": {
+      "post": {
+        "description": "Records a «stop» request and erases the contact’s details",
+        "operationId": "withdrawAdminPromotionContact",
+        "parameters": [
+          {
+            "name": "contactId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPromotionContacts"
+        ]
+      }
+    },
     "/api/v1/clients/current/photo": {
       "put": {
         "operationId": "setCurrentClientPhoto",
@@ -10460,6 +10570,84 @@
           "headline",
           "description",
           "image"
+        ]
+      },
+      "AdminPromotionContactDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "consentedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the former Client ticked the promotions box"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "phone",
+          "consentedAt"
+        ]
+      },
+      "AdminPromotionContactPageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPromotionContactDto"
+            }
+          },
+          "page": {
+            "type": "number",
+            "minimum": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "totalItems": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Contacts matching the search"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ]
+      },
+      "AdminPromotionContactExportDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "description": "Every contact not withdrawn, newest consent first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AdminPromotionContactDto"
+            }
+          }
+        },
+        "required": [
+          "items"
         ]
       },
       "SetClientPhotoDto": {

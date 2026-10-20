@@ -295,7 +295,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW14` | Formulario de gasto | Categoría + inline "+ Nueva categoría" / Monto / Fecha; a quiet line says which Branch the Expense belongs to; the inline category row adds with a compact neutral «Agregar» |
 | `AW15` | Categorías de gasto | Plain list, inline add row, delete disabled when in use; studio-wide; used categories say «En uso»; deleting asks first; refusals for a category in use and a taken name |
 | `AW16` | Reporte de ingresos y gastos | Own date range + "Todas las sucursales"; 3 stat tiles, bar chart, category breakdown; «Nómina» only across all Branches, and a single-Branch frame with its caption; Desde / Hasta / Sucursal controls (archived Branches included), centavos everywhere, every month on a rounded scale with a hover popover, «Totales por mes» beside the categories, empty and invalid-range states |
-| `AW17` | Promociones | Drag-to-reorder card list (order = carousel order); each card shows its derived state: Borrador, Programada, Activa, Finalizada (a deleted Promotion is archived and leaves the list); empty frame, an Éxito result line, «Sin imagen» for a draft without image; at 420 px headlines wrap and windows keep «Del … al …»; keyboard reordering on the handle |
+| `AW17` | Promociones | Drag-to-reorder card list (order = carousel order); each card shows its derived state: Borrador, Programada, Activa, Finalizada (a deleted Promotion is archived and leaves the list); empty frame, an Éxito result line, «Sin imagen» for a draft without image; at 420 px headlines wrap and windows keep «Del … al …»; keyboard reordering on the handle; a «Contactos para promociones» button opens `AW35` |
 | `AW18` | Formulario de promoción | Image upload, título, descripción, date range; «Guardar borrador» / «Publicar» (disabled until image, title, description, and both dates exist); a published Promotion offers «Guardar cambios» / «Dejar de publicar», and changing or removing its image unpublishes it on save with a warning; accepts JPG, PNG or WEBP; «Imagen actual · ancho × alto»; a non-16:9 file previews with the cropped bands dimmed; refused-file reasons under the drop target; «Eliminar promoción» with a confirmation in every edit |
 | `AW19` | Sucursales | Two-column table (Nombre / Dirección); feeds the top-bar selector; no delete; Estado filter; archived Branches carry a neutral «Archivada» pill |
 | `AW20` | Formulario de sucursal | Side panel; nombre + dirección only; edit mode carries a fixed note about linked records; edit offers «Archivar sucursal» (refused while Sessions or a weekly schedule depend on it) |
@@ -313,6 +313,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW32` | Crear contraseña | Page opened by an emailed link: Desde una invitación or Restablecer contraseña, plus expired and removed-invitation states |
 | `AW33` | Menú de usuario y cambiar contraseña | Top-bar user menu overlay, change-password side panel, log-out confirm |
 | `AW34` | Selector de sucursal | Not a page: the open states of the top-bar branch control (branches come from `AW19`); picking one closes the popover and reloads the current page in that scope |
+| `AW35` | Contactos para promociones | List of the Promotion Contacts kept for former Clients who asked to keep receiving promotions (ADR-0097), newest consent first, search only; «Exportar CSV» downloads every contact (audited); a per-row «Dejar de enviar» confirmation erases the contact; reached from `AW17`, no sidebar item; empty, no-results, and after-erasing frames |
 
 ---
 
@@ -325,6 +326,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `AW08→AW31` via "Ver historial de retiros"; the back link returns to `AW08`.
 - The top-bar user cell opens the `AW33` menu overlay (change-password side panel, log-out confirm) from any shell page.
 - `AW22` → «Cerrar cuenta» opens a confirmation that lists what the closure does to that client; **Volver** / **Cerrar cuenta** (Error outline). A pending transfer keeps the dialog open with a refusal and a link to `AW28`; a completed closure returns to `AW21` with an Éxito line.
+- `AW17` → «Contactos para promociones» opens `AW35`; `AW35` → «← Promociones» returns to `AW17`. «Dejar de enviar» opens a confirmation (**Volver** / **Borrar contacto**, Error outline); a completed erasure stays on `AW35` with an Éxito line.
 - Read-only pages with no primary action: `AW21`, `AW22`, `AW25`, `AW26`, `AW27`, `AW28`, `AW31`, plus `AW16`.
 - `AW08` has four actions, in this order: **+ Nuevo insumo** (primary), **Registrar retiro** (outlined — it subtracts stock), **Registrar reposición** (outlined — it adds units, never money; same panel as `AW10` with «Cantidad repuesta») and **Ver historial de retiros** (link → `AW31`).
 

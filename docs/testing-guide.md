@@ -26,6 +26,7 @@ you are starting with no project knowledge.
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
+| Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 
 ## Before you begin
 
@@ -4628,3 +4629,38 @@ folder (ADR-0096):
 3. When the policy changes, update the «Última actualización» date on
    `/privacidad` in the same pull request, and check REL-004's Data safety
    answers still match.
+
+## Test 59: the Promotion Contacts on AW35 (BE-022)
+
+A Client who closes her own Account with «Quiero seguir recibiendo
+promociones de Emma Pilates» ticked leaves a Promotion Contact (Test 35,
+ADR-0097). An Administrator sees, exports, and erases them on AW35.
+
+1. Use a copy of the fixtures database, because erasing is permanent:
+   `createdb pilates_test_contacts`, then `db:migrate:deploy` and
+   `db:fixtures` on it, and run the API and the admin web against it (Test 23;
+   `ADMIN_API_PROXY_TARGET` points the dev server at another API port).
+2. Make contacts: close a fixture Client from the Client app with the box
+   ticked (Test 35), or insert rows into `booking.promotion_contacts` with
+   `psql`.
+3. Log in as `paola.mendoza@example.com`, open Promociones, and press
+   «Contactos para promociones». Expected: AW35 with «← Promociones», the
+   sidebar still marking Promociones, newest consent first, «—» for a contact
+   without a phone, and «Aceptó el» as the Bolivia date (a consent at 23:30 in
+   Bolivia keeps that day).
+4. Search by a name without its accent, an email fragment, or phone digits.
+   Expected: only the matching rows, and «No se encontró ningún contacto.»
+   when none match.
+5. Press «Exportar CSV». Expected: `contactos-promociones-aaaa-mm-dd.csv` with
+   every contact (not only the page), columns Nombre, Correo, Teléfono, Aceptó
+   el, accents intact in a spreadsheet, and a
+   `promotion_contact.exported` audit record with `contactCount`.
+6. Press «Dejar de enviar» on a row, then «Borrar contacto». Expected:
+   «Borramos el contacto de …», the row gone, and in `psql` the row kept with
+   «Contacto retirado», a `retirado-<id>@contactos-retirados.invalid` email,
+   no phone, `withdrawn_at` set, and a `promotion_contact.withdrawn` audit
+   record. Calling `POST
+   /api/v1/administrator/promotion-contacts/{id}/withdrawal` again answers
+   `404` `promotion_contact_not_found`.
+7. Check at 1440 px and 420 px, then drop the copy:
+   `dropdb pilates_test_contacts`.

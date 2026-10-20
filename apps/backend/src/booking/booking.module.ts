@@ -144,6 +144,7 @@ import { createPrismaScheduleBatch } from './administration/prisma-schedule-batc
 import { accountClosure } from './account-closure/account-closure-provider';
 import { adminWebReads } from './admin-web-reads';
 import { receiptReadProvider } from './payments/prisma-receipt-read';
+import { promotionContactsWiring } from './promotion-contacts/promotion-contacts-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 
@@ -180,6 +181,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...adminWebReads.controllers,
     ...accountClosure.controllers,
     ...promotionsWiring.controllers,
+    ...promotionContactsWiring.controllers,
     ...clientPhotoWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
@@ -572,6 +574,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...accountClosure.providers(PRISMA_CLIENT),
     receiptReadProvider(PRISMA_CLIENT),
     ...promotionsWiring.providers(PRISMA_CLIENT),
+    ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
   ],
 })

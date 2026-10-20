@@ -24,6 +24,15 @@ describe("AW17 Promociones", () => {
   useMockServer();
   beforeEach(() => server.use(...signedInHandlers()));
 
+  it("opens the Promotion Contacts from the title row (follow-up 102)", async () => {
+    server.use(promotionList([]));
+    renderAdmin("/promociones");
+
+    expect(
+      await screen.findByRole("link", { name: "Contactos para promociones" }),
+    ).toHaveAttribute("href", "/promociones/contactos");
+  });
+
   it("lists every live Promotion as a card in carousel order with its thumbnail, window, state, and position", async () => {
     server.use(promotionList([reformer, barre, horario, verano]));
     renderAdmin("/promociones");
