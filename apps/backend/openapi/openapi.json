@@ -10639,7 +10639,16 @@
         "properties": {
           "id": {
             "type": "string",
-            "format": "uuid"
+            "format": "uuid",
+            "description": "The Promotion Contact, or the live Client’s open Promotions Consent"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "client",
+              "former_client"
+            ],
+            "description": "A live Client who agreed in Perfil, or a former Client who ticked the box when closing"
           },
           "name": {
             "type": "string"
@@ -10655,11 +10664,12 @@
           "consentedAt": {
             "type": "string",
             "format": "date-time",
-            "description": "When the former Client ticked the promotions box"
+            "description": "When the Client agreed to promotions"
           }
         },
         "required": [
           "id",
+          "kind",
           "name",
           "email",
           "phone",

@@ -4,13 +4,17 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { AdminPromotionContactDtoKind } from "./adminPromotionContactDtoKind";
 
 export interface AdminPromotionContactDto {
+  /** The Promotion Contact, or the live Client’s open Promotions Consent */
   id: string;
+  /** A live Client who agreed in Perfil, or a former Client who ticked the box when closing */
+  kind: AdminPromotionContactDtoKind;
   name: string;
   email: string;
   /** @nullable */
   phone: string | null;
-  /** When the former Client ticked the promotions box */
+  /** When the Client agreed to promotions */
   consentedAt: string;
 }

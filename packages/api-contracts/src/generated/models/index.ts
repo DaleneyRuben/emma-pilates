@@ -36,6 +36,7 @@ export * from "./adminPlanDto";
 export * from "./adminPlanDtoDurationMonths";
 export * from "./adminPlanPageDto";
 export * from "./adminPromotionContactDto";
+export * from "./adminPromotionContactDtoKind";
 export * from "./adminPromotionContactExportDto";
 export * from "./adminPromotionContactPageDto";
 export * from "./adminPromotionDto";
