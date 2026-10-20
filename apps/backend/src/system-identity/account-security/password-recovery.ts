@@ -3,6 +3,7 @@ import {
   authenticationSessionTimes,
   type NewAuthenticationSession,
 } from '../authentication/create-authentication-session';
+import { AuthenticationLinkStateChangedError } from './authentication-links';
 
 /** Who may receive the replacement session a completed recovery opens. */
 export type RecoverySessionEligibility = 'any' | 'administrator';
@@ -115,14 +116,22 @@ export const completePasswordRecovery = async (
 
   // ADR-0030 opens one replacement session where the reset completed; the
   // admin web may hold one only for an Administrator (ADR-0053).
-  const { sessionOpened } = await dependencies.gateway.completeRecovery({
-    tokenDigest,
-    passwordHash,
-    completedAt,
-    authenticationSession,
-    sessionEligibility: surface === 'admin_web' ? 'administrator' : 'any',
-    auditRecordId: dependencies.newAuditRecordId(),
-  });
+  let sessionOpened: boolean;
+  try {
+    ({ sessionOpened } = await dependencies.gateway.completeRecovery({
+      tokenDigest,
+      passwordHash,
+      completedAt,
+      authenticationSession,
+      sessionEligibility: surface === 'admin_web' ? 'administrator' : 'any',
+      auditRecordId: dependencies.newAuditRecordId(),
+    }));
+  } catch (error) {
+    if (error instanceof AuthenticationLinkStateChangedError) {
+      return { status: 'expired' };
+    }
+    throw error;
+  }
 
   if (!sessionOpened) {
     return { status: 'recovered' };

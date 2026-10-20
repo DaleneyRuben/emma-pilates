@@ -62,11 +62,18 @@ export const activateAccount = async (
   }
 
   const passwordHash = await dependencies.hashPassword(command.password);
-  await dependencies.gateway.activateAccount({
-    tokenDigest,
-    passwordHash,
-    completedAt: inspectedAt,
-  });
+  try {
+    await dependencies.gateway.activateAccount({
+      tokenDigest,
+      passwordHash,
+      completedAt: inspectedAt,
+    });
+  } catch (error) {
+    if (error instanceof AuthenticationLinkStateChangedError) {
+      return { status: 'expired' };
+    }
+    throw error;
+  }
 
   return { status: 'activated' };
 };

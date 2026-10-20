@@ -142,6 +142,22 @@ const commandProblem = (error: Error): HttpException | null => {
       'booking_not_cancellable',
       'Booking is not cancellable',
     ],
+    'Booking is outside the Cancellation Window': [
+      'reschedule_outside_window',
+      'Booking is outside the Cancellation Window',
+    ],
+    'Target Session is not eligible for Reschedule': [
+      'reschedule_target_ineligible',
+      'Target Session is not eligible for Reschedule',
+    ],
+    'Booking is not reschedulable': [
+      'booking_not_reschedulable',
+      'Booking is not reschedulable',
+    ],
+    'Attendance roster is incomplete': [
+      'attendance_roster_incomplete',
+      'Attendance roster is incomplete',
+    ],
   };
   const problem = problems[error.message];
 
@@ -416,7 +432,13 @@ export class ClassHistoryController {
     @Headers('authorization') authorization: string | undefined,
   ): Promise<ClassHistoryEntryDto[]> {
     const principal = await this.authenticate(authorization);
-    return this.listClassHistory(principal);
+    try {
+      return await this.listClassHistory(principal);
+    } catch (error) {
+      const problem = error instanceof Error ? commandProblem(error) : null;
+      if (problem !== null) throw problem;
+      throw error;
+    }
   }
 
   private async authenticate(
@@ -461,10 +483,16 @@ export class TrainerAttendanceController {
     if (parsedSessionId === null || parsed === null)
       throw invalidRequest('Invalid Attendance request');
     const principal = await this.authenticate(authorization);
-    await this.recordAttendance(
-      { sessionId: parsedSessionId, outcomes: parsed.outcomes },
-      principal,
-    );
+    try {
+      await this.recordAttendance(
+        { sessionId: parsedSessionId, outcomes: parsed.outcomes },
+        principal,
+      );
+    } catch (error) {
+      const problem = error instanceof Error ? commandProblem(error) : null;
+      if (problem !== null) throw problem;
+      throw error;
+    }
   }
 
   private async authenticate(
