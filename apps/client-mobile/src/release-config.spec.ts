@@ -109,6 +109,16 @@ describe("client release configuration", () => {
     expect(packageJson.devDependencies).toHaveProperty("@sentry/cli");
   });
 
+  // MOB-064: the app only picks photos from the gallery, and the privacy policy
+  // says it never uses the camera; false also blocks the picker library's own
+  // manifest CAMERA and drops the iOS usage descriptions.
+  it("asks for neither the camera nor the microphone", () => {
+    expect(appConfig.expo.plugins).toContainEqual([
+      "expo-image-picker",
+      { cameraPermission: false, microphonePermission: false },
+    ]);
+  });
+
   it("submits only the production profile", () => {
     expect(Object.keys(easConfig.submit)).toEqual(["production"]);
   });
