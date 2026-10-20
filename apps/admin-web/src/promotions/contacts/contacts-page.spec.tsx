@@ -305,7 +305,9 @@ describe("AW35 Contactos para promociones", () => {
       expect(saved?.blob.type).toBe("text/csv;charset=utf-8");
       const text = saved === undefined ? "" : await readBlob(saved.blob);
       expect(text.split("\r\n")).toHaveLength(4);
-      expect(text).toContain("Daniela Rojas,daniela@example.com,,16/10/2026");
+      expect(text).toContain(
+        "Daniela Rojas,Cuenta cerrada,daniela@example.com,,16/10/2026",
+      );
     });
 
     it("says so when the export fails", async () => {
