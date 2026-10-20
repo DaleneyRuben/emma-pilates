@@ -9,7 +9,7 @@ These standards apply regardless of which AI assistant, editor, or command-line 
 
 ## Inherited baseline
 
-This project specializes the user's global [coding standards](/Users/rubendaleney/.agents/skills/coding-standards/SKILL.md). Read that skill first when it is available. This file restates its operative rules so contributors on other machines and AI tools can follow the project without depending on that absolute path.
+This project specializes the user's global `coding-standards` skill. Read that skill first when your AI tool has it installed. This file restates its operative rules so contributors on other machines and AI tools can follow the project without depending on it.
 
 If the global and project standards differ, follow the stricter rule unless it conflicts with a direct user instruction. Accepted ADRs remain authoritative for architecture choices.
 
@@ -20,9 +20,19 @@ Before changing domain terms or business behavior:
 1. Read [`CONTEXT-MAP.md`](../../../CONTEXT-MAP.md).
 2. Read the affected bounded context's `CONTEXT.md` and ADRs.
 3. Read the relevant project-wide ADRs in [`docs/adr/`](../../../docs/adr/).
-4. Ask for explicit approval before changing or extending business behavior.
+4. Record every product, business-rule, or technical decision before acting on it (see «Decisions and approvals» below).
 
 Do not invent synonyms for defined domain terms. Keep Booking & Membership, Back Office, and system identity ownership explicit.
+
+## Decisions and approvals
+
+The user gave a standing blanket approval (2026-09-22, reaffirmed 2026-09-23 and 2026-09-30) for product, business-rule, and technical decisions: take the recommended option yourself instead of stopping at each gate. For a non-trivial choice, still write the proposal (options, recommendation, consequences) in the item's design note or ADR, then proceed with the recommended option and record the decision in the item's Evidence column and in the pull request's «Decisions taken». Do not queue reviews for the user per item; open questions and follow-ups go into the backlog.
+
+The approval does not cover:
+
+- **Migrations.** Creating, modifying, applying, or resetting a Prisma migration still needs the user's explicit approval each time (see «Persistence»).
+- **Accounts and money.** Provider, store, and billing account steps, purchases, and anything behind the user's own logins are the user's to do.
+- **Standing rules.** The rules in this skill, in [`design-workflow`](../design-workflow/SKILL.md), and in [`commit`](../commit/SKILL.md) are not decisions to take; change them only when the user asks.
 
 ## Test-driven development
 
@@ -120,11 +130,17 @@ Never edit files under `design/`. Read and follow [`design-workflow`](../design-
 
 Automated tests prove behavior; they do not prove that a screen looks and works the way the design and the person using it expect. Before marking any item done, exercise the change on its real surface:
 
-- **Mobile** (`apps/client-mobile`, `apps/staff-mobile`, `packages/mobile-core`): run the affected journey in the iOS Simulator on an **iPhone and an iPad**, with the API on a disposable or development database, following the fixture Accounts and steps in `docs/testing-guide.md`. Use Maestro flows where they exist and add one for a new critical journey. The iPad run matters even for phone-first screens: the Assistant works on a tablet and layouts must adapt, not just scale.
+- **Mobile** (`apps/client-mobile`, `apps/staff-mobile`, `packages/mobile-core`): run the affected journey on **iOS and Android**: the **iPhone 16 Pro** and the **iPad Pro 11-inch (M4)** Simulators, and the **Android emulator**, with the API on a disposable or development database, following the fixture Accounts and steps in `docs/testing-guide.md`. Exercise **both the Client and the Staff app** whenever the change touches both (anything in `packages/mobile-core` does), and record per platform and per app what was and was not checked; «iOS unaffected» still needs a look. Use Maestro flows where they exist and add one for a new critical journey. The iPad run matters even for phone-first screens: the Assistant works on a tablet and layouts must adapt, not just scale.
 - **Admin web** (`apps/admin-web`): open the change in a **real browser** against the Vite dev server (`pnpm dev:admin`), at the 1440 px desktop reference and at a 420 px narrow width, and walk the affected pages, dialogs, and forms. Browser automation with screenshots counts; Jest with jsdom, a build, or a curl smoke does not, because none of them renders the styles.
 - **Backend-only** changes still need the API journey exercised end to end (curl or Swagger against `pilates_dev_sim`, as the testing guide describes), and if the change alters what a screen shows, the surface check above too.
 
+Never stop a dev server, simulator process, or other background process by command-line pattern (`pkill -f`, `killall`, `pgrep … | xargs kill`): other sessions run the same commands in sibling checkouts. Stop only processes you started, by the PID you recorded when you started them.
+
 Compare what you see with the governing design prompt and the design system, fix discrepancies before marking done, and record in the backlog evidence which device or browser and width you verified on, what you did, and what you saw. Report plainly when a surface check could not be run (no Simulator, no browser access) instead of implying it happened.
+
+## Testing guide
+
+[`docs/testing-guide.md`](../../../docs/testing-guide.md) is how the user tests by hand. Every item that changes visible copy, states, screens, or endpoints updates it in the same branch before the item is marked done (a separate docs commit is fine): grep the guide for the old copy and the screens it names, update the matching test sections, the summary table, and «What you cannot test yet».
 
 ## Completion and commits
 
@@ -143,5 +159,5 @@ Every change reaches `main` through a pull request. This applies to code, genera
 - **Keep the commit history on the branch.** The red → green → refactor checkpoints and the separate mark-done commit stay as individual commits, because the backlog's Evidence column cites their hashes. Pull requests are therefore merged with a merge commit, never squashed and never rebased, so the cited hashes survive on `main`.
 - **The pull request is the handoff.** Open it with `gh pr create` when the item is marked done (or when the session stops partway, as a draft). The title is the backlog ID and the item in lowercase, like a commit message (`ext-004 add github actions ci`). The body follows [`.github/pull_request_template.md`](../../../.github/pull_request_template.md): what changed, how it was verified with the exact counts and the surfaces exercised, the decisions taken under the blanket approval, and leftovers, in the same words as the item's Evidence column. Like commit messages, pull request descriptions carry no AI attribution.
 - **The user merges.** A session opens the pull request, records its URL in the item's Evidence column and in the session handoff note, and stops; it never merges, closes, or force-pushes. CI (EXT-004) must be green before merging, read through the pull request's checks. `main` is protected by convention only: GitHub's branch protection and rulesets need GitHub Pro or a public repository, and the user declined both on 2026-10-08, so nothing on the server refuses a direct push or an unmerged pull request; the commit skill's refusal to commit on `main`, this rule, and the user merging every pull request are the whole discipline.
-- **A session that finds the previous item's pull request still open** branches from `main` anyway and says so in its handoff; it does not stack branches. If the new work depends on the unmerged change, it stops and asks the user to merge first.
+- **Never wait for a merge.** An item that does not depend on an unmerged item branches from an up-to-date `main` and its pull request targets `main`, accepting a small conflict to resolve later (two items appending to the same testing-guide section, say). An item that depends on an unmerged item's code stacks instead: branch from that item's branch, open the pull request against it, and say in the body which pull request it stacks on. Stack only for a real dependency: the repository does not delete head branches automatically, and when the base branch is merged and then deleted GitHub closes the stacked pull request instead of retargeting it. If that happens, open a new pull request from the same branch against `main` and update the Evidence link; never force-push.
 - Pre-existing direct commits on `main` from before this rule (2026-10-07) stay as they are; nothing is rewritten.
