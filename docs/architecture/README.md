@@ -34,6 +34,7 @@ Accepted architecture decisions:
 - [x] Publish the store-required privacy, support, and account-deletion pages as static Spanish HTML on Cloudflare Pages at `app.emmapilatesstudio.com`, keeping the apex for the studio website (ADR-0096).
 - [x] Erase a closing Client's name, email, phone, password, and profile photo while every row stays soft-deleted, and keep a Promotion Contact only when the Client ticks the promotions box (ADR-0097).
 - [x] Let a live Client give or withdraw a Promotions Consent from Perfil, one row per period, ended by closure and carried into the Promotion Contact when the closure box is ticked (ADR-0098).
+- [x] Limit every request to 1,200 a minute per network address and 600 a minute per credential in the API's memory, answering `429` `rate_limit_exceeded` with `Retry-After` (ADR-0099).
 - [x] Commit authentication state and encrypted pg-boss email jobs together, then deliver asynchronously after rechecking that the link is still current.
 - [x] Limit provider attempts to ten seconds and retry eligible authentication-email failures three times with bounded backoff over about ten minutes.
 - [x] Keep public delivery status neutral while authorized staff can inspect sanitized pending-invitation status and manage hard-bounce or complaint suppression.
