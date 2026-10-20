@@ -72,6 +72,7 @@ function probes(expectedRelease: string | undefined): Probe[] {
 export async function runSmokeChecks(input: {
   baseUrl: string;
   expectedRelease?: string;
+  apiDocumentation?: 'served' | 'hidden';
   fetch: SmokeFetch;
 }): Promise<SmokeReport> {
   const checks: SmokeCheck[] = [];
