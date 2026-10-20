@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
   actions: { gap: spacing.sm },
   badge: { borderRadius: radii.pill, paddingHorizontal: spacing.smLg, paddingVertical: spacing.xs },
   badgeActive: { backgroundColor: "rgba(124,148,115,0.16)" },
-  badgeExpired: { backgroundColor: "rgba(184,84,80,0.14)" },
+  badgeExpired: { backgroundColor: colors.errorPill },
   badgeLabel: { fontSize: typography.label, fontWeight: "600" },
   badgeLabelActive: { color: colors.successText },
   badgeLabelExpired: { color: colors.errorText },

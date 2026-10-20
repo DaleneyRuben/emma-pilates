@@ -267,13 +267,13 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     minHeight: 52,
   },
-  destructiveDisabled: { borderColor: "#E7CFC8" },
+  destructiveDisabled: { borderColor: colors.errorDisabledBorder },
   destructiveLabel: {
     color: colors.error,
     fontSize: typography.body,
     fontWeight: "500",
   },
-  destructiveLabelDisabled: { color: "#D4A99F" },
+  destructiveLabelDisabled: { color: colors.errorDisabledText },
   destructivePressed: { backgroundColor: colors.errorTint },
   failure: {
     backgroundColor: colors.errorTint,
@@ -301,9 +301,9 @@ const styles = StyleSheet.create({
     gap: spacing.smLg,
     padding: spacing.lgXl,
   },
-  pendingText: { color: "#6E5A36" },
+  pendingText: { color: colors.warningBody },
   pendingTitle: {
-    color: "#7C5D2A",
+    color: colors.warningTitle,
     fontSize: typography.bodyLarge,
     fontWeight: "500",
   },

@@ -312,7 +312,7 @@ const styles = StyleSheet.create({
     padding: spacing.xl,
   },
   sheetBackdrop: {
-    backgroundColor: "rgba(74,58,48,0.22)",
+    backgroundColor: colors.scrim,
     flex: 1,
     justifyContent: "flex-end",
   },
