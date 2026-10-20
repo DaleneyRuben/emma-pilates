@@ -114,6 +114,26 @@ describe("pickReceipt", () => {
     expect(receipt?.mediaType).toBe("image/jpeg");
   });
 
+  // MOB-065: the system photo picker (PHPicker on iOS, the photo picker on
+  // Android) runs outside the app, so no photo library access is asked for.
+  it("opens the picker without asking for photo library access", async () => {
+    jest.mocked(ImagePicker.requestMediaLibraryPermissionsAsync).mockClear();
+    jest
+      .mocked(ImagePicker.requestMediaLibraryPermissionsAsync)
+      .mockResolvedValueOnce({ granted: false } as never);
+    jest
+      .mocked(ImagePicker.launchImageLibraryAsync)
+      .mockResolvedValue(picked("file:///receipt.jpg", "image/jpeg", 1200, 1600));
+    jest
+      .mocked(ImageManipulator.manipulateAsync)
+      .mockResolvedValue({ uri: "file:///receipt-small.jpg", width: 1200, height: 1600 });
+
+    const receipt = await pickReceipt();
+
+    expect(ImagePicker.requestMediaLibraryPermissionsAsync).not.toHaveBeenCalled();
+    expect(receipt).toMatchObject({ uri: "file:///receipt-small.jpg" });
+  });
+
   it("asks the picker for the original so the photo is encoded only once", async () => {
     jest
       .mocked(ImagePicker.launchImageLibraryAsync)

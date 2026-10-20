@@ -68,6 +68,7 @@
       [
         "expo-media-library",
         {
+          "photosPermission": false,
           "savePhotosPermission": "Permite que Emma Pilates guarde el QR del estudio en tus fotos.",
           "granularPermissions": []
         }
@@ -75,6 +76,7 @@
       [
         "expo-image-picker",
         {
+          "photosPermission": false,
           "cameraPermission": false,
           "microphonePermission": false
         }
