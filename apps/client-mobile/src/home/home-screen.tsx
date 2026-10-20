@@ -117,7 +117,7 @@ function PurchaseCard({ onPurchase }: { onPurchase: () => void }) {
       <BodyText style={styles.purchaseBody}>
         Paquetes desde Bs 560. Puedes pagar en el estudio o desde la app.
       </BodyText>
-      <PrimaryButton label="Comprar un plan" onPress={onPurchase} />
+      <PrimaryButton label="Comprar un plan" onPress={onPurchase} testID="home-buy-plan" />
     </View>
   );
 }

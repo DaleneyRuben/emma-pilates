@@ -106,7 +106,7 @@ export function PaymentStatusScreen() {
               <BodyText>{`Vigente hasta el ${formatCivilDate(active.endsOn)}`}</BodyText>
             )}
           </View>
-          <PrimaryButton label="Ir al inicio" onPress={goHome} />
+          <PrimaryButton label="Ir al inicio" onPress={goHome} testID="payment-status-home" />
         </ScrollView>
       </Screen>
     );
@@ -139,7 +139,7 @@ export function PaymentStatusScreen() {
             label="Subir un nuevo comprobante"
             onPress={() => void startAgain()}
           />
-          <TextButton label="Volver al inicio" onPress={goHome} />
+          <TextButton label="Volver al inicio" onPress={goHome} testID="payment-status-home" />
         </ScrollView>
       </Screen>
     );
@@ -157,7 +157,7 @@ export function PaymentStatusScreen() {
         <BodyText style={styles.centered}>
           Un administrador va a confirmar tu comprobante pronto. Te avisaremos apenas esté listo.
         </BodyText>
-        <TextButton label="Volver al inicio" onPress={goHome} />
+        <TextButton label="Volver al inicio" onPress={goHome} testID="payment-status-home" />
       </ScrollView>
     </Screen>
   );

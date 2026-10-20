@@ -155,6 +155,7 @@ export function RescheduleScreen({
                 key={session.id}
                 onPress={() => setSelectedId(session.id)}
                 selected={selected}
+                testID={`reschedule-option-${session.id}`}
                 time={formatTimeRange(session.startsAt, session.endsAt)}
                 title={session.classTypeName}
                 trainerName={session.trainerName}
@@ -174,6 +175,7 @@ export function RescheduleScreen({
           disabled={selectedId === null}
           label="Confirmar cambio"
           onPress={() => void confirm()}
+          testID="reschedule-confirm"
         />
       ) : null}
     </Screen>

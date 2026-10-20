@@ -191,6 +191,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
           busy={busy}
           label="Continuar al pago"
           onPress={() => void continueToPayment()}
+          testID="plan-continue-to-payment"
         />
       </ScrollView>
     </Screen>

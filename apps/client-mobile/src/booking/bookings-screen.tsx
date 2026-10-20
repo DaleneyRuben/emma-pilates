@@ -57,10 +57,12 @@ function Badge({ label }: { label: string }) {
 function OutlinedAction({
   label,
   onPress,
+  testID,
   tone = "neutral",
 }: {
   label: string;
   onPress: () => void;
+  testID: string;
   tone?: "neutral" | "error";
 }) {
   return (
@@ -69,6 +71,7 @@ function OutlinedAction({
       accessibilityRole="button"
       onPress={onPress}
       style={[styles.action, tone === "error" && styles.actionError]}
+      testID={testID}
     >
       <Text style={[styles.actionLabel, tone === "error" && styles.actionLabelError]}>{label}</Text>
     </Pressable>
@@ -104,11 +107,23 @@ function BookingCard({
         {`${formatSessionDate(item.startsAt)} · ${formatTimeRange(item.startsAt, item.endsAt)}`}
       </BodyText>
       {item.kind === "waitlist" ? (
-        <OutlinedAction label="Salir de la lista de espera" onPress={onLeave} />
+        <OutlinedAction
+          label="Salir de la lista de espera"
+          onPress={onLeave}
+          testID={`booking-leave-waitlist-${item.waitlistEntryId}`}
+        />
       ) : insideWindow ? (
-        <OutlinedAction label="Reprogramar" onPress={onReschedule} />
+        <OutlinedAction
+          label="Reprogramar"
+          onPress={onReschedule}
+          testID={`booking-reschedule-${item.bookingId}`}
+        />
       ) : (
-        <OutlinedAction label="Cancelar" onPress={onCancel} />
+        <OutlinedAction
+          label="Cancelar"
+          onPress={onCancel}
+          testID={`booking-cancel-${item.bookingId}`}
+        />
       )}
     </View>
   );
@@ -252,6 +267,7 @@ export function BookingsScreen({
             <OutlinedAction
               label="Sí, cancelar reserva"
               onPress={() => void confirmCancel()}
+              testID="booking-cancel-confirm"
               tone="error"
             />
             <TextButton label="Volver" onPress={() => setCancelling(null)} />

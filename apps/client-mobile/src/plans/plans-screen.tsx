@@ -28,6 +28,7 @@ function PlanCard({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
       accessibilityRole="button"
       onPress={onPress}
       style={styles.card}
+      testID={`plan-card-${plan.id}`}
     >
       <View style={styles.cardBody}>
         <Text style={styles.planName}>{plan.name}</Text>

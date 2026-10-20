@@ -226,6 +226,7 @@ export function BrowseSessionsScreen() {
                   {seatsTag(session.availableSeats)}
                 </SeatPill>
               }
+              testID={`session-card-${session.id}`}
               time={formatTimeRange(session.startsAt, session.endsAt)}
               title={session.classTypeName}
               trainerName={session.trainerName}

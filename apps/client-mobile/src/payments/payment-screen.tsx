@@ -142,6 +142,7 @@ export function PaymentScreen() {
           disabled={uploading}
           onPress={() => void attach()}
           style={styles.upload}
+          testID="payment-receipt"
         >
           {receipt === null ? (
             <>
@@ -171,6 +172,7 @@ export function PaymentScreen() {
           disabled={receipt === null || uploading}
           label="Enviar comprobante"
           onPress={() => void submit()}
+          testID="payment-submit"
         />
       </ScrollView>
     </Screen>
