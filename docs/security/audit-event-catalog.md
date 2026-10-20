@@ -59,6 +59,8 @@ beyond what the table below names.
 | `promotion.published` | Booking & Membership | An Administrator publishes a Promotion, exposing its public image copies (ADR-0077) | Administrator | `promotion` | — | `displayStartsOn`, `displayEndsOn` |
 | `promotion.unpublished` | Booking & Membership | An Administrator takes a published Promotion out of the carousel; its public copies are retired | Administrator | `promotion` | — | — |
 | `promotion.archived` | Booking & Membership | An Administrator deletes a Promotion (the row is archived, never removed; its image is released, ADR-0076) | Administrator | `promotion` | — | `wasPublished` |
+| `promotion_contact.exported` | Booking & Membership | An Administrator exports the Promotion Contacts (BE-022, ADR-0097), handing their names, emails, and phones out of the system | Administrator | `promotion_contact` | — | `contactCount` |
+| `promotion_contact.withdrawn` | Booking & Membership | An Administrator records a former Client's «stop» request: the contact's name, email, and phone are erased and `withdrawn_at` is set (BE-022) | Administrator | `promotion_contact` | — | — |
 | `salary_payment.recorded` | Back Office | An Administrator records a Salary Payment | Administrator | `salary_payment` | — | `amountCentavos`, `paidOn` |
 | `salary_payment.updated` | Back Office | An Administrator corrects a Salary Payment | Administrator | `salary_payment` | — | previous and new `staffMemberId`, `amountCentavos`, `paidOn` (only those changed) |
 | `expense.recorded` | Back Office | An Administrator records a Branch Expense | Administrator | `expense` | Expense Branch | `amountCentavos`, `incurredOn`, `expenseCategoryId` |
