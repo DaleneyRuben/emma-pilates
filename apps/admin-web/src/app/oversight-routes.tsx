@@ -1,6 +1,7 @@
 import { createRoute, lazyRouteComponent } from "@tanstack/react-router";
 import { evaluationSearchSchema } from "../oversight/evaluations/evaluation-search";
 import { nameSearchSchema } from "../oversight/oversight-search";
+import { clientSearchSchema } from "../people/people-search";
 import { optionalSearch } from "../components/table/pagination";
 import { authenticatedRoute } from "./root-routes";
 
@@ -22,6 +23,18 @@ const promotionsRoute = createRoute({
   component: lazyRouteComponent(
     () => import("../promotions/promotions-route"),
     "PromotionsRoute",
+  ),
+});
+
+// AW35 (BE-022) belongs to Promociones and has no sidebar entry; its search
+// is AW21's (name, email, or phone).
+const promotionContactsRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/promociones/contactos",
+  validateSearch: optionalSearch(clientSearchSchema),
+  component: lazyRouteComponent(
+    () => import("../promotions/contacts/contacts-route"),
+    "ContactsRoute",
   ),
 });
 
@@ -48,6 +61,7 @@ const creditsRoute = createRoute({
 export const oversightRoutes = [
   evaluationsRoute,
   promotionsRoute,
+  promotionContactsRoute,
   referralsRoute,
   creditsRoute,
 ];
