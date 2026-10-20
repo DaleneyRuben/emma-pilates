@@ -91,6 +91,8 @@ gates»): **Apple Developer** (gate 9). The domain (gate 7) arrived on
 | Mobile | store builds (gates 8–9) | `staging` EAS profile: `com.emmapilates.client.staging`, `com.emmapilates.staff.staging` | development builds and Metro |
 | Data | Real; one Administrator (Fernando Daleney) since 2026-10-14, no Clients; dumped daily to R2, restore drill passed 2026-10-14 | Synthetic, or an unmodified copy of production made by hand as a last resort (`Copy Production to Staging`, ADR-0093); not backed up | Fixtures |
 | `NODE_ENV` | `production` | `production` (errors tagged `staging` through `ERROR_REPORTING_ENVIRONMENT`) | `development` |
+| API documentation | off: `/docs` and `/openapi.json` answer 404 (BE-025) | Swagger at `/docs`, document at `/openapi.json` | the same at http://localhost:3100/docs |
+| Request limit | 1,200 a minute per network address and 600 per credential, in the `api` process's memory (ADR-0099) | the same | the same |
 | Email | none: the worker leaves authentication emails queued until EXT-001 | none, as production | `LocalEmailCapture` under `apps/backend/.data/email-capture` |
 | Images | Cloudflare R2 `emma-pilates-prod-images` (`OBJECT_STORAGE=s3`) | R2 `emma-pilates-staging-images` | `apps/backend/.data/uploads` |
 | Release | started by hand (`Release Production`), promotes a commit staging passed, [runbook](../runbooks/production-release.md) | automatic after CI on `main` (`Release Staging`) | — |
@@ -410,7 +412,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `VERCEL_ORG_ID`, `VERCEL_PRODUCTION_PROJECT_ID`, `VERCEL_PRODUCTION_TOKEN` | GitHub repository secrets | — | — | `Release Production` deploys the admin web; the token is scoped to `emma-pilates-admin` |
 | `VERCEL_STAGING_PROJECT_ID`, `VERCEL_STAGING_TOKEN` | GitHub repository secrets | — | — | `Release Staging` deploys the staging admin web; the token is scoped to `emma-pilates-admin-staging` |
 | `STAGING_API_URL`, `STAGING_NORTHFLANK_WORKER_SERVICE_ID` | GitHub repository **variables** | — | — | The staging API and worker; the staging workflow does nothing while `STAGING_API_URL` is empty |
-| `ERROR_REPORTING_ENVIRONMENT` | unset (reports `production`) | — | unset | Northflank `staging` group (`staging`); names the environment in error reports (EXT-017) |
+| `ERROR_REPORTING_ENVIRONMENT` | unset (reports `production`) | — | unset | Northflank `staging` group (`staging`); names the environment in error reports (EXT-017). Under `NODE_ENV=production` only `staging` serves Swagger and `/openapi.json` (BE-025); anything else, unset included, hides them, so production must never set `staging` |
 | Staging settings | — | — | — | Northflank `staging` group, listed under «Staging in detail» |
 
 ## Automation

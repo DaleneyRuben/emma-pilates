@@ -23,7 +23,10 @@ function field(body: unknown, key: string): unknown {
 
 // ADR-0080: post-deployment checks only read. They never run a synthetic
 // Booking, Payment, or any other business command.
-function probes(expectedRelease: string | undefined): Probe[] {
+function probes(
+  expectedRelease: string | undefined,
+  apiDocumentation: 'served' | 'hidden',
+): Probe[] {
   return [
     {
       name: 'liveness',
@@ -46,14 +49,21 @@ function probes(expectedRelease: string | undefined): Probe[] {
           : `serving release ${String(release)}, expected ${expectedRelease}`;
       },
     },
+    // BE-025: production hides Swagger, so there a 404 is the healthy answer.
     {
       name: 'openapi',
       path: '/openapi.json',
-      verify: (response, body) =>
-        response.status === 200 &&
-        field(field(body, 'info'), 'title') === 'Emma Pilates API'
+      verify: (response, body) => {
+        if (apiDocumentation === 'hidden') {
+          return response.status === 404
+            ? null
+            : `answered ${response.status} where the documentation must be hidden`;
+        }
+        return response.status === 200 &&
+          field(field(body, 'info'), 'title') === 'Emma Pilates API'
           ? null
-          : `answered ${response.status}`,
+          : `answered ${response.status}`;
+      },
     },
     {
       name: 'anonymous_access_rejected',
@@ -72,10 +82,14 @@ function probes(expectedRelease: string | undefined): Probe[] {
 export async function runSmokeChecks(input: {
   baseUrl: string;
   expectedRelease?: string;
+  apiDocumentation?: 'served' | 'hidden';
   fetch: SmokeFetch;
 }): Promise<SmokeReport> {
   const checks: SmokeCheck[] = [];
-  for (const probe of probes(input.expectedRelease)) {
+  for (const probe of probes(
+    input.expectedRelease,
+    input.apiDocumentation ?? 'served',
+  )) {
     try {
       const response = await input.fetch(
         new URL(probe.path, input.baseUrl).href,

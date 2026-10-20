@@ -12,7 +12,7 @@ you are starting with no project knowledge.
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
-| API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete                                                                                                            |
+| API documentation            | Open Swagger and inspect or send requests to every current endpoint                                                             | Swagger does not make unfinished journeys complete; production hides it (BE-025, Test 63)                                                                                                            |
 | Client registration          | Register from the mobile app or Swagger and use change-email, resend, and cancellation actions; in the app «Revisa tu correo» survives a restart until you verify, cancel, or log in (Test 5) | The worker writes every captured email under `apps/backend/.data/email-capture/` (Test 34); the link opens nothing on the Simulator until LNK-001 wires universal links, so paste its token into Swagger |
 | Pending registration actions | Correct the email, request another verification email, or cancel using the continuation returned by registration                | Resend deliberately gives the same neutral response whether it sends or suppresses an email                                                                   |
 | Email verification           | Confirm that an unknown token returns `invalid`; complete a real verification with the token from `.data/email-capture` (Test 34) | The link is a URL the Simulator cannot open yet (LNK-001)                                                                                                    |
@@ -312,6 +312,10 @@ SMOKE_EXPECTED_RELEASE=local pnpm smoke
 It prints one JSON report and exits with status 1 when any check fails; a wrong
 `SMOKE_EXPECTED_RELEASE` makes the readiness check fail with "serving release
 local, expected …".
+
+Swagger and `/openapi.json` are served locally and on staging only; production
+answers 404 for both (BE-025), and its release workflow runs the smoke check
+with `SMOKE_API_DOCUMENTATION=hidden`, which fails if production serves them.
 
 The API terminal now prints one JSON line per request with `environment`,
 `service`, `release`, `reqId`, the method, and the path (never the query
@@ -4748,3 +4752,41 @@ the deployed policy.
    and Work Sans.
 4. The public site also sends `strict-transport-security` now
    (`curl -sI https://app.emmapilatesstudio.com/privacidad/`).
+
+## Test 63: Swagger off in production and the general request limit (BE-025)
+
+Every request counts against its network address (1,200 a minute) and, when
+it carries a credential, against that credential (600 a minute). A full lane
+answers `429` with the problem code `rate_limit_exceeded` and `Retry-After` in
+seconds until the minute ends (ADR-0099). `/health/*` and Resend's webhook are
+never limited. Use a copy of the fixtures (`createdb pilates_test_be025`,
+`db:migrate:deploy`, `db:fixtures`) and run the API on another port (3110
+here):
+
+1. Swagger locally: open http://localhost:3110/docs. Expected: Swagger loads,
+   and `/openapi.json` answers 200.
+2. Production mode: stop the API and start it again with `NODE_ENV=production`
+   and the production settings it insists on (any test values) but no
+   `ERROR_REPORTING_ENVIRONMENT`. Expected: `/docs` and `/openapi.json` answer
+   `404` `resource_not_found`, `/health/live` still `200`. Add
+   `ERROR_REPORTING_ENVIRONMENT=staging` and restart. Expected: both are
+   served again.
+3. Log in as `lucia@example.com` (`POST /api/v1/authentication-sessions`) and
+   send 601 `GET /api/v1/clients/current/subscription` with her credential
+   inside one minute:
+
+   ```sh
+   for i in $(seq 601); do curl -s -o /dev/null -w '%{http_code}\n' \
+     -H "Authorization: Bearer $TOKEN" \
+     http://localhost:3110/api/v1/clients/current/subscription; done | sort | uniq -c
+   ```
+
+   Expected: 600 answers `200` and the last `429`; `curl -i` once more shows
+   `retry-after` and `"code":"rate_limit_exceeded"`. Another Account's
+   credential still gets `200` from the same address, and `/health/live`
+   answers `200`.
+4. Anonymous requests: 1,201 `GET /api/v1/rate-limit-probe` (any unknown
+   path) without a credential. Expected: 1,200 `404` and then `429`, which
+   also turns away every credentialed request from that address until the
+   minute ends.
+5. Drop the copy: `dropdb pilates_test_be025`.

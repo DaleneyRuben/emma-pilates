@@ -91,6 +91,43 @@ describe('runSmokeChecks', () => {
     ).toMatchObject({ passed: false });
   });
 
+  // BE-025: production must answer 404 where staging serves Swagger.
+  it('expects the API documentation hidden when production is checked', async () => {
+    const { fetch } = fakeFetch({
+      ...healthyReplies,
+      '/openapi.json': {
+        status: 404,
+        body: { status: 404, code: 'resource_not_found' },
+        contentType: 'application/problem+json',
+      },
+    });
+
+    const report = await runSmokeChecks({
+      baseUrl: 'https://api.example.com',
+      apiDocumentation: 'hidden',
+      fetch,
+    });
+
+    expect(report.passed).toBe(true);
+  });
+
+  it('fails when production serves its API documentation', async () => {
+    const { fetch } = fakeFetch(healthyReplies);
+
+    const report = await runSmokeChecks({
+      baseUrl: 'https://api.example.com',
+      apiDocumentation: 'hidden',
+      fetch,
+    });
+
+    expect(report.passed).toBe(false);
+    expect(report.checks.find((check) => check.name === 'openapi')).toEqual({
+      name: 'openapi',
+      passed: false,
+      detail: 'answered 200 where the documentation must be hidden',
+    });
+  });
+
   it('reports an unreachable API as failed checks instead of throwing', async () => {
     const { fetch } = fakeFetch({});
 
