@@ -10216,6 +10216,11 @@
             "format": "password",
             "minLength": 1,
             "writeOnly": true
+          },
+          "keepPromotions": {
+            "type": "boolean",
+            "default": false,
+            "description": "The Client agrees to keep receiving the studio’s promotions after closing: their name, email, and phone are kept as a Promotion Contact (ADR-0097)"
           }
         },
         "required": [

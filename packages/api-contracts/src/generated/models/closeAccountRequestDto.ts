@@ -8,4 +8,6 @@
 export interface CloseAccountRequestDto {
   /** @minLength 1 */
   password: string;
+  /** The Client agrees to keep receiving the studio’s promotions after closing: their name, email, and phone are kept as a Promotion Contact (ADR-0097) */
+  keepPromotions?: boolean;
 }

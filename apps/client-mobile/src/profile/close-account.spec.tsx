@@ -137,13 +137,55 @@ describe("Cerrar mi cuenta", () => {
     });
     expect(closure).toHaveBeenCalledTimes(1);
     const init = (closure.mock.calls[0] as unknown as [RequestInit])[0];
-    expect(JSON.parse(String(init.body))).toEqual({ password: "secret" });
+    expect(JSON.parse(String(init.body))).toEqual({ password: "secret", keepPromotions: false });
     expect(runtime.sessionManager.endLocally).toHaveBeenCalledWith({
       accountId: "account-1",
       role: "client",
     });
     expect(runtime.sessionManager.logout).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Iniciar sesión" })).toBeOnTheScreen();
+  });
+
+  // BE-021 (ADR-0097): the Client may keep a Promotion Contact; nothing is pre-ticked.
+  it("says what is erased and sends the promotions choice the Client ticks", async () => {
+    const closure = jest.fn(() =>
+      jsonResponse({
+        closedWaitlistEntries: 0,
+        cancelledBookings: 0,
+        cancelledEvaluations: 0,
+        forfeitedClasses: 0,
+        forfeitedCreditCentavos: 0,
+      }),
+    );
+    const { screen } = await openClosure(
+      closureRoutes({ "POST /api/v1/accounts/current/closure": closure }),
+    );
+    const box = screen.getByRole("checkbox", {
+      name: "Quiero seguir recibiendo promociones de Emma Pilates",
+    });
+
+    expect(
+      screen.getByText(
+        "Borramos tu nombre, correo, teléfono y foto. El estudio conserva tus pagos y tus clases sin tus datos, para su contabilidad.",
+      ),
+    ).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        "Guardamos solo tu nombre, correo y teléfono para enviarte promociones. Puedes pedir que paremos cuando quieras.",
+      ),
+    ).toBeOnTheScreen();
+    expect(box).not.toBeChecked();
+
+    await fireEvent.press(box);
+    expect(box).toBeChecked();
+    await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar mi cuenta" }));
+
+    await waitFor(() => {
+      expect(closure).toHaveBeenCalledTimes(1);
+    });
+    const init = (closure.mock.calls[0] as unknown as [RequestInit])[0];
+    expect(JSON.parse(String(init.body))).toEqual({ password: "secret", keepPromotions: true });
   });
 
   // MOB-060: the destructive button shows it is working while closing.

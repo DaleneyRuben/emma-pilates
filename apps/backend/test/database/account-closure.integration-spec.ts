@@ -274,15 +274,15 @@ describe('closing a Client Account (PostgreSQL)', () => {
     await expect(
       world.prisma.account.findUniqueOrThrow({
         where: { id: ana.accountId },
-        select: { deletedAt: true, email: true },
+        select: { deletedAt: true },
       }),
-    ).resolves.toEqual({ deletedAt: closureNow, email: ana.email });
+    ).resolves.toEqual({ deletedAt: closureNow });
     await expect(
       world.prisma.client.findUniqueOrThrow({
         where: { id: ana.clientId },
-        select: { deletedAt: true, name: true },
+        select: { deletedAt: true },
       }),
-    ).resolves.toEqual({ deletedAt: closureNow, name: 'Ana Justiniano' });
+    ).resolves.toEqual({ deletedAt: closureNow });
     await expect(
       world.prisma.auditRecord.findFirstOrThrow({
         where: { actionCode: 'account.closed', targetId: ana.accountId },
@@ -308,6 +308,7 @@ describe('closing a Client Account (PostgreSQL)', () => {
         cancelledEvaluations: 0,
         forfeitedClasses: 8,
         forfeitedCreditCentavos: 0,
+        keptPromotionContact: false,
       },
     });
   });

@@ -4,6 +4,15 @@ import { z } from 'zod';
 export class CloseAccountRequestDto {
   @ApiProperty({ format: 'password', minLength: 1, writeOnly: true })
   password!: string;
+
+  @ApiProperty({
+    type: Boolean,
+    required: false,
+    default: false,
+    description:
+      'The Client agrees to keep receiving the studio’s promotions after closing: their name, email, and phone are kept as a Promotion Contact (ADR-0097)',
+  })
+  keepPromotions?: boolean;
 }
 
 export class AccountClosureSummaryDto {
@@ -32,7 +41,10 @@ export class AccountClosureSummaryDto {
   forfeitedCreditCentavos!: number;
 }
 
-const closeAccountSchema = z.strictObject({ password: z.string().min(1) });
+const closeAccountSchema = z.strictObject({
+  password: z.string().min(1),
+  keepPromotions: z.boolean().default(false),
+});
 
 export const parseCloseAccountRequest = (value: unknown) =>
   closeAccountSchema.safeParse(value);

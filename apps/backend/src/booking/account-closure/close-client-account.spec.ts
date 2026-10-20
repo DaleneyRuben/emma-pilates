@@ -57,6 +57,7 @@ const fakeTransaction = (overrides: Partial<ClosureTransaction> = {}): Fake => {
     endSubscription: record('endSubscription', { forfeitedClasses: 4 }),
     forfeitCredit: record('forfeitCredit', 6000),
     promoteWaitlists: record('promoteWaitlists', undefined),
+    keepPromotionContact: record('keepPromotionContact', undefined),
     closeAccount: record('closeAccount', undefined),
     removeClient: record('removeClient', undefined),
     recordAudit: (entry) => {
@@ -155,9 +156,66 @@ describe('closeClientAccount', () => {
           cancelledEvaluations: 1,
           forfeitedClasses: 4,
           forfeitedCreditCentavos: 6000,
+          keptPromotionContact: false,
         },
       },
     ]);
+  });
+
+  it('keeps a Promotion Contact before erasing the Account when the Client ticks the box', async () => {
+    const keepPromotionContact = jest.fn(() => {
+      fake.calls.push('keepPromotionContact');
+      return Promise.resolve();
+    });
+    const fake = fakeTransaction({ keepPromotionContact });
+    const { dependencies } = setup(fake);
+
+    await closeClientAccount(
+      { clientId: 'client-1', password: 'correct horse', keepPromotions: true },
+      client,
+      dependencies,
+    );
+
+    expect(keepPromotionContact).toHaveBeenCalledWith({
+      clientId: 'client-1',
+      accountId: 'client-account',
+      consentedAt: now,
+    });
+    expect(fake.calls.slice(-4)).toEqual([
+      'keepPromotionContact',
+      'closeAccount',
+      'removeClient',
+      'recordAudit',
+    ]);
+    expect(fake.audit[0]?.metadata).toMatchObject({
+      keptPromotionContact: true,
+    });
+  });
+
+  it('keeps no Promotion Contact unless the Client ticks the box', async () => {
+    const fake = fakeTransaction();
+    const { dependencies } = setup(fake);
+
+    await closeClientAccount(
+      { clientId: 'client-1', password: 'correct horse' },
+      client,
+      dependencies,
+    );
+
+    expect(fake.calls).not.toContain('keepPromotionContact');
+  });
+
+  it('keeps no Promotion Contact when an Administrator closes the Account', async () => {
+    const fake = fakeTransaction();
+    const { dependencies } = setup(fake);
+
+    await closeClientAccount(
+      { clientId: 'client-1', keepPromotions: true },
+      staff('administrator'),
+      dependencies,
+    );
+
+    expect(fake.calls).not.toContain('keepPromotionContact');
   });
 
   it('promotes the Waitlist of every Session that lost a Booking', async () => {

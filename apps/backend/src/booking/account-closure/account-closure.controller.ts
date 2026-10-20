@@ -70,7 +70,7 @@ export class AccountClosureController {
     @Headers('authorization') authorization: string | undefined,
     @Body() body: CloseAccountRequestDto,
   ): Promise<AccountClosureSummaryDto> {
-    const { password } = parsed(
+    const { password, keepPromotions } = parsed(
       parseCloseAccountRequest(body),
       'Invalid closure',
     );
@@ -83,7 +83,7 @@ export class AccountClosureController {
         throw new AccountClosureError('closure_access_denied');
       }
       return this.operations.close(
-        { clientId: principal.identity.clientId, password },
+        { clientId: principal.identity.clientId, password, keepPromotions },
         principal,
       );
     });

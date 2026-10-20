@@ -90,3 +90,21 @@ model StaffBranchAssignment {
   @@map("staff_branch_assignments")
   @@schema("booking")
 }
+
+// A former Client who agreed, while closing their own Account, to keep
+// receiving promotions (ADR-0097). Deliberately unlinked from the closed
+// Client and Account so their history stays anonymous.
+model PromotionContact {
+  id          String    @id @default(uuid()) @db.Uuid
+  name        String
+  email       String
+  phone       String?
+  consentedAt DateTime  @map("consented_at") @db.Timestamptz(3)
+  withdrawnAt DateTime? @map("withdrawn_at") @db.Timestamptz(3)
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([email])
+  @@map("promotion_contacts")
+  @@schema("booking")
+}
