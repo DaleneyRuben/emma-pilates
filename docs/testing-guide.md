@@ -2052,17 +2052,28 @@ The committed Maestro flows under `apps/client-mobile/.maestro` and
 names the fixture Account it logs in as and what it needs beyond the
 fixtures; this test is the checklist for the whole suite.
 
-**Before a run.** Rebuild `pilates_dev_sim` from the migrations and load
-fresh fixtures (Test 5A; stop the API and worker first:
+**Before a run.** Rebuild the database from the migrations and load fresh
+fixtures **before each suite** (Test 5A; stop the API and worker first:
 `dropdb pilates_dev_sim && createdb pilates_dev_sim`, then `db:migrate:deploy`
-and `db:fixtures` on it). Start the API **and the worker** on it
+and `db:fixtures` on it). The Staff suite needs the fixtures as they ship,
+not a database the Client suite has used: its seed buys Plans for Mariana and
+Sofía, which the Client suite gives a pending transfer and closes. A quick way
+to reset between suites is a template: load the fixtures once into
+`pilates_journeys_base`, then `dropdb --force pilates_journeys && createdb
+pilates_journeys -T pilates_journeys_base` before each suite, with the API and
+the worker restarted on it (the fixtures' 30-day window and Valeria's
+three-day Plan count from the day the template was loaded, so rebuild the
+template on a new day). Start the API **and the worker** on it
 (`pnpm --filter @pilates/backend start:worker`): `profile-photo.yaml`
 uploads a photo that stays «processing» until the worker rebuilds it, and
 without the worker the flow times out waiting for «Quitar foto». Serve both
 apps in development mode (Expo Go cannot run a production bundle here): the
 staff Metro on 8082 and the client Metro on any free port (8083 below,
-because another project holds 8081 on this machine). Then seed what the
-fixtures do not ship:
+because another project holds 8081 on this machine). The studio QR on 10 is
+the untracked placeholder `apps/backend/.data/transfer-qr.png` (Test 10B); a
+fresh git worktree does not have it, so copy it from your main checkout or
+`purchase-plan-transfer.yaml` finds only the grey placeholder. Then seed what
+the fixtures do not ship:
 
 - **Two published Promotions** with the headlines of Test 33, «Nueva sala de
   Reformer en Urubó» and «Clases de Barre los sábados», created in the
@@ -2096,11 +2107,46 @@ driver does not connect):
 ```sh
 cd apps/client-mobile
 maestro --udid <udid> test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8083 \
-  -e PASSWORD=emma-local-2026 .maestro
+  -e PASSWORD=emma-local-2026 -e API_URL=http://127.0.0.1:3100 .maestro
+# rebuild the database here, then:
 cd ../staff-mobile
+API_URL=http://127.0.0.1:3100 node .maestro/seed.mjs
 maestro --udid <udid> test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8082 \
-  -e PASSWORD=emma-local-2026 .maestro
+  -e PASSWORD=emma-local-2026 -e API_URL=http://127.0.0.1:3100 .maestro
 ```
+
+`API_URL` is the API the apps talk to: several flows seed their own classes
+through it before they log in (`.maestro/scripts/seed.js`, run by Maestro's
+`runScript`, so the flow reads the new Session's id and day). With a
+development build (Test 45) instead of Expo Go, pass the app's id and the
+dev-client link: `-e APP_ID=com.emmapilates.client -e
+"APP_LINK=exp+emma-pilates-client://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8083"`
+(`com.emmapilates.staff` and `exp+emma-pilates-staff://…8082` for Staff).
+On the Android emulator the development launcher ignores the `exp+` link:
+pass the app's own scheme instead,
+`"APP_LINK=emmapilates-client://expo-development-client/?url=http%3A%2F%2F127.0.0.1%3A8083"`
+(`emmapilates-staff://` for Staff), run `adb reverse tcp:<port> tcp:<port>`
+for both Metro ports and the API's, and use `--udid emulator-5554`. The
+launcher can still drop the first link while it starts, so
+`subflows/open-app.yaml` sends it again on Android. Android's photo picker
+labels each photo «Photo taken on …» and wants «Done»;
+`subflows/pick-first-photo.yaml` handles both pickers, and the emulator's
+library needs one image too (on this machine the emulator still holds
+`mob065-receipt.png` in Pictures; a push into Pictures with `adb` is refused).
+
+`seed.mjs` (Node, no dependencies) does what Maestro's scripts cannot: Mariana
+and Sofía each buy the 8-class Plan by transfer with a generated receipt
+image (so the worker must be running), and Emma gets a five-minute class at
+Centro starting about two minutes later with Lucía booked, which has ended by
+the time the suite reaches the Trainer's attendance. It prints one line per
+item; run it once per fresh database.
+
+The flows find controls by `testID` (MOB-066), not by their Spanish labels:
+the login fields and button (`login-email`, `login-password`,
+`login-submit`), the Client tabs (`tab-home`, `tab-booking`, `tab-bookings`,
+`tab-profile`), and per-item ids such as `session-card-<id>`,
+`browse-day-<YYYY-MM-DD>`, or `pending-payment-<id>`. Text is still asserted
+where it is the behaviour under test (a refusal message, a confirmation).
 
 Since NOT-002 a booking, an Evaluation, and a Staff role's first home can
 raise the notification sheet «¿Te avisamos?» while the system has not asked
@@ -2110,31 +2156,61 @@ do it **before** asserting «Reserva confirmada» or «Evaluación confirmada»:
 the sheet hides the screen beneath it from Maestro, and those notices last
 eight seconds.
 
-The Client suite runs its six flows in the order its `config.yaml` pins
-(Maestro's own order is not the file order): `book-and-cancel-class`
+The Client suite runs its eleven flows in the order its `config.yaml` pins
+(Maestro's own order is not the file order): `login-errors-and-recovery`
+(a wrong password shows «El correo o la contraseña no son correctos.», then
+«¿Olvidaste tu contraseña?» sends Lucía a recovery link that is captured,
+never opened), `book-and-cancel-class`
 (Lucía books the first Session of the day and cancels it; Sofía's fixture
 Plan is expired, so she cannot book), `email-change` (Lucía asks, resends, and cancels an email
 change; the captured link of Test 34 is not read), `evaluation-book-and-cancel`
 (Lucía), `home-plan-and-notifications` (Lucía; the Promotions and
 notifications above), `profile-photo` (Lucía; the worker and the library
-photo above), and last `close-account` (Sofía closes her Account for good,
+photo above), `promotions-consent`, `purchase-plan-transfer` (Mariana buys
+the first Plan from Home: 08 → 09 → 10 with the studio QR → a receipt from
+the library → 11 «Pago en revisión»; the worker and the library photo
+again), `waitlist-join-and-leave` (the flow seeds a one-seat class tomorrow at
+05:00 in Centro that Valeria fills; Lucía joins its Waitlist from 04 and
+leaves it from 05), `reschedule-booking` (the flow books Lucía on a class
+about 10 minutes away, inside the 2 h 30 window where 05 offers
+«Reprogramar», and a later one the same day for Valeria, both ten minutes
+long; Lucía moves to it; it fails after about 23:30, when the second class
+would fall on the next day), and last `close-account` (Sofía closes her Account for good,
 Test 35: nothing after it logs in as her, but the database is spent, so
 rebuild it before the next run instead of re-applying the fixtures). The
-Staff suite runs `administrator-pending-payments`
+three seeding flows add classes at Centro early tomorrow and in the next
+hour, which is why they run after the flows that read today's fixture
+schedule.
+
+The Staff suite runs its nine flows in its `config.yaml` order:
+`administrator-pending-payments`
 (Paola; «No hay pagos pendientes.» is accepted, so no transfer is needed),
 `assistant-client-search` (Camila finds Lucía), `nutritionist-availability`
-(Gabriela publishes and removes a Friday block), and `trainer-agenda-and-inbox`
-(Emma; an empty day is accepted). Every run changes the database: rebuild it
-between the iPhone and the iPad.
+(Gabriela publishes and removes a Friday block), `trainer-agenda-and-inbox`
+(Emma; an empty day is accepted), then the journeys that change things:
+`administrator-review-payments` (Paola confirms Mariana's transfer and
+rejects Sofía's with a reason, S12; both come from `seed.mjs`),
+`administrator-cancel-session` (the flow seeds a class tomorrow at Centro
+booked by Lucía; Paola cancels it from S13 and S14 reports one Client told
+and refunded), `assistant-create-client` (Camila creates «Paula Maestro»
+with a new `maestro.<time>@example.com` address on every run, S05, and lands
+on the pending invitation, S06), `assistant-cash-payment-and-booking` (Camila
+takes Isabel's cash Payment for the first Plan, S08–S10, then books her into
+a class the flow seeds tomorrow at Centro, S07 and S11), and last
+`trainer-attendance` (Emma opens `seed.mjs`'s finished class, waits for it to
+end if needed, marks Lucía «Asistió», and saves, S03). Every run changes the
+database: rebuild it before each suite and between the iPhone and the iPad.
 
-**Expo Go's floating gear.** In development mode Expo Go draws its dev-menu
-button over the top-right corner of every screen, where the Staff avatar
-«Tu cuenta» and the Nutritionist's «+ Nuevo horario» sit. The four Staff
-flows park it before the first tap: the button is in the view hierarchy as
+**The floating dev-tools button.** In development mode Expo Go and the
+development builds draw a dev-menu button over the top-right corner of
+every screen, where the Staff avatar «Tu cuenta» and the Nutritionist's
+«+ Nuevo horario» sit. Every Staff flow parks it first through
+`subflows/park-dev-gear.yaml`. On iOS the button is in the view hierarchy as
 `gearshape.fill`, and a `swipe` from that element moves it to the
-bottom-right corner, on the phone and on the tablet alike; the step runs
-only when the element is visible, so a development build without the gear
-is not affected. The Client flows tap nothing under it. A render error in
+bottom-right corner, on the phone and on the tablet alike. On Android a swipe
+opens the dev menu instead and the button's touch area covers the whole
+avatar, so the subflow taps it («Tools»), switches **Tools button** off in
+the menu, and closes it. Each step runs only when the button is on screen. The Client flows tap nothing under it. A render error in
 Expo Go opens LogBox over the recovery screen (Test 1); none of the
 committed flows provokes one.
 
