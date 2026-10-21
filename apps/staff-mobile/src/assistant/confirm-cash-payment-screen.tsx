@@ -146,6 +146,7 @@ export function ConfirmCashPaymentScreen({
                 }
                 navigation.popTo("ClientOverview", { clientId });
               }}
+              testID="cash-back-to-client"
             />
           </View>
         </CenteredCard>
@@ -192,6 +193,7 @@ export function ConfirmCashPaymentScreen({
                       key={branch.id}
                       onPress={() => setSelectedBranchId(branch.id)}
                       style={[styles.chip, selected && styles.chipSelected]}
+                      testID={`cash-branch-${branch.id}`}
                     >
                       <Text style={[styles.chipLabel, selected && styles.chipLabelSelected]}>
                         {branch.name}
@@ -215,6 +217,7 @@ export function ConfirmCashPaymentScreen({
             disabled={branchId === null}
             label="Confirmar pago recibido"
             onPress={() => void confirm()}
+            testID="cash-confirm"
           />
         </ScrollView>
       </CenteredCard>

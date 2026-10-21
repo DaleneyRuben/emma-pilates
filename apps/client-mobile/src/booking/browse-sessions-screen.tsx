@@ -164,6 +164,7 @@ export function BrowseSessionsScreen() {
               key={date}
               onPress={() => setSelectedDate(date)}
               style={[styles.dayChip, selected && styles.chipSelected]}
+              testID={`browse-day-${date}`}
             >
               <Text style={[styles.dayWeekday, selected && styles.chipLabelSelected]}>
                 {label.weekday}
@@ -226,6 +227,7 @@ export function BrowseSessionsScreen() {
                   {seatsTag(session.availableSeats)}
                 </SeatPill>
               }
+              testID={`session-card-${session.id}`}
               time={formatTimeRange(session.startsAt, session.endsAt)}
               title={session.classTypeName}
               trainerName={session.trainerName}

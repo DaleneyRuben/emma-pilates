@@ -71,7 +71,7 @@ export function RecoveryRequestScreen({
         <BodyText style={[authStyles.muted, authStyles.centered]}>
           El enlace vence en 30 minutos. Si no llega, revisa tu carpeta de spam.
         </BodyText>
-        <TextButton label="Volver a iniciar sesión" onPress={onBack} />
+        <TextButton label="Volver a iniciar sesión" onPress={onBack} testID="recovery-back" />
       </AuthenticationScreen>
     );
   }
@@ -99,10 +99,17 @@ export function RecoveryRequestScreen({
         label="Correo electrónico"
         onChangeText={setEmail}
         placeholder={emailPlaceholder(teamAccess)}
+        testID="recovery-email"
         value={email}
       />
       {failure === null ? null : <BodyText accessibilityRole="alert">{failure}</BodyText>}
-      <PrimaryButton busy={submitting} disabled={limited} label="Enviar enlace" onPress={submit} />
+      <PrimaryButton
+        busy={submitting}
+        disabled={limited}
+        label="Enviar enlace"
+        onPress={submit}
+        testID="recovery-submit"
+      />
       {limited ? <TextButton label="Volver a iniciar sesión" onPress={onBack} /> : null}
     </AuthenticationScreen>
   );

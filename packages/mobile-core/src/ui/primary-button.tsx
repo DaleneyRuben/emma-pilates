@@ -11,6 +11,7 @@ type PrimaryButtonProps = {
   busy?: boolean;
   /** «compact» for the 48 pt action inside a card. */
   size?: "compact" | "regular";
+  testID?: string;
 };
 
 export function PrimaryButton({
@@ -19,6 +20,7 @@ export function PrimaryButton({
   disabled = false,
   busy = false,
   size = "regular",
+  testID,
 }: PrimaryButtonProps) {
   // Busy keeps the fill: grey would read as unavailable, not as working.
   const greyed = disabled && !busy;
@@ -30,6 +32,7 @@ export function PrimaryButton({
       disabled={disabled || busy}
       onPress={onPress}
       style={[styles.button, size === "compact" && styles.compact, greyed && styles.disabledButton]}
+      testID={testID}
     >
       <ButtonLabel
         busy={busy}

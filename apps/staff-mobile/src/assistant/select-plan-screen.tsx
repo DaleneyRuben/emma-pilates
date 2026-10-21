@@ -93,6 +93,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
                 })
               }
               style={styles.card}
+              testID={`select-plan-${plan.id}`}
             >
               <View style={styles.cardBody}>
                 <Text style={styles.planName}>{plan.name}</Text>

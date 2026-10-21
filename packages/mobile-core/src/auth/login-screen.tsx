@@ -108,6 +108,7 @@ export function LoginScreen({
                 onBlur={onBlur}
                 onChangeText={onChange}
                 placeholder={emailPlaceholder(teamAccess)}
+                testID="login-email"
                 value={value}
               />
             )}
@@ -124,6 +125,7 @@ export function LoginScreen({
                 onChangeText={onChange}
                 placeholder="••••••••"
                 secureTextEntry
+                testID="login-password"
                 value={value}
               />
             )}
@@ -133,12 +135,17 @@ export function LoginScreen({
             disabled={retryAfterSeconds > 0}
             label="Iniciar sesión"
             onPress={submitLogin}
+            testID="login-submit"
           />
           {onBiometricUnlock === undefined ? null : (
             <BiometricLoginButton onPress={onBiometricUnlock} />
           )}
           {onForgotPassword === undefined ? null : (
-            <TextButton label="¿Olvidaste tu contraseña?" onPress={onForgotPassword} />
+            <TextButton
+              label="¿Olvidaste tu contraseña?"
+              onPress={onForgotPassword}
+              testID="login-forgot-password"
+            />
           )}
         </View>
         {onRegister === undefined ? null : (

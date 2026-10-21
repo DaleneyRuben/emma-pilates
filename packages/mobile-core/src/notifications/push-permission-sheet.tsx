@@ -35,7 +35,7 @@ export function PushPermissionSheet({
 
 const styles = StyleSheet.create({
   backdrop: {
-    backgroundColor: "rgba(74,58,48,0.22)",
+    backgroundColor: colors.scrim,
     flex: 1,
     justifyContent: "flex-end",
   },

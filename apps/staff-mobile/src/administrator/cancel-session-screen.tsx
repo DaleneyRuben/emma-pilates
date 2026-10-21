@@ -104,6 +104,7 @@ export function CancelSessionScreen({
         disabled={submitting}
         onPress={() => void cancel()}
         style={styles.destructive}
+        testID="cancel-session-confirm"
       >
         <ButtonLabel
           busy={submitting}

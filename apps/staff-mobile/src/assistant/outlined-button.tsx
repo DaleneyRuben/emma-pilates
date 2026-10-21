@@ -6,12 +6,14 @@ export function OutlinedButton({
   disabled = false,
   label,
   onPress,
+  testID,
   tone = "primary",
 }: {
   busy?: boolean;
   disabled?: boolean;
   label: string;
   onPress: () => void;
+  testID?: string;
   tone?: "primary" | "error";
 }) {
   return (
@@ -26,6 +28,7 @@ export function OutlinedButton({
         tone === "error" && styles.outlinedError,
         disabled && !busy && styles.outlinedDisabled,
       ]}
+      testID={testID}
     >
       <ButtonLabel
         busy={busy}

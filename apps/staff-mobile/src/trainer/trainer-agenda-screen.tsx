@@ -46,6 +46,7 @@ function AgendaCard({
     capacity: number;
     classTypeName: string;
     endsAt: string;
+    sessionId: string;
     startsAt: string;
   };
   onPress: () => void;
@@ -57,6 +58,7 @@ function AgendaCard({
       accessibilityRole="button"
       onPress={onPress}
       style={styles.card}
+      testID={`agenda-session-${session.sessionId}`}
     >
       <View style={styles.header}>
         <View style={styles.titles}>

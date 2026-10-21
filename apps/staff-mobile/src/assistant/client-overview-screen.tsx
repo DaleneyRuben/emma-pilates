@@ -149,15 +149,18 @@ export function ClientOverviewScreen({
             disabled={!canBook}
             label="Reservar clase"
             onPress={() => navigation.navigate("BrowseSessions", context)}
+            testID="client-overview-book"
           />
           <OutlinedButton
             label="Registrar pago en efectivo"
             onPress={() => navigation.navigate("SelectPlan", context)}
+            testID="client-overview-cash-payment"
           />
           {hasActiveSubscription ? (
             <TextButton
               label="Ver reservas"
               onPress={() => navigation.navigate("ClientBookings", context)}
+              testID="client-overview-bookings"
             />
           ) : null}
         </View>
@@ -192,7 +195,7 @@ const styles = StyleSheet.create({
   actions: { gap: spacing.sm },
   badge: { borderRadius: radii.pill, paddingHorizontal: spacing.smLg, paddingVertical: spacing.xs },
   badgeActive: { backgroundColor: "rgba(124,148,115,0.16)" },
-  badgeExpired: { backgroundColor: "rgba(184,84,80,0.14)" },
+  badgeExpired: { backgroundColor: colors.errorPill },
   badgeLabel: { fontSize: typography.label, fontWeight: "600" },
   badgeLabelActive: { color: colors.successText },
   badgeLabelExpired: { color: colors.errorText },

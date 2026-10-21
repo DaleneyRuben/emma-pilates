@@ -114,6 +114,7 @@ export function PendingPaymentsScreen({
                 key={payment.id}
                 onPress={() => navigation.navigate("ReviewPayment", { paymentId: payment.id })}
                 style={styles.card}
+                testID={`pending-payment-${payment.id}`}
               >
                 <View style={styles.cardHeader}>
                   <View style={styles.identity}>
@@ -140,7 +141,11 @@ export function PendingPaymentsScreen({
             ))}
           </>
         )}
-        <TextButton label="Cancelar una clase" onPress={() => navigation.navigate("CancelClass")} />
+        <TextButton
+          label="Cancelar una clase"
+          onPress={() => navigation.navigate("CancelClass")}
+          testID="pending-payments-cancel-class"
+        />
       </ScrollView>
     </Screen>
   );

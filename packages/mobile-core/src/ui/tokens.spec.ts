@@ -61,3 +61,25 @@ describe("quiet icon token (MOB-040)", () => {
     expect(colors.iconQuiet).toBe("#C4BAB6");
   });
 });
+
+// MOB-066: colours the screens wrote by hand become named tokens with the
+// design's values (design system «Scrim», 24 «Cerrar mi cuenta», S06 «Vencida»).
+describe("design tokens for hand-written colours (MOB-066)", () => {
+  it("names the scrim behind sheets and modals", () => {
+    expect(colors.scrim).toBe("rgba(74,58,48,0.22)");
+  });
+
+  it("names 24's disabled destructive button", () => {
+    expect(colors.errorDisabledBorder).toBe("#E7CFC8");
+    expect(colors.errorDisabledText).toBe("#D4A99F");
+  });
+
+  it("names 24's pending notice text on Advertencia tint", () => {
+    expect(colors.warningTitle).toBe("#7C5D2A");
+    expect(colors.warningBody).toBe("#6E5A36");
+  });
+
+  it("names the Error status pill at 12% alpha", () => {
+    expect(colors.errorPill).toBe("rgba(178,93,75,0.12)");
+  });
+});

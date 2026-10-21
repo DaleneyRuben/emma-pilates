@@ -103,6 +103,7 @@ const ProfileStack = createNativeStackNavigator({
 });
 
 const tabOptions = (title: string, icon: ClientTabIconName) => ({
+  tabBarButtonTestID: `tab-${icon}`,
   tabBarIcon: ({ color }: { color: string }) => <ClientTabIcon color={color} name={icon} />,
   title,
 });

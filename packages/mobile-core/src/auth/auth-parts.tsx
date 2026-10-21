@@ -14,7 +14,7 @@ export const emailPlaceholder = (teamAccess: boolean) =>
 /** A form-level failure above the fields: never says which field failed. */
 export function FormAlert({ children }: PropsWithChildren) {
   return (
-    <View accessibilityRole="alert" accessible style={styles.alert}>
+    <View accessibilityRole="alert" accessible style={styles.alert} testID="form-alert">
       <View style={styles.dot} />
       <Text style={styles.alertText}>{children}</Text>
     </View>

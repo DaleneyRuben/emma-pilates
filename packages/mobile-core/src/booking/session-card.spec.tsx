@@ -81,3 +81,23 @@ describe("SessionCard", () => {
     expect(screen.getByText("Emma Vargas")).toHaveStyle({ color: "#6E6663", fontSize: 14 });
   });
 });
+
+// MOB-066: Maestro reaches a card by a stable id instead of its Spanish label.
+describe("SessionCard testID", () => {
+  it("puts the testID on the pressable card", async () => {
+    const screen = await render(
+      <SessionCard
+        accessibilityLabel="Reformer Pilates 07:00 – 07:50"
+        onPress={jest.fn()}
+        testID="session-card-s1"
+        time="07:00 – 07:50"
+        title="Reformer Pilates"
+        trainerName="Emma Vargas"
+      />,
+    );
+
+    expect(screen.getByTestId("session-card-s1")).toBe(
+      screen.getByRole("button", { name: "Reformer Pilates 07:00 – 07:50" }),
+    );
+  });
+});

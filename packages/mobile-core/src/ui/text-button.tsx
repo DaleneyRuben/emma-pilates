@@ -7,6 +7,7 @@ type TextButtonProps = {
   disabled?: boolean;
   label: string;
   onPress: () => void;
+  testID?: string;
   /** «onTint» for a link on Palo de rosa tinte, such as a pending card's. */
   tone?: "default" | "onTint";
 };
@@ -15,6 +16,7 @@ export function TextButton({
   disabled = false,
   label,
   onPress,
+  testID,
   tone = "default",
 }: TextButtonProps) {
   return (
@@ -26,6 +28,7 @@ export function TextButton({
       hitSlop={spacing.sm}
       onPress={onPress}
       style={styles.button}
+      testID={testID}
     >
       <Text style={[styles.label, tone === "onTint" && styles.onTint, disabled && styles.disabled]}>
         {label}

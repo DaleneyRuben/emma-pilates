@@ -30,11 +30,19 @@ export const colors = {
   warningText: "#9A7434",
   error: "#B25D4B",
   errorText: "#94493A",
+  // 24's destructive button while it cannot be pressed (MOB-066).
+  errorDisabledBorder: "#E7CFC8",
+  errorDisabledText: "#D4A99F",
+  // 24's pending-payment notice on Advertencia tint (MOB-066).
+  warningTitle: "#7C5D2A",
+  warningBody: "#6E5A36",
   successTint: "rgba(124,148,115,0.14)",
   warningTint: "rgba(201,154,78,0.12)",
   // The rule between a pending card's notes (S06).
   warningRule: "rgba(201,154,78,0.28)",
   errorTint: "rgba(178,93,75,0.08)",
+  // The Error status pill, such as S06's «Vencida» (MOB-066).
+  errorPill: "rgba(178,93,75,0.12)",
   // The dashed empty-state box on Superficie (S06 «Sin plan activo»).
   neutralTint: "rgba(216,201,187,0.14)",
   // The circle behind an empty panel's icon (S04's tablet split view).
@@ -52,6 +60,8 @@ export const colors = {
   // The frames' quiet icon: the 34 pt empty-state glyphs of 07, 19, S20,
   // S21, and S22 and the row chevrons of 02, 18, and S23 (MOB-040).
   iconQuiet: "#C4BAB6",
+  // The design system's scrim behind sheets and modals (MOB-066).
+  scrim: "rgba(74,58,48,0.22)",
 } as const;
 
 export const spacing = {
