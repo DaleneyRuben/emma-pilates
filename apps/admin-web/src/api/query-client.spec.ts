@@ -58,4 +58,44 @@ describe("createAdminQueryClient", () => {
     expect(defaults?.staleTime).toBe(30_000);
     expect(defaults?.refetchOnWindowFocus).toBe(false);
   });
+
+  // WEB-032: once per failure, after the retry, through the caches; what
+  // counts as a failure worth reporting is the reporter's business.
+  describe("failure reporting", () => {
+    const serverError = new ApiError({ status: 503, code: "unexpected_error" });
+
+    it("reports a query that still fails after its retry, once", async () => {
+      const reportFailure = jest.fn();
+      const client = createAdminQueryClient({ reportFailure });
+      const queryFn = jest.fn().mockRejectedValue(serverError);
+
+      await expect(
+        client.fetchQuery({ queryKey: ["read"], queryFn, retryDelay: 0 }),
+      ).rejects.toBe(serverError);
+
+      expect(queryFn).toHaveBeenCalledTimes(2);
+      expect(reportFailure.mock.calls).toEqual([[serverError]]);
+    });
+
+    it("reports a failed mutation once", async () => {
+      const reportFailure = jest.fn();
+      const client = createAdminQueryClient({ reportFailure });
+      const mutation = client.getMutationCache().build(client, {
+        mutationFn: () => Promise.reject(serverError),
+      });
+
+      await expect(mutation.execute(undefined)).rejects.toBe(serverError);
+
+      expect(reportFailure.mock.calls).toEqual([[serverError]]);
+    });
+
+    it("reports nothing when a query succeeds", async () => {
+      const reportFailure = jest.fn();
+      const client = createAdminQueryClient({ reportFailure });
+
+      await client.fetchQuery({ queryKey: ["ok"], queryFn: async () => 1 });
+
+      expect(reportFailure).not.toHaveBeenCalled();
+    });
+  });
 });

@@ -214,6 +214,10 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - Read-only values render as a `#FAF7F2` row with 1px `#EFE6DC`, a padlock icon, and an explanation.
 - Footer: padding 18px 22px, top border `#EFE6DC`, full-width primary button (46px).
 
+### Recovery state
+
+- When a page fails while drawing, the main area shows the plain empty state in its place, directly on Superficie with no card and no icon: «Algo salió mal» in Lora 22, the 15px `#766D69` note «No pudimos mostrar esta página. Inténtalo de nuevo; si vuelve a pasar, recarga la página.» up to 360px wide, and the large «Reintentar» primary button at least 220px wide, centred. It replaces only the content area (the sidebar and the top bar stay) and «Reintentar» draws the page again; the sidebar still moves to any other page. The startup page «No pudimos conectar con el servidor» stays for the session probe alone.
+
 ---
 
 ## Screen inventory

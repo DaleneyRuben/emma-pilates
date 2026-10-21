@@ -1,4 +1,5 @@
 import {
+  captureException,
   dedupeIntegration,
   globalHandlersIntegration,
   init,
@@ -90,6 +91,20 @@ export function sanitizeErrorEvent(
     tags: { service: event.tags?.service },
     exception: { values: event.exception?.values?.map(keepException) },
   };
+}
+
+/**
+ * WEB-032: a read or write TanStack Query gave up on. The page shows its own
+ * notice, so the failure is handled, but a 5xx, an unreachable backend, or an
+ * error no request shaped is still worth knowing; a 4xx is the backend's
+ * deliberate answer. A no-op until started, so local runs send nothing.
+ */
+export function reportRequestFailure(
+  error: unknown,
+  capture: typeof captureException = captureException,
+): void {
+  if (isClientErrorAnswer(error)) return;
+  capture(error, { mechanism: { type: "tanstack_query", handled: true } });
 }
 
 // Provider initialization stays at the application shell (ADR-0081); without

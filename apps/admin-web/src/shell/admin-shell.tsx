@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { Outlet, useRouterState } from "@tanstack/react-router";
+import { CatchBoundary, Outlet, useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { navigationItemOf } from "../app/navigation";
 import { useDocumentTitle } from "../app/use-document-title";
+import { PageRecoveryState } from "../components/page/page-recovery-state";
 import { activeBranchesQueryOptions } from "./branch/branch-queries";
 import { BranchProvider } from "./branch/branch-provider";
 import { SidebarNav } from "./sidebar-nav";
@@ -12,7 +13,11 @@ import { useIsNarrowViewport } from "./use-media-query";
 // AW02 and design/README.md: a persistent 236px sidebar whose top cell holds
 // the one "Emma" wordmark, a top bar with the Branch selector and the account
 // cell, and the main area on Superficie; the sidebar collapses to a drawer
-// on narrow browsers, where the top bar carries the wordmark instead.
+// on narrow browsers, where the top bar carries the wordmark instead. A page
+// that throws while drawing is replaced by the recovery state inside the main
+// area (WEB-032); Reintentar resets it, and so does another page's match once
+// it is committed (the location moves before the matches do, so the
+// pathname would reset the boundary onto the page that just failed).
 const noBranches: never[] = [];
 
 // Moving to another page puts focus on its content, so a keyboard or screen
@@ -39,6 +44,9 @@ export function AdminShell() {
   const main = useRef<HTMLElement>(null);
   const pathname = useFocusContentOnNavigation(main);
   useDocumentTitle(navigationItemOf(pathname)?.label);
+  const pageKey = useRouterState({
+    select: (state) => state.matches.at(-1)?.id,
+  });
 
   return (
     <BranchProvider
@@ -68,7 +76,12 @@ export function AdminShell() {
             tabIndex={-1}
             className="flex-1 bg-superficie px-4 py-5 outline-none focus-visible:shadow-none lg:px-8 lg:py-7"
           >
-            <Outlet />
+            <CatchBoundary
+              getResetKey={() => pageKey}
+              errorComponent={PageRecoveryState}
+            >
+              <Outlet />
+            </CatchBoundary>
           </main>
         </div>
       </div>
