@@ -7,25 +7,14 @@ env:
 - extendedWaitUntil:
     visible: "Tu cuenta.*"
     timeout: 30000
-# Expo Go's floating dev-menu gear covers the top-right corner («Tu cuenta»,
-# «+ Nuevo horario» on the iPad): park it bottom-right before the first tap.
-# A development build has no gear, so the step is skipped there.
-- runFlow:
-    when:
-      visible:
-        id: "gearshape.fill"
-    commands:
-      - swipe:
-          from:
-            id: "gearshape.fill"
-          direction: DOWN
-          duration: 600
+- runFlow: subflows/park-dev-gear.yaml
 - extendedWaitUntil:
     visible:
       text: "No tienes clases este día.|.*Pilates"
     timeout: 15000
 - takeScreenshot: staff-trainer-agenda
-- tapOn: "Tu cuenta.*"
+- tapOn:
+    id: "account-avatar"
 - extendedWaitUntil:
     visible:
       text: "Notificaciones.*"

@@ -8,7 +8,7 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - tapOn:
-    text: "Perfil, .*tab.*"
+    id: "tab-profile"
 # «Cerrar sesión» sits below the fold since follow-up 103.
 - extendedWaitUntil:
     visible: "Cambiar contraseña"

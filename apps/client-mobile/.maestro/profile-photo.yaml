@@ -13,7 +13,7 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - tapOn:
-    text: "Perfil, .*tab.*"
+    id: "tab-profile"
 # «Cerrar sesión» sits below the fold since follow-up 103.
 - extendedWaitUntil:
     visible: "Cambiar contraseña"
@@ -27,31 +27,7 @@ env:
 - assertNotVisible: "Quitar foto"
 - takeScreenshot: client-photo-2-editar-iniciales
 - tapOn: "Cambiar foto"
-# The system photo picker (PHPicker) runs outside the app; pick the first photo.
-- extendedWaitUntil:
-    visible: "Cancel|Cancelar"
-    timeout: 20000
-- extendedWaitUntil:
-    notVisible: "Loading…|Loading...|Cargando…"
-    timeout: 60000
-- extendedWaitUntil:
-    visible: "Photos|Fotos|Recents|Recientes|Albums|Álbumes"
-    timeout: 60000
-- takeScreenshot: client-photo-3-picker
-# First grid cell of the system picker: the iPad shows an album sidebar
-# first, the phone grid starts at the left edge.
-- runFlow:
-    when:
-      visible: "Favorites|Favoritos"
-    commands:
-      - tapOn:
-          point: "36%,17%"
-- runFlow:
-    when:
-      notVisible: "Favorites|Favoritos"
-    commands:
-      - tapOn:
-          point: "16%,28%"
+- runFlow: subflows/pick-first-photo.yaml
 - extendedWaitUntil:
     visible: "Se recorta al centro en forma de círculo."
     timeout: 60000

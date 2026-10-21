@@ -11,10 +11,10 @@ env:
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
     visible:
-      text: "Reservar, tab.*"
+      id: "tab-booking"
     timeout: 30000
 - tapOn:
-    text: "Reservar, tab.*"
+    id: "tab-booking"
 - extendedWaitUntil:
     visible:
       text: "Sucursal: .*"
@@ -35,23 +35,26 @@ env:
     text: ".*Pilates \\d\\d:\\d\\d.*"
     index: 0
 - extendedWaitUntil:
-    visible: "Reservar"
+    visible:
+      id: "session-book"
     timeout: 15000
 - tapOn:
-    text: "Reservar"
-    index: 0
+    id: "session-book"
 - runFlow: subflows/dismiss-push-permission.yaml
+# «Reserva confirmada» lasts eight seconds and the notification sheet can
+# outlast it on a slow emulator; the booking's «Cancelar» is the lasting proof.
 - extendedWaitUntil:
-    visible: "Reserva confirmada"
-    timeout: 15000
+    visible:
+      id: "booking-cancel-.*"
+    timeout: 30000
 - takeScreenshot: client-booking-confirmed
 - tapOn:
-    text: "Cancelar"
-    index: 0
+    id: "booking-cancel-.*"
 - extendedWaitUntil:
     visible: "¿Cancelar esta reserva?"
     timeout: 10000
-- tapOn: "Sí, cancelar reserva"
+- tapOn:
+    id: "booking-cancel-confirm"
 - extendedWaitUntil:
     notVisible: "¿Cancelar esta reserva?"
     timeout: 10000
