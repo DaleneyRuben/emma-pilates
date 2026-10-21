@@ -22,6 +22,13 @@ Open a row in the incident log below with the time, who noticed, and what was
 seen. Keep adding a line for every action you take, with the time. Do not
 delete lines; corrections are new lines.
 
+Save the logs the same day: Northflank keeps a container's logs for 30 days
+after they are written, so copy the relevant window for `api`, `worker`, and
+the jobs out of the console (or tail it with the Northflank CLI into a file
+kept outside the repository and the chat) before it ages out; see
+[«Logs and retention»](../architecture/infrastructure.md#logs-and-retention)
+for what else holds evidence.
+
 ## 2. Freeze deploys
 
 Stop new releases so the evidence and the state stay as they are. Since
@@ -80,10 +87,11 @@ a leaked object-storage key by rotating it (step 4).
 Secrets live in the provider that runs the process
 ([ADR-0079](../adr/0079-keep-runtime-secrets-in-environment-providers.md)). After
 a suspected leak, rotate what could have been read, then redeploy so the API and
-worker pick up the same values:
+worker pick up the same values. The step-by-step procedure for each one, the
+order that avoids downtime, and the yearly calendar are the
+[secrets rotation runbook](./secrets-rotation.md); this table says what each
+rotation costs.
 
-| Secret | Where | Effect of rotating |
-| --- | --- | --- |
 Each environment has its own values: production's are in Northflank's
 `production` secret group (team `emma-pilates`), staging's in the `staging`
 group (team `emma-pilates-staging`). Rotate the environment that leaked;
@@ -104,6 +112,13 @@ changes.
 | `ERROR_REPORTING_DSN`, `WORKER_HEARTBEAT_URL`, `BACKUP_HEARTBEAT_URL` | Better Stack, then Northflank | Errors and heartbeats are lost until the restart; a heartbeat may alert once |
 | Deploy tokens: `NORTHFLANK_API_TOKEN`, `NORTHFLANK_STAGING_API_TOKEN`, `VERCEL_PRODUCTION_TOKEN`, `VERCEL_STAGING_TOKEN` | Northflank or Vercel, then `gh secret set` | Releases fail until the repository secret is replaced ([release runbook](./production-release.md#the-deploy-tokens)) |
 | The Play submit key (`play-submit`) and `SENTRY_AUTH_TOKEN` | Google Cloud or Better Stack, then the Expo account | Store submissions or source-map uploads fail until replaced ([mobile release runbook](./mobile-release.md)) |
+| `BACKUP_STORAGE_*` on the `backup` job (R2 token `northflank-production-backups`) and the owner's `mac-backup-restore` token | Cloudflare R2, then the `backup` job's variables (and the owner's password manager) | The next dump fails until replaced, then runs on the new key; the bucket lock keeps the last 25 days of dumps whatever the leaked token tries |
+| `PRODUCTION_BACKUP_READ_*` (R2 token `github-staging-copy`) | Cloudflare R2, then `gh secret set` | A leaked token could read the dumps (every row of production): rotate at once; the copy workflow fails until replaced |
+| `STAGING_DATABASE_PASSWORD` (the `emma_staging` role) | Aiven, then the Northflank `staging` group **and** `gh secret set` | Staging's `api` and `worker` reconnect after their restart; the copy workflow fails until the secret is replaced |
+| The FCM V1 service-account key (Firebase Admin SDK) | Google Cloud, then both EAS projects' Android credentials | Android pushes fail until the new key is uploaded; no build needed |
+| The Android upload keystores (EAS-held) | Play Console → App integrity → Request upload key reset | Play App Signing keeps the app signing key, so installed apps are unaffected; the next store build waits for Google's reset |
+| `VERCEL_ORG_ID` and the project IDs, `AIVEN_CA_CERT`, the DSNs, `google-services.json` | — | Identifiers and public values: nothing to rotate, but note them in the log if they were in the leaked material |
+| The owner's own provider logins | Each provider's account settings | Change the password and re-enrol two-factor authentication; sign out other sessions where the provider offers it (GitHub, Google, Cloudflare, Vercel, Expo); then rotate every token the account could issue |
 
 Never paste a secret into the incident log, a chat, or a commit.
 
