@@ -72,6 +72,40 @@ describe('Prisma catalog administration', () => {
         ),
       ),
     ).resolves.toBe('branch_not_found');
+
+    await expect(
+      world.prisma.auditRecord.findMany({
+        where: { targetId: created.id },
+        orderBy: { actionCode: 'asc' },
+        select: {
+          actionCode: true,
+          actorRole: true,
+          targetType: true,
+          branchId: true,
+          metadata: true,
+        },
+      }),
+    ).resolves.toEqual([
+      {
+        actionCode: 'branch.created',
+        actorRole: 'ADMINISTRATOR',
+        targetType: 'branch',
+        branchId: created.id,
+        metadata: { name: 'Sucursal Norte' },
+      },
+      {
+        actionCode: 'branch.updated',
+        actorRole: 'ADMINISTRATOR',
+        targetType: 'branch',
+        branchId: created.id,
+        metadata: {
+          previousName: 'Sucursal Norte',
+          name: 'Norte',
+          previousAddress: 'Av. Banzer 3er anillo',
+          address: 'Av. Banzer 4to anillo',
+        },
+      },
+    ]);
   });
 
   it('refuses to archive a Branch with upcoming Sessions and ends Nutritionist blocks when archiving an idle one', async () => {
@@ -116,6 +150,16 @@ describe('Prisma catalog administration', () => {
         where: { branchId: idle.id, effectiveUntil: null },
       }),
     ).resolves.toBe(0);
+    await expect(
+      world.prisma.auditRecord.findFirst({
+        where: { targetId: idle.id, actionCode: 'branch.archived' },
+        select: { actorRole: true, branchId: true, metadata: true },
+      }),
+    ).resolves.toEqual({
+      actorRole: 'ADMINISTRATOR',
+      branchId: idle.id,
+      metadata: { endedAvailabilityBlocks: 1 },
+    });
   });
 
   it('manages Class Types, rejecting duplicate names and archiving only unused ones', async () => {
@@ -161,6 +205,47 @@ describe('Prisma catalog administration', () => {
         await administrator(),
       ),
     ).resolves.toMatchObject({ archivedAt: expect.any(Date) as Date });
+
+    await expect(
+      world.prisma.auditRecord.findMany({
+        where: { targetId: barre.id },
+        orderBy: { actionCode: 'asc' },
+        select: {
+          actionCode: true,
+          actorRole: true,
+          targetType: true,
+          branchId: true,
+          metadata: true,
+        },
+      }),
+    ).resolves.toEqual([
+      {
+        actionCode: 'class_type.archived',
+        actorRole: 'ADMINISTRATOR',
+        targetType: 'class_type',
+        branchId: null,
+        metadata: {},
+      },
+      {
+        actionCode: 'class_type.created',
+        actorRole: 'ADMINISTRATOR',
+        targetType: 'class_type',
+        branchId: null,
+        metadata: { defaultCapacity: 10 },
+      },
+      {
+        actionCode: 'class_type.updated',
+        actorRole: 'ADMINISTRATOR',
+        targetType: 'class_type',
+        branchId: null,
+        metadata: {
+          previousDefaultCapacity: 10,
+          defaultCapacity: 12,
+          descriptionChanged: false,
+          equipmentNeedsChanged: false,
+        },
+      },
+    ]);
   });
 
   it('creates, reprices, and hides Plans with audits, and rejects invalid durations', async () => {
