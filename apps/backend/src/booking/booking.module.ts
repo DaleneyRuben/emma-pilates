@@ -13,14 +13,18 @@ import {
   BookingCancellationController,
   BookingRescheduleController,
   ClassHistoryController,
-  TrainerAttendanceController,
-  TrainerScheduleController,
-  TrainerSessionRosterController,
+} from './booking.controller';
+import {
   classHistory,
   sessionAvailability,
   trainerSchedule,
   trainerSessionRoster,
-} from './booking.controller';
+} from './booking-controller-support';
+import {
+  TrainerAttendanceController,
+  TrainerScheduleController,
+  TrainerSessionRosterController,
+} from './trainer.controller';
 import { boliviaDate } from '../time/bolivia-time';
 import { createCatalogRepository } from './catalog/prisma-catalog-repository';
 import {

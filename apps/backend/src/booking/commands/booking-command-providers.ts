@@ -9,7 +9,7 @@ import {
   joinWaitlistCommand,
   recordAttendanceCommand,
   rescheduleBookingCommand,
-} from '../booking.controller';
+} from '../booking-controller-support';
 import { leaveWaitlistCommand } from '../client/client-bookings.controller';
 import { cancelSessionCommand } from '../payments/administrator.controller';
 import { PrismaBookingCommands } from './prisma-booking-commands';
