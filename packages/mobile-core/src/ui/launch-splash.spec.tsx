@@ -32,9 +32,12 @@ describe("launch splash", () => {
   });
 
   it("releases it once the first screen is ready, and only once", async () => {
-    const hook = await renderHook(({ ready }) => useReleaseLaunchSplash(ready), {
-      initialProps: { ready: false },
-    });
+    const hook = await renderHook(
+      ({ ready }: { ready: boolean }) => useReleaseLaunchSplash(ready),
+      {
+        initialProps: { ready: false },
+      },
+    );
 
     await hook.rerender({ ready: true });
     expect(mocked.hideAsync).toHaveBeenCalledTimes(1);
