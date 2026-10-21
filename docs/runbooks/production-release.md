@@ -126,6 +126,31 @@ staging again.
 4. When the bug is fixed, pause staging. The copy stays until the next copy
    or a reset; apply any personal-data request to it too.
 
+### While a production copy is on staging, do not
+
+The copy carries real people's addresses and production's `pgboss` queue,
+and staging's worker sends real email through its own Resend key
+(`northflank-staging`), so a test that would be harmless on synthetic data
+reaches real inboxes (EXT-021, user's decision 2026-10-20: no code change,
+only this list).
+
+- **Do not** request a password recovery, a verification resend, a Staff
+  invitation, an email change, or an account closure for a real person's
+  address: staging's worker delivers it. Sign in with your own production
+  credentials and test with your own address only.
+- **Do not** assume the queue is empty: the restore brings production's
+  `pgboss` tables as they were at the dump, so an email job that was queued
+  in production and not yet sent may be sent again, from staging, as soon
+  as `worker` resumes. Reproduce the bug with that in mind, and prefer
+  staging paused except while you test.
+- **Do not** set `EXPO_ACCESS_TOKEN` on staging while a copy is loaded:
+  the copy holds production's registered devices, and the worker would push
+  to real phones.
+- **Do not** run bulk email tests: staging shares Resend's 100-a-day limit
+  with production, so a burst on staging fails production's own email.
+- **Do** release a fresh staging reset as soon as the bug is fixed, so the
+  copy does not outlive its reason.
+
 It needs the secrets `PRODUCTION_BACKUP_READ_ACCESS_KEY_ID` and
 `PRODUCTION_BACKUP_READ_SECRET_ACCESS_KEY` (R2 token
 `github-staging-copy`, Object Read only on `emma-pilates-prod-backups`) and
