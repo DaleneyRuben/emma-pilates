@@ -115,7 +115,9 @@ describe("AW35 Contactos para promociones", () => {
     const row = await rowOf("Paula Antelo");
 
     await user.click(
-      within(row).getByRole("button", { name: "Dejar de enviar" }),
+      within(row).getByRole("button", {
+        name: "Dejar de enviar a Paula Antelo",
+      }),
     );
     const dialog = await screen.findByRole("alertdialog", {
       name: "¿Dejar de enviar promociones a Paula Antelo?",
@@ -207,7 +209,9 @@ describe("AW35 Contactos para promociones", () => {
     const row = await rowOf("Valeria Quiroga");
 
     await user.click(
-      within(row).getByRole("button", { name: "Dejar de enviar" }),
+      within(row).getByRole("button", {
+        name: "Dejar de enviar a Valeria Quiroga",
+      }),
     );
     const dialog = await screen.findByRole("alertdialog", {
       name: "¿Dejar de enviar promociones a Valeria Quiroga?",
@@ -247,7 +251,9 @@ describe("AW35 Contactos para promociones", () => {
     const row = await rowOf("Valeria Quiroga");
 
     await user.click(
-      within(row).getByRole("button", { name: "Dejar de enviar" }),
+      within(row).getByRole("button", {
+        name: "Dejar de enviar a Valeria Quiroga",
+      }),
     );
     const dialog = await screen.findByRole("alertdialog");
     await user.click(

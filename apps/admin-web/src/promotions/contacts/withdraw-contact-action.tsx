@@ -39,6 +39,7 @@ export function WithdrawContactAction({
       <Button
         variant="link"
         size="sm"
+        aria-label={`Dejar de enviar a ${contact.name}`}
         className="text-error hover:text-error-texto"
         onClick={() => {
           setFailed(false);
