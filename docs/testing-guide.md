@@ -4746,7 +4746,13 @@ ADR-0097). An Administrator sees, exports, and erases them on AW35.
    record. Calling `POST
    /api/v1/administrator/promotion-contacts/{id}/withdrawal` again answers
    `404` `promotion_contact_not_found`.
-7. Check at 1440 px and 420 px, then drop the copy:
+7. With more than 20 contacts (insert them with `psql`), a screen reader
+   names each row's button «Dejar de enviar a …» with the contact's name
+   (WEB-031). Open page 2, leave it with one contact, and press «Dejar de
+   enviar» on it. Expected: the list goes back to page 1 with the success line
+   still shown, never an empty page with a non-zero count. Then type a search
+   or change the page. Expected: the success line goes away.
+8. Check at 1440 px and 420 px, then drop the copy:
    `dropdb pilates_test_contacts`.
 
 ## Test 60: a live Client's promotions consent (BE-023)
