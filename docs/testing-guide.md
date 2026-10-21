@@ -2896,10 +2896,13 @@ pnpm test:admin-e2e
 ```
 
 The script builds the backend and the admin web, then runs
-`playwright test` in `apps/admin-web`. Its global setup prints the two
-process ids, the ports, and the `pilates_test_*` database name it made, and
-its teardown stops both servers and drops that database. The ten journeys
-take about twenty seconds:
+`playwright test` in `apps/admin-web`. Its global setup prints the three
+process ids (the API, the worker, and the preview server), the ports, and
+the `pilates_test_*` database name it made, and its teardown stops the three
+servers and drops that database. Since WEB-034 the worker runs too, because
+the payment journeys send a real transfer receipt the way the Client app
+does, and only the worker turns it into variants. The seventeen journeys take
+about thirty seconds:
 
 1. **Sessions.** Paola signs in and lands on Horario; the
    `__Host-emma-admin-session` cookie is HttpOnly, Secure, SameSite Lax, and
@@ -2929,14 +2932,56 @@ take about twenty seconds:
    the second dragged above the first by its handle (the "Soltar en posición
    1" line, the saved order surviving a reload), and one deleted after the
    confirmation.
+8. **Client closure (AW22).** Sofía, whose transfer the journey sends
+   first, cannot be closed: the dialog refuses at once with «No se puede
+   cerrar todavía…» and «Ir a Pagos», its button disabled. Lucía's dialog
+   lists her Plan ending without refund and the erasure line, closing her
+   says «Cuenta de Lucía Fernández cerrada.», and she is gone from the four
+   remaining Clients after a reload.
+9. **Transfer review (AW28/AW29).** Mariana's and Sofía's transfers (sent
+   through the API with a receipt the worker finalised) wait in Pagos.
+   Mariana's panel shows «Monto a verificar», Bs 560,00, the receipt image
+   (read from the API) and its enlargement; confirming asks first and says
+   «Pago de Mariana Peña confirmado: su plan Paquete de 8 clases empieza
+   hoy.». Sofía's is rejected with a reason («Confirmar rechazo» stays
+   disabled until one is typed). Under `?status=all` both rows read
+   Confirmado and Rechazado and no longer open.
+10. **Staff (AW23/AW24).** Valentina Soria is invited as a Nutritionist at
+    Centro («Invitación enviada a valentina@emmapilates.bo: tiene 7 días
+    para activar su cuenta.»), her row reads Pendiente and her panel
+    «Pendiente de activación» with «Reenviar enlace» and «Cancelar
+    invitación». Camila Rojas is deactivated after the confirmation («Camila
+    Rojas ya no tiene acceso: cerramos todas sus sesiones.»), reads
+    Desactivado, and opens read-only. Her invitation is cancelled from the
+    panel («Sí, cancelar invitación» → «Cancelamos la invitación de Valentina
+    Soria.») so Personal shows its six fixture members again.
+11. **Session create and edit (AW03).** In next week's Horario, a one-off
+    Reformer Pilates with Daniela Ortiz next Saturday at 11:00 for 75
+    minutes (capacity 12 filled from the Class Type) appears as
+    «11:00 – 12:15»; from Editar sesión (no «Solo esta sesión» choice for a
+    one-off) the hour moves to 12:00 and the block follows, also after a
+    reload.
+12. **Report (AW16).** Ingresos, Gastos, and Neto agree with each other
+    (Neto is the difference, parsed from the tiles, since earlier journeys
+    may have confirmed a transfer or recorded an Expense), the chart and both
+    tables are there, Centro shows only its cash (Valeria's Bs 780,00) and
+    its Expenses with the Nómina row gone, a start after the end keeps the
+    last report, and January 2020 says «Sin ingresos ni gastos en este
+    rango.».
+13. **Promotion Contacts (AW35).** Valeria closes her own Account through
+    the API keeping promotions; AW35 lists her as Cuenta cerrada with her
+    phone and today's date, the search narrows and empties, «Exportar CSV»
+    downloads `contactos-promociones-aaaa-mm-dd.csv` with the BOM header and
+    her row, and «Dejar de enviar a Valeria Quiroga» → «Borrar contacto»
+    leaves «Todavía no hay contactos.» with the export disabled.
 
 To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
 `pnpm exec playwright test e2e/session.spec.ts --headed`. A failed journey
 leaves a screenshot and a trace under `apps/admin-web/test-results/`
 (`pnpm exec playwright show-trace <file>` opens it). The two servers'
-stderr goes to `apps/admin-web/test-results/e2e-backend.stderr.log` and
-`e2e-preview.stderr.log`, so a backend that crashed at startup ("The backend
+stderr goes to `apps/admin-web/test-results/e2e-backend.stderr.log`,
+`e2e-worker.stderr.log`, and `e2e-preview.stderr.log`, so a backend that crashed at startup ("The backend
 did not answer…") can be read there; `E2E_DEBUG=1 pnpm test:admin-e2e`
 prints it in the terminal instead. If a run is killed
 before its teardown, stop the servers it left (`lsof -ti tcp:3101`,
@@ -2948,7 +2993,7 @@ Set `TEST_DATABASE_URL` to another `pilates_test_*` admin database, or
 `E2E_API_PORT` and `E2E_WEB_PORT` to other ports, when the defaults collide
 with something on your machine.
 
-CI runs the same ten journeys in the **web-e2e** job of
+CI runs the same seventeen journeys in the **web-e2e** job of
 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) (WEB-017), beside
 the web-unit job as soon as quality-web passed (EXT-005), on every pull
 request that touches the admin web and on every push to `main`. The job runs
@@ -2957,8 +3002,8 @@ container: a `psql` step first creates the `pilates_test_ci` admin database
 the api-integration job also uses, and
 `TEST_DATABASE_URL` points the global setup at it, so the run creates its
 own `pilates_test_*` database beside it as it does locally (the setup's line
-and the teardown's «stopped both servers and dropped database …» line are
-both in the step's log). The runner has no browser, so the shared setup
+and the teardown's «stopped the three servers and dropped database …» line
+are both in the step's log). The runner has no browser, so the shared setup
 action installs the pinned Chromium (`playwright install chromium`, kept in
 GitHub's cache under `~/.cache/ms-playwright` by Playwright version, about
 fifteen seconds to download when the cache is cold) and its system packages
@@ -2968,9 +3013,10 @@ failed run uploads `apps/admin-web/test-results/` (the traces, the
 screenshots, and both servers' stderr) as the `web-e2e-test-results`
 artifact, kept for seven days, from the run's summary page; download it,
 unzip it, and open a trace with `pnpm exec playwright show-trace <file>`. A
-green run uploads nothing. The job takes about two and a half minutes (the
-setup with the browser about 1 m 20 s, both builds about 35 s, the journeys
-about 25 s on the two-core runner).
+green run uploads nothing. The job takes about three minutes (the setup
+with the browser about 1 m 20 s, both builds about 35 s, the journeys about
+45 s on the two-core runner since WEB-034 added seven, with the worker's
+boot and two receipt uploads inside them).
 
 ## Test 32: image variants and Promotions through Swagger
 
