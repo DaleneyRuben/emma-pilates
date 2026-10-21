@@ -109,11 +109,19 @@ The form's «delete» answers are **Yes** with the deletion URL above.
 
 ## Related gaps found by the audit
 
-- The Client build declares `CAMERA` and `RECORD_AUDIO`, which
-  `expo-image-picker` adds on its own, although the app never uses the camera
-  and the privacy policy says so. MOB-064 drops them (the `expo-image-picker`
-  plugin with `cameraPermission: false` and `microphonePermission: false`);
-  they leave the store build with the next one (REL-009).
+All fixed; the two permission fixes reach Play with REL-009's next store
+build.
+
+- The Client build declared `CAMERA` and `RECORD_AUDIO`, which
+  `expo-image-picker` adds on its own, although the app never used the camera
+  and the privacy policy says so. MOB-064 (2026-10-19) dropped them (the
+  `expo-image-picker` plugin with `cameraPermission: false` and
+  `microphonePermission: false`).
+- On iOS the Client app asked for read access to the photo library before
+  every pick, with the plugin's English text, although the system photo
+  picker needs no permission. MOB-065 (2026-10-19) stopped asking, so the
+  build no longer declares `NSPhotoLibraryUsageDescription`; saving the QR
+  still asks only to add photos.
 - Privacy policy wording (WEB-028, fixed with BE-021 on 2026-10-19): the
   installation ID is a SHA-256 digest on the server and stays on the device
   after logout; crash reports carry the app version but not the OS; the

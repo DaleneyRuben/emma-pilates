@@ -499,13 +499,17 @@ Values never go in the repository or a chat. «Mac» means the user's own
 
 ## Known gaps
 
-- The emailed authentication links open a 404: they point at
-  `/authentication/...` on the API host, which serves nothing there, and the
-  apps have no verified app links yet (LNK-001).
+- The emailed links open the Client and Staff apps through Android's verified
+  app links on builds made since LNK-001 (the staging builds); the Play
+  builds (versionCode 3) predate it, and iOS Universal Links wait for gate 9,
+  so on those the link page offers the store or the browser instead
+  (REL-009, REL-010).
 - Resend's free plan sends 100 emails a day: a launch-day burst beyond that
   fails after its retries (ADR-0094), so invitations are spread over days or
   the plan is upgraded for that month.
-- Production still uses the providers' hostnames, and replies sent from the
+- The API and the admin web still answer on the providers' hostnames
+  (`code.run`, `vercel.app`); only the link hosts and the public pages are on
+  `emmapilatesstudio.com`. Replies sent from the
   owner's Gmail show that address until Gmail «Send mail as» `soporte@` goes
   through Resend's SMTP (`smtp.resend.com`).
 - iOS push needs an APNs key (gate 9). Until then iOS installations register,
