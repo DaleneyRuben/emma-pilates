@@ -1,6 +1,6 @@
 # Keep runtime secrets in environment providers
 
-Status: accepted; the development environment's Render and Vercel Preview secrets are removed by [ADR-0091](./0091-retire-the-shared-development-environment.md)
+Status: accepted; the development environment's Render and Vercel Preview secrets are removed by [ADR-0091](./0091-retire-the-shared-development-environment.md); the rotation and access procedures promised below are the [secrets rotation runbook](../runbooks/secrets-rotation.md) (EXT-020, 2026-10-21)
 
 Runtime secrets are stored in the protected configuration of the provider that runs the process and are separated across local, development, preview, and production environments. Northflank injects only the production values required by each API, worker, or migration command. Render holds development runtime values. Vercel receives only the admin web's environment-specific public configuration, and EAS manages mobile signing and build credentials; values embedded in a web or mobile bundle are never treated as secrets.
 

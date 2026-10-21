@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
@@ -3744,8 +3744,11 @@ as `evaluation_reminders`, or the queue `uploads.finalize.v1`) and the error
 code; never the message or job data. The admin web reports uncaught errors,
 unhandled rejections, and render errors (including the startup error page)
 as service `admin-web`, only when `VITE_ERROR_REPORTING_DSN` is set at build
-time (Vercel Production only); 4xx API answers are never reported, and no
-message, page URL, user, or breadcrumbs leave the browser. Stacks are
+time (Vercel Production only); since WEB-032 a page that crashes inside the
+shell (Test 64) and every read or write TanStack Query gave up on (a 5xx or
+an unreachable backend, once per failure, after its retry) are reported too;
+4xx API answers are never reported, and no message, page URL, user, or
+breadcrumbs leave the browser. Stacks are
 minified: no source maps are uploaded. Since EXT-012 the browser sends its
 events to its own origin, `/api/monitoring/envelope`, and a Vercel Function
 (the dev server locally) forwards them to the DSN's ingest, so Brave Shields
@@ -4875,3 +4878,40 @@ here):
    also turns away every credentialed request from that address until the
    minute ends.
 5. Drop the copy: `dropdb pilates_test_be025`.
+
+## Test 64: a page crash recovers inside the admin shell (WEB-032)
+
+A defect that throws while a page draws no longer lands on the startup page
+«No pudimos conectar con el servidor»: the sidebar and the top bar stay, and
+the content area shows the recovery state of design follow-up 105. Nothing in
+the fixtures crashes on purpose, so force one on `pnpm dev:admin` (Test 23),
+signed in as `paola.mendoza@example.com`:
+
+1. Open Planes. In `apps/admin-web/src/schedule/schedule-route.tsx`, add
+   `throw new Error("forced");` as the first line of `ScheduleRoute` (do not
+   commit it); Vite picks it up. Click **Horario** in the sidebar. Expected:
+   the sidebar, the top bar with the Branch selector, and the account cell
+   stay; the main area shows «Algo salió mal» (Lora), the note «No pudimos
+   mostrar esta página. Inténtalo de nuevo; si vuelve a pasar, recarga la
+   página.», and a 220 px-wide «Reintentar» primary button, directly on the
+   cream surface with no card and no icon. The console logs the error;
+   nothing covers the page.
+2. Click **Reintentar**. Expected: the page is drawn again and, as the cause
+   is still there, the same state returns at once. Click **Planes** in the
+   sidebar. Expected: Planes shows its list; the state is gone.
+3. Remove the line. Open Horario again, or click **Reintentar** if the state
+   is showing. Expected: the week grid is back.
+4. At 420 px (Test 23's narrow drawer), repeat steps 1 to 3 through the
+   **Abrir menú** drawer. Expected: the same state, the note wrapped, the
+   button at its full width, nothing scrolling sideways.
+5. With a local DSN (Test 44 step 5), the crash arrives at the receiver as
+   one `Error` event through React's root error handler, and a read that
+   fails after the API is stopped (open a page you have not visited, such as
+   Clientes, which shows «No pudimos cargar las clientas.») arrives as one
+   `ApiError` event with the mechanism `tanstack_query`, even though the
+   request was retried once. A 4xx answer, such as Login's wrong password,
+   still sends nothing.
+
+Verified on 2026-10-21 (WEB-032) in the in-app browser: every step above at
+1440 px and 420 px, 2 events in all (one `Error`, one `ApiError`), none
+with a message or a URL.

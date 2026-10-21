@@ -96,6 +96,15 @@ has passed.
 
 Run one **every quarter** and **after every major migration**: any migration that
 alters or drops columns or constraints on existing tables, or backfills data.
+The `Operations reminders` workflow
+([`.github/workflows/operations-reminders.yml`](../../.github/workflows/operations-reminders.yml),
+EXT-020) opens a GitHub issue «[ops] Restore drill <year> Q<n>» on the first
+day of January, April, July, and October; the drill is done when its row is
+in the log below and the issue is closed with a link to the row's commit.
+The workflow cannot tell that a quarter's drill was already done: its first
+run, by hand on 2026-10-21, opened «Restore drill 2026 Q4» although the
+drill of 2026-10-14 covers it, so such an issue is closed with a comment
+naming the log row. The first real reminder is due 2027-01-01.
 
 1. Download the latest dump from R2 with the restore token and check its
    checksum against the object's metadata (and the job's log line):
@@ -210,6 +219,17 @@ A production restore is an incident action, not a routine one: follow
 how to switch the API and worker to the restored database.
 
 ## Drill log
+
+One row per drill, filled in as the steps run. Copy this template row into
+the table and replace every `…`; a step that failed says so in its cell and
+names the incident-log row:
+
+```text
+| YYYY-MM-DD | `daily/emma-….dump` (… bytes, SHA-256 equal to the metadata; row counts …/…/…/…/… equal after restore) | … s, `pg_restore --no-owner --no-acl --exit-on-error`, Mac PostgreSQL 18.x on 5433 | Up to date (… migrations) | Passed (API on port 3199) | Passed: 2 audit guards, … ledger triggers, 0 negative balances, 0 Clients without one live Account, newest audit … UTC; `backup:check` passed | Owner (token, download) and … (restore, checks); reminder issue #… |
+```
+
+The row counts are, in order, `system.accounts`, `booking.clients`,
+`booking.payments`, `booking.bookings`, `system.audit_records`.
 
 | Date | Dump used | Restored in | Migrate status | Smoke check | Fixture-free checks | Done by |
 | --- | --- | --- | --- | --- | --- | --- |

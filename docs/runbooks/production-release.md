@@ -237,6 +237,10 @@ To rotate it: Northflank → Team → **API tokens** → create a token with the
 same role and lifetime; copy it with its copy icon; run
 `gh secret set NORTHFLANK_API_TOKEN --repo DaleneyRuben/emma-pilates` and
 paste at the hidden prompt; then delete the old token. Never print it.
+The rotation is planned for 2027-09-14 (staging's for 2027-09-17), a month
+before each expiry; the `Operations reminders` workflow opens an issue then,
+and every other secret's procedure and date is in the
+[secrets rotation runbook](./secrets-rotation.md).
 
 ## Release a commit by hand
 

@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-19** (WEB-021 added the public pages on Cloudflare Pages; LNK-001 added the link hosts; EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
+Last verified **2026-10-21** (EXT-020 added the [secrets rotation runbook](../runbooks/secrets-rotation.md), the reminder workflow, log retention, the free-plan limits, and the three uptime monitors, which the owner added the same day; WEB-021 added the public pages on Cloudflare Pages; LNK-001 added the link hosts; EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -65,7 +65,7 @@ Details are in the sections below.
 
 | Provider | What we use | What it does for us | Not used (on purpose) |
 | --- | --- | --- | --- |
-| **GitHub** | Private repository `emma-pilates`; Actions (3 workflows); repository secrets; 4 repository variables; commit status `release/staging` | Holds the code; runs CI on every pull request and `main`; releases `main` to staging; promotes to production when started by hand | Branch protection (needs Pro), Packages, Pages |
+| **GitHub** | Private repository `emma-pilates`; Actions (5 workflows: CI, the two releases, the production copy, and the monthly operations reminders); repository secrets; repository variables; commit status `release/staging`; issues as the operations reminders (EXT-020) | Holds the code; runs CI on every pull request and `main`; releases `main` to staging; promotes to production when started by hand; opens an issue a month before each secret rotation, each quarterly drill, and each monthly usage check | Branch protection (needs Pro), Packages, Pages |
 | **Northflank** | Project `default` (US Central): services `api` and `worker`, jobs `migrate` and `backup` (daily cron), secret group `production` (15 variables, 2 files), API token `github-actions-release` with role `github-production-release`; logs and metrics | Builds the backend's Docker image and runs the **production API** and the **worker** (image processing, scheduled jobs); runs **database migrations** before each release and the **daily database dump** to R2; holds production settings and secrets | Its own CI (off: GitHub starts builds), addons (the database is Aiven), alert integrations (Better Stack alerts instead) |
 | **Aiven** | One PostgreSQL 18 service, `emma-pilates-prod-db` (Free-1-1gb), holding the databases `emma` (production) and `emma_staging` (staging, its own role); its CA certificate | The **production and staging databases** | The $50 trial credit, point-in-time restore, any paid plan |
 | **Vercel** | Projects `emma-pilates-admin` and `emma-pilates-admin-staging` (Hobby), each deployed only by its release workflow with the Vercel CLI (Git deployments off in `vercel.json`); `vercel.json` rewrites, `middleware.ts`, the error-envelope Function, Production environment variables; one project-scoped token per project | Hosts the **admin web** and forwards its `/api/v1` calls to the matching API with that environment's proxy proof | Vercel Pro, Git deployments and pull-request previews (off since ADR-0091 and ADR-0092), custom domain (gate 7) |
@@ -74,7 +74,7 @@ Details are in the sections below.
 | **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates»), `com.emmapilates.staff` («Emma Pilates Staff»), and their staging variants `com.emmapilates.client.staging` and `com.emmapilates.staff.staging` (EXT-017); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
 | **Google Play Console** | Personal developer account «Daleney Labs» (ID `5688059300530668770`) owned by the user's Google account, identity verified 2026-10-15; draft apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»), Spanish (Latin America), free, Play App Signing accepted, automatic protection on | Distributes the **Android apps**: Internal testing first, then the Client app's closed test and production release (REL-002 to REL-007); Staff stays on a closed track | Paid apps and in-app purchases (earning money is off, which keeps the legal address private), organization verification, the developer website |
 | **Resend** | Account signed in with the owner's Google account (Free); verified domain `emmapilatesstudio.com` in São Paulo (`sa-east-1`), return path `send`, open and click tracking off, TLS opportunistic; sending-only API keys `northflank-production` and `northflank-staging` for that domain; one webhook per environment for `email.bounced` and `email.complained` | Sends the **authentication emails** from `Emma Pilates Studio <no-responder@emmapilatesstudio.com>` with replies to `soporte@` (EXT-001, ADR-0094) | Broadcasts, audiences, templates, automations, receiving, tracking |
-| **Better Stack** | Uptime monitor «Production API readiness»; error tracking apps `emma-pilates-api`, `emma-pilates-admin`, and `emma-pilates-mobile` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management, status pages, on-call |
+| **Better Stack** | Uptime monitors «Production API readiness», «Production admin web», «Public pages», and «Link host» (the last three since 2026-10-21, [runbook](../runbooks/uptime-monitors.md)); error tracking apps `emma-pilates-api`, `emma-pilates-admin`, and `emma-pilates-mobile` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management (no logs are sent; see «Logs and retention»), status pages, on-call |
 
 Not created yet, in the order the gates open (backlog, «Order to open the
 gates»): **Apple Developer** (gate 9). The domain (gate 7) arrived on
@@ -376,7 +376,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | --- | --- | --- | --- | --- |
 | `DATABASE_URL` | Northflank `production` | — | `.env` (local) | Reset in Aiven to rotate |
 | `DATABASE_POOL_MAX` | Northflank `production` (4) | default 10 | default 10 | Most connections per process (API or worker), split between its one Prisma and one pg-boss pool; Aiven allows 20 (BE-018) |
-| `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | — | `.env` | Fresh per environment; rotation plan still to write |
+| `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | — | `.env` | Fresh per environment; how and when every secret is rotated is the [secrets rotation runbook](../runbooks/secrets-rotation.md) (EXT-020) |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY` | Northflank `production` | — | `.env` | 32 random bytes, base64 |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | Northflank `production` (`northflank-prod-v1`) | — | `local-development-v1` | |
 | `AUTHENTICATION_LINK_BASE_URL` | Northflank `api` **and** `worker` services (`https://links.emmapilatesstudio.com`; staging `https://links-staging.emmapilatesstudio.com`) | default | default | The link host the API serves (ADR-0095) |
@@ -407,8 +407,11 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `NODE_ENV` | `production` (image default) | — | `.env` | |
 | `RELEASE_ID` | from `NF_GIT_SHA` at build | unset (`local`) | unset | |
 | `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | — | — | Lets Vercel use the pinned pnpm |
-| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `Release Production` workflow; expires around 2027-10-14 |
-| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `Release Staging` workflow; expires around 2027-10-17 |
+| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `Release Production` workflow; expires around 2027-10-14, rotation planned 2027-09-14 ([calendar](../runbooks/secrets-rotation.md#calendar)) |
+| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `Release Staging` workflow; expires around 2027-10-17, rotation planned 2027-09-17 |
+| `PRODUCTION_BACKUP_READ_ACCESS_KEY_ID`, `PRODUCTION_BACKUP_READ_SECRET_ACCESS_KEY` | GitHub repository secrets | — | — | `Copy Production to Staging`; R2 token `github-staging-copy` (Object Read only on `emma-pilates-prod-backups`) |
+| `STAGING_DATABASE_PASSWORD` | GitHub repository secret (the same password is inside staging's `DATABASE_URL`) | — | — | `Copy Production to Staging` connects as `emma_staging`; reset in Aiven, then update both holders |
+| `AIVEN_CA_CERT` | GitHub repository **variable** | — | — | Aiven's public CA certificate for the copy workflow; the same file is `/etc/secrets/emma-ca.pem` on Northflank |
 | `VERCEL_ORG_ID`, `VERCEL_PRODUCTION_PROJECT_ID`, `VERCEL_PRODUCTION_TOKEN` | GitHub repository secrets | — | — | `Release Production` deploys the admin web; the token is scoped to `emma-pilates-admin` |
 | `VERCEL_STAGING_PROJECT_ID`, `VERCEL_STAGING_TOKEN` | GitHub repository secrets | — | — | `Release Staging` deploys the staging admin web; the token is scoped to `emma-pilates-admin-staging` |
 | `STAGING_API_URL`, `STAGING_NORTHFLANK_WORKER_SERVICE_ID` | GitHub repository **variables** | — | — | The staging API and worker; the staging workflow does nothing while `STAGING_API_URL` is empty |
@@ -465,6 +468,14 @@ Values never go in the repository or a chat. «Mac» means the user's own
   with a typed confirmation; restores the newest daily production dump from
   R2 (digest checked) into `emma_staging` as the `emma_staging` role, then
   starts `Release Staging` (EXT-018, ADR-0093).
+- **`.github/workflows/operations-reminders.yml`:** on the first day of
+  every month opens a GitHub issue for each operations task due in the
+  coming month: a secret rotation within 31 days of its calendar date, the
+  restore drill in January, April, July, and October, and the free-plan
+  usage check every month (EXT-020). It needs no secret (the workflow's own
+  token, `issues: write`), skips a task whose issue is still open, and can
+  be started by hand. GitHub disables it after 60 days without a push; its
+  dates are the [rotation calendar](../runbooks/secrets-rotation.md#calendar).
 
 ## Monitoring
 
@@ -518,6 +529,73 @@ Values never go in the repository or a chat. «Mac» means the user's own
   frames stay unsymbolicated.
 - Not yet: source maps for the admin web (declined: the upload needs an
   account-wide Better Stack token on Vercel).
+- **Three more Better Stack monitors**, added by the owner on 2026-10-21
+  (EXT-020, [runbook](../runbooks/uptime-monitors.md)) with the API
+  monitor's settings (every 3 minutes, 3-minute confirmation and recovery,
+  Europe, North America, Asia, and Australia, e-mail to the primary
+  responder, SSL verification on; the free plan cannot check certificate
+  or domain expiry), all Up the same day:
+  - «Production admin web» (monitor 5107874): `https://emma-pilates-admin.vercel.app/`
+  - «Public pages»: `https://app.emmapilatesstudio.com/`
+  - «Link host»: `https://links.emmapilatesstudio.com/.well-known/assetlinks.json`
+  An alert has not been provoked on them yet (the runbook's «Prove one
+  alert fires»).
+
+### Logs and retention
+
+- **Northflank** is the only log store (ADR-0081). The API, worker,
+  `migrate`, and `backup` write JSON lines to stdout; Northflank keeps a
+  container's logs, running or terminated, for **up to 30 days**
+  ([its docs](https://northflank.com/docs/v1/application/observe/view-logs)),
+  and build logs with each build. There is no plan-level setting and no
+  export button: logs are read in the console (Services → `api` → Logs,
+  with the time range and text filters), or tailed and saved with the
+  Northflank CLI or API. Staging's logs follow the same rule while its
+  services run; a paused service keeps its last container's logs.
+- **Better Stack logs are unused**: the free plan's 3 GB for 3 days is never
+  filled because nothing ships logs there, and no log sink is configured
+  on Northflank. Better Stack holds only error events (100k a month),
+  heartbeats, and monitors.
+- **Vercel** keeps the admin web's runtime logs (the proxy and the error
+  tunnel Function) for about an hour on Hobby, in the project's Logs tab;
+  **Cloudflare Pages** keeps build logs per deployment and no request logs
+  on the free plan; **GitHub Actions** keeps workflow logs for 90 days.
+- **What the logs hold:** request and job correlation identifiers,
+  release, severity, and event names, never bodies, credentials, links, or
+  personal data beyond an account identifier (ADR-0081). The audit records
+  in the database (`system.audit_records`) are the durable trail and are
+  never deleted; the logs are not.
+- **When an incident needs older logs:** on the day an incident is
+  declared, before anything else expires, save the relevant window from
+  Northflank (select the range in the Logs view and copy, or tail with the
+  CLI into a file kept outside the repository and the chat) for every piece
+  involved, because the window closes 30 days after the lines were written,
+  not after the incident. Anything older than 30 days is gone: fall back to
+  the audit records, the email-delivery events, Better Stack's error
+  events, Resend's Logs (its own retention), and the daily dumps (30 days,
+  then the monthly copies). If a future incident shows 30 days is too
+  short, the cheapest change is a Northflank log sink to an R2 bucket with
+  a lifecycle rule, not a paid log plan.
+
+## Free-plan limits that can be exceeded silently
+
+Each provider stops or bills without an email you would notice in time, so
+the monthly reminder issue (`Operations reminders` workflow) asks for a look
+at every console below. Write the month's numbers in the issue and close it.
+
+| Provider | Free limit | What happens past it | Where to check |
+| --- | --- | --- | --- |
+| **Expo EAS** | 15 iOS and 15 Android builds a month (the `development`, `staging`, and `production` profiles all count); updates to 1,000 monthly users | A build is refused until the month resets, or billed if a card is added | <https://expo.dev> → organization `emma-pilates` → **Usage** (or `eas build:list --limit 30` from an app folder) |
+| **Resend** | 100 emails a day and 3,000 a month, **shared by production and staging** | Sends fail after their retries (ADR-0094); a launch-day burst of invitations is the likely cause, a staging test the other | <https://resend.com> → **Emails** (the day's count) and **Usage**; a staging test sends from the same quota |
+| **Cloudflare R2** | 10 GB-month stored, 1M Class A (writes) and 10M Class B (reads) operations a month, free egress; the images bucket and the backups bucket together | Billed on the card on file ($0.015 per GB-month, $4.50 per million writes, $0.36 per million reads), without pausing | Cloudflare → **R2** → Overview (the account's usage bars) and each bucket's Metrics |
+| **Vercel Hobby** | 100 GB Fast Data Transfer and 1M middleware invocations a month (the proxy middleware runs on every `/api/v1` request), plus Vercel's fair-use terms for non-commercial use (accepted by decision) | Vercel pauses the project's deployments past the limit; no bill | Vercel → team → **Usage** |
+| **Northflank Sandbox** | 2 services, 2 jobs, $20 of resources a month (about $10.80 used) | A third service or job cannot be created; resources past $20 would need a plan | Northflank → team `emma-pilates` → Billing → Usage |
+| **Northflank staging** | Pay as you go, billing alert at $3 | Charged monthly; the alert emails at $3 (forgotten resumed services are the risk: about $12 a month) | Northflank → team `emma-pilates-staging` → Billing → Usage; pause `api` and `worker` after testing |
+| **Aiven Free** | 1 GB disk, 20 connections, one service; powered off after a notice when idle | Writes fail on a full disk; Aiven emails before powering off an idle service | Aiven → the service → Overview (disk) and Metrics (connections) |
+| **Better Stack** | 10 monitors, 10 heartbeats, 100k error events a month | Error events beyond the quota are dropped for the month | Better Stack → team → **Usage** |
+| **GitHub Actions** | 2,000 minutes a month on a private repository (every push to `main` runs the whole CI plus a staging release; EXT-022's evidence has the runner minutes per run) and 500 MB of artifacts | Workflows stop, so releases stop, until the month resets | GitHub → Settings → Billing → **Usage this month** |
+| **Cloudflare Pages** | 500 builds a month | A merge touching `apps/public-site` is not published until the month resets | Cloudflare → Workers & Pages → `emma-pilates-public` → Deployments |
+| **Firebase Spark, Expo Push, Google Play** | No metered limit for what the project uses (FCM, push tickets, store distribution) | — | — |
 
 ## Known gaps
 

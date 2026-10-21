@@ -1,0 +1,70 @@
+name: Operations reminders
+
+# EXT-020: on the first day of every month (09:00 La Paz) open one GitHub
+# issue for each operations task that falls due in the coming month, so the
+# owner's email is the reminder and nothing is paid for it. The dates are the
+# calendar in docs/runbooks/secrets-rotation.md; move a line forward there and
+# here after each rotation. A reminder whose issue is still open is skipped.
+# GitHub disables a scheduled workflow after 60 days without a push: start it
+# by hand (Run workflow) and re-enable it when GitHub's email says so.
+on:
+  schedule:
+    - cron: "0 13 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  remind:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DOCS: https://github.com/${{ github.repository }}/blob/main/docs
+    steps:
+      - name: Open the reminders that fall due this month
+        run: |
+          set -euo pipefail
+          today=$(date -u +%F)
+          horizon=$(date -u -d "$today + 31 days" +%F)
+          month=$(date -u +%m)
+          year=$(date -u +%Y)
+          open_titles=$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --limit 200 --json title --jq '.[].title')
+
+          remind() { # title, body
+            if printf '%s\n' "$open_titles" | grep -Fxq -- "$1"; then
+              echo "still open: $1"
+              return
+            fi
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$1" --body "$2"
+            echo "opened: $1"
+          }
+
+          # Dated tasks: due date | title | what to do. A task stays due until
+          # its date is moved forward, so a closed issue reopens next month
+          # unless the rotation was recorded.
+          while IFS='|' read -r due title what; do
+            [ -z "$due" ] && continue
+            if [[ "$due" < "$horizon" ]]; then
+              body=$(printf '%s\n\nSteps: %s/runbooks/secrets-rotation.md. After rotating, add a log row and move this date a year forward in the calendar there and in .github/workflows/operations-reminders.yml.' "$what" "$DOCS")
+              remind "[ops] $title (due $due)" "$body"
+            fi
+          done <<'TABLE'
+          2027-09-14|Rotate NORTHFLANK_API_TOKEN|The production deploy token (Northflank team emma-pilates, github-actions-release) expires 2027-10-14. Create a new 1-year token with the same role, set the repository secret, verify with the next promotion, delete the old token.
+          2027-09-17|Rotate NORTHFLANK_STAGING_API_TOKEN|The staging deploy token (team emma-pilates-staging, github-actions-staging-release) expires 2027-10-17. Same steps as production with the staging workflow as the check.
+          2027-09-14|Yearly rotation of the never-expiring credentials|Vercel tokens (check their expiry first), the R2 tokens, Resend keys and webhook secrets, the Expo robot token, the FCM key, the Play submit key, and the Telemetry API token; also check the domain renewal (2027-10-15) and the Aiven CA date.
+          TABLE
+
+          # Quarterly restore drill (BE-007 G9): January, April, July, October.
+          # A drill already in the log for that quarter closes the issue by hand.
+          case "$month" in
+            01) quarter=1 ;; 04) quarter=2 ;; 07) quarter=3 ;; 10) quarter=4 ;; *) quarter= ;;
+          esac
+          if [ -n "$quarter" ]; then
+            remind "[ops] Restore drill $year Q$quarter" "Run the quarterly restore drill and add its row to the drill log: $DOCS/runbooks/backups-and-restore-drills.md#restore-drill (template under «Drill log»). A failed step is an incident."
+          fi
+
+          # Monthly free-plan usage check.
+          remind "[ops] Free-plan usage check $year-$month" "Open each console listed under «Free-plan limits that can be exceeded silently» and note the month's usage: $DOCS/architecture/infrastructure.md#free-plan-limits-that-can-be-exceeded-silently. Also run the weekly backup check if it was skipped. Close this issue with the numbers in a comment."

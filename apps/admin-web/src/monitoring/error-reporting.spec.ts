@@ -1,6 +1,10 @@
 import type { ErrorEvent } from "@sentry/react";
 import { ApiError } from "../api/problem";
-import { sanitizeErrorEvent, startErrorReporting } from "./error-reporting";
+import {
+  reportRequestFailure,
+  sanitizeErrorEvent,
+  startErrorReporting,
+} from "./error-reporting";
 
 const settings = {
   dsn: "https://token@errors.example.com/2",
@@ -159,5 +163,50 @@ describe("admin web error reporting (EXT-011)", () => {
     expect(
       sanitizeErrorEvent(event, answer(0, "network_error")),
     ).not.toBeNull();
+  });
+
+  // WEB-032: a failed read or write the page already answered with its own
+  // notice is still a failure of the backend or the network worth knowing.
+  describe("reportRequestFailure", () => {
+    const handled = { mechanism: { type: "tanstack_query", handled: true } };
+
+    it("captures a 5xx answer, an unreachable backend, and an unexpected error", () => {
+      const capture = jest.fn();
+      const serverError = new ApiError({
+        status: 503,
+        code: "unexpected_error",
+      });
+      const networkError = new ApiError({ status: 0, code: "network_error" });
+      const unexpected = new TypeError("x is not a function");
+
+      reportRequestFailure(serverError, capture);
+      reportRequestFailure(networkError, capture);
+      reportRequestFailure(unexpected, capture);
+
+      expect(capture.mock.calls).toEqual([
+        [serverError, handled],
+        [networkError, handled],
+        [unexpected, handled],
+      ]);
+    });
+
+    it("never captures a 4xx answer, the backend's deliberate reply", () => {
+      const capture = jest.fn();
+
+      reportRequestFailure(
+        new ApiError({ status: 401, code: "authentication_required" }),
+        capture,
+      );
+      reportRequestFailure(
+        new ApiError({ status: 403, code: "administration_access_denied" }),
+        capture,
+      );
+      reportRequestFailure(
+        new ApiError({ status: 409, code: "conflict" }),
+        capture,
+      );
+
+      expect(capture).not.toHaveBeenCalled();
+    });
   });
 });
