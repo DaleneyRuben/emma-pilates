@@ -49,11 +49,19 @@ test("invites a Nutritionist and deactivates an Assistant", async ({
   await expect(
     pending.getByRole("button", { name: "Reenviar enlace" }),
   ).toBeVisible();
+  // Cancelled before she activates: the links die, the email is freed,
+  // and Personal shows the six fixture members again.
+  await pending.getByRole("button", { name: "Cancelar invitación" }).click();
+  const cancel = page.getByRole("alertdialog", {
+    name: "¿Cancelar la invitación de Valentina Soria?",
+  });
+  await cancel.getByRole("button", { name: "Sí, cancelar invitación" }).click();
   await expect(
-    pending.getByRole("button", { name: "Cancelar invitación" }),
+    page.getByText("Cancelamos la invitación de Valentina Soria."),
   ).toBeVisible();
-  await page.keyboard.press("Escape");
   await expect(pending).toHaveCount(0);
+  await expect(valentina).toHaveCount(0);
+  await expect(page.getByText("Mostrando 1–6 de 6 miembros")).toBeVisible();
 
   await page.getByRole("button", { name: "Camila Rojas" }).click();
   const camila = page.getByRole("dialog", { name: "Editar miembro" });
