@@ -1,0 +1,34 @@
+# The development tools' floating button covers the top-right corner («Tu
+# cuenta», «+ Nuevo horario» on the iPad). On iOS a swipe from it
+# (`gearshape.fill`) parks it bottom-right. On Android a swipe opens the dev
+# menu instead and its touch area covers the whole avatar, so the flow opens
+# the menu and switches «Tools button» off. Either step is skipped where the
+# button is not on screen.
+appId: ${APP_ID}
+---
+- runFlow:
+    when:
+      platform: iOS
+      visible:
+        id: "gearshape.fill"
+    commands:
+      - swipe:
+          from:
+            id: "gearshape.fill"
+          direction: DOWN
+          duration: 600
+- runFlow:
+    when:
+      platform: Android
+      visible: "Tools"
+    commands:
+      - tapOn: "Tools"
+      - scrollUntilVisible:
+          element: "Tools button"
+          direction: DOWN
+          timeout: 10000
+      - tapOn: "Tools button"
+      - tapOn: "Close"
+      - extendedWaitUntil:
+          notVisible: "Tools button"
+          timeout: 5000

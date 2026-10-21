@@ -1,0 +1,46 @@
+# Picks the first photo in the system photo picker, which runs outside the
+# app (PHPicker on iOS, the Android photo picker). The device needs at least
+# one image in its library (Test 19).
+appId: ${APP_ID}
+---
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      - extendedWaitUntil:
+          visible: "Photo taken on.*"
+          timeout: 30000
+      - tapOn:
+          text: "Photo taken on.*"
+          index: 0
+      # The picker can keep the selection open until it is confirmed.
+      - tapOn:
+          text: "Done|Listo"
+          optional: true
+- runFlow:
+    when:
+      platform: iOS
+    commands:
+      - extendedWaitUntil:
+          visible: "Cancel|Cancelar"
+          timeout: 20000
+      - extendedWaitUntil:
+          notVisible: "Loading…|Loading...|Cargando…"
+          timeout: 60000
+      - extendedWaitUntil:
+          visible: "Photos|Fotos|Recents|Recientes|Albums|Álbumes"
+          timeout: 60000
+      # First grid cell: the iPad shows an album sidebar first, the phone
+      # grid starts at the left edge.
+      - runFlow:
+          when:
+            visible: "Favorites|Favoritos"
+          commands:
+            - tapOn:
+                point: "36%,17%"
+      - runFlow:
+          when:
+            notVisible: "Favorites|Favoritos"
+          commands:
+            - tapOn:
+                point: "16%,28%"
