@@ -376,7 +376,7 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | --- | --- | --- | --- | --- |
 | `DATABASE_URL` | Northflank `production` | — | `.env` (local) | Reset in Aiven to rotate |
 | `DATABASE_POOL_MAX` | Northflank `production` (4) | default 10 | default 10 | Most connections per process (API or worker), split between its one Prisma and one pg-boss pool; Aiven allows 20 (BE-018) |
-| `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | — | `.env` | Fresh per environment; rotation plan still to write |
+| `AUTHENTICATION_EMAIL_DIGEST_KEY` | Northflank `production` | — | `.env` | Fresh per environment; how and when every secret is rotated is the [secrets rotation runbook](../runbooks/secrets-rotation.md) (EXT-020) |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY` | Northflank `production` | — | `.env` | 32 random bytes, base64 |
 | `AUTHENTICATION_LINK_ENCRYPTION_KEY_ID` | Northflank `production` (`northflank-prod-v1`) | — | `local-development-v1` | |
 | `AUTHENTICATION_LINK_BASE_URL` | Northflank `api` **and** `worker` services (`https://links.emmapilatesstudio.com`; staging `https://links-staging.emmapilatesstudio.com`) | default | default | The link host the API serves (ADR-0095) |
@@ -407,8 +407,11 @@ Values never go in the repository or a chat. «Mac» means the user's own
 | `NODE_ENV` | `production` (image default) | — | `.env` | |
 | `RELEASE_ID` | from `NF_GIT_SHA` at build | unset (`local`) | unset | |
 | `ENABLE_EXPERIMENTAL_COREPACK` | Vercel Production | — | — | Lets Vercel use the pinned pnpm |
-| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `Release Production` workflow; expires around 2027-10-14 |
-| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `Release Staging` workflow; expires around 2027-10-17 |
+| `NORTHFLANK_API_TOKEN` | GitHub repository secret | — | — | `Release Production` workflow; expires around 2027-10-14, rotation planned 2027-09-14 ([calendar](../runbooks/secrets-rotation.md#calendar)) |
+| `NORTHFLANK_STAGING_API_TOKEN` | GitHub repository secret | — | — | `Release Staging` workflow; expires around 2027-10-17, rotation planned 2027-09-17 |
+| `PRODUCTION_BACKUP_READ_ACCESS_KEY_ID`, `PRODUCTION_BACKUP_READ_SECRET_ACCESS_KEY` | GitHub repository secrets | — | — | `Copy Production to Staging`; R2 token `github-staging-copy` (Object Read only on `emma-pilates-prod-backups`) |
+| `STAGING_DATABASE_PASSWORD` | GitHub repository secret (the same password is inside staging's `DATABASE_URL`) | — | — | `Copy Production to Staging` connects as `emma_staging`; reset in Aiven, then update both holders |
+| `AIVEN_CA_CERT` | GitHub repository **variable** | — | — | Aiven's public CA certificate for the copy workflow; the same file is `/etc/secrets/emma-ca.pem` on Northflank |
 | `VERCEL_ORG_ID`, `VERCEL_PRODUCTION_PROJECT_ID`, `VERCEL_PRODUCTION_TOKEN` | GitHub repository secrets | — | — | `Release Production` deploys the admin web; the token is scoped to `emma-pilates-admin` |
 | `VERCEL_STAGING_PROJECT_ID`, `VERCEL_STAGING_TOKEN` | GitHub repository secrets | — | — | `Release Staging` deploys the staging admin web; the token is scoped to `emma-pilates-admin-staging` |
 | `STAGING_API_URL`, `STAGING_NORTHFLANK_WORKER_SERVICE_ID` | GitHub repository **variables** | — | — | The staging API and worker; the staging workflow does nothing while `STAGING_API_URL` is empty |
