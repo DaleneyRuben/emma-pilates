@@ -1,0 +1,65 @@
+# Critical journey: a wrong password is refused with the neutral message, then
+# «¿Olvidaste tu contraseña?» asks for a recovery link (Test 6B). Lucía's
+# Account is not changed: the link is captured, never opened. One wrong
+# attempt stays under the login throttle.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runFlow: subflows/open-app.yaml
+- tapOn:
+    id: "login-email"
+- waitForAnimationToEnd
+- inputText: ${EMAIL}
+- tapOn:
+    id: "login-password"
+- waitForAnimationToEnd
+- inputText: "not-the-password"
+- tapOn:
+    id: "login-submit"
+- extendedWaitUntil:
+    visible:
+      id: "form-alert"
+    timeout: 15000
+- assertVisible: "El correo o la contraseña no son correctos."
+- takeScreenshot: client-login-rejected
+# After the refused submit the form can stay padded for the keyboard and
+# clip the link under it: scroll it up inside the visible part first.
+- swipe:
+    start: "50%,45%"
+    end: "50%,15%"
+- waitForAnimationToEnd
+- repeat:
+    times: 3
+    while:
+      notVisible:
+        id: "recovery-email"
+    commands:
+      - tapOn:
+          id: "login-forgot-password"
+      - waitForAnimationToEnd
+      - extendedWaitUntil:
+          visible:
+            id: "recovery-email"
+          timeout: 5000
+          optional: true
+- extendedWaitUntil:
+    visible:
+      id: "recovery-email"
+    timeout: 10000
+- tapOn:
+    id: "recovery-email"
+- waitForAnimationToEnd
+- inputText: ${EMAIL}
+- tapOn:
+    id: "recovery-submit"
+- extendedWaitUntil:
+    visible: "Si hay una cuenta con ${EMAIL}, te enviamos un enlace.*"
+    timeout: 15000
+- takeScreenshot: client-recovery-sent
+- tapOn:
+    id: "recovery-back"
+- extendedWaitUntil:
+    visible:
+      id: "login-submit"
+    timeout: 10000

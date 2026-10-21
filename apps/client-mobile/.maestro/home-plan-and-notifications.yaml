@@ -57,7 +57,7 @@ env:
     timeout: 15000
 - takeScreenshot: client-home-4-evaluacion
 - tapOn:
-    text: "Perfil, .*tab.*"
+    id: "tab-profile"
 # «Cerrar sesión» sits below the fold since follow-up 103.
 - extendedWaitUntil:
     visible: "Cambiar contraseña"

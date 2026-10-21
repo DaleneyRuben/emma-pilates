@@ -1,0 +1,45 @@
+# Critical journey: the Assistant creates a Client's account (S05) and lands
+# on her overview with the invitation pending (S06). The email is new on
+# every run (scripts/seed.js «new-client»), so the flow can repeat on the same
+# database; each run leaves one more pending invitation.
+appId: ${APP_ID}
+env:
+  EMAIL: camila.rojas@example.com
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: new-client
+- runFlow: subflows/login.yaml
+- runFlow: subflows/park-dev-gear.yaml
+- extendedWaitUntil:
+    visible:
+      id: "client-search-new-client"
+    timeout: 30000
+- tapOn:
+    id: "client-search-new-client"
+- extendedWaitUntil:
+    visible:
+      id: "new-client-name"
+    timeout: 10000
+- tapOn:
+    id: "new-client-name"
+- waitForAnimationToEnd
+- inputText: "Paula Maestro"
+- tapOn:
+    id: "new-client-email"
+- waitForAnimationToEnd
+- inputText: ${output.email}
+- tapOn:
+    id: "new-client-phone"
+- waitForAnimationToEnd
+- inputText: "70012345"
+- takeScreenshot: staff-new-client-1-form
+- tapOn:
+    id: "new-client-submit"
+- extendedWaitUntil:
+    visible:
+      id: "pending-card"
+    timeout: 20000
+- assertVisible: "Cuenta pendiente de activación"
+- takeScreenshot: staff-new-client-2-pending

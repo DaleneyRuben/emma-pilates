@@ -2,65 +2,27 @@
 # in as ${EMAIL} with the shared development-fixture password.
 appId: ${APP_ID}
 ---
-- launchApp:
-    appId: ${APP_ID}
-    clearKeychain: true
-    clearState: true
-- openLink: ${APP_LINK}
-# iOS asks «Open in "<app>"?» for the link, sometimes twice on a
-# development build (once for the launcher, again once the bundle loads), and
-# an open alert hides the app from Maestro. Answer it until the app's first
-# screen shows, then once more if a late alert follows.
-- repeat:
-    times: 12
-    while:
-      notVisible: "Continue|Iniciar sesión"
-    commands:
-      - tapOn:
-          text: "Open"
-          optional: true
-      - extendedWaitUntil:
-          visible: "Open|Continue|Iniciar sesión"
-          timeout: 15000
-          optional: true
-- extendedWaitUntil:
-    visible: "Open"
-    timeout: 5000
-    optional: true
+- runFlow: open-app.yaml
 - tapOn:
-    text: "Open"
-    optional: true
-- extendedWaitUntil:
-    visible:
-      text: "Continue|Iniciar sesión"
-    timeout: 180000
-- tapOn:
-    text: "Continue"
-    optional: true
-- extendedWaitUntil:
-    visible: "Reload"
-    timeout: 10000
-    optional: true
-- tapOn:
-    point: "50%,25%"
-    optional: true
-- extendedWaitUntil:
-    visible: "Iniciar sesión"
-    timeout: 90000
-- tapOn: "tu@emmapilates.bo"
+    id: "login-email"
+# The iPad drops text typed before the keyboard has settled.
+- waitForAnimationToEnd
 - inputText: ${EMAIL}
-- tapOn: "••••••••"
+- tapOn:
+    id: "login-password"
+- waitForAnimationToEnd
 - inputText: ${PASSWORD}
 - repeat:
     times: 3
     while:
-      visible: "Iniciar sesión"
+      visible:
+        id: "login-submit"
     commands:
       - tapOn:
-          text: "Iniciar sesión"
-          index: 0
+          id: "login-submit"
       - extendedWaitUntil:
-          notVisible: "Iniciar sesión"
+          notVisible:
+            id: "login-submit"
           timeout: 6000
           optional: true
 - extendedWaitUntil:

@@ -6,10 +6,10 @@ env:
 - runFlow: subflows/login.yaml
 - extendedWaitUntil:
     visible:
-      text: "Perfil, .*tab.*"
+      id: "tab-profile"
     timeout: 30000
 - tapOn:
-    text: "Perfil, .*tab.*"
+    id: "tab-profile"
 - extendedWaitUntil:
     visible: "Evaluación nutricional"
     timeout: 15000
@@ -33,8 +33,11 @@ env:
 - takeScreenshot: client-evaluation-3-confirmar
 - tapOn: "Confirmar"
 - runFlow: subflows/dismiss-push-permission.yaml
+# «Evaluación confirmada» lasts eight seconds and the notification sheet can
+# outlast it on a slow emulator; the booked card's cancellation line is the
+# lasting proof.
 - extendedWaitUntil:
-    visible: "Evaluación confirmada"
+    visible: "Evaluación confirmada|Puedes cancelar hasta 3 horas antes."
     timeout: 15000
 - assertVisible: "Puedes cancelar hasta 3 horas antes."
 - takeScreenshot: client-evaluation-4-confirmada

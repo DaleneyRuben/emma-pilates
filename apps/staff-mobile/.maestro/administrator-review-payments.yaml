@@ -1,0 +1,93 @@
+# Critical journey: the Administrator confirms one transfer and rejects
+# another with a reason (S12). Needs the two transfers seed.mjs leaves
+# (Mariana's to confirm, Sofía's to reject); scripts/seed.js finds them.
+appId: ${APP_ID}
+env:
+  EMAIL: paola.mendoza@example.com
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: pending-transfers
+- runFlow: subflows/login.yaml
+- runFlow: subflows/park-dev-gear.yaml
+- extendedWaitUntil:
+    visible:
+      id: "pending-payment-${output.confirmId}"
+    timeout: 30000
+- takeScreenshot: staff-review-1-pending
+- tapOn:
+    id: "pending-payment-${output.confirmId}"
+- extendedWaitUntil:
+    visible:
+      id: "review-confirm"
+    timeout: 15000
+- takeScreenshot: staff-review-2-detail
+# The actions sit under the receipt, below the fold on a phone.
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- tapOn:
+    id: "review-confirm"
+- extendedWaitUntil:
+    visible:
+      id: "pending-payments-cancel-class"
+    timeout: 15000
+- extendedWaitUntil:
+    notVisible:
+      id: "pending-payment-${output.confirmId}"
+    timeout: 15000
+- extendedWaitUntil:
+    visible:
+      id: "pending-payment-${output.rejectId}"
+    timeout: 15000
+- tapOn:
+    id: "pending-payment-${output.rejectId}"
+- extendedWaitUntil:
+    visible:
+      id: "review-reject"
+    timeout: 15000
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- tapOn:
+    id: "review-reject"
+- extendedWaitUntil:
+    visible:
+      id: "review-reject-reason"
+    timeout: 10000
+- tapOn:
+    id: "review-reject-reason"
+- waitForAnimationToEnd
+- inputText: "El monto no coincide con la transferencia."
+# The iPad keyboard has its own «Hide keyboard» key; the phone has none, and
+# Maestro's hideKeyboard taps the receipt there.
+- tapOn:
+    text: "Hide keyboard"
+    optional: true
+- waitForAnimationToEnd
+# On the phone the form scrolls above the keyboard: swipe inside the visible
+# part until «Confirmar rechazo» rises into view.
+- repeat:
+    times: 3
+    while:
+      notVisible:
+        id: "review-reject-confirm"
+    commands:
+      - swipe:
+          start: "50%,55%"
+          end: "50%,20%"
+      - waitForAnimationToEnd
+- takeScreenshot: staff-review-3-reason
+- tapOn:
+    id: "review-reject-confirm"
+# Back on Pagos pendientes without Sofía's transfer.
+- extendedWaitUntil:
+    visible:
+      id: "pending-payments-cancel-class"
+    timeout: 15000
+- extendedWaitUntil:
+    notVisible:
+      id: "pending-payment-${output.rejectId}"
+    timeout: 15000
+- takeScreenshot: staff-review-4-done

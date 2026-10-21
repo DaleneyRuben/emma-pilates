@@ -7,7 +7,7 @@ env:
 ---
 - runFlow: subflows/login.yaml
 - tapOn:
-    text: "Perfil, .*tab.*"
+    id: "tab-profile"
 # Since follow-up 103 the promotions card pushes «Cerrar sesión» below the
 # fold on a phone, so wait for the menu's last row.
 - extendedWaitUntil:

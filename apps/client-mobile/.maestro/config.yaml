@@ -1,18 +1,26 @@
-# Run from apps/client-mobile with the app served and fixtures freshly applied:
+# Run from apps/client-mobile with the app served, the API and the worker up
+# on a freshly rebuilt fixtures database, and one photo in the device library:
 #   maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8083 \
-#     -e PASSWORD=emma-local-2026 .maestro
-# Test 19 lists what each flow needs beyond the fixtures.
+#     -e PASSWORD=emma-local-2026 -e API_URL=http://127.0.0.1:3100 .maestro
+# Flows that seed their own classes call the API at API_URL
+# (scripts/seed.js). Test 19 lists what each flow needs beyond the fixtures.
 flows:
   - "*.yaml"
 executionOrder:
   continueOnFailure: false
-  # Maestro's default order is not the file order; close-account closes
-  # Sofía's Account for good, so it runs last.
+  # Maestro's default order is not the file order. The journeys that seed
+  # classes for Lucía and Valeria run after the ones that read her day as the
+  # fixtures ship it, and close-account closes Sofía's Account for good, so
+  # it runs last.
   flowsOrder:
+    - login-errors-and-recovery
     - book-and-cancel-class
     - email-change
     - evaluation-book-and-cancel
     - home-plan-and-notifications
     - profile-photo
     - promotions-consent
+    - purchase-plan-transfer
+    - waitlist-join-and-leave
+    - reschedule-booking
     - close-account

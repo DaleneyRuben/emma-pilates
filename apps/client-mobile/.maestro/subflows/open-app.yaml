@@ -1,0 +1,71 @@
+# Opens the app through ${APP_LINK} (Expo Go or a development build) with a
+# clean state and waits for the login screen.
+appId: ${APP_ID}
+---
+- launchApp:
+    appId: ${APP_ID}
+    clearKeychain: true
+    clearState: true
+- openLink: ${APP_LINK}
+# On Android the development launcher drops a link that arrives while it is
+# still starting (it shows its server list instead): send it again once it
+# has settled. Android takes the app's own scheme for the link, such as
+# emmapilates-client://expo-development-client/?url=… (Test 19).
+- runFlow:
+    when:
+      platform: Android
+    commands:
+      # Nothing has this id: an eight-second pause.
+      - extendedWaitUntil:
+          visible:
+            id: "maestro-pause"
+          timeout: 8000
+          optional: true
+      - openLink: ${APP_LINK}
+# iOS asks «Open in "<app>"?» for the link, sometimes twice on a
+# development build (once for the launcher, again once the bundle loads), and
+# an open alert hides the app from Maestro. Answer it until the app's first
+# screen shows, then once more if a late alert follows.
+- repeat:
+    times: 12
+    while:
+      notVisible: "Continue|Iniciar sesión"
+    commands:
+      - tapOn:
+          text: "Open"
+          optional: true
+      - extendedWaitUntil:
+          visible: "Open|Continue|Iniciar sesión"
+          timeout: 15000
+          optional: true
+      - runFlow:
+          when:
+            platform: Android
+            notVisible: "Continue|Iniciar sesión"
+          commands:
+            - openLink: ${APP_LINK}
+- extendedWaitUntil:
+    visible: "Open"
+    timeout: 5000
+    optional: true
+- tapOn:
+    text: "Open"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      text: "Continue|Iniciar sesión"
+    timeout: 180000
+- tapOn:
+    text: "Continue"
+    optional: true
+- extendedWaitUntil:
+    visible: "Reload"
+    timeout: 10000
+    optional: true
+- tapOn:
+    point: "50%,25%"
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: "login-submit"
+    timeout: 90000
