@@ -23,6 +23,11 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
+      // Coding standards «File size and reuse»: 400 lines of code per file.
+      "max-lines": [
+        "error",
+        { max: 400, skipBlankLines: true, skipComments: true },
+      ],
     },
   },
   {

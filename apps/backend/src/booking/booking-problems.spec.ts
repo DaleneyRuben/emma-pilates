@@ -1,8 +1,8 @@
 import {
   BookingRescheduleController,
   ClassHistoryController,
-  TrainerAttendanceController,
 } from './booking.controller';
+import { TrainerAttendanceController } from './trainer.controller';
 import { BookingAccessDeniedError } from './commands/create-booking';
 
 // BE-024: a rule a Client or Staff Member can break answers a stable problem

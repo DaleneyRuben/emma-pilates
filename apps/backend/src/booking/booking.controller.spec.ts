@@ -3,11 +3,13 @@ import {
   BookingCancellationController,
   BookingController,
   ClassHistoryController,
-  TrainerAttendanceController,
   BookingRescheduleController,
+} from './booking.controller';
+import {
+  TrainerAttendanceController,
   TrainerScheduleController,
   TrainerSessionRosterController,
-} from './booking.controller';
+} from './trainer.controller';
 import { BookingAccessDeniedError } from './commands/create-booking';
 
 const principal = {

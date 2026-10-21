@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,7 +8,6 @@ import {
   Post,
   Get,
   Query,
-  UnauthorizedException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,82 +21,33 @@ import {
 } from '@nestjs/swagger';
 import { authenticatedPrincipalResolver } from '../system-identity/authentication/authentication.controller';
 import type { AuthenticatedPrincipal } from '../system-identity/authentication/resolve-authenticated-principal';
-import { AuthenticationRequiredError } from '../system-identity/authentication/resolve-authenticated-principal';
 import {
   ClassHistoryEntryDto,
   CreatedBookingDto,
   CreateBookingDto,
   parseAvailabilityQuery,
-  parseAttendance,
-  parseCalendarDate,
   parseCreateBooking,
   parseRescheduleBooking,
   parseUuid,
   SessionAvailabilityDto,
-  TrainerScheduleSessionDto,
-  TrainerSessionRosterDto,
 } from './booking.dto';
-import type { TrainerScheduleSession } from './trainer-schedule';
-import type { TrainerSessionRosterResult } from './trainer-session-roster';
-import { commandProblem } from './booking-command-problems';
+import {
+  authenticateBearer,
+  cancelBookingCommand,
+  classHistory,
+  createBookingCommand,
+  invalidRequest,
+  joinWaitlistCommand,
+  rescheduleBookingCommand,
+  rethrowAsProblem,
+  sessionAvailability,
+  type CancellationCommandHandler,
+  type ClassHistoryHandler,
+  type CommandHandler,
+  type PrincipalResolver,
+  type RescheduleCommandHandler,
+} from './booking-controller-support';
 import type { SessionAvailabilityHandler } from './session-availability';
-
-export const createBookingCommand = Symbol('createBookingCommand');
-export const joinWaitlistCommand = Symbol('joinWaitlistCommand');
-export const cancelBookingCommand = Symbol('cancelBookingCommand');
-export const rescheduleBookingCommand = Symbol('rescheduleBookingCommand');
-export const classHistory = Symbol('classHistory');
-export const recordAttendanceCommand = Symbol('recordAttendanceCommand');
-export const trainerSchedule = Symbol('trainerSchedule');
-export const trainerSessionRoster = Symbol('trainerSessionRoster');
-export const sessionAvailability = Symbol('sessionAvailability');
-
-type CommandHandler = (
-  command: { sessionId: string; clientId?: string },
-  principal: AuthenticatedPrincipal,
-  idempotencyKey: string,
-) => Promise<{ id: string }>;
-type PrincipalResolver = (
-  credential: string,
-  meaningfulActivity: boolean,
-) => Promise<AuthenticatedPrincipal>;
-type CancellationCommandHandler = (
-  command: { bookingId: string },
-  principal: AuthenticatedPrincipal,
-) => Promise<void>;
-type RescheduleCommandHandler = (
-  command: { bookingId: string; targetSessionId: string },
-  principal: AuthenticatedPrincipal,
-) => Promise<{ id: string }>;
-type ClassHistoryHandler = (
-  principal: AuthenticatedPrincipal,
-) => Promise<ClassHistoryEntryDto[]>;
-type AttendanceHandler = (
-  command: {
-    sessionId: string;
-    outcomes: { bookingId: string; outcome: 'attended' | 'no_show' }[];
-  },
-  principal: AuthenticatedPrincipal,
-) => Promise<void>;
-type TrainerScheduleHandler = (
-  input: { on: Date },
-  principal: AuthenticatedPrincipal,
-) => Promise<TrainerScheduleSession[]>;
-type TrainerSessionRosterHandler = (
-  input: { sessionId: string },
-  principal: AuthenticatedPrincipal,
-) => Promise<TrainerSessionRosterResult>;
-
-const parseBearerCredential = (authorization: string | undefined): string => {
-  const match = /^Bearer ([A-Za-z0-9_-]{43})$/.exec(authorization ?? '');
-  if (match?.[1] === undefined) {
-    throw new UnauthorizedException('Authentication is required');
-  }
-  return match[1];
-};
-
-const invalidRequest = (detail: string): BadRequestException =>
-  new BadRequestException({ code: 'invalid_request', detail });
 
 @Controller({ path: 'sessions', version: '1' })
 @ApiBearerAuth()
@@ -204,29 +153,14 @@ export class BookingController {
         parsedIdempotencyKey,
       );
     } catch (error) {
-      const problem = error instanceof Error ? commandProblem(error) : null;
-      if (problem !== null) throw problem;
-      throw error;
+      return rethrowAsProblem(error);
     }
   }
 
-  private async authenticate(
+  private authenticate(
     authorization: string | undefined,
   ): Promise<AuthenticatedPrincipal> {
-    try {
-      return await this.principalResolver(
-        parseBearerCredential(authorization),
-        true,
-      );
-    } catch (error) {
-      if (
-        error instanceof AuthenticationRequiredError ||
-        error instanceof UnauthorizedException
-      ) {
-        throw new UnauthorizedException('Authentication is required');
-      }
-      throw error;
-    }
+    return authenticateBearer(this.principalResolver, authorization);
   }
 }
 
@@ -261,29 +195,14 @@ export class BookingCancellationController {
         principal,
       );
     } catch (error) {
-      const problem = error instanceof Error ? commandProblem(error) : null;
-      if (problem !== null) throw problem;
-      throw error;
+      return rethrowAsProblem(error);
     }
   }
 
-  private async authenticate(
+  private authenticate(
     authorization: string | undefined,
   ): Promise<AuthenticatedPrincipal> {
-    try {
-      return await this.principalResolver(
-        parseBearerCredential(authorization),
-        true,
-      );
-    } catch (error) {
-      if (
-        error instanceof AuthenticationRequiredError ||
-        error instanceof UnauthorizedException
-      ) {
-        throw new UnauthorizedException('Authentication is required');
-      }
-      throw error;
-    }
+    return authenticateBearer(this.principalResolver, authorization);
   }
 }
 
@@ -320,29 +239,14 @@ export class BookingRescheduleController {
         principal,
       );
     } catch (error) {
-      const problem = error instanceof Error ? commandProblem(error) : null;
-      if (problem !== null) throw problem;
-      throw error;
+      return rethrowAsProblem(error);
     }
   }
 
-  private async authenticate(
+  private authenticate(
     authorization: string | undefined,
   ): Promise<AuthenticatedPrincipal> {
-    try {
-      return await this.principalResolver(
-        parseBearerCredential(authorization),
-        true,
-      );
-    } catch (error) {
-      if (
-        error instanceof AuthenticationRequiredError ||
-        error instanceof UnauthorizedException
-      ) {
-        throw new UnauthorizedException('Authentication is required');
-      }
-      throw error;
-    }
+    return authenticateBearer(this.principalResolver, authorization);
   }
 }
 
@@ -366,185 +270,13 @@ export class ClassHistoryController {
     try {
       return await this.listClassHistory(principal);
     } catch (error) {
-      const problem = error instanceof Error ? commandProblem(error) : null;
-      if (problem !== null) throw problem;
-      throw error;
+      return rethrowAsProblem(error);
     }
   }
 
-  private async authenticate(
+  private authenticate(
     authorization: string | undefined,
   ): Promise<AuthenticatedPrincipal> {
-    try {
-      return await this.principalResolver(
-        parseBearerCredential(authorization),
-        true,
-      );
-    } catch (error) {
-      if (
-        error instanceof AuthenticationRequiredError ||
-        error instanceof UnauthorizedException
-      ) {
-        throw new UnauthorizedException('Authentication is required');
-      }
-      throw error;
-    }
-  }
-}
-
-@Controller({ path: 'sessions', version: '1' })
-@ApiBearerAuth()
-export class TrainerAttendanceController {
-  constructor(
-    @Inject(recordAttendanceCommand)
-    private readonly recordAttendance: AttendanceHandler,
-    @Inject(authenticatedPrincipalResolver)
-    private readonly principalResolver: PrincipalResolver,
-  ) {}
-
-  @Post(':sessionId/attendance')
-  @ApiOperation({ operationId: 'recordSessionAttendance' })
-  async record(
-    @Param('sessionId') sessionId: string,
-    @Headers('authorization') authorization: string | undefined,
-    @Body() body: unknown,
-  ): Promise<void> {
-    const parsedSessionId = parseUuid(sessionId);
-    const parsed = parseAttendance(body);
-    if (parsedSessionId === null || parsed === null)
-      throw invalidRequest('Invalid Attendance request');
-    const principal = await this.authenticate(authorization);
-    try {
-      await this.recordAttendance(
-        { sessionId: parsedSessionId, outcomes: parsed.outcomes },
-        principal,
-      );
-    } catch (error) {
-      const problem = error instanceof Error ? commandProblem(error) : null;
-      if (problem !== null) throw problem;
-      throw error;
-    }
-  }
-
-  private async authenticate(
-    authorization: string | undefined,
-  ): Promise<AuthenticatedPrincipal> {
-    try {
-      return await this.principalResolver(
-        parseBearerCredential(authorization),
-        true,
-      );
-    } catch (error) {
-      if (
-        error instanceof AuthenticationRequiredError ||
-        error instanceof UnauthorizedException
-      )
-        throw new UnauthorizedException('Authentication is required');
-      throw error;
-    }
-  }
-}
-
-@Controller({ path: 'trainer/sessions', version: '1' })
-@ApiBearerAuth()
-export class TrainerScheduleController {
-  constructor(
-    @Inject(trainerSchedule)
-    private readonly listTrainerSchedule: TrainerScheduleHandler,
-    @Inject(authenticatedPrincipalResolver)
-    private readonly principalResolver: PrincipalResolver,
-  ) {}
-
-  @Get()
-  @ApiOperation({ operationId: 'listTrainerSchedule' })
-  @ApiQuery({ name: 'on', required: true, schema: { format: 'date' } })
-  @ApiOkResponse({ type: TrainerScheduleSessionDto, isArray: true })
-  async list(
-    @Query('on') on: string,
-    @Headers('authorization') authorization: string | undefined,
-  ): Promise<TrainerScheduleSessionDto[]> {
-    const parsedOn = parseCalendarDate(on);
-    if (parsedOn === null) throw invalidRequest('Invalid schedule date');
-    const principal = await this.authenticate(authorization);
-
-    try {
-      return await this.listTrainerSchedule({ on: parsedOn }, principal);
-    } catch (error) {
-      const problem = error instanceof Error ? commandProblem(error) : null;
-      if (problem !== null) throw problem;
-      throw error;
-    }
-  }
-
-  private async authenticate(
-    authorization: string | undefined,
-  ): Promise<AuthenticatedPrincipal> {
-    try {
-      return await this.principalResolver(
-        parseBearerCredential(authorization),
-        true,
-      );
-    } catch (error) {
-      if (
-        error instanceof AuthenticationRequiredError ||
-        error instanceof UnauthorizedException
-      )
-        throw new UnauthorizedException('Authentication is required');
-      throw error;
-    }
-  }
-}
-
-@Controller({ path: 'trainer/sessions', version: '1' })
-@ApiBearerAuth()
-export class TrainerSessionRosterController {
-  constructor(
-    @Inject(trainerSessionRoster)
-    private readonly loadTrainerSessionRoster: TrainerSessionRosterHandler,
-    @Inject(authenticatedPrincipalResolver)
-    private readonly principalResolver: PrincipalResolver,
-  ) {}
-
-  @Get(':sessionId/roster')
-  @ApiOperation({ operationId: 'getTrainerSessionRoster' })
-  @ApiParam({ name: 'sessionId', format: 'uuid' })
-  @ApiOkResponse({ type: TrainerSessionRosterDto })
-  async get(
-    @Param('sessionId') sessionId: string,
-    @Headers('authorization') authorization: string | undefined,
-  ): Promise<TrainerSessionRosterDto> {
-    const parsedSessionId = parseUuid(sessionId);
-    if (parsedSessionId === null)
-      throw invalidRequest('Invalid Session identifier');
-    const principal = await this.authenticate(authorization);
-
-    try {
-      return await this.loadTrainerSessionRoster(
-        { sessionId: parsedSessionId },
-        principal,
-      );
-    } catch (error) {
-      const problem = error instanceof Error ? commandProblem(error) : null;
-      if (problem !== null) throw problem;
-      throw error;
-    }
-  }
-
-  private async authenticate(
-    authorization: string | undefined,
-  ): Promise<AuthenticatedPrincipal> {
-    try {
-      return await this.principalResolver(
-        parseBearerCredential(authorization),
-        true,
-      );
-    } catch (error) {
-      if (
-        error instanceof AuthenticationRequiredError ||
-        error instanceof UnauthorizedException
-      )
-        throw new UnauthorizedException('Authentication is required');
-      throw error;
-    }
+    return authenticateBearer(this.principalResolver, authorization);
   }
 }
