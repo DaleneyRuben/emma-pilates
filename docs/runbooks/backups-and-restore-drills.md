@@ -101,7 +101,10 @@ The `Operations reminders` workflow
 EXT-020) opens a GitHub issue «[ops] Restore drill <year> Q<n>» on the first
 day of January, April, July, and October; the drill is done when its row is
 in the log below and the issue is closed with a link to the row's commit.
-The first reminder is due 2027-01-01 (the first drill was 2026-10-14).
+The workflow cannot tell that a quarter's drill was already done: its first
+run, by hand on 2026-10-21, opened «Restore drill 2026 Q4» although the
+drill of 2026-10-14 covers it, so such an issue is closed with a comment
+naming the log row. The first real reminder is due 2027-01-01.
 
 1. Download the latest dump from R2 with the restore token and check its
    checksum against the object's metadata (and the job's log line):

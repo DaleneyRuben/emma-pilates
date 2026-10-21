@@ -1,18 +1,18 @@
 # Runbook: add the missing uptime monitors in Better Stack
 
-Better Stack watches only the API (`Production API readiness`, every 3
-minutes). The admin web, the public pages, and the link host have no
-monitor, so an expired certificate, a broken DNS record, or a Vercel or
-Cloudflare outage would be found by a person (EXT-020). The free plan allows
-10 monitors (one in use; heartbeats have their own allowance of 10, two in
-use), so the three below cost nothing.
+Until 2026-10-21 Better Stack watched only the API (`Production API
+readiness`, every 3 minutes); an expired certificate, a broken DNS record,
+or a Vercel or Cloudflare outage on the other hosts would have been found by
+a person (EXT-020). The owner added the three monitors below that day,
+following these steps; keep them for re-creating a monitor or adding one
+for a new host. The free plan allows 10 monitors (four in use; heartbeats
+have their own allowance of 10, two in use).
 
 Every step is in the owner's Better Stack console, signed in from Brave;
 an assistant cannot do them. Do them one at a time and check the result in
 the list before the next. Afterwards update the «Monitoring» section of
-[infrastructure](../architecture/infrastructure.md#monitoring) (the three
-monitors are listed there as «to add by the user») and change its «Last
-verified» date.
+[infrastructure](../architecture/infrastructure.md#monitoring) and change
+its «Last verified» date.
 
 ## The three monitors
 
@@ -52,16 +52,17 @@ alert the same way. Open that monitor first (Uptime → Monitors → its row →
    - **Request timeout, HTTP method, expected status codes:** whatever the
      API monitor shows (Better Stack's defaults: 30 seconds, `GET`, any
      2xx–3xx). Add no request body or headers. Leave «Follow redirects» on.
-   - **Verify SSL** on, and the **SSL expiration** alert on at Better
-     Stack's default of 14 days (set the API monitor the same if it
-     differs; Northflank, Vercel, and Cloudflare renew their certificates
-     on their own, so this catches a renewal that silently stops).
-   - **Domain expiration** alert on for the two `emmapilatesstudio.com`
-     monitors (the domain expires 2027-10-15 with auto-renew on; this is a
-     second reminder that costs nothing). Off for the `vercel.app` host.
-6. **Monitor name:** the name from the table (the list shows it; the alert
-   e-mail quotes it). Leave the group empty, or make one group «Emma
-   Pilates production» and move the API monitor into it too.
+   - **SSL/TLS verification** On. **SSL expiration** and **Domain
+     expiration** stay at «Don't check»: the free plan cannot check them
+     (the form says «Upgrade your account»). Northflank, Vercel, and
+     Cloudflare renew their certificates on their own, and a certificate
+     that did expire fails the verification above; the domain's renewal
+     (2027-10-15, auto-renew on) is in the rotation calendar instead.
+   - **Pronounceable monitor name:** the name from the table; it is the
+     name the list and the alert e-mails show (there is no separate name
+     field).
+6. Leave **Metadata** closed (no group is needed; the list shows every
+   monitor under «Monitors»).
 7. Select **Create monitor**. The new row shows a grey «Pending» dot, then
    green **Up** within a check interval. If it shows **Down**, open the row:
    the error names the cause (a typo in the URL is the usual one); fix the

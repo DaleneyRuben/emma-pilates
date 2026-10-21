@@ -56,8 +56,8 @@ the provider never expires it and only the calendar below does.
 | --- | --- | --- | --- | --- |
 | `NORTHFLANK_API_TOKEN` | GitHub secret | Northflank team `emma-pilates` → API tokens (`github-actions-release`, role `github-production-release`) | `Release Production` | **2027-10-14** (1-year lifetime from 2026-10-14) |
 | `NORTHFLANK_STAGING_API_TOKEN` | GitHub secret | Northflank team `emma-pilates-staging` → API tokens (`github-actions-staging-release`, role `github-staging-release`) | `Release Staging` | **2027-10-17** (1 year from 2026-10-17) |
-| `VERCEL_PRODUCTION_TOKEN` | GitHub secret | Vercel → Account Settings → Tokens (`github-actions-production-release`, scoped to `emma-pilates-admin`) | `Release Production` (admin web) | as chosen at creation; check in Vercel → Tokens and record it in the log |
-| `VERCEL_STAGING_TOKEN` | GitHub secret | Vercel → Tokens (`github-actions-staging-release`, scoped to `emma-pilates-admin-staging`) | `Release Staging` (admin web) | as above |
+| `VERCEL_PRODUCTION_TOKEN` | GitHub secret | Vercel → Account Settings → Tokens (`github-actions-production-release`, scoped to `emma-pilates-admin`) | `Release Production` (admin web) | — (checked 2026-10-21: «Never expires»), so it joins the yearly September sitting |
+| `VERCEL_STAGING_TOKEN` | GitHub secret | Vercel → Tokens (`github-actions-staging-release`, scoped to `emma-pilates-admin-staging`) | `Release Staging` (admin web) | — («Never expires», checked 2026-10-21) |
 | `VERCEL_ORG_ID`, `VERCEL_PRODUCTION_PROJECT_ID`, `VERCEL_STAGING_PROJECT_ID` | GitHub secrets | Vercel project settings | both release workflows | — (identifiers, not credentials; they never rotate) |
 | `PRODUCTION_BACKUP_READ_ACCESS_KEY_ID`, `PRODUCTION_BACKUP_READ_SECRET_ACCESS_KEY` | GitHub secrets | Cloudflare R2 → Manage API tokens (`github-staging-copy`, Object Read on `emma-pilates-prod-backups`) | `Copy Production to Staging` | — |
 | `STAGING_DATABASE_PASSWORD` | GitHub secret **and** inside staging's `DATABASE_URL` (Northflank `staging` group) | Aiven, the `emma_staging` role's password | `Copy Production to Staging`; staging `api`, `worker`, `migrate` | — |
@@ -193,7 +193,7 @@ stops the next release; nothing in production stops.
 | --- | --- | --- |
 | **2027-09-14** | Rotate `NORTHFLANK_API_TOKEN` (new token, 1-year lifetime) | Expires 2027-10-14 |
 | **2027-09-17** | Rotate `NORTHFLANK_STAGING_API_TOKEN` | Expires 2027-10-17 |
-| **2027-09-14** (same sitting) | Check `VERCEL_PRODUCTION_TOKEN` and `VERCEL_STAGING_TOKEN` expiry in Vercel → Tokens; rotate any that expires before 2028-09; rotate the R2 tokens (`northflank-production-images`, `northflank-production-backups`, `github-staging-copy`, `northflank-staging-images`, `mac-backup-restore`), the Resend keys and webhook secrets, the Expo robot token, the FCM key, the Play submit key, and the Telemetry API token | Yearly rotation of never-expiring credentials |
+| **2027-09-14** (same sitting) | Rotate `VERCEL_PRODUCTION_TOKEN` and `VERCEL_STAGING_TOKEN` (they never expire on their own), the R2 tokens (`northflank-production-images`, `northflank-production-backups`, `github-staging-copy`, `northflank-staging-images`, `mac-backup-restore`), the Resend keys and webhook secrets, the Expo robot token, the FCM key, the Play submit key, and the Telemetry API token | Yearly rotation of never-expiring credentials |
 | **2027-09-15** | Check the domain renewal (`emmapilatesstudio.com` expires 2027-10-15, auto-renew on, card on Cloudflare) and the Aiven CA's «Not after» date | Not secrets, but the same month |
 | every 3 months (first run January 2027) | Restore drill ([backups runbook](./backups-and-restore-drills.md#restore-drill)) | BE-007 G9 |
 | every month | Free-plan usage check ([infrastructure, «Free-plan limits that can be exceeded silently»](../architecture/infrastructure.md#free-plan-limits-that-can-be-exceeded-silently)) | Cost guard |
@@ -226,3 +226,4 @@ Two things to know:
 | --- | --- | --- | --- | --- | --- |
 | 2026-10-14 | `NORTHFLANK_API_TOKEN` created | production | Owner | 2027-10-14 | First token (EXT-008) |
 | 2026-10-17 | `NORTHFLANK_STAGING_API_TOKEN` created | staging | Owner | 2027-10-17 | First token (EXT-017) |
+| 2026-10-21 | `VERCEL_PRODUCTION_TOKEN`, `VERCEL_STAGING_TOKEN` checked | both | Owner | never | Created without an expiry (EXT-017); next rotation at the 2027-09-14 sitting |

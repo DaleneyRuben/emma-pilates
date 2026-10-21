@@ -58,6 +58,7 @@ jobs:
           TABLE
 
           # Quarterly restore drill (BE-007 G9): January, April, July, October.
+          # A drill already in the log for that quarter closes the issue by hand.
           case "$month" in
             01) quarter=1 ;; 04) quarter=2 ;; 07) quarter=3 ;; 10) quarter=4 ;; *) quarter= ;;
           esac
