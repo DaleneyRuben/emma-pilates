@@ -1,7 +1,24 @@
-# Run from apps/staff-mobile with the app served and fixtures freshly applied:
+# Run from apps/staff-mobile with the app served and the API and the worker
+# up on a freshly rebuilt fixtures database (not one the Client suite has
+# used: seed.mjs buys Plans for Mariana and Sofía). Seed first, then run:
+#   API_URL=http://127.0.0.1:3100 node .maestro/seed.mjs
 #   maestro test -e APP_ID=host.exp.Exponent -e APP_LINK=exp://127.0.0.1:8082 \
-#     -e PASSWORD=emma-local-2026 .maestro
+#     -e PASSWORD=emma-local-2026 -e API_URL=http://127.0.0.1:3100 .maestro
+# Test 19 lists what each flow needs beyond the fixtures.
 flows:
   - "*.yaml"
 executionOrder:
   continueOnFailure: false
+  # Maestro's default order is not the file order. The read-only journeys run
+  # first; the ones that confirm, reject, cancel, or create follow; the
+  # Trainer's attendance runs last so seed.mjs's five-minute class has ended.
+  flowsOrder:
+    - administrator-pending-payments
+    - assistant-client-search
+    - nutritionist-availability
+    - trainer-agenda-and-inbox
+    - administrator-review-payments
+    - administrator-cancel-session
+    - assistant-create-client
+    - assistant-cash-payment-and-booking
+    - trainer-attendance
