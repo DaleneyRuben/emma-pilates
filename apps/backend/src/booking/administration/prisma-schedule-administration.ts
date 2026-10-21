@@ -15,6 +15,7 @@ import {
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate, boliviaInstant } from '../../time/bolivia-time';
 import { formatEvaluationMoment } from '../evaluations/evaluation-notifications';
+import { recordAdministratorAudit } from './administration-audit';
 import {
   AdministrationError,
   requireAdministrator,
@@ -261,7 +262,7 @@ export const createPrismaScheduleAdministration = (
       },
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      const actor = requireAdministrator(principal);
       const now = dependencies.now();
       if (input.startsAt <= now) {
         throw new AdministrationError('effective_date_invalid');
@@ -277,7 +278,7 @@ export const createPrismaScheduleAdministration = (
         });
         const capacity = input.capacity ?? defaults.defaultCapacity;
         if (capacity < 1) throw new AdministrationError('invalid_schedule');
-        return transaction.session.create({
+        const session = await transaction.session.create({
           data: {
             branchId: input.branchId,
             classTypeId: input.classTypeId,
@@ -291,6 +292,21 @@ export const createPrismaScheduleAdministration = (
           },
           select: sessionSelect,
         });
+        await recordAdministratorAudit(transaction, actor, {
+          actionCode: 'session.created',
+          targetType: 'session',
+          targetId: session.id,
+          branchId: session.branchId,
+          metadata: {
+            classTypeId: session.classTypeId,
+            trainerStaffMemberId: session.trainerStaffMemberId,
+            startsAt: session.startsAt.toISOString(),
+            durationMinutes: input.durationMinutes,
+            capacity,
+          },
+          occurredAt: now,
+        });
+        return session;
       });
     },
 

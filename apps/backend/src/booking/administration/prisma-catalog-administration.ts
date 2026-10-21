@@ -1,15 +1,13 @@
-import { randomUUID } from 'node:crypto';
 import { retrySerializable } from '../../database/retry-serializable';
-import {
-  AuditActorKind,
-  AuditOutcome,
-  SessionState,
-  StaffRole,
-} from '../../generated/prisma/enums';
+import { SessionState } from '../../generated/prisma/enums';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import { endNutritionistAvailability } from '../evaluations/prisma-evaluation-commands';
+import {
+  changedValues,
+  recordAdministratorAudit,
+} from './administration-audit';
 import {
   AdministrationError,
   databaseCause,
@@ -95,28 +93,21 @@ export const createPrismaCatalogAdministration = (
 
   const effectiveToday = () => boliviaDate(dependencies.now());
 
-  const recordPlanAudit = (
+  const audit = (
     transaction: Transaction,
     actor: AdministratorActor,
-    input: {
-      actionCode: 'plan.created' | 'plan.updated' | 'plan.visibility_changed';
-      planId: string;
-      metadata: Prisma.InputJsonObject;
+    record: {
+      actionCode: string;
+      targetType: 'branch' | 'class_type' | 'plan';
+      targetId: string;
+      branchId?: string;
+      metadata?: Prisma.InputJsonObject;
     },
   ) =>
-    transaction.auditRecord.create({
-      data: {
-        actionCode: input.actionCode,
-        outcome: AuditOutcome.SUCCEEDED,
-        actorKind: AuditActorKind.ACCOUNT,
-        actorAccountId: actor.accountId,
-        actorRole: StaffRole.ADMINISTRATOR,
-        targetType: 'plan',
-        targetId: input.planId,
-        correlationId: randomUUID(),
-        metadata: input.metadata,
-        occurredAt: dependencies.now(),
-      },
+    recordAdministratorAudit(transaction, actor, {
+      ...record,
+      metadata: record.metadata ?? {},
+      occurredAt: dependencies.now(),
     });
 
   const requirePlanValues = (input: PlanInput) => {
@@ -135,30 +126,50 @@ export const createPrismaCatalogAdministration = (
       input: BranchInput,
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      const actor = requireAdministrator(principal);
       const values = trimmed(input);
-      return transact((transaction) =>
-        transaction.branch.create({ data: values, select: branchSelect }),
-      );
+      return transact(async (transaction) => {
+        const branch = await transaction.branch.create({
+          data: values,
+          select: branchSelect,
+        });
+        await audit(transaction, actor, {
+          actionCode: 'branch.created',
+          targetType: 'branch',
+          targetId: branch.id,
+          branchId: branch.id,
+          metadata: { name: branch.name },
+        });
+        return branch;
+      });
     },
 
     updateBranch: async (
       input: BranchInput & { branchId: string },
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      const actor = requireAdministrator(principal);
       const { branchId, ...values } = trimmed(input);
       return transact(async (transaction) => {
-        const updated = await transaction.branch.updateMany({
-          where: { id: branchId },
-          data: values,
-        });
-        if (updated.count === 0)
-          throw new AdministrationError('branch_not_found');
-        return transaction.branch.findUniqueOrThrow({
+        const previous = await transaction.branch.findUnique({
           where: { id: branchId },
           select: branchSelect,
         });
+        if (previous === null)
+          throw new AdministrationError('branch_not_found');
+        const branch = await transaction.branch.update({
+          where: { id: branchId },
+          data: values,
+          select: branchSelect,
+        });
+        await audit(transaction, actor, {
+          actionCode: 'branch.updated',
+          targetType: 'branch',
+          targetId: branchId,
+          branchId,
+          metadata: changedValues(previous, branch, ['name', 'address']),
+        });
+        return branch;
       });
     },
 
@@ -203,19 +214,29 @@ export const createPrismaCatalogAdministration = (
           distinct: ['nutritionistStaffMemberId'],
           select: { nutritionistStaffMemberId: true },
         });
+        let endedAvailabilityBlocks = 0;
         for (const { nutritionistStaffMemberId } of nutritionists) {
-          await endNutritionistAvailability(transaction, {
+          const ended = await endNutritionistAvailability(transaction, {
             staffMemberId: nutritionistStaffMemberId,
             branchId: branch.id,
             actorAccountId: actor.accountId,
             now,
           });
+          endedAvailabilityBlocks += ended.endedBlocks;
         }
-        return transaction.branch.update({
+        const archived = await transaction.branch.update({
           where: { id: branch.id },
           data: { archivedAt: now },
           select: branchSelect,
         });
+        await audit(transaction, actor, {
+          actionCode: 'branch.archived',
+          targetType: 'branch',
+          targetId: branch.id,
+          branchId: branch.id,
+          metadata: { endedAvailabilityBlocks },
+        });
+        return archived;
       });
     },
 
@@ -223,11 +244,21 @@ export const createPrismaCatalogAdministration = (
       input: ClassTypeInput,
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      const actor = requireAdministrator(principal);
       const values = trimmed(input);
-      return transact((transaction) =>
-        transaction.classType.create({ data: values, select: classTypeSelect }),
-      );
+      return transact(async (transaction) => {
+        const classType = await transaction.classType.create({
+          data: values,
+          select: classTypeSelect,
+        });
+        await audit(transaction, actor, {
+          actionCode: 'class_type.created',
+          targetType: 'class_type',
+          targetId: classType.id,
+          metadata: { defaultCapacity: classType.defaultCapacity },
+        });
+        return classType;
+      });
     },
 
     // Existing Sessions keep their facts (follow-up 39 §2); a Class Type has
@@ -236,31 +267,33 @@ export const createPrismaCatalogAdministration = (
       input: ClassTypeInput & { classTypeId: string },
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
-      const {
-        classTypeId,
-        name,
-        description,
-        defaultCapacity,
-        equipmentNeeds,
-      } = trimmed(input);
+      const actor = requireAdministrator(principal);
+      const { classTypeId, ...values } = trimmed(input);
       return transact(async (transaction) => {
-        const updated = await transaction.classType.updateMany({
-          where: { id: classTypeId },
-          data: {
-            name,
-            description,
-            defaultCapacity,
-            equipmentNeeds,
-          },
-        });
-        if (updated.count === 0) {
-          throw new AdministrationError('class_type_not_found');
-        }
-        return transaction.classType.findUniqueOrThrow({
+        const previous = await transaction.classType.findUnique({
           where: { id: classTypeId },
           select: classTypeSelect,
         });
+        if (previous === null) {
+          throw new AdministrationError('class_type_not_found');
+        }
+        const classType = await transaction.classType.update({
+          where: { id: classTypeId },
+          data: values,
+          select: classTypeSelect,
+        });
+        await audit(transaction, actor, {
+          actionCode: 'class_type.updated',
+          targetType: 'class_type',
+          targetId: classTypeId,
+          metadata: {
+            ...changedValues(previous, classType, ['name', 'defaultCapacity']),
+            descriptionChanged: previous.description !== classType.description,
+            equipmentNeedsChanged:
+              previous.equipmentNeeds !== classType.equipmentNeeds,
+          },
+        });
+        return classType;
       });
     },
 
@@ -268,7 +301,7 @@ export const createPrismaCatalogAdministration = (
       input: { classTypeId: string },
       principal: AuthenticatedPrincipal,
     ) => {
-      requireAdministrator(principal);
+      const actor = requireAdministrator(principal);
       return transact(async (transaction) => {
         const classType = await transaction.classType.findUnique({
           where: { id: input.classTypeId },
@@ -288,11 +321,17 @@ export const createPrismaCatalogAdministration = (
           },
         });
         if (schedules > 0) throw new AdministrationError('class_type_in_use');
-        return transaction.classType.update({
+        const archived = await transaction.classType.update({
           where: { id: classType.id },
           data: { archivedAt: dependencies.now() },
           select: classTypeSelect,
         });
+        await audit(transaction, actor, {
+          actionCode: 'class_type.archived',
+          targetType: 'class_type',
+          targetId: classType.id,
+        });
+        return archived;
       });
     },
 
@@ -307,9 +346,10 @@ export const createPrismaCatalogAdministration = (
           data: values,
           select: planSelect,
         });
-        await recordPlanAudit(transaction, actor, {
+        await audit(transaction, actor, {
           actionCode: 'plan.created',
-          planId: plan.id,
+          targetType: 'plan',
+          targetId: plan.id,
           metadata: { priceCentavos: plan.priceCentavos },
         });
         return plan;
@@ -347,9 +387,10 @@ export const createPrismaCatalogAdministration = (
           },
           select: planSelect,
         });
-        await recordPlanAudit(transaction, actor, {
+        await audit(transaction, actor, {
           actionCode: 'plan.updated',
-          planId,
+          targetType: 'plan',
+          targetId: planId,
           metadata: {
             previousPriceCentavos: previous.priceCentavos,
             priceCentavos: plan.priceCentavos,
@@ -376,9 +417,10 @@ export const createPrismaCatalogAdministration = (
           data: { hiddenAt: input.visible ? null : dependencies.now() },
           select: planSelect,
         });
-        await recordPlanAudit(transaction, actor, {
+        await audit(transaction, actor, {
           actionCode: 'plan.visibility_changed',
-          planId: plan.id,
+          targetType: 'plan',
+          targetId: plan.id,
           metadata: { visible: input.visible },
         });
         return plan;
