@@ -1,4 +1,5 @@
 import { MutationCache, QueryCache, QueryClient } from "@tanstack/react-query";
+import { reportRequestFailure } from "../monitoring/error-reporting";
 import { isApiError } from "./problem";
 import type { SessionExpiry } from "./session-expiry";
 
@@ -19,18 +20,31 @@ export function shouldRetryQuery(
   return true;
 }
 
+/**
+ * The caches see each failure once, after the retry, whichever page asked:
+ * the session's end goes to the guard and the failure to error monitoring
+ * (WEB-032), which decides what is worth reporting.
+ */
 export function createAdminQueryClient(
-  options: { sessionExpiry?: SessionExpiry } = {},
+  options: {
+    sessionExpiry?: SessionExpiry;
+    reportFailure?: (error: unknown) => void;
+  } = {},
 ): QueryClient {
-  const { sessionExpiry } = options;
+  const { sessionExpiry, reportFailure = reportRequestFailure } = options;
 
   return new QueryClient({
     queryCache: new QueryCache({
-      onError: (error, query) => sessionExpiry?.report(error, query.meta),
+      onError: (error, query) => {
+        sessionExpiry?.report(error, query.meta);
+        reportFailure(error);
+      },
     }),
     mutationCache: new MutationCache({
-      onError: (error, _variables, _context, mutation) =>
-        sessionExpiry?.report(error, mutation.meta),
+      onError: (error, _variables, _context, mutation) => {
+        sessionExpiry?.report(error, mutation.meta);
+        reportFailure(error);
+      },
     }),
     defaultOptions: {
       queries: {
