@@ -25,22 +25,22 @@ describe("launch splash", () => {
     expect(mocked.preventAutoHideAsync).toHaveBeenCalledTimes(1);
   });
 
-  it("keeps holding while the first screen is not ready", () => {
-    renderHook(() => useReleaseLaunchSplash(false));
+  it("keeps holding while the first screen is not ready", async () => {
+    await renderHook(() => useReleaseLaunchSplash(false));
 
     expect(mocked.hideAsync).not.toHaveBeenCalled();
   });
 
-  it("releases it once the first screen is ready, and only once", () => {
-    const hook = renderHook(({ ready }) => useReleaseLaunchSplash(ready), {
+  it("releases it once the first screen is ready, and only once", async () => {
+    const hook = await renderHook(({ ready }) => useReleaseLaunchSplash(ready), {
       initialProps: { ready: false },
     });
 
-    hook.rerender({ ready: true });
+    await hook.rerender({ ready: true });
     expect(mocked.hideAsync).toHaveBeenCalledTimes(1);
 
-    hook.rerender({ ready: false });
-    hook.rerender({ ready: true });
+    await hook.rerender({ ready: false });
+    await hook.rerender({ ready: true });
     expect(mocked.hideAsync).toHaveBeenCalledTimes(1);
   });
 
@@ -49,8 +49,7 @@ describe("launch splash", () => {
     mocked.hideAsync.mockRejectedValueOnce(new Error("already hidden"));
 
     expect(() => holdLaunchSplash()).not.toThrow();
-    renderHook(() => useReleaseLaunchSplash(true));
-    await Promise.resolve();
+    await renderHook(() => useReleaseLaunchSplash(true));
 
     expect(mocked.hideAsync).toHaveBeenCalledTimes(1);
   });
