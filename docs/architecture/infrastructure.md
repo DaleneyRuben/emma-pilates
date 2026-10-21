@@ -468,6 +468,14 @@ Values never go in the repository or a chat. «Mac» means the user's own
   with a typed confirmation; restores the newest daily production dump from
   R2 (digest checked) into `emma_staging` as the `emma_staging` role, then
   starts `Release Staging` (EXT-018, ADR-0093).
+- **`.github/workflows/operations-reminders.yml`:** on the first day of
+  every month opens a GitHub issue for each operations task due in the
+  coming month: a secret rotation within 31 days of its calendar date, the
+  restore drill in January, April, July, and October, and the free-plan
+  usage check every month (EXT-020). It needs no secret (the workflow's own
+  token, `issues: write`), skips a task whose issue is still open, and can
+  be started by hand. GitHub disables it after 60 days without a push; its
+  dates are the [rotation calendar](../runbooks/secrets-rotation.md#calendar).
 
 ## Monitoring
 
