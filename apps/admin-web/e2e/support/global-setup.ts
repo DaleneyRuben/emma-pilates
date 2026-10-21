@@ -64,6 +64,7 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
     runSql(`drop database if exists "${name}" with (force)`);
 
   let api: ChildProcess | undefined;
+  let worker: ChildProcess | undefined;
   let web: ChildProcess | undefined;
   try {
     const environment = backendEnvironment(databaseUrl.toString());
@@ -83,6 +84,13 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
       env: environment,
       stdio: serverStdio(adminWebRoot, "e2e-backend"),
     });
+    // The worker turns a transfer receipt into variants (WEB-034's payment
+    // journeys seed one) and captures the invitation email locally.
+    worker = spawn("node", ["dist/src/worker-main.js"], {
+      cwd: backendRoot,
+      env: environment,
+      stdio: serverStdio(adminWebRoot, "e2e-worker"),
+    });
     web = spawn(
       "node",
       [
@@ -101,10 +109,11 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
     await waitFor(`${apiOrigin}/health/ready`, "The backend");
     await waitFor(`${webOrigin}/`, "The preview server");
     console.log(
-      `e2e: backend pid ${api.pid} on ${apiOrigin}, preview pid ${web.pid} on ${webOrigin}, database ${name}; stderr under test-results/ (E2E_DEBUG=1 prints it here)`,
+      `e2e: backend pid ${api.pid} on ${apiOrigin}, worker pid ${worker.pid}, preview pid ${web.pid} on ${webOrigin}, database ${name}; stderr under test-results/ (E2E_DEBUG=1 prints it here)`,
     );
   } catch (error) {
     await stopChild(web);
+    await stopChild(worker);
     await stopChild(api);
     dropDatabase();
     throw error;
@@ -112,8 +121,9 @@ export default async function globalSetup(): Promise<() => Promise<void>> {
 
   return async () => {
     await stopChild(web);
+    await stopChild(worker);
     await stopChild(api);
     dropDatabase();
-    console.log(`e2e: stopped both servers and dropped database ${name}`);
+    console.log(`e2e: stopped the three servers and dropped database ${name}`);
   };
 }
