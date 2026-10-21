@@ -2,7 +2,7 @@
 
 Status: accepted; Render's measured hop count no longer applies since [ADR-0091](./0091-retire-the-shared-development-environment.md) retired the development API
 
-[ADR-0029](./0029-manage-authentication-in-nestjs-backend.md) takes the network address for throttling from the direct connection or explicitly trusted hosting proxies. This decision says which proxies are trusted and how the backend proves it.
+[ADR-0029](./0029-manage-authentication-in-the-nestjs-backend.md) takes the network address for throttling from the direct connection or explicitly trusted hosting proxies. This decision says which proxies are trusted and how the backend proves it.
 
 The API reads the network address from the request's forwarding chain: the `X-Forwarded-For` entries followed by the direct connection's address. Each environment sets `TRUSTED_PROXY_HOPS`, the number of proxies its hosting platform always places in front of the API. The network address is the entry that many places from the right end of the chain. Entries further left were written by the requester or by a proxy the backend does not trust, so they are never used. The default is `0`, the direct connection, which is what local development and tests use. When a chain is shorter than the configured count, the backend takes its leftmost entry, which a trusted proxy wrote.
 
