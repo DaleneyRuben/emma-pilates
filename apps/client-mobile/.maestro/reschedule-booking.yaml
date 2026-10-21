@@ -1,0 +1,47 @@
+# Critical journey: move a booking that is inside the 2 h 30 cancellation
+# window to another class the same day (05 «Reprogramar» → 06). The flow
+# seeds both Sessions itself (scripts/seed.js «reschedule»: Lucía booked on a
+# class about 10 minutes away, a later one booked by Valeria), so it needs
+# API_URL and fails late in the evening, when the two would fall on
+# different days.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: reschedule
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-bookings"
+    timeout: 30000
+- tapOn:
+    id: "tab-bookings"
+- extendedWaitUntil:
+    visible:
+      id: "booking-reschedule-.*"
+    timeout: 30000
+- assertVisible: "No cancelable"
+- takeScreenshot: client-reschedule-1-bookings
+- tapOn:
+    id: "booking-reschedule-.*"
+- extendedWaitUntil:
+    visible:
+      id: "reschedule-option-${output.targetId}"
+    timeout: 30000
+- tapOn:
+    id: "reschedule-option-${output.targetId}"
+- takeScreenshot: client-reschedule-2-selected
+- tapOn:
+    id: "reschedule-confirm"
+- runFlow: subflows/dismiss-push-permission.yaml
+# «Reserva confirmada» lasts eight seconds and the notification sheet can
+# outlast it, so the proof is Lucía's one booking now at the new time.
+- extendedWaitUntil:
+    visible: ".*${output.targetTime} – .*"
+    timeout: 15000
+- assertVisible:
+    id: "booking-reschedule-.*"
+- takeScreenshot: client-reschedule-3-confirmed

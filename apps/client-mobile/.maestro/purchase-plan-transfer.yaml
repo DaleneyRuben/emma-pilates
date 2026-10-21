@@ -1,0 +1,71 @@
+# Critical journey: buy a Plan by bank transfer (08 → 09 → 10 → 11): Home's
+# «Comprar un plan», the first Plan, the studio QR, a receipt from the photo
+# library, and the payment in review. Mariana has never bought a Plan, so
+# Home offers the purchase. Needs the worker (the receipt stays «processing»
+# until it rebuilds the image) and one image in the device's photo library
+# (Test 19), as profile-photo.yaml does. Leaves Mariana's transfer pending.
+appId: ${APP_ID}
+env:
+  EMAIL: mariana@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "home-buy-plan"
+    timeout: 30000
+- tapOn:
+    id: "home-buy-plan"
+- extendedWaitUntil:
+    visible:
+      id: "plan-card-.*"
+    timeout: 15000
+- takeScreenshot: client-purchase-1-plans
+- tapOn:
+    id: "plan-card-.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "plan-continue-to-payment"
+    timeout: 15000
+- takeScreenshot: client-purchase-2-plan
+# «Continuar al pago» ends the scroll, under the tab bar on a phone.
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- tapOn:
+    id: "plan-continue-to-payment"
+- extendedWaitUntil:
+    visible: "Monto exacto a transferir"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "Código QR del estudio.*"
+    timeout: 20000
+- takeScreenshot: client-purchase-3-qr
+# The receipt card sits under the QR, below the fold on a phone.
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- tapOn:
+    id: "payment-receipt"
+- runFlow: subflows/pick-first-photo.yaml
+# The card's label hides its «Comprobante listo» text from Maestro; it
+# changes once the upload is ready and attached.
+- extendedWaitUntil:
+    visible: "Comprobante adjunto. Toca para cambiarlo."
+    timeout: 90000
+- takeScreenshot: client-purchase-4-receipt
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- tapOn:
+    id: "payment-submit"
+- extendedWaitUntil:
+    visible: "Un administrador va a confirmar tu comprobante pronto.*"
+    timeout: 20000
+- takeScreenshot: client-purchase-5-review
+- tapOn:
+    id: "payment-status-home"
+- extendedWaitUntil:
+    visible:
+      id: "tab-home"
+    timeout: 15000

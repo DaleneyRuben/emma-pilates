@@ -1,0 +1,59 @@
+# Critical journey: join the Waitlist of a full Session from its detail (04),
+# then leave it from Mis reservas (05). The flow seeds the full Session itself
+# (scripts/seed.js «full-session»: one seat tomorrow at 05:00 in Centro,
+# taken by Valeria), so it needs API_URL; Lucía ends with no Waitlist entry.
+appId: ${APP_ID}
+env:
+  EMAIL: lucia@example.com
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: full-session
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible:
+      id: "tab-booking"
+    timeout: 30000
+- tapOn:
+    id: "tab-booking"
+- extendedWaitUntil:
+    visible:
+      id: "browse-day-${output.date}"
+    timeout: 20000
+- tapOn:
+    id: "browse-day-${output.date}"
+- extendedWaitUntil:
+    visible:
+      id: "session-card-${output.sessionId}"
+    timeout: 30000
+- tapOn:
+    id: "session-card-${output.sessionId}"
+- extendedWaitUntil:
+    visible:
+      id: "session-join-waitlist"
+    timeout: 15000
+- assertVisible: "Clase llena. Te avisaremos si se libera un cupo."
+- takeScreenshot: client-waitlist-1-full
+- tapOn:
+    id: "session-join-waitlist"
+- runFlow: subflows/dismiss-push-permission.yaml
+- extendedWaitUntil:
+    visible: "Ya estás en la lista de espera."
+    timeout: 15000
+- takeScreenshot: client-waitlist-2-joined
+- tapOn:
+    id: "tab-bookings"
+- extendedWaitUntil:
+    visible:
+      id: "booking-leave-waitlist-.*"
+    timeout: 30000
+- assertVisible: "En lista de espera"
+- takeScreenshot: client-waitlist-3-bookings
+- tapOn:
+    id: "booking-leave-waitlist-.*"
+- extendedWaitUntil:
+    notVisible:
+      id: "booking-leave-waitlist-.*"
+    timeout: 15000
+- takeScreenshot: client-waitlist-4-left
