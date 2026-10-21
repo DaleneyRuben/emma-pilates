@@ -1,0 +1,54 @@
+# Critical journey: the Trainer records attendance after a class (S03). Needs
+# the five-minute Session seed.mjs leaves for Emma with Lucía booked; the
+# roster offers «Asistió» only once the class has ended, so the flow reopens
+# it every half minute until then. Runs last: nothing after it needs Emma.
+appId: ${APP_ID}
+env:
+  EMAIL: emma.vargas@example.com
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: finished-session
+- runFlow: subflows/login.yaml
+- runFlow: subflows/park-dev-gear.yaml
+- extendedWaitUntil:
+    visible:
+      id: "agenda-session-${output.sessionId}"
+    timeout: 30000
+- takeScreenshot: staff-attendance-1-agenda
+- repeat:
+    times: 14
+    while:
+      notVisible:
+        id: "roster-attended-.*"
+    commands:
+      - tapOn:
+          id: "agenda-session-${output.sessionId}"
+          optional: true
+      - extendedWaitUntil:
+          visible:
+            id: "roster-attended-.*"
+          timeout: 10000
+          optional: true
+      - runFlow:
+          when:
+            notVisible:
+              id: "roster-attended-.*"
+          commands:
+            - tapOn: "Volver"
+            # Nothing has this id: a 30-second pause before reopening.
+            - extendedWaitUntil:
+                visible:
+                  id: "maestro-pause"
+                timeout: 30000
+                optional: true
+- takeScreenshot: staff-attendance-2-roster
+- tapOn:
+    id: "roster-attended-.*"
+- tapOn:
+    id: "roster-save"
+- extendedWaitUntil:
+    visible: "Asistencia guardada."
+    timeout: 15000
+- takeScreenshot: staff-attendance-3-saved

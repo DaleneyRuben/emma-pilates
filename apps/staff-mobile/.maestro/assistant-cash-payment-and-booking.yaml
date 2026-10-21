@@ -1,0 +1,89 @@
+# Critical journey: the Assistant takes Isabel's cash Payment for a new Plan
+# (S08–S10, her fixture Plan has no classes left) and then books her a class
+# (S07, S11). The flow seeds the class itself (scripts/seed.js
+# «open-session»: tomorrow early at Centro), so it needs API_URL.
+appId: ${APP_ID}
+env:
+  EMAIL: camila.rojas@example.com
+  CLIENT: Isabel
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: open-session
+- runFlow: subflows/login.yaml
+- runFlow: subflows/park-dev-gear.yaml
+- extendedWaitUntil:
+    visible:
+      id: "client-search-input"
+    timeout: 30000
+- tapOn:
+    id: "client-search-input"
+- waitForAnimationToEnd
+- inputText: ${CLIENT}
+- extendedWaitUntil:
+    visible:
+      id: "client-result-.*"
+    timeout: 15000
+- tapOn:
+    id: "client-result-.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "client-overview-cash-payment"
+    timeout: 15000
+- takeScreenshot: staff-cash-1-overview
+- tapOn:
+    id: "client-overview-cash-payment"
+- extendedWaitUntil:
+    visible:
+      id: "select-plan-.*"
+    timeout: 15000
+- tapOn:
+    id: "select-plan-.*"
+    index: 0
+- extendedWaitUntil:
+    visible:
+      id: "cash-confirm"
+    timeout: 15000
+- takeScreenshot: staff-cash-2-confirm
+- tapOn:
+    id: "cash-confirm"
+- extendedWaitUntil:
+    visible: "Cobrado en efectivo: .*"
+    timeout: 15000
+- takeScreenshot: staff-cash-3-recorded
+- tapOn:
+    id: "cash-back-to-client"
+- extendedWaitUntil:
+    visible:
+      id: "client-overview-book"
+    timeout: 15000
+- tapOn:
+    id: "client-overview-book"
+- extendedWaitUntil:
+    visible:
+      id: "assistant-day-${output.date}"
+    timeout: 15000
+- tapOn:
+    id: "assistant-day-${output.date}"
+- extendedWaitUntil:
+    visible:
+      id: "session-card-${output.sessionId}"
+    timeout: 15000
+- tapOn:
+    id: "session-card-${output.sessionId}"
+- extendedWaitUntil:
+    visible:
+      id: "session-book"
+    timeout: 15000
+- tapOn:
+    id: "session-book"
+- runFlow: subflows/dismiss-push-permission.yaml
+# «Reserva confirmada» lasts eight seconds and the notification sheet can
+# outlast it, so the proof is the booking on her list at the class's time.
+- extendedWaitUntil:
+    visible: "Viendo reservas de: .*"
+    timeout: 15000
+- assertVisible: ".*${output.time} – .*"
+- takeScreenshot: staff-cash-4-booked

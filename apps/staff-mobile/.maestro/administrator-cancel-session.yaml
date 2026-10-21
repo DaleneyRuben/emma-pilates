@@ -1,0 +1,49 @@
+# Critical journey: the Administrator cancels a booked Session (S13 → S14)
+# and Lucía is told and refunded. The flow seeds the Session itself
+# (scripts/seed.js «booked-session»: tomorrow early at Centro, booked by
+# Lucía), so it needs API_URL and never cancels a fixture class.
+appId: ${APP_ID}
+env:
+  EMAIL: paola.mendoza@example.com
+---
+- runScript:
+    file: scripts/seed.js
+    env:
+      SEED: booked-session
+- runFlow: subflows/login.yaml
+- runFlow: subflows/park-dev-gear.yaml
+- extendedWaitUntil:
+    visible:
+      id: "pending-payments-cancel-class"
+    timeout: 30000
+- swipe:
+    start: "50%,70%"
+    end: "50%,30%"
+- tapOn:
+    id: "pending-payments-cancel-class"
+- extendedWaitUntil:
+    visible:
+      id: "cancel-class-day-${output.date}"
+    timeout: 15000
+- tapOn:
+    id: "cancel-class-day-${output.date}"
+- extendedWaitUntil:
+    visible:
+      id: "cancel-class-card-${output.sessionId}"
+    timeout: 15000
+- takeScreenshot: staff-cancel-1-list
+- tapOn:
+    id: "cancel-class-card-${output.sessionId}"
+- extendedWaitUntil:
+    visible:
+      id: "cancel-session-confirm"
+    timeout: 15000
+- assertVisible: "Esto no se puede deshacer"
+- takeScreenshot: staff-cancel-2-confirm
+- tapOn:
+    id: "cancel-session-confirm"
+- extendedWaitUntil:
+    visible: "Se notificó al cliente afectado."
+    timeout: 15000
+- assertVisible: "Se reembolsó una clase a cada cliente."
+- takeScreenshot: staff-cancel-3-cancelled
