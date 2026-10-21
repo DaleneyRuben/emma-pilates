@@ -27,6 +27,7 @@ you are starting with no project knowledge.
 | Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
+| Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 
 ## Before you begin
@@ -4574,6 +4575,7 @@ fade, then a slow breath every 2.8 s; 240 pt wide on phones and 300 pt from
 Screen readers hear the screen's own label («Cargando notificaciones»,
 «Cargando cliente», …) as progress. The plain «Cargando…» text is gone; the
 Promotions placeholder card and the receipt's «Cargando el comprobante…» stay.
+The launch screen before any screen, on a cold start, is Test 65.
 
 Run it on the development builds of Test 45 (Android emulator, iPhone 16 Pro,
 iPad Pro 11). A local API answers in well under 400 ms, so slow it down with a
@@ -4961,3 +4963,48 @@ signed in as `paola.mendoza@example.com`:
 Verified on 2026-10-21 (WEB-032) in the in-app browser: every step above at
 1440 px and 420 px, 2 events in all (one `Error`, one `ApiError`), none
 with a message or a URL.
+
+## Test 65: the launch screen on a cold start (MOB-068)
+
+From the tap on the icon until the first screen is ready, both apps show the
+Emma logo centred on the icons' blush background `#F3E9E7` (design follow-up
+106): 240 pt wide on iOS (phone and iPad alike), 160 dp on Android, where
+Android 12 and newer draw it inside the system's icon circle (invisible on
+the same background). Nothing else is on it, and it fades out over 300 ms
+once Login or the saved session's first screen has drawn; the breathing logo
+of Test 54 then takes over inside that screen's content area when it loads
+data. The screen is native: Expo Go cannot show it, and a store build only
+carries it from the builds made after MOB-068 (REL-009's next round).
+
+Build a **Release** app locally, which embeds the JavaScript and needs no
+Metro, so the cold start is the store build's (the development builds of
+Test 45 show the splash too, before the development launcher):
+
+- iOS, from the app folder:
+  `export LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 SENTRY_DISABLE_AUTO_UPLOAD=true EXPO_PUBLIC_API_URL=http://127.0.0.1:3100/api/v1`
+  then `env -u CI npx expo run:ios --configuration Release --device 49C1E5FE-BDBD-4404-AF4F-F0AF0BB078B0 --no-bundler`
+  (CocoaPods and Xcode, about ten minutes the first time). It installs and
+  opens the app on the iPhone 16 Pro; install the same `.app` on the iPad
+  Pro 11 with `xcrun simctl install 57B2FBC4-2D73-4063-B00D-5D882C233AA2 ios/build/Build/Products/Release-iphonesimulator/<EmmaPilates or EmmaPilatesStaff>.app`.
+- Android, from the app folder, with
+  `JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"`:
+  `npx expo prebuild --clean -p android --no-install`, then in `android/`
+  `./gradlew assembleRelease -PreactNativeArchitectures=arm64-v8a -x lintVitalAnalyzeRelease -x lintVitalRelease`
+  and `./gradlew --stop`. The APK is debug-signed, so
+  `adb uninstall com.emmapilates.client` (or `.staff`) first, then
+  `adb install app/build/outputs/apk/release/app-release.apk`.
+
+Then, on each device and for each app:
+
+1. Quit the app if it is open (`xcrun simctl terminate <udid> com.emmapilates.client`
+   or `adb shell am force-stop com.emmapilates.client`) and open it again
+   from the home screen or the launcher (`xcrun simctl launch <udid> <id>`,
+   `adb shell monkey -p <id> 1`). Expected: at once, the blush screen with
+   the logo and nothing else; a screenshot in the first second catches it.
+   On Android 12+ the logo is smaller than on iOS and sits in the system's
+   circle; no white screen appears before it.
+2. Expected: the logo fades out as the Login screen (or the saved session's
+   first screen) appears under it; no white gap between the two.
+3. Open the other app and repeat.
+
+Verified on 2026-10-21 (MOB-068): see the backlog row's Evidence.
