@@ -18,3 +18,13 @@ allowBuilds:
   sharp: true
   ssh2: false
   unrs-resolver: true
+
+# EXT-019: `pnpm audit --audit-level high` runs in CI; advisories whose fix is
+# not published yet are ignored here, each with its reason in
+# docs/architecture/infrastructure.md («Dependency audit»), and reviewed
+# when the next audit run or Dependabot pull request names them.
+auditConfig:
+  ignoreGhsas:
+    - GHSA-vfj7-8cjw-p6xm # braces <=3.0.3 via jest: 3.0.4 is not on npm
+    - GHSA-86w9-cpqp-85rv # node-forge <=1.4.0 via expo: 1.4.1 is not on npm
+    - GHSA-2883-xcg3-v3hh # js-yaml 4.3.1 pinned by orval 8.26.0; upgrading orval regenerates the client

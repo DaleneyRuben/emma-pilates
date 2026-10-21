@@ -422,7 +422,29 @@ Values never go in the repository or a chat. «Mac» means the user's own
   database jobs on `postgres:18-alpine`. The API integration suite, the
   longest, starts right after `quality-api` and runs as three shards
   (`api-integration (1/3)` to `(3/3)`), each with its own PostgreSQL and
-  S3Mock (EXT-022). Deploys nothing.
+  S3Mock (EXT-022). Deploys nothing. Since EXT-019 it also runs the security
+  checks below, and a push to `main` is never cancelled by the next one
+  (only a pull request's run is replaced by a newer push).
+- **Security checks in `ci.yml` (EXT-019):** `audit` runs
+  `pnpm audit --audit-level high` on the lockfile alone, every dependency
+  included (the development tooling runs in CI with the repository's
+  secrets); an advisory whose fix is not published yet is ignored in
+  `pnpm-workspace.yaml` (`auditConfig.ignoreGhsas`, one comment each) and
+  reviewed when the next run or Dependabot names it. `secrets` runs gitleaks
+  over the pull request's commits (or the pushed ones) with the allowlists in
+  `.gitleaks.toml` (the Firebase client keys in `google-services.json`, the
+  CI and test database URLs, S3Mock's fixed credentials, generated design
+  output); a finding fails the job and shows redacted in its summary.
+  `migrations` applies every Prisma migration to an empty PostgreSQL and
+  diffs it against `apps/backend/prisma/models`; the only drift allowed is
+  `apps/backend/prisma/known-drift.sql`, the composite foreign keys written
+  as raw SQL. `public-site` checks `apps/public-site` (`_headers`, complete
+  pages, every site-relative link resolves). Nothing here needs an account:
+  Dependabot and gitleaks-action are free for a personal repository.
+- **`.github/dependabot.yml`:** security updates only, grouped into at most
+  one pull request a week per ecosystem (npm on Monday morning, GitHub
+  Actions likewise); version updates are off. The user merges them like any
+  pull request, after CI.
 - **`.github/workflows/release-staging.yml`:** after `CI` passes on a push
   to `main` (or by hand with a commit), releases it to the staging team
   (migrate, `api` readiness, `worker`, smoke check), deploys the staging

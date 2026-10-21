@@ -1,0 +1,35 @@
+# EXT-019: gitleaks runs over every pull request's commits and every push to
+# main (ci.yml, job `secrets`) with the default rules plus these allowlists.
+# Each entry names a value that looks like a secret and is not one. A real
+# secret is never allowlisted: it is rotated, then that commit is listed by
+# fingerprint (.gitleaksignore) until history is rewritten.
+
+title = "emma-pilates"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Firebase client configuration: the Android API keys identify the Firebase project and ship inside the apps"
+paths = ['''apps/(client|staff)-mobile/google-services\.json$''']
+
+[[allowlists]]
+description = "generated design output with sample values on the artboards"
+paths = ['''^design/''']
+
+[[allowlists]]
+description = "the CI, test, and placeholder database URLs and S3Mock's fixed credentials"
+regexes = [
+  '''postgresql://postgres:postgres@localhost:5432/''',
+  '''postgresql://nobody@127\.0\.0\.1:1/''',
+  '''postgresql://[a-z]+@localhost:5433/pilates_''',
+  '''OBJECT_STORAGE_TEST_(ACCESS_KEY_ID|SECRET_ACCESS_KEY): s3mock''',
+]
+
+[[allowlists]]
+description = "fixture UUIDs in the backend specs and the schema proposal's prose about token digests"
+regexTarget = "line"
+regexes = [
+  '''authenticationTokenId: '[0-9a-f-]{36}'\,''',
+  '''one-way token digest, ''',
+]
