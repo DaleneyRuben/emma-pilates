@@ -1,7 +1,7 @@
 # Infrastructure
 
 What runs where, who owns each account, and where every setting lives.
-Last verified **2026-10-21** (EXT-020 added the [secrets rotation runbook](../runbooks/secrets-rotation.md), the reminder workflow, log retention, the free-plan limits, and the three uptime monitors to add; WEB-021 added the public pages on Cloudflare Pages; LNK-001 added the link hosts; EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
+Last verified **2026-10-21** (EXT-020 added the [secrets rotation runbook](../runbooks/secrets-rotation.md), the reminder workflow, log retention, the free-plan limits, and the three uptime monitors, which the owner added the same day; WEB-021 added the public pages on Cloudflare Pages; LNK-001 added the link hosts; EXT-017 added staging and the promoted production release; EXT-016 retired the shared development environment; EXT-009; Expo/EAS added by REL-001; push added by NOT-002; domain and Email Routing added by EXT-014). This page holds **no secret values**:
 it names each secret and the one place it is kept. How to release is in the
 [production release runbook](../runbooks/production-release.md); why each
 provider was chosen is in the ADRs linked below; prices and the order of the
@@ -74,7 +74,7 @@ Details are in the sections below.
 | **Firebase** | One Spark (no-cost) project, `emma-pilates`, with the Android apps `com.emmapilates.client` («Emma Pilates»), `com.emmapilates.staff` («Emma Pilates Staff»), and their staging variants `com.emmapilates.client.staging` and `com.emmapilates.staff.staging` (EXT-017); Cloud Messaging; the Admin SDK service account `firebase-adminsdk-fbsvc@emma-pilates.iam.gserviceaccount.com`, whose key is held by EAS | Google's only delivery channel for Android push: Expo hands each Android push to FCM | Google Analytics and Gemini (both off at creation), every other Firebase product, the Firebase SDKs (the apps only carry the public `google-services.json`) |
 | **Google Play Console** | Personal developer account «Daleney Labs» (ID `5688059300530668770`) owned by the user's Google account, identity verified 2026-10-15; draft apps `com.emmapilates.client` («Emma Pilates») and `com.emmapilates.staff` («Emma Pilates Staff»), Spanish (Latin America), free, Play App Signing accepted, automatic protection on | Distributes the **Android apps**: Internal testing first, then the Client app's closed test and production release (REL-002 to REL-007); Staff stays on a closed track | Paid apps and in-app purchases (earning money is off, which keeps the legal address private), organization verification, the developer website |
 | **Resend** | Account signed in with the owner's Google account (Free); verified domain `emmapilatesstudio.com` in São Paulo (`sa-east-1`), return path `send`, open and click tracking off, TLS opportunistic; sending-only API keys `northflank-production` and `northflank-staging` for that domain; one webhook per environment for `email.bounced` and `email.complained` | Sends the **authentication emails** from `Emma Pilates Studio <no-responder@emmapilatesstudio.com>` with replies to `soporte@` (EXT-001, ADR-0094) | Broadcasts, audiences, templates, automations, receiving, tracking |
-| **Better Stack** | Uptime monitor «Production API readiness» (three more, for the admin web, the public pages, and the link host, are **to add by the user**: [runbook](../runbooks/uptime-monitors.md)); error tracking apps `emma-pilates-api`, `emma-pilates-admin`, and `emma-pilates-mobile` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management (no logs are sent; see «Logs and retention»), status pages, on-call |
+| **Better Stack** | Uptime monitors «Production API readiness», «Production admin web», «Public pages», and «Link host» (the last three since 2026-10-21, [runbook](../runbooks/uptime-monitors.md)); error tracking apps `emma-pilates-api`, `emma-pilates-admin`, and `emma-pilates-mobile` with the Incidents email integration; heartbeats «Worker heartbeat» and «Database backup» | **Alerts** you by email when production is down or the API reports an unexpected error | Log management (no logs are sent; see «Logs and retention»), status pages, on-call |
 
 Not created yet, in the order the gates open (backlog, «Order to open the
 gates»): **Apple Developer** (gate 9). The domain (gate 7) arrived on
@@ -529,16 +529,17 @@ Values never go in the repository or a chat. «Mac» means the user's own
   frames stay unsymbolicated.
 - Not yet: source maps for the admin web (declined: the upload needs an
   account-wide Better Stack token on Vercel).
-- **To add by the user** (EXT-020; the click-by-click steps are the
-  [uptime monitors runbook](../runbooks/uptime-monitors.md)): three more
-  Better Stack monitors with the API monitor's settings (every 3 minutes,
-  3-minute confirmation, four regions, e-mail), checked 2026-10-21 to answer
-  200 today:
-  - «Production admin web»: `https://emma-pilates-admin.vercel.app/`
+- **Three more Better Stack monitors**, added by the owner on 2026-10-21
+  (EXT-020, [runbook](../runbooks/uptime-monitors.md)) with the API
+  monitor's settings (every 3 minutes, 3-minute confirmation and recovery,
+  Europe, North America, Asia, and Australia, e-mail to the primary
+  responder, SSL verification on; the free plan cannot check certificate
+  or domain expiry), all Up the same day:
+  - «Production admin web» (monitor 5107874): `https://emma-pilates-admin.vercel.app/`
   - «Public pages»: `https://app.emmapilatesstudio.com/`
   - «Link host»: `https://links.emmapilatesstudio.com/.well-known/assetlinks.json`
-  Until they exist, an outage of Vercel, Cloudflare Pages, the `links.`
-  record, or its certificate is found by a person.
+  An alert has not been provoked on them yet (the runbook's «Prove one
+  alert fires»).
 
 ### Logs and retention
 
