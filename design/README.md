@@ -154,6 +154,12 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - Announced as progress with the screen's Spanish label («Cargando clases»); the image itself is not read.
 - Not for busy buttons, pull-to-refresh, the Promotions placeholder card, image placeholders, or errors.
 
+### Launch screen (Client and Staff)
+
+- From the tap on the icon until the first screen is ready (Login, or the saved session's first screen), both apps show `emma-logo.png` centred on `#F3E9E7`, the icons' blush edge tone; then a 300ms fade. Light mode only, nothing else on the screen.
+- iOS draws the logo 240pt wide on phones and tablets. Android draws it 160dp wide: on Android 12+ inside the system's 192dp icon circle (invisible on the same background), the widest that fits without clipping; older Android centres the same 160dp logo without the circle.
+- A native screen: it changes only with a store build, never with an over-the-air update.
+
 ### Home shortcuts (`02`)
 
 - Under an 11px uppercase `0.16em` `#766D69` «Accesos rápidos» eyebrow, a full-width «Reservar una clase» card (padding 18, gap 14) holds a 44px tile on `rgba(216,189,184,0.28)` at radius 12 with a 22px `#B78380` calendar (stroke 1.3), the title in Lora 17 weight 500 over a 13px `#766D69` note, and the 19px chevron.
