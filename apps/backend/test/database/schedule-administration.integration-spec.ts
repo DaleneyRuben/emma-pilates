@@ -252,5 +252,27 @@ describe('Prisma schedule administration', () => {
       sessionScheduleId: null,
       capacity: 8,
     });
+    await expect(
+      world.prisma.auditRecord.findFirst({
+        where: { targetId: session.id, actionCode: 'session.created' },
+        select: {
+          actorRole: true,
+          targetType: true,
+          branchId: true,
+          metadata: true,
+        },
+      }),
+    ).resolves.toEqual({
+      actorRole: 'ADMINISTRATOR',
+      targetType: 'session',
+      branchId: centro,
+      metadata: {
+        classTypeId: mat,
+        trainerStaffMemberId: staff('daniela'),
+        startsAt: bolivia('2026-09-26', '15:00').toISOString(),
+        durationMinutes: 50,
+        capacity: 8,
+      },
+    });
   });
 });
