@@ -1,0 +1,37 @@
+# EXT-019: security updates only, grouped into one pull request a week per
+# ecosystem. Version updates stay off (open-pull-requests-limit 0 for
+# version updates is how Dependabot spells «security only» for a listed
+# ecosystem), so the queue is what `pnpm audit` would flag, not every
+# release. The user merges, after CI, like any other pull request.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/La_Paz
+    open-pull-requests-limit: 0
+    groups:
+      npm-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+    labels:
+      - dependencies
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: America/La_Paz
+    open-pull-requests-limit: 0
+    groups:
+      actions-security:
+        applies-to: security-updates
+        patterns:
+          - "*"
+    labels:
+      - dependencies
