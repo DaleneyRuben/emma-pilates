@@ -1,21 +1,17 @@
-import { retrySerializable } from '../../database/retry-serializable';
 import { SessionState } from '../../generated/prisma/enums';
 import type { Prisma, PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import { endNutritionistAvailability } from '../evaluations/prisma-evaluation-commands';
-import {
-  changedValues,
-  recordAdministratorAudit,
-} from './administration-audit';
+import { changedValues } from './administration-audit';
 import {
   AdministrationError,
-  databaseCause,
   requireAdministrator,
-  type AdministratorActor,
 } from './administration-errors';
+import { catalogWrites, trimmed } from './catalog-writes';
+import { createPrismaPlanAdministration } from './prisma-plan-administration';
 
-type Transaction = Prisma.TransactionClient;
+export type { PlanInput } from './prisma-plan-administration';
 
 export type BranchInput = { name: string; address: string };
 export type ClassTypeInput = {
@@ -24,16 +20,6 @@ export type ClassTypeInput = {
   defaultCapacity: number;
   equipmentNeeds: string | null;
 };
-export type PlanInput = {
-  name: string;
-  durationMonths: number;
-  classAllowance: number;
-  priceCentavos: number;
-  displayOrder: number;
-};
-
-const planDurations = new Set([1, 3, 6, 12]);
-const serializable = { isolationLevel: 'Serializable' } as const;
 
 const branchSelect = {
   id: true,
@@ -49,79 +35,17 @@ const classTypeSelect = {
   equipmentNeeds: true,
   archivedAt: true,
 } satisfies Prisma.ClassTypeSelect;
-const planSelect = {
-  id: true,
-  name: true,
-  durationMonths: true,
-  classAllowance: true,
-  priceCentavos: true,
-  displayOrder: true,
-  hiddenAt: true,
-} satisfies Prisma.PlanSelect;
-
-const trimmed = <Input extends Record<string, unknown>>(input: Input): Input =>
-  Object.fromEntries(
-    Object.entries(input).map(([key, value]) => [
-      key,
-      typeof value === 'string' ? value.trim() : value,
-    ]),
-  ) as Input;
-
-// Database checks guard every catalog value; their violations map to one code.
-const translate = (error: unknown): never => {
-  const cause = databaseCause(error);
-  if (cause.includes('class_types_active_normalized_name_key')) {
-    throw new AdministrationError('class_type_name_taken');
-  }
-  if (cause.includes('violates check constraint') || cause.includes('23514')) {
-    throw new AdministrationError('invalid_catalog_value');
-  }
-  throw error;
-};
-
 // ADM-001 slice A: Branch, Class Type, and Plan management for the admin web.
 export const createPrismaCatalogAdministration = (
   prisma: PrismaClient,
   dependencies: { now: () => Date },
 ) => {
-  const transact = <Result>(
-    work: (transaction: Transaction) => Promise<Result>,
-  ): Promise<Result> =>
-    retrySerializable(() => prisma.$transaction(work, serializable)).catch(
-      translate,
-    );
-
+  const { transact, audit } = catalogWrites(prisma, dependencies);
   const effectiveToday = () => boliviaDate(dependencies.now());
 
-  const audit = (
-    transaction: Transaction,
-    actor: AdministratorActor,
-    record: {
-      actionCode: string;
-      targetType: 'branch' | 'class_type' | 'plan';
-      targetId: string;
-      branchId?: string;
-      metadata?: Prisma.InputJsonObject;
-    },
-  ) =>
-    recordAdministratorAudit(transaction, actor, {
-      ...record,
-      metadata: record.metadata ?? {},
-      occurredAt: dependencies.now(),
-    });
-
-  const requirePlanValues = (input: PlanInput) => {
-    if (
-      !planDurations.has(input.durationMonths) ||
-      input.name.trim() === '' ||
-      input.classAllowance < 1 ||
-      input.priceCentavos < 1
-    ) {
-      throw new AdministrationError('invalid_catalog_value');
-    }
-  };
-
   return {
+    ...createPrismaPlanAdministration(prisma, dependencies),
+
     createBranch: async (
       input: BranchInput,
       principal: AuthenticatedPrincipal,
@@ -332,98 +256,6 @@ export const createPrismaCatalogAdministration = (
           targetId: classType.id,
         });
         return archived;
-      });
-    },
-
-    // Subscriptions keep their snapshots and open Purchase Intents keep their
-    // amounts, so a new price applies to purchases started afterwards.
-    createPlan: async (input: PlanInput, principal: AuthenticatedPrincipal) => {
-      const actor = requireAdministrator(principal);
-      requirePlanValues(input);
-      const values = trimmed(input);
-      return transact(async (transaction) => {
-        const plan = await transaction.plan.create({
-          data: values,
-          select: planSelect,
-        });
-        await audit(transaction, actor, {
-          actionCode: 'plan.created',
-          targetType: 'plan',
-          targetId: plan.id,
-          metadata: { priceCentavos: plan.priceCentavos },
-        });
-        return plan;
-      });
-    },
-
-    updatePlan: async (
-      input: PlanInput & { planId: string },
-      principal: AuthenticatedPrincipal,
-    ) => {
-      const actor = requireAdministrator(principal);
-      requirePlanValues(input);
-      const {
-        planId,
-        name,
-        durationMonths,
-        classAllowance,
-        priceCentavos,
-        displayOrder,
-      } = trimmed(input);
-      return transact(async (transaction) => {
-        const previous = await transaction.plan.findUnique({
-          where: { id: planId },
-          select: planSelect,
-        });
-        if (previous === null) throw new AdministrationError('plan_not_found');
-        const plan = await transaction.plan.update({
-          where: { id: planId },
-          data: {
-            name,
-            durationMonths,
-            classAllowance,
-            priceCentavos,
-            displayOrder,
-          },
-          select: planSelect,
-        });
-        await audit(transaction, actor, {
-          actionCode: 'plan.updated',
-          targetType: 'plan',
-          targetId: planId,
-          metadata: {
-            previousPriceCentavos: previous.priceCentavos,
-            priceCentavos: plan.priceCentavos,
-          },
-        });
-        return plan;
-      });
-    },
-
-    setPlanVisibility: async (
-      input: { planId: string; visible: boolean },
-      principal: AuthenticatedPrincipal,
-    ) => {
-      const actor = requireAdministrator(principal);
-      return transact(async (transaction) => {
-        const previous = await transaction.plan.findUnique({
-          where: { id: input.planId },
-          select: planSelect,
-        });
-        if (previous === null) throw new AdministrationError('plan_not_found');
-        if ((previous.hiddenAt === null) === input.visible) return previous;
-        const plan = await transaction.plan.update({
-          where: { id: input.planId },
-          data: { hiddenAt: input.visible ? null : dependencies.now() },
-          select: planSelect,
-        });
-        await audit(transaction, actor, {
-          actionCode: 'plan.visibility_changed',
-          targetType: 'plan',
-          targetId: plan.id,
-          metadata: { visible: input.visible },
-        });
-        return plan;
       });
     },
   };
