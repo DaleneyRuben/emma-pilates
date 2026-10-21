@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Link } from "@tanstack/react-router";
 import { Download } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { SearchChange } from "../../catalog/catalog-search";
 import { isForbidden } from "../../components/page/is-forbidden";
 import { PageHeader } from "../../components/page/page-header";
@@ -13,7 +13,7 @@ import {
   QueryFailure,
 } from "../../components/page/query-failure";
 import { DataTable } from "../../components/table/data-table";
-import { countFormat } from "../../components/table/pagination";
+import { countFormat, pageCount } from "../../components/table/pagination";
 import { SearchFilter } from "../../components/table/search-filter";
 import { Button } from "../../components/ui/button";
 import { saveFile } from "../../lib/save-file";
@@ -124,6 +124,21 @@ export function ContactsPage({
       ),
   });
   const noContacts = search.q === undefined && query.data?.totalItems === 0;
+  const lastPage =
+    query.data === undefined || query.isPlaceholderData
+      ? undefined
+      : pageCount(query.data.totalItems, search.pageSize);
+  // A withdrawal can empty a later page: step back to the last one left,
+  // keeping the success line that says what happened.
+  useEffect(() => {
+    if (lastPage !== undefined && search.page > lastPage) {
+      onSearchChange({ page: lastPage });
+    }
+  }, [lastPage, search.page, onSearchChange]);
+  const changeSearch: SearchChange<ClientSearch> = (change) => {
+    setNotice(null);
+    onSearchChange(change);
+  };
 
   return (
     <article className="flex flex-col gap-5">
@@ -161,7 +176,7 @@ export function ContactsPage({
         label="Buscar por nombre, correo o teléfono"
         value={search.q ?? ""}
         onChange={(text) =>
-          onSearchChange({ q: text === "" ? undefined : text, page: 1 })
+          changeSearch({ q: text === "" ? undefined : text, page: 1 })
         }
       />
       {exportContacts.isError ? (
@@ -191,7 +206,7 @@ export function ContactsPage({
             page: search.page,
             pageSize: search.pageSize,
             totalItems: query.data.totalItems,
-            onPageChange: (page) => onSearchChange({ page }),
+            onPageChange: (page) => changeSearch({ page }),
             rangeLabel: ({ shown }) =>
               `Mostrando ${countFormat.format(shown)} de ${contactos(query.data.totalItems)}`,
           }}
