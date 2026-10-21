@@ -54,6 +54,20 @@
     },
     "plugins": [
       [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-logo.png",
+          "backgroundColor": "#F3E9E7",
+          "resizeMode": "contain",
+          "ios": {
+            "imageWidth": 240
+          },
+          "android": {
+            "imageWidth": 160
+          }
+        }
+      ],
+      [
         "expo-secure-store",
         {
           "faceIDPermission": "Permite que Emma Pilates use Face ID para proteger tu sesión."
