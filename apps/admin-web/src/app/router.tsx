@@ -15,6 +15,7 @@ import { backOfficeRoutes } from "./back-office-routes";
 import { oversightRoutes } from "./oversight-routes";
 import { reportRoutes } from "./report-routes";
 import { optionalSearch } from "../components/table/pagination";
+import { pagePendingOptions } from "./page-pending";
 import { authenticatedRoute, publicRoutes, rootRoute } from "./root-routes";
 
 // List pages validate their page-and-offset search and allowlisted filters
@@ -103,6 +104,7 @@ export function createAdminRouter(options: {
     },
     defaultPreload: "intent",
     scrollRestoration: true,
+    ...pagePendingOptions,
   });
 }
 
