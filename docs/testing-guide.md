@@ -2610,7 +2610,13 @@ Bolivia time, whatever time zone your computer uses.
    it, book a Session first as a Client (Test 10 or the Staff app, Test 11).
 5. **Sucursales, Tipos de clase, Planes.** Each is a dense table with
    pagination and one filter in the address (`?status=archived`,
-   `?visibility=hidden`). **+ Nueva …** and a row open the side panel. Plans
+   `?visibility=hidden`). **+ Nueva …** and a row open the side panel. A new
+   Branch asks for **Nombre** and **Dirección** under "Aparecerá en el
+   selector de sucursal al guardarla."; an existing one explains that it
+   already appears in the top bar and in every Back Office record that
+   depends on it, so renaming moves nothing, and its **Archivar sucursal**
+   dialog says it leaves the selector, receives no new Sessions, and keeps
+   its history. Plans
    show prices as `Bs 1.050,00`, last 1, 3, 6, or 12 months, and always carry
    a class count; **Ocultar en la app** hides one from the Client catalog.
    A Class Type needs a description, and a taken name is marked on its field.
@@ -3043,6 +3049,14 @@ about thirty seconds:
     downloads `contactos-promociones-aaaa-mm-dd.csv` with the BOM header and
     her row, and «Dejar de enviar a Valeria Quiroga» → «Borrar contacto»
     leaves «Todavía no hay contactos.» with the export disabled.
+14. **Security headers (WEB-030, WEB-037).** Every response carries the
+    policy of Test 62 and the overlays lock the page behind them; that test
+    reads the journey.
+
+Three of these files hold more than one case: `session.spec.ts` is the
+three parts of item 1 and `authorization.spec.ts` the two of item 5 (the
+neutral rejection and the untrusted origin), which is how fourteen files
+make seventeen journeys.
 
 To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
@@ -5497,3 +5511,75 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    activo» (Test 11 B), Pagos pendientes (Test 10 C), the roster (Test 12),
    Mis evaluaciones (Test 15), referrals and Credit (Test 10 A), and «Ver
    la app como…» (Test 67 A).
+
+## Test 72: the admin web's empty, failed, refused, and lost states
+
+Every list page draws one of four states inside its white card: its rows,
+"Cargando …" while they arrive (Test 66 covers the logo before that), an
+empty line, or a load failure with **Reintentar**. Check each at 1440 px
+and 420 px in a real browser (Test 23).
+
+1. **An empty studio.** Create an empty database and its first
+   Administrator (Test 14 on `pilates_test_bootstrap`, activated through
+   the captured link), start the API and the admin web on it, and sign in.
+   The top bar's selector reads "Todavía no hay sucursales activas."
+   instead of a Branch, and each page says what to do first:
+   - **Horario**: "Todavía no hay sucursales activas. Crea una en
+     Sucursales para armar su horario."; **Insumos**: "… para llevar sus
+     insumos."; **Gastos**: "… para registrar sus gastos."; **Evaluaciones
+     nutricionales**: "Todavía no hay sucursales activas. Las evaluaciones
+     se ven por sucursal."; **Retiros e insumos consumidos**: the bare
+     line.
+   - **Clientes**: "Todavía no hay clientas."; **Pagos**: "Todavía no hay
+     transferencias." under **Todos**, "Todavía no hay pagos confirmados."
+     and "… rechazados." under those filters (Test 27); **Nómina**:
+     "Todavía no hay pagos registrados." (with an **Empleado** chosen, "No
+     hay pagos registrados para esta persona."); **Categorías de gasto**:
+     "Todavía no hay categorías. Agrega la primera abajo."; **Referidos**:
+     "Todavía no hay referidos." under the subtitle "Todavía no hay
+     referidos en el estudio"; **Promociones**: "Todavía no hay
+     promociones." (Test 33); **Contactos para promociones**: "Todavía no
+     hay contactos." (Test 59); **Personal** lists the Administrator alone.
+   - Create a Branch (Test 25, step 5): the selector and Horario wake up,
+     and **Insumos** reads "Todavía no hay insumos en esta sucursal.",
+     **Gastos** "Todavía no hay gastos en esta sucursal.", and **Nuevo
+     gasto**'s category list "Todavía no hay categorías: crea la primera."
+     until each gets its first row. Drop the database afterwards.
+2. **A filter with no match.** On the fixtures, `?status=archived` on
+   Sucursales says "No hay sucursales con este filtro.", the same address
+   on Tipos de clase "No hay tipos de clase con este filtro.", and
+   `?visibility=hidden` on Planes "No hay planes con este filtro." (archive
+   or hide one to see the row instead). A searched list that finds nothing
+   keeps its header and says so (Clientes, Referidos, and Contactos in Tests
+   26, 29, and 59); the pagination footer of an empty table reads "Sin
+   resultados" and a table with no copy of its own "No hay registros.".
+3. **A load failure.** Signed in on the fixtures, stop the API and open a
+   page you have not visited: its card reads "No pudimos cargar …" with
+   the page's noun (Test 64 shows "No pudimos cargar las clientas.") and a
+   small **Reintentar**; the sidebar, top bar, and selector stay. The
+   selector itself, when its own read fails, reads "No pudimos cargar las
+   sucursales. Inténtalo de nuevo."; inside a panel, a list that fails
+   reads its own line ("No pudimos cargar las categorías." in Nuevo gasto,
+   "No pudimos cargar al personal" in Registrar pago, "No pudimos cargar
+   los insumos. Cierra el panel e inténtalo de nuevo." in Registrar
+   retiro). Start the API and **Reintentar** fills the card. Each failure
+   that TanStack gave up on is one `ApiError` event when a DSN is set (Test
+   44, step 5).
+4. **Lost at startup.** Stop the API and reload any address: the whole
+   window shows "No pudimos conectar con el servidor. Revisa tu conexión e
+   inténtalo de nuevo." with a large **Reintentar** on the Login layout
+   (screen readers hear the heading "Sin conexión"); start the API and
+   **Reintentar** continues to the page. Compare Test 64, where a page
+   crash keeps the shell.
+5. **Unknown address.** `/no-existe` shows "Página no encontrada" with
+   **Volver al horario** inside the shell (Test 23, step 4).
+6. **Refused.** The admin web maps a `403` from the API to a line of its
+   own instead of a crash: "No tienes permiso para ver esta sección." in a
+   list's card, and on a write "No tienes permiso para cambiar el
+   horario." (Horario), "… el catálogo." (Tipos de clase), "… sucursales.",
+   "… los planes.", "… al personal.", "… el Back Office.", "… las
+   promociones.", and "No tienes permiso para decidir pagos." (Pagos).
+   A signed-in Administrator cannot reach them by hand (the API accepts
+   every one of her requests, and her own Role cannot be changed, Test 17),
+   so the Jest suite covers each copy (Test 8); a tester sees them only
+   after a defect.
