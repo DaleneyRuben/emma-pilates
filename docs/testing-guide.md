@@ -1844,11 +1844,13 @@ assigned to several Branches a chip row asks where you received the cash.
 **Confirmar pago recibido** activates the Plan at once and shows
 "¡Pago registrado!" with the Plan, its classes, and "Válido hasta el …";
 **Volver al cliente** returns to the overview, now **Activa**, and **Volver**
-from there goes back to **Buscar cliente**. For a Client whose Plan is
-active or about to expire (Lucía), **Registrar pago en efectivo** on the
-overview is disabled with "Podrá comprar otro plan cuando este termine."
-under it, so the picker never opens (UX-003); should two Assistants race,
-the confirmation still answers "El cliente ya tiene un plan activo."
+from there goes back to **Buscar cliente**. While a Client's Plan is still
+in force (paid through today with classes left or an upcoming Booking, as
+Lucía's is), **Registrar pago en efectivo** on the overview is disabled with
+"Podrá comprar otro plan cuando este termine." under it, so the picker never
+opens (UX-003); Isabel's Plan has no classes left and no Booking, so hers
+stays enabled. Should two Assistants race, the confirmation still answers
+"El cliente ya tiene un plan activo."
 
 ### E. Invite a new Client and manage the invitation
 
