@@ -203,6 +203,7 @@ describe("MobileIdentityProvider", () => {
   it("signs out a closed Account locally and keeps a notice for the login screen", async () => {
     const manager = {
       endLocally: jest.fn().mockResolvedValue(undefined),
+      refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
       restore: jest.fn().mockResolvedValue({ accountId: "account-1", role: "client" }),
