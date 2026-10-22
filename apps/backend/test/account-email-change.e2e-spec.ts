@@ -193,7 +193,6 @@ describe('account email change (e2e)', () => {
           '/api/v1/accounts/current/email-change',
         ),
     ]) {
-      // eslint-disable-next-line no-await-in-loop -- one request after another
       await send()
         .set('Authorization', bearer)
         .expect(403)

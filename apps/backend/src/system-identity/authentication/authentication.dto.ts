@@ -1,5 +1,6 @@
 import { ApiProperty, getSchemaPath } from '@nestjs/swagger';
 import { z } from 'zod';
+import { ImpersonationDto } from '../impersonation/impersonation.dto';
 
 export class CreateAuthenticationSessionDto {
   @ApiProperty({ format: 'email' })
@@ -50,6 +51,14 @@ export class CurrentAuthenticationPrincipalDto {
     discriminator: { propertyName: 'kind' },
   })
   identity!: ClientAuthenticationIdentityDto | StaffAuthenticationIdentityDto;
+
+  @ApiProperty({
+    type: ImpersonationDto,
+    required: false,
+    description:
+      'Present while an Administrator sees the Staff app as this Staff Member (FUT-001)',
+  })
+  impersonation?: ImpersonationDto;
 }
 
 const createAuthenticationSessionSchema = z.object({

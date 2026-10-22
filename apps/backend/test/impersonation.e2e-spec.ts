@@ -182,21 +182,21 @@ describe('commands refused while impersonating (e2e, FUT-001)', () => {
   let app: INestApplication<App>;
   const bearer = `Bearer ${'a'.repeat(43)}`;
   const impersonating: AuthenticatedPrincipal = {
-      accountId: 'trainer-account-id',
-      authenticationSessionId: 'authentication-session-id',
-      identity: {
-        kind: 'staff',
-        staffMemberId: 'trainer-staff-member-id',
-        role: 'trainer',
-        branchIds: [],
-      },
-      impersonation: {
-        id: 'impersonation-id',
-        administratorAccountId: 'administrator-account-id',
-        staffMemberName: 'Camila Rojas',
-        expiresAt: new Date('2026-10-22T15:30:00.000Z'),
-      },
-    };
+    accountId: 'trainer-account-id',
+    authenticationSessionId: 'authentication-session-id',
+    identity: {
+      kind: 'staff',
+      staffMemberId: 'trainer-staff-member-id',
+      role: 'trainer',
+      branchIds: [],
+    },
+    impersonation: {
+      id: 'impersonation-id',
+      administratorAccountId: 'administrator-account-id',
+      staffMemberName: 'Camila Rojas',
+      expiresAt: new Date('2026-10-22T15:30:00.000Z'),
+    },
+  };
   const register = jest.fn<() => Promise<void>>();
   const deactivate = jest.fn<() => Promise<void>>();
   const markRead = jest.fn<() => Promise<void>>();

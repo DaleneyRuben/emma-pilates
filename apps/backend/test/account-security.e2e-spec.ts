@@ -17,6 +17,7 @@ import {
 } from '../src/system-identity/account-security/account-security.controller';
 import { CurrentPasswordIncorrectError } from '../src/system-identity/account-security/change-password';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
+import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
 
 describe('Account security (e2e)', () => {
   let app: INestApplication<App>;
@@ -39,13 +40,14 @@ describe('Account security (e2e)', () => {
     }),
   );
   const changeCurrentPassword = jest.fn(() => Promise.resolve(undefined));
-  const resolvePrincipal = jest.fn(() =>
+  const resolvePrincipal = jest.fn<() => Promise<AuthenticatedPrincipal>>(() =>
     Promise.resolve({
       accountId: 'account-id',
       authenticationSessionId: 'authentication-session-id',
       identity: { kind: 'client' as const, clientId: 'client-id' },
     }),
   );
+  const bearer = `Bearer ${'a'.repeat(43)}`;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -118,9 +120,8 @@ describe('Account security (e2e)', () => {
     });
   });
 
-
   it('refuses the command while an Administrator impersonates (FUT-001)', async () => {
-    resolvePrincipal.mockResolvedValue({
+    resolvePrincipal.mockResolvedValueOnce({
       accountId: 'trainer-account-id',
       authenticationSessionId: 'authentication-session-id',
       identity: {
@@ -140,7 +141,10 @@ describe('Account security (e2e)', () => {
     await request(app.getHttpServer())
       .patch('/api/v1/accounts/current/password')
       .set('Authorization', bearer)
-      .send({ currentPassword: 'old password', newPassword: 'new password 2026' })
+      .send({
+        currentPassword: 'old password',
+        newPassword: 'new password 2026',
+      })
       .expect(403)
       .expect(({ body }) =>
         expect(body).toMatchObject({ code: 'impersonation_forbidden' }),

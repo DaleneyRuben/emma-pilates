@@ -19,6 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { z } from 'zod';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
+import { refuseWhileImpersonating } from '../../system-identity/authentication/refuse-while-impersonating';
 import {
   authenticateBearer,
   type PrincipalResolver,
@@ -98,6 +99,7 @@ export class DevicesController {
       this.principalResolver,
       authorization,
     );
+    refuseWhileImpersonating(principal);
 
     await this.register({
       accountId: principal.accountId,
@@ -122,6 +124,7 @@ export class DevicesController {
       this.principalResolver,
       authorization,
     );
+    refuseWhileImpersonating(principal);
 
     await this.deactivate({
       accountId: principal.accountId,

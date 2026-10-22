@@ -108,6 +108,8 @@ describe('impersonation (FUT-001, ADR-0100)', () => {
             impersonation: {
               id: 'other',
               administratorAccountId: 'administrator-account-id',
+              staffMemberName: 'Camila Rojas',
+              expiresAt: new Date('2026-10-22T15:30:00.000Z'),
             },
           },
           { gateway: gateway(), now: () => now, newId: () => 'id' },
@@ -185,6 +187,8 @@ describe('impersonation (FUT-001, ADR-0100)', () => {
           impersonation: {
             id: 'impersonation-id',
             administratorAccountId: 'administrator-account-id',
+            staffMemberName: 'Camila Rojas',
+            expiresAt: new Date('2026-10-22T15:30:00.000Z'),
           },
         },
         { gateway: deps, now: () => now },
@@ -212,6 +216,8 @@ describe('impersonation (FUT-001, ADR-0100)', () => {
             impersonation: {
               id: 'impersonation-id',
               administratorAccountId: 'administrator-account-id',
+              staffMemberName: 'Camila Rojas',
+              expiresAt: new Date('2026-10-22T15:30:00.000Z'),
             },
           },
           {

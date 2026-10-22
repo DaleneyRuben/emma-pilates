@@ -27,6 +27,7 @@ type ImpersonationRow = {
   expiresAt: Date;
   staffMember: {
     id: string;
+    name: string;
     role: StaffRole;
     deletedAt: Date | null;
     account: { id: string; disabledAt: Date | null } | null;
@@ -46,6 +47,7 @@ const toImpersonationRecord = (
           id: row.staffMember.id,
           // A Staff Member without an Account cannot be acted as.
           accountId: row.staffMember.account?.id ?? '',
+          name: row.staffMember.name,
           role: row.staffMember.role,
           branchIds: row.staffMember.branchAssignments.map(
             ({ branchId }) => branchId,
@@ -234,6 +236,7 @@ export class PrismaAuthenticationGateway {
               staffMember: {
                 select: {
                   id: true,
+                  name: true,
                   role: true,
                   deletedAt: true,
                   account: { select: { id: true, disabledAt: true } },

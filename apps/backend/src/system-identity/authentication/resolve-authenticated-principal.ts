@@ -20,6 +20,7 @@ export type ImpersonationPrincipalRecord = {
   expiresAt: Date;
   staffMember: StaffMemberRecord & {
     accountId: string;
+    name: string;
     accountDisabledAt: Date | null;
     deletedAt: Date | null;
   };
@@ -51,7 +52,12 @@ export type AuthenticatedPrincipal = {
   authenticationSessionId: string;
   identity: { kind: 'client'; clientId: string } | StaffIdentity;
   /** Set while an Administrator sees the Staff app as this Staff Member. */
-  impersonation?: { id: string; administratorAccountId: string };
+  impersonation?: {
+    id: string;
+    administratorAccountId: string;
+    staffMemberName: string;
+    expiresAt: Date;
+  };
 };
 
 export type ImpersonationEnd = {
@@ -168,6 +174,8 @@ export const resolveAuthenticatedPrincipal = async (
         impersonation: {
           id: impersonation.id,
           administratorAccountId: session.accountId,
+          staffMemberName: impersonation.staffMember.name,
+          expiresAt: impersonation.expiresAt,
         },
       };
     }
