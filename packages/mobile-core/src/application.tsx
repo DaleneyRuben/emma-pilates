@@ -9,7 +9,12 @@ import { MobileIdentityProvider, useMobileIdentity } from "./auth/identity-provi
 import type { LoginSubmissionResult, LoginValues } from "./auth/login-screen";
 import type { PendingRegistrationStore } from "./auth/pending-registration-store";
 import { createSessionApi, type SessionLoginResult } from "./auth/session-api";
-import { createSessionManager, type AppRole, type SessionManager } from "./auth/session-manager";
+import {
+  createSessionManager,
+  type AppRole,
+  type MobileImpersonation,
+  type SessionManager,
+} from "./auth/session-manager";
 import type { LinkSource } from "./ingress/link-ingress";
 import { createExpoPushPlatform } from "./notifications/expo-push-platform";
 import type { PushPlatform } from "./notifications/push-platform";
@@ -51,6 +56,8 @@ export type MobileNavigationProps = {
   authenticationIntent: AuthenticationLinkIntent | null;
   apiBaseUrl?: string;
   apiFetcher?: typeof globalThis.fetch;
+  /** FUT-001: set while an Administrator sees the Staff app as a Staff Member. */
+  impersonation?: MobileImpersonation;
   installationIdentifier?: () => Promise<string>;
   onBiometricUnlock?: () => void;
   onLogin: (values: LoginValues) => Promise<LoginSubmissionResult | void>;
@@ -58,6 +65,8 @@ export type MobileNavigationProps = {
   /** The Client app keeps «Revisa tu correo» across launches (MOB-028). */
   pendingRegistrationStore?: PendingRegistrationStore;
   pushPlatform?: PushPlatform;
+  /** Resolves the session again after an Impersonation starts or ends (FUT-001). */
+  refreshSession?: () => Promise<void>;
   role?: AppRole;
   /** The login screen's one-time notice, such as after closing the Account. */
   signOutNotice?: string | null;
@@ -163,6 +172,7 @@ function IdentityNavigation({
       authenticationIntent={intent}
       apiBaseUrl={apiBaseUrl}
       apiFetcher={apiFetcher}
+      impersonation={identity.session?.impersonation}
       installationIdentifier={installationIdentifier}
       onBiometricUnlock={
         identity.status === "biometric-locked" ? identity.unlockWithBiometrics : undefined
@@ -171,6 +181,7 @@ function IdentityNavigation({
       onRecoveryCredential={identity.start}
       pendingRegistrationStore={pendingRegistrationStore}
       pushPlatform={pushPlatform}
+      refreshSession={identity.refresh}
       role={identity.session?.role}
       signOutNotice={identity.signOutNotice}
     />

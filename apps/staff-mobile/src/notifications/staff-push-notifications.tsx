@@ -32,12 +32,15 @@ export function StaffPushNotifications({
   fetcher,
   installationIdentifier = unavailableInstallation,
   platform,
+  registrationEnabled = true,
   role,
 }: {
   children: (navigation: NavigationHandle) => ReactNode;
   fetcher: typeof globalThis.fetch;
   installationIdentifier?: () => Promise<string>;
   platform?: PushPlatform;
+  /** FUT-001: off while an Administrator sees the app as a Staff Member. */
+  registrationEnabled?: boolean;
   role: StaffRole;
 }) {
   const ref = useNavigationContainerRef<ParamListBase>();
@@ -61,6 +64,7 @@ export function StaffPushNotifications({
       onOpen={opener.deliver}
       permissionReason="Activa las notificaciones para enterarte al momento de cambios en tu agenda y de lo que necesite tu atención."
       platform={platform}
+      registrationEnabled={registrationEnabled}
     >
       <OfferOnHome />
       {children({ ref, onReady: opener.onReady })}

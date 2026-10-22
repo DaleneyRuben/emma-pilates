@@ -14,6 +14,7 @@ executionOrder:
   # Trainer's attendance runs last so seed.mjs's five-minute class has ended.
   flowsOrder:
     - administrator-pending-payments
+    - administrator-view-as
     - assistant-client-search
     - nutritionist-availability
     - trainer-agenda-and-inbox

@@ -55,6 +55,12 @@ type PushNotificationsProviderProps = PropsWithChildren<{
   onOpen: (payload: PushPayload) => void;
   permissionReason: string;
   platform?: PushPlatform;
+  /**
+   * FUT-001: false while an Administrator sees the app as a Staff Member, so
+   * this installation never becomes that Staff Member's push destination and
+   * the permission is not offered in their name.
+   */
+  registrationEnabled?: boolean;
 }>;
 
 // Mounted only while an Account is signed in (NOT-002): registers this
@@ -67,6 +73,7 @@ export function PushNotificationsProvider({
   onOpen,
   permissionReason,
   platform,
+  registrationEnabled = true,
 }: PushNotificationsProviderProps) {
   const queryClient = useQueryClient();
   const [permissionStatus, setPermissionStatus] = useState<PushPermissionStatus | null>(null);
@@ -82,10 +89,11 @@ export function PushNotificationsProvider({
         ?.getPermissionStatus()
         .then((status) => {
           setPermissionStatus(status);
+          if (!registrationEnabled) return undefined;
           return syncPushRegistration({ fetcher, installationId, platform });
         })
         .catch(() => undefined),
-    [fetcher, installationId, platform],
+    [fetcher, installationId, platform, registrationEnabled],
   );
 
   const refreshInbox = useCallback(
@@ -153,14 +161,14 @@ export function PushNotificationsProvider({
   );
 
   const offerPermission = useCallback(() => {
-    if (platform === undefined) return;
+    if (platform === undefined || !registrationEnabled) return;
     void (async () => {
       if ((await platform.getPermissionStatus()) !== "undetermined") return;
       const snoozedUntil = Number((await AsyncStorage.getItem(snoozeKey)) ?? 0);
       if (snoozedUntil > now()) return;
       setOffering(true);
     })();
-  }, [now, platform]);
+  }, [now, platform, registrationEnabled]);
 
   const accept = useCallback(async () => {
     setOffering(false);
