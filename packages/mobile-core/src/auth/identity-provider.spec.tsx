@@ -251,7 +251,7 @@ describe("MobileIdentityProvider", () => {
     );
 
     expect(screen.getByText("restoring")).toBeOnTheScreen();
-    screen.unmount();
+    await screen.unmount();
     await act(async () => {
       failRestoration(new Error("keychain -34018"));
     });
