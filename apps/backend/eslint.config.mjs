@@ -47,7 +47,6 @@ export default tseslint.config(
       'src/booking/evaluations/prisma-evaluation-commands.ts',
       'src/booking/payments/prisma-payment-commands.ts',
       'src/development-fixtures/development-fixtures.ts',
-      'test/database/payment-lifecycle.integration-spec.ts',
       'test/database/promotions.integration-spec.ts',
     ],
     rules: { 'max-lines': 'off' },
