@@ -257,3 +257,89 @@ describe("createSessionManager", () => {
     expect(clearAccountCache).toHaveBeenCalledWith("account-1");
   });
 });
+
+describe("createSessionManager under an Impersonation (FUT-001)", () => {
+  const impersonation = {
+    id: "impersonation-1",
+    staffMemberId: "staff-2",
+    staffMemberName: "Camila Rojas",
+    role: "trainer" as const,
+    expiresAt: "2026-10-22T15:30:00.000Z",
+  };
+  const actingPrincipal = {
+    accountId: "trainer-account",
+    identity: {
+      branchIds: ["branch-1"],
+      kind: "staff" as const,
+      role: "trainer" as const,
+      staffMemberId: "staff-2",
+    },
+    impersonation,
+  };
+
+  it("carries the Impersonation beside the acting Role", async () => {
+    const manager = createSessionManager({
+      acceptedIdentityKind: "staff",
+      clearAccountCache: jest.fn(),
+      credentialStore: { clear: jest.fn(), load: jest.fn(), save: jest.fn() },
+      resolveCurrent: jest.fn().mockResolvedValue(actingPrincipal),
+      revokeCurrent: jest.fn(),
+    });
+
+    await expect(manager.start("credential")).resolves.toEqual({
+      accountId: "trainer-account",
+      role: "trainer",
+      impersonation,
+    });
+  });
+
+  it("refreshes the session from the same credential once the Impersonation ends", async () => {
+    const resolveCurrent = jest
+      .fn()
+      .mockResolvedValueOnce(actingPrincipal)
+      .mockResolvedValueOnce({
+        accountId: "administrator-account",
+        identity: {
+          branchIds: [],
+          kind: "staff" as const,
+          role: "administrator" as const,
+          staffMemberId: "staff-1",
+        },
+      });
+    const manager = createSessionManager({
+      acceptedIdentityKind: "staff",
+      clearAccountCache: jest.fn(),
+      credentialStore: { clear: jest.fn(), load: jest.fn(), save: jest.fn() },
+      resolveCurrent,
+      revokeCurrent: jest.fn(),
+    });
+
+    await manager.start("credential");
+    await expect(manager.refresh()).resolves.toEqual({
+      accountId: "administrator-account",
+      role: "administrator",
+    });
+    expect(resolveCurrent).toHaveBeenLastCalledWith("credential");
+  });
+
+  it("refreshes from the stored credential when none is active and answers null without one", async () => {
+    const load = jest.fn().mockResolvedValueOnce("stored").mockResolvedValueOnce(null);
+    const manager = createSessionManager({
+      clearAccountCache: jest.fn(),
+      credentialStore: { clear: jest.fn(), load, save: jest.fn() },
+      resolveCurrent: jest.fn().mockResolvedValue(actingPrincipal),
+      revokeCurrent: jest.fn(),
+    });
+
+    await expect(manager.refresh()).resolves.toMatchObject({ role: "trainer" });
+    await expect(manager.refresh()).resolves.toMatchObject({ role: "trainer" });
+    await expect(
+      createSessionManager({
+        clearAccountCache: jest.fn(),
+        credentialStore: { clear: jest.fn(), load: jest.fn().mockResolvedValue(null), save: jest.fn() },
+        resolveCurrent: jest.fn(),
+        revokeCurrent: jest.fn(),
+      }).refresh(),
+    ).resolves.toBeNull();
+  });
+});
