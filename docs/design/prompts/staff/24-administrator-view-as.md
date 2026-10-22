@@ -30,9 +30,9 @@ Using the Emma Pilates Studio design system (Prompt 00) and the same header-with
 
 Show these frames:
 
-- **iOS · Lista** — two Entrenadoras (Camila Rojas · Equipetrol; Emma Vargas · Centro, Equipetrol, Urubó), one Asistente (Julia Soto · Equipetrol), one Nutricionista (Carla Méndez · Centro), the intro note above.
+- **iOS · Lista** — two Entrenadoras (Camila Rojas · Equipetrol; Emma Vargas · Centro, Equipetrol, Urubó), one Asistente (Julia Zapata · Equipetrol), one Nutricionista (Daniela Arce · Centro), the intro note above.
 - **iOS · Confirmación** — the same list with the sheet open over it for Camila Rojas.
 - **Android · Lista** — same content, Android header height.
-- **Tablet · Lista** — the iPad Pro 11 frame: the list centred in a 560 px column, the rest unchanged (the same width S23 uses on the tablet).
+- **Tablet · Lista** — the iPad Pro 11 frame: the list centred in a 560 px column, the rest unchanged.
 
 Generous whitespace, calm tone, consistent with S23. Nothing on this screen is editable; it only chooses who to see as.

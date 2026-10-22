@@ -41,16 +41,17 @@ banner. The banner is the first thing under the status bar, **above the
 screen's own header**, full width, and it stays fixed while the content
 scrolls:
 
-- a 44 px strip (plus the status-bar inset above it) on **Palo de rosa
-  profundo `#8A5D59`**, text in white, 14 px, weight 500;
-- left: a 16 px white outline «eye» icon (the same glyph as §1), then
-  «Viendo como Camila Rojas · Entrenadora» (name and Role, the Role word as
-  `S23` writes it: Entrenadora / Asistente / Nutricionista), trimmed with an
-  ellipsis on one line if long;
-- right: «Quedan 28 min» in 13 px white at 0.85 opacity, then «Salir» as a
-  text button in white, weight 600, with a 44 px touch target and a pressed
-  state of `rgba(255,255,255,0.14)` behind it, labelled «Salir de ver como
-  Camila Rojas» for screen readers;
+- a 52 px strip (plus the status-bar inset above it) on **Palo de rosa
+  profundo `#8A5D59`**, text in white;
+- left: a 16 px white outline «eye» icon (the same glyph as §1), then two
+  lines: «Viendo como Camila Rojas» in 14 px weight 500 over «Entrenadora ·
+  Quedan 28 min» in 12 px at 0.85 opacity (the Role word as `S23` writes it:
+  Entrenadora / Asistente / Nutricionista), each trimmed with an ellipsis on
+  its line if long (one line could not hold the name, the Role, and the
+  minutes on a 402 px phone);
+- right: «Salir» as a text button in white, weight 600, with a 44 px touch
+  target and a pressed state of `rgba(255,255,255,0.14)` behind it, labelled
+  «Salir de ver como Camila Rojas» for screen readers;
 - the strip never covers the header's controls: the header moves down under
   it, keeping its own paddings;
 - the account avatar in the header keeps showing the **Staff Member's**
@@ -58,10 +59,11 @@ scrolls:
   it shows her read-only data under the same banner, without the «Ver la
   app como…» row.
 
-The sample names: `S02` Camila Rojas · Entrenadora, `S04` Julia Soto ·
-Asistente, `S15` Carla Méndez · Nutricionista. The minutes: 28, 12, and 4;
-under 5 minutes the number stays white (no colour change: the banner is
-already the strongest element on the screen).
+The sample names: `S02` Camila Rojas · Entrenadora, `S04` Julia Zapata ·
+Asistente, `S15` Daniela Arce · Nutricionista (the names behind the initials
+the screens already draw: CR, JZ, DA). The minutes: 28, 12, and 4; under 5
+minutes the number stays white (no colour change: the banner is already the
+strongest element on the screen).
 
 Tapping «Salir» returns at once to the Administrator's own root `S11` with
 the transient Éxito-tinted notice strip the README already describes for
@@ -79,13 +81,13 @@ que quedan y «Salir» ocupa la parte superior de todas las pantallas
 
 In «06 · Navegación», after the «Avatar de cuenta» card, a white card (1 px
 Arena cálida border, radius 16, padding 40) with the eyebrow «Franja de
-suplantación» in the same 12 px uppercase 0.16em style, one still 270 px
-wide tile showing the strip exactly as §2 draws it over the top of `S02`'s
-header («Viendo como Camila Rojas · Entrenadora», «Quedan 28 min», «Salir»),
-and the spec line in the 13 px caption style: «Solo cuando administración
-ve la app como otra persona (hasta 30 minutos). Fija arriba de todas las
-pantallas, sobre la cabecera. Palo de rosa profundo, texto blanco. «Salir»
-vuelve a Pagos pendientes.»
+suplantación» in the same 12 px uppercase 0.16em style, one still
+phone-width (402 px) tile showing the strip exactly as §2 draws it over the top of `S02`'s
+header («Viendo como Camila Rojas» over «Entrenadora · Quedan 28 min»,
+«Salir»), and the spec line in the 13 px caption style: «Solo cuando
+administración ve la app como otra persona (hasta 30 minutos). Fija arriba
+de todas las pantallas, sobre la cabecera. Palo de rosa profundo, texto
+blanco. «Salir» vuelve a Pagos pendientes.»
 
 ## 4. README
 
@@ -101,11 +103,11 @@ vuelve a Pagos pendientes.»
   > ### Impersonation banner (Staff)
   >
   > - While an Administrator sees the app as a Staff Member (FUT-001,
-  >   ADR-0100), a fixed 44px strip on `#8A5D59` with white 14px text sits
-  >   above every screen's header: an eye icon, «Viendo como {name} ·
-  >   {role}», «Quedan {n} min» at 0.85 opacity, and «Salir» (weight 600,
-  >   44px target, pressed `rgba(255,255,255,0.14)`, label «Salir de ver
-  >   como {name}»).
+  >   ADR-0100), a fixed 52px strip on `#8A5D59` with white text sits above
+  >   every screen's header: an eye icon, «Viendo como {name}» (14px, weight
+  >   500) over «{role} · Quedan {n} min» (12px at 0.85 opacity), both
+  >   trimmed with an ellipsis, and «Salir» (weight 600, 44px target,
+  >   pressed `rgba(255,255,255,0.14)`, label «Salir de ver como {name}»).
   > - «Salir» or the 30-minute expiry returns to `S11` with the transient
   >   notice strip («Dejaste de ver la app como {name}.» / «Terminó el
   >   tiempo para ver la app como {name}.»). The header avatar shows the
