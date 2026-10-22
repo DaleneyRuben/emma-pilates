@@ -1,0 +1,48 @@
+# Critical journey (FUT-001): the Administrator sees the app as a Trainer from
+# Perfil, lands on her agenda under the banner, and leaves through «Salir».
+appId: ${APP_ID}
+env:
+  EMAIL: paola.mendoza@example.com
+---
+- runFlow: subflows/login.yaml
+- extendedWaitUntil:
+    visible: "Pagos pendientes"
+    timeout: 30000
+- runFlow: subflows/park-dev-gear.yaml
+- tapOn:
+    id: "account-avatar"
+- extendedWaitUntil:
+    visible: "Ver la app como…"
+    timeout: 15000
+- tapOn: "Ver la app como…"
+- extendedWaitUntil:
+    visible: "Entrenadoras"
+    timeout: 20000
+- takeScreenshot: staff-admin-view-as
+- tapOn: "Emma Vargas"
+- extendedWaitUntil:
+    visible: "¿Ver la app como Emma Vargas?"
+    timeout: 10000
+- tapOn: "Ver como Emma"
+- extendedWaitUntil:
+    visible: "Viendo como Emma Vargas"
+    timeout: 20000
+- extendedWaitUntil:
+    visible:
+      text: "Entrenadora · Quedan .* min"
+    timeout: 10000
+- extendedWaitUntil:
+    visible: "Hola, Emma"
+    timeout: 20000
+- runFlow: subflows/dismiss-push-permission.yaml
+- takeScreenshot: staff-admin-viewing-as-trainer
+- tapOn:
+    id: "impersonation-exit"
+- extendedWaitUntil:
+    visible: "Pagos pendientes"
+    timeout: 20000
+- extendedWaitUntil:
+    visible: "Dejaste de ver la app como Emma Vargas."
+    timeout: 10000
+- assertNotVisible: "Viendo como Emma Vargas"
+- takeScreenshot: staff-admin-back-from-view-as
