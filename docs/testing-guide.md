@@ -1814,7 +1814,12 @@ Class Type chips; the Session cards look exactly like the Client's (Test 5 B:
 the time and the Lora Class Type, the seat pill in the same tones with
 **Llena** for a full class, the Trainer after a person icon, the chevron), and
 like the Client's list it leaves out today's Sessions
-that already started (a Client cannot be booked into one, MOB-044). Tap a Session: the detail shows Trainer, Branch, date, time, duration,
+that already started (a Client cannot be booked into one, MOB-044). The
+Session she already holds a Booking in (her «Próxima reserva» on the
+overview) carries the neutral **Ya reservada** pill instead of the seat
+count, and its detail shows "La clienta ya tiene esta clase reservada."
+where **Reservar** would be, with no button (UX-003; a class she only waits
+for keeps its count). Tap a Session: the detail shows Trainer, Branch, date, time, duration,
 and a white box with «X de Y cupos disponibles» beside a **Con cupos** pill
 (Palo de rosa oscuro on Palo de rosa tinte); a full class reads «0 de Y cupos
 disponibles» beside **Completa** on the neutral sand pill, never red or green,
@@ -1839,8 +1844,11 @@ assigned to several Branches a chip row asks where you received the cash.
 **Confirmar pago recibido** activates the Plan at once and shows
 "¡Pago registrado!" with the Plan, its classes, and "Válido hasta el …";
 **Volver al cliente** returns to the overview, now **Activa**, and **Volver**
-from there goes back to **Buscar cliente**. A Client with an active Plan
-answers "El cliente ya tiene un plan activo."
+from there goes back to **Buscar cliente**. For a Client whose Plan is
+active or about to expire (Lucía), **Registrar pago en efectivo** on the
+overview is disabled with "Podrá comprar otro plan cuando este termine."
+under it, so the picker never opens (UX-003); should two Assistants race,
+the confirmation still answers "El cliente ya tiene un plan activo."
 
 ### E. Invite a new Client and manage the invitation
 
