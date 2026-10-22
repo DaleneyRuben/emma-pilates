@@ -1,6 +1,5 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
-import { Alert } from "react-native";
 
 import App from "../../App";
 import { createClientRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -182,25 +181,25 @@ describe("Client Profile", () => {
     expect(screen.getByRole("button", { name: "Comprar un plan" })).toBeOnTheScreen();
   });
 
-  it("asks for confirmation before logging out", async () => {
-    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
+  it("asks for confirmation in the sheet before logging out", async () => {
     const runtime = createClientRuntime(routeFetcher(readRoutes));
     const screen = await openProfile(runtime);
 
     await fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
 
-    expect(alert).toHaveBeenCalledWith("¿Cerrar sesión?", expect.any(String), expect.any(Array));
+    // UX-002: the design's sheet, not a native alert.
+    const sheet = within(screen.getByTestId("logout-sheet"));
+    expect(sheet.getByText("¿Cerrar sesión?")).toBeOnTheScreen();
+    await fireEvent.press(sheet.getByRole("button", { name: "Cancelar" }));
+    expect(screen.queryByTestId("logout-sheet")).toBeNull();
     expect(runtime.sessionManager.logout).not.toHaveBeenCalled();
-    const buttons = alert.mock.calls[0]?.[2] as {
-      text?: string;
-      onPress?: () => void;
-    }[];
-    buttons.find((button) => button.text === "Cerrar sesión")?.onPress?.();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Cerrar sesión" }));
+    await fireEvent.press(screen.getByTestId("logout-confirm"));
 
     await waitFor(() => {
       expect(runtime.sessionManager.logout).toHaveBeenCalled();
     });
-    alert.mockRestore();
   });
 
   it("shows the unread count on the Notificaciones row and opens the inbox", async () => {
