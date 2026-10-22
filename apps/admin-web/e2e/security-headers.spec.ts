@@ -23,6 +23,9 @@ test("serves the security headers and stays within its policy", async ({
   expect(headers["x-content-type-options"]).toBe("nosniff");
 
   await signIn(page, "/");
+  // WEB-035: the first-load state index.html draws is gone once a page is
+  // on screen, and its stylesheet and image pass the policy.
+  await expect(page.locator("#arranque")).toHaveCount(0);
   for (const section of ["Clientes", "Pagos", "Reporte", "Promociones"]) {
     await sidebar(page).getByRole("link", { name: section }).click();
     await expect(page.getByRole("heading", { level: 1 }).first()).toBeVisible();
