@@ -1,6 +1,12 @@
-import { ButtonLabel, colors, radii, typography } from "@pilates/mobile-core";
 import { Pressable, StyleSheet } from "react-native";
 
+import { ButtonLabel } from "./button-label";
+import { colors, radii, typography } from "./tokens";
+
+/**
+ * The outlined action of the cards and confirmation sheets: Palo de rosa by
+ * default, the Error outline for a destructive confirmation (05, S06, S15, S17).
+ */
 export function OutlinedButton({
   busy = false,
   disabled = false,
@@ -48,6 +54,7 @@ const styles = StyleSheet.create({
   disabledLabel: { color: colors.disabledText },
   outlined: {
     alignItems: "center",
+    backgroundColor: "transparent",
     borderColor: colors.primary,
     borderRadius: radii.control,
     borderWidth: 1,

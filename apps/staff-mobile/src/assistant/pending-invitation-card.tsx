@@ -7,6 +7,7 @@ import {
   BodyText,
   colors,
   FormField,
+  OutlinedButton,
   PrimaryButton,
   radii,
   spacing,
@@ -22,7 +23,6 @@ import { Modal, StyleSheet, Text, View } from "react-native";
 import { useStaffFetcher } from "../staff-fetcher";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { accountEmailLimitCode, formatInstantDate, resendLimitNotice } from "./assistant-format";
-import { OutlinedButton } from "./outlined-button";
 import { SelfRegisteredNotice } from "./self-registered-notice";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
