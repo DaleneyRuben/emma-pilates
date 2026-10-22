@@ -3,7 +3,6 @@ import { z } from "zod";
 import {
   createRootRouteWithContext,
   createRoute,
-  Outlet,
   redirect,
 } from "@tanstack/react-router";
 import type { SessionExpiry } from "../api/session-expiry";
@@ -15,6 +14,7 @@ import { NotFoundPage } from "../pages/not-found-page";
 import { StartupErrorPage } from "../pages/startup-error-page";
 import { readSignedInSession } from "../session/session-queries";
 import { AdminShell } from "../shell/admin-shell";
+import { RootLayout } from "./startup-state";
 
 export type AdminRouterContext = {
   queryClient: QueryClient;
@@ -22,7 +22,7 @@ export type AdminRouterContext = {
 };
 
 export const rootRoute = createRootRouteWithContext<AdminRouterContext>()({
-  component: Outlet,
+  component: RootLayout,
   notFoundComponent: NotFoundPage,
 });
 

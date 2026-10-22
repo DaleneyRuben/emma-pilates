@@ -1,0 +1,64 @@
+/*
+ * WEB-035, design follow-up 106: the loading states. index.html links this
+ * file so the first-load state is styled before the bundle runs; the
+ * router's pending state reuses `.carga-logo`. Only the logo, breathing as
+ * the mobile apps' loading state does (follow-up 94), still under Reduce
+ * Motion. The Content-Security-Policy (WEB-030) allows no inline styles, so
+ * everything the static markup needs is here.
+ */
+@keyframes carga-aparece {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.55;
+  }
+}
+
+@keyframes carga-respira {
+  from {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* The first load: the whole viewport, Crema, over whatever React draws
+   until the first page is on screen. */
+.carga-pantalla {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f2ece5;
+}
+
+.carga-logo {
+  display: block;
+  width: 240px;
+  height: auto;
+  opacity: 0.55;
+  transform: scale(0.96);
+  animation:
+    carga-aparece 300ms ease-out both,
+    carga-respira 1.4s ease-in-out 300ms infinite alternate;
+}
+
+@media (min-width: 1024px) {
+  .carga-logo {
+    width: 300px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .carga-logo {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
