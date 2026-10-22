@@ -218,6 +218,12 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 - When a page fails while drawing, the main area shows the plain empty state in its place, directly on Superficie with no card and no icon: «Algo salió mal» in Lora 22, the 15px `#766D69` note «No pudimos mostrar esta página. Inténtalo de nuevo; si vuelve a pasar, recarga la página.» up to 360px wide, and the large «Reintentar» primary button at least 220px wide, centred. It replaces only the content area (the sidebar and the top bar stay) and «Reintentar» draws the page again; the sidebar still moves to any other page. The startup page «No pudimos conectar con el servidor» stays for the session probe alone.
 
+### Loading states
+
+- **First load:** from the first paint until the session probe answers, the viewport is Crema `#F2ECE5` with only `emma-logo.png` centred in it (300px wide, 240px on a phone), with no delay: it is the web's splash screen. The first page replaces it with no exit animation.
+- **Page switch:** when a sidebar entry's page has not arrived after 400ms, the main area shows only the logo centred in its content area on Superficie `#FAF7F2` (300px wide at 1440px, 240px at 420px); the sidebar, the top bar, and the skip link stay. The page replaces it with no exit animation.
+- Motion and Reduce Motion as the mobile loading state above (300ms fade-in, a 2.8s breath between opacity 0.55 / scale 0.96 and 1 / 1; still under Reduce Motion). Announced as a status: «Cargando la administración» and «Cargando la página». Not for the in-page «Cargando …» notices, busy buttons, or the recovery state.
+
 ---
 
 ## Screen inventory
