@@ -20,6 +20,8 @@ import {
   surfaces,
   TextButton,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -150,6 +152,9 @@ export function BookingsScreen({
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const queryKeys = [getListUpcomingBookingsQueryKey(), getGetCurrentClientSubscriptionQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const refresh = () =>
     Promise.all([
@@ -226,15 +231,19 @@ export function BookingsScreen({
           onRetry={() => void upcoming.refetch()}
         />
       ) : items.length === 0 ? (
-        <View style={styles.empty}>
+        <ScrollView contentContainerStyle={styles.empty} refreshControl={refreshControl}>
           <BodyText>Aún no tienes reservas próximas.</BodyText>
           <PrimaryButton
             label="Reservar una clase"
             onPress={() => navigation.navigate("Booking")}
           />
-        </View>
+        </ScrollView>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView
+          contentContainerStyle={styles.list}
+          refreshControl={refreshControl}
+          testID="bookings-scroll"
+        >
           {items.map((item) => (
             <BookingCard
               item={item}

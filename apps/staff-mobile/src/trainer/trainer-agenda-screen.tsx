@@ -1,4 +1,8 @@
-import { useGetCurrentStaffMemberProfile, useListTrainerSchedule } from "@pilates/api-contracts";
+import {
+  getListTrainerScheduleQueryKey,
+  useGetCurrentStaffMemberProfile,
+  useListTrainerSchedule,
+} from "@pilates/api-contracts";
 import {
   BodyText,
   boliviaCivilDate,
@@ -16,6 +20,8 @@ import {
   spacing,
   surfaces,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -93,6 +99,9 @@ export function TrainerAgendaScreen() {
     () => [-2, -1, 0, 1, 2, 3, 4].map((offset) => addDays(selectedDate, offset)),
     [selectedDate],
   );
+  const queryKeys = [getListTrainerScheduleQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const firstName = profile.data?.status === 200 ? profile.data.data.name.split(" ")[0] : undefined;
   const header = (
@@ -143,11 +152,15 @@ export function TrainerAgendaScreen() {
         ))}
       </ScrollView>
       {sessions.length === 0 ? (
-        <View style={styles.centered}>
+        <ScrollView contentContainerStyle={styles.centered} refreshControl={refreshControl}>
           <BodyText>No tienes clases este día.</BodyText>
-        </View>
+        </ScrollView>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView
+          contentContainerStyle={styles.list}
+          refreshControl={refreshControl}
+          testID="agenda-scroll"
+        >
           {sessions.map((session) => (
             <AgendaCard
               key={session.sessionId}

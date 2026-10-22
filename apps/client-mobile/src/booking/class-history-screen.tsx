@@ -1,4 +1,4 @@
-import { useListClassHistory } from "@pilates/api-contracts";
+import { getListClassHistoryQueryKey, useListClassHistory } from "@pilates/api-contracts";
 import {
   ClassHistoryList,
   EmptyState,
@@ -7,6 +7,8 @@ import {
   Screen,
   ScreenTopBar,
   spacing,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { StyleSheet } from "react-native";
@@ -20,6 +22,9 @@ export function ClassHistoryScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const queryKeys = [getListClassHistoryQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
     <ScreenTopBar fullBleed onBack={() => navigation.goBack()} title="Historial de clases" />
@@ -59,7 +64,7 @@ export function ClassHistoryScreen() {
           variant="plain"
         />
       ) : (
-        <ClassHistoryList entries={entries} lead="Has asistido a" />
+        <ClassHistoryList entries={entries} lead="Has asistido a" refreshControl={refreshControl} />
       )}
     </Screen>
   );
