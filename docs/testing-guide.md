@@ -5439,3 +5439,61 @@ that state; `invalid_back_office_value` and `invalid_promotion_value` answer
 `400` to a Back Office or Promotion body that fails a rule the DTO cannot
 express (a negative quantity, an end date before the start). Drop the copy
 afterwards: `dropdb pilates_test_codes`.
+
+## Test 71: the mobile apps' load, error, offline, and link states
+
+Every screen that reads data draws the same three states in both apps:
+the breathing logo while it loads (Test 54), a load failure, and its own
+content or empty state. The failure is a plain line under the header with a
+**Reintentar** primary button (screen readers hear the line as an alert).
+Run it on the iPhone 16 Pro, the iPad Pro 11, and the Android emulator, in
+both apps, with the API on `pilates_dev_sim` and the fixtures.
+
+1. **A load failure.** Sign in as `lucia@example.com`, then stop the API
+   (Ctrl+C in its Terminal) and open a screen you have not visited: Perfil
+   → **Notificaciones** reads «No pudimos cargar tus notificaciones.»,
+   **Mis evaluaciones** «No pudimos cargar tus evaluaciones.», **Mi
+   crédito** «No pudimos cargar tu crédito.», the **Reservar** tab «No
+   pudimos cargar las clases.», a Plan «No pudimos cargar el plan.». Pull
+   to refresh on a tab you had already opened keeps the last data instead
+   (the Account-scoped cache of Test 9 F). Start the API again and tap
+   **Reintentar**: the screen loads. In the Staff app as
+   `camila.rojas@example.com` the search result's overview reads «No
+   pudimos cargar al cliente.» (on the iPad, inside the right panel), the
+   Trainer's root «No pudimos cargar tu agenda.», the roster «No pudimos
+   cargar la lista de asistencia.», the Administrator's root «No pudimos
+   cargar los pagos pendientes.», and the Nutritionist's **Mi
+   disponibilidad** «No pudimos cargar tus horarios.».
+2. **An action failure.** With the API stopped, tap an action instead: a
+   refused command shows its own line and keeps the form, in the pattern
+   «No pudimos … Inténtalo de nuevo.» (Test 10 D's «No pudimos cancelar la
+   sesión. Inténtalo de nuevo.», Test 67's «No pudimos empezar a ver la
+   app como esa persona. Inténtalo de nuevo.»); the button spins while the
+   request waits (Test 50) and nothing is sent twice.
+3. **Offline.** Cut the device's network as Test 9 F describes: the banner
+   «Sin conexión. Mostrando la última información guardada.» sits above
+   every screen until the network is back, and the screens of step 1 that
+   were already loaded keep their data.
+4. **A render error.** Test 1 describes «Algo salió mal» with
+   **Reintentar**; it needs a defect to appear (a temporary `throw` in a
+   screen, never committed), so it is read there, not here.
+5. **The link screens.** Open an authentication link on the Android
+   emulator with a development build (Test 57): the app first shows
+   **Comprobando enlace** under the Emma wordmark while it inspects the
+   token (`POST /api/v1/authentication-links/inspection`, Test 6 A), then
+   the password form («Crea una contraseña nueva» for a recovery,
+   «Activar cuenta» for an invitation; both fields carry the eye of Test
+   52). Open the same link a second time: **Este enlace ya no es válido**
+   under the Palo de rosa clock of Test 1, with **Volver a iniciar
+   sesión**. An activation link whose invitation the 30-day cleanup removed
+   (Test 68, step 1) reads **Esta invitación ya no está activa**. The Staff
+   app draws the same screens (S18, S19) for a Staff Member's recovery
+   (`¿Olvidaste tu contraseña?` on its Login, Test 1 B) and for the
+   activation link of a member invited in Test 26, whose `/staff/` link
+   opens the Staff build.
+6. **Empty states** are read where their screens are: Reservar and Mi
+   plan (Test 5 B and Test 18), the Client's history and inbox (Tests 5 B
+   and 9 B), the Assistant's reservations and history and «Sin plan
+   activo» (Test 11 B), Pagos pendientes (Test 10 C), the roster (Test 12),
+   Mis evaluaciones (Test 15), referrals and Credit (Test 10 A), and «Ver
+   la app como…» (Test 67 A).
