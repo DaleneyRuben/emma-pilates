@@ -5,9 +5,12 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { ClientAuthenticationIdentityDto } from "./clientAuthenticationIdentityDto";
+import type { ImpersonationDto } from "./impersonationDto";
 import type { StaffAuthenticationIdentityDto } from "./staffAuthenticationIdentityDto";
 
 export interface CurrentAuthenticationPrincipalDto {
   accountId: string;
   identity: ClientAuthenticationIdentityDto | StaffAuthenticationIdentityDto;
+  /** Present while an Administrator sees the Staff app as this Staff Member (FUT-001) */
+  impersonation?: ImpersonationDto;
 }

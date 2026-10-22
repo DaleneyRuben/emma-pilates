@@ -110,6 +110,7 @@ import type {
   GetExpenseReportParams,
   GetIncomeReportParams,
   GetPaymentReceiptParams,
+  ImpersonationDto,
   IncomeReportDto,
   InviteClientDto,
   ListAdminBranchesParams,
@@ -184,6 +185,7 @@ import type {
   StaffMemberPageDto,
   StaffProfileDto,
   StartClientRegistrationDto,
+  StartImpersonationDto,
   SupplyChangeDto,
   SupplyInputDto,
   SupplyMovementDto,
@@ -3755,6 +3757,241 @@ export const useCompleteEmailChange = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(
     getCompleteEmailChangeMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type startImpersonationResponse201 = {
+  data: ImpersonationDto;
+  status: 201;
+};
+
+export type startImpersonationResponseSuccess =
+  startImpersonationResponse201 & {
+    headers: Headers;
+  };
+export type startImpersonationResponse = startImpersonationResponseSuccess;
+
+export const getStartImpersonationUrl = () => {
+  return `/api/v1/impersonations`;
+};
+
+export const startImpersonation = async (
+  startImpersonationDto: StartImpersonationDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<startImpersonationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getStartImpersonationUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(startImpersonationDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: startImpersonationResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as startImpersonationResponse;
+};
+
+export const getStartImpersonationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof startImpersonation>>,
+    TError,
+    StartImpersonationMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof startImpersonation>>,
+  TError,
+  StartImpersonationMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["startImpersonation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof startImpersonation>>,
+    StartImpersonationMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return startImpersonation(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type StartImpersonationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof startImpersonation>>
+>;
+export type StartImpersonationMutationBody = StartImpersonationDto;
+export type StartImpersonationMutationError = unknown;
+export type StartImpersonationMutationVariables = {
+  data: StartImpersonationDto;
+};
+
+export const useStartImpersonation = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof startImpersonation>>,
+      TError,
+      StartImpersonationMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof startImpersonation>>,
+  TError,
+  StartImpersonationMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getStartImpersonationMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type endCurrentImpersonationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type endCurrentImpersonationResponseSuccess =
+  endCurrentImpersonationResponse204 & {
+    headers: Headers;
+  };
+export type endCurrentImpersonationResponse =
+  endCurrentImpersonationResponseSuccess;
+
+export const getEndCurrentImpersonationUrl = () => {
+  return `/api/v1/impersonations/current`;
+};
+
+export const endCurrentImpersonation = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<endCurrentImpersonationResponse> => {
+  const res = await (fetchFn ?? fetch)(getEndCurrentImpersonationUrl(), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: endCurrentImpersonationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as endCurrentImpersonationResponse;
+};
+
+export const getEndCurrentImpersonationMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof endCurrentImpersonation>>,
+    TError,
+    void,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof endCurrentImpersonation>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["endCurrentImpersonation"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof endCurrentImpersonation>>,
+    void
+  > = () => {
+    return endCurrentImpersonation(fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type EndCurrentImpersonationMutationResult = NonNullable<
+  Awaited<ReturnType<typeof endCurrentImpersonation>>
+>;
+
+export type EndCurrentImpersonationMutationError = unknown;
+
+export const useEndCurrentImpersonation = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof endCurrentImpersonation>>,
+      TError,
+      void,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof endCurrentImpersonation>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(
+    getEndCurrentImpersonationMutationOptions(options),
     queryClient,
   );
 };

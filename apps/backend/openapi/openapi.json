@@ -829,6 +829,63 @@
         ]
       }
     },
+    "/api/v1/impersonations": {
+      "post": {
+        "operationId": "startImpersonation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartImpersonationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpersonationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Impersonation"
+        ]
+      }
+    },
+    "/api/v1/impersonations/current": {
+      "delete": {
+        "operationId": "endCurrentImpersonation",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Impersonation"
+        ]
+      }
+    },
     "/api/v1/client-email-verifications": {
       "post": {
         "operationId": "verifyClientEmail",
@@ -7029,6 +7086,42 @@
           "password"
         ]
       },
+      "ImpersonationDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffMemberName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "trainer",
+              "assistant",
+              "nutritionist"
+            ]
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "When the 30 minutes end"
+          }
+        },
+        "required": [
+          "id",
+          "staffMemberId",
+          "staffMemberName",
+          "role",
+          "expiresAt"
+        ]
+      },
       "CurrentAuthenticationPrincipalDto": {
         "type": "object",
         "properties": {
@@ -7048,6 +7141,14 @@
             "discriminator": {
               "propertyName": "kind"
             }
+          },
+          "impersonation": {
+            "description": "Present while an Administrator sees the Staff app as this Staff Member (FUT-001)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ImpersonationDto"
+              }
+            ]
           }
         },
         "required": [
@@ -7319,6 +7420,18 @@
         },
         "required": [
           "status"
+        ]
+      },
+      "StartImpersonationDto": {
+        "type": "object",
+        "properties": {
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "staffMemberId"
         ]
       },
       "VerifyClientEmailDto": {
