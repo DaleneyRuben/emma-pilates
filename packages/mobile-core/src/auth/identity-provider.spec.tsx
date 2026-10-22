@@ -10,6 +10,7 @@ jest.mock("../monitoring/error-reporting", () => ({ reportRecoveredError: jest.f
 // answered -34018) must not hold the identity, and the launch screen, forever.
 const failingManager = (failure: "hasBiometricSession" | "restore", error: Error) => ({
   endLocally: jest.fn(),
+  refresh: jest.fn().mockResolvedValue(null),
   hasBiometricSession:
     failure === "hasBiometricSession"
       ? jest.fn().mockRejectedValue(error)
