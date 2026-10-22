@@ -43,6 +43,7 @@ export * from "./ui/card-footer";
 export * from "./ui/body-text";
 export * from "./ui/button-label";
 export * from "./ui/chevron";
+export * from "./ui/confirmation-sheet";
 export * from "./ui/detail-line";
 export * from "./ui/empty-state";
 export * from "./ui/fonts";
