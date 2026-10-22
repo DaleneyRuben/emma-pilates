@@ -30,6 +30,58 @@ you are starting with no project knowledge.
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
+| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
+| Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
+| Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
+| Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
+| Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
+
+## Where each designed screen is tested
+
+The design index ([`docs/design/prompts/README.md`](./design/prompts/README.md))
+names every screen; this table says which tests walk each one, so a screen
+can be found by its design name.
+
+| Client app | Tests |
+| --- | --- |
+| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71 |
+| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70 |
+| 12 Mi plan | 5, 18, 71 |
+| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
+| 16 Mis referidos, 17 Mi crédito | 10, 18 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
+| 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
+| 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
+
+| Staff app | Tests |
+| --- | --- |
+| S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
+| S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
+| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
+| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
+| S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
+| S24 Ver la app como…, the impersonation banner | 67, 71 |
+
+| Admin web | Tests |
+| --- | --- |
+| AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
+| AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
+| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
+| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72 |
+| AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
+| AW16 Reporte de ingresos y gastos | 30, 31 |
+| AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
+| AW23–AW24 Personal | 26, 31, 72 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
 
 ## Before you begin
 
@@ -3248,7 +3300,17 @@ The following are not ready for manual product testing:
   (Tests 46 and 48);
 - iOS store builds and TestFlight (gate 9), and the Play closed test and
   production release (REL-003 to REL-007);
-- the Playwright journeys in Firefox or WebKit (only Chromium is installed).
+- the Playwright journeys in Firefox or WebKit (only Chromium is installed);
+- the admin web's «No tienes permiso…» refusal copies, an email change for
+  an Account that is not active (`account_not_active`), and a registration
+  that refers to itself (`referral_self_reference`): each needs a state the
+  API never lets a tester reach, so the Jest and e2e suites cover them
+  (Tests 70 and 72);
+- the inbox's fallback for a notification type the push catalog does not
+  know («Emma Pilates» / «Tienes una notificación nueva.», silent): nothing
+  sends one until a new type ships;
+- real push delivery on iOS devices and the `InvalidCredentials` receipt
+  Expo answers for them until the APNs key is uploaded (gate 9, Test 46).
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -5649,8 +5711,8 @@ touching production.
 2. **Copy production into staging** (the same runbook, «last resort»,
    [ADR-0093](./adr/0093-copy-production-into-staging-as-a-last-resort.md)).
    Rehearse only the refusal: `gh workflow run copy-production-to-staging.yml -f confirm="no"`
-   ends at its first step without touching anything, because the input
-   must be exactly `copy production to staging`. The real run restores
+   leaves its only job skipped and touches nothing, because the job runs
+   only when the input is exactly `copy production to staging`. The real run restores
    production's newest daily dump as `emma_staging` and releases `main` to
    staging again; while a copy is loaded, the runbook's «do not» list
    applies (no recovery, resend, invitation, email change, or closure for a
@@ -5690,8 +5752,8 @@ touching production.
    <date>)`, `[ops] Restore drill <year> Q<n>`, `[ops] Free-plan usage check
    <year>-<month>`), skipping any whose issue is still open. Run it by hand
    with `gh workflow run operations-reminders.yml`: the run's log lists
-   each task as opened or «still open», and `gh issue list --label ""` (or
-   the repository's Issues tab) shows the usage-check issue for the month.
+   each task as opened or «still open», and `gh issue list` (or the
+   repository's Issues tab) shows the usage-check issue for the month.
    Close the issue with the month's numbers from the consoles listed under
    [«Free-plan limits that can be exceeded
    silently»](./architecture/infrastructure.md#free-plan-limits-that-can-be-exceeded-silently)
