@@ -1,5 +1,5 @@
 /**
- * Design follow-up 106: only the logo, centred in the content area it is
+ * Design follow-up 107: only the logo, centred in the content area it is
  * given, while a page's chunk is slow to arrive (WEB-035). The breath and
  * its Reduce Motion stillness come from `.carga-logo` in `src/carga.css`,
  * the same rule the first-load state in index.html uses. Inside the shell

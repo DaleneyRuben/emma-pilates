@@ -154,6 +154,12 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - Announced as progress with the screen's Spanish label («Cargando clases»); the image itself is not read.
 - Not for busy buttons, pull-to-refresh, the Promotions placeholder card, image placeholders, or errors.
 
+### Launch screen (Client and Staff)
+
+- From the tap on the icon until the first screen is ready (Login, or the saved session's first screen), both apps show `emma-logo.png` centred on `#F3E9E7`, the icons' blush edge tone; then a 300ms fade. Light mode only, nothing else on the screen.
+- iOS draws the logo 240pt wide on phones and tablets. Android draws it 160dp wide: on Android 12+ inside the system's 192dp icon circle (invisible on the same background), the widest that fits without clipping; older Android centres the same 160dp logo without the circle.
+- A native screen: it changes only with a store build, never with an over-the-air update.
+
 ### Home shortcuts (`02`)
 
 - Under an 11px uppercase `0.16em` `#766D69` «Accesos rápidos» eyebrow, a full-width «Reservar una clase» card (padding 18, gap 14) holds a 44px tile on `rgba(216,189,184,0.28)` at radius 12 with a 22px `#B78380` calendar (stroke 1.3), the title in Lora 17 weight 500 over a 13px `#766D69` note, and the 19px chevron.
@@ -217,7 +223,6 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 ### Recovery state
 
 - When a page fails while drawing, the main area shows the plain empty state in its place, directly on Superficie with no card and no icon: «Algo salió mal» in Lora 22, the 15px `#766D69` note «No pudimos mostrar esta página. Inténtalo de nuevo; si vuelve a pasar, recarga la página.» up to 360px wide, and the large «Reintentar» primary button at least 220px wide, centred. It replaces only the content area (the sidebar and the top bar stay) and «Reintentar» draws the page again; the sidebar still moves to any other page. The startup page «No pudimos conectar con el servidor» stays for the session probe alone.
-
 ### Loading states
 
 - **First load:** from the first paint until the session probe answers, the viewport is Crema `#F2ECE5` with only `emma-logo.png` centred in it (300px wide, 240px on a phone), with no delay: it is the web's splash screen. The first page replaces it with no exit animation.

@@ -15,7 +15,7 @@ import { server, useMockServer } from "../test/msw";
 import { signedInHandlers } from "../test/session-handlers";
 import { AdminShell } from "./admin-shell";
 
-// WEB-035, design follow-up 106: every page is its own chunk, and a sidebar
+// WEB-035, design follow-up 107: every page is its own chunk, and a sidebar
 // click can land before the chunk has arrived (a fast click beats the
 // hover preload, or the connection is slow). The shell then shows only the
 // logo in its content area, after 400 ms so a page that arrives in time
@@ -63,7 +63,7 @@ const advance = (milliseconds: number) =>
     jest.advanceTimersByTime(milliseconds);
   });
 
-describe("a page slow to arrive (WEB-035, follow-up 106)", () => {
+describe("a page slow to arrive (WEB-035, follow-up 107)", () => {
   useMockServer();
   let chunk: ReturnType<typeof deferred<PageModule>>;
 

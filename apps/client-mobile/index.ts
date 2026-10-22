@@ -1,9 +1,10 @@
-import { startErrorReporting } from "@pilates/mobile-core";
+import { holdLaunchSplash, startErrorReporting } from "@pilates/mobile-core";
 import { registerRootComponent } from "expo";
 
 import App from "./App";
 
 startErrorReporting("client-mobile");
+holdLaunchSplash();
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,

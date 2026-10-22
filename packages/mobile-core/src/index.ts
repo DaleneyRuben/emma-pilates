@@ -56,6 +56,7 @@ export * from "./ui/query-failure";
 export * from "./ui/recovery-screen";
 export * from "./ui/render-error-boundary";
 export * from "./ui/heading";
+export * from "./ui/launch-splash";
 export * from "./ui/line-icon";
 export * from "./ui/loading-state";
 export * from "./ui/offline-banner";

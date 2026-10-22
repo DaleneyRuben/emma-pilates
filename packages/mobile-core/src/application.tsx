@@ -24,6 +24,7 @@ import { createApiFetcher } from "./api/fetcher";
 import { clearPersistedAccountCache } from "./query/persistence";
 import { clearMobileQueryCache, MobileQueryProvider } from "./query/provider";
 import { fontAssets } from "./ui/fonts";
+import { useReleaseLaunchSplash } from "./ui/launch-splash";
 import { RenderErrorBoundary } from "./ui/render-error-boundary";
 
 export type MobileRuntime = {
@@ -134,6 +135,9 @@ function IdentityNavigation({
 }) {
   const identity = useMobileIdentity();
   const { intent } = useVerifiedLinkIntent();
+  // The fonts are loaded by now; once the session check has answered, the
+  // first screen (Login or the saved session's) is drawn under the splash.
+  useReleaseLaunchSplash(identity.status !== "restoring");
   const handleLogin = useCallback(
     async (values: LoginValues) => {
       const result = await login(values);

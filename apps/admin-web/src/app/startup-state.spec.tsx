@@ -13,7 +13,7 @@ import {
 } from "../test/session-handlers";
 import { startupStateId } from "./startup-state";
 
-// WEB-035, design follow-up 106: index.html draws the logo on Crema before
+// WEB-035, design follow-up 107: index.html draws the logo on Crema before
 // any script runs, and the page keeps it until the router has drawn the
 // first page, so the browser never shows a blank page or a blink between
 // the static logo and React's own.

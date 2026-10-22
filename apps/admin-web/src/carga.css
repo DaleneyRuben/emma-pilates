@@ -1,5 +1,5 @@
 /*
- * WEB-035, design follow-up 106: the loading states. index.html links this
+ * WEB-035, design follow-up 107: the loading states. index.html links this
  * file so the first-load state is styled before the bundle runs; the
  * router's pending state reuses `.carga-logo`. Only the logo, breathing as
  * the mobile apps' loading state does (follow-up 94), still under Reduce
