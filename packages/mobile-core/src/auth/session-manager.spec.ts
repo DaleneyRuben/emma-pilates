@@ -336,7 +336,11 @@ describe("createSessionManager under an Impersonation (FUT-001)", () => {
     await expect(
       createSessionManager({
         clearAccountCache: jest.fn(),
-        credentialStore: { clear: jest.fn(), load: jest.fn().mockResolvedValue(null), save: jest.fn() },
+        credentialStore: {
+          clear: jest.fn(),
+          load: jest.fn().mockResolvedValue(null),
+          save: jest.fn(),
+        },
         resolveCurrent: jest.fn(),
         revokeCurrent: jest.fn(),
       }).refresh(),
