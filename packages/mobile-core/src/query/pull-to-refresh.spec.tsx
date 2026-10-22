@@ -12,6 +12,9 @@ function Probe({ queryFn }: { queryFn: () => Promise<string> }) {
     <ScrollView refreshControl={refreshControl} testID="probe-scroll">
       <Text>{bookings.data ?? "loading"}</Text>
       <Text>{refreshControl.props.refreshing ? "refreshing" : "idle"}</Text>
+      {/* RN's Jest mock drops the native control's props; the element keeps them. */}
+      <Text testID="tint">{String(refreshControl.props.tintColor)}</Text>
+      <Text testID="colors">{String(refreshControl.props.colors)}</Text>
     </ScrollView>
   );
 }
@@ -23,9 +26,9 @@ describe("usePullToRefresh", () => {
         <Probe queryFn={jest.fn().mockResolvedValue("fresh")} />
       </QueryClientProvider>,
     );
-    const control = screen.getByTestId("probe-scroll").children[0];
-    expect(control).toHaveProp("tintColor", colors.primary);
-    expect(control).toHaveProp("colors", [colors.primary]);
+    await waitFor(() => expect(screen.getByText("fresh")).toBeOnTheScreen());
+    expect(screen.getByTestId("tint")).toHaveTextContent(colors.primary);
+    expect(screen.getByTestId("colors")).toHaveTextContent(colors.primary);
   });
 
   it("refetches the screen's queries on a pull and spins only meanwhile", async () => {
@@ -47,7 +50,9 @@ describe("usePullToRefresh", () => {
     await waitFor(() => expect(screen.getByText("stale")).toBeOnTheScreen());
     expect(screen.getByText("idle")).toBeOnTheScreen();
 
-    await fireEvent(screen.getByTestId("probe-scroll").children[0], "refresh");
+    const [control] = screen.getByTestId("probe-scroll").children;
+    if (typeof control === "string") throw new Error("The control is the first child");
+    await fireEvent(control, "refresh");
 
     expect(queryFn).toHaveBeenCalledTimes(2);
     expect(screen.getByText("refreshing")).toBeOnTheScreen();
