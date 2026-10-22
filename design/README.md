@@ -184,6 +184,13 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 
 ---
 
+### Impersonation banner (Staff)
+
+- While an Administrator sees the app as a Staff Member (FUT-001, ADR-0100), a fixed 52px strip on `#8A5D59` with white text sits above every screen's header: an eye icon, «Viendo como {name}» (14px, weight 500) over «{role} · Quedan {n} min» (12px at 0.85 opacity), both trimmed with an ellipsis, and «Salir» (weight 600, 44px target, pressed `rgba(255,255,255,0.14)`, label «Salir de ver como {name}»).
+- «Salir» or the 30-minute expiry returns to `S11` with the transient notice strip («Dejaste de ver la app como {name}.» / «Terminó el tiempo para ver la app como {name}.»). The header avatar shows the Staff Member's initials meanwhile.
+
+---
+
 ## Admin web — shell (shared by AW02–AW29, AW31, AW33)
 
 Reference width **1440px**; a 420px narrow-browser variant is drawn for every screen.
@@ -288,7 +295,8 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `S20` | Notificaciones | All staff — reached from `S23`'s «Notificaciones» row and from a push, filtered by role; six types, including the Client-cancelled Evaluation for the Nutritionist (opens `S15`) |
 | `S21` | Reservas de la clienta | Front desk |
 | `S22` | Historial de la clienta | Front desk |
-| `S23` | Perfil | All staff — read-only data, «Notificaciones» (opens `S20`, with the unread count), change password, log out |
+| `S23` | Perfil | All staff — read-only data, «Notificaciones» (opens `S20`, with the unread count), change password, log out; Administración also has «Ver la app como…» (opens `S24`) |
+| `S24` | Ver la app como… | Administration — the active Trainers, Assistants, and Nutritionists by Role; a row confirms in a sheet and the app re-draws as that Role for 30 minutes under the impersonation banner (FUT-001) |
 
 ### Admin web (desktop)
 
@@ -363,6 +371,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 - `S05` sends an activation link instead of a password and then opens `S06` for the new Client; it also draws the self-registered and other-account states (the self-registered state's «Ver cliente» opens her `S06`). The same email in the same creation flow opens that pending Client's `S06` with «… ya estaba pendiente de activación. Le enviamos un enlace nuevo y conservamos sus datos.» When the staff Account's email limit is full, the form shows the neutral clock notice above the fields («Enviaste muchos correos en poco tiempo. Espera un momento para enviar otro; los enlaces que ya enviaste siguen sirviendo.», «Podrás intentarlo en m:ss.») and keeps «Crear cuenta» disabled until the wait ends; nothing is created or sent.
 - `S06` manages a pending invitation on every visit (after `S05` or from `S04`): a card above the plan with the email and «Cambiar correo» («Nuevo correo», «Guardar correo», «Cancelar»), the 7-day link expiry and the 30-day removal as separate lines, «Reenviar enlace» (a limited resend shows the server-provided wait and keeps the current link; the staff Account's own email limit uses the same notice with «Enviaste muchos correos en poco tiempo…» and «Podrás enviarlo en m:ss.», for «Reenviar enlace», «Cambiar correo», and «Enviar enlace de verificación» alike), and a quiet «Cancelar invitación» that confirms in a sheet and returns to `S04`; a Client with payments or bookings shows «La cuenta ya tiene pagos o reservas, así que la invitación se mantiene.» instead. The card disappears once the Client activates. A pending Client who registered herself has no invitation: `S06` shows `S05`'s verification notice with «Enviar enlace de verificación» only (sent and limited lines as above), on the phone and in the tablet's right panel, until she verifies.
 - `S06→S21` (Reservas de la clienta) and `S06→S22` (Historial de la clienta).
+- `S23→S24` (Ver la app como…, Administración only); choosing a person opens that Role's root (`S02`, `S04`, or `S15`) under the impersonation banner, and «Salir» returns to `S11`.
 - `S15` cards are selectable, not navigable: tapping highlights a card (border → `#B78380`) so the nutritionist keeps their place down the day, and shows «Cancelar evaluación» under it, which opens a confirmation sheet; confirming removes the card and shows «Evaluación cancelada». There is no assessment detail screen anywhere — an Evaluation records the appointment, not its content (same reason `AW25` rows are not links).
 - `S20` is reached from `S23`'s «Notificaciones» row (which shows the unread count) and from a push notification, and is filtered by role. Every role root (`S02`, `S04`, `S11`, `S15`) carries a 46px circular initials avatar (never a photo) as the **last control on the right** of its header, labelled "Tu cuenta", and it is the only path to `S23` — and therefore to change password and log out. Where the root also has a screen action (`S11` → `S13`, `S15` → `S16`), that action is a 46px rounded square with a 1px `#D8C9BB` border and sits **before** the avatar (10px gap): outlined square = screen action, filled circle with initials = your account. With unread notifications the avatar carries the unread dot on its top-right edge (drawn on the first frame of each root); its label stays «Tu cuenta» and screen readers hear «Tu cuenta, notificaciones sin leer».
 

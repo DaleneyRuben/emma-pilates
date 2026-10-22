@@ -439,6 +439,76 @@
       </x-import>
     </div>
 
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Viendo como</div>
+          <div style="font-size:12px;color:#766D69;">Administración ve la app como Daniela durante 30 minutos · la franja es fija y «Salir» vuelve a S11</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="height:100%;min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;overflow:hidden;">
+          <div style="flex:none;padding:54px 16px 0;background:#8A5D59;"><div style="height:52px;display:flex;align-items:center;gap:10px;color:#FFFFFF;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="3"></circle></svg><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Viendo como Daniela Arce</span><span style="font-size:12px;opacity:0.85;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;">Nutricionista · Quedan 4 min</span></span><button aria-label="Salir de ver como Daniela Arce" style="flex:none;height:44px;padding:0 10px;border:none;border-radius:8px;background:transparent;color:#FFFFFF;font-size:14px;font-weight:600;cursor:pointer;" style-active="background:rgba(255,255,255,0.14);">Salir</button></div></div>
+          <div style="flex:1;min-height:0;overflow-y:auto;padding:20px 20px 40px;display:flex;flex-direction:column;gap:26px;">
+
+            <div style="flex:none;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Nutricionista</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Hola, Daniela</span>
+              </div>
+              <div style="flex:none;display:flex;align-items:center;gap:10px;">
+                <button title="Mi disponibilidad" style="flex:none;width:46px;height:46px;border-radius:12px;border:1px solid #D8C9BB;background:#FFFFFF;color:#B78380;display:flex;align-items:center;justify-content:center;cursor:pointer;" style-hover="border-color:#B78380;background:#F6EDEB;">
+                  <svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line><polyline points="8.5,14 10.5,16 15.5,12"></polyline></svg>
+                </button>
+                <button aria-label="Tu cuenta" style="position:relative;flex:none;width:46px;height:46px;border-radius:50%;border:none;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;cursor:pointer;" style-hover="background:#CEB0AB;" style-active="background:#C4A29D;">DA<span aria-hidden="true" style="position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#8A5D59;box-shadow:0 0 0 2px #FAF7F2;"></span></button>
+              </div>
+            </div>
+
+            <sc-if value="{{ hasItems }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:26px;">
+                <sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+                  <div style="display:flex;flex-direction:column;gap:12px;">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                      <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">{{ g.label }}</span>
+                      <span style="font-size:12px;color:#7A716D;">{{ g.count }}</span>
+                    </div>
+                    <sc-for list="{{ g.items }}" as="e" hint-placeholder-count="3">
+                      <div style="display:flex;flex-direction:column;gap:4px;">
+                      <button onClick="{{ e.onClick }}" style="display:flex;align-items:center;gap:16px;width:100%;text-align:left;padding:18px;border:1px solid {{ e.border }};border-radius:16px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.05);" style-hover="border-color:#B78380;">
+                          <span style="flex:none;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:62px;">
+                            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">{{ e.time }}</span>
+                            <span style="font-size:12px;color:#7A716D;">{{ e.duration }}</span>
+                          </span>
+                          <span style="flex:none;width:1px;height:38px;background:#EFE7DE;"></span>
+                          <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                            <span style="font-size:16px;color:#4A4A4A;">{{ e.client }}</span>
+                            <span style="font-size:13px;color:#766D69;">{{ e.kind }}</span>
+                          </span>
+                          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+                        </button>
+                        <sc-if value="{{ e.selected }}" hint-placeholder-val="{{ false }}">
+                          <button style="align-self:flex-start;min-height:40px;padding:0 6px;border:none;background:transparent;color:#B25D4B;font-size:14px;font-weight:500;cursor:pointer;" style-hover="color:#94493A;">Cancelar evaluación</button>
+                        </sc-if>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isEmpty }}">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:56px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">No tienes evaluaciones agendadas.</span>
+                <span style="font-size:13px;line-height:1.5;color:#766D69;">Revisa tu disponibilidad para que las clientas puedan reservar.</span>
+              </div>
+            </sc-if>
+
+          </div>
+        </div>
+      </x-import>
+    </div>
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
@@ -449,6 +519,7 @@
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Hora primero</span>La hora ancla la tarjeta en cifras tabulares; el nombre de la clienta va en cuerpo, no en serif, para no competir con la hora.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Primera o seguimiento</span>«Primera evaluación» si la clienta no tiene una evaluación anterior reservada; si la tiene, «Seguimiento».</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Estado vacío</span>Tono neutro: puede ser una semana tranquila. Sugiere revisar la disponibilidad, sin tratarlo como error.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Viendo como</span>Si administración está viendo la app como esta persona, una franja fija en Palo de rosa profundo con su nombre, los minutos que quedan y «Salir» ocupa la parte superior de todas las pantallas (FUT-001).</div>
   </div>
 
 </div>

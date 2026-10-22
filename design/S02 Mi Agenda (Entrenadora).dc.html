@@ -227,6 +227,78 @@
       </x-import>
     </div>
 
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Viendo como</div>
+          <div style="font-size:12px;color:#766D69;">Administración ve la app como Camila durante 30 minutos · la franja es fija y «Salir» vuelve a S11</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;">
+          <div style="flex:none;padding:54px 16px 0;background:#8A5D59;"><div style="height:52px;display:flex;align-items:center;gap:10px;color:#FFFFFF;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><path d="M2.5 12s3.5-6.5 9.5-6.5S21.5 12 21.5 12s-3.5 6.5-9.5 6.5S2.5 12 2.5 12z"></path><circle cx="12" cy="12" r="3"></circle></svg><span style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;"><span style="font-size:14px;font-weight:500;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Viendo como Camila Rojas</span><span style="font-size:12px;opacity:0.85;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;">Entrenadora · Quedan 28 min</span></span><button aria-label="Salir de ver como Camila Rojas" style="flex:none;height:44px;padding:0 10px;border:none;border-radius:8px;background:transparent;color:#FFFFFF;font-size:14px;font-weight:600;cursor:pointer;" style-active="background:rgba(255,255,255,0.14);">Salir</button></div></div>
+          <div style="padding:20px 0 40px;display:flex;flex-direction:column;gap:24px;">
+
+            <div style="padding:0 20px;display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">Entrenadora</span>
+                <span style="font-family:Lora,Georgia,serif;font-size:32px;font-weight:400;line-height:1.15;">Hola, Camila</span>
+              </div>
+              <button aria-label="Tu cuenta" style="position:relative;flex:none;width:46px;height:46px;border-radius:50%;border:none;background:#D8BDB8;color:#FFFFFF;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:17px;cursor:pointer;" style-hover="background:#CEB0AB;" style-active="background:#C4A29D;">CR<span aria-hidden="true" style="position:absolute;top:0;right:0;width:12px;height:12px;border-radius:50%;background:#8A5D59;box-shadow:0 0 0 2px #FAF7F2;"></span></button>
+            </div>
+
+            <div style="display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;padding:2px 20px 6px;">
+              <sc-for list="{{ days }}" as="d" hint-placeholder-count="7">
+                <button onClick="{{ d.onClick }}" style="flex:none;width:56px;padding:12px 0;border-radius:12px;border:1px solid {{ d.border }};background:{{ d.bg }};color:{{ d.color }};display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;">
+                  <span style="font-size:11px;letter-spacing:0.08em;text-transform:uppercase;">{{ d.dow }}</span>
+                  <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">{{ d.num }}</span>
+                </button>
+              </sc-for>
+            </div>
+
+            <div style="padding:0 20px;display:flex;flex-direction:column;gap:14px;">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;">
+                <span style="font-size:11px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:#766D69;">{{ dayTitle }}</span>
+                <span style="font-size:12px;color:#7A716D;">{{ countLabel }}</span>
+              </div>
+
+              <sc-for list="{{ sessions }}" as="s" hint-placeholder-count="3">
+                <button style="display:flex;flex-direction:column;gap:14px;width:100%;text-align:left;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;cursor:pointer;box-shadow:0 2px 8px rgba(74,74,74,0.05);" style-hover="border-color:#B78380;">
+                  <span style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;width:100%;">
+                    <span style="display:flex;flex-direction:column;gap:5px;min-width:0;">
+                      <span style="font-size:13px;font-weight:500;letter-spacing:0.06em;color:#766D69;font-variant-numeric:tabular-nums;">{{ s.time }}</span>
+                      <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;color:#4A4A4A;">{{ s.type }}</span>
+                      <span style="display:inline-flex;align-items:center;gap:7px;font-size:13px;color:#766D69;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="10" r="3"></circle><path d="M12 21c4.5-4.7 6.5-7.7 6.5-10.6A6.5 6.5 0 0 0 5.5 10.4C5.5 13.3 7.5 16.3 12 21z"></path></svg>
+                        {{ s.branch }}
+                      </span>
+                    </span>
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:4px;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+                  </span>
+                  <span style="display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;padding-top:13px;border-top:1px solid #EFE7DE;">
+                    <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;font-variant-numeric:tabular-nums;">
+                      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>
+                      {{ s.booked }}
+                    </span>
+                    <span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:500;background:{{ s.tagBg }};color:{{ s.tagColor }};white-space:nowrap;">{{ s.tagLabel }}</span>
+                  </span>
+                </button>
+              </sc-for>
+
+              <sc-if value="{{ isEmpty }}">
+                <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:48px 24px;border:1px dashed #D8C9BB;border-radius:16px;background:rgba(216,201,187,0.14);text-align:center;">
+                  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.2" stroke-linecap="round"><rect x="3.5" y="5.5" width="17" height="15" rx="2.5"></rect><line x1="3.5" y1="10" x2="20.5" y2="10"></line></svg>
+                  <span style="font-family:Lora,Georgia,serif;font-size:18px;font-weight:500;">No tienes clases este día.</span>
+                  <span style="font-size:13px;line-height:1.5;color:#766D69;">Elige otra fecha en el calendario de arriba.</span>
+                </div>
+              </sc-if>
+            </div>
+
+          </div>
+        </div>
+      </x-import>
+    </div>
   </div>
 
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
@@ -234,6 +306,7 @@
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Sin navegación</span>Rol sin barra de pestañas: esta es la raíz. El avatar abre perfil y cierre de sesión.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Orden</span>Cronológico ascendente. El contador de reservas usa cifras tabulares.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Al tocar</span>Cada tarjeta abre la lista de asistentes de esa sesión (S03).</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Viendo como</span>Si administración está viendo la app como esta persona, una franja fija en Palo de rosa profundo con su nombre, los minutos que quedan y «Salir» ocupa la parte superior de todas las pantallas (FUT-001).</div>
   </div>
 
 </div>
