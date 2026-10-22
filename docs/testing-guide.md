@@ -29,7 +29,7 @@ you are starting with no project knowledge.
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Impersonation (API)          | As the Administrator, see and act in the Staff app's API as a Trainer, Assistant, or Nutritionist for 30 minutes, read the two audit records, and see the refused commands (Test 67) | The Staff app's picker and banner come with FUT-001 stage 3 |
+| Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 
 ## Before you begin
 
@@ -3168,9 +3168,6 @@ The following are not ready for manual product testing:
 - iOS store builds and TestFlight (gate 9), and the Play closed test and
   production release (REL-003 to REL-007);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed).
-- the Staff app's «Ver la app como…» picker and the impersonation banner
-  (FUT-001 stage 3); until then the API journey in Test 67 is the way to
-  try it.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -5075,14 +5072,44 @@ must stay silent.
 The in-page «Cargando …» notices a page shows while its own data loads
 (the white card, Tests 25 to 30) are unchanged.
 
-## Test 67: see the Staff app as a Staff Member through the API (FUT-001)
+## Test 67: see the Staff app as a Staff Member (FUT-001)
 
 An Administrator signed in to the Staff app may see and act in it as one
 active Trainer, Assistant, or Nutritionist for 30 minutes
 ([ADR-0100](./adr/0100-impersonate-a-staff-member-from-the-staff-app.md)).
-The Staff app's «Ver la app como…» row and the banner arrive with stage 3;
-this test drives the API with Swagger or curl against the fixtures (Test 2
-and Test 3 show how to start the API and log in).
+
+### A. In the Staff app
+
+Start the API and the Staff app as Test 1 and Test 2 describe and log in as
+`paola.mendoza@example.com` on the iPhone, the iPad, or the Android emulator.
+
+1. Tap the «Tu cuenta» avatar on Pagos pendientes. Perfil shows a third row,
+   «Ver la app como…», that only an Administrator has.
+2. The row opens «Ver la app como…»: the intro line, then the active Staff
+   Members grouped as **Entrenadoras**, **Asistentes**, and
+   **Nutricionistas**, each with their initials, name, and Branches. Paola
+   herself and pending or deactivated members never appear.
+3. Tap Emma Vargas. The confirmation names her («¿Ver la app como Emma
+   Vargas?») and states the 30 minutes and that everything is recorded in
+   your name; «Cancelar» leaves everything as it is, «Ver como Emma» starts.
+4. The app re-draws as Emma: her «Mi agenda» root under a fixed Palo de rosa
+   profundo strip reading «Viendo como Emma Vargas» over «Entrenadora ·
+   Quedan 29 min», with «Salir» at its right. The strip stays over every
+   screen, the avatar shows her initials, and Perfil shows her read-only data
+   without the «Ver la app como…» row. No notification permission is offered
+   and this phone is not registered as her push device.
+5. Tap «Salir»: you are back on Pagos pendientes with the notice «Dejaste de
+   ver la app como Emma Vargas.» for a few seconds, and the strip is gone.
+   Let the 30 minutes run out instead and the app returns on its own with
+   «Terminó el tiempo para ver la app como Emma Vargas.»
+
+The committed Maestro journey `administrator-view-as.yaml` does steps 1 to 5
+(Test 19 shows how to run the suite).
+
+### B. Through the API
+
+With Swagger or curl against the fixtures (Test 2 and Test 3 show how to
+start the API and log in):
 
 1. Log in as `paola.mendoza@example.com` and read the active Staff Members
    with `GET /api/v1/administrator/staff-members?status=active&pageSize=100`.
