@@ -7,7 +7,7 @@ you are starting with no project knowledge.
 
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
+| Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
 | Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
@@ -638,6 +638,17 @@ separated by thin `#EFE7DE` rules. With no attendance yet the screen centres
 a quiet clock, «Aún no tienes clases en tu historial.», and «Aquí aparecerán
 tus clases una vez que registremos tu asistencia en el estudio.» (the
 fixtures reach this until a Trainer records attendance).
+
+Every list keeps itself current (UX-004). With **Mis reservas** open, switch
+to **Inicio**, book a class for Lucía from Swagger or the Staff app, and come
+back: the new card appears within a second, with no loading logo and the
+existing cards still in place (before UX-004 it stayed hidden until the app
+restarted). Returning from a screen a list opened (Detalle de sesión,
+Reprogramar, Historial) refreshes it the same way. Pull any list down
+(**Reservar**, **Mis reservas**, **Historial de clases**, **Mi plan**, **Mis
+evaluaciones**, **Notificaciones**, **Mis referidos**, **Mi crédito**, and
+**Inicio** as before): the platform's spinner in Palo de rosa turns while the
+list refetches and the list stays under it.
 
 That Client Account must not authenticate in the Staff app. Use a Staff fixture
 such as `emma.vargas@example.com` in the Staff app instead; it must be rejected
@@ -2133,13 +2144,20 @@ In the Client app as `lucia@example.com`:
    "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
    termine."; while expiring, an amber banner; once expired, "Último plan",
    "Venció el …", and **Comprar un plan**. As `isabel@example.com` (no
-   classes left) the classes line reads "Sin clases disponibles".
+   classes left) the classes line reads "Sin clases disponibles". Mi plan
+   refreshes when it regains focus and on pull (UX-004): confirm Lucía's
+   pending transfer in the admin web while the screen is open elsewhere and
+   it shows the new Plan on its next focus, without the loading logo.
 3. In **Perfil → Notificaciones**, tapping an Evaluation notice opens Mis
    evaluaciones, a class-cancelled notice opens Mis reservas, a payment notice
    opens the payment status, and a Plan notice opens Mi plan.
 
 In the Staff app, a Trainer's "Tu clase … se canceló" notice and a
-Nutritionist's Evaluation notices open **Mi agenda**.
+Nutritionist's Evaluation notices open **Mi agenda**. The Staff roots (Mi
+agenda, the results of Buscar cliente, Pagos pendientes, the Nutritionist's
+agenda, Mi disponibilidad) and both apps' Notificaciones refresh when they
+regain focus (closing the roster, a review, or a client refetches the list
+behind it) and on pull, with the same Palo de rosa spinner (UX-004).
 
 ## Test 19: run the mobile critical journeys and the release smoke check
 
