@@ -879,11 +879,24 @@ Home, class browsing, Plan, and profile screens:
 | `GET /api/v1/class-types`               | Mat, Prenatal, and Reformer Pilates with descriptions                     |
 | `GET /api/v1/sessions?branchId=…`       | Sessions in a Branch with Class Type and Trainer names and free seats     |
 | `GET /api/v1/sessions/{sessionId}`      | One Session with its Branch, Class Type description, Trainer, and seats   |
+| `GET /api/v1/plans/{planId}`            | One Plan (the app's Detalle del plan); an unknown id answers `404 plan_not_found` |
+| `PATCH /api/v1/clients/current` `{ name, phone }` | Saves the name and phone (Perfil → Editar); an empty name answers `400 client_name_required` |
+| `GET /api/v1/bookings` / `GET /api/v1/bookings/history` | Upcoming Bookings and Waitlist Entries (Mis reservas) / attended classes, newest first (Historial) |
+
+The commands behind Reservar and Mis reservas, each with an
+`idempotency-key` UUID where it changes something, are
+`POST /api/v1/sessions/{id}/bookings` (`201`; for a full Session
+`POST …/waitlist-entries` instead), `DELETE /api/v1/bookings/{id}`,
+`POST /api/v1/bookings/{id}/reschedule` `{ "targetSessionId" }`, and
+`DELETE /api/v1/waitlist-entries/{id}`; the Assistant sends the same with
+`{ "clientId" }` in the body (Test 11). Their rule codes are in Test 70.
 
 Log in as `valeria@example.com`, `sofia@example.com`, or `mariana@example.com`
 to see the `expiring_soon`, `expired`, and `none` Subscription statuses. A Staff
 credential receives `403` with `booking_access_denied` from the two
-`clients/current` endpoints.
+`clients/current` endpoints; its own profile is
+`GET /api/v1/staff-members/current` (name, Role, Branches, the Staff Perfil
+of Test 9 E), which a Client credential gets `403` from in turn.
 
 The notification inbox is available to every signed-in Account:
 `GET /api/v1/notifications` (cursor pages), `GET /api/v1/notifications/unread-count`,
@@ -1690,8 +1703,8 @@ When the available Credit covers the whole price, **Continuar al pago**
 activates the Plan immediately (`POST /api/v1/credit-purchases`) and lands on
 "¡Pago confirmado!" without a QR. The fixtures cannot reach this (Bs 60 is
 below the cheapest Plan), so the automated purchase-flow spec covers it; to
-see it by hand, raise Sofía's Credit on a copy of the fixtures (Test 70,
-«Payments»).
+see it by hand, create a Plan priced under Bs 60 in Planes and buy it as
+Sofía (Test 70, «Payments»).
 
 ## Test 11: act for a Client as the Assistant in the Staff app
 
@@ -2647,7 +2660,10 @@ the admin web, exactly as Test 24 describes, and log in as
    she had one. A Client invited from the Staff app who has not created her
    password yet shows **Pendiente de activación**. Nothing here is editable;
    the only action is «Cerrar cuenta» in the footer (Test 35), which a
-   deactivated account does not offer.
+   deactivated account does not offer. The list is
+   `GET /api/v1/administrator/clients?q=…&page=…&pageSize=…` and the panel
+   `GET …/clients/{clientId}` (`404 client_not_found` for a closed or
+   unknown one).
 4. **Personal.** Back Office → **Personal** lists every Staff Member with the
    Role as a plain label (Entrenador, Asistente, Administrador, Nutricionista),
    the contact, the Branches ("Todas" for an Administrator), and **Activo**,
@@ -2721,7 +2737,10 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    app. The subtitle reads "Todo el estudio · 1 transferencia esperando
    revisión". The **Estado** filter starts on **Pendiente**, oldest first;
    **Todos**, **Confirmado**, and **Rechazado** stay in the address
-   (`?status=all`). Each row shows the Client, the Plan, the amount she
+   (`?status=all`; the page reads
+   `GET /api/v1/administrator/payments?status=…&q=…&page=…&pageSize=…`,
+   while the Staff app's list is `…/payments/pending`, Test 7). Each row
+   shows the Client, the Plan, the amount she
    transferred as `Bs 560,00` on the right (with "con Bs 60,00 de crédito"
    under it when Credit paid part), the date and time sent in Bolivia time
    (`23/09/2026 · 22:51`), and **Pendiente**, **Confirmado**, or **Rechazado**.
@@ -3259,7 +3278,13 @@ not an email went out (one per address per minute, five per hour, ten per day,
 like registration); **Cancelar cambio** removes the card. Saving with the
 same address only saves name and phone and returns to Perfil. Meanwhile the
 capture directory holds two files: `email_change` to the new address (with
-the link) and `email_change_notice` to the current one (no link).
+the link) and `email_change_notice` to the current one (no link). The
+screen's four calls are `POST /api/v1/accounts/current/email-change`
+`{ "email" }` (`202`), `GET …/email-change` (the pending card, `pending: null`
+with nothing pending), `POST …/email-change/resends`, and
+`DELETE …/email-change`; the last two answer `404 email_change_not_pending`
+once the card is gone, and every one of them `403 impersonation_forbidden`
+from an impersonating Administrator (Test 67).
 
 ### B. Confirm the change
 
@@ -4855,7 +4880,8 @@ ADR-0097). An Administrator sees, exports, and erases them on AW35.
    Bolivia keeps that day).
 4. Search by a name without its accent, an email fragment, or phone digits.
    Expected: only the matching rows, and «No se encontró ningún contacto.»
-   when none match.
+   when none match (`GET /api/v1/administrator/promotion-contacts?q=…`;
+   the export below is `GET …/promotion-contacts/export`, a CSV body).
 5. Press «Exportar CSV». Expected: `contactos-promociones-aaaa-mm-dd.csv` with
    every contact (not only the page), columns Nombre, Tipo, Correo, Teléfono,
    Aceptó el (Tipo since BE-023), accents intact in a spreadsheet, and a
@@ -4892,7 +4918,8 @@ Clients («Cuenta cerrada»), and closing her Account ends the consent.
    sesión», with its helper and the switch off. The Maestro flow
    `.maestro/promotions-consent.yaml` turns it on and off again.
 3. Turn it on. Expected: the switch turns Palo de rosa, and `GET
-   /api/v1/clients/current/promotions-consent` answers `consented: true` with
+   /api/v1/clients/current/promotions-consent` (the switch sends
+   `PUT …/promotions-consent` `{ "consented": true }`) answers `consented: true` with
    the time. Each period is its own row in
    `booking.client_promotions_consents`; turning it on again while it is on
    keeps the first time, and a Staff token answers `403`
@@ -5219,3 +5246,196 @@ start the API and log in):
    revocation). A cash Payment, an Evaluation cancellation, or a Client
    invitation made meanwhile is audited to Paola with `actor_role =
    administrator` and `impersonation_id` set.
+
+## Test 68: watch the worker's other housekeeping sweeps
+
+Besides the sweeps of Tests 13 and 16, the worker runs four more
+housekeeping sweeps once at start and then on their interval
+(`apps/backend/src/worker.ts`; a failure logs `<job>_failed` and reports
+to Better Stack, Test 44). Nothing is physically deleted
+([ADR-0086](./adr/0086-soft-delete-every-database-row.md)): rows get
+`deleted_at` or an end state, and only object bytes leave the store. Use a
+copy of the fixtures (`createdb -T pilates_dev_sim pilates_test_sweeps`),
+start the API and the worker on it, and back-date one row per sweep with
+`psql -d pilates_test_sweeps`; the next run (at most an hour away, or at once
+when you restart the worker) does the rest.
+
+1. **`pending_account_cleanup` (hourly).** A registration nobody verified
+   for 7 days, or a Staff-made invitation nobody activated for 30 days, is
+   removed: register from the Client app (Test 4) and invite a Client as
+   Camila (Test 11 E), then
+   `update system.accounts set pending_expires_at = now() - interval '1 day' where email in ('<registered>', '<invited>')`.
+   After the sweep both rows carry `deleted_at`, the Assistant's search no
+   longer finds the invited Client, her invitation link answers `removed` to
+   `POST /api/v1/authentication-links/inspection` (Test 6 A), and the
+   registered address can register again.
+2. **`image_upload_cleanup` (hourly).** Three kinds of bytes go: an upload
+   declared but never finalized, 3 days later
+   ([ADR-0089](./adr/0089-delete-abandoned-uploads-after-three-days.md));
+   the variants of a replaced or removed profile photo and of a deleted
+   Promotion, at once
+   ([ADR-0076](./adr/0076-delete-detached-profile-and-promotion-images.md),
+   Tests 9 A and 32 C); and a transfer receipt 45 days after it was
+   finalized or 7 days after the Payment was decided, whichever is later
+   ([ADR-0075](./adr/0075-delete-receipt-images-after-forty-five-days.md)).
+   Confirm or reject a transfer (Test 10 C), then
+   `update system.image_assets set deletion_due_at = now() - interval '1 minute' where purpose = 'transfer_receipt' and deletion_due_at is not null`.
+   After the sweep the `readable` and `thumbnail` files are gone from
+   `apps/backend/.data/uploads/private/transfer_receipt/<id>/` (or from the
+   bucket, Test 42), `system.image_assets` keeps the row with `deleted_at`
+   and its sizes, the Payment row still names the asset, and
+   `GET /api/v1/administrator/payments/{id}/receipt` answers
+   `409 payment_receipt_not_ready` («Receipt is no longer available»).
+   A declaration sets `deletion_due_at` three days ahead, so
+   `POST /api/v1/uploads` without the `PUT` and `finalize`, then the same
+   `update` for `state = 'pending'`, shows the abandoned case: the
+   `pending/` file disappears and the row is marked removed.
+3. **`purchase_intent_expiry` (every 5 minutes).** Open an Intent as
+   `mariana@example.com` (Test 7, «Buying a Plan through Swagger», steps
+   1–3; attach no receipt), then
+   `update booking.purchase_intents set expires_at = now() - interval '1 minute' where state = 'open'`.
+   Within five minutes `GET /api/v1/purchase-intents/current` answers
+   `404 purchase_intent_not_found`, the row reads `state = 'expired'`,
+   `GET /api/v1/clients/current/credit` shows any reserved Credit back in
+   `availableCentavos`, and `POST …/{id}/submit` answers
+   `409 purchase_intent_not_open` (before the sweep passes, the same call
+   on the back-dated row answers `409 purchase_intent_expired`). A new
+   Intent can be opened at once.
+4. **`subscription_reminders` (hourly)** records «Plan por vencer» / «Tu
+   plan vence en 3 días.» once per Subscription that ends in three days
+   (Valeria's fixture, Test 7); a second run adds nothing.
+
+Drop the copy afterwards: `dropdb pilates_test_sweeps`.
+
+## Test 69: the notifications a studio change sends
+
+Three inbox types are only reached when administration changes a class
+that is already booked. Each is an entry with sound on the Android
+`actionable` channel (Test 46 B) that opens Mis reservas or Mi agenda from
+Perfil → Notificaciones (Test 18). Start the API, the worker, both apps, and
+the admin web on `pilates_dev_sim` with the fixtures (Tests 5 A and 24).
+
+1. **A seat frees for a waitlisted Client.** Seed a one-seat class the way
+   the Maestro flow does (`waitlist-join-and-leave.yaml`: tomorrow at 05:00
+   in Centro, filled by Valeria), or create a Session of capacity 1 in
+   Horario (Test 25, step 2) and book it as `valeria@example.com`; join its
+   Waitlist as `lucia@example.com` (**Unirme a la lista de espera**, Test
+   5 B). Then cancel Valeria's Booking (her **Cancelar** in Mis reservas, or
+   `DELETE /api/v1/bookings/{id}`). Lucía's Waitlist Entry closes as
+   `promoted`, a Booking is created for her in the same transaction, and
+   her inbox reads «Cupo liberado» / «¡Tienes un cupo! Te promovimos de la
+   lista de espera para tu clase de Mat Pilates.» (the Class Type varies);
+   Mis reservas shows the class as a Booking and the Perfil badge counts
+   one. A Client with no eligible Plan at that moment is skipped and the
+   next entry is promoted.
+2. **The studio moves a booked class.** In Horario, open a Session Lucía
+   has booked and change its **Hora** with **Solo esta sesión** (Test 25,
+   step 3; the API is `PATCH /api/v1/administrator/sessions/{id}`). Every
+   booked Client receives «Tu clase cambió de horario» / «Tu clase de Mat
+   Pilates cambió de horario: ahora es el sábado 26 de septiembre, 16:00.»
+   (the day and time vary), and Mis reservas shows the new time. The empty-Session check of Test 13 starts
+   over for the moved Session.
+3. **The studio reassigns a Trainer.** In the same panel change the
+   **Entrenadora** to Daniela Ortiz. Daniela's inbox (Staff app, Perfil →
+   Notificaciones) reads «Nueva clase asignada» / «Se te asignó una clase:
+   Mat Pilates, sábado 26 de septiembre, 16:00.» and opens her Mi agenda; the previous
+   Trainer is not told. A weekly schedule's replacement (Test 21, step 2)
+   sends the same notice.
+
+Each of the three is one row per change: repeating the same edit sends
+nothing new (the `business_event_key` carries the change's instant), and
+all three are `delivered` through push on an Android development build
+(Test 46), with the full copy on the lock screen (none of them is private).
+
+## Test 70: the rule codes a journey can answer
+
+Every rule a Client or Staff Member can break answers a stable problem code
+(RFC 9457, Test 4), never `500` (Test 61). The codes below are the ones the
+earlier tests never show; call the endpoints with Swagger or curl on a copy
+of the fixtures (`createdb -T pilates_dev_sim pilates_test_codes`, the API
+on it) as the Account named, with an `idempotency-key` UUID on every
+command.
+
+**Bookings** (`lucia@example.com`; Test 7 names the endpoints):
+
+| Do this | Answer |
+| --- | --- |
+| Book a Session, then book the same Session again | `409 active_booking_exists` |
+| Book a second Session that overlaps the first in time (no two fixture classes share an hour on the same day, so add a one-off Session at Equipetrol at a Centro class's time in Horario, Test 25 step 2) | `409 booking_overlap` |
+| Book a full Session (`isabel@example.com` has no classes; fill a capacity-1 Session first) | `409 session_full` |
+| Join the Waitlist of a Session that still has seats | `409 session_has_capacity` |
+| Join a Waitlist twice | `409 active_waitlist_entry_exists` |
+| Cancel a Booking less than 2 h 30 before its start (one the flow of Test 19 seeds «10 minutes away») | `409 booking_cancellation_window` |
+| Cancel the same Booking twice, or a Booking of a cancelled Session | `409 booking_not_cancellable` |
+| Leave a Waitlist Entry that was already closed (promoted, left, or its Session started) | `409 waitlist_entry_not_active` |
+| Book as `mariana@example.com` (no Plan) or `sofia@example.com` (expired) | `409 no_eligible_subscription` |
+| Reschedule outside the window, to another day, or a cancelled Booking | `409 reschedule_outside_window`, `reschedule_target_ineligible`, `booking_not_reschedulable` (Test 61) |
+
+**Payments** (`mariana@example.com`; Test 7, «Buying a Plan through
+Swagger», names the endpoints):
+
+| Do this | Answer |
+| --- | --- |
+| Open an Intent for a Plan hidden with **Ocultar en la app** (Test 25, step 5) | `409 plan_not_purchasable` |
+| Submit an Intent without a receipt | `409 payment_receipt_required` |
+| Attach an upload that is still `processing` (stop the worker first) | `409 payment_receipt_not_ready` |
+| Attach a receipt that another Account uploaded (Sofía's asset id) | `403 payment_receipt_invalid_owner` |
+| Attach or submit after the Intent was submitted | `409 purchase_intent_not_open` |
+| Attach or submit after the Intent expired (Test 68, step 3) | `409 purchase_intent_expired` |
+| Open an Intent while a transfer is under review | `409 payment_pending_exists` |
+| `POST /api/v1/credit-purchases` as `sofia@example.com` (Bs 60 of Credit) for a Plan that costs more | `409 credit_insufficient`; create a Plan priced under Bs 60 in Planes (Test 25, step 5) and the same call activates it at once, with `payment_confirmed` in her inbox and no QR (Test 10 E) |
+| As Paola, confirm or reject a cash Payment's id, or a decided one again with the opposite decision | `409 payment_not_pending`, `409 payment_confirmation_conflict` (Test 7) |
+
+**Uploads** (any Account; Test 32 A names the three calls; limits are 10 MB
+for a receipt, 5 MB for a profile photo, 20 MB for a Promotion image, JPEG,
+PNG, or WebP only):
+
+| Do this | Answer |
+| --- | --- |
+| Declare `mediaType: image/gif` (or `application/pdf`) | `400 image_media_type_invalid` |
+| Declare `byteSize: 0` or a negative size | `400 image_size_invalid` |
+| Declare a checksum that is not a base64 SHA-256 | `400 image_checksum_invalid` |
+| Declare a `byteSize` over the purpose's limit | `400 image_too_large` |
+| `PUT` more than 25 MB of bytes | `413 payload_too_large` |
+| `PUT` to an upload that was already finalized, or `finalize` one that is already `ready` or `failed` (a second `finalize` while it is `processing` is accepted and does nothing) | `409 upload_not_writable`, `409 upload_not_finalizable` |
+| `PUT` or `finalize` another Account's upload | `403 upload_access_denied` |
+| `GET /api/v1/uploads/{id}` with a made-up id, or another Account's | `404 upload_not_found` |
+
+**Catalog and schedules** (`paola.mendoza@example.com`; Test 21 names the
+endpoints):
+
+| Do this | Answer |
+| --- | --- |
+| Create a Branch or Class Type with an empty name, or a Plan with a price or class count of 0 | `400 invalid_catalog_value` |
+| Create a Class Type named «Mat Pilates» | `409 class_type_name_taken` |
+| A weekly schedule or one-off Session with a capacity of 0, or a `startsAtLocal` such as `25:00` (a duration outside 5–240 minutes is refused earlier as `invalid_request`) | `400 invalid_schedule` |
+| A schedule, replacement, or end whose `effectiveFrom` is in the past | `400 effective_date_invalid` |
+| `PATCH` a Session that is cancelled or already started | `409 session_not_editable` |
+| Send Branches for a new Administrator | `400 invalid_branch_assignment` (Test 17) |
+
+**Identity** (Test 67 names the impersonation endpoints):
+
+| Do this | Answer |
+| --- | --- |
+| `POST /api/v1/impersonations` twice in the same second from two terminals | `409 impersonation_active` for the loser of the race (the sequential case answers `403 staff_access_denied`) |
+| `POST /api/v1/accounts/current/closure` with a Staff credential | `403 closure_access_denied` |
+| `POST /api/v1/accounts/current/email-change` for an Account that is not active | `409 account_not_active` (only reachable through the automated tests: a pending Account cannot sign in) |
+| Register with your own referral code | `400 referral_self_reference` (unreachable by hand: a code belongs to an existing Client; the unit tests cover it) |
+
+The `*_not_found` family (`session_not_found`, `payment_not_found`,
+`evaluation_not_found`, `supply_not_found`, `expense_not_found`,
+`expense_category_not_found`, `salary_payment_not_found`,
+`promotion_not_found`, `session_schedule_not_found`,
+`availability_block_not_found`, `evaluation_slot_not_found`,
+`notification_not_found`, `profile_photo_not_found`,
+`promotion_image_not_found`) answers `404` to a made-up UUID on the matching
+route; `profile_photo_not_ready` and `promotion_image_not_ready` answer
+`409` to an asset the worker has not finished; `invalid_cursor` answers
+`400` to a garbled `cursor` on `GET /api/v1/notifications`;
+`expense_category_name_taken`,
+`availability_block_ended`, `branch_archived`, `promotion_archived`, and
+`staff_member_deactivated` answer `409` when the row named is already in
+that state; `invalid_back_office_value` and `invalid_promotion_value` answer
+`400` to a Back Office or Promotion body that fails a rule the DTO cannot
+express (a negative quantity, an end date before the start). Drop the copy
+afterwards: `dropdb pilates_test_codes`.
