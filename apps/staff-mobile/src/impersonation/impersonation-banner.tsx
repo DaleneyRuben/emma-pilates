@@ -1,7 +1,7 @@
 import { colors, Glyph, type MobileImpersonation, spacing, typography } from "@pilates/mobile-core";
 import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { roleLabel } from "../profile/staff-labels";
 
@@ -38,8 +38,9 @@ export function ImpersonationBanner({
   }, [expiresAt, onExpire]);
 
   const name = impersonation.staffMemberName;
+  const insets = useSafeAreaInsets();
   return (
-    <SafeAreaView accessibilityRole="header" edges={["top"]} style={styles.strip}>
+    <View accessibilityRole="header" style={[styles.strip, { paddingTop: insets.top }]}>
       <View style={styles.row}>
         <Glyph color={colors.white} name="eye" size={16} strokeWidth={1.5} />
         <View style={styles.text}>
@@ -58,7 +59,7 @@ export function ImpersonationBanner({
           <Text style={styles.exitText}>Salir</Text>
         </Pressable>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -80,8 +81,8 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
-  // Over the top inset: the screen under it keeps its own safe-area padding
-  // and the wrapper pushes it down by the strip's 52 px (navigation.tsx).
+  // Over the top inset; navigation.tsx pushes the screens down by the inset
+  // plus the strip, so their own safe-area views add nothing more.
   strip: { backgroundColor: colors.primaryDeep, left: 0, position: "absolute", right: 0, top: 0 },
   text: { flex: 1, gap: 2 },
   title: { color: colors.white, fontSize: typography.note, fontWeight: "500" },

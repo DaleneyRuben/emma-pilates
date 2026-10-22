@@ -20,8 +20,13 @@ import {
 import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
 import { createStaticNavigation, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useCallback, useMemo, useState } from "react";
+import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  initialWindowMetrics,
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 
 import { CancelClassScreen } from "./administrator/cancel-class-screen";
 import { CancelSessionScreen } from "./administrator/cancel-session-screen";
@@ -246,6 +251,22 @@ const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNavigation
   trainer: createStaticNavigation(TrainerStack),
 };
 
+// Jest has no native metrics; the device fills them in before the first frame.
+const windowMetrics = initialWindowMetrics ?? {
+  frame: { x: 0, y: 0, width: 0, height: 0 },
+  insets: { top: 0, right: 0, bottom: 0, left: 0 },
+};
+
+// FUT-001: the screens start under the strip, which covers the top inset.
+function UnderBanner({ children }: { children: ReactNode }) {
+  const insets = useSafeAreaInsets();
+  return (
+    <View style={[styles.pushedDown, { paddingTop: insets.top + impersonationBannerHeight }]}>
+      {children}
+    </View>
+  );
+}
+
 export function StaffNavigation({
   accountId,
   apiFetcher,
@@ -310,14 +331,14 @@ export function StaffNavigation({
               {impersonation === undefined ? (
                 navigator
               ) : (
-                <View style={styles.underBanner}>
-                  <View style={styles.pushedDown}>{navigator}</View>
+                <SafeAreaProvider initialMetrics={windowMetrics} style={styles.underBanner}>
+                  <UnderBanner>{navigator}</UnderBanner>
                   <ImpersonationBanner
                     impersonation={impersonation}
                     onExit={onExit}
                     onExpire={onExpire}
                   />
-                </View>
+                </SafeAreaProvider>
               )}
             </ImpersonationContext.Provider>
           </AssistantWorkspaceProvider>
@@ -370,6 +391,6 @@ const styles = StyleSheet.create({
   },
   segmentTextSelected: { color: colors.white },
   segmented: { flexDirection: "row" },
-  pushedDown: { flex: 1, paddingTop: impersonationBannerHeight },
+  pushedDown: { flex: 1 },
   underBanner: { flex: 1 },
 });
