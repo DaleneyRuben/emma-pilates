@@ -252,7 +252,7 @@ describe('resolveAuthenticatedPrincipal while impersonating (FUT-001)', () => {
   const activeImpersonation = {
     id: 'impersonation-id',
     expiresAt: new Date('2026-10-22T15:20:00.000Z'),
-    staffMember: trainer,
+    staffMember: { ...trainer, name: 'Camila Rojas' },
   };
   const dependencies = (
     session: Record<string, unknown>,
@@ -285,6 +285,8 @@ describe('resolveAuthenticatedPrincipal while impersonating (FUT-001)', () => {
       impersonation: {
         id: 'impersonation-id',
         administratorAccountId: 'administrator-account-id',
+        staffMemberName: 'Camila Rojas',
+        expiresAt: new Date('2026-10-22T15:20:00.000Z'),
       },
     });
     expect(deps.endImpersonation).not.toHaveBeenCalled();

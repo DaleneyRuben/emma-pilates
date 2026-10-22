@@ -118,6 +118,36 @@ describe('Account security (e2e)', () => {
     });
   });
 
+
+  it('refuses the command while an Administrator impersonates (FUT-001)', async () => {
+    resolvePrincipal.mockResolvedValue({
+      accountId: 'trainer-account-id',
+      authenticationSessionId: 'authentication-session-id',
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'trainer-staff-member-id',
+        role: 'trainer',
+        branchIds: [],
+      },
+      impersonation: {
+        id: 'impersonation-id',
+        administratorAccountId: 'administrator-account-id',
+        staffMemberName: 'Camila Rojas',
+        expiresAt: new Date('2026-10-22T15:30:00.000Z'),
+      },
+    });
+
+    await request(app.getHttpServer())
+      .patch('/api/v1/accounts/current/password')
+      .set('Authorization', bearer)
+      .send({ currentPassword: 'old password', newPassword: 'new password 2026' })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'impersonation_forbidden' }),
+      );
+    expect(changeCurrentPassword).not.toHaveBeenCalled();
+  });
+
   it('returns stable Problem Details for an incorrect current password', async () => {
     changeCurrentPassword.mockRejectedValueOnce(
       new CurrentPasswordIncorrectError(),

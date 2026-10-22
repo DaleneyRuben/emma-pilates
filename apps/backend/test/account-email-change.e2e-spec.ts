@@ -161,6 +161,51 @@ describe('account email change (e2e)', () => {
     );
   });
 
+  it('refuses the email change while an Administrator impersonates (FUT-001)', async () => {
+    resolvePrincipal.mockResolvedValue({
+      accountId: 'trainer-account-id',
+      authenticationSessionId: 'authentication-session-id',
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'trainer-staff-member-id',
+        role: 'trainer',
+        branchIds: [],
+      },
+      impersonation: {
+        id: 'impersonation-id',
+        administratorAccountId: 'administrator-account-id',
+        staffMemberName: 'Camila Rojas',
+        expiresAt: new Date('2026-10-22T15:30:00.000Z'),
+      },
+    });
+
+    for (const send of [
+      () =>
+        request(app.getHttpServer())
+          .post('/api/v1/accounts/current/email-change')
+          .send({ email: 'nueva@example.com' }),
+      () =>
+        request(app.getHttpServer()).post(
+          '/api/v1/accounts/current/email-change/resends',
+        ),
+      () =>
+        request(app.getHttpServer()).delete(
+          '/api/v1/accounts/current/email-change',
+        ),
+    ]) {
+      // eslint-disable-next-line no-await-in-loop -- one request after another
+      await send()
+        .set('Authorization', bearer)
+        .expect(403)
+        .expect(({ body }) =>
+          expect(body).toMatchObject({ code: 'impersonation_forbidden' }),
+        );
+    }
+    expect(operations.request).not.toHaveBeenCalled();
+    expect(operations.resend).not.toHaveBeenCalled();
+    expect(operations.cancel).not.toHaveBeenCalled();
+  });
+
   it('completes a change from the public link without a session', async () => {
     await request(app.getHttpServer())
       .post('/api/v1/email-changes')
