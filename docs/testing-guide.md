@@ -209,8 +209,8 @@ Press `Ctrl+C` in Terminal when you want to stop Expo.
 These steps create and update a database named `emma_pilates` on your own
 computer. Never run them with a shared-development or production database URL.
 
-The project runs on **PostgreSQL 18** everywhere (production, CI, the shared
-development database, and your computer). Locally it is Homebrew's
+The project runs on **PostgreSQL 18** everywhere (production, staging, CI,
+and your computer; the shared development database was retired by EXT-016). Locally it is Homebrew's
 `postgresql@18` on port **5433**, so it can sit beside an older PostgreSQL on
 5432 that other projects use. Install and start it once:
 
@@ -1357,8 +1357,8 @@ version):
   dies with the runner) side by side, each waiting for both contracts and
   api-unit;
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
-  **web-unit** (the admin-web Jest suite) and **web-e2e** (the ten Playwright
-  journeys of Test 31 through the built backend and the built admin web, on
+  **web-unit** (the admin-web Jest suite) and **web-e2e** (the seventeen
+  Playwright journeys of Test 31 through the built backend and the built admin web, on
   a `postgres:18-alpine` service container with a `pilates_test_ci` admin
   database, WEB-017) side by side;
 - **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
@@ -1646,7 +1646,7 @@ nuevo comprobante para activar tu plan. Tu crédito volvió a estar disponible."
 and **Subir un nuevo comprobante** opens a fresh **Pago por transferencia**
 for the same Plan.
 
-### E. Cancel a Session as the Administrator
+### D. Cancel a Session as the Administrator
 
 From **Pagos pendientes** tap **Cancelar una clase**. Pick the Branch (the
 **Sucursal:** pill with its pin and down chevron, then a Branch chip), a day
@@ -1674,12 +1674,14 @@ The fixtures ship no Bookings, so book a class from the Client app first
 `409 session_has_no_bookings` and the screen shows "No pudimos cancelar la
 sesión. Inténtalo de nuevo.".
 
-### D. Paying fully with Credit
+### E. Paying fully with Credit
 
 When the available Credit covers the whole price, **Continuar al pago**
 activates the Plan immediately (`POST /api/v1/credit-purchases`) and lands on
 "¡Pago confirmado!" without a QR. The fixtures cannot reach this (Bs 60 is
-below the cheapest Plan), so the automated purchase-flow spec covers it.
+below the cheapest Plan), so the automated purchase-flow spec covers it; to
+see it by hand, raise Sofía's Credit on a copy of the fixtures (Test 70,
+«Payments»).
 
 ## Test 11: act for a Client as the Assistant in the Staff app
 
@@ -1911,8 +1913,11 @@ It prints `administrator_bootstrap_completed` with `status: created`. Then:
    `paola.mendoza@example.com` is already an active Administrator.
 
 Every refusal changes nothing. Drop the throwaway database afterwards with
-`dropdb pilates_test_bootstrap`. Completing activation needs the link from the
-queued email, which the local capture does not expose to testers yet.
+`dropdb pilates_test_bootstrap`. To complete the activation, either start the
+worker on that database and take the `activation` email's `token` from
+`apps/backend/.data/email-capture/` (Test 34), or print the queued link with
+`node dist/src/administrator-activation-link-main.js` (Test 42 C); paste it
+into the admin web's `/crear-contrasena?token=…` page (Test 24, step 10).
 
 ## Test 15: book an Evaluation and manage the Nutritionist's availability
 
@@ -1963,16 +1968,21 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
 
 ## Test 16: watch the worker's retention sweeps
 
-When the worker starts, and then every hour, it deletes housekeeping rows that
-have outlived their provisional retention (BE-008): idempotency records past
-their own expiry and at least 48 hours old, Authentication Sessions 90 days
-after they were revoked or expired, throttle events 30 days after they
-stopped counting, and notifications 180 days after they were read. Unread
-notifications and audit records are never deleted. To see it, insert an old
-read notification for a fixture Account in `pilates_dev_sim` (for example
-`read_at = now() - interval '200 days'`), start the worker, and the row is
-gone a few seconds later. The worker logs only a sanitized
-`retention_sweep_failed` event if a sweep fails.
+When the worker starts, and then every hour, its `retention_sweep` marks
+housekeeping rows that have outlived their provisional retention (BE-008)
+as removed: idempotency records past their own expiry and at least 48 hours
+old, Authentication Sessions 90 days after they were revoked or expired,
+throttle events 30 days after they stopped counting, and notifications 180
+days after they were read. Unread notifications and audit records are never
+touched. Nothing is physically deleted
+([ADR-0086](./adr/0086-soft-delete-every-database-row.md)): the row stays
+with `deleted_at` set and leaves every list. To see it, insert an old read
+notification for a fixture Account in `pilates_dev_sim` (for example
+`read_at = now() - interval '200 days'`), start the worker, and a few
+seconds later the row has `deleted_at` and the inbox no longer lists it.
+The worker logs only a sanitized `retention_sweep_failed` event if a sweep
+fails. The other housekeeping sweeps (pending Accounts, abandoned and
+released images, open Purchase Intents) are Test 68.
 
 ## Test 17: manage Staff Members as the Administrator (API)
 
@@ -1982,11 +1992,14 @@ shows how to log in and authorize):
 
 1. `GET /api/v1/administrator/staff-members` lists every Staff Member with
    `page`, `pageSize` (up to 100), and optional `role`, `branchId`, and
-   `status` (`pending`, `active`, `deactivated`) filters.
+   `status` (`pending`, `active`, `deactivated`) filters;
+   `GET …/staff-members/{id}` reads one (the admin web's panel, Test 26;
+   `404 staff_member_not_found` for an unknown id).
 2. `POST /api/v1/administrator/staff-members` with a name, email, Role, and
    Branches creates a pending Staff Member and queues the Activation Link
    email. An Administrator is created without Branches (they hold every
-   Branch); every other Role needs at least one active Branch.
+   Branch; Branches sent for one answer `400 invalid_branch_assignment`);
+   every other Role needs at least one active Branch.
 3. `POST …/{id}/activation-link` sends a new link while the person is still
    pending (at most one per minute per email; a limited send answers `429
    email_throttled` with `Retry-After` in seconds). While pending,
@@ -2184,10 +2197,11 @@ three seeding flows add classes at Centro early tomorrow and in the next
 hour, which is why they run after the flows that read today's fixture
 schedule.
 
-The Staff suite runs its nine flows in its `config.yaml` order:
+The Staff suite runs its ten flows in its `config.yaml` order:
 `administrator-pending-payments`
 (Paola; «No hay pagos pendientes.» is accepted, so no transfer is needed),
-`assistant-client-search` (Camila finds Lucía), `nutritionist-availability`
+`administrator-view-as` (Paola sees the app as Emma from Perfil and leaves
+with «Salir», Test 67), `assistant-client-search` (Camila finds Lucía), `nutritionist-availability`
 (Gabriela publishes and removes a Friday block), `trainer-agenda-and-inbox`
 (Emma; an empty day is accepted), then the journeys that change things:
 `administrator-review-payments` (Paola confirms Mariana's transfer and
@@ -2236,9 +2250,12 @@ every Branch appear together, each card naming its Trainer and Branch
 
 ## Test 21: manage the catalog, schedules, and reports as the Administrator (API)
 
-The admin web is not built yet, so try these through Swagger or curl as
-`paola.mendoza@example.com` (Test 3 shows how to log in and authorize). Other
-Roles get `403 administration_access_denied`.
+The admin web does all of this on its pages (Tests 25, 29, and 30); to try
+the API directly, use Swagger or curl as `paola.mendoza@example.com` (Test 3
+shows how to log in and authorize). Other Roles get
+`403 administration_access_denied`. The rule codes these commands answer
+(`invalid_catalog_value`, `class_type_name_taken`, `invalid_schedule`,
+`effective_date_invalid`, `session_not_editable`) are listed in Test 70.
 
 1. **Catalog**: `GET`/`POST /api/v1/administrator/branches`, `PUT …/{id}`,
    and `POST …/{id}/archive`; the same for `class-types`. A Branch or Class
@@ -2438,7 +2455,7 @@ pnpm dev:admin
    session of the Account (the Staff app, for example) is signed out, and you
    must use the new password next time; run the fixtures command again to
    restore `emma-local-2026`.
-5. **Show the password** (WEB-022, design follow-up 92). Every password
+6. **Show the password** (WEB-022, design follow-up 92). Every password
    field (**Contraseña** on the Login card, the three fields of **Cambiar
    contraseña**, and both fields of the emailed **Crear contraseña** page)
    starts hidden, with an eye inside its right end. Click the eye: the typed
@@ -2448,32 +2465,45 @@ pnpm dev:admin
    With the keyboard, **Tab** from a field reaches its eye (focus ring) and
    **Space** or **Enter** toggles it without submitting. Logging in works
    the same with the password shown.
-5. **Log out.** Open the menu, choose **Cerrar sesión**: it first asks
+7. **Log out.** Open the menu, choose **Cerrar sesión**: it first asks
    "¿Cerrar sesión?" with **Cancelar**, which has focus (press Enter to keep
    your session). Confirm, and you are back on Login;
    the session cookie is gone and going back to a page asks you to log in.
-6. **Throttling.** On Login, submit a made-up email such as
+   A session that ended behind the browser's back (log out from a second
+   tab, or `DELETE /api/v1/admin-web/authentication-sessions/current` with
+   the cookie jar) sends the next click to Login with "Tu sesión terminó.
+   Vuelve a iniciar sesión." and brings you back to that page after Login;
+   with the cookie gone, `GET /api/v1/admin-web/authentication-sessions/current`
+   answers `401 authentication_required`.
+8. **Throttling.** On Login, submit a made-up email such as
    `nobody.admin-login@example.com` with any password six times. The seventh
    try shows "Demasiados intentos. Intenta de nuevo en un momento." with a
    countdown from the server (0:30 at first) and a disabled button.
-7. **Recovery.** **¿Olvidaste tu contraseña?** opens **Recuperar contraseña**.
+9. **Recovery.** **¿Olvidaste tu contraseña?** opens **Recuperar contraseña**.
    Any email gives the same "Revisa tu correo" state ("El enlace vence en 30
    minutos.") whether or not it belongs to an Account. Once the device or
    network budget is full (Test 5 G), a note with a clock above the field
    reads "Demasiadas solicitudes. Intenta de nuevo en un momento; si ya
    recibiste un enlace, sigue sirviendo." with "Podrás pedirlo en m:ss." and
    **Enviar enlace** stays disabled.
-8. **Links.** Open
-   [http://localhost:5173/crear-contrasena?token=not-a-real-link-secret](http://localhost:5173/crear-contrasena?token=not-a-real-link-secret):
-   "Este enlace no es válido". With the worker running, real links are in
-   `apps/backend/.data/email-capture/` (Test 34): paste a captured activation
-   or recovery link's `token` after `?token=` to see the form, or a used or
-   superseded one for "Este enlace ya no es válido". An activation link whose
-   invitation the 30-day cleanup removed (to fake one locally, set that
-   pending Account's `pending_expires_at` to the past in `pilates_dev_sim`)
-   shows "Esta invitación ya no está activa" with **Volver a iniciar
-   sesión**.
-9. **Narrow browser.** At a phone width the top bar keeps only the avatar, the
+10. **Links.** Open
+    [http://localhost:5173/crear-contrasena?token=not-a-real-link-secret](http://localhost:5173/crear-contrasena?token=not-a-real-link-secret):
+    "Este enlace no es válido". With the worker running, real links are in
+    `apps/backend/.data/email-capture/` (Test 34): paste a captured activation
+    or recovery link's `token` after `?token=` to see the form, or a used or
+    superseded one for "Este enlace ya no es válido". An activation link whose
+    invitation the 30-day cleanup removed (to fake one locally, set that
+    pending Account's `pending_expires_at` to the past in `pilates_dev_sim`)
+    shows "Esta invitación ya no está activa" with **Volver a iniciar
+    sesión**. Finish each kind once: an activation link (a Staff Member
+    invited in Test 26) saves the password through
+    `POST /api/v1/account-activations` and returns to Login with "Tu cuenta
+    está activa. Inicia sesión con tu nueva contraseña." and no session; a
+    recovery link (step 9, for Paola) goes through
+    `POST /api/v1/admin-web/password-recoveries` and lands on Horario
+    signed in, her other sessions revoked. Either token answers `expired` a
+    second time and the page shows the used-link state.
+11. **Narrow browser.** At a phone width the top bar keeps only the avatar, the
    menu opens from the bottom, and **Cambiar contraseña** fills the screen.
 
 A request that changes something with the session cookie from any other site
@@ -2654,7 +2684,7 @@ the admin web, exactly as Test 24 describes, and log in as
 Every change stays in `pilates_dev_sim`; the fixtures command restores the
 fixture Accounts but does not delete Staff Members you created. With the
 worker running, the activation email lands in the local capture (Test 34):
-paste its `token` into the admin web's link page (Test 24, step 8) to activate
+paste its `token` into the admin web's link page (Test 24, step 10) to activate
 the new person. Cancelled invitations and removed members stay as rows marked
 removed.
 
@@ -3046,7 +3076,9 @@ one file per variant (`readable` and `thumbnail` for a receipt, `display` and
 the `pending/<purpose>/<id>` original is gone. A Promotion image smaller than
 1200×675 ends `failed` with `image_dimensions_too_small`; an animated image
 with `image_animated_not_allowed`. Failed originals stay under `pending/` until
-the three-day cleanup (Test 13's worker, ADR-0089) removes them.
+the three-day cleanup (Test 68, ADR-0089) removes them. The refusals the
+three calls answer before anything is stored (a wrong media type, size,
+checksum, or order of calls) are listed in Test 70, «Uploads».
 
 ### B. The receipt variants in the review screens
 
@@ -3146,7 +3178,7 @@ crop).
 
 Deleted Promotions stay archived in `booking.promotions`; the fixtures
 command does not remove them. A refused upload leaves nothing behind; one the
-worker refused waits under `pending/` for the three-day cleanup (Test 13).
+worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 ## What you cannot test yet
 
@@ -3215,8 +3247,9 @@ the link) and `email_change_notice` to the current one (no link).
 
 ### B. Confirm the change
 
-The Simulator cannot open the link yet (LNK-001). Copy the `token` from the
-`email_change` file's `link` and send it to `POST /api/v1/email-changes` as
+The iOS Simulator cannot open the link (Universal Links wait for gate 9; on
+the Android emulator a development build opens it, Test 57). Copy the `token`
+from the `email_change` file's `link` and send it to `POST /api/v1/email-changes` as
 `{ "token": "…" }` (Swagger, no credential needed): `{ "status": "changed" }`
 the first time, `expired` the second. Pull Perfil: the summary shows
 `lucia.nueva@example.com`, the signed-in session keeps working (ADR-0030),
@@ -3242,7 +3275,7 @@ Tests 4 and 6 can be completed with real tokens through
 and `POST /api/v1/password-recoveries`. `POST /api/v1/authentication-links/inspection`
 tells a captured activation or recovery link apart: `current`, `expired`, or
 `removed` (Test 6A); the admin web's link page opens the same tokens
-(Test 24, step 8). The directory is ignored by Git and
+(Test 24, step 10). The directory is ignored by Git and
 safe to delete.
 
 Since EML-001 each file is the real message: `subject`, `text` (plain text),
@@ -3252,9 +3285,13 @@ activar tu cuenta» (24 horas), «Activa tu cuenta en Emma Pilates Studio»
 (7 días), «Crea una contraseña nueva» (30 minutos), «Confirma tu correo
 nuevo» (24 horas), and, for the current address of an email change, «Alguien
 pidió cambiar el correo de tu cuenta» (no link). Links start with
-`AUTHENTICATION_LINK_BASE_URL` (`https://links.emmapilates.test` locally; the
-real domain comes with LNK-001). Open the `html` value in a browser to see
+`AUTHENTICATION_LINK_BASE_URL` (`https://links.emmapilates.test` locally;
+`https://links.emmapilatesstudio.com` on production and `links-staging.` on
+staging, LNK-001, Test 57). Open the `html` value in a browser to see
 the card; the copy comes from design follow-ups 33–38 and the IDN-008 rule.
+No file ever holds a raw address in its name or in the worker's log: the
+worker logs a digest of the recipient (`AUTHENTICATION_EMAIL_DIGEST_KEY`),
+and so does `system.email_suppressions` (Test 56).
 
 ## Test 35: close a Client Account
 
@@ -3344,8 +3381,10 @@ the deployment's Logs in Vercel: the middleware failed to load or run.
 
 ## Test 37: check the Better Stack monitors fire and recover
 
-Better Stack's free plan (ADR-0081, ADR-0066) holds three monitors, all
-alerting by email to the account's only team member. Its dashboard is at
+Better Stack's free plan (ADR-0081, ADR-0066) holds the three monitors
+below plus the «Database backup» heartbeat (Test 43) and, since 2026-10-21,
+the «Production admin web», «Public pages», and «Link host» monitors (Test
+74), all alerting by email to the account's only team member. Its dashboard is at
 https://betterstack.com; the error DSN and the heartbeat URL are credentials
 and live only in your own `apps/backend/.env` (commented out) and in the
 hosts' environments, never in the repository.
@@ -3425,9 +3464,10 @@ every endpoint's validation and authorization, refuses untrusted admin
 origins, stores data in Aiven and images in R2, and runs the worker (EXT-002)
 and the daily backup (EXT-009). The first Administrator was activated through
 a link printed in the `api` shell, so the admin web can be signed into
-(step 5). It still sends no email (gate 7, EXT-001): no Client can verify a
-registration and no Staff Member can be activated or recover a password.
-The transfer instructions are the studio's real QR image (PAY-003).
+(step 4). Since EXT-001 the worker sends the authentication emails through
+Resend (Test 56), and since LNK-001 their links open the apps on Android
+(Test 57); iOS waits for gate 9. The transfer instructions are the studio's
+real QR image (PAY-003).
 
 1. From the repository root, with the commit Northflank shows on the `api`
    service:
@@ -3454,7 +3494,7 @@ The transfer instructions are the studio's real QR image (PAY-003).
    `authentication_failed` in RFC 9457 form; Application → Cookies holds only
    `__Host-emma-admin-client`, HttpOnly, Secure, SameSite Lax, Path `/`,
    host-only. Reload `/catalogo/planes`: the login page loads, not a `404`.
-5. **Signed in** (WEB-010, verified 2026-10-14). In a private window with
+4. **Signed in** (WEB-010, verified 2026-10-14). In a private window with
    DevTools → Network (Preserve log), sign in as the production
    Administrator. `admin-web/authentication-sessions` answers `201` and
    `authentication-sessions/current` `200`. Before any screenshot of
@@ -3466,7 +3506,7 @@ The transfer instructions are the studio's real QR image (PAY-003).
    Branches), a reload keeps the session, and «Cerrar sesión» returns to
    the login page, removes the session cookie, and keeps the client one;
    Back stays on the login page.
-4. To re-measure the hops (ADR-0087), send
+5. To re-measure the hops (ADR-0087), send
    `curl https://p01--api--mmps25fn9k9x.code.run/api/v1/hop-probe` and the same
    path through `https://emma-pilates-admin.vercel.app`, then search the path
    in the `api` service's Logs and open each line: `forwardedFor` is `1`
@@ -3534,6 +3574,10 @@ workflow; production changes only when you start `Release Production`
 ([runbook](./runbooks/production-release.md)). Staging must be resumed
 first if it is paused (runbook, «Pause and resume staging»).
 
+0. Staging costs money while it runs (about $0.015 an hour for `api` and
+   `worker` together, Pay as you go): resume both services before this test
+   and **pause them again when you are done** (Test 74 has the steps and
+   the cost check).
 1. After a pull request merges, find the merge's staging release:
 
    ```sh
@@ -3582,6 +3626,10 @@ first if it is paused (runbook, «Pause and resume staging»).
 6. Two merges in quick succession: only the newest pending staging release
    runs; one whose commit is no longer main's head ends `superseded`, deploys
    nothing, and records no status.
+7. The production release ends with the smoke check against production
+   (`SMOKE_API_DOCUMENTATION=hidden`, Test 3), so a release that serves
+   Swagger on production fails there. Copying production's data into
+   staging is a separate, last-resort workflow (Test 74).
 
 ## Test 41: check that the QR is the only transfer instruction
 
@@ -3662,14 +3710,17 @@ HTTPS endpoint.
    is down.
 2. In Cloudflare, R2 → `emma-pilates-prod-images` → Objects shows the two
    variants under `private/transfer_receipt/<id>/`.
-3. Northflank → `worker` → Logs shows `authentication_email_disabled` once at
-   start (no email provider until EXT-001) and the finalize job for the upload.
+3. Northflank → `worker` → Logs shows the finalize job for the upload (and
+   `authentication_email_disabled` once at start only while the worker has
+   no `RESEND_API_KEY`, Test 56).
 
 ### C. The first Administrator without email
 
-Until EXT-001 sends email, the first production Administrator's Activation
-Link is read from the queue in the `api` service's shell, right after the
-bootstrap command ([runbook](./runbooks/first-administrator-bootstrap.md)):
+On an environment whose worker cannot send email yet, the first
+Administrator's Activation Link is read from the queue in the `api`
+service's shell, right after the bootstrap command
+([runbook](./runbooks/first-administrator-bootstrap.md)); this is how
+production's first Administrator was activated before EXT-001:
 
 ```sh
 node dist/src/administrator-activation-link-main.js
@@ -4492,7 +4543,7 @@ Every password field in both apps carries an eye inside its right end
 account. It starts hidden; a tap shows the typed text with the eye crossed
 out («Ocultar contraseña»), a second tap hides it again («Mostrar
 contraseña»), and the value and cursor stay. Each field toggles on its own.
-The admin web side is WEB-022 (Test 24, step 5).
+The admin web side is WEB-022 (Test 24, step 6).
 
 Run it on the development builds of Test 45 on the Android emulator, the
 iPhone 16 Pro, and the iPad Pro 11, in both apps.
