@@ -2,9 +2,13 @@ import type { CurrentAuthenticationPrincipalDto } from "@pilates/api-contracts";
 
 export type AppRole = "client" | "trainer" | "assistant" | "administrator" | "nutritionist";
 
+/** FUT-001: the Administrator is seeing the Staff app as this Staff Member. */
+export type MobileImpersonation = NonNullable<CurrentAuthenticationPrincipalDto["impersonation"]>;
+
 export type MobileSession = {
   accountId: string;
   role: AppRole;
+  impersonation?: MobileImpersonation;
 };
 
 type CredentialStore = {
@@ -28,6 +32,8 @@ type SessionManagerOptions = {
 export type SessionManager = {
   /** Forgets a session the server already revoked, such as a closed Account's. */
   endLocally: (session: MobileSession) => Promise<void>;
+  /** Resolves the current session again, such as after an Impersonation starts or ends. */
+  refresh: () => Promise<MobileSession | null>;
   hasBiometricSession: () => Promise<boolean>;
   logout: (session: MobileSession) => Promise<void>;
   restore: () => Promise<MobileSession | null>;
@@ -42,6 +48,7 @@ function toMobileSession(principal: CurrentAuthenticationPrincipalDto): MobileSe
   return {
     accountId: principal.accountId,
     role: principal.identity.kind === "client" ? "client" : principal.identity.role,
+    ...(principal.impersonation === undefined ? {} : { impersonation: principal.impersonation }),
   };
 }
 
@@ -120,6 +127,15 @@ export function createSessionManager(options: SessionManagerOptions): SessionMan
       activeCredential = null;
       await credentialStore.clear();
       await clearAccountCache(session.accountId);
+    },
+    async refresh(): Promise<MobileSession | null> {
+      const credential = activeCredential ?? (await credentialStore.load());
+
+      if (credential === null) {
+        return null;
+      }
+
+      return resolveCredential(credential);
     },
     async endLocally(session: MobileSession): Promise<void> {
       activeCredential = null;

@@ -27,7 +27,7 @@ import { branchesLabel, roleLabel } from "./staff-labels";
 
 type ProfileNavigation = {
   goBack: () => void;
-  navigate: (screen: "Notifications" | "ChangePassword") => void;
+  navigate: (screen: "Notifications" | "ChangePassword" | "ViewAs") => void;
 };
 
 function ValueRow({ label, value }: { label: string; value: string }) {
@@ -130,6 +130,9 @@ export function StaffProfileScreen() {
             label="Cambiar contraseña"
             onPress={() => navigation.navigate("ChangePassword")}
           />
+          {identity.session?.role === "administrator" ? (
+            <MenuRow label="Ver la app como…" onPress={() => navigation.navigate("ViewAs")} />
+          ) : null}
         </View>
         <Pressable
           accessibilityLabel="Cerrar sesión"

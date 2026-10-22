@@ -33,6 +33,7 @@ describe("Client App", () => {
           login: jest.fn(),
           sessionManager: {
             endLocally: jest.fn(),
+            refresh: jest.fn().mockResolvedValue(null),
             hasBiometricSession: jest.fn().mockResolvedValue(false),
             logout: jest.fn(),
             restore: jest.fn().mockResolvedValue(null),
@@ -67,6 +68,7 @@ describe("Client App", () => {
           login,
           sessionManager: {
             endLocally: jest.fn(),
+            refresh: jest.fn().mockResolvedValue(null),
             hasBiometricSession: jest.fn().mockResolvedValue(false),
             logout: jest.fn(),
             restore: jest.fn().mockResolvedValue(null),
@@ -109,6 +111,7 @@ describe("Client App", () => {
           login: jest.fn(),
           sessionManager: {
             endLocally: jest.fn(),
+            refresh: jest.fn().mockResolvedValue(null),
             hasBiometricSession: jest.fn().mockResolvedValue(false),
             logout: jest.fn(),
             restore: jest.fn().mockResolvedValue(null),
@@ -139,6 +142,7 @@ describe("Client App", () => {
           login: jest.fn(),
           sessionManager: {
             endLocally: jest.fn(),
+            refresh: jest.fn().mockResolvedValue(null),
             hasBiometricSession: jest.fn().mockResolvedValue(false),
             logout: jest.fn(),
             restore: jest.fn().mockResolvedValue({

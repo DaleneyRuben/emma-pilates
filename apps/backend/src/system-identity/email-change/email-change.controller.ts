@@ -21,6 +21,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { authenticatedPrincipalResolver } from '../authentication/authentication.controller';
+import { refuseWhileImpersonating } from '../authentication/refuse-while-impersonating';
 import {
   authenticateBearer,
   type PrincipalResolver,
@@ -105,6 +106,7 @@ export class EmailChangeController {
     const parsed = parseEmailChangeRequest(body);
     if (!parsed.success) throw invalidRequest('Invalid email change request');
     const principal = await this.authenticate(authorization);
+    refuseWhileImpersonating(principal);
     return run(() => this.operations.request(parsed.data, principal));
   }
 
@@ -130,6 +132,7 @@ export class EmailChangeController {
     @Headers('authorization') authorization: string | undefined,
   ): Promise<EmailChangeResendResultDto> {
     const principal = await this.authenticate(authorization);
+    refuseWhileImpersonating(principal);
     return run(() => this.operations.resend(principal));
   }
 
@@ -143,6 +146,7 @@ export class EmailChangeController {
     @Headers('authorization') authorization: string | undefined,
   ): Promise<void> {
     const principal = await this.authenticate(authorization);
+    refuseWhileImpersonating(principal);
     await run(() => this.operations.cancel(principal));
   }
 

@@ -37,6 +37,7 @@ import {
   toAuthenticationLinkInspectionDto,
 } from './account-security.dto';
 import { authenticatedPrincipalResolver } from '../authentication/authentication.controller';
+import { refuseWhileImpersonating } from '../authentication/refuse-while-impersonating';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 import { EmailSourceBudget } from '../email-source-budget/email-source-budget.guard';
 import {
@@ -156,6 +157,7 @@ export class AccountSecurityController {
     if (!parsed.success)
       throw new BadRequestException('Invalid password change');
     const principal = await this.authenticate(authorization);
+    refuseWhileImpersonating(principal);
     try {
       await this.changePassword({
         accountId: principal.accountId,

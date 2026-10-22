@@ -7,7 +7,6 @@ import {
   EvaluationSlotState,
   EvaluationState,
   PrismaClient,
-  StaffRole,
   SubscriptionState,
 } from '../../generated/prisma/client';
 import { retrySerializable } from '../../database/retry-serializable';
@@ -15,6 +14,7 @@ import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
+import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import {
   addCivilDays,
@@ -1378,13 +1378,15 @@ export const createPrismaEvaluationCommands = (
           }),
         );
       }
+      const actor = auditActorOf(principal);
       await transaction.auditRecord.create({
         data: {
           actionCode: 'evaluation.cancelled_by_staff',
           outcome: AuditOutcome.SUCCEEDED,
           actorKind: AuditActorKind.ACCOUNT,
-          actorAccountId: principal.accountId,
-          actorRole: identity.role.toUpperCase() as StaffRole,
+          actorAccountId: actor.accountId,
+          actorRole: actor.role,
+          impersonationId: actor.impersonationId,
           targetType: 'evaluation',
           targetId: evaluation.id,
           branchId: evaluation.slot.branchId,

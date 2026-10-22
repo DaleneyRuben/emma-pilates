@@ -3,6 +3,7 @@ import {
   AccountDeviceDeactivationReason,
   AuthenticationSessionRevocationReason,
 } from '../../generated/prisma/enums';
+import { endOpenImpersonations } from '../impersonation/prisma-impersonation-gateway';
 
 const disablingReasons: ReadonlySet<AuthenticationSessionRevocationReason> =
   new Set([
@@ -19,15 +20,27 @@ export const revokeAuthenticationSessions = async (
   input: { revokedAt: Date; reason: AuthenticationSessionRevocationReason },
 ): Promise<number> => {
   const live = { ...where, revokedAt: null };
-  const linked = await transaction.authenticationSession.findMany({
-    where: { ...live, accountDeviceId: { not: null } },
-    select: { accountDeviceId: true },
+  const revoked = await transaction.authenticationSession.findMany({
+    where: live,
+    select: { id: true, accountDeviceId: true },
   });
   const { count } = await transaction.authenticationSession.updateMany({
     where: live,
     data: { revokedAt: input.revokedAt, revocationReason: input.reason },
   });
-  const deviceIds = linked.flatMap(({ accountDeviceId }) =>
+  // FUT-001: an Impersonation lives on the Administrator's session and ends with it.
+  await endOpenImpersonations(
+    transaction,
+    revoked.map(({ id }) => id),
+    {
+      endedAt: input.revokedAt,
+      reason:
+        input.reason === AuthenticationSessionRevocationReason.LOGOUT
+          ? 'logged_out'
+          : 'revoked',
+    },
+  );
+  const deviceIds = revoked.flatMap(({ accountDeviceId }) =>
     accountDeviceId === null ? [] : [accountDeviceId],
   );
 

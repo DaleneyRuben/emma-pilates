@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { impersonating, openImpersonation } from './impersonation-test-support';
 import { PrismaClient } from '../../src/generated/prisma/client';
 import { PaymentRuleError } from '../../src/booking/payments/payment-errors';
 import { createPrismaReceiptRead } from '../../src/booking/payments/prisma-receipt-read';
@@ -187,6 +188,36 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     });
     expect(['CONFIRMED', 'REJECTED']).toContain(settled.state);
     expect(settled.subscription === null).toBe(settled.state === 'REJECTED');
+  });
+
+  it('audits a cash Payment taken while an Administrator sees the app as the Assistant to the Administrator (FUT-001)', async () => {
+    const buyer = await newClient('Efectivo suplantado');
+    const assistant = await staffPrincipal('camila.rojas@example.com');
+    const paola = await staffPrincipal('paola.mendoza@example.com');
+    const centro = fixtures.branches.find((b) => b.name === 'Centro')!;
+    const impersonation = await openImpersonation(prisma, {
+      administratorAccountId: paola.accountId,
+      staffMemberId: (assistant.identity as { staffMemberId: string })
+        .staffMemberId,
+      now,
+    });
+
+    const payment = await commands().recordCashPayment(
+      { clientId: buyer.clientId, planId: plan.id, branchId: centro.id },
+      impersonating(assistant, impersonation),
+      randomUUID(),
+    );
+
+    await expect(
+      prisma.auditRecord.findFirst({
+        where: { actionCode: 'payment.cash_confirmed', targetId: payment.id },
+      }),
+    ).resolves.toMatchObject({
+      actorAccountId: paola.accountId,
+      actorRole: 'ADMINISTRATOR',
+      impersonationId: impersonation.id,
+      branchId: centro.id,
+    });
   });
 
   it('records an instant cash Payment at an assigned Branch, spending Credit and activating the Subscription', async () => {

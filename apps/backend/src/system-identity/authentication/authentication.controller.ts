@@ -31,6 +31,7 @@ import {
   parseCreateAuthenticationSession,
   StaffAuthenticationIdentityDto,
 } from './authentication.dto';
+import { toImpersonationDto } from '../impersonation/impersonation.dto';
 import type { LoginCommand } from './login';
 import { toLoginProblem } from './login-problems';
 import type { AuthenticatedPrincipal } from './resolve-authenticated-principal';
@@ -115,7 +116,23 @@ export class AuthenticationController {
   ): Promise<CurrentAuthenticationPrincipalDto> {
     const principal = await this.resolvePrincipal(authorization);
 
-    return { accountId: principal.accountId, identity: principal.identity };
+    return {
+      accountId: principal.accountId,
+      identity: principal.identity,
+      ...(principal.impersonation === undefined ||
+      principal.identity.kind !== 'staff' ||
+      principal.identity.role === 'administrator'
+        ? {}
+        : {
+            impersonation: toImpersonationDto({
+              id: principal.impersonation.id,
+              staffMemberId: principal.identity.staffMemberId,
+              staffMemberName: principal.impersonation.staffMemberName,
+              role: principal.identity.role,
+              expiresAt: principal.impersonation.expiresAt,
+            }),
+          }),
+    };
   }
 
   @Delete('current')

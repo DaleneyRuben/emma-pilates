@@ -127,6 +127,46 @@ describe('authentication (e2e)', () => {
     expect(resolvePrincipal).toHaveBeenCalledWith(opaqueCredential, true);
   });
 
+  it('describes the current Impersonation beside the acting identity (FUT-001)', async () => {
+    resolvePrincipal.mockResolvedValue({
+      accountId: 'trainer-account-id',
+      authenticationSessionId: 'authentication-session-id',
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'trainer-staff-member-id',
+        role: 'trainer',
+        branchIds: ['11111111-1111-4111-8111-111111111111'],
+      },
+      impersonation: {
+        id: 'impersonation-id',
+        administratorAccountId: 'administrator-account-id',
+        staffMemberName: 'Camila Rojas',
+        expiresAt: new Date('2026-10-22T15:30:00.000Z'),
+      },
+    });
+
+    await request(app.getHttpServer())
+      .get('/api/v1/authentication-sessions/current')
+      .set('Authorization', `Bearer ${opaqueCredential}`)
+      .expect(200)
+      .expect({
+        accountId: 'trainer-account-id',
+        identity: {
+          kind: 'staff',
+          staffMemberId: 'trainer-staff-member-id',
+          role: 'trainer',
+          branchIds: ['11111111-1111-4111-8111-111111111111'],
+        },
+        impersonation: {
+          id: 'impersonation-id',
+          staffMemberId: 'trainer-staff-member-id',
+          staffMemberName: 'Camila Rojas',
+          role: 'trainer',
+          expiresAt: '2026-10-22T15:30:00.000Z',
+        },
+      });
+  });
+
   it('logs out the current Authentication Session', async () => {
     await request(app.getHttpServer())
       .delete('/api/v1/authentication-sessions/current')

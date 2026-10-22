@@ -23,6 +23,7 @@ import {
 } from '@nestjs/swagger';
 import { z } from 'zod';
 import { authenticatedPrincipalResolver } from '../system-identity/authentication/authentication.controller';
+import { refuseWhileImpersonating } from '../system-identity/authentication/refuse-while-impersonating';
 import {
   authenticateBearer,
   type PrincipalResolver,
@@ -191,6 +192,7 @@ export class NotificationsController {
       this.principalResolver,
       authorization,
     );
+    refuseWhileImpersonating(principal);
     return this.markEveryRead(principal);
   }
 
@@ -210,6 +212,7 @@ export class NotificationsController {
       this.principalResolver,
       authorization,
     );
+    refuseWhileImpersonating(principal);
 
     try {
       await this.markOneRead({ notificationId: parsed.data }, principal);

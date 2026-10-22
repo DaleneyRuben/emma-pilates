@@ -17,6 +17,7 @@ import {
 } from '../src/system-identity/account-security/account-security.controller';
 import { CurrentPasswordIncorrectError } from '../src/system-identity/account-security/change-password';
 import { authenticatedPrincipalResolver } from '../src/system-identity/authentication/authentication.controller';
+import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
 
 describe('Account security (e2e)', () => {
   let app: INestApplication<App>;
@@ -39,13 +40,14 @@ describe('Account security (e2e)', () => {
     }),
   );
   const changeCurrentPassword = jest.fn(() => Promise.resolve(undefined));
-  const resolvePrincipal = jest.fn(() =>
+  const resolvePrincipal = jest.fn<() => Promise<AuthenticatedPrincipal>>(() =>
     Promise.resolve({
       accountId: 'account-id',
       authenticationSessionId: 'authentication-session-id',
       identity: { kind: 'client' as const, clientId: 'client-id' },
     }),
   );
+  const bearer = `Bearer ${'a'.repeat(43)}`;
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
@@ -116,6 +118,38 @@ describe('Account security (e2e)', () => {
       currentPassword: 'old password',
       newPassword: 'new password',
     });
+  });
+
+  it('refuses the command while an Administrator impersonates (FUT-001)', async () => {
+    resolvePrincipal.mockResolvedValueOnce({
+      accountId: 'trainer-account-id',
+      authenticationSessionId: 'authentication-session-id',
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'trainer-staff-member-id',
+        role: 'trainer',
+        branchIds: [],
+      },
+      impersonation: {
+        id: 'impersonation-id',
+        administratorAccountId: 'administrator-account-id',
+        staffMemberName: 'Camila Rojas',
+        expiresAt: new Date('2026-10-22T15:30:00.000Z'),
+      },
+    });
+
+    await request(app.getHttpServer())
+      .patch('/api/v1/accounts/current/password')
+      .set('Authorization', bearer)
+      .send({
+        currentPassword: 'old password',
+        newPassword: 'new password 2026',
+      })
+      .expect(403)
+      .expect(({ body }) =>
+        expect(body).toMatchObject({ code: 'impersonation_forbidden' }),
+      );
+    expect(changeCurrentPassword).not.toHaveBeenCalled();
   });
 
   it('returns stable Problem Details for an incorrect current password', async () => {

@@ -37,12 +37,11 @@ import { adminWebProviders } from './admin-web/admin-web-providers';
 import { AdminWebSessionController } from './admin-web/admin-web-session.controller';
 import { applySystemIdentityMiddleware } from './system-identity-middleware';
 import { passwordRecoveryDependencies } from './account-security/password-recovery-dependencies';
-import type { AuthenticationSurface } from './authentication/create-authentication-session';
 import { login } from './authentication/login';
 import { loginDependencies } from './authentication/login-dependencies';
 import { logout } from './authentication/logout';
 import { PrismaAuthenticationGateway } from './authentication/prisma-authentication-gateway';
-import { resolveAuthenticatedPrincipal } from './authentication/resolve-authenticated-principal';
+import { principalResolverProvider } from './authentication/principal-resolver-wiring';
 import { CancelPendingClientRegistration } from './registration/cancel-pending-client-registration';
 import { ClientEmailVerificationController } from './registration/client-email-verification.controller';
 import { ClientRegistrationController } from './registration/client-registration.controller';
@@ -64,6 +63,10 @@ import {
 import { PrismaClientInvitationUnitOfWork } from './invitations/prisma-client-invitation-unit-of-work';
 import { sendClientVerification } from './invitations/client-verification-resend';
 import { emailChangeWiring } from './email-change/email-change-wiring';
+import {
+  impersonationGateway,
+  impersonationWiring,
+} from './impersonation/impersonation-wiring';
 import { emailSuppressionWiring } from './email-suppression/email-suppression-wiring';
 import { emailSourceBudgetProviders } from './email-source-budget/email-source-budget-providers';
 import { staffEmailBudgetProviders } from './staff-email-budget/staff-email-budget-providers';
@@ -90,12 +93,14 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
     AssistantClientInvitationsController,
     AuthenticationController,
     ...emailChangeWiring.controllers,
+    ...impersonationWiring.controllers,
     ...emailSuppressionWiring.controllers,
     ClientEmailVerificationController,
     ClientRegistrationController,
   ],
   providers: [
     ...emailChangeWiring.providers(PRISMA_CLIENT),
+    ...impersonationWiring.providers(PRISMA_CLIENT),
     ...emailSuppressionWiring.providers(PRISMA_CLIENT),
     ...emailSourceBudgetProviders(PRISMA_CLIENT),
     ...staffEmailBudgetProviders(PRISMA_CLIENT),
@@ -225,30 +230,10 @@ const accountSecurityGateway = Symbol('accountSecurityGateway');
       authentication: authenticationGateway,
       accountSecurity: accountSecurityGateway,
     }),
-    {
-      provide: authenticatedPrincipalResolver,
-      inject: [authenticationGateway],
-      useFactory:
-        (gateway: PrismaAuthenticationGateway) =>
-        (
-          credential: string,
-          meaningfulActivity: boolean,
-          surface?: AuthenticationSurface,
-        ): ReturnType<typeof resolveAuthenticatedPrincipal> =>
-          resolveAuthenticatedPrincipal(
-            credential,
-            meaningfulActivity,
-            {
-              digestCredential: authenticationTokens.digest,
-              findSessionByCredentialDigest: (digest) =>
-                gateway.findSessionByCredentialDigest(digest),
-              recordMeaningfulActivity: (input) =>
-                gateway.recordMeaningfulActivity(input),
-              now: () => new Date(),
-            },
-            surface,
-          ),
-    },
+    principalResolverProvider({
+      authentication: authenticationGateway,
+      impersonation: impersonationGateway,
+    }),
     {
       provide: currentSessionLogout,
       inject: [authenticationGateway],

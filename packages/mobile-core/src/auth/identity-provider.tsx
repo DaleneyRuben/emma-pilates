@@ -19,6 +19,8 @@ type MobileIdentity = MobileIdentityState & {
   /** Signs out after the server closed the Account and revoked every session. */
   endClosedSession: (notice: string) => Promise<void>;
   logout: () => Promise<void>;
+  /** Resolves the current session again (FUT-001: an Impersonation started or ended). */
+  refresh: () => Promise<void>;
   /** Shown once on the login screen after a closure; cleared by the next sign-in. */
   signOutNotice: string | null;
   start: (credential: string, options?: { protectWithBiometrics?: boolean }) => Promise<void>;
@@ -104,6 +106,15 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
     setIdentity({ session: null, status: "signed-out" });
   }, [identity.session, manager]);
 
+  const refresh = useCallback(async () => {
+    const session = await manager.refresh();
+
+    setIdentity({
+      session,
+      status: session === null ? "signed-out" : "signed-in",
+    });
+  }, [manager]);
+
   const endClosedSession = useCallback(
     async (notice: string) => {
       if (identity.session !== null) {
@@ -121,6 +132,7 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
         ...identity,
         endClosedSession,
         logout,
+        refresh,
         signOutNotice,
         start,
         unlockWithBiometrics,

@@ -23,6 +23,7 @@ import {
   recordNotification as defaultNotificationRecorder,
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
+import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
@@ -491,17 +492,16 @@ export function createPrismaPaymentCommands(
       branchId?: string | null;
       now: Date;
     },
-  ) =>
-    transaction.auditRecord.create({
+  ) => {
+    const actor = auditActorOf(input.principal);
+    return transaction.auditRecord.create({
       data: {
         actionCode: input.actionCode,
         outcome: AuditOutcome.SUCCEEDED,
         actorKind: AuditActorKind.ACCOUNT,
-        actorAccountId: input.principal.accountId,
-        actorRole:
-          input.principal.identity.kind === 'staff'
-            ? (input.principal.identity.role.toUpperCase() as StaffRole)
-            : null,
+        actorAccountId: actor.accountId,
+        actorRole: actor.role,
+        impersonationId: actor.impersonationId,
         targetType: 'payment',
         targetId: input.payment.id,
         branchId: input.branchId ?? null,
@@ -516,6 +516,7 @@ export function createPrismaPaymentCommands(
         },
       },
     });
+  };
 
   // A confirmed Payment activates exactly one Subscription and qualifies the
   // Client's pending Referral, awarding the referrer once.

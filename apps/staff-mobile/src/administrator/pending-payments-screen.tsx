@@ -22,6 +22,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import { useImpersonation } from "../impersonation/impersonation-context";
 import { useStaffFetcher } from "../staff-fetcher";
 import { RootHeader } from "../ui/root-header";
 
@@ -33,6 +34,7 @@ type PendingPaymentsNavigation = {
 };
 
 const noticeMilliseconds = 2_000;
+const impersonationNoticeMilliseconds = 4_000;
 
 export function PendingPaymentsScreen({
   route,
@@ -46,9 +48,17 @@ export function PendingPaymentsScreen({
     query: { refetchOnMount: "always" },
   });
   // Confirming or rejecting returns here with a two-second notice.
-  const notice = useTransientNotice(route.params?.notice, noticeMilliseconds, () =>
+  const paymentsNotice = useTransientNotice(route.params?.notice, noticeMilliseconds, () =>
     navigation.setParams({ notice: undefined }),
   );
+  // FUT-001: «Salir» or the expiry of an Impersonation lands here with its line.
+  const impersonation = useImpersonation();
+  const impersonationNotice = useTransientNotice(
+    impersonation.notice ?? undefined,
+    impersonationNoticeMilliseconds,
+    impersonation.clearNotice,
+  );
+  const notice = paymentsNotice ?? impersonationNotice;
 
   const header = (
     <>
