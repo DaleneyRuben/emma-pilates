@@ -85,11 +85,13 @@ async function renderProvider({
   fetcher = createFetcher(),
   onOpen = jest.fn(),
   now = () => 1_791_468_000_000,
+  registrationEnabled,
 }: {
   platform?: ReturnType<typeof fakePlatform>;
   fetcher?: ReturnType<typeof createFetcher>;
   onOpen?: jest.Mock;
   now?: () => number;
+  registrationEnabled?: boolean;
 } = {}) {
   const screen = await render(
     <MobileQueryProvider>
@@ -100,6 +102,7 @@ async function renderProvider({
         onOpen={onOpen}
         permissionReason="Te avisamos si tu clase cambia."
         platform={platform}
+        registrationEnabled={registrationEnabled}
       >
         <OfferButton />
       </PushNotificationsProvider>
@@ -124,6 +127,18 @@ describe("PushNotificationsProvider", () => {
     await waitFor(() => expect(calls(fetcher, "/devices/current")).toHaveLength(1));
     await act(async () => platform.listeners.token.forEach((listener) => listener()));
     await waitFor(() => expect(calls(fetcher, "/devices/current")).toHaveLength(2));
+  });
+
+  it("registers nothing while the Administrator sees the app as someone else (FUT-001)", async () => {
+    const { fetcher, platform, screen } = await renderProvider({ registrationEnabled: false });
+
+    await act(async () => platform.listeners.token.forEach((listener) => listener()));
+    await waitFor(() => expect(calls(fetcher, "/unread-count").length).toBeGreaterThan(0));
+    expect(calls(fetcher, "/devices/current")).toHaveLength(0);
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Reservar" }));
+    });
+    expect(screen.queryByText("Te avisamos si tu clase cambia.")).not.toBeOnTheScreen();
   });
 
   it("marks a tapped entry read, then opens its destination", async () => {
