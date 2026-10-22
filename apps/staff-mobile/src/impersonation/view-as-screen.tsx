@@ -170,7 +170,14 @@ const styles = StyleSheet.create({
   avatarText: { color: colors.primaryOnTint, fontSize: typography.body, fontWeight: "500" },
   branches: { color: colors.textMuted, fontSize: typography.note },
   card: { ...surfaces.flatCard, overflow: "hidden" },
-  content: { gap: spacing.xl, paddingBottom: spacing.xxl },
+  // S24: a 560 pt column on the tablet, the full width on a phone.
+  content: {
+    alignSelf: "center",
+    gap: spacing.xl,
+    maxWidth: 560,
+    paddingBottom: spacing.xxl,
+    width: "100%",
+  },
   eyebrow: {
     color: colors.textMuted,
     fontSize: typography.label,
