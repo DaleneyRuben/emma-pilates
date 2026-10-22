@@ -195,6 +195,7 @@ const createInvitationTransaction = (
         actorKind: AuditActorKind.ACCOUNT,
         actorAccountId: audit.actorAccountId,
         actorRole: staffRoles[audit.actorRole],
+        impersonationId: audit.impersonationId,
         targetType: 'account',
         targetId: audit.targetAccountId,
         correlationId: audit.correlationId,

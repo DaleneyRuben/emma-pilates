@@ -1,3 +1,4 @@
+import { auditActorOf } from '../authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../authentication/resolve-authenticated-principal';
 import {
   activationLifetimeMilliseconds,
@@ -29,7 +30,14 @@ export const requireAssistant = (principal: AuthenticatedPrincipal): Actor => {
   ) {
     throw new InvitationAccessDeniedError();
   }
-  return { accountId: principal.accountId, role: principal.identity.role };
+  // ADR-0100: an Administrator seeing the app as an Assistant acts as the
+  // Assistant, and the audit record names the Administrator.
+  const actor = auditActorOf(principal);
+  return {
+    accountId: actor.accountId,
+    role: actor.role === 'ADMINISTRATOR' ? 'administrator' : 'assistant',
+    impersonationId: actor.impersonationId,
+  };
 };
 
 const normalizeEmail = (email: string): string => email.trim().toLowerCase();
@@ -126,6 +134,7 @@ export const audit = (
   actionCode: input.actionCode,
   actorAccountId: actor.accountId,
   actorRole: actor.role,
+  impersonationId: actor.impersonationId,
   targetAccountId: input.targetAccountId,
   correlationId: dependencies.newId(),
   metadata: input.metadata ?? null,
