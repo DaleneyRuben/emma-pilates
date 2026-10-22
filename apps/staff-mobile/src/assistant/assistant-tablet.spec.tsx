@@ -3,7 +3,13 @@ import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { Dimensions, Keyboard } from "react-native";
 
 import { jsonResponse } from "../test-support";
-import { assistantRoutes, invitation, newClient, openClientSearch } from "./assistant-fixtures";
+import {
+  assistantRoutes,
+  expiredOverview,
+  invitation,
+  newClient,
+  openClientSearch,
+} from "./assistant-fixtures";
 
 jest.setTimeout(20_000);
 
@@ -132,6 +138,7 @@ describe("Assistant flows on a tablet", () => {
   it("takes cash with Plans in a two-column grid and returns to the split overview", async () => {
     const screen = await selectLucia({
       ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () => jsonResponse(expiredOverview),
       "POST /api/v1/assistant/clients/client-lucia/cash-payments": () =>
         jsonResponse(cashPayment, 201),
     });

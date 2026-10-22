@@ -91,6 +91,16 @@ export const overview = {
   creditAvailableCentavos: 6_000,
 };
 
+// Her last Plan has ended, so the Assistant may take cash for a new one (UX-003).
+export const expiredOverview = {
+  ...overview,
+  subscription: {
+    status: "expired",
+    subscription: { ...subscription, remainingClassAllowance: 0, endsOn: "2026-09-12" },
+  },
+  nextBooking: null,
+};
+
 export const planQuotes = {
   creditAvailableCentavos: 6_000,
   plans: [

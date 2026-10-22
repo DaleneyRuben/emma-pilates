@@ -152,10 +152,15 @@ export function ClientOverviewScreen({
             testID="client-overview-book"
           />
           <OutlinedButton
+            disabled={hasActiveSubscription}
             label="Registrar pago en efectivo"
             onPress={() => navigation.navigate("SelectPlan", context)}
             testID="client-overview-cash-payment"
           />
+          {hasActiveSubscription ? (
+            // No second Plan while one is active (12's rule, subscription_not_expired).
+            <BodyText style={styles.note}>Podrá comprar otro plan cuando este termine.</BodyText>
+          ) : null}
           {hasActiveSubscription ? (
             <TextButton
               label="Ver reservas"
@@ -218,5 +223,6 @@ const styles = StyleSheet.create({
   historyTitle: { color: colors.text, fontSize: typography.body, fontWeight: "500" },
   label: { color: colors.textMuted, fontSize: typography.label, textTransform: "uppercase" },
   muted: { color: colors.textMuted, fontSize: typography.note },
+  note: { color: colors.textMuted, fontSize: typography.note, textAlign: "center" },
   screen: { gap: spacing.md },
 });

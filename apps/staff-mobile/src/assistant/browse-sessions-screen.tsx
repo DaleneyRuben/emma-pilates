@@ -34,6 +34,7 @@ import { describeCount } from "../administrator/administrator-format";
 import { useStaffFetcher } from "../staff-fetcher";
 import { TabletGrid } from "./assistant-layout";
 import { ClientBanner } from "./client-banner";
+import { useClientBookedSessionIds } from "./client-booked-sessions";
 import type { ClientContext } from "./client-overview-screen";
 
 type BrowseNavigation = {
@@ -83,6 +84,7 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
 
   const branches = useListBranches({ fetcher });
   const classTypes = useListClassTypes({ fetcher });
+  const bookedSessionIds = useClientBookedSessionIds(clientId);
   const branchList = branches.data?.status === 200 ? branches.data.data : [];
   const branch = branchList.find((candidate) => candidate.id === selectedBranchId) ?? branchList[0];
   const { from, until } = civilDateRange(selectedDate);
@@ -231,7 +233,14 @@ export function BrowseSessionsScreen({ route }: { route: { params: ClientContext
                     sessionId: session.id,
                   })
                 }
-                tag={<SeatPill full={session.availableSeats === 0}>{seatsTag(session)}</SeatPill>}
+                tag={
+                  bookedSessionIds.has(session.id) ? (
+                    // Her own Booking takes the neutral pill, like a full class.
+                    <SeatPill full>Ya reservada</SeatPill>
+                  ) : (
+                    <SeatPill full={session.availableSeats === 0}>{seatsTag(session)}</SeatPill>
+                  )
+                }
                 testID={`session-card-${session.id}`}
                 time={formatTimeRange(session.startsAt, session.endsAt)}
                 title={session.classTypeName}

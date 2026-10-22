@@ -33,6 +33,7 @@ import { CenteredCard } from "./assistant-layout";
 import { CapacitySummary } from "./capacity-summary";
 import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { ClientBanner } from "./client-banner";
+import { useClientBookedSessionIds } from "./client-booked-sessions";
 import { useShowClientBookings } from "./show-client-bookings";
 import type { ClientContext } from "./client-overview-screen";
 
@@ -74,6 +75,7 @@ export function AssistantSessionDetailScreen({
     query: { refetchOnMount: "always" },
   });
   const overview = useGetAssistantClientOverview(clientId, { fetcher });
+  const bookedSessionIds = useClientBookedSessionIds(clientId);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [forcedFull, setForcedFull] = useState(false);
@@ -110,6 +112,7 @@ export function AssistantSessionDetailScreen({
     (view.status === "active" || view.status === "expiring_soon") &&
     (view.subscription?.remainingClassAllowance ?? 0) > 0;
   const full = forcedFull || detail.availableSeats === 0;
+  const booked = bookedSessionIds.has(detail.id);
 
   const refresh = () =>
     Promise.all([
@@ -212,7 +215,9 @@ export function AssistantSessionDetailScreen({
               {message}
             </BodyText>
           ) : null}
-          {full ? (
+          {booked ? (
+            <BodyText style={styles.note}>La clienta ya tiene esta clase reservada.</BodyText>
+          ) : full ? (
             waitlisted ? (
               <BodyText style={styles.note}>El cliente ya está en la lista de espera.</BodyText>
             ) : (
