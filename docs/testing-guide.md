@@ -29,6 +29,7 @@ you are starting with no project knowledge.
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
+| Impersonation (API)          | As the Administrator, see and act in the Staff app's API as a Trainer, Assistant, or Nutritionist for 30 minutes, read the two audit records, and see the refused commands (Test 67) | The Staff app's picker and banner come with FUT-001 stage 3 |
 
 ## Before you begin
 
@@ -3167,6 +3168,9 @@ The following are not ready for manual product testing:
 - iOS store builds and TestFlight (gate 9), and the Play closed test and
   production release (REL-003 to REL-007);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed).
+- the Staff app's «Ver la app como…» picker and the impersonation banner
+  (FUT-001 stage 3); until then the API journey in Test 67 is the way to
+  try it.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -5070,3 +5074,48 @@ must stay silent.
 
 The in-page «Cargando …» notices a page shows while its own data loads
 (the white card, Tests 25 to 30) are unchanged.
+
+## Test 67: see the Staff app as a Staff Member through the API (FUT-001)
+
+An Administrator signed in to the Staff app may see and act in it as one
+active Trainer, Assistant, or Nutritionist for 30 minutes
+([ADR-0100](./adr/0100-impersonate-a-staff-member-from-the-staff-app.md)).
+The Staff app's «Ver la app como…» row and the banner arrive with stage 3;
+this test drives the API with Swagger or curl against the fixtures (Test 2
+and Test 3 show how to start the API and log in).
+
+1. Log in as `paola.mendoza@example.com` and read the active Staff Members
+   with `GET /api/v1/administrator/staff-members?status=active&pageSize=100`.
+   Keep Emma Vargas's `id`.
+2. `POST /api/v1/impersonations` with `{ "staffMemberId": "<Emma's id>" }`
+   answers `201` with the Impersonation (`staffMemberName`, `role`, and
+   `expiresAt` 30 minutes ahead) and `Cache-Control: no-store`. Paola's own
+   id answers `409 staff_member_not_impersonable` (so does a pending or
+   deactivated member), an unknown id `404 staff_member_not_found`, and a
+   Trainer calling it `403 staff_access_denied`. The admin web's cookie
+   session answers `403 impersonation_surface`.
+3. With the **same** bearer credential, `GET /api/v1/authentication-sessions/current`
+   now returns Emma's identity (`role: trainer`, her Branches) plus an
+   `impersonation` object with her name and the expiry. Every other request
+   behaves as Emma: `GET /api/v1/trainer/sessions?…` lists her Sessions, the
+   notification inbox and unread count are hers, and an Administrator route
+   such as `GET /api/v1/administrator/staff-members` answers `403`. A second
+   `POST /api/v1/impersonations` answers `403 staff_access_denied` too: while
+   it lasts, the session is not an Administrator's.
+4. The commands kept from an impersonating session answer
+   `403 impersonation_forbidden`: `PATCH /api/v1/accounts/current/password`,
+   the three `/api/v1/accounts/current/email-change` commands,
+   `PUT /api/v1/notifications/devices/current` and its `deactivate`, and
+   `POST /api/v1/notifications/read-all` or `…/{id}/read`. Reading the inbox
+   stays allowed.
+5. `DELETE /api/v1/impersonations/current` answers `204`; a second call
+   `404 impersonation_not_active`, and `…/current` is Paola again. Logging
+   out while impersonating ends it too, and so do the 30 minutes (the next
+   request after `expiresAt` resolves Paola and ends the row as `expired`).
+6. In the database, `system.impersonation_sessions` holds the row with
+   `end_reason` (`exited`, `expired`, `logged_out`, or `revoked`), and
+   `system.audit_records` holds `impersonation.started` and
+   `impersonation.ended` with Paola as actor (the system for an expiry or a
+   revocation). A cash Payment, an Evaluation cancellation, or a Client
+   invitation made meanwhile is audited to Paola with `actor_role =
+   administrator` and `impersonation_id` set.
