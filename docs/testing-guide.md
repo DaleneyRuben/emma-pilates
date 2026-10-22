@@ -5004,7 +5004,9 @@ Then, on each device and for each app:
    On Android 12+ the logo is smaller than on iOS and sits in the system's
    circle; no white screen appears before it.
 2. Expected: the logo fades out as the Login screen (or the saved session's
-   first screen) appears under it; no white gap between the two.
+   first screen) appears under it; no white gap between the two. Since
+   MOB-069 a credential restore that fails (a keychain the build cannot
+   read) lands on Login too instead of holding the logo forever.
 3. Open the other app and repeat.
 
 Verified on 2026-10-21 (MOB-068): see the backlog row's Evidence.

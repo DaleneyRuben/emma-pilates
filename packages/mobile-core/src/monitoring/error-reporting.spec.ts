@@ -4,6 +4,7 @@ import { AuthenticationApiError } from "../auth/authentication-api";
 import {
   errorReportingEnvironment,
   reportCaughtRenderError,
+  reportRecoveredError,
   sanitizeMobileErrorEvent,
   startMobileErrorReporting,
 } from "./error-reporting";
@@ -181,6 +182,17 @@ describe("mobile error reporting (EXT-013)", () => {
 
     expect(capture).toHaveBeenCalledWith(error, {
       mechanism: { type: "react_error_boundary", handled: true },
+    });
+  });
+
+  it("reports an error the app recovered from as handled (MOB-069)", () => {
+    const capture = jest.fn();
+    const error = new Error("keychain -34018");
+
+    reportRecoveredError(error, capture);
+
+    expect(capture).toHaveBeenCalledWith(error, {
+      mechanism: { type: "generic", handled: true },
     });
   });
 

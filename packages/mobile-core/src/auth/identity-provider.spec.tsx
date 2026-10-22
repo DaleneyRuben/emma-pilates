@@ -1,7 +1,27 @@
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { Button, Text } from "react-native";
 
+import { reportRecoveredError } from "../monitoring/error-reporting";
 import { MobileIdentityProvider, useMobileIdentity } from "./identity-provider";
+
+jest.mock("../monitoring/error-reporting", () => ({ reportRecoveredError: jest.fn() }));
+
+// MOB-069: a keychain that cannot be read (an unsigned Simulator build
+// answered -34018) must not hold the identity, and the launch screen, forever.
+const failingManager = (failure: "hasBiometricSession" | "restore", error: Error) => ({
+  endLocally: jest.fn(),
+  hasBiometricSession:
+    failure === "hasBiometricSession"
+      ? jest.fn().mockRejectedValue(error)
+      : jest.fn().mockResolvedValue(false),
+  logout: jest.fn(),
+  restore:
+    failure === "restore"
+      ? jest.fn().mockRejectedValue(error)
+      : jest.fn().mockResolvedValue({ accountId: "account-1", role: "client" }),
+  start: jest.fn(),
+  unlockWithBiometrics: jest.fn(),
+});
 
 function IdentityProbe() {
   const identity = useMobileIdentity();
@@ -28,6 +48,10 @@ function IdentityActionsProbe() {
 }
 
 describe("MobileIdentityProvider", () => {
+  afterEach(() => {
+    jest.mocked(reportRecoveredError).mockClear();
+  });
+
   it("restores the current mobile Authentication Session at startup", async () => {
     let finishRestoration: (session: { accountId: string; role: "trainer" }) => void = () =>
       undefined;
@@ -171,5 +195,69 @@ describe("MobileIdentityProvider", () => {
     });
 
     await waitFor(() => expect(screen.getByText("signed-in|none")).toBeOnTheScreen());
+  });
+
+  it("signs out and reports once when the credential restore rejects (MOB-069)", async () => {
+    const error = new Error("keychain -34018");
+    const manager = failingManager("restore", error);
+    const screen = await render(
+      <MobileIdentityProvider manager={manager}>
+        <IdentityProbe />
+      </MobileIdentityProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("signed-out")).toBeOnTheScreen();
+    });
+    expect(reportRecoveredError).toHaveBeenCalledTimes(1);
+    expect(reportRecoveredError).toHaveBeenCalledWith(error);
+  });
+
+  it("signs out and reports once when the biometric check rejects (MOB-069)", async () => {
+    const error = new Error("biometrics unavailable");
+    const manager = failingManager("hasBiometricSession", error);
+    const screen = await render(
+      <MobileIdentityProvider manager={manager}>
+        <IdentityProbe />
+      </MobileIdentityProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("signed-out")).toBeOnTheScreen();
+    });
+    expect(reportRecoveredError).toHaveBeenCalledTimes(1);
+    expect(reportRecoveredError).toHaveBeenCalledWith(error);
+  });
+
+  it("leaves the identity alone when the restore rejects after unmounting (MOB-069)", async () => {
+    let failRestoration: (error: Error) => void = () => undefined;
+    const manager = {
+      endLocally: jest.fn(),
+      hasBiometricSession: jest.fn().mockResolvedValue(false),
+      logout: jest.fn(),
+      restore: jest.fn().mockReturnValue(
+        new Promise((_resolve, reject) => {
+          failRestoration = reject;
+        }),
+      ),
+      start: jest.fn(),
+      unlockWithBiometrics: jest.fn(),
+    };
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => undefined);
+    const screen = await render(
+      <MobileIdentityProvider manager={manager}>
+        <IdentityProbe />
+      </MobileIdentityProvider>,
+    );
+
+    expect(screen.getByText("restoring")).toBeOnTheScreen();
+    await screen.unmount();
+    await act(async () => {
+      failRestoration(new Error("keychain -34018"));
+    });
+
+    expect(consoleError).not.toHaveBeenCalled();
+    expect(reportRecoveredError).toHaveBeenCalledTimes(1);
+    consoleError.mockRestore();
   });
 });
