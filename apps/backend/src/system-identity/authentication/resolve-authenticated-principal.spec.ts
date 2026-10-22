@@ -222,3 +222,137 @@ describe('resolveAuthenticatedPrincipal', () => {
     });
   });
 });
+
+describe('resolveAuthenticatedPrincipal while impersonating (FUT-001)', () => {
+  const now = new Date('2026-10-22T15:00:00.000Z');
+  const administratorSession = {
+    id: 'authentication-session-id',
+    accountId: 'administrator-account-id',
+    surface: 'mobile' as const,
+    createdAt: new Date('2026-10-22T14:00:00.000Z'),
+    idleExpiresAt: new Date('2026-11-21T14:00:00.000Z'),
+    absoluteExpiresAt: new Date('2027-01-20T14:00:00.000Z'),
+    revokedAt: null,
+    accountDisabledAt: null,
+    clientId: null,
+    staffMember: {
+      id: 'administrator-staff-member-id',
+      role: 'ADMINISTRATOR' as const,
+      branchIds: [],
+    },
+  };
+  const trainer = {
+    id: 'trainer-staff-member-id',
+    accountId: 'trainer-account-id',
+    role: 'TRAINER' as const,
+    branchIds: ['branch-one'],
+    accountDisabledAt: null,
+    deletedAt: null,
+  };
+  const activeImpersonation = {
+    id: 'impersonation-id',
+    expiresAt: new Date('2026-10-22T15:20:00.000Z'),
+    staffMember: trainer,
+  };
+  const dependencies = (
+    session: Record<string, unknown>,
+    endImpersonation = jest.fn().mockResolvedValue(undefined),
+  ) => ({
+    digestCredential: () => Buffer.from('credential-digest'),
+    findSessionByCredentialDigest: jest.fn().mockResolvedValue(session),
+    recordMeaningfulActivity: jest.fn().mockResolvedValue(undefined),
+    endImpersonation,
+    now: () => now,
+  });
+
+  it('resolves the acting Staff Member with the Administrator beside it', async () => {
+    const deps = dependencies({
+      ...administratorSession,
+      impersonation: activeImpersonation,
+    });
+
+    await expect(
+      resolveAuthenticatedPrincipal('opaque-credential', true, deps),
+    ).resolves.toEqual({
+      accountId: 'trainer-account-id',
+      authenticationSessionId: 'authentication-session-id',
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'trainer-staff-member-id',
+        role: 'trainer',
+        branchIds: ['branch-one'],
+      },
+      impersonation: {
+        id: 'impersonation-id',
+        administratorAccountId: 'administrator-account-id',
+      },
+    });
+    expect(deps.endImpersonation).not.toHaveBeenCalled();
+    expect(deps.recordMeaningfulActivity).toHaveBeenCalledWith(
+      expect.objectContaining({
+        authenticationSessionId: 'authentication-session-id',
+      }),
+    );
+  });
+
+  it('ends an expired Impersonation and resolves the Administrator again', async () => {
+    const expiresAt = new Date('2026-10-22T15:00:00.000Z');
+    const deps = dependencies({
+      ...administratorSession,
+      impersonation: { ...activeImpersonation, expiresAt },
+    });
+
+    await expect(
+      resolveAuthenticatedPrincipal('opaque-credential', false, deps),
+    ).resolves.toEqual({
+      accountId: 'administrator-account-id',
+      authenticationSessionId: 'authentication-session-id',
+      identity: {
+        kind: 'staff',
+        staffMemberId: 'administrator-staff-member-id',
+        role: 'administrator',
+        branchIds: [],
+      },
+    });
+    expect(deps.endImpersonation).toHaveBeenCalledWith({
+      impersonationId: 'impersonation-id',
+      endedAt: expiresAt,
+      reason: 'expired',
+    });
+  });
+
+  it.each([
+    [
+      'deactivated',
+      { ...trainer, accountDisabledAt: new Date('2026-10-22T14:30:00.000Z') },
+    ],
+    [
+      'removed',
+      { ...trainer, deletedAt: new Date('2026-10-22T14:30:00.000Z') },
+    ],
+    [
+      'promoted to Administrator',
+      { ...trainer, role: 'ADMINISTRATOR' as const },
+    ],
+  ])(
+    'revokes the Impersonation when the Staff Member was %s',
+    async (_label, staffMember) => {
+      const deps = dependencies({
+        ...administratorSession,
+        impersonation: { ...activeImpersonation, staffMember },
+      });
+
+      await expect(
+        resolveAuthenticatedPrincipal('opaque-credential', false, deps),
+      ).resolves.toMatchObject({
+        accountId: 'administrator-account-id',
+        identity: { role: 'administrator' },
+      });
+      expect(deps.endImpersonation).toHaveBeenCalledWith({
+        impersonationId: 'impersonation-id',
+        endedAt: now,
+        reason: 'revoked',
+      });
+    },
+  );
+});
