@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { SidePanel } from "./side-panel";
 
 describe("SidePanel", () => {
@@ -18,5 +18,31 @@ describe("SidePanel", () => {
       "bg-superficie",
       "hover:border-primario",
     );
+  });
+
+  // WEB-036: a viewer opened over the panel (AW29's enlarged receipt) is a
+  // dialog of its own, portaled outside the panel. Radix hands Escape to the
+  // highest layer, but a layer becomes the highest only in an effect after
+  // it is painted and focused, so an Escape pressed inside the viewer in
+  // that window reaches the panel instead and closes both.
+  it("ignores an Escape pressed inside another dialog layered over it", () => {
+    const onOpenChange = jest.fn();
+    render(
+      <SidePanel open onOpenChange={onOpenChange} title="Revisar pago">
+        <p>Formulario</p>
+      </SidePanel>,
+    );
+    const viewer = document.body.appendChild(document.createElement("div"));
+    viewer.setAttribute("role", "dialog");
+    const close = viewer.appendChild(document.createElement("button"));
+
+    fireEvent.keyDown(close, { key: "Escape" });
+    expect(onOpenChange).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(screen.getByRole("button", { name: "Cerrar" }), {
+      key: "Escape",
+    });
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+    viewer.remove();
   });
 });

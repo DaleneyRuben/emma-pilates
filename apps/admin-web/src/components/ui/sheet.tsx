@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
 import { Dialog as SheetPrimitive } from "radix-ui";
-import type { ComponentProps } from "react";
+import { useRef, type ComponentProps } from "react";
 import { cn } from "../../lib/cn";
 
 // Side panels (408px) and their narrow-browser sheets, plus the sidebar
@@ -46,12 +46,29 @@ export function SheetContent({
   hideClose = false,
   ...props
 }: SheetContentProps) {
+  const content = useRef<HTMLDivElement>(null);
+
   return (
     <SheetPrimitive.Portal>
       <SheetPrimitive.Overlay className="fixed inset-0 z-50 bg-scrim" />
       <SheetPrimitive.Content
+        ref={content}
         data-slot="sheet-content"
         className={cn(sheetVariants({ side }), className)}
+        // WEB-036: a dialog opened over the sheet (the enlarged receipt) is
+        // portaled outside it and becomes Radix's highest layer only in an
+        // effect after it is painted and focused; an Escape pressed inside it
+        // in that window would otherwise close the sheet, and the dialog
+        // with it. Escape then belongs to the dialog it was pressed in.
+        onEscapeKeyDown={(event) => {
+          const dialog =
+            event.target instanceof Element
+              ? event.target.closest('[role="dialog"]')
+              : null;
+          if (dialog !== null && dialog !== content.current) {
+            event.preventDefault();
+          }
+        }}
         {...props}
       >
         {children}
