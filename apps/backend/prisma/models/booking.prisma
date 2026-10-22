@@ -51,6 +51,7 @@ model StaffMember {
   availabilityBlocks  AvailabilityBlock[]
   evaluationSlots     EvaluationSlot[]
   salaryPayments      SalaryPayment[]
+  impersonations      ImpersonationSession[]
 
   @@map("staff_members")
   @@schema("booking")

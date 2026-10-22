@@ -27,6 +27,15 @@ enum AuthenticationSessionRevocationReason {
   @@schema("system")
 }
 
+enum ImpersonationEndReason {
+  EXITED     @map("exited")
+  EXPIRED    @map("expired")
+  LOGGED_OUT @map("logged_out")
+  REVOKED    @map("revoked")
+
+  @@schema("system")
+}
+
 enum AuthenticationThrottlePurpose {
   LOGIN             @map("login")
   VERIFICATION      @map("verification")
@@ -173,6 +182,7 @@ model Account {
   staffEmailRequests        AuthenticationThrottleEvent[]
   emailSuppressionsResolved EmailSuppression[]      @relation("EmailSuppressionResolver")
   auditRecords              AuditRecord[]           @relation("AuditActor")
+  impersonationsAsAdministrator ImpersonationSession[] @relation("ImpersonationAdministrator")
   cancelledSessions         Session[]
   createdBookings           Booking[]               @relation("BookingCreatedBy")
   cancelledBookings         Booking[]               @relation("BookingCancelledBy")
@@ -254,11 +264,36 @@ model AuthenticationSession {
   deletedAt                DateTime?                              @map("deleted_at") @db.Timestamptz(3)
   account                  Account                                @relation(fields: [accountId], references: [id], onDelete: Restrict)
   accountDevice            AccountDevice?                         @relation(fields: [accountDeviceId], references: [id], onDelete: Restrict)
+  impersonations           ImpersonationSession[]
 
   @@index([accountId, revokedAt])
   @@index([idleExpiresAt])
   @@index([absoluteExpiresAt])
   @@map("authentication_sessions")
+  @@schema("system")
+}
+
+// FUT-001 / ADR-0100: an Administrator's 30-minute view of the Staff app as one
+// Trainer, Assistant, or Nutritionist, tied to their own mobile Authentication
+// Session. One active row per session (partial unique index in the migration).
+model ImpersonationSession {
+  id                      String                  @id @default(uuid()) @db.Uuid
+  authenticationSessionId String                  @map("authentication_session_id") @db.Uuid
+  administratorAccountId  String                  @map("administrator_account_id") @db.Uuid
+  staffMemberId           String                  @map("staff_member_id") @db.Uuid
+  startedAt               DateTime                @map("started_at") @db.Timestamptz(3)
+  expiresAt               DateTime                @map("expires_at") @db.Timestamptz(3)
+  endedAt                 DateTime?               @map("ended_at") @db.Timestamptz(3)
+  endReason               ImpersonationEndReason? @map("end_reason")
+  deletedAt               DateTime?               @map("deleted_at") @db.Timestamptz(3)
+  authenticationSession   AuthenticationSession   @relation(fields: [authenticationSessionId], references: [id], onDelete: Restrict)
+  administratorAccount    Account                 @relation("ImpersonationAdministrator", fields: [administratorAccountId], references: [id], onDelete: Restrict)
+  staffMember             StaffMember             @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
+  auditRecords            AuditRecord[]
+
+  @@index([administratorAccountId, startedAt])
+  @@index([staffMemberId, startedAt])
+  @@map("impersonation_sessions")
   @@schema("system")
 }
 
@@ -317,15 +352,18 @@ model AuditRecord {
   targetId       String?        @map("target_id") @db.Uuid
   branchId       String?        @map("branch_id") @db.Uuid
   correlationId  String         @map("correlation_id") @db.Uuid
+  impersonationId String?       @map("impersonation_id") @db.Uuid
   metadata       Json?
   occurredAt     DateTime       @default(now()) @map("occurred_at") @db.Timestamptz(3)
   actorAccount   Account?       @relation("AuditActor", fields: [actorAccountId], references: [id], onDelete: Restrict)
   branch         Branch?        @relation(fields: [branchId], references: [id], onDelete: Restrict)
+  impersonation  ImpersonationSession? @relation(fields: [impersonationId], references: [id], onDelete: Restrict)
 
   @@index([actorAccountId, occurredAt])
   @@index([targetType, targetId, occurredAt])
   @@index([branchId, occurredAt])
   @@index([correlationId])
+  @@index([impersonationId])
   @@map("audit_records")
   @@schema("system")
 }
