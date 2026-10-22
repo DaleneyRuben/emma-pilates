@@ -262,7 +262,7 @@
             <div style="display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;box-shadow:0 2px 8px rgba(74,74,74,0.05);">
               <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
                 <div style="display:flex;flex-direction:column;gap:4px;"><span style="font-size:12px;font-weight:500;letter-spacing:0.1em;color:#766D69;font-variant-numeric:tabular-nums;">09:30 – 10:30</span><span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Mat Pilates</span></div>
-                <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:500;background:#EFE0DC;color:#7A4F4B;white-space:nowrap;">4 cupos</span>
+                <span style="display:inline-flex;align-items:center;padding:7px 13px;border-radius:999px;font-size:12px;font-weight:500;background:rgba(216,201,187,0.34);color:#6E6663;white-space:nowrap;">Ya reservada</span>
               </div>
               <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:12px;border-top:1px solid #EFE7DE;">
                 <span style="display:inline-flex;align-items:center;gap:8px;font-size:14px;color:#6E6663;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round"><circle cx="12" cy="8" r="4"></circle><path d="M4.5 20c1.4-3.4 4.2-5 7.5-5s6.1 1.6 7.5 5"></path></svg>Camila Áñez</span>
@@ -299,6 +299,7 @@
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Banda de contexto</span>"Reservando para" acompaña a la asistente en toda la ruta de reserva, hasta la confirmación.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Paridad con cliente</span>Sucursal, fechas, chips y tarjetas son idénticos a la app de cliente; solo cambia el contexto.</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cupos</span>Palo de rosa tinte mientras queden cupos; neutro cuando está completa, nunca en rojo ni en verde: no es un error, solo capacidad completa, como en 03.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Ya reservada</span>La clase que la clienta ya tiene reservada lleva la píldora neutra «Ya reservada» en lugar del conteo y abre S08 sin «Reservar» (UX-003).</div>
     <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Tablet</span>Rejilla de dos columnas; filtros y fechas en una sola fila superior.</div>
   </div>
 
@@ -325,7 +326,7 @@ const SESSIONS = {
   ],
   1: [
     { time: "07:00 – 08:00", type: "Reformer Intermedio", kind: "Reformer", trainer: "Camila Áñez", spots: 0 },
-    { time: "09:30 – 10:30", type: "Mat Pilates", kind: "Mat", trainer: "Camila Áñez", spots: 4 },
+    { time: "09:30 – 10:30", type: "Mat Pilates", kind: "Mat", trainer: "Camila Áñez", spots: 4, booked: true },
     { time: "18:00 – 19:00", type: "Reformer Principiante", kind: "Reformer", trainer: "Daniela Roca", spots: 5 },
     { time: "19:15 – 20:15", type: "Barre", kind: "Barre", trainer: "Camila Áñez", spots: 2 }
   ],
@@ -367,12 +368,13 @@ class Component extends DCLogic {
       }),
       sessions: list.map(s => {
         const full = s.spots === 0;
+        const booked = s.booked === true;
         const low = s.spots > 0 && s.spots <= 2;
         return {
           time: s.time, type: s.type, trainer: s.trainer,
-          tagLabel: full ? "Completa" : (s.spots === 1 ? "1 cupo" : s.spots + " cupos"),
-          tagBg: full ? "rgba(216,201,187,0.34)" : "#EFE0DC",
-          tagColor: full ? "#6E6663" : "#7A4F4B"
+          tagLabel: booked ? "Ya reservada" : (full ? "Completa" : (s.spots === 1 ? "1 cupo" : s.spots + " cupos")),
+          tagBg: (full || booked) ? "rgba(216,201,187,0.34)" : "#EFE0DC",
+          tagColor: (full || booked) ? "#6E6663" : "#7A4F4B"
         };
       })
     };
