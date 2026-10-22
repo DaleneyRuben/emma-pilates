@@ -1,6 +1,5 @@
-import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { cleanup, fireEvent, render, waitFor, within } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
-import { Alert } from "react-native";
 
 import App from "../../App";
 import { createStaffRuntime, jsonResponse, routeFetcher } from "../test-support";
@@ -104,7 +103,6 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
         impersonation: impersonationOf(new Date(Date.now() + 28 * 60_000 + 5_000)),
       })
       .mockResolvedValueOnce({ accountId: "account-1", role: "administrator" });
-    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined);
     const screen = await render(<App runtime={runtime} />);
 
     await waitFor(
@@ -129,19 +127,21 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     ).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Camila Rojas" }));
-    expect(alert).toHaveBeenCalledWith(
-      "¿Ver la app como Camila Rojas?",
-      "Durante 30 minutos verás sus clases y sus sucursales y podrás actuar como ella. Todo lo que hagas quedará registrado a tu nombre.",
-      expect.arrayContaining([
-        expect.objectContaining({ text: "Cancelar" }),
-        expect.objectContaining({ text: "Ver como Camila" }),
-      ]),
-    );
-    const buttons = alert.mock.calls[0]?.[2] ?? [];
+    // UX-002: the design's sheet (S24), not a native alert.
+    const sheet = within(screen.getByTestId("view-as-sheet"));
+    expect(sheet.getByText("¿Ver la app como Camila Rojas?")).toBeOnTheScreen();
+    expect(
+      sheet.getByText(
+        "Durante 30 minutos verás sus clases y sus sucursales y podrás actuar como ella. Todo lo que hagas quedará registrado a tu nombre.",
+      ),
+    ).toBeOnTheScreen();
+    await fireEvent.press(sheet.getByRole("button", { name: "Cancelar" }));
+    expect(screen.queryByTestId("view-as-sheet")).toBeNull();
+    expect(calls).toEqual([]);
+
+    await fireEvent.press(screen.getByRole("button", { name: "Camila Rojas" }));
     profile = trainerProfile;
-    await act(async () => {
-      await buttons.find((button) => button.text === "Ver como Camila")?.onPress?.();
-    });
+    await fireEvent.press(screen.getByTestId("view-as-confirm"));
 
     await waitFor(() => expect(screen.getByText("Viendo como Camila Rojas")).toBeOnTheScreen());
     expect(calls).toEqual([
