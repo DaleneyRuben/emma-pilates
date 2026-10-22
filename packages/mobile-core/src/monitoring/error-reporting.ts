@@ -103,6 +103,14 @@ export function reportCaughtRenderError(
   capture(error, { mechanism: { type: "react_error_boundary", handled: true } });
 }
 
+/** The app fell back to a safe state (MOB-069), so nothing else reports it; a no-op until started. */
+export function reportRecoveredError(
+  error: unknown,
+  capture: typeof captureException = captureException,
+): void {
+  capture(error, { mechanism: { type: "generic", handled: true } });
+}
+
 // Provider initialization stays at the application shell (ADR-0081); without
 // a DSN nothing starts, so local runs and tests send nothing.
 export function startMobileErrorReporting(

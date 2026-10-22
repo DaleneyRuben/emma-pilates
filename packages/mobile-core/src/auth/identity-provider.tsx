@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 
+import { reportRecoveredError } from "../monitoring/error-reporting";
 import type { MobileSession, SessionManager } from "./session-manager";
 
 type MobileIdentityState = {
@@ -40,7 +41,7 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
   useEffect(() => {
     let active = true;
 
-    void Promise.all([manager.restore(), manager.hasBiometricSession()]).then(
+    Promise.all([manager.restore(), manager.hasBiometricSession()]).then(
       ([session, hasBiometricSession]) => {
         if (active) {
           setIdentity({
@@ -52,6 +53,14 @@ export function MobileIdentityProvider({ children, manager }: MobileIdentityProv
                   ? "signed-out"
                   : "signed-in",
           });
+        }
+      },
+      // MOB-069: a keychain the build cannot read (an unsigned Simulator build
+      // answered -34018) lands on Login instead of holding the launch screen.
+      (error: unknown) => {
+        reportRecoveredError(error);
+        if (active) {
+          setIdentity({ session: null, status: "signed-out" });
         }
       },
     );
