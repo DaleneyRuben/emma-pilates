@@ -6,12 +6,14 @@ import {
   AuthenticationSessionSurface,
   AuthenticationThrottleEventKind,
   AuthenticationThrottlePurpose,
+  type StaffRole,
 } from '../../generated/prisma/enums';
 import type { AccountCredentials } from './authenticate-credentials';
 import type { NewAuthenticationSession } from './create-authentication-session';
 import {
   AuthenticationRequiredError,
   type AuthenticationSessionPrincipalRecord,
+  type ImpersonationPrincipalRecord,
 } from './resolve-authenticated-principal';
 
 type ThrottleDigests = {
@@ -19,6 +21,42 @@ type ThrottleDigests = {
   clientDigest: Uint8Array | null;
   networkDigest: Uint8Array;
 };
+
+type ImpersonationRow = {
+  id: string;
+  expiresAt: Date;
+  staffMember: {
+    id: string;
+    role: StaffRole;
+    deletedAt: Date | null;
+    account: { id: string; disabledAt: Date | null } | null;
+    branchAssignments: { branchId: string }[];
+  };
+};
+
+const toImpersonationRecord = (
+  row: ImpersonationRow | undefined,
+): ImpersonationPrincipalRecord | null =>
+  row === undefined
+    ? null
+    : {
+        id: row.id,
+        expiresAt: row.expiresAt,
+        staffMember: {
+          id: row.staffMember.id,
+          // A Staff Member without an Account cannot be acted as.
+          accountId: row.staffMember.account?.id ?? '',
+          role: row.staffMember.role,
+          branchIds: row.staffMember.branchAssignments.map(
+            ({ branchId }) => branchId,
+          ),
+          accountDisabledAt: row.staffMember.account?.disabledAt ?? null,
+          deletedAt:
+            row.staffMember.account === null
+              ? row.expiresAt
+              : row.staffMember.deletedAt,
+        },
+      };
 
 export class PrismaAuthenticationGateway {
   constructor(private readonly prisma: PrismaClient) {}
@@ -186,6 +224,27 @@ export class PrismaAuthenticationGateway {
               },
             },
           },
+          // FUT-001: the one active Impersonation and who it acts as.
+          impersonations: {
+            where: { endedAt: null, deletedAt: null },
+            take: 1,
+            select: {
+              id: true,
+              expiresAt: true,
+              staffMember: {
+                select: {
+                  id: true,
+                  role: true,
+                  deletedAt: true,
+                  account: { select: { id: true, disabledAt: true } },
+                  branchAssignments: {
+                    where: { deletedAt: null },
+                    select: { branchId: true },
+                  },
+                },
+              },
+            },
+          },
         },
       })
       .then((session) =>
@@ -215,6 +274,7 @@ export class PrismaAuthenticationGateway {
                           ({ branchId }) => branchId,
                         ),
                     },
+              impersonation: toImpersonationRecord(session.impersonations[0]),
             },
       );
   }
