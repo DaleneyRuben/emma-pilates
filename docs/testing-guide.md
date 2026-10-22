@@ -4879,7 +4879,9 @@ spec checks), and `vite preview` sends it so the Playwright journeys run under
 the deployed policy.
 
 1. Locally: `pnpm test:admin-e2e`. Expected: «serves the security headers and
-   stays within its policy» passes, so no page logged «Refused to …».
+   stays within its policy» passes, so no page logged «Refused to …», and
+   the overlays it opens (Isabel's «Revisar pago» panel, the enlarged
+   receipt, the confirmation) locked the page behind them (WEB-037).
 2. After a release: `curl -sI https://emma-pilates-admin.vercel.app/` and the
    staging host. Expected: `content-security-policy` ending in
    `frame-ancestors 'none'`, `x-frame-options: DENY`,
@@ -4888,7 +4890,17 @@ the deployed policy.
 3. Open the admin web, sign in, and walk a few pages with the browser's
    console open. Expected: no «Content Security Policy» errors; fonts are Lora
    and Work Sans.
-4. The public site also sends `strict-transport-security` now
+4. **The overlays (WEB-037).** Still with the console open, open «Nuevo gasto»
+   on a Gastos list long enough to scroll, a transfer on Pagos with
+   «Ver en grande», then «Confirmar pago» and «Volver»; in a window
+   narrower than 1024 px, the «Abrir menú» drawer and the Branch bottom
+   sheet. Expected: no «Refused to apply inline style» line (Radix's own
+   scroll lock injected one until WEB-037); while any of them is open the
+   page behind does not scroll with the wheel or the scrollbar, nothing
+   shifts sideways when it opens or closes, and the page scrolls again
+   once the last one is closed (the enlarged receipt or the confirmation
+   closing over the panel keeps the lock).
+5. The public site also sends `strict-transport-security` now
    (`curl -sI https://app.emmapilatesstudio.com/privacidad/`).
 
 ## Test 63: Swagger off in production and the general request limit (BE-025)

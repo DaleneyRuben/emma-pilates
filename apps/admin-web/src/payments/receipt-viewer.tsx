@@ -1,6 +1,7 @@
 import { X, ZoomIn } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useState, type ReactNode } from "react";
+import { BodyScrollLock } from "../components/ui/body-scroll-lock";
 import { Button } from "../components/ui/button";
 import { closeButtonClass } from "../components/ui/sheet";
 import { cn } from "../lib/cn";
@@ -120,6 +121,7 @@ export function ReceiptViewer({
                 : "top-1/2 left-1/2 max-w-[min(900px,90vw)] -translate-x-1/2 -translate-y-1/2",
             )}
           >
+            <BodyScrollLock />
             <Dialog.Title className="sr-only">
               Comprobante ampliado
             </Dialog.Title>
