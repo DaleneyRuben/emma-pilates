@@ -80,6 +80,33 @@ describe('inviteClient', () => {
     );
   });
 
+  it('audits an invitation sent while an Administrator sees the app as the Assistant to the Administrator (FUT-001)', async () => {
+    const transaction = createTransaction();
+
+    await inviteClient(
+      command,
+      {
+        ...assistant,
+        impersonation: {
+          id: 'impersonation-id',
+          administratorAccountId: 'administrator-account',
+          staffMemberName: 'Camila Rojas',
+          expiresAt: new Date('2026-10-22T15:30:00.000Z'),
+        },
+      },
+      dependencies(transaction),
+    );
+
+    expect(transaction.recordAudit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        actionCode: 'client_invitation.created',
+        actorAccountId: 'administrator-account',
+        actorRole: 'administrator',
+        impersonationId: 'impersonation-id',
+      }),
+    );
+  });
+
   it('re-sends the activation link when the email belongs to a pending invitation', async () => {
     const transaction = createTransaction({
       findAccountByEmail: jest.fn().mockResolvedValue({
