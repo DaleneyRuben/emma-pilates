@@ -76,6 +76,27 @@ beyond what the table below names.
 
 Back Office money records follow BKO-001 D17: Salary Payments and Expenses are audited; Supplies, Withdrawals, Restocks, and Expense Categories are not (below).
 
+## Planned by FUT-001 (stage 2 moves these rows into the catalog)
+
+Decided in the [FUT-001 proposal](../implementation/FUT-001-impersonation-proposal.md)
+(I8) and [ADR-0100](../adr/0100-impersonate-a-staff-member-from-the-staff-app.md);
+the backend does not write them yet, so they sit outside the catalog table
+the architecture spec checks until stage 2 lands them with the code.
+
+| Action code | Context | Written when | Actor | Target | Branch | Metadata |
+| --- | --- | --- | --- | --- | --- | --- |
+| `impersonation.started` | System Identity | An Administrator starts seeing the Staff app as a Trainer, Assistant, or Nutritionist from `S24` (FUT-001, ADR-0100) | Administrator | `account` (the Staff Member's) | — | `staffMemberId`, `role`, `expiresAt` |
+| `impersonation.ended` | System Identity | The Impersonation ends: «Salir» (`exited`), the 30 minutes pass (`expired`), the Administrator logs out (`logged_out`), or the Staff Member is deactivated or the session revoked (`revoked`) | Administrator for `exited` and `logged_out`; `system` for `expired` and `revoked` | `account` (the Staff Member's) | — | `reason`, `durationSeconds` |
+
+While an Impersonation is active, **every** audit record written by the
+request carries `impersonation_id`: the actor columns name the Administrator
+(`actor_account_id`, `actor_role = administrator`) and the Impersonation row
+names the acted-as Staff Member. Rows that are not audited (a Booking's
+`created_by`, Attendance's `recorded_by`, a Cash Payment's `recorded_by`)
+keep the Staff Member's Account, as the screen showed it, and are attributed
+to the Administrator through the Impersonation's `started_at`–`ended_at`
+window.
+
 ## Considered and not audited
 
 | Workflow | Why not |

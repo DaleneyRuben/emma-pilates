@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Work+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #F2ECE5; -webkit-font-smoothing: antialiased; }
+  input, button { font: inherit; }
+  input::placeholder { color: #7A716D; }
+  a { color: #8A5D59; text-decoration: none; }
+  a:hover { color: #7A4F4B; }
+</style>
+</helmet>
+<div style="background:#F2ECE5;min-height:100vh;padding:56px 40px 80px;font-family:'Work Sans',system-ui,sans-serif;color:#4A4A4A;">
+<div style="max-width:1840px;margin:0 auto;display:flex;flex-direction:column;gap:40px;">
+
+  <header style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:12px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">App de staff · Pantalla S24 · Rol: administración</div>
+    <h1 style="font-family:Lora,Georgia,serif;font-weight:400;font-size:38px;margin:0;">Ver la app como…</h1>
+    <p style="margin:0;max-width:720px;font-size:15px;line-height:1.6;color:#766D69;">Solo para administración, desde la fila «Ver la app como…» de Perfil (S23). Lista a las entrenadoras, asistentes y nutricionistas activas, agrupadas por rol; al elegir a una persona y confirmar, la app se muestra como la ve ella durante 30 minutos, con la franja de suplantación arriba de todas las pantallas, hasta «Salir», el fin del tiempo o cerrar sesión (FUT-001, ADR-0100). Nunca aparece otra administradora, ni personal pendiente o desactivado.</p>
+  </header>
+
+  <div style="display:flex;flex-wrap:wrap;gap:56px;align-items:flex-start;">
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Lista</div>
+          <div style="font-size:12px;color:#766D69;">Agrupada por rol · sin búsqueda: el estudio tiene pocas personas</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;position:relative;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Ver la app como…</span>
+          </div>
+          <div style="flex:1;padding:28px 20px 40px;display:flex;flex-direction:column;gap:26px;">
+            <div style="font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Verás la app tal como la ve esa persona, con sus clases y sus sucursales, durante 30 minutos. Puedes salir cuando quieras desde la franja de arriba.</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadoras</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">CR</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Camila Rojas</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">EV</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Emma Vargas</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Centro, Equipetrol, Urubó</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Asistentes</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">JZ</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Julia Zapata</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nutricionistas</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">DA</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Daniela Arce</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Centro</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">iOS · Confirmación</div>
+          <div style="font-size:12px;color:#766D69;">Al tocar una fila · la hoja explica los 30 minutos y el registro a tu nombre</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;position:relative;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:60px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Ver la app como…</span>
+          </div>
+          <div style="flex:1;padding:28px 20px 40px;display:flex;flex-direction:column;gap:26px;">
+            <div style="font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Verás la app tal como la ve esa persona, con sus clases y sus sucursales, durante 30 minutos. Puedes salir cuando quieras desde la franja de arriba.</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadoras</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">CR</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Camila Rojas</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">EV</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Emma Vargas</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Centro, Equipetrol, Urubó</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Asistentes</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">JZ</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Julia Zapata</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nutricionistas</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">DA</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Daniela Arce</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Centro</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+          </div>
+          <div style="position:absolute;inset:0;background:rgba(74,58,48,0.28);display:flex;align-items:flex-end;">
+            <div style="width:100%;background:#FFFFFF;border-radius:24px 24px 0 0;padding:14px 22px 40px;box-shadow:0 -12px 28px rgba(74,58,48,0.14);display:flex;flex-direction:column;gap:16px;">
+              <div style="width:40px;height:4px;border-radius:999px;background:#D8C9BB;align-self:center;"></div>
+              <div style="display:flex;flex-direction:column;gap:7px;">
+                <span style="font-family:Lora,Georgia,serif;font-size:20px;font-weight:500;">¿Ver la app como Camila Rojas?</span>
+                <p style="margin:0;font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Durante 30 minutos verás sus clases y sus sucursales y podrás actuar como ella. Todo lo que hagas quedará registrado a tu nombre.</p>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:8px;">
+                <button style="height:48px;width:100%;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:15px;font-weight:500;cursor:pointer;box-shadow:0 2px 6px rgba(183,131,128,0.22);" style-hover="background:#A87370;">Ver como Camila</button>
+                <button style="height:44px;align-self:center;border:none;background:transparent;color:#8A5D59;font-size:15px;cursor:pointer;">Cancelar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Android · Lista</div>
+          <div style="font-size:12px;color:#766D69;">Mismo contenido · altura de cabecera Android</div>
+        </div>
+      </sc-if>
+      <x-import component-from-global-scope="AndroidDevice" from="./android-frame.jsx" hint-size="412px,892px">
+        <div style="min-height:100%;background:#FAF7F2;display:flex;flex-direction:column;position:relative;">
+          <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:44px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Ver la app como…</span>
+          </div>
+          <div style="flex:1;padding:28px 20px 40px;display:flex;flex-direction:column;gap:26px;">
+            <div style="font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Verás la app tal como la ve esa persona, con sus clases y sus sucursales, durante 30 minutos. Puedes salir cuando quieras desde la franja de arriba.</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadoras</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">CR</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Camila Rojas</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">EV</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Emma Vargas</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Centro, Equipetrol, Urubó</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Asistentes</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">JZ</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Julia Zapata</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nutricionistas</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">DA</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Daniela Arce</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Centro</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </x-import>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:3px;">
+          <div style="font-size:13px;font-weight:500;">Tablet · Lista</div>
+          <div style="font-size:12px;color:#766D69;">iPad Pro 11 · la lista centrada en una columna de 560 px</div>
+        </div>
+      </sc-if>
+    <div style="width:1104px;flex:none;padding:16px;border-radius:32px;background:#2E2A28;box-shadow:0 18px 40px rgba(74,74,74,0.18);">
+      <div style="height:768px;border-radius:18px;overflow:hidden;background:#FAF7F2;display:flex;flex-direction:column;">
+        <div style="position:sticky;top:0;z-index:5;background:rgba(250,247,242,0.94);backdrop-filter:blur(8px);border-bottom:1px solid #EFE7DE;padding:24px 16px 12px;display:flex;align-items:center;gap:6px;">
+            <button style="width:44px;height:44px;border:none;border-radius:999px;background:transparent;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;" style-hover="background:rgba(216,201,187,0.3);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4A4A4A" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="14.5,5 7.5,12 14.5,19"></polyline></svg>
+            </button>
+            <span style="font-family:Lora,Georgia,serif;font-size:19px;font-weight:500;">Ver la app como…</span>
+          </div>
+        <div style="flex:1;overflow:hidden;display:flex;justify-content:center;padding:32px 24px 40px;">
+          <div style="width:560px;display:flex;flex-direction:column;gap:26px;">
+            <div style="font-size:13px;line-height:1.55;color:#7A716D;text-wrap:pretty;">Verás la app tal como la ve esa persona, con sus clases y sus sucursales, durante 30 minutos. Puedes salir cuando quieras desde la franja de arriba.</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Entrenadoras</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;border-bottom:1px solid #EFE7DE;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">CR</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Camila Rojas</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">EV</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Emma Vargas</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Centro, Equipetrol, Urubó</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Asistentes</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">JZ</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Julia Zapata</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Equipetrol</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <span style="font-size:11px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Nutricionistas</span>
+              <div style="border:1px solid #D8C9BB;border-radius:16px;background:#FFFFFF;overflow:hidden;">
+              <button style="display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:0 18px;border:none;background:transparent;cursor:pointer;text-align:left;" style-hover="background:rgba(216,201,187,0.16);">
+                <span style="flex:none;width:40px;height:40px;border-radius:999px;background:#EFE0DC;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-family:Lora,Georgia,serif;font-size:15px;font-weight:500;">DA</span>
+                <span style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+                  <span style="font-size:16px;color:#4A4A4A;">Daniela Arce</span>
+                  <span style="font-size:13px;color:#766D69;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Centro</span>
+                </span>
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" style="flex:none;"><polyline points="9.5,5 16.5,12 9.5,19"></polyline></svg>
+              </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+  </div>
+
+  <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;background:#FFFFFF;border:1px solid #D8C9BB;border-radius:16px;padding:24px;font-size:14px;line-height:1.6;color:#6E6663;">
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Quién aparece</span>Solo entrenadoras, asistentes y nutricionistas activas, por rol y en ese orden. Nunca otra administradora ni personal pendiente o desactivado.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Al confirmar</span>La app se redibuja como la raíz de ese rol (S02, S04 o S15) bajo la franja de suplantación; esta pantalla no vuelve a mostrarse hasta salir.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Estado vacío</span>«Nadie a quien ver todavía» con «Cuando actives a una entrenadora, asistente o nutricionista, aparecerá aquí.», el estado vacío desnudo de las tarjetas.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Carga y fallo</span>El estado de carga de la sección 08 mientras llega la lista; «No pudimos cargar al personal.» con «Reintentar» si falla.</div>
+  </div>
+  </sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;showCaptions&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Documentación&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      showCaptions: this.props.showCaptions ?? true
+    };
+  }
+}
+</script>
+</body>
+</html>
