@@ -477,7 +477,9 @@ safe: it updates the same rows instead of duplicating them. Re-running it also
 resets every fixture Session to its scheduled start and end time while keeping
 cancellations, so run it again if class times ever look shifted by four hours.
 It creates three Branches (Centro, Equipetrol, Urubó), three Class Types, the
-four designed Plans, weekly Session Schedules with the next 30 days of
+four designed Plans (Paquete de 8 clases, Bs 560; Paquete de 12 clases,
+Bs 780; Mensual 16 clases, Bs 1 050; Trimestral 36 clases, Bs 2 100 for three
+months), weekly Session Schedules with the next 30 days of
 Sessions, Gabriela's weekly Availability Blocks with their next 30 days of
 Evaluation slots, and these active Accounts. Every fixture Account uses the password `emma-local-2026`.
 
@@ -536,6 +538,10 @@ the name and phone and saves through the API (changing the email is Test 34).
 
 The **Reservar** tab lists the fixture Sessions for the selected Branch, day,
 and Class Type (past Sessions of today are hidden; full ones show **Lleno**).
+A day without Sessions centres "No hay clases este día."; a Class Type chip
+that matches none of the day's Sessions reads "No hay clases con este
+filtro" instead (any Branch on a Sunday, which no fixture schedule covers;
+Prenatal at Centro).
 Each Session is a white card: the time in small spaced capitals over the Class
 Type in Lora, the seat pill on the right («N cupos» in Palo de rosa oscuro on
 Palo de rosa tinte; a full class reads **Lleno** in grey on a neutral sand
@@ -1537,9 +1543,13 @@ que necesite tu atención."
 The apps are online-first. When the device loses connectivity, a banner reads
 "Sin conexión. Mostrando la última información guardada." and only the class
 schedule, upcoming Bookings, and the Subscription summary stay visible from the
-Account-scoped cache; everything else needs the connection back. The iOS
-Simulator shares the Mac's network, so this is easiest to see on a device with
-airplane mode.
+Account-scoped cache; everything else needs the connection back. The banner
+follows the device's connectivity (NetInfo feeds TanStack Query's
+`onlineManager`), so on the Android emulator `adb shell svc wifi disable`
+and `adb shell svc data disable` show it (and `enable` hides it); the iOS
+Simulator shares the Mac's network, so there it is easiest on a device with
+airplane mode. Test 71 walks the other states (load errors, action errors,
+link screens).
 
 ### Time zones
 
@@ -1842,10 +1852,15 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    list is empty.
 2. Tap a Session to open its roster ("Centro · 07:00 – 07:50" under the
    title): every booked Client with **Asistió** and
-   **No asistió** choices, or "No hay reservas para esta sesión."
+   **No asistió** choices, or "No hay reservas para esta sesión." A Session
+   that has not ended yet shows "Podrás marcar asistencia cuando termine la
+   clase." instead of the choices (the API answers `403` before the end,
+   Test 61).
 3. Mark every Client and tap **Guardar asistencia** (enabled only once every
-   Client has an outcome). "Asistió" classes then appear in the Client's
-   **Ver historial**.
+   Client has an outcome): "Asistencia guardada." appears under the button
+   ("No pudimos guardar la asistencia." if the API refused). "Asistió"
+   classes then appear in the Client's **Ver historial** as «Ha asistido a»
+   with the month group of Test 5 B.
 4. Open the roster again: the saved outcomes are restored, and a changed
    outcome can be saved as a correction.
 
@@ -2052,7 +2067,8 @@ In the Client app as `lucia@example.com`:
 2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with dates such as
    "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
    termine."; while expiring, an amber banner; once expired, "Último plan",
-   "Venció el …", and **Comprar un plan**.
+   "Venció el …", and **Comprar un plan**. As `isabel@example.com` (no
+   classes left) the classes line reads "Sin clases disponibles".
 3. In **Perfil → Notificaciones**, tapping an Evaluation notice opens Mis
    evaluaciones, a class-cancelled notice opens Mis reservas, a payment notice
    opens the payment status, and a Plan notice opens Mi plan.
@@ -5139,7 +5155,13 @@ Start the API and the Staff app as Test 1 and Test 2 describe and log in as
 2. The row opens «Ver la app como…»: the intro line, then the active Staff
    Members grouped as **Entrenadoras**, **Asistentes**, and
    **Nutricionistas**, each with their initials, name, and Branches. Paola
-   herself and pending or deactivated members never appear.
+   herself and pending or deactivated members never appear. With nobody
+   active (deactivate every other member in Personal on a copy of the
+   fixtures, Test 26) the screen centres «Nadie a quien ver todavía» over
+   «Cuando actives a una entrenadora, asistente o nutricionista, aparecerá
+   aquí.»; with the API down it shows «No pudimos cargar al personal.» with
+   **Reintentar** (Test 71), and a start the API refuses reads «No pudimos
+   empezar a ver la app como esa persona. Inténtalo de nuevo.».
 3. Tap Emma Vargas. The confirmation names her («¿Ver la app como Emma
    Vargas?») and states the 30 minutes and that everything is recorded in
    your name; «Cancelar» leaves everything as it is, «Ver como Emma» starts.
