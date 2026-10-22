@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
@@ -2333,7 +2333,9 @@ pnpm dev:admin
 
 Open [http://localhost:5173](http://localhost:5173) in any browser (the tab is
 titled after the page, "Horario · Emma", and loads Lora and Work Sans from
-Google Fonts; before you sign in it reads "Iniciar sesión · Emma").
+Google Fonts; before you sign in it reads "Iniciar sesión · Emma"). While
+it loads, the page shows only the Emma logo on the cream background
+(Test 66).
 Every page now needs a signed-in Administrator, so start the backend
 (Test 2) and log in first as Test 24 describes; `/api/v1` is proxied to
 `http://127.0.0.1:3100` like the Vercel origin will do.
@@ -5010,3 +5012,49 @@ Then, on each device and for each app:
 3. Open the other app and repeat.
 
 Verified on 2026-10-21 (MOB-068): see the backlog row's Evidence.
+
+## Test 66: the loading states of the admin web (WEB-035)
+
+The admin web no longer shows a blank page while it loads, nor an unchanged
+page while a slow sidebar page arrives: both moments show only the Emma
+logo, breathing calmly as the mobile apps' loading state does (design
+follow-up 107). On a fast computer against a local backend neither lasts
+long enough to see, so slow the browser down: in Chrome's developer tools,
+open the **Network** panel and choose **Slow 4G** (or a custom profile) in
+the throttling menu, and tick **Disable cache**. Use the development server
+(`pnpm dev:admin`, Test 23) or the built app (`preview`, Test 23); the
+built app also runs under the Content-Security-Policy (Test 62), which
+must stay silent.
+
+1. **First load.** Signed in or not, open
+   [http://localhost:5173/catalogo/planes](http://localhost:5173/catalogo/planes)
+   with the throttle on. Expected: from the first paint the whole window
+   is the cream background with only the Emma logo centred in it, 300 px
+   wide (240 px in a window narrower than 1024 px), fading in and then
+   breathing (opacity between 0.55 and 1, about one breath every three
+   seconds); no wordmark, no text, no spinner. It stays, without a blink,
+   until Planes (or Login) is drawn, and that page replaces it at once.
+   The browser's console shows no «Refused to» line.
+2. **Page switch.** Signed in, with the throttle still on and the cache
+   disabled, click a sidebar entry you have not opened since the page
+   loaded, such as **Gastos**, and do not hover it first (the sidebar
+   preloads a page you point at). Expected: for the first 400 ms nothing
+   changes; then the content area shows only the logo on the cream surface,
+   centred between the top bar and the bottom of the window, while the
+   sidebar, the top bar, and the Branch selector stay usable (you may click
+   another entry). The logo stays at least half a second, then Gastos
+   replaces it at once. Without the throttle, or on an entry you hovered
+   first, the page appears with no logo in between.
+3. **Narrow window.** At 420 px (Test 23's narrow drawer) repeat steps 1
+   and 2 through **Abrir menú**. Expected: the same two states with the
+   logo 240 px wide, nothing scrolling sideways.
+4. **Reduce Motion.** With the system's reduce-motion setting on (macOS:
+   System Settings → Accessibility → Display → Reduce motion), repeat step
+   1. Expected: the logo appears still, at full opacity, with no fade and no
+   breath.
+5. **Screen reader.** VoiceOver reads the first load as «Cargando la
+   administración» and the page switch as «Cargando la página»; the image
+   itself is not read.
+
+The in-page «Cargando …» notices a page shows while its own data loads
+(the white card, Tests 25 to 30) are unchanged.

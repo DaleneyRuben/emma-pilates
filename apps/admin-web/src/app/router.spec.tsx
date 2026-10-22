@@ -3,7 +3,9 @@ import { server, useMockServer } from "../test/msw";
 import { emptyPageHandlers } from "../test/page-handlers";
 import { renderAdmin } from "../test/render-admin";
 import { signedInHandlers } from "../test/session-handlers";
+import { createAdminApp } from "./create-admin-app";
 import { navigationGroups, navigationItems } from "./navigation";
+import { pagePendingOptions } from "./page-pending";
 
 const renderAt = (path: string) => renderAdmin(path).router;
 
@@ -74,6 +76,18 @@ describe("admin navigation", () => {
       "Referidos",
       "Créditos",
     ]);
+  });
+});
+
+describe("admin router", () => {
+  // WEB-035: the logo in the content area while a page's chunk is slow.
+  it("shows the pending state after 400 ms and for at least 500 ms", () => {
+    expect(pagePendingOptions).toMatchObject({
+      defaultPendingMs: 400,
+      defaultPendingMinMs: 500,
+    });
+    expect(pagePendingOptions).toHaveProperty("defaultPendingComponent");
+    expect(createAdminApp().router.options).toMatchObject(pagePendingOptions);
   });
 });
 
