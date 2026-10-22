@@ -3746,7 +3746,11 @@ first if it is paused (runbook, «Pause and resume staging»).
 7. The production release ends with the smoke check against production
    (`SMOKE_API_DOCUMENTATION=hidden`, Test 3), so a release that serves
    Swagger on production fails there. Copying production's data into
-   staging is a separate, last-resort workflow (Test 74).
+   staging is a separate, last-resort workflow (Test 74). When a
+   release fails, the runbook's «When a release fails», «Release a commit
+   by hand», and «Change a setting» sections say what to read in
+   Northflank and Vercel, how to release a commit without the workflow,
+   and that a secret edit needs a manual restart.
 
 ## Test 41: check that the QR is the only transfer instruction
 
@@ -5073,6 +5077,11 @@ the deployed policy.
    closing over the panel keeps the lock).
 5. The public site also sends `strict-transport-security` now
    (`curl -sI https://app.emmapilatesstudio.com/privacidad/`).
+6. The API itself sends no policy of its own: it answers JSON to the apps
+   and the proxy, so a `curl -sI` against the API shows only
+   `X-Content-Type-Options: nosniff` on the image routes (receipts, photos,
+   Promotion images), never a Content-Security-Policy.
+
 
 ## Test 63: Swagger off in production and the general request limit (BE-025)
 
@@ -5334,7 +5343,11 @@ to Better Stack, Test 44). Nothing is physically deleted
 copy of the fixtures (`createdb -T pilates_dev_sim pilates_test_sweeps`),
 start the API and the worker on it, and back-date one row per sweep with
 `psql -d pilates_test_sweeps`; the next run (at most an hour away, or at once
-when you restart the worker) does the rest.
+when you restart the worker) does the rest. Two things no sweep touches: pg-boss's own
+`pgboss.job` rows, which keep a failed job's sanitized record for 30 days
+([ADR-0065](./adr/0065-retain-failed-jobs-for-thirty-days.md)) before pg-boss
+removes it, and a pg-boss runtime error, which the worker only logs as
+`pg_boss_error`.
 
 1. **`pending_account_cleanup` (hourly).** A registration nobody verified
    for 7 days, or a Staff-made invitation nobody activated for 30 days, is
@@ -5511,7 +5524,9 @@ route; `profile_photo_not_ready` and `promotion_image_not_ready` answer
 `expense_category_name_taken`,
 `availability_block_ended`, `branch_archived`, `promotion_archived`, and
 `staff_member_deactivated` answer `409` when the row named is already in
-that state; `invalid_back_office_value` and `invalid_promotion_value` answer
+that state, and so do `evaluation_not_booked` and `evaluation_started` to
+`DELETE /api/v1/administrator/evaluations/{id}` for a cancelled or started
+Evaluation; `invalid_back_office_value` and `invalid_promotion_value` answer
 `400` to a Back Office or Promotion body that fails a rule the DTO cannot
 express (a negative quantity, an end date before the start). Drop the copy
 afterwards: `dropdb pilates_test_codes`.
