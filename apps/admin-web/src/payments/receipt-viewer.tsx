@@ -106,6 +106,13 @@ export function ReceiptViewer({
           <Dialog.Content
             aria-describedby={undefined}
             data-presentation={narrow ? "full-screen" : "viewer"}
+            // WEB-036: Radix closes the viewer on Escape only once its layer
+            // is the highest, which happens in an effect after the viewer is
+            // painted and focused; until then the sheet below ignores the
+            // key (see SheetContent), so the viewer closes itself.
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setEnlarged(false);
+            }}
             className={cn(
               "fixed z-50 flex flex-col gap-2 outline-none",
               narrow
