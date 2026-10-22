@@ -31,6 +31,8 @@ beyond what the table below names.
 | `client_invitation.email_corrected` | System Identity | The pending invitation's email is corrected | Staff Account and Role | `account` | — | `previousEmail` |
 | `client_invitation.cancelled` | System Identity | A pending invitation without activity is removed | Staff Account and Role | `account` | — | `email` (the removed Account no longer exists) |
 | `client_invitation.verification_sent` | System Identity | An Assistant or Administrator sends a self-registered pending Client a new Verification Link from S05 «Enviar enlace de verificación» (MOB-021); older verification links stop working and the 7-day pending window restarts | Staff Account and Role | `account` | — | — |
+| `impersonation.started` | System Identity | An Administrator starts seeing the Staff app as a Trainer, Assistant, or Nutritionist from `S24` (FUT-001, ADR-0100) | Administrator | `account` (the Staff Member's) | — | `staffMemberId`, `role`, `expiresAt` |
+| `impersonation.ended` | System Identity | The Impersonation ends: «Salir» (`exited`), the 30 minutes pass (`expired`), the Administrator logs out (`logged_out`), or the Staff Member is deactivated or the session revoked (`revoked`) | Administrator for `exited` and `logged_out`; `system` for `expired` and `revoked` | `account` (the Staff Member's) | — | `reason`, `durationSeconds` |
 | `administrator_bootstrap.created` | System Identity | The bootstrap command creates the first, pending Administrator | `bootstrap` | `account` | — | — |
 | `administrator_bootstrap.activation_resent` | System Identity | The bootstrap command reissues the pending Administrator's link | `bootstrap` | `account` | — | — |
 | `client.photo_changed` | Booking & Membership | A Client attaches or replaces their own profile photo (Client 22); a replaced photo's variants are released at once (ADR-0076) | Client Account | `client` | — | `replaced` |
@@ -75,18 +77,6 @@ beyond what the table below names.
 | `expense.updated` | Back Office | An Administrator corrects an Expense (the Branch never changes) | Administrator | `expense` | Expense Branch | previous and new `expenseCategoryId`, `amountCentavos`, `incurredOn` (only those changed) |
 
 Back Office money records follow BKO-001 D17: Salary Payments and Expenses are audited; Supplies, Withdrawals, Restocks, and Expense Categories are not (below).
-
-## Planned by FUT-001 (stage 2 moves these rows into the catalog)
-
-Decided in the [FUT-001 proposal](../implementation/FUT-001-impersonation-proposal.md)
-(I8) and [ADR-0100](../adr/0100-impersonate-a-staff-member-from-the-staff-app.md);
-the backend does not write them yet, so they sit outside the catalog table
-the architecture spec checks until stage 2 lands them with the code.
-
-| Action code | Context | Written when | Actor | Target | Branch | Metadata |
-| --- | --- | --- | --- | --- | --- | --- |
-| `impersonation.started` | System Identity | An Administrator starts seeing the Staff app as a Trainer, Assistant, or Nutritionist from `S24` (FUT-001, ADR-0100) | Administrator | `account` (the Staff Member's) | — | `staffMemberId`, `role`, `expiresAt` |
-| `impersonation.ended` | System Identity | The Impersonation ends: «Salir» (`exited`), the 30 minutes pass (`expired`), the Administrator logs out (`logged_out`), or the Staff Member is deactivated or the session revoked (`revoked`) | Administrator for `exited` and `logged_out`; `system` for `expired` and `revoked` | `account` (the Staff Member's) | — | `reason`, `durationSeconds` |
 
 While an Impersonation is active, **every** audit record written by the
 request carries `impersonation_id`: the actor columns name the Administrator
