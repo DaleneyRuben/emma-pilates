@@ -5454,9 +5454,9 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    → **Notificaciones** reads «No pudimos cargar tus notificaciones.»,
    **Mis evaluaciones** «No pudimos cargar tus evaluaciones.», **Mi
    crédito** «No pudimos cargar tu crédito.», the **Reservar** tab «No
-   pudimos cargar las clases.», a Plan «No pudimos cargar el plan.». Pull
-   to refresh on a tab you had already opened keeps the last data instead
-   (the Account-scoped cache of Test 9 F). Start the API again and tap
+   pudimos cargar las clases.», a Plan «No pudimos cargar el plan.». A tab you
+   had already opened shows the same line once its refresh fails. Start the
+   API again and tap
    **Reintentar**: the screen loads. In the Staff app as
    `camila.rojas@example.com` the search result's overview reads «No
    pudimos cargar al cliente.» (on the iPad, inside the right panel), the
@@ -5481,9 +5481,9 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    emulator with a development build (Test 57): the app first shows
    **Comprobando enlace** under the Emma wordmark while it inspects the
    token (`POST /api/v1/authentication-links/inspection`, Test 6 A), then
-   the password form («Crea una contraseña nueva» for a recovery,
-   «Activar cuenta» for an invitation; both fields carry the eye of Test
-   52). Open the same link a second time: **Este enlace ya no es válido**
+   the password form («Crea una contraseña nueva» for a recovery; «Crea tu
+   contraseña» under the eyebrow «Activar cuenta» for an invitation, which
+   ends on «Tu cuenta está activa»; both fields carry the eye of Test 52). Open the same link a second time: **Este enlace ya no es válido**
    under the Palo de rosa clock of Test 1, with **Volver a iniciar
    sesión**. An activation link whose invitation the 30-day cleanup removed
    (Test 68, step 1) reads **Esta invitación ya no está activa**. The Staff
