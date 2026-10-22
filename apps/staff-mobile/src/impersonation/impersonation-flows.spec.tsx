@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { clearMobileQueryCache } from "@pilates/mobile-core";
 import { Alert } from "react-native";
 
@@ -71,7 +71,11 @@ function routes(current: () => unknown, calls: { method: string; path: string; b
     "/api/v1/branches": () => jsonResponse(branches),
     "/api/v1/trainer/sessions": () => jsonResponse([]),
     "POST /api/v1/impersonations": (init?: RequestInit) => {
-      calls.push({ method: "POST", path: "/api/v1/impersonations", body: JSON.parse(String(init?.body)) });
+      calls.push({
+        method: "POST",
+        path: "/api/v1/impersonations",
+        body: JSON.parse(String(init?.body)),
+      });
       return jsonResponse(impersonationOf(new Date(Date.now() + 28 * 60_000 + 5_000)), 201);
     },
     "DELETE /api/v1/impersonations/current": () => {
@@ -135,7 +139,9 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     );
     const buttons = alert.mock.calls[0]?.[2] ?? [];
     profile = trainerProfile;
-    await buttons.find((button) => button.text === "Ver como Camila")?.onPress?.();
+    await act(async () => {
+      await buttons.find((button) => button.text === "Ver como Camila")?.onPress?.();
+    });
 
     await waitFor(() => expect(screen.getByText("Viendo como Camila Rojas")).toBeOnTheScreen());
     expect(calls).toEqual([
@@ -155,7 +161,10 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
 
   it("returns to Pagos pendientes on its own when the 30 minutes run out", async () => {
     const calls: { method: string; path: string }[] = [];
-    const runtime = createStaffRuntime(routeFetcher(routes(() => trainerProfile, calls)), "trainer");
+    const runtime = createStaffRuntime(
+      routeFetcher(routes(() => trainerProfile, calls)),
+      "trainer",
+    );
     runtime.sessionManager.restore = jest.fn().mockResolvedValue({
       accountId: "trainer-account",
       role: "trainer",
@@ -172,7 +181,9 @@ describe("Administrator impersonation in the Staff app (FUT-001)", () => {
     await waitFor(() => expect(screen.getByLabelText("Pagos pendientes")).toBeOnTheScreen(), {
       timeout: 8_000,
     });
-    expect(screen.getByText("Terminó el tiempo para ver la app como Camila Rojas.")).toBeOnTheScreen();
+    expect(
+      screen.getByText("Terminó el tiempo para ver la app como Camila Rojas."),
+    ).toBeOnTheScreen();
     expect(calls).toEqual([]);
   });
 

@@ -20,8 +20,9 @@ import {
 import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
 import { createStaticNavigation, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useMemo, useState } from "react";
+import { type ReactNode, useCallback, useContext, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 import { CancelClassScreen } from "./administrator/cancel-class-screen";
 import { CancelSessionScreen } from "./administrator/cancel-session-screen";
@@ -38,6 +39,13 @@ import { ClientSearchScreen } from "./assistant/client-search-screen";
 import { ConfirmCashPaymentScreen } from "./assistant/confirm-cash-payment-screen";
 import { NewClientScreen } from "./assistant/new-client-screen";
 import { SelectPlanScreen } from "./assistant/select-plan-screen";
+import { ImpersonationBanner } from "./impersonation/impersonation-banner";
+import { createImpersonationApi } from "./impersonation/impersonation-api";
+import {
+  ImpersonationContext,
+  type ImpersonationNotice,
+} from "./impersonation/impersonation-context";
+import { ViewAsScreen } from "./impersonation/view-as-screen";
 import { AvailabilityBlockFormScreen } from "./nutritionist/availability-block-form-screen";
 import { AvailabilityScreen } from "./nutritionist/availability-screen";
 import type { StaffRole } from "./notifications/notification-destinations";
@@ -215,6 +223,7 @@ const AdministratorStack = createNativeStackNavigator({
     ReviewPayment: ReviewPaymentScreen,
     CancelClass: CancelClassScreen,
     CancelSession: CancelSessionScreen,
+    ViewAs: ViewAsScreen,
     ...accountScreens,
   },
 });
@@ -235,32 +244,87 @@ const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNavigation
   trainer: createStaticNavigation(TrainerStack),
 };
 
+// FUT-001: the banner takes the top inset so the screens under it do not add it again.
+function UnderBanner({ children }: { children: ReactNode }) {
+  const insets = useContext(SafeAreaInsetsContext);
+  const value = useMemo(() => ({ bottom: 0, left: 0, right: 0, ...insets, top: 0 }), [insets]);
+  return <SafeAreaInsetsContext.Provider value={value}>{children}</SafeAreaInsetsContext.Provider>;
+}
+
 export function StaffNavigation({
   accountId,
   apiFetcher,
   authenticationApi,
   authenticationIntent,
+  impersonation,
   installationIdentifier,
   onBiometricUnlock,
   onLogin,
   onRecoveryCredential,
   pushPlatform,
+  refreshSession,
   role,
 }: MobileNavigationProps) {
+  const fetcher = apiFetcher ?? unavailableFetcher;
+  const [notice, setNotice] = useState<string | null>(null);
+  const refresh = useCallback(() => refreshSession?.() ?? Promise.resolve(), [refreshSession]);
+  const leave = useCallback(
+    async (line: ImpersonationNotice, end: boolean) => {
+      const name = impersonation?.staffMemberName ?? "";
+      if (end) {
+        try {
+          await createImpersonationApi(fetcher).end();
+        } catch {
+          // The row may already have ended on the server; the refresh tells.
+        }
+      }
+      setNotice(`${line} ${name}.`);
+      await refresh();
+    },
+    [fetcher, impersonation?.staffMemberName, refresh],
+  );
+  const onExit = useCallback(() => void leave("Dejaste de ver la app como", true), [leave]);
+  const onExpire = useCallback(
+    () => void leave("Terminó el tiempo para ver la app como", false),
+    [leave],
+  );
+  const clearNotice = useCallback(() => setNotice(null), []);
+  const impersonationState = useMemo(
+    () => ({ impersonation: impersonation ?? null, notice, clearNotice, refreshSession: refresh }),
+    [clearNotice, impersonation, notice, refresh],
+  );
+
   if (role !== undefined && role !== "client") {
     const AuthenticatedStaffNavigation = roleNavigation[role];
+    const navigator = (
+      <StaffPushNotifications
+        fetcher={fetcher}
+        installationIdentifier={installationIdentifier}
+        platform={pushPlatform}
+        registrationEnabled={impersonation === undefined}
+        role={role}
+      >
+        {({ onReady, ref }) => <AuthenticatedStaffNavigation onReady={onReady} ref={ref} />}
+      </StaffPushNotifications>
+    );
     return (
       <MobileQueryProvider accountId={accountId}>
-        <StaffFetcherContext.Provider value={apiFetcher ?? unavailableFetcher}>
+        <StaffFetcherContext.Provider value={fetcher}>
           <AssistantWorkspaceProvider>
-            <StaffPushNotifications
-              fetcher={apiFetcher ?? unavailableFetcher}
-              installationIdentifier={installationIdentifier}
-              platform={pushPlatform}
-              role={role}
-            >
-              {({ onReady, ref }) => <AuthenticatedStaffNavigation onReady={onReady} ref={ref} />}
-            </StaffPushNotifications>
+            <ImpersonationContext.Provider value={impersonationState}>
+              {impersonation === undefined ? (
+                navigator
+              ) : (
+                <View style={styles.underBanner}>
+                  <ImpersonationBanner
+                    impersonation={impersonation}
+                    onExit={onExit}
+                    onExpire={onExpire}
+                  />
+                  <UnderBanner>{navigator}</UnderBanner>
+                </View>
+              )}
+            </ImpersonationContext.Provider>
           </AssistantWorkspaceProvider>
         </StaffFetcherContext.Provider>
       </MobileQueryProvider>
@@ -311,4 +375,5 @@ const styles = StyleSheet.create({
   },
   segmentTextSelected: { color: colors.white },
   segmented: { flexDirection: "row" },
+  underBanner: { flex: 1 },
 });
