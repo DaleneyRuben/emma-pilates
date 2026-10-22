@@ -60,6 +60,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S21](./staff/21-assistant-manage-bookings.md) | Reservas de la clienta (Asistente) | `S21` | ✅ |
 | [S22](./staff/22-assistant-client-history.md) | Historial de la clienta (Asistente) | `S22` | ✅ |
 | [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | ✅ |
+| [S24](./staff/24-administrator-view-as.md) | Ver la app como… (Administración) | `S24` | 🕓 pending |
 
 ## Admin web (`admin-web/`)
 
@@ -217,6 +218,7 @@ Each of these was sent as the next message in the existing design session for th
 | [105](./followups/105-admin-recovery-state.md) | The recovery state for the admin web (WEB-032): when a page throws while drawing, the main area shows «Algo salió mal», the note «No pudimos mostrar esta página. Inténtalo de nuevo; si vuelve a pasar, recarga la página.», and a large «Reintentar» primary button as the plain empty state on Superficie, keeping the sidebar and the top bar; a «Recovery state» subsection in the README's shell section, no numbered screen changes | ✅ applied (Claude Design canvas, 2026-10-21, `a5b2bc78`; the admin web is built in WEB-032) |
 | [106](./followups/106-launch-screen.md) | The launch screen (MOB-068): from the tap on the icon until the first screen is ready, both apps show `emma-logo.png` centred on `#F3E9E7` (the icons' blush edge tone), 240 pt wide on iOS and 160 dp on Android (inside Android 12's icon circle), then a 300 ms fade; a «Pantalla de inicio» card inside «08 · Carga» and a «Launch screen» README subsection, no numbered screen changes | ✅ applied (Claude Design canvas, 2026-10-21, `38985f82`; the apps are built in MOB-068) |
 | [107](./followups/107-admin-loading-state.md) | The loading states of the admin web (WEB-035): only the logo, as follow-up 94's mobile state, centred on Crema for the whole viewport on the first load (no delay) and in the main area on Superficie after 400 ms on a page switch, keeping the sidebar and the top bar; a second card «En la web de administración» in section 08 of the design system and a «Loading states» subsection in the README's shell section, no numbered screen changes | ✅ applied (Claude Design canvas, 2026-10-21, `7f49aa06` as follow-up 106; renumbered 107 and exported again on a second canvas over `main`'s launch-screen card when the branch merged `main`; the admin web is built in WEB-035) |
+| [108](./followups/108-impersonation-entry-and-banner.md) | The «Ver la app como…» row on `S23`'s Administrator frame (opens the new `S24`), the fixed Palo de rosa profundo impersonation banner («Viendo como {name} · {role}», «Quedan {n} min», «Salir») in one new frame each on `S02`/`S04`/`S15`, a «Franja de suplantación» card in the design system's section 06, and the README (`S24` row, «Impersonation banner (Staff)», navigation) (FUT-001, ADR-0100) | 🕓 pending |
 
 ## Status
 
