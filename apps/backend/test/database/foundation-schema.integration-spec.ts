@@ -66,6 +66,7 @@ describe('foundation migration', () => {
       'system.idempotency_records',
       'system.image_assets',
       'system.image_variants',
+      'system.impersonation_sessions',
       'system.notification_deliveries',
       'system.notifications',
     ]);

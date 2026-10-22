@@ -41,6 +41,7 @@ describe('soft delete schema', () => {
       'system.idempotency_records',
       'system.image_assets',
       'system.image_variants',
+      'system.impersonation_sessions',
       'system.notifications',
     ]);
   });
