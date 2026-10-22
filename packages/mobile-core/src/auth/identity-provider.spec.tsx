@@ -36,10 +36,13 @@ function IdentityProbe() {
 
 function IdentityActionsProbe() {
   const identity = useMobileIdentity();
+  const acting = identity.session?.impersonation?.staffMemberName ?? "nobody";
 
   return (
     <>
       <Text>{identity.status}</Text>
+      <Button onPress={() => void identity.refresh()} title="Refresh" />
+      <Text>{`acting:${acting}`}</Text>
       <Button onPress={() => identity.start("new-credential")} title="Start" />
       <Button onPress={() => identity.logout()} title="Logout" />
       <Button onPress={() => identity.unlockWithBiometrics()} title="Unlock" />
@@ -57,6 +60,7 @@ describe("MobileIdentityProvider", () => {
       undefined;
     const manager = {
       endLocally: jest.fn(),
+      refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
       restore: jest.fn().mockReturnValue(
@@ -86,6 +90,7 @@ describe("MobileIdentityProvider", () => {
     const session = { accountId: "account-2", role: "assistant" as const };
     const manager = {
       endLocally: jest.fn(),
+      refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn().mockResolvedValue(undefined),
       restore: jest.fn().mockResolvedValue(null),
@@ -118,10 +123,56 @@ describe("MobileIdentityProvider", () => {
     expect(manager.logout).toHaveBeenCalledWith(session);
   });
 
+  it("refreshes the session in place when an Impersonation starts or ends (FUT-001)", async () => {
+    const impersonation = {
+      id: "impersonation-1",
+      staffMemberId: "staff-2",
+      staffMemberName: "Camila Rojas",
+      role: "trainer" as const,
+      expiresAt: "2026-10-22T15:30:00.000Z",
+    };
+    const manager = {
+      endLocally: jest.fn(),
+      hasBiometricSession: jest.fn().mockResolvedValue(false),
+      logout: jest.fn(),
+      refresh: jest
+        .fn()
+        .mockResolvedValueOnce({ accountId: "trainer-account", role: "trainer", impersonation })
+        .mockResolvedValueOnce({ accountId: "account-1", role: "administrator" }),
+      restore: jest.fn().mockResolvedValue({ accountId: "account-1", role: "administrator" }),
+      start: jest.fn(),
+      unlockWithBiometrics: jest.fn(),
+    };
+    const screen = await render(
+      <MobileIdentityProvider manager={manager}>
+        <IdentityActionsProbe />
+      </MobileIdentityProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText("signed-in")).toBeOnTheScreen();
+    });
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Refresh" }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("acting:Camila Rojas")).toBeOnTheScreen();
+    });
+
+    await act(async () => {
+      fireEvent.press(screen.getByRole("button", { name: "Refresh" }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText("acting:nobody")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("signed-in")).toBeOnTheScreen();
+  });
+
   it("waits for an explicit biometric unlock before restoring the session", async () => {
     const session = { accountId: "account-3", role: "client" as const };
     const manager = {
       endLocally: jest.fn(),
+      refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(true),
       logout: jest.fn(),
       restore: jest.fn().mockResolvedValue(null),
@@ -233,6 +284,7 @@ describe("MobileIdentityProvider", () => {
     let failRestoration: (error: Error) => void = () => undefined;
     const manager = {
       endLocally: jest.fn(),
+      refresh: jest.fn().mockResolvedValue(null),
       hasBiometricSession: jest.fn().mockResolvedValue(false),
       logout: jest.fn(),
       restore: jest.fn().mockReturnValue(
