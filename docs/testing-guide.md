@@ -30,6 +30,58 @@ you are starting with no project knowledge.
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
+| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
+| Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
+| Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
+| Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
+| Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
+
+## Where each designed screen is tested
+
+The design index ([`docs/design/prompts/README.md`](./design/prompts/README.md))
+names every screen; this table says which tests walk each one, so a screen
+can be found by its design name.
+
+| Client app | Tests |
+| --- | --- |
+| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71 |
+| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70 |
+| 12 Mi plan | 5, 18, 71 |
+| 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
+| 16 Mis referidos, 17 Mi crédito | 10, 18 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
+| 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
+| 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
+
+| Staff app | Tests |
+| --- | --- |
+| S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
+| S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
+| S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
+| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
+| S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
+| S24 Ver la app como…, the impersonation banner | 67, 71 |
+
+| Admin web | Tests |
+| --- | --- |
+| AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
+| AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
+| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
+| AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72 |
+| AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
+| AW16 Reporte de ingresos y gastos | 30, 31 |
+| AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
+| AW23–AW24 Personal | 26, 31, 72 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
 
 ## Before you begin
 
@@ -209,8 +261,8 @@ Press `Ctrl+C` in Terminal when you want to stop Expo.
 These steps create and update a database named `emma_pilates` on your own
 computer. Never run them with a shared-development or production database URL.
 
-The project runs on **PostgreSQL 18** everywhere (production, CI, the shared
-development database, and your computer). Locally it is Homebrew's
+The project runs on **PostgreSQL 18** everywhere (production, staging, CI,
+and your computer; the shared development database was retired by EXT-016). Locally it is Homebrew's
 `postgresql@18` on port **5433**, so it can sit beside an older PostgreSQL on
 5432 that other projects use. Install and start it once:
 
@@ -477,7 +529,9 @@ safe: it updates the same rows instead of duplicating them. Re-running it also
 resets every fixture Session to its scheduled start and end time while keeping
 cancellations, so run it again if class times ever look shifted by four hours.
 It creates three Branches (Centro, Equipetrol, Urubó), three Class Types, the
-four designed Plans, weekly Session Schedules with the next 30 days of
+four designed Plans (Paquete de 8 clases, Bs 560; Paquete de 12 clases,
+Bs 780; Mensual 16 clases, Bs 1 050; Trimestral 36 clases, Bs 2 100 for three
+months), weekly Session Schedules with the next 30 days of
 Sessions, Gabriela's weekly Availability Blocks with their next 30 days of
 Evaluation slots, and these active Accounts. Every fixture Account uses the password `emma-local-2026`.
 
@@ -536,6 +590,10 @@ the name and phone and saves through the API (changing the email is Test 34).
 
 The **Reservar** tab lists the fixture Sessions for the selected Branch, day,
 and Class Type (past Sessions of today are hidden; full ones show **Lleno**).
+A day without Sessions centres "No hay clases este día."; a Class Type chip
+that matches none of the day's Sessions reads "No hay clases con este
+filtro" instead (any Branch on a Sunday, which no fixture schedule covers;
+Prenatal at Centro).
 Each Session is a white card: the time in small spaced capitals over the Class
 Type in Lora, the seat pill on the right («N cupos» in Palo de rosa oscuro on
 Palo de rosa tinte; a full class reads **Lleno** in grey on a neutral sand
@@ -873,11 +931,24 @@ Home, class browsing, Plan, and profile screens:
 | `GET /api/v1/class-types`               | Mat, Prenatal, and Reformer Pilates with descriptions                     |
 | `GET /api/v1/sessions?branchId=…`       | Sessions in a Branch with Class Type and Trainer names and free seats     |
 | `GET /api/v1/sessions/{sessionId}`      | One Session with its Branch, Class Type description, Trainer, and seats   |
+| `GET /api/v1/plans/{planId}`            | One Plan (the app's Detalle del plan); an unknown id answers `404 plan_not_found` |
+| `PATCH /api/v1/clients/current` `{ name, phone }` | Saves the name and phone (Perfil → Editar); an empty name answers `400 client_name_required` |
+| `GET /api/v1/bookings` / `GET /api/v1/bookings/history` | Upcoming Bookings and Waitlist Entries (Mis reservas) / attended classes, newest first (Historial) |
+
+The commands behind Reservar and Mis reservas, each with an
+`idempotency-key` UUID where it changes something, are
+`POST /api/v1/sessions/{id}/bookings` (`201`; for a full Session
+`POST …/waitlist-entries` instead), `DELETE /api/v1/bookings/{id}`,
+`POST /api/v1/bookings/{id}/reschedule` `{ "targetSessionId" }`, and
+`DELETE /api/v1/waitlist-entries/{id}`; the Assistant sends the same with
+`{ "clientId" }` in the body (Test 11). Their rule codes are in Test 70.
 
 Log in as `valeria@example.com`, `sofia@example.com`, or `mariana@example.com`
 to see the `expiring_soon`, `expired`, and `none` Subscription statuses. A Staff
 credential receives `403` with `booking_access_denied` from the two
-`clients/current` endpoints.
+`clients/current` endpoints; its own profile is
+`GET /api/v1/staff-members/current` (name, Role, Branches, the Staff Perfil
+of Test 9 E), which a Client credential gets `403` from in turn.
 
 The notification inbox is available to every signed-in Account:
 `GET /api/v1/notifications` (cursor pages), `GET /api/v1/notifications/unread-count`,
@@ -1357,8 +1428,8 @@ version):
   dies with the runner) side by side, each waiting for both contracts and
   api-unit;
 - **quality-web** (admin-web lint, `format:check`, typecheck, build) →
-  **web-unit** (the admin-web Jest suite) and **web-e2e** (the ten Playwright
-  journeys of Test 31 through the built backend and the built admin web, on
+  **web-unit** (the admin-web Jest suite) and **web-e2e** (the seventeen
+  Playwright journeys of Test 31 through the built backend and the built admin web, on
   a `postgres:18-alpine` service container with a `pilates_test_ci` admin
   database, WEB-017) side by side;
 - **quality-mobile** (tooling lint; lint, `format:check`, and typecheck of
@@ -1537,9 +1608,13 @@ que necesite tu atención."
 The apps are online-first. When the device loses connectivity, a banner reads
 "Sin conexión. Mostrando la última información guardada." and only the class
 schedule, upcoming Bookings, and the Subscription summary stay visible from the
-Account-scoped cache; everything else needs the connection back. The iOS
-Simulator shares the Mac's network, so this is easiest to see on a device with
-airplane mode.
+Account-scoped cache; everything else needs the connection back. The banner
+follows the device's connectivity (NetInfo feeds TanStack Query's
+`onlineManager`), so on the Android emulator `adb shell svc wifi disable`
+and `adb shell svc data disable` show it (and `enable` hides it); the iOS
+Simulator shares the Mac's network, so there it is easiest on a device with
+airplane mode. Test 71 walks the other states (load errors, action errors,
+link screens).
 
 ### Time zones
 
@@ -1646,7 +1721,7 @@ nuevo comprobante para activar tu plan. Tu crédito volvió a estar disponible."
 and **Subir un nuevo comprobante** opens a fresh **Pago por transferencia**
 for the same Plan.
 
-### E. Cancel a Session as the Administrator
+### D. Cancel a Session as the Administrator
 
 From **Pagos pendientes** tap **Cancelar una clase**. Pick the Branch (the
 **Sucursal:** pill with its pin and down chevron, then a Branch chip), a day
@@ -1674,12 +1749,14 @@ The fixtures ship no Bookings, so book a class from the Client app first
 `409 session_has_no_bookings` and the screen shows "No pudimos cancelar la
 sesión. Inténtalo de nuevo.".
 
-### D. Paying fully with Credit
+### E. Paying fully with Credit
 
 When the available Credit covers the whole price, **Continuar al pago**
 activates the Plan immediately (`POST /api/v1/credit-purchases`) and lands on
 "¡Pago confirmado!" without a QR. The fixtures cannot reach this (Bs 60 is
-below the cheapest Plan), so the automated purchase-flow spec covers it.
+below the cheapest Plan), so the automated purchase-flow spec covers it; to
+see it by hand, create a Plan priced under Bs 60 in Planes and buy it as
+Sofía (Test 70, «Payments»).
 
 ## Test 11: act for a Client as the Assistant in the Staff app
 
@@ -1840,10 +1917,15 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    list is empty.
 2. Tap a Session to open its roster ("Centro · 07:00 – 07:50" under the
    title): every booked Client with **Asistió** and
-   **No asistió** choices, or "No hay reservas para esta sesión."
+   **No asistió** choices, or "No hay reservas para esta sesión." A Session
+   that has not ended yet shows "Podrás marcar asistencia cuando termine la
+   clase." instead of the choices (the API answers `403` before the end,
+   Test 61).
 3. Mark every Client and tap **Guardar asistencia** (enabled only once every
-   Client has an outcome). "Asistió" classes then appear in the Client's
-   **Ver historial**.
+   Client has an outcome): "Asistencia guardada." appears under the button
+   ("No pudimos guardar la asistencia." if the API refused). "Asistió"
+   classes then appear in the Client's **Ver historial** as «Ha asistido a»
+   with the month group of Test 5 B.
 4. Open the roster again: the saved outcomes are restored, and a changed
    outcome can be saved as a correction.
 
@@ -1911,8 +1993,11 @@ It prints `administrator_bootstrap_completed` with `status: created`. Then:
    `paola.mendoza@example.com` is already an active Administrator.
 
 Every refusal changes nothing. Drop the throwaway database afterwards with
-`dropdb pilates_test_bootstrap`. Completing activation needs the link from the
-queued email, which the local capture does not expose to testers yet.
+`dropdb pilates_test_bootstrap`. To complete the activation, either start the
+worker on that database and take the `activation` email's `token` from
+`apps/backend/.data/email-capture/` (Test 34), or print the queued link with
+`node dist/src/administrator-activation-link-main.js` (Test 42 C); paste it
+into the admin web's `/crear-contrasena?token=…` page (Test 24, step 10).
 
 ## Test 15: book an Evaluation and manage the Nutritionist's availability
 
@@ -1963,16 +2048,21 @@ Load the fixtures (Test 5A) and start the backend and both apps (Test 1).
 
 ## Test 16: watch the worker's retention sweeps
 
-When the worker starts, and then every hour, it deletes housekeeping rows that
-have outlived their provisional retention (BE-008): idempotency records past
-their own expiry and at least 48 hours old, Authentication Sessions 90 days
-after they were revoked or expired, throttle events 30 days after they
-stopped counting, and notifications 180 days after they were read. Unread
-notifications and audit records are never deleted. To see it, insert an old
-read notification for a fixture Account in `pilates_dev_sim` (for example
-`read_at = now() - interval '200 days'`), start the worker, and the row is
-gone a few seconds later. The worker logs only a sanitized
-`retention_sweep_failed` event if a sweep fails.
+When the worker starts, and then every hour, its `retention_sweep` marks
+housekeeping rows that have outlived their provisional retention (BE-008)
+as removed: idempotency records past their own expiry and at least 48 hours
+old, Authentication Sessions 90 days after they were revoked or expired,
+throttle events 30 days after they stopped counting, and notifications 180
+days after they were read. Unread notifications and audit records are never
+touched. Nothing is physically deleted
+([ADR-0086](./adr/0086-soft-delete-every-database-row.md)): the row stays
+with `deleted_at` set and leaves every list. To see it, insert an old read
+notification for a fixture Account in `pilates_dev_sim` (for example
+`read_at = now() - interval '200 days'`), start the worker, and a few
+seconds later the row has `deleted_at` and the inbox no longer lists it.
+The worker logs only a sanitized `retention_sweep_failed` event if a sweep
+fails. The other housekeeping sweeps (pending Accounts, abandoned and
+released images, open Purchase Intents) are Test 68.
 
 ## Test 17: manage Staff Members as the Administrator (API)
 
@@ -1982,11 +2072,14 @@ shows how to log in and authorize):
 
 1. `GET /api/v1/administrator/staff-members` lists every Staff Member with
    `page`, `pageSize` (up to 100), and optional `role`, `branchId`, and
-   `status` (`pending`, `active`, `deactivated`) filters.
+   `status` (`pending`, `active`, `deactivated`) filters;
+   `GET …/staff-members/{id}` reads one (the admin web's panel, Test 26;
+   `404 staff_member_not_found` for an unknown id).
 2. `POST /api/v1/administrator/staff-members` with a name, email, Role, and
    Branches creates a pending Staff Member and queues the Activation Link
    email. An Administrator is created without Branches (they hold every
-   Branch); every other Role needs at least one active Branch.
+   Branch; Branches sent for one answer `400 invalid_branch_assignment`);
+   every other Role needs at least one active Branch.
 3. `POST …/{id}/activation-link` sends a new link while the person is still
    pending (at most one per minute per email; a limited send answers `429
    email_throttled` with `Retry-After` in seconds). While pending,
@@ -2039,7 +2132,8 @@ In the Client app as `lucia@example.com`:
 2. **Ver detalle** opens **Mi plan**: "Suscripción actual" with dates such as
    "13 de octubre de 2026" and "Podrás comprar un plan nuevo cuando este
    termine."; while expiring, an amber banner; once expired, "Último plan",
-   "Venció el …", and **Comprar un plan**.
+   "Venció el …", and **Comprar un plan**. As `isabel@example.com` (no
+   classes left) the classes line reads "Sin clases disponibles".
 3. In **Perfil → Notificaciones**, tapping an Evaluation notice opens Mis
    evaluaciones, a class-cancelled notice opens Mis reservas, a payment notice
    opens the payment status, and a Plan notice opens Mi plan.
@@ -2184,10 +2278,11 @@ three seeding flows add classes at Centro early tomorrow and in the next
 hour, which is why they run after the flows that read today's fixture
 schedule.
 
-The Staff suite runs its nine flows in its `config.yaml` order:
+The Staff suite runs its ten flows in its `config.yaml` order:
 `administrator-pending-payments`
 (Paola; «No hay pagos pendientes.» is accepted, so no transfer is needed),
-`assistant-client-search` (Camila finds Lucía), `nutritionist-availability`
+`administrator-view-as` (Paola sees the app as Emma from Perfil and leaves
+with «Salir», Test 67), `assistant-client-search` (Camila finds Lucía), `nutritionist-availability`
 (Gabriela publishes and removes a Friday block), `trainer-agenda-and-inbox`
 (Emma; an empty day is accepted), then the journeys that change things:
 `administrator-review-payments` (Paola confirms Mariana's transfer and
@@ -2236,9 +2331,12 @@ every Branch appear together, each card naming its Trainer and Branch
 
 ## Test 21: manage the catalog, schedules, and reports as the Administrator (API)
 
-The admin web is not built yet, so try these through Swagger or curl as
-`paola.mendoza@example.com` (Test 3 shows how to log in and authorize). Other
-Roles get `403 administration_access_denied`.
+The admin web does all of this on its pages (Tests 25, 29, and 30); to try
+the API directly, use Swagger or curl as `paola.mendoza@example.com` (Test 3
+shows how to log in and authorize). Other Roles get
+`403 administration_access_denied`. The rule codes these commands answer
+(`invalid_catalog_value`, `class_type_name_taken`, `invalid_schedule`,
+`effective_date_invalid`, `session_not_editable`) are listed in Test 70.
 
 1. **Catalog**: `GET`/`POST /api/v1/administrator/branches`, `PUT …/{id}`,
    and `POST …/{id}/archive`; the same for `class-types`. A Branch or Class
@@ -2438,7 +2536,7 @@ pnpm dev:admin
    session of the Account (the Staff app, for example) is signed out, and you
    must use the new password next time; run the fixtures command again to
    restore `emma-local-2026`.
-5. **Show the password** (WEB-022, design follow-up 92). Every password
+6. **Show the password** (WEB-022, design follow-up 92). Every password
    field (**Contraseña** on the Login card, the three fields of **Cambiar
    contraseña**, and both fields of the emailed **Crear contraseña** page)
    starts hidden, with an eye inside its right end. Click the eye: the typed
@@ -2448,32 +2546,45 @@ pnpm dev:admin
    With the keyboard, **Tab** from a field reaches its eye (focus ring) and
    **Space** or **Enter** toggles it without submitting. Logging in works
    the same with the password shown.
-5. **Log out.** Open the menu, choose **Cerrar sesión**: it first asks
+7. **Log out.** Open the menu, choose **Cerrar sesión**: it first asks
    "¿Cerrar sesión?" with **Cancelar**, which has focus (press Enter to keep
    your session). Confirm, and you are back on Login;
    the session cookie is gone and going back to a page asks you to log in.
-6. **Throttling.** On Login, submit a made-up email such as
+   A session that ended behind the browser's back (log out from a second
+   tab, or `DELETE /api/v1/admin-web/authentication-sessions/current` with
+   the cookie jar) sends the next click to Login with "Tu sesión terminó.
+   Vuelve a iniciar sesión." and brings you back to that page after Login;
+   with the cookie gone, `GET /api/v1/admin-web/authentication-sessions/current`
+   answers `401 authentication_required`.
+8. **Throttling.** On Login, submit a made-up email such as
    `nobody.admin-login@example.com` with any password six times. The seventh
    try shows "Demasiados intentos. Intenta de nuevo en un momento." with a
    countdown from the server (0:30 at first) and a disabled button.
-7. **Recovery.** **¿Olvidaste tu contraseña?** opens **Recuperar contraseña**.
+9. **Recovery.** **¿Olvidaste tu contraseña?** opens **Recuperar contraseña**.
    Any email gives the same "Revisa tu correo" state ("El enlace vence en 30
    minutos.") whether or not it belongs to an Account. Once the device or
    network budget is full (Test 5 G), a note with a clock above the field
    reads "Demasiadas solicitudes. Intenta de nuevo en un momento; si ya
    recibiste un enlace, sigue sirviendo." with "Podrás pedirlo en m:ss." and
    **Enviar enlace** stays disabled.
-8. **Links.** Open
-   [http://localhost:5173/crear-contrasena?token=not-a-real-link-secret](http://localhost:5173/crear-contrasena?token=not-a-real-link-secret):
-   "Este enlace no es válido". With the worker running, real links are in
-   `apps/backend/.data/email-capture/` (Test 34): paste a captured activation
-   or recovery link's `token` after `?token=` to see the form, or a used or
-   superseded one for "Este enlace ya no es válido". An activation link whose
-   invitation the 30-day cleanup removed (to fake one locally, set that
-   pending Account's `pending_expires_at` to the past in `pilates_dev_sim`)
-   shows "Esta invitación ya no está activa" with **Volver a iniciar
-   sesión**.
-9. **Narrow browser.** At a phone width the top bar keeps only the avatar, the
+10. **Links.** Open
+    [http://localhost:5173/crear-contrasena?token=not-a-real-link-secret](http://localhost:5173/crear-contrasena?token=not-a-real-link-secret):
+    "Este enlace no es válido". With the worker running, real links are in
+    `apps/backend/.data/email-capture/` (Test 34): paste a captured activation
+    or recovery link's `token` after `?token=` to see the form, or a used or
+    superseded one for "Este enlace ya no es válido". An activation link whose
+    invitation the 30-day cleanup removed (to fake one locally, set that
+    pending Account's `pending_expires_at` to the past in `pilates_dev_sim`)
+    shows "Esta invitación ya no está activa" with **Volver a iniciar
+    sesión**. Finish each kind once: an activation link (a Staff Member
+    invited in Test 26) saves the password through
+    `POST /api/v1/account-activations` and returns to Login with "Tu cuenta
+    está activa. Inicia sesión con tu nueva contraseña." and no session; a
+    recovery link (step 9, for Paola) goes through
+    `POST /api/v1/admin-web/password-recoveries` and lands on Horario
+    signed in, her other sessions revoked. Either token answers `expired` a
+    second time and the page shows the used-link state.
+11. **Narrow browser.** At a phone width the top bar keeps only the avatar, the
    menu opens from the bottom, and **Cambiar contraseña** fills the screen.
 
 A request that changes something with the session cookie from any other site
@@ -2551,7 +2662,13 @@ Bolivia time, whatever time zone your computer uses.
    it, book a Session first as a Client (Test 10 or the Staff app, Test 11).
 5. **Sucursales, Tipos de clase, Planes.** Each is a dense table with
    pagination and one filter in the address (`?status=archived`,
-   `?visibility=hidden`). **+ Nueva …** and a row open the side panel. Plans
+   `?visibility=hidden`). **+ Nueva …** and a row open the side panel. A new
+   Branch asks for **Nombre** and **Dirección** under "Aparecerá en el
+   selector de sucursal al guardarla."; an existing one explains that it
+   already appears in the top bar and in every Back Office record that
+   depends on it, so renaming moves nothing, and its **Archivar sucursal**
+   dialog says it leaves the selector, receives no new Sessions, and keeps
+   its history. Plans
    show prices as `Bs 1.050,00`, last 1, 3, 6, or 12 months, and always carry
    a class count; **Ocultar en la app** hides one from the Client catalog.
    A Class Type needs a description, and a taken name is marked on its field.
@@ -2601,7 +2718,10 @@ the admin web, exactly as Test 24 describes, and log in as
    she had one. A Client invited from the Staff app who has not created her
    password yet shows **Pendiente de activación**. Nothing here is editable;
    the only action is «Cerrar cuenta» in the footer (Test 35), which a
-   deactivated account does not offer.
+   deactivated account does not offer. The list is
+   `GET /api/v1/administrator/clients?q=…&page=…&pageSize=…` and the panel
+   `GET …/clients/{clientId}` (`404 client_not_found` for a closed or
+   unknown one).
 4. **Personal.** Back Office → **Personal** lists every Staff Member with the
    Role as a plain label (Entrenador, Asistente, Administrador, Nutricionista),
    the contact, the Branches ("Todas" for an Administrator), and **Activo**,
@@ -2654,7 +2774,7 @@ the admin web, exactly as Test 24 describes, and log in as
 Every change stays in `pilates_dev_sim`; the fixtures command restores the
 fixture Accounts but does not delete Staff Members you created. With the
 worker running, the activation email lands in the local capture (Test 34):
-paste its `token` into the admin web's link page (Test 24, step 8) to activate
+paste its `token` into the admin web's link page (Test 24, step 10) to activate
 the new person. Cancelled invitations and removed members stay as rows marked
 removed.
 
@@ -2675,7 +2795,10 @@ admin web, as Tests 10 and 24 describe. Raise a transfer with a receipt as
    app. The subtitle reads "Todo el estudio · 1 transferencia esperando
    revisión". The **Estado** filter starts on **Pendiente**, oldest first;
    **Todos**, **Confirmado**, and **Rechazado** stay in the address
-   (`?status=all`). Each row shows the Client, the Plan, the amount she
+   (`?status=all`; the page reads
+   `GET /api/v1/administrator/payments?status=…&q=…&page=…&pageSize=…`,
+   while the Staff app's list is `…/payments/pending`, Test 7). Each row
+   shows the Client, the Plan, the amount she
    transferred as `Bs 560,00` on the right (with "con Bs 60,00 de crédito"
    under it when Credit paid part), the date and time sent in Bolivia time
    (`23/09/2026 · 22:51`), and **Pendiente**, **Confirmado**, or **Rechazado**.
@@ -2978,6 +3101,14 @@ about thirty seconds:
     downloads `contactos-promociones-aaaa-mm-dd.csv` with the BOM header and
     her row, and «Dejar de enviar a Valeria Quiroga» → «Borrar contacto»
     leaves «Todavía no hay contactos.» with the export disabled.
+14. **Security headers (WEB-030, WEB-037).** Every response carries the
+    policy of Test 62 and the overlays lock the page behind them; that test
+    reads the journey.
+
+Three of these files hold more than one case: `session.spec.ts` is the
+three parts of item 1 and `authorization.spec.ts` the two of item 5 (the
+neutral rejection and the untrusted origin), which is how fourteen files
+make seventeen journeys.
 
 To run one file or watch the browser, use Playwright directly from
 `apps/admin-web`, for example
@@ -3046,7 +3177,9 @@ one file per variant (`readable` and `thumbnail` for a receipt, `display` and
 the `pending/<purpose>/<id>` original is gone. A Promotion image smaller than
 1200×675 ends `failed` with `image_dimensions_too_small`; an animated image
 with `image_animated_not_allowed`. Failed originals stay under `pending/` until
-the three-day cleanup (Test 13's worker, ADR-0089) removes them.
+the three-day cleanup (Test 68, ADR-0089) removes them. The refusals the
+three calls answer before anything is stored (a wrong media type, size,
+checksum, or order of calls) are listed in Test 70, «Uploads».
 
 ### B. The receipt variants in the review screens
 
@@ -3146,7 +3279,7 @@ crop).
 
 Deleted Promotions stay archived in `booking.promotions`; the fixtures
 command does not remove them. A refused upload leaves nothing behind; one the
-worker refused waits under `pending/` for the three-day cleanup (Test 13).
+worker refused waits under `pending/` for the three-day cleanup (Test 68).
 
 ## What you cannot test yet
 
@@ -3167,7 +3300,17 @@ The following are not ready for manual product testing:
   (Tests 46 and 48);
 - iOS store builds and TestFlight (gate 9), and the Play closed test and
   production release (REL-003 to REL-007);
-- the Playwright journeys in Firefox or WebKit (only Chromium is installed).
+- the Playwright journeys in Firefox or WebKit (only Chromium is installed);
+- the admin web's «No tienes permiso…» refusal copies, an email change for
+  an Account that is not active (`account_not_active`), and a registration
+  that refers to itself (`referral_self_reference`): each needs a state the
+  API never lets a tester reach, so the Jest and e2e suites cover them
+  (Tests 70 and 72);
+- the inbox's fallback for a notification type the push catalog does not
+  know («Emma Pilates» / «Tienes una notificación nueva.», silent): nothing
+  sends one until a new type ships;
+- real push delivery on iOS devices and the `InvalidCredentials` receipt
+  Expo answers for them until the APNs key is uploaded (gate 9, Test 46).
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -3211,12 +3354,19 @@ not an email went out (one per address per minute, five per hour, ten per day,
 like registration); **Cancelar cambio** removes the card. Saving with the
 same address only saves name and phone and returns to Perfil. Meanwhile the
 capture directory holds two files: `email_change` to the new address (with
-the link) and `email_change_notice` to the current one (no link).
+the link) and `email_change_notice` to the current one (no link). The
+screen's four calls are `POST /api/v1/accounts/current/email-change`
+`{ "email" }` (`202`), `GET …/email-change` (the pending card, `pending: null`
+with nothing pending), `POST …/email-change/resends`, and
+`DELETE …/email-change`; the last two answer `404 email_change_not_pending`
+once the card is gone, and every one of them `403 impersonation_forbidden`
+from an impersonating Administrator (Test 67).
 
 ### B. Confirm the change
 
-The Simulator cannot open the link yet (LNK-001). Copy the `token` from the
-`email_change` file's `link` and send it to `POST /api/v1/email-changes` as
+The iOS Simulator cannot open the link (Universal Links wait for gate 9; on
+the Android emulator a development build opens it, Test 57). Copy the `token`
+from the `email_change` file's `link` and send it to `POST /api/v1/email-changes` as
 `{ "token": "…" }` (Swagger, no credential needed): `{ "status": "changed" }`
 the first time, `expired` the second. Pull Perfil: the summary shows
 `lucia.nueva@example.com`, the signed-in session keeps working (ADR-0030),
@@ -3242,7 +3392,7 @@ Tests 4 and 6 can be completed with real tokens through
 and `POST /api/v1/password-recoveries`. `POST /api/v1/authentication-links/inspection`
 tells a captured activation or recovery link apart: `current`, `expired`, or
 `removed` (Test 6A); the admin web's link page opens the same tokens
-(Test 24, step 8). The directory is ignored by Git and
+(Test 24, step 10). The directory is ignored by Git and
 safe to delete.
 
 Since EML-001 each file is the real message: `subject`, `text` (plain text),
@@ -3252,9 +3402,13 @@ activar tu cuenta» (24 horas), «Activa tu cuenta en Emma Pilates Studio»
 (7 días), «Crea una contraseña nueva» (30 minutos), «Confirma tu correo
 nuevo» (24 horas), and, for the current address of an email change, «Alguien
 pidió cambiar el correo de tu cuenta» (no link). Links start with
-`AUTHENTICATION_LINK_BASE_URL` (`https://links.emmapilates.test` locally; the
-real domain comes with LNK-001). Open the `html` value in a browser to see
+`AUTHENTICATION_LINK_BASE_URL` (`https://links.emmapilates.test` locally;
+`https://links.emmapilatesstudio.com` on production and `links-staging.` on
+staging, LNK-001, Test 57). Open the `html` value in a browser to see
 the card; the copy comes from design follow-ups 33–38 and the IDN-008 rule.
+No file ever holds a raw address in its name or in the worker's log: the
+worker logs a digest of the recipient (`AUTHENTICATION_EMAIL_DIGEST_KEY`),
+and so does `system.email_suppressions` (Test 56).
 
 ## Test 35: close a Client Account
 
@@ -3344,8 +3498,10 @@ the deployment's Logs in Vercel: the middleware failed to load or run.
 
 ## Test 37: check the Better Stack monitors fire and recover
 
-Better Stack's free plan (ADR-0081, ADR-0066) holds three monitors, all
-alerting by email to the account's only team member. Its dashboard is at
+Better Stack's free plan (ADR-0081, ADR-0066) holds the three monitors
+below plus the «Database backup» heartbeat (Test 43) and, since 2026-10-21,
+the «Production admin web», «Public pages», and «Link host» monitors (Test
+74), all alerting by email to the account's only team member. Its dashboard is at
 https://betterstack.com; the error DSN and the heartbeat URL are credentials
 and live only in your own `apps/backend/.env` (commented out) and in the
 hosts' environments, never in the repository.
@@ -3425,9 +3581,10 @@ every endpoint's validation and authorization, refuses untrusted admin
 origins, stores data in Aiven and images in R2, and runs the worker (EXT-002)
 and the daily backup (EXT-009). The first Administrator was activated through
 a link printed in the `api` shell, so the admin web can be signed into
-(step 5). It still sends no email (gate 7, EXT-001): no Client can verify a
-registration and no Staff Member can be activated or recover a password.
-The transfer instructions are the studio's real QR image (PAY-003).
+(step 4). Since EXT-001 the worker sends the authentication emails through
+Resend (Test 56), and since LNK-001 their links open the apps on Android
+(Test 57); iOS waits for gate 9. The transfer instructions are the studio's
+real QR image (PAY-003).
 
 1. From the repository root, with the commit Northflank shows on the `api`
    service:
@@ -3454,7 +3611,7 @@ The transfer instructions are the studio's real QR image (PAY-003).
    `authentication_failed` in RFC 9457 form; Application → Cookies holds only
    `__Host-emma-admin-client`, HttpOnly, Secure, SameSite Lax, Path `/`,
    host-only. Reload `/catalogo/planes`: the login page loads, not a `404`.
-5. **Signed in** (WEB-010, verified 2026-10-14). In a private window with
+4. **Signed in** (WEB-010, verified 2026-10-14). In a private window with
    DevTools → Network (Preserve log), sign in as the production
    Administrator. `admin-web/authentication-sessions` answers `201` and
    `authentication-sessions/current` `200`. Before any screenshot of
@@ -3466,7 +3623,7 @@ The transfer instructions are the studio's real QR image (PAY-003).
    Branches), a reload keeps the session, and «Cerrar sesión» returns to
    the login page, removes the session cookie, and keeps the client one;
    Back stays on the login page.
-4. To re-measure the hops (ADR-0087), send
+5. To re-measure the hops (ADR-0087), send
    `curl https://p01--api--mmps25fn9k9x.code.run/api/v1/hop-probe` and the same
    path through `https://emma-pilates-admin.vercel.app`, then search the path
    in the `api` service's Logs and open each line: `forwardedFor` is `1`
@@ -3534,6 +3691,10 @@ workflow; production changes only when you start `Release Production`
 ([runbook](./runbooks/production-release.md)). Staging must be resumed
 first if it is paused (runbook, «Pause and resume staging»).
 
+0. Staging costs money while it runs (about $0.015 an hour for `api` and
+   `worker` together, Pay as you go): resume both services before this test
+   and **pause them again when you are done** (Test 74 has the steps and
+   the cost check).
 1. After a pull request merges, find the merge's staging release:
 
    ```sh
@@ -3582,6 +3743,14 @@ first if it is paused (runbook, «Pause and resume staging»).
 6. Two merges in quick succession: only the newest pending staging release
    runs; one whose commit is no longer main's head ends `superseded`, deploys
    nothing, and records no status.
+7. The production release ends with the smoke check against production
+   (`SMOKE_API_DOCUMENTATION=hidden`, Test 3), so a release that serves
+   Swagger on production fails there. Copying production's data into
+   staging is a separate, last-resort workflow (Test 74). When a
+   release fails, the runbook's «When a release fails», «Release a commit
+   by hand», and «Change a setting» sections say what to read in
+   Northflank and Vercel, how to release a commit without the workflow,
+   and that a secret edit needs a manual restart.
 
 ## Test 41: check that the QR is the only transfer instruction
 
@@ -3662,14 +3831,17 @@ HTTPS endpoint.
    is down.
 2. In Cloudflare, R2 → `emma-pilates-prod-images` → Objects shows the two
    variants under `private/transfer_receipt/<id>/`.
-3. Northflank → `worker` → Logs shows `authentication_email_disabled` once at
-   start (no email provider until EXT-001) and the finalize job for the upload.
+3. Northflank → `worker` → Logs shows the finalize job for the upload (and
+   `authentication_email_disabled` once at start only while the worker has
+   no `RESEND_API_KEY`, Test 56).
 
 ### C. The first Administrator without email
 
-Until EXT-001 sends email, the first production Administrator's Activation
-Link is read from the queue in the `api` service's shell, right after the
-bootstrap command ([runbook](./runbooks/first-administrator-bootstrap.md)):
+On an environment whose worker cannot send email yet, the first
+Administrator's Activation Link is read from the queue in the `api`
+service's shell, right after the bootstrap command
+([runbook](./runbooks/first-administrator-bootstrap.md)); this is how
+production's first Administrator was activated before EXT-001:
 
 ```sh
 node dist/src/administrator-activation-link-main.js
@@ -4492,7 +4664,7 @@ Every password field in both apps carries an eye inside its right end
 account. It starts hidden; a tap shows the typed text with the eye crossed
 out («Ocultar contraseña»), a second tap hides it again («Mostrar
 contraseña»), and the value and cursor stay. Each field toggles on its own.
-The admin web side is WEB-022 (Test 24, step 5).
+The admin web side is WEB-022 (Test 24, step 6).
 
 Run it on the development builds of Test 45 on the Android emulator, the
 iPhone 16 Pro, and the iPad Pro 11, in both apps.
@@ -4788,7 +4960,8 @@ ADR-0097). An Administrator sees, exports, and erases them on AW35.
    Bolivia keeps that day).
 4. Search by a name without its accent, an email fragment, or phone digits.
    Expected: only the matching rows, and «No se encontró ningún contacto.»
-   when none match.
+   when none match (`GET /api/v1/administrator/promotion-contacts?q=…`;
+   the export below is `GET …/promotion-contacts/export`, a CSV body).
 5. Press «Exportar CSV». Expected: `contactos-promociones-aaaa-mm-dd.csv` with
    every contact (not only the page), columns Nombre, Tipo, Correo, Teléfono,
    Aceptó el (Tipo since BE-023), accents intact in a spreadsheet, and a
@@ -4825,7 +4998,8 @@ Clients («Cuenta cerrada»), and closing her Account ends the consent.
    sesión», with its helper and the switch off. The Maestro flow
    `.maestro/promotions-consent.yaml` turns it on and off again.
 3. Turn it on. Expected: the switch turns Palo de rosa, and `GET
-   /api/v1/clients/current/promotions-consent` answers `consented: true` with
+   /api/v1/clients/current/promotions-consent` (the switch sends
+   `PUT …/promotions-consent` `{ "consented": true }`) answers `consented: true` with
    the time. Each period is its own row in
    `booking.client_promotions_consents`; turning it on again while it is on
    keeps the first time, and a Staff token answers `403`
@@ -4903,6 +5077,11 @@ the deployed policy.
    closing over the panel keeps the lock).
 5. The public site also sends `strict-transport-security` now
    (`curl -sI https://app.emmapilatesstudio.com/privacidad/`).
+6. The API itself sends no policy of its own: it answers JSON to the apps
+   and the proxy, so a `curl -sI` against the API shows only
+   `X-Content-Type-Options: nosniff` on the image routes (receipts, photos,
+   Promotion images), never a Content-Security-Policy.
+
 
 ## Test 63: Swagger off in production and the general request limit (BE-025)
 
@@ -5088,7 +5267,13 @@ Start the API and the Staff app as Test 1 and Test 2 describe and log in as
 2. The row opens «Ver la app como…»: the intro line, then the active Staff
    Members grouped as **Entrenadoras**, **Asistentes**, and
    **Nutricionistas**, each with their initials, name, and Branches. Paola
-   herself and pending or deactivated members never appear.
+   herself and pending or deactivated members never appear. With nobody
+   active (deactivate every other member in Personal on a copy of the
+   fixtures, Test 26) the screen centres «Nadie a quien ver todavía» over
+   «Cuando actives a una entrenadora, asistente o nutricionista, aparecerá
+   aquí.»; with the API down it shows «No pudimos cargar al personal.» with
+   **Reintentar** (Test 71), and a start the API refuses reads «No pudimos
+   empezar a ver la app como esa persona. Inténtalo de nuevo.».
 3. Tap Emma Vargas. The confirmation names her («¿Ver la app como Emma
    Vargas?») and states the 30 minutes and that everything is recorded in
    your name; «Cancelar» leaves everything as it is, «Ver como Emma» starts.
@@ -5146,3 +5331,471 @@ start the API and log in):
    revocation). A cash Payment, an Evaluation cancellation, or a Client
    invitation made meanwhile is audited to Paola with `actor_role =
    administrator` and `impersonation_id` set.
+
+## Test 68: watch the worker's other housekeeping sweeps
+
+Besides the sweeps of Tests 13 and 16, the worker runs four more
+housekeeping sweeps once at start and then on their interval
+(`apps/backend/src/worker.ts`; a failure logs `<job>_failed` and reports
+to Better Stack, Test 44). Nothing is physically deleted
+([ADR-0086](./adr/0086-soft-delete-every-database-row.md)): rows get
+`deleted_at` or an end state, and only object bytes leave the store. Use a
+copy of the fixtures (`createdb -T pilates_dev_sim pilates_test_sweeps`),
+start the API and the worker on it, and back-date one row per sweep with
+`psql -d pilates_test_sweeps`; the next run (at most an hour away, or at once
+when you restart the worker) does the rest. Two things no sweep touches: pg-boss's own
+`pgboss.job` rows, which keep a failed job's sanitized record for 30 days
+([ADR-0065](./adr/0065-retain-failed-jobs-for-thirty-days.md)) before pg-boss
+removes it, and a pg-boss runtime error, which the worker only logs as
+`pg_boss_error`.
+
+1. **`pending_account_cleanup` (hourly).** A registration nobody verified
+   for 7 days, or a Staff-made invitation nobody activated for 30 days, is
+   removed: register from the Client app (Test 4) and invite a Client as
+   Camila (Test 11 E), then
+   `update system.accounts set pending_expires_at = now() - interval '1 day' where email in ('<registered>', '<invited>')`.
+   After the sweep both rows carry `deleted_at`, the Assistant's search no
+   longer finds the invited Client, her invitation link answers `removed` to
+   `POST /api/v1/authentication-links/inspection` (Test 6 A), and the
+   registered address can register again.
+2. **`image_upload_cleanup` (hourly).** Three kinds of bytes go: an upload
+   declared but never finalized, 3 days later
+   ([ADR-0089](./adr/0089-delete-abandoned-uploads-after-three-days.md));
+   the variants of a replaced or removed profile photo and of a deleted
+   Promotion, at once
+   ([ADR-0076](./adr/0076-delete-detached-profile-and-promotion-images.md),
+   Tests 9 A and 32 C); and a transfer receipt 45 days after it was
+   finalized or 7 days after the Payment was decided, whichever is later
+   ([ADR-0075](./adr/0075-delete-receipt-images-after-forty-five-days.md)).
+   Confirm or reject a transfer (Test 10 C), then
+   `update system.image_assets set deletion_due_at = now() - interval '1 minute' where purpose = 'transfer_receipt' and deletion_due_at is not null`.
+   After the sweep the `readable` and `thumbnail` files are gone from
+   `apps/backend/.data/uploads/private/transfer_receipt/<id>/` (or from the
+   bucket, Test 42), `system.image_assets` keeps the row with `deleted_at`
+   and its sizes, the Payment row still names the asset, and
+   `GET /api/v1/administrator/payments/{id}/receipt` answers
+   `409 payment_receipt_not_ready` («Receipt is no longer available»).
+   A declaration sets `deletion_due_at` three days ahead, so
+   `POST /api/v1/uploads` without the `PUT` and `finalize`, then the same
+   `update` for `state = 'pending'`, shows the abandoned case: the
+   `pending/` file disappears and the row is marked removed.
+3. **`purchase_intent_expiry` (every 5 minutes).** Open an Intent as
+   `mariana@example.com` (Test 7, «Buying a Plan through Swagger», steps
+   1–3; attach no receipt), then
+   `update booking.purchase_intents set expires_at = now() - interval '1 minute' where state = 'open'`.
+   Within five minutes `GET /api/v1/purchase-intents/current` answers
+   `404 purchase_intent_not_found`, the row reads `state = 'expired'`,
+   `GET /api/v1/clients/current/credit` shows any reserved Credit back in
+   `availableCentavos`, and `POST …/{id}/submit` answers
+   `409 purchase_intent_not_open` (before the sweep passes, the same call
+   on the back-dated row answers `409 purchase_intent_expired`). A new
+   Intent can be opened at once.
+4. **`subscription_reminders` (hourly)** records «Plan por vencer» / «Tu
+   plan vence en 3 días.» once per Subscription that ends in three days
+   (Valeria's fixture, Test 7); a second run adds nothing.
+
+Drop the copy afterwards: `dropdb pilates_test_sweeps`.
+
+## Test 69: the notifications a studio change sends
+
+Three inbox types are only reached when administration changes a class
+that is already booked. Each is an entry with sound on the Android
+`actionable` channel (Test 46 B) that opens Mis reservas or Mi agenda from
+Perfil → Notificaciones (Test 18). Start the API, the worker, both apps, and
+the admin web on `pilates_dev_sim` with the fixtures (Tests 5 A and 24).
+
+1. **A seat frees for a waitlisted Client.** Seed a one-seat class the way
+   the Maestro flow does (`waitlist-join-and-leave.yaml`: tomorrow at 05:00
+   in Centro, filled by Valeria), or create a Session of capacity 1 in
+   Horario (Test 25, step 2) and book it as `valeria@example.com`; join its
+   Waitlist as `lucia@example.com` (**Unirme a la lista de espera**, Test
+   5 B). Then cancel Valeria's Booking (her **Cancelar** in Mis reservas, or
+   `DELETE /api/v1/bookings/{id}`). Lucía's Waitlist Entry closes as
+   `promoted`, a Booking is created for her in the same transaction, and
+   her inbox reads «Cupo liberado» / «¡Tienes un cupo! Te promovimos de la
+   lista de espera para tu clase de Mat Pilates.» (the Class Type varies);
+   Mis reservas shows the class as a Booking and the Perfil badge counts
+   one. A Client with no eligible Plan at that moment is skipped and the
+   next entry is promoted.
+2. **The studio moves a booked class.** In Horario, open a Session Lucía
+   has booked and change its **Hora** with **Solo esta sesión** (Test 25,
+   step 3; the API is `PATCH /api/v1/administrator/sessions/{id}`). Every
+   booked Client receives «Tu clase cambió de horario» / «Tu clase de Mat
+   Pilates cambió de horario: ahora es el sábado 26 de septiembre, 16:00.»
+   (the day and time vary), and Mis reservas shows the new time. The empty-Session check of Test 13 starts
+   over for the moved Session.
+3. **The studio reassigns a Trainer.** In the same panel change the
+   **Entrenadora** to Daniela Ortiz. Daniela's inbox (Staff app, Perfil →
+   Notificaciones) reads «Nueva clase asignada» / «Se te asignó una clase:
+   Mat Pilates, sábado 26 de septiembre, 16:00.» and opens her Mi agenda; the previous
+   Trainer is not told. A weekly schedule's replacement (Test 21, step 2)
+   sends the same notice.
+
+Each of the three is one row per change: repeating the same edit sends
+nothing new (the `business_event_key` carries the change's instant), and
+all three are `delivered` through push on an Android development build
+(Test 46), with the full copy on the lock screen (none of them is private).
+
+## Test 70: the rule codes a journey can answer
+
+Every rule a Client or Staff Member can break answers a stable problem code
+(RFC 9457, Test 4), never `500` (Test 61). The codes below are the ones the
+earlier tests never show; call the endpoints with Swagger or curl on a copy
+of the fixtures (`createdb -T pilates_dev_sim pilates_test_codes`, the API
+on it) as the Account named, with an `idempotency-key` UUID on every
+command.
+
+**Bookings** (`lucia@example.com`; Test 7 names the endpoints):
+
+| Do this | Answer |
+| --- | --- |
+| Book a Session, then book the same Session again | `409 active_booking_exists` |
+| Book a second Session that overlaps the first in time (no two fixture classes share an hour on the same day, so add a one-off Session at Equipetrol at a Centro class's time in Horario, Test 25 step 2) | `409 booking_overlap` |
+| Book a full Session (`isabel@example.com` has no classes; fill a capacity-1 Session first) | `409 session_full` |
+| Join the Waitlist of a Session that still has seats | `409 session_has_capacity` |
+| Join a Waitlist twice | `409 active_waitlist_entry_exists` |
+| Cancel a Booking less than 2 h 30 before its start (one the flow of Test 19 seeds «10 minutes away») | `409 booking_cancellation_window` |
+| Cancel the same Booking twice, or a Booking of a cancelled Session | `409 booking_not_cancellable` |
+| Leave a Waitlist Entry that was already closed (promoted, left, or its Session started) | `409 waitlist_entry_not_active` |
+| Book as `mariana@example.com` (no Plan) or `sofia@example.com` (expired) | `409 no_eligible_subscription` |
+| Reschedule outside the window, to another day, or a cancelled Booking | `409 reschedule_outside_window`, `reschedule_target_ineligible`, `booking_not_reschedulable` (Test 61) |
+
+**Payments** (`mariana@example.com`; Test 7, «Buying a Plan through
+Swagger», names the endpoints):
+
+| Do this | Answer |
+| --- | --- |
+| Open an Intent for a Plan hidden with **Ocultar en la app** (Test 25, step 5) | `409 plan_not_purchasable` |
+| Submit an Intent without a receipt | `409 payment_receipt_required` |
+| Attach an upload that is still `processing` (stop the worker first) | `409 payment_receipt_not_ready` |
+| Attach a receipt that another Account uploaded (Sofía's asset id) | `403 payment_receipt_invalid_owner` |
+| Attach or submit after the Intent was submitted | `409 purchase_intent_not_open` |
+| Attach or submit after the Intent expired (Test 68, step 3) | `409 purchase_intent_expired` |
+| Open an Intent while a transfer is under review | `409 payment_pending_exists` |
+| `POST /api/v1/credit-purchases` as `sofia@example.com` (Bs 60 of Credit) for a Plan that costs more | `409 credit_insufficient`; create a Plan priced under Bs 60 in Planes (Test 25, step 5) and the same call activates it at once, with `payment_confirmed` in her inbox and no QR (Test 10 E) |
+| As Paola, confirm or reject a cash Payment's id, or a decided one again with the opposite decision | `409 payment_not_pending`, `409 payment_confirmation_conflict` (Test 7) |
+
+**Uploads** (any Account; Test 32 A names the three calls; limits are 10 MB
+for a receipt, 5 MB for a profile photo, 20 MB for a Promotion image, JPEG,
+PNG, or WebP only):
+
+| Do this | Answer |
+| --- | --- |
+| Declare `mediaType: image/gif` (or `application/pdf`) | `400 image_media_type_invalid` |
+| Declare `byteSize: 0` or a negative size | `400 image_size_invalid` |
+| Declare a checksum that is not a base64 SHA-256 | `400 image_checksum_invalid` |
+| Declare a `byteSize` over the purpose's limit | `400 image_too_large` |
+| `PUT` more than 25 MB of bytes | `413 payload_too_large` |
+| `PUT` to an upload that was already finalized, or `finalize` one that is already `ready` or `failed` (a second `finalize` while it is `processing` is accepted and does nothing) | `409 upload_not_writable`, `409 upload_not_finalizable` |
+| `PUT` or `finalize` another Account's upload | `403 upload_access_denied` |
+| `GET /api/v1/uploads/{id}` with a made-up id, or another Account's | `404 upload_not_found` |
+
+**Catalog and schedules** (`paola.mendoza@example.com`; Test 21 names the
+endpoints):
+
+| Do this | Answer |
+| --- | --- |
+| Create a Branch or Class Type with an empty name, or a Plan with a price or class count of 0 | `400 invalid_catalog_value` |
+| Create a Class Type named «Mat Pilates» | `409 class_type_name_taken` |
+| A weekly schedule or one-off Session with a capacity of 0, or a `startsAtLocal` such as `25:00` (a duration outside 5–240 minutes is refused earlier as `invalid_request`) | `400 invalid_schedule` |
+| A schedule, replacement, or end whose `effectiveFrom` is in the past | `400 effective_date_invalid` |
+| `PATCH` a Session that is cancelled or already started | `409 session_not_editable` |
+| Send Branches for a new Administrator | `400 invalid_branch_assignment` (Test 17) |
+
+**Identity** (Test 67 names the impersonation endpoints):
+
+| Do this | Answer |
+| --- | --- |
+| `POST /api/v1/impersonations` twice in the same second from two terminals | `409 impersonation_active` for the loser of the race (the sequential case answers `403 staff_access_denied`) |
+| `POST /api/v1/accounts/current/closure` with a Staff credential | `403 closure_access_denied` |
+| `POST /api/v1/accounts/current/email-change` for an Account that is not active | `409 account_not_active` (only reachable through the automated tests: a pending Account cannot sign in) |
+| Register with your own referral code | `400 referral_self_reference` (unreachable by hand: a code belongs to an existing Client; the unit tests cover it) |
+
+The `*_not_found` family (`session_not_found`, `payment_not_found`,
+`evaluation_not_found`, `supply_not_found`, `expense_not_found`,
+`expense_category_not_found`, `salary_payment_not_found`,
+`promotion_not_found`, `session_schedule_not_found`,
+`availability_block_not_found`, `evaluation_slot_not_found`,
+`notification_not_found`, `profile_photo_not_found`,
+`promotion_image_not_found`) answers `404` to a made-up UUID on the matching
+route; `profile_photo_not_ready` and `promotion_image_not_ready` answer
+`409` to an asset the worker has not finished; `invalid_cursor` answers
+`400` to a garbled `cursor` on `GET /api/v1/notifications`;
+`expense_category_name_taken`,
+`availability_block_ended`, `branch_archived`, `promotion_archived`, and
+`staff_member_deactivated` answer `409` when the row named is already in
+that state, and so do `evaluation_not_booked` and `evaluation_started` to
+`DELETE /api/v1/administrator/evaluations/{id}` for a cancelled or started
+Evaluation; `invalid_back_office_value` and `invalid_promotion_value` answer
+`400` to a Back Office or Promotion body that fails a rule the DTO cannot
+express (a negative quantity, an end date before the start). Drop the copy
+afterwards: `dropdb pilates_test_codes`.
+
+## Test 71: the mobile apps' load, error, offline, and link states
+
+Every screen that reads data draws the same three states in both apps:
+the breathing logo while it loads (Test 54), a load failure, and its own
+content or empty state. The failure is a plain line under the header with a
+**Reintentar** primary button (screen readers hear the line as an alert).
+Run it on the iPhone 16 Pro, the iPad Pro 11, and the Android emulator, in
+both apps, with the API on `pilates_dev_sim` and the fixtures.
+
+1. **A load failure.** Sign in as `lucia@example.com`, then stop the API
+   (Ctrl+C in its Terminal) and open a screen you have not visited: Perfil
+   → **Notificaciones** reads «No pudimos cargar tus notificaciones.»,
+   **Mis evaluaciones** «No pudimos cargar tus evaluaciones.», **Mi
+   crédito** «No pudimos cargar tu crédito.», the **Reservar** tab «No
+   pudimos cargar las clases.», a Plan «No pudimos cargar el plan.». A tab you
+   had already opened shows the same line once its refresh fails. Start the
+   API again and tap
+   **Reintentar**: the screen loads. In the Staff app as
+   `camila.rojas@example.com` the search result's overview reads «No
+   pudimos cargar al cliente.» (on the iPad, inside the right panel), the
+   Trainer's root «No pudimos cargar tu agenda.», the roster «No pudimos
+   cargar la lista de asistencia.», the Administrator's root «No pudimos
+   cargar los pagos pendientes.», and the Nutritionist's **Mi
+   disponibilidad** «No pudimos cargar tus horarios.».
+2. **An action failure.** With the API stopped, tap an action instead: a
+   refused command shows its own line and keeps the form, in the pattern
+   «No pudimos … Inténtalo de nuevo.» (Test 10 D's «No pudimos cancelar la
+   sesión. Inténtalo de nuevo.», Test 67's «No pudimos empezar a ver la
+   app como esa persona. Inténtalo de nuevo.»); the button spins while the
+   request waits (Test 50) and nothing is sent twice.
+3. **Offline.** Cut the device's network as Test 9 F describes: the banner
+   «Sin conexión. Mostrando la última información guardada.» sits above
+   every screen until the network is back, and the screens of step 1 that
+   were already loaded keep their data.
+4. **A render error.** Test 1 describes «Algo salió mal» with
+   **Reintentar**; it needs a defect to appear (a temporary `throw` in a
+   screen, never committed), so it is read there, not here.
+5. **The link screens.** Open an authentication link on the Android
+   emulator with a development build (Test 57): the app first shows
+   **Comprobando enlace** under the Emma wordmark while it inspects the
+   token (`POST /api/v1/authentication-links/inspection`, Test 6 A), then
+   the password form («Crea una contraseña nueva» for a recovery; «Crea tu
+   contraseña» under the eyebrow «Activar cuenta» for an invitation, which
+   ends on «Tu cuenta está activa»; both fields carry the eye of Test 52). Open the same link a second time: **Este enlace ya no es válido**
+   under the Palo de rosa clock of Test 1, with **Volver a iniciar
+   sesión**. An activation link whose invitation the 30-day cleanup removed
+   (Test 68, step 1) reads **Esta invitación ya no está activa**. The Staff
+   app draws the same screens (S18, S19) for a Staff Member's recovery
+   (`¿Olvidaste tu contraseña?` on its Login, Test 1 B) and for the
+   activation link of a member invited in Test 26, whose `/staff/` link
+   opens the Staff build.
+6. **Empty states** are read where their screens are: Reservar and Mi
+   plan (Test 5 B and Test 18), the Client's history and inbox (Tests 5 B
+   and 9 B), the Assistant's reservations and history and «Sin plan
+   activo» (Test 11 B), Pagos pendientes (Test 10 C), the roster (Test 12),
+   Mis evaluaciones (Test 15), referrals and Credit (Test 10 A), and «Ver
+   la app como…» (Test 67 A).
+
+## Test 72: the admin web's empty, failed, refused, and lost states
+
+Every list page draws one of four states inside its white card: its rows,
+"Cargando …" while they arrive (Test 66 covers the logo before that), an
+empty line, or a load failure with **Reintentar**. Check each at 1440 px
+and 420 px in a real browser (Test 23).
+
+1. **An empty studio.** Create an empty database and its first
+   Administrator (Test 14 on `pilates_test_bootstrap`, activated through
+   the captured link), start the API and the admin web on it, and sign in.
+   The top bar's selector reads "Todavía no hay sucursales activas."
+   instead of a Branch, and each page says what to do first:
+   - **Horario**: "Todavía no hay sucursales activas. Crea una en
+     Sucursales para armar su horario."; **Insumos**: "… para llevar sus
+     insumos."; **Gastos**: "… para registrar sus gastos."; **Evaluaciones
+     nutricionales**: "Todavía no hay sucursales activas. Las evaluaciones
+     se ven por sucursal."; **Retiros e insumos consumidos**: the bare
+     line.
+   - **Clientes**: "Todavía no hay clientas."; **Pagos**: "Todavía no hay
+     transferencias." under **Todos**, "Todavía no hay pagos confirmados."
+     and "… rechazados." under those filters (Test 27); **Nómina**:
+     "Todavía no hay pagos registrados." (with an **Empleado** chosen, "No
+     hay pagos registrados para esta persona."); **Categorías de gasto**:
+     "Todavía no hay categorías. Agrega la primera abajo."; **Referidos**:
+     "Todavía no hay referidos." under the subtitle "Todavía no hay
+     referidos en el estudio"; **Promociones**: "Todavía no hay
+     promociones." (Test 33); **Contactos para promociones**: "Todavía no
+     hay contactos." (Test 59); **Personal** lists the Administrator alone.
+   - Create a Branch (Test 25, step 5): the selector and Horario wake up,
+     and **Insumos** reads "Todavía no hay insumos en esta sucursal.",
+     **Gastos** "Todavía no hay gastos en esta sucursal.", and **Nuevo
+     gasto**'s category list "Todavía no hay categorías: crea la primera."
+     until each gets its first row. Drop the database afterwards.
+2. **A filter with no match.** On the fixtures, `?status=archived` on
+   Sucursales says "No hay sucursales con este filtro.", the same address
+   on Tipos de clase "No hay tipos de clase con este filtro.", and
+   `?visibility=hidden` on Planes "No hay planes con este filtro." (archive
+   or hide one to see the row instead). A searched list that finds nothing
+   keeps its header and says so (Clientes, Referidos, and Contactos in Tests
+   26, 29, and 59); the pagination footer of an empty table reads "Sin
+   resultados" and a table with no copy of its own "No hay registros.".
+3. **A load failure.** Signed in on the fixtures, stop the API and open a
+   page you have not visited: its card reads "No pudimos cargar …" with
+   the page's noun (Test 64 shows "No pudimos cargar las clientas.") and a
+   small **Reintentar**; the sidebar, top bar, and selector stay. The
+   selector itself, when its own read fails, reads "No pudimos cargar las
+   sucursales. Inténtalo de nuevo."; inside a panel, a list that fails
+   reads its own line ("No pudimos cargar las categorías." in Nuevo gasto,
+   "No pudimos cargar al personal" in Registrar pago, "No pudimos cargar
+   los insumos. Cierra el panel e inténtalo de nuevo." in Registrar
+   retiro). Start the API and **Reintentar** fills the card. Each failure
+   that TanStack gave up on is one `ApiError` event when a DSN is set (Test
+   44, step 5).
+4. **Lost at startup.** Stop the API and reload any address: the whole
+   window shows "No pudimos conectar con el servidor. Revisa tu conexión e
+   inténtalo de nuevo." with a large **Reintentar** on the Login layout
+   (screen readers hear the heading "Sin conexión"); start the API and
+   **Reintentar** continues to the page. Compare Test 64, where a page
+   crash keeps the shell.
+5. **Unknown address.** `/no-existe` shows "Página no encontrada" with
+   **Volver al horario** inside the shell (Test 23, step 4).
+6. **Refused.** The admin web maps a `403` from the API to a line of its
+   own instead of a crash: "No tienes permiso para ver esta sección." in a
+   list's card, and on a write "No tienes permiso para cambiar el
+   horario." (Horario), "… el catálogo." (Tipos de clase), "… sucursales.",
+   "… los planes.", "… al personal.", "… el Back Office.", "… las
+   promociones.", and "No tienes permiso para decidir pagos." (Pagos).
+   A signed-in Administrator cannot reach them by hand (the API accepts
+   every one of her requests, and her own Role cannot be changed, Test 17),
+   so the Jest suite covers each copy (Test 8); a tester sees them only
+   after a defect.
+
+## Test 73: CI's security jobs and the automated dependency updates
+
+Besides the test chains of Test 8, [`ci.yml`](../.github/workflows/ci.yml)
+runs four jobs that check the repository itself (EXT-019); none needs a
+secret, and three of them can be run on the Mac:
+
+1. **`audit`** runs `pnpm audit --audit-level high` on every pull request.
+   Run it from the repository root: it prints the advisories and exits 0
+   while none is high or critical outside the ignore list in
+   `pnpm-workspace.yaml` (`auditConfig.ignoreGhsa`); a new high advisory
+   fails the job until the dependency is updated or the advisory is
+   ignored on purpose, with the reason beside it.
+2. **`secrets`** runs gitleaks over the whole history
+   (`gitleaks/gitleaks-action`, pinned version) and fails on anything that
+   looks like a credential. It runs only in CI; to try it, push a branch
+   with a fake token such as `AKIAIOSFODNN7EXAMPLE` in a scratch file and
+   watch the job fail, then drop the commit (never merge it).
+3. **`migrations`** proves that the committed migrations still produce the
+   Prisma schema: `.github/scripts/check-migrations.sh` applies every
+   migration to an empty database and diffs it against
+   `apps/backend/prisma/models`. Run it locally against a throwaway
+   database:
+
+   ```sh
+   createdb pilates_test_drift
+   DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_drift" .github/scripts/check-migrations.sh
+   dropdb pilates_test_drift
+   ```
+
+   It prints «the migrations produce the schema (only the known drift
+   remains)»: the ten composite foreign keys that live only in migration
+   SQL are listed in `apps/backend/prisma/known-drift.sql`, and any other
+   statement fails the check.
+4. **`public-site`** runs `node .github/scripts/check-public-site.mjs`
+   when `apps/public-site/**` changes: the `_headers` file is present and
+   complete, every page is whole, and every link resolves. Run the same
+   command from the root; it exits 0 and prints nothing to fix.
+
+On a pull request the `changes` job starts only the jobs whose paths
+changed (Test 8), and a push to `main` is never cancelled by a later one.
+[`dependabot.yml`](../.github/dependabot.yml) opens one grouped pull request
+a week per ecosystem for **security** updates only (version updates stay
+off); it shows up as a pull request by `dependabot[bot]` that CI checks
+like any other, and the user merges it.
+
+## Test 74: the operations runbooks, the monthly reminder, and the monitors
+
+The runbooks under [`docs/runbooks/`](./runbooks/) are the procedures a
+person follows outside the code. Each has a part you can rehearse without
+touching production.
+
+1. **Pause and resume staging** ([release
+   runbook](./runbooks/production-release.md#pause-and-resume-staging)).
+   Staging's team is Pay as you go (about $0.015 an hour for `api` and
+   `worker` together). Before Test 40 or Test 55: Northflank, team
+   `emma-pilates-staging` → Services → `api` → **Resume**, then `worker`,
+   and wait for `curl -s https://p01--api--jmys6w5p8vlk.code.run/health/ready`
+   to answer `ready` (a merge that landed while paused failed its release
+   at readiness: `gh workflow run release-staging.yml` releases main's
+   head). After testing: **Pause** both, in that order, and confirm the
+   services read Paused. Team → Billing → Usage shows the hours; a $3
+   billing alert emails the owner.
+2. **Copy production into staging** (the same runbook, «last resort»,
+   [ADR-0093](./adr/0093-copy-production-into-staging-as-a-last-resort.md)).
+   Rehearse only the refusal: `gh workflow run copy-production-to-staging.yml -f confirm="no"`
+   leaves its only job skipped and touches nothing, because the job runs
+   only when the input is exactly `copy production to staging`. The real run restores
+   production's newest daily dump as `emma_staging` and releases `main` to
+   staging again; while a copy is loaded, the runbook's «do not» list
+   applies (no recovery, resend, invitation, email change, or closure for a
+   real address; no `EXPO_ACCESS_TOKEN` on staging; no bulk email tests),
+   and a fresh staging reset follows the fix.
+3. **A personal data request**
+   ([runbook](./runbooks/personal-data-requests.md)). Rehearse it on
+   `pilates_dev_sim` for a fixture Client: verify the requester (only from
+   the Account's address, or in person with an ID), add the row to the
+   request log with the 15-business-day deadline, run the queries of
+   [`personal-data-request.sql`](./runbooks/personal-data-request.sql) with
+   `psql` to collect her data, and read the «Deletion requests» and «Stop
+   promotions» sections, which point at the closure of Test 35 and the
+   AW35 actions of Tests 59 and 60.
+4. **An incident** ([runbook](./runbooks/incident-response.md)). Rehearse
+   the first two steps without an incident: pick the severity from the
+   table, open a row in the incident log, and freeze deploys with
+   `gh workflow disable "Release Production" --repo DaleneyRuben/emma-pilates`
+   (`gh workflow list` shows it disabled; `gh workflow enable` puts it
+   back). The runbook then says what to contain, which secrets to rotate
+   (its table), when to restore from a backup (Test 43 B), whom to tell,
+   and to save Northflank's logs the same day, because they are kept 30
+   days ([infrastructure, «Logs and
+   retention»](./architecture/infrastructure.md#logs-and-retention)).
+5. **Secrets rotation** ([runbook](./runbooks/secrets-rotation.md)). Read
+   the inventory (which secret lives in which store, who issues it) and
+   the calendar: the deploy tokens on 2027-09-14 and 2027-09-17, every
+   never-expiring credential in the same September sitting, the restore
+   drill every quarter from January 2027, and the free-plan usage check
+   every month. A rotation ends with a row in the rotation log and the
+   calendar line moved a year forward in the runbook **and** in the
+   workflow below.
+6. **The monthly reminder**
+   ([`operations-reminders.yml`](../.github/workflows/operations-reminders.yml)).
+   On the first of every month at 09:00 La Paz it opens one GitHub issue
+   per task that falls due in the coming month (`[ops] <task> (due
+   <date>)`, `[ops] Restore drill <year> Q<n>`, `[ops] Free-plan usage check
+   <year>-<month>`), skipping any whose issue is still open. Run it by hand
+   with `gh workflow run operations-reminders.yml`: the run's log lists
+   each task as opened or «still open», and `gh issue list` (or the
+   repository's Issues tab) shows the usage-check issue for the month.
+   Close the issue with the month's numbers from the consoles listed under
+   [«Free-plan limits that can be exceeded
+   silently»](./architecture/infrastructure.md#free-plan-limits-that-can-be-exceeded-silently)
+   (EAS builds, Resend, R2, Vercel, Northflank, Aiven, Better Stack,
+   Actions minutes, Pages builds). GitHub disables the schedule after 60
+   days without a push; its email is the cue to run it by hand and
+   re-enable it.
+7. **The restore drill** ([backups
+   runbook](./runbooks/backups-and-restore-drills.md#restore-drill)) is
+   Test 43 B; each quarter's run adds a row to the runbook's «Drill log»
+   (the reminder issue asks for it), and the weekly bucket check is
+   `pnpm backup:check` (Test 43 A).
+8. **The three newer uptime monitors**
+   ([runbook](./runbooks/uptime-monitors.md)) check
+   `https://emma-pilates-admin.vercel.app/`,
+   `https://app.emmapilatesstudio.com/`, and
+   `https://links.emmapilatesstudio.com/.well-known/assetlinks.json` every
+   3 minutes with the API monitor's settings (Test 37). To prove one
+   fires without breaking anything, open **Production admin web** →
+   Configure, point it at `https://emma-pilates-admin.vercel.app/api/v1/does-not-exist`
+   (the proxy answers 404), save, and wait about 6 minutes for «New
+   incident started»; put the URL back and «Incident resolved» follows.
+   Record the two times in the infrastructure page, as the API monitor's
+   were. The runbook's last table says where to look first when each one
+   alerts (Vercel's deployments, Cloudflare Pages, the `links.` DNS record
+   and Northflank's certificate).
+9. **The mobile release** ([runbook](./runbooks/mobile-release.md)) is
+   rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
+   EAS Update path for a JavaScript-only fix and the «confirm a Client's
+   email by hand» command of Test 48 C.
