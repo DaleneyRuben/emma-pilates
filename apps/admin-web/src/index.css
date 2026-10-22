@@ -164,6 +164,17 @@
     background-color: var(--color-primario-tinte);
     color: var(--color-primario-profundo);
   }
+
+  /*
+   * WEB-037: the page behind an open dialog, sheet, or side panel. The
+   * overlays toggle the class (`body-scroll-lock.ts`) and keep the hidden
+   * scrollbar's width in `--ancho-barra`, so the layout does not shift.
+   */
+  body.sin-desplazamiento {
+    overflow: hidden;
+    overscroll-behavior: contain;
+    padding-right: var(--ancho-barra, 0px);
+  }
 }
 
 @utility tabular {

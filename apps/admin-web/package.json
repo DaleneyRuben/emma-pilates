@@ -97,7 +97,8 @@
       "/node_modules/.pnpm/(?!(rettime|until-async|@open-draft\\+deferred-promise)@)"
     ],
     "moduleNameMapper": {
-      "\\.css$": "<rootDir>/test/style-stub.cjs"
+      "\\.css$": "<rootDir>/test/style-stub.cjs",
+      "^react-remove-scroll-bar$": "<rootDir>/src/components/ui/remove-scroll-bar-stub.ts"
     }
   }
 }

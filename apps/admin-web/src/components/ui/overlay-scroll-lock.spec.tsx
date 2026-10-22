@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ReceiptViewer } from "../../payments/receipt-viewer";
 import { SidePanel } from "../panel/side-panel";
@@ -74,7 +74,7 @@ describe("the overlays and the body scroll lock", () => {
     expect(document.body).toHaveClass(scrollLockClass);
     expect(document.querySelectorAll("style")).toHaveLength(0);
 
-    await user.click(enlarged.getByRole("button", { name: "Cerrar" }));
+    await user.click(within(enlarged).getByRole("button", { name: "Cerrar" }));
     expect(
       screen.queryByRole("dialog", { name: "Comprobante ampliado" }),
     ).toBeNull();

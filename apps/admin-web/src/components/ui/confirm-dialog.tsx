@@ -1,5 +1,6 @@
 import { AlertDialog } from "radix-ui";
 import type { ReactNode } from "react";
+import { BodyScrollLock } from "./body-scroll-lock";
 import { Button } from "./button";
 
 /**
@@ -38,6 +39,7 @@ export function ConfirmDialog({
       <AlertDialog.Portal>
         <AlertDialog.Overlay className="fixed inset-0 z-50 bg-scrim" />
         <AlertDialog.Content className="fixed top-1/2 left-1/2 z-50 flex w-[min(420px,calc(100vw-32px))] -translate-x-1/2 -translate-y-1/2 flex-col gap-3 rounded-panel border border-borde bg-blanco p-5 shadow-popover">
+          <BodyScrollLock />
           <AlertDialog.Title className="font-serif text-titulo-panel text-texto">
             {title}
           </AlertDialog.Title>

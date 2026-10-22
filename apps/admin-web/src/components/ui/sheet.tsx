@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { Dialog as SheetPrimitive } from "radix-ui";
 import { useRef, type ComponentProps } from "react";
 import { cn } from "../../lib/cn";
+import { BodyScrollLock } from "./body-scroll-lock";
 
 // Side panels (408px) and their narrow-browser sheets, plus the sidebar
 // drawer, all share the Dialog behavior: scrim, focus trap, Esc to close.
@@ -71,6 +72,7 @@ export function SheetContent({
         }}
         {...props}
       >
+        <BodyScrollLock />
         {children}
         {hideClose ? null : (
           <SheetPrimitive.Close

@@ -1,6 +1,7 @@
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import type { IncomingMessage } from "node:http";
+import { fileURLToPath } from "node:url";
 import { defineConfig, type Plugin } from "vite";
 import { forwardEnvelope } from "./api/monitoring/envelope.ts";
 import { securityHeaders } from "./security-headers.ts";
@@ -45,6 +46,21 @@ export default defineConfig({
   // The built app runs under the deployed headers (WEB-030); the dev server
   // does not, since its hot reload injects scripts the policy refuses.
   preview: { headers: securityHeaders },
+  resolve: {
+    // WEB-037: Radix's scroll lock would inject a <style> element the policy
+    // refuses; the overlays lock the body through a class instead.
+    alias: [
+      {
+        find: /^react-remove-scroll-bar$/,
+        replacement: fileURLToPath(
+          new URL(
+            "./src/components/ui/remove-scroll-bar-stub.ts",
+            import.meta.url,
+          ),
+        ),
+      },
+    ],
+  },
   server: {
     port: 5173,
     strictPort: true,
