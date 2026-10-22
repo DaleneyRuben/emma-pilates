@@ -31,8 +31,9 @@ env:
     visible:
       text: "Entrenadora · Quedan .* min"
     timeout: 10000
+# The greeting carries the screen's label, so the label is what Maestro sees.
 - extendedWaitUntil:
-    visible: "Hola, Emma"
+    visible: "Mi agenda"
     timeout: 20000
 - runFlow: subflows/dismiss-push-permission.yaml
 - takeScreenshot: staff-admin-viewing-as-trainer

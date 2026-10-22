@@ -20,9 +20,8 @@ import {
 import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
 import { createStaticNavigation, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { type ReactNode, useCallback, useContext, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { SafeAreaInsetsContext } from "react-native-safe-area-context";
 
 import { CancelClassScreen } from "./administrator/cancel-class-screen";
 import { CancelSessionScreen } from "./administrator/cancel-session-screen";
@@ -39,7 +38,10 @@ import { ClientSearchScreen } from "./assistant/client-search-screen";
 import { ConfirmCashPaymentScreen } from "./assistant/confirm-cash-payment-screen";
 import { NewClientScreen } from "./assistant/new-client-screen";
 import { SelectPlanScreen } from "./assistant/select-plan-screen";
-import { ImpersonationBanner } from "./impersonation/impersonation-banner";
+import {
+  ImpersonationBanner,
+  impersonationBannerHeight,
+} from "./impersonation/impersonation-banner";
 import { createImpersonationApi } from "./impersonation/impersonation-api";
 import {
   ImpersonationContext,
@@ -244,13 +246,6 @@ const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNavigation
   trainer: createStaticNavigation(TrainerStack),
 };
 
-// FUT-001: the banner takes the top inset so the screens under it do not add it again.
-function UnderBanner({ children }: { children: ReactNode }) {
-  const insets = useContext(SafeAreaInsetsContext);
-  const value = useMemo(() => ({ bottom: 0, left: 0, right: 0, ...insets, top: 0 }), [insets]);
-  return <SafeAreaInsetsContext.Provider value={value}>{children}</SafeAreaInsetsContext.Provider>;
-}
-
 export function StaffNavigation({
   accountId,
   apiFetcher,
@@ -316,12 +311,12 @@ export function StaffNavigation({
                 navigator
               ) : (
                 <View style={styles.underBanner}>
+                  <View style={styles.pushedDown}>{navigator}</View>
                   <ImpersonationBanner
                     impersonation={impersonation}
                     onExit={onExit}
                     onExpire={onExpire}
                   />
-                  <UnderBanner>{navigator}</UnderBanner>
                 </View>
               )}
             </ImpersonationContext.Provider>
@@ -375,5 +370,6 @@ const styles = StyleSheet.create({
   },
   segmentTextSelected: { color: colors.white },
   segmented: { flexDirection: "row" },
+  pushedDown: { flex: 1, paddingTop: impersonationBannerHeight },
   underBanner: { flex: 1 },
 });

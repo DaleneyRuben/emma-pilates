@@ -1,11 +1,13 @@
 import { colors, Glyph, type MobileImpersonation, spacing, typography } from "@pilates/mobile-core";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { SafeAreaInsetsContext } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { roleLabel } from "../profile/staff-labels";
 
 const minute = 60_000;
+
+export const impersonationBannerHeight = 52;
 
 export function minutesLeft(expiresAt: string, now: number): number {
   return Math.max(0, Math.floor((new Date(expiresAt).getTime() - now) / minute));
@@ -22,8 +24,6 @@ export function ImpersonationBanner({
   onExit: () => void;
   onExpire: () => void;
 }) {
-  // Outside a SafeAreaProvider (tests) the strip starts at the top edge.
-  const insets = useContext(SafeAreaInsetsContext);
   const [now, setNow] = useState(() => Date.now());
   const expiresAt = new Date(impersonation.expiresAt).getTime();
 
@@ -39,7 +39,7 @@ export function ImpersonationBanner({
 
   const name = impersonation.staffMemberName;
   return (
-    <View accessibilityRole="header" style={[styles.strip, { paddingTop: insets?.top ?? 0 }]}>
+    <SafeAreaView accessibilityRole="header" edges={["top"]} style={styles.strip}>
       <View style={styles.row}>
         <Glyph color={colors.white} name="eye" size={16} strokeWidth={1.5} />
         <View style={styles.text}>
@@ -58,7 +58,7 @@ export function ImpersonationBanner({
           <Text style={styles.exitText}>Salir</Text>
         </Pressable>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -80,7 +80,9 @@ const styles = StyleSheet.create({
     minHeight: 52,
     paddingHorizontal: spacing.lg,
   },
-  strip: { backgroundColor: colors.primaryDeep },
+  // Over the top inset: the screen under it keeps its own safe-area padding
+  // and the wrapper pushes it down by the strip's 52 px (navigation.tsx).
+  strip: { backgroundColor: colors.primaryDeep, left: 0, position: "absolute", right: 0, top: 0 },
   text: { flex: 1, gap: 2 },
   title: { color: colors.white, fontSize: typography.note, fontWeight: "500" },
 });
