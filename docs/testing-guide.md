@@ -5583,3 +5583,142 @@ and 420 px in a real browser (Test 23).
    every one of her requests, and her own Role cannot be changed, Test 17),
    so the Jest suite covers each copy (Test 8); a tester sees them only
    after a defect.
+
+## Test 73: CI's security jobs and the automated dependency updates
+
+Besides the test chains of Test 8, [`ci.yml`](../.github/workflows/ci.yml)
+runs four jobs that check the repository itself (EXT-019); none needs a
+secret, and three of them can be run on the Mac:
+
+1. **`audit`** runs `pnpm audit --audit-level high` on every pull request.
+   Run it from the repository root: it prints the advisories and exits 0
+   while none is high or critical outside the ignore list in
+   `pnpm-workspace.yaml` (`auditConfig.ignoreGhsa`); a new high advisory
+   fails the job until the dependency is updated or the advisory is
+   ignored on purpose, with the reason beside it.
+2. **`secrets`** runs gitleaks over the whole history
+   (`gitleaks/gitleaks-action`, pinned version) and fails on anything that
+   looks like a credential. It runs only in CI; to try it, push a branch
+   with a fake token such as `AKIAIOSFODNN7EXAMPLE` in a scratch file and
+   watch the job fail, then drop the commit (never merge it).
+3. **`migrations`** proves that the committed migrations still produce the
+   Prisma schema: `.github/scripts/check-migrations.sh` applies every
+   migration to an empty database and diffs it against
+   `apps/backend/prisma/models`. Run it locally against a throwaway
+   database:
+
+   ```sh
+   createdb pilates_test_drift
+   DATABASE_URL="postgresql://$USER@localhost:5433/pilates_test_drift" .github/scripts/check-migrations.sh
+   dropdb pilates_test_drift
+   ```
+
+   It prints «the migrations produce the schema (only the known drift
+   remains)»: the ten composite foreign keys that live only in migration
+   SQL are listed in `apps/backend/prisma/known-drift.sql`, and any other
+   statement fails the check.
+4. **`public-site`** runs `node .github/scripts/check-public-site.mjs`
+   when `apps/public-site/**` changes: the `_headers` file is present and
+   complete, every page is whole, and every link resolves. Run the same
+   command from the root; it exits 0 and prints nothing to fix.
+
+On a pull request the `changes` job starts only the jobs whose paths
+changed (Test 8), and a push to `main` is never cancelled by a later one.
+[`dependabot.yml`](../.github/dependabot.yml) opens one grouped pull request
+a week per ecosystem for **security** updates only (version updates stay
+off); it shows up as a pull request by `dependabot[bot]` that CI checks
+like any other, and the user merges it.
+
+## Test 74: the operations runbooks, the monthly reminder, and the monitors
+
+The runbooks under [`docs/runbooks/`](./runbooks/) are the procedures a
+person follows outside the code. Each has a part you can rehearse without
+touching production.
+
+1. **Pause and resume staging** ([release
+   runbook](./runbooks/production-release.md#pause-and-resume-staging)).
+   Staging's team is Pay as you go (about $0.015 an hour for `api` and
+   `worker` together). Before Test 40 or Test 55: Northflank, team
+   `emma-pilates-staging` → Services → `api` → **Resume**, then `worker`,
+   and wait for `curl -s https://p01--api--jmys6w5p8vlk.code.run/health/ready`
+   to answer `ready` (a merge that landed while paused failed its release
+   at readiness: `gh workflow run release-staging.yml` releases main's
+   head). After testing: **Pause** both, in that order, and confirm the
+   services read Paused. Team → Billing → Usage shows the hours; a $3
+   billing alert emails the owner.
+2. **Copy production into staging** (the same runbook, «last resort»,
+   [ADR-0093](./adr/0093-copy-production-into-staging-as-a-last-resort.md)).
+   Rehearse only the refusal: `gh workflow run copy-production-to-staging.yml -f confirm="no"`
+   ends at its first step without touching anything, because the input
+   must be exactly `copy production to staging`. The real run restores
+   production's newest daily dump as `emma_staging` and releases `main` to
+   staging again; while a copy is loaded, the runbook's «do not» list
+   applies (no recovery, resend, invitation, email change, or closure for a
+   real address; no `EXPO_ACCESS_TOKEN` on staging; no bulk email tests),
+   and a fresh staging reset follows the fix.
+3. **A personal data request**
+   ([runbook](./runbooks/personal-data-requests.md)). Rehearse it on
+   `pilates_dev_sim` for a fixture Client: verify the requester (only from
+   the Account's address, or in person with an ID), add the row to the
+   request log with the 15-business-day deadline, run the queries of
+   [`personal-data-request.sql`](./runbooks/personal-data-request.sql) with
+   `psql` to collect her data, and read the «Deletion requests» and «Stop
+   promotions» sections, which point at the closure of Test 35 and the
+   AW35 actions of Tests 59 and 60.
+4. **An incident** ([runbook](./runbooks/incident-response.md)). Rehearse
+   the first two steps without an incident: pick the severity from the
+   table, open a row in the incident log, and freeze deploys with
+   `gh workflow disable "Release Production" --repo DaleneyRuben/emma-pilates`
+   (`gh workflow list` shows it disabled; `gh workflow enable` puts it
+   back). The runbook then says what to contain, which secrets to rotate
+   (its table), when to restore from a backup (Test 43 B), whom to tell,
+   and to save Northflank's logs the same day, because they are kept 30
+   days ([infrastructure, «Logs and
+   retention»](./architecture/infrastructure.md#logs-and-retention)).
+5. **Secrets rotation** ([runbook](./runbooks/secrets-rotation.md)). Read
+   the inventory (which secret lives in which store, who issues it) and
+   the calendar: the deploy tokens on 2027-09-14 and 2027-09-17, every
+   never-expiring credential in the same September sitting, the restore
+   drill every quarter from January 2027, and the free-plan usage check
+   every month. A rotation ends with a row in the rotation log and the
+   calendar line moved a year forward in the runbook **and** in the
+   workflow below.
+6. **The monthly reminder**
+   ([`operations-reminders.yml`](../.github/workflows/operations-reminders.yml)).
+   On the first of every month at 09:00 La Paz it opens one GitHub issue
+   per task that falls due in the coming month (`[ops] <task> (due
+   <date>)`, `[ops] Restore drill <year> Q<n>`, `[ops] Free-plan usage check
+   <year>-<month>`), skipping any whose issue is still open. Run it by hand
+   with `gh workflow run operations-reminders.yml`: the run's log lists
+   each task as opened or «still open», and `gh issue list --label ""` (or
+   the repository's Issues tab) shows the usage-check issue for the month.
+   Close the issue with the month's numbers from the consoles listed under
+   [«Free-plan limits that can be exceeded
+   silently»](./architecture/infrastructure.md#free-plan-limits-that-can-be-exceeded-silently)
+   (EAS builds, Resend, R2, Vercel, Northflank, Aiven, Better Stack,
+   Actions minutes, Pages builds). GitHub disables the schedule after 60
+   days without a push; its email is the cue to run it by hand and
+   re-enable it.
+7. **The restore drill** ([backups
+   runbook](./runbooks/backups-and-restore-drills.md#restore-drill)) is
+   Test 43 B; each quarter's run adds a row to the runbook's «Drill log»
+   (the reminder issue asks for it), and the weekly bucket check is
+   `pnpm backup:check` (Test 43 A).
+8. **The three newer uptime monitors**
+   ([runbook](./runbooks/uptime-monitors.md)) check
+   `https://emma-pilates-admin.vercel.app/`,
+   `https://app.emmapilatesstudio.com/`, and
+   `https://links.emmapilatesstudio.com/.well-known/assetlinks.json` every
+   3 minutes with the API monitor's settings (Test 37). To prove one
+   fires without breaking anything, open **Production admin web** →
+   Configure, point it at `https://emma-pilates-admin.vercel.app/api/v1/does-not-exist`
+   (the proxy answers 404), save, and wait about 6 minutes for «New
+   incident started»; put the URL back and «Incident resolved» follows.
+   Record the two times in the infrastructure page, as the API monitor's
+   were. The runbook's last table says where to look first when each one
+   alerts (Vercel's deployments, Cloudflare Pages, the `links.` DNS record
+   and Northflank's certificate).
+9. **The mobile release** ([runbook](./runbooks/mobile-release.md)) is
+   rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
+   EAS Update path for a JavaScript-only fix and the «confirm a Client's
+   email by hand» command of Test 48 C.
