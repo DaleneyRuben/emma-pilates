@@ -47,7 +47,6 @@ export default tseslint.config(
       'src/booking/evaluations/prisma-evaluation-commands.ts',
       'src/booking/payments/prisma-payment-commands.ts',
       'src/development-fixtures/development-fixtures.ts',
-      'test/evaluations.e2e-spec.ts',
       'test/database/booking-command.integration-spec.ts',
       'test/database/client-registration.integration-spec.ts',
       'test/database/evaluation-bookings.integration-spec.ts',
