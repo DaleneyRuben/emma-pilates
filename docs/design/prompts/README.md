@@ -61,7 +61,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S22](./staff/22-assistant-client-history.md) | Historial de la clienta (Asistente) | `S22` | ✅ |
 | [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | ✅ |
 | [S24](./staff/24-administrator-view-as.md) | Ver la app como… (Administración) | `S24` | ✅ (Claude Design canvas, 2026-10-22, `e81417e9`; the app side is stage 3 of FUT-001) |
-| [S28](./staff/28-coordinator-contact-list.md) | Para contactar (Coordinación) | `S28` | 🕓 pending (BKM-013) |
+| [S28](./staff/28-coordinator-contact-list.md) | Para contactar (Coordinación) | `S28` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 
 ## Admin web (`admin-web/`)
 
@@ -103,7 +103,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW33](./admin-web/33-user-menu.md) | Menú de usuario y cambiar contraseña | `AW33` | ✅ |
 | [AW34](./admin-web/34-branch-selector.md) | Selector de sucursal | `AW34` | ✅ |
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
-| [AW39](./admin-web/39-para-contactar.md) | Para contactar | `AW39` | 🕓 pending (BKM-013) |
+| [AW39](./admin-web/39-para-contactar.md) | Para contactar | `AW39` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 
 ## Follow-ups (`followups/`)
 
@@ -227,9 +227,9 @@ Each of these was sent as the next message in the existing design session for th
 | [156](./followups/156-aw22-edit-client-profile.md) | «Editar perfil» on `AW22` for the Administrator and the Coordinator (IDN-009): name and phone in place, the email read-only, the empty-name error and the saved line; the Coordinator's panel has no Crédito row and no «Cerrar cuenta» | ✅ applied (Claude Design canvas, 2026-10-23, `e8137c42`; canvas deleted) |
 | [157](./followups/157-staff-coordinator-role.md) | The «Coordinador» Role in `AW23`/`AW24` (IDN-009): the filter option and tag, five Role options with every Branch implicit for her, and the Coordinator's read-only Personal | ✅ applied (Claude Design canvas, 2026-10-23, `e8137c42`; canvas deleted) |
 | [158](./followups/158-staff-app-coordinator-stack.md) | The Coordinator's Staff app stack (IDN-009): `S04` without «Nuevo cliente» and with «Cancelar una clase», `S06` without the cash sale and the Crédito line, `S13` back to Clientes, «Coordinación» on `S23`, and her row in `S24` | ✅ applied (Claude Design canvas, 2026-10-23, `e8137c42`; canvas deleted) |
-| [185](./followups/185-aw02-para-contactar-entry.md) | «Para contactar» in the admin sidebar (BKM-013): after «Clientes» in `AW02`'s Administrator and Coordinator frames, with a count badge; amends checklist 30 §5; design system and README (`AW39` row) | 🕓 pending |
-| [186](./followups/186-s04-para-contactar-entry.md) | «Para contactar» under «Cancelar una clase» on `S04`'s Coordinator frame, with a count pill, opening the new `S28`; README (BKM-013) | 🕓 pending |
-| [187](./followups/187-lifecycle-messages-inbox.md) | The first-90-days message in `19`'s list («Tu primera semana», opens nothing); amends checklist 30 §8 to eight Client types; README (BKM-013) | 🕓 pending |
+| [185](./followups/185-aw02-para-contactar-entry.md) | «Para contactar» in the admin sidebar (BKM-013): after «Clientes» in `AW02`'s Administrator and Coordinator frames, with a count badge; amends checklist 30 §5; design system and README (`AW39` row) | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
+| [186](./followups/186-s04-para-contactar-entry.md) | «Para contactar» under «Cancelar una clase» on `S04`'s Coordinator frame, with a count pill, opening the new `S28`; README (BKM-013) | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
+| [187](./followups/187-lifecycle-messages-inbox.md) | The first-90-days message in `19`'s list («Tu primera semana», opens nothing); amends checklist 30 §8 to eight Client types; README (BKM-013) | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 
 ## Status
 
