@@ -756,7 +756,7 @@ Acceptance criteria:
 Acceptance criteria: a 10-day Freeze moves the end 10 days, and a second
 request is refused. Booking during the Freeze is refused with its own message.
 
-Evidence (BKM-012, 2026-10-23, branch `feature/bkm-012-freeze`, stacked on `feature/bkm-010-founder-membership` at `57fae76a`). Rules red `c6a92ad2`, rules green `196e9fbf`, booking block red `028c3a8e`, booking block green `a16c00e9`, decision `66e2303d`, schema and persistence `a4c32d7a`, contract `a3a9d2c6`, screens `d21aac95`.
+Evidence (BKM-012, 2026-10-23, branch `feature/bkm-012-freeze`, stacked on `feature/bkm-010-founder-membership` at `57fae76a`, [PR #175](https://github.com/DaleneyRuben/emma-pilates/pull/175)). Rules red `c6a92ad2`, rules green `196e9fbf`, booking block red `028c3a8e`, booking block green `a16c00e9`, decision `66e2303d`, schema and persistence `a4c32d7a`, contract `a3a9d2c6`, screens `d21aac95`.
 
 Decisions taken:
 
