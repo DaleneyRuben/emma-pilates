@@ -32,11 +32,11 @@ export const cashDayRowProps = (day: CashDayDto): ComponentProps<"tr"> => {
   return difference < 0
     ? ({
         "data-difference": "short",
-        className: "bg-error/[0.06]",
+        className: "bg-error/[0.06] max-md:bg-error/[0.06]",
       } as ComponentProps<"tr">)
     : ({
         "data-difference": "over",
-        className: "bg-advertencia/[0.08]",
+        className: "bg-advertencia/[0.08] max-md:bg-advertencia/[0.08]",
       } as ComponentProps<"tr">);
 };
 
