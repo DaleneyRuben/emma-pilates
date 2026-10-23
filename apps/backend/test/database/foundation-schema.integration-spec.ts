@@ -26,6 +26,7 @@ describe('foundation migration', () => {
     `);
 
     expect(result.rows.map(({ table_name: tableName }) => tableName)).toEqual([
+      'back_office.cost_budget_lines',
       'back_office.expense_categories',
       'back_office.expenses',
       'back_office.salary_payments',
