@@ -5051,6 +5051,170 @@
         ]
       }
     },
+    "/api/v1/administrator/clients/{clientId}/acquisition": {
+      "get": {
+        "operationId": "getClientAcquisition",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientAcquisitionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClientAcquisition"
+        ]
+      },
+      "put": {
+        "operationId": "correctClientAcquisition",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectClientAcquisitionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientAcquisitionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClientAcquisition"
+        ]
+      }
+    },
+    "/api/v1/administrator/staff-members/{staffMemberId}/referral-code": {
+      "get": {
+        "operationId": "getStaffMemberReferralCode",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainerReferralCodeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorTrainerReferralCode"
+        ]
+      },
+      "put": {
+        "operationId": "setStaffMemberReferralCode",
+        "parameters": [
+          {
+            "name": "staffMemberId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetTrainerReferralCodeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrainerReferralCodeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorTrainerReferralCode"
+        ]
+      }
+    },
     "/api/v1/clients/current/photo": {
       "put": {
         "operationId": "setCurrentClientPhoto",
@@ -7193,6 +7357,25 @@
             "type": "string",
             "nullable": true,
             "example": "+591 70000000"
+          },
+          "acquisitionChannel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other"
+            ],
+            "description": "«¿Cómo nos conociste?» Required by current builds; a build that omits it records `unknown` (BKM-011)"
+          },
+          "referralCode": {
+            "type": "string",
+            "example": "CARLA",
+            "description": "Referral Code of the Client or Trainer who brought her; it decides the Acquisition Channel"
           }
         },
         "required": [
@@ -7546,7 +7729,21 @@
           "referralCode": {
             "type": "string",
             "example": "REF-LUCIA",
-            "description": "Referral code of the Client who invited this person"
+            "description": "Referral Code of the Client or Trainer who brought this person; it decides the Acquisition Channel (BKM-011)"
+          },
+          "acquisitionChannel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other"
+            ],
+            "description": "«¿Cómo nos conociste?» Required by current builds; a build that omits it registers as `unknown` (BKM-011)"
           }
         },
         "required": [
@@ -10863,6 +11060,148 @@
         },
         "required": [
           "consented"
+        ]
+      },
+      "AcquisitionReferrerDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "client",
+              "trainer"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "name"
+        ]
+      },
+      "ClientAcquisitionDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "channel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other",
+              "unknown"
+            ],
+            "description": "The attribution: a Referral Code makes it `friend` (a Client’s) or `trainer` (a Trainer’s); `unknown` before the question existed"
+          },
+          "declaredChannel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other",
+              "unknown"
+            ],
+            "description": "What she answered to «¿Cómo nos conociste?»"
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "referrer": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AcquisitionReferrerDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "clientId",
+          "channel",
+          "declaredChannel",
+          "referralCode",
+          "referrer"
+        ]
+      },
+      "CorrectClientAcquisitionDto": {
+        "type": "object",
+        "properties": {
+          "channel": {
+            "type": "string",
+            "enum": [
+              "instagram",
+              "tiktok",
+              "facebook",
+              "google",
+              "friend",
+              "trainer",
+              "walk_in",
+              "other"
+            ]
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "description": "A Client’s or Trainer’s Referral Code; it wins over the channel"
+          }
+        },
+        "required": [
+          "channel",
+          "referralCode"
+        ]
+      },
+      "TrainerReferralCodeDto": {
+        "type": "object",
+        "properties": {
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "CARLA"
+          }
+        },
+        "required": [
+          "staffMemberId",
+          "referralCode"
+        ]
+      },
+      "SetTrainerReferralCodeDto": {
+        "type": "object",
+        "properties": {
+          "referralCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "CARLA",
+            "description": "3 to 20 letters, digits, or hyphens, not starting with REF-; null removes the code"
+          }
+        },
+        "required": [
+          "referralCode"
         ]
       },
       "SetClientPhotoDto": {
