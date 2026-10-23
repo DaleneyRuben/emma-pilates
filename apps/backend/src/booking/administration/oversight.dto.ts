@@ -103,29 +103,6 @@ export class AdminReferralPageDto {
   pendingCount!: number;
 }
 
-export class AdminCreditBalanceDto {
-  @ApiProperty({ format: 'uuid' }) clientId!: string;
-  @ApiProperty() clientName!: string;
-  @ApiProperty({ description: 'BOB centavos' }) availableCentavos!: number;
-  @ApiProperty({ format: 'date-time' }) lastMovementAt!: Date;
-  @ApiProperty({
-    enum: ['earned', 'reserved', 'spent', 'returned'],
-    description:
-      'The last ledger entry: a Referral award, a reservation for an open purchase, its spend at confirmation, or its release',
-  })
-  lastMovementKind!: 'earned' | 'reserved' | 'spent' | 'returned';
-}
-
-export class AdminCreditPageDto {
-  @ApiProperty({ type: AdminCreditBalanceDto, isArray: true })
-  items!: AdminCreditBalanceDto[];
-  @ApiProperty() page!: number;
-  @ApiProperty() pageSize!: number;
-  @ApiProperty() totalItems!: number;
-  @ApiProperty({ description: 'Studio-wide available Credit, BOB centavos' })
-  outstandingCentavos!: number;
-}
-
 export class IncomeByMethodDto {
   @ApiProperty() cash!: number;
   @ApiProperty() transfer!: number;

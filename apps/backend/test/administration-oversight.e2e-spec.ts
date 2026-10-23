@@ -26,7 +26,6 @@ describe('administration oversight endpoints (e2e)', () => {
   const oversight = {
     listEvaluations: operation(),
     listReferrals: operation(),
-    listCredits: operation(),
     incomeReport: operation(),
   };
   const principal: AuthenticatedPrincipal = {
@@ -79,7 +78,6 @@ describe('administration oversight endpoints (e2e)', () => {
       .get('/api/v1/administrator/credits')
       .set('authorization', bearer)
       .expect(404);
-    expect(oversight.listCredits).not.toHaveBeenCalled();
   });
 
   it('narrows the Evaluation list to one Branch without caching it', async () => {

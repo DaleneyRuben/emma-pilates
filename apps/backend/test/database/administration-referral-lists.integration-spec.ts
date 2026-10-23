@@ -5,10 +5,9 @@ import {
   type EvaluationTestWorld,
 } from './evaluation-test-support';
 
-// WEB-008 (AW26, AW27): the counts and the last Credit movement the two
-// read-only lists show. The fixtures give Sofía an awarded and a pending
-// Referral and the Bs 60 of Credit the awarded one earned.
-describe('Prisma administration Referral and Credit lists for AW26 and AW27', () => {
+// WEB-008 (AW26): the counts the read-only Referral list shows. AW27's
+// Credit list went with Credit (PAY-005).
+describe('Prisma administration Referral list for AW26', () => {
   let world: EvaluationTestWorld;
   const oversight = () =>
     createPrismaOversight(world.prisma, { now: () => fixtureNow });
@@ -59,19 +58,5 @@ describe('Prisma administration Referral and Credit lists for AW26 and AW27', ()
         }),
       ],
     });
-  });
-
-  it('says whether the last Credit movement earned, reserved, spent, or returned it', async () => {
-    const credits = await oversight().listCredits(
-      { page: 1, pageSize: 20 },
-      await administrator(),
-    );
-
-    expect(credits.items).toEqual([
-      expect.objectContaining({
-        clientName: 'Sofía Guzmán',
-        lastMovementKind: 'earned',
-      }),
-    ]);
   });
 });
