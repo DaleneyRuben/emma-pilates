@@ -149,6 +149,7 @@ export * from "./getExpenseReportParams";
 export * from "./getIncomeReportParams";
 export * from "./getPaymentReceiptParams";
 export * from "./getPaymentReceiptVariant";
+export * from "./grantCourtesyAccessDto";
 export * from "./impersonationDto";
 export * from "./impersonationDtoRole";
 export * from "./incomeByMethodDto";
