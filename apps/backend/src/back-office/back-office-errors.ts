@@ -16,7 +16,12 @@ export type BackOfficeErrorCode =
   | 'expense_category_not_found'
   | 'expense_category_name_taken'
   | 'expense_category_in_use'
-  | 'idempotency_key_reused';
+  | 'idempotency_key_reused'
+  | 'equipment_not_found'
+  | 'equipment_number_taken'
+  | 'equipment_archived'
+  | 'equipment_issue_not_found'
+  | 'equipment_issue_resolved';
 
 const statuses: Record<BackOfficeErrorCode, number> = {
   back_office_access_denied: 403,
@@ -35,6 +40,11 @@ const statuses: Record<BackOfficeErrorCode, number> = {
   expense_category_name_taken: 409,
   expense_category_in_use: 409,
   idempotency_key_reused: 409,
+  equipment_not_found: 404,
+  equipment_number_taken: 409,
+  equipment_archived: 409,
+  equipment_issue_not_found: 404,
+  equipment_issue_resolved: 409,
 };
 
 export class BackOfficeError extends Error {
