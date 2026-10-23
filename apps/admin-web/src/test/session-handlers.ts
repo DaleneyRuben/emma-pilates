@@ -39,6 +39,9 @@ export const signedInHandlers = () => [
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
   pendingBadgeHandler(),
   branchSuppliesHandler(),
+  http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
+    jsonResponse({ items: [], totalItems: 0 }),
+  ),
 ];
 
 // IDN-009: Carolina Rivas, the Coordinator (ADR-0102). Her shell reads no
@@ -67,6 +70,9 @@ export const coordinatorHandlers = () => [
   http.get(apiUrl(staffProfilePath), () => jsonResponse(carolinaProfile)),
   activeBranchesHandler(),
   http.get(apiUrl("/api/v1/administrator/sessions"), () => jsonResponse([])),
+  http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
+    jsonResponse({ items: [], totalItems: 0 }),
+  ),
 ];
 
 export const signedOutHandlers = () => [

@@ -16,6 +16,7 @@ test.describe("the Coordinator's admin web", () => {
     await expect(sidebar(page).getByRole("link")).toHaveText([
       "Horario",
       "Clientes",
+      "Para contactar",
       "Personal",
     ]);
     await expect(

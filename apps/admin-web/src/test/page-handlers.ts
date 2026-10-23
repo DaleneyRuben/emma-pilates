@@ -25,6 +25,9 @@ export const emptyPageHandlers = () => [
   http.get(apiUrl(expensesPath), () => jsonResponse(expensePage([]))),
   categoriesHandler(() => []),
   http.get(apiUrl(clientsPath), () => jsonResponse(clientPage([]))),
+  http.get(apiUrl("/api/v1/administrator/contact-alerts"), () =>
+    jsonResponse({ items: [], totalItems: 0 }),
+  ),
   http.get(apiUrl(referralsPath), () => jsonResponse(referralPage([]))),
   http.get(apiUrl(evaluationsPath), () => jsonResponse(evaluationPage([]))),
   http.get(apiUrl(staffMembersPath), () => jsonResponse(page([]))),
