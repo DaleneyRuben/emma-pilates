@@ -8032,14 +8032,32 @@
           "name": {
             "type": "string"
           },
+          "durationDays": {
+            "type": "number",
+            "enum": [
+              30,
+              60,
+              90
+            ]
+          },
+          "weeklyClassCap": {
+            "type": "number",
+            "enum": [
+              3,
+              4
+            ],
+            "nullable": true,
+            "description": "Most Bookings a week from the base allowance"
+          },
           "durationMonths": {
             "type": "number",
             "enum": [
               1,
-              3,
-              6,
-              12
-            ]
+              2,
+              3
+            ],
+            "deprecated": true,
+            "description": "durationDays / 30, for builds that still read months"
           },
           "classAllowance": {
             "type": "number",
@@ -8054,6 +8072,8 @@
         "required": [
           "id",
           "name",
+          "durationDays",
+          "weeklyClassCap",
           "durationMonths",
           "classAllowance",
           "priceCentavos"
@@ -8577,14 +8597,22 @@
             "type": "string",
             "maxLength": 80
           },
-          "durationMonths": {
+          "durationDays": {
             "type": "number",
             "enum": [
-              1,
-              3,
-              6,
-              12
+              30,
+              60,
+              90
             ]
+          },
+          "weeklyClassCap": {
+            "type": "number",
+            "enum": [
+              3,
+              4
+            ],
+            "nullable": true,
+            "description": "Only on 60- and 90-day Plans"
           },
           "classAllowance": {
             "type": "number",
@@ -8602,7 +8630,8 @@
         },
         "required": [
           "name",
-          "durationMonths",
+          "durationDays",
+          "weeklyClassCap",
           "classAllowance",
           "priceCentavos",
           "displayOrder"
@@ -8618,14 +8647,31 @@
           "name": {
             "type": "string"
           },
+          "durationDays": {
+            "type": "number",
+            "enum": [
+              30,
+              60,
+              90
+            ]
+          },
+          "weeklyClassCap": {
+            "type": "number",
+            "enum": [
+              3,
+              4
+            ],
+            "nullable": true
+          },
           "durationMonths": {
             "type": "number",
             "enum": [
               1,
-              3,
-              6,
-              12
-            ]
+              2,
+              3
+            ],
+            "deprecated": true,
+            "description": "durationDays / 30, for builds that still read months"
           },
           "classAllowance": {
             "type": "number"
@@ -8646,6 +8692,8 @@
         "required": [
           "id",
           "name",
+          "durationDays",
+          "weeklyClassCap",
           "durationMonths",
           "classAllowance",
           "priceCentavos",
@@ -9474,14 +9522,23 @@
           "planName": {
             "type": "string"
           },
+          "durationDays": {
+            "type": "number",
+            "enum": [
+              30,
+              60,
+              90
+            ]
+          },
           "durationMonths": {
             "type": "number",
             "enum": [
               1,
-              3,
-              6,
-              12
-            ]
+              2,
+              3
+            ],
+            "deprecated": true,
+            "description": "durationDays / 30, for builds that still read months"
           },
           "classAllowance": {
             "type": "number",
@@ -9526,6 +9583,7 @@
           "id",
           "planId",
           "planName",
+          "durationDays",
           "durationMonths",
           "classAllowance",
           "planPriceCentavos",
@@ -9579,14 +9637,23 @@
           "planName": {
             "type": "string"
           },
+          "durationDays": {
+            "type": "number",
+            "enum": [
+              30,
+              60,
+              90
+            ]
+          },
           "durationMonths": {
             "type": "number",
             "enum": [
               1,
-              3,
-              6,
-              12
-            ]
+              2,
+              3
+            ],
+            "deprecated": true,
+            "description": "durationDays / 30, for builds that still read months"
           },
           "classAllowance": {
             "type": "number",
@@ -9629,6 +9696,7 @@
           "state",
           "planId",
           "planName",
+          "durationDays",
           "durationMonths",
           "classAllowance",
           "planPriceCentavos",
@@ -9866,14 +9934,23 @@
           "planName": {
             "type": "string"
           },
+          "durationDays": {
+            "type": "number",
+            "enum": [
+              30,
+              60,
+              90
+            ]
+          },
           "durationMonths": {
             "type": "number",
             "enum": [
               1,
-              3,
-              6,
-              12
-            ]
+              2,
+              3
+            ],
+            "deprecated": true,
+            "description": "durationDays / 30, for builds that still read months"
           },
           "classAllowance": {
             "type": "number",
@@ -9933,6 +10010,7 @@
           "state",
           "planId",
           "planName",
+          "durationDays",
           "durationMonths",
           "classAllowance",
           "planPriceCentavos",
@@ -10187,14 +10265,32 @@
           "name": {
             "type": "string"
           },
+          "durationDays": {
+            "type": "number",
+            "enum": [
+              30,
+              60,
+              90
+            ]
+          },
+          "weeklyClassCap": {
+            "type": "number",
+            "enum": [
+              3,
+              4
+            ],
+            "nullable": true,
+            "description": "Most Bookings a week from the base allowance"
+          },
           "durationMonths": {
             "type": "number",
             "enum": [
               1,
-              3,
-              6,
-              12
-            ]
+              2,
+              3
+            ],
+            "deprecated": true,
+            "description": "durationDays / 30, for builds that still read months"
           },
           "classAllowance": {
             "type": "number",
@@ -10219,6 +10315,8 @@
         "required": [
           "id",
           "name",
+          "durationDays",
+          "weeklyClassCap",
           "durationMonths",
           "classAllowance",
           "priceCentavos",
