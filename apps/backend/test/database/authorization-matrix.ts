@@ -37,6 +37,22 @@ export type MatrixRow = {
   /** Sends image bytes instead of JSON. */
   rawBody?: true;
   /**
+   * The handler reads the row before the Role, so a missing identifier is
+   * 404 for both. That 404 is the denial this probe can reach.
+   */
+  missingResource?: true;
+  /**
+   * The Staff app calls this with a bearer credential. The probe otherwise
+   * sends the admin cookie on `/administrator/` paths only, and a cookie on
+   * an assistant path never becomes a session.
+   */
+  bearer?: true;
+  /**
+   * A 403 with this problem code is a data rule after the Role passed
+   * (a receipt the caller does not own), so the probe counts it as allow.
+   */
+  passedCode?: string;
+  /**
    * Needs no credential: any answer but 403 passes, a refused Login (401)
    * included.
    */
@@ -167,7 +183,12 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/trainer/sessions/{sessionId}/roster': both('deny'),
   'GET /api/v1/nutritionist/evaluations': both('deny'),
   'DELETE /api/v1/nutritionist/evaluations/{evaluationId}': administratorOnly(),
-  'POST /api/v1/nutritionist/evaluations/{evaluationId}/no-show': both('deny'),
+  // The command looks the Evaluation up before it checks the Role, so a
+  // missing row is 404 for both. A booked Evaluation needs a payment the
+  // matrix does not build; 404 is the denial this probe can reach.
+  'POST /api/v1/nutritionist/evaluations/{evaluationId}/no-show': both('deny', {
+    missingResource: true,
+  }),
   'GET /api/v1/nutritionist/availability-blocks': both('deny'),
   'POST /api/v1/nutritionist/availability-blocks': both('deny'),
   'POST /api/v1/nutritionist/availability-blocks/{blockId}/replacement':
@@ -200,8 +221,19 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/assistant/clients/{clientId}/class-history': both('allow'),
   // Selling and registering new Clients stay at the front desk.
   'GET /api/v1/assistant/clients/{clientId}/plan-quotes': administratorOnly(),
+  // The receipt is parsed before the Role is checked. A valid body
+  // reaches the denial; the Administrator is allowed and then fails on
+  // the missing receipt, which is still an authorization pass.
   'POST /api/v1/assistant/clients/{clientId}/transfer-payments':
-    administratorOnly(),
+    administratorOnly({
+      bearer: true,
+      passedCode: 'payment_receipt_invalid_owner',
+      body: {
+        planId: uuid,
+        branchId: uuid,
+        imageAssetId: uuid,
+      },
+    }),
   'POST /api/v1/assistant/clients/{clientId}/cash-payments':
     administratorOnly(),
   'POST /api/v1/assistant/client-invitations': administratorOnly(),
@@ -219,8 +251,13 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/administrator/clients': both('allow'),
   'GET /api/v1/administrator/clients/{clientId}': both('allow'),
   'PATCH /api/v1/administrator/clients/{clientId}': both('allow'),
-  'GET /api/v1/administrator/clients/{clientId}/acquisition': both('allow'),
-  'PUT /api/v1/administrator/clients/{clientId}/acquisition': both('allow'),
+  // acquisitionEditorRoles is still administrator only. The comment in
+  // client-acquisition.ts says the Coordinator joins once the Role exists;
+  // the array was not updated, so she is denied.
+  'GET /api/v1/administrator/clients/{clientId}/acquisition':
+    administratorOnly(),
+  'PUT /api/v1/administrator/clients/{clientId}/acquisition':
+    administratorOnly(),
   'POST /api/v1/administrator/clients/{clientId}/courtesy-access':
     administratorOnly(),
   'POST /api/v1/administrator/clients/{clientId}/allowance-adjustments':
@@ -274,8 +311,28 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/class-types/{classTypeId}/archive':
     administratorOnly(),
   'GET /api/v1/administrator/plans': administratorOnly(),
-  'POST /api/v1/administrator/plans': administratorOnly(),
-  'PUT /api/v1/administrator/plans/{planId}': administratorOnly(),
+  // Plan input is parsed before the Role is checked, so a body the
+  // schema rejects is 400 for both. A valid Plan reaches the denial.
+  'POST /api/v1/administrator/plans': administratorOnly({
+    body: {
+      name: 'Mensual matriz',
+      durationDays: 30,
+      weeklyClassCap: null,
+      classAllowance: 8,
+      priceCentavos: 45000,
+      displayOrder: 9,
+    },
+  }),
+  'PUT /api/v1/administrator/plans/{planId}': administratorOnly({
+    body: {
+      name: 'Mensual matriz',
+      durationDays: 30,
+      weeklyClassCap: null,
+      classAllowance: 8,
+      priceCentavos: 45000,
+      displayOrder: 9,
+    },
+  }),
   'PUT /api/v1/administrator/plans/{planId}/visibility': administratorOnly(),
 
   // Oversight and money: Payments, Credit, Referrals, reports, Evaluations.

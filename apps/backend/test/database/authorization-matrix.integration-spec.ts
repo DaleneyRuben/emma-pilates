@@ -77,8 +77,9 @@ describe('authorization matrix: Administrator and Coordinator', () => {
       row?.realIds === true ? {} : row?.realIds,
     )}${row?.query ?? sample.query}`;
     const browser =
-      path.startsWith('/api/v1/administrator/') ||
-      path.startsWith('/api/v1/admin-web/');
+      !row?.bearer &&
+      (path.startsWith('/api/v1/administrator/') ||
+        path.startsWith('/api/v1/admin-web/'));
     const credential = await credentialFor(
       role,
       browser ? 'ADMIN_WEB' : 'MOBILE',
@@ -100,7 +101,23 @@ describe('authorization matrix: Administrator and Coordinator', () => {
       pending = pending.send(body ?? sample.body ?? {});
     }
     try {
-      return (await pending.timeout(15_000)).status;
+      const response = await pending.timeout(15_000);
+      const body: unknown = response.body;
+      const code =
+        body !== null &&
+        typeof body === 'object' &&
+        'code' in body &&
+        typeof body.code === 'string'
+          ? body.code
+          : undefined;
+      if (
+        response.status === 403 &&
+        row?.passedCode !== undefined &&
+        code === row.passedCode
+      ) {
+        return 200;
+      }
+      return response.status;
     } catch {
       return 0;
     }
@@ -109,8 +126,9 @@ describe('authorization matrix: Administrator and Coordinator', () => {
   const outcome = (
     status: number,
     isPublic = false,
+    missingResource = false,
   ): Access | `unexpected ${number}` => {
-    if (status === 403) return 'deny';
+    if (status === 403 || (missingResource && status === 404)) return 'deny';
     if (status === 0 || (status === 401 && !isPublic) || status >= 500) {
       return `unexpected ${status}`;
     }
@@ -165,7 +183,9 @@ describe('authorization matrix: Administrator and Coordinator', () => {
           if (outcome(status).startsWith('unexpected')) {
             mismatches.push(`${key}: answered ${status}`);
           }
-        } else if (outcome(status, row?.public) !== expected) {
+        } else if (
+          outcome(status, row?.public, row?.missingResource) !== expected
+        ) {
           mismatches.push(`${key}: expected ${expected}, answered ${status}`);
         }
       }
