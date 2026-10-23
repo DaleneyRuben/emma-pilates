@@ -308,6 +308,7 @@ describe("Assistant Client flows", () => {
     });
     await fireEvent.changeText(screen.getByLabelText("Nombre"), "Ana Nueva");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "ana@example.com");
+    await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Ana Nueva")).toBeOnTheScreen();
@@ -357,12 +358,14 @@ describe("Assistant Client flows", () => {
     await fireEvent.changeText(screen.getByLabelText("Nombre"), " Ana Nueva ");
     await fireEvent.changeText(screen.getByLabelText("Correo electrónico"), "Ana@Example.com");
     await fireEvent.changeText(screen.getByLabelText("Teléfono (opcional)"), "+591 70000000");
+    await fireEvent.press(screen.getByRole("radio", { name: "Instagram" }));
     await fireEvent.press(screen.getByRole("button", { name: "Crear cuenta" }));
 
     await waitFor(() => {
       expect(screen.getByLabelText("Ana Nueva")).toBeOnTheScreen();
     });
     expect(invited).toHaveBeenCalledWith({
+      acquisitionChannel: "instagram",
       name: "Ana Nueva",
       email: "Ana@Example.com",
       phone: "+591 70000000",

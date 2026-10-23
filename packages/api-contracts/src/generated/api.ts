@@ -69,6 +69,7 @@ import type {
   ClassHistoryEntryDto,
   ClassTypeDto,
   ClassTypeInputDto,
+  ClientAcquisitionDto,
   ClientEmailVerificationResultDto,
   ClientEvaluationDto,
   ClientEvaluationPageDto,
@@ -83,6 +84,7 @@ import type {
   CompleteEmailChangeDto,
   CompletePasswordRecoveryDto,
   ContactAlertListDto,
+  CorrectClientAcquisitionDto,
   CorrectInvitationEmailDto,
   CorrectPendingClientEmailDto,
   CorrectStaffEmailDto,
@@ -197,6 +199,7 @@ import type {
   SessionScheduleReplacementDto,
   SetClientPhotoDto,
   SetPromotionsConsentDto,
+  SetTrainerReferralCodeDto,
   StaffMemberDto,
   StaffMemberPageDto,
   StaffProfileDto,
@@ -209,6 +212,7 @@ import type {
   SupplyInputDto,
   SupplyMovementDto,
   SupplyMovementInputDto,
+  TrainerReferralCodeDto,
   TrainerScheduleSessionDto,
   TrainerSessionRosterDto,
   TransferInstructionsDto,
@@ -20536,6 +20540,689 @@ export function useGetStudioRules<
 
   return withQueryKey(query, queryOptions.queryKey);
 }
+
+export type getClientAcquisitionResponse200 = {
+  data: ClientAcquisitionDto;
+  status: 200;
+};
+
+export type getClientAcquisitionResponseSuccess =
+  getClientAcquisitionResponse200 & {
+    headers: Headers;
+  };
+export type getClientAcquisitionResponse = getClientAcquisitionResponseSuccess;
+
+export const getGetClientAcquisitionUrl = (clientId: string) => {
+  return `/api/v1/administrator/clients/${clientId}/acquisition`;
+};
+
+export const getClientAcquisition = async (
+  clientId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getClientAcquisitionResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetClientAcquisitionUrl(clientId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getClientAcquisitionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getClientAcquisitionResponse;
+};
+
+export const getGetClientAcquisitionQueryKey = (clientId: string) => {
+  return [`/api/v1/administrator/clients/${clientId}/acquisition`] as const;
+};
+
+export const getGetClientAcquisitionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getClientAcquisition>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientAcquisition>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetClientAcquisitionQueryKey(clientId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getClientAcquisition>>
+  > = ({ signal }) =>
+    getClientAcquisition(clientId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: clientId !== null && clientId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getClientAcquisition>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetClientAcquisitionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getClientAcquisition>>
+>;
+export type GetClientAcquisitionQueryError = unknown;
+
+export function useGetClientAcquisition<
+  TData = Awaited<ReturnType<typeof getClientAcquisition>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientAcquisition>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientAcquisition>>,
+          TError,
+          Awaited<ReturnType<typeof getClientAcquisition>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientAcquisition<
+  TData = Awaited<ReturnType<typeof getClientAcquisition>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientAcquisition>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getClientAcquisition>>,
+          TError,
+          Awaited<ReturnType<typeof getClientAcquisition>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetClientAcquisition<
+  TData = Awaited<ReturnType<typeof getClientAcquisition>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientAcquisition>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetClientAcquisition<
+  TData = Awaited<ReturnType<typeof getClientAcquisition>>,
+  TError = unknown,
+>(
+  clientId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getClientAcquisition>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetClientAcquisitionQueryOptions(clientId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type correctClientAcquisitionResponse200 = {
+  data: ClientAcquisitionDto;
+  status: 200;
+};
+
+export type correctClientAcquisitionResponseSuccess =
+  correctClientAcquisitionResponse200 & {
+    headers: Headers;
+  };
+export type correctClientAcquisitionResponse =
+  correctClientAcquisitionResponseSuccess;
+
+export const getCorrectClientAcquisitionUrl = (clientId: string) => {
+  return `/api/v1/administrator/clients/${clientId}/acquisition`;
+};
+
+export const correctClientAcquisition = async (
+  clientId: string,
+  correctClientAcquisitionDto: CorrectClientAcquisitionDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<correctClientAcquisitionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getCorrectClientAcquisitionUrl(clientId),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(correctClientAcquisitionDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: correctClientAcquisitionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as correctClientAcquisitionResponse;
+};
+
+export const getCorrectClientAcquisitionMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof correctClientAcquisition>>,
+    TError,
+    CorrectClientAcquisitionMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof correctClientAcquisition>>,
+  TError,
+  CorrectClientAcquisitionMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["correctClientAcquisition"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof correctClientAcquisition>>,
+    CorrectClientAcquisitionMutationVariables
+  > = (props) => {
+    const { clientId, data } = props ?? {};
+
+    return correctClientAcquisition(clientId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CorrectClientAcquisitionMutationResult = NonNullable<
+  Awaited<ReturnType<typeof correctClientAcquisition>>
+>;
+export type CorrectClientAcquisitionMutationBody = CorrectClientAcquisitionDto;
+export type CorrectClientAcquisitionMutationError = unknown;
+export type CorrectClientAcquisitionMutationVariables = {
+  clientId: string;
+  data: CorrectClientAcquisitionDto;
+};
+
+export const useCorrectClientAcquisition = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof correctClientAcquisition>>,
+      TError,
+      CorrectClientAcquisitionMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof correctClientAcquisition>>,
+  TError,
+  CorrectClientAcquisitionMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getCorrectClientAcquisitionMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type getStaffMemberReferralCodeResponse200 = {
+  data: TrainerReferralCodeDto;
+  status: 200;
+};
+
+export type getStaffMemberReferralCodeResponseSuccess =
+  getStaffMemberReferralCodeResponse200 & {
+    headers: Headers;
+  };
+export type getStaffMemberReferralCodeResponse =
+  getStaffMemberReferralCodeResponseSuccess;
+
+export const getGetStaffMemberReferralCodeUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/referral-code`;
+};
+
+export const getStaffMemberReferralCode = async (
+  staffMemberId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getStaffMemberReferralCodeResponse> => {
+  const res = await (fetchFn ?? fetch)(
+    getGetStaffMemberReferralCodeUrl(staffMemberId),
+    {
+      ...options,
+      method: "GET",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getStaffMemberReferralCodeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getStaffMemberReferralCodeResponse;
+};
+
+export const getGetStaffMemberReferralCodeQueryKey = (
+  staffMemberId: string,
+) => {
+  return [
+    `/api/v1/administrator/staff-members/${staffMemberId}/referral-code`,
+  ] as const;
+};
+
+export const getGetStaffMemberReferralCodeQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getGetStaffMemberReferralCodeQueryKey(staffMemberId);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getStaffMemberReferralCode>>
+  > = ({ signal }) =>
+    getStaffMemberReferralCode(
+      staffMemberId,
+      { signal, ...fetchOptions },
+      fetcherFn,
+    );
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: staffMemberId !== null && staffMemberId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetStaffMemberReferralCodeQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStaffMemberReferralCode>>
+>;
+export type GetStaffMemberReferralCodeQueryError = unknown;
+
+export function useGetStaffMemberReferralCode<
+  TData = Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffMemberReferralCode>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffMemberReferralCode<
+  TData = Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+          TError,
+          Awaited<ReturnType<typeof getStaffMemberReferralCode>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetStaffMemberReferralCode<
+  TData = Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetStaffMemberReferralCode<
+  TData = Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+  TError = unknown,
+>(
+  staffMemberId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getStaffMemberReferralCode>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetStaffMemberReferralCodeQueryOptions(
+    staffMemberId,
+    options,
+  );
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type setStaffMemberReferralCodeResponse200 = {
+  data: TrainerReferralCodeDto;
+  status: 200;
+};
+
+export type setStaffMemberReferralCodeResponseSuccess =
+  setStaffMemberReferralCodeResponse200 & {
+    headers: Headers;
+  };
+export type setStaffMemberReferralCodeResponse =
+  setStaffMemberReferralCodeResponseSuccess;
+
+export const getSetStaffMemberReferralCodeUrl = (staffMemberId: string) => {
+  return `/api/v1/administrator/staff-members/${staffMemberId}/referral-code`;
+};
+
+export const setStaffMemberReferralCode = async (
+  staffMemberId: string,
+  setTrainerReferralCodeDto: SetTrainerReferralCodeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<setStaffMemberReferralCodeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getSetStaffMemberReferralCodeUrl(staffMemberId),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(setTrainerReferralCodeDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setStaffMemberReferralCodeResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setStaffMemberReferralCodeResponse;
+};
+
+export const getSetStaffMemberReferralCodeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof setStaffMemberReferralCode>>,
+    TError,
+    SetStaffMemberReferralCodeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof setStaffMemberReferralCode>>,
+  TError,
+  SetStaffMemberReferralCodeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["setStaffMemberReferralCode"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof setStaffMemberReferralCode>>,
+    SetStaffMemberReferralCodeMutationVariables
+  > = (props) => {
+    const { staffMemberId, data } = props ?? {};
+
+    return setStaffMemberReferralCode(
+      staffMemberId,
+      data,
+      fetchOptions,
+      fetcherFn,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SetStaffMemberReferralCodeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof setStaffMemberReferralCode>>
+>;
+export type SetStaffMemberReferralCodeMutationBody = SetTrainerReferralCodeDto;
+export type SetStaffMemberReferralCodeMutationError = unknown;
+export type SetStaffMemberReferralCodeMutationVariables = {
+  staffMemberId: string;
+  data: SetTrainerReferralCodeDto;
+};
+
+export const useSetStaffMemberReferralCode = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof setStaffMemberReferralCode>>,
+      TError,
+      SetStaffMemberReferralCodeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof setStaffMemberReferralCode>>,
+  TError,
+  SetStaffMemberReferralCodeMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getSetStaffMemberReferralCodeMutationOptions(options),
+    queryClient,
+  );
+};
 
 export type setCurrentClientPhotoResponse200 = {
   data: ClientProfileDto;

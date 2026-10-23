@@ -150,6 +150,7 @@ import { adminWebReads } from './admin-web-reads';
 import { receiptReadProvider } from './payments/prisma-receipt-read';
 import { promotionContactsWiring } from './promotion-contacts/promotion-contacts-wiring';
 import { promotionsConsentWiring } from './promotions-consent/promotions-consent-wiring';
+import { acquisitionWiring } from './acquisition/acquisition-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
@@ -192,6 +193,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...promotionContactsWiring.controllers,
     ...promotionsConsentWiring.controllers,
     ...studioSettingsWiring.controllers,
+    ...acquisitionWiring.controllers,
     ...clientPhotoWiring.controllers,
     ...first90DaysWiring.controllers,
     ...invoiceDataWiring.controllers,
@@ -589,6 +591,7 @@ import { invoiceDataWiring } from './payments/invoice-data/invoice-data-wiring';
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...promotionsConsentWiring.providers(PRISMA_CLIENT),
     ...studioSettingsWiring.providers(PRISMA_CLIENT),
+    ...acquisitionWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
     ...first90DaysWiring.providers(PRISMA_CLIENT),
     ...invoiceDataWiring.providers(PRISMA_CLIENT),
