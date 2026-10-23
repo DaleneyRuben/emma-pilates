@@ -30,6 +30,7 @@ you are starting with no project knowledge.
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
+| Feedback                     | Send «Enviar comentarios» from Perfil in both apps, see it arrive on the admin web's «Comentarios» with its version, build, system, and Role, triage it to Resuelto with «Qué cambiamos», and export the CSV (Test 75) | Ten per Account in 24 hours; the Administrators' push needs the worker and a development build (Test 46) |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
@@ -54,6 +55,7 @@ can be found by its design name.
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
+| 25 Enviar comentarios | 19, 75 |
 
 | Staff app | Tests |
 | --- | --- |
@@ -67,6 +69,7 @@ can be found by its design name.
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
+| S27 Enviar comentarios | 19, 75 |
 
 | Admin web | Tests |
 | --- | --- |
@@ -82,6 +85,7 @@ can be found by its design name.
 | AW23–AW24 Personal | 26, 31, 72 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+| AW38 Comentarios | 75 |
 
 ## Before you begin
 
@@ -5834,3 +5838,65 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 75: send feedback from the apps and triage it on the admin web (REL-012)
+
+«Enviar comentarios» is the last row of Perfil in the Client app (Prompt 25,
+follow-up 165) and a row after «Cambiar contraseña» on the Staff app's Perfil
+for every Role (`S27`). The admin web lists what arrives under
+**Comentarios** (`AW38`), the last entry of the sidebar.
+
+### A. Send one from each app
+
+1. With the backend, the worker, and Metro running (Test 2), log in to the
+   Client app as `isabel@example.com` on the iPhone, the iPad, or the Android
+   emulator and open **Perfil → Enviar comentarios**.
+2. The button «Enviar comentario» stays disabled until you pick a type
+   (Problema, Sugerencia, Otro) and write at least 10 characters; the counter
+   reads «n / 2000» and the field stops at 2,000. The card under the field
+   names what travels with the text: «la versión de la app (1.0.1,
+   compilación 3), el sistema (Android 14) y tu rol. No enviamos capturas de
+   pantalla.» (Expo Go reports its own version and build; a store or
+   development build reports the app's.)
+3. Send it: «¡Gracias por tu comentario!» replaces the form, and «Volver al
+   perfil» returns to Perfil.
+4. In the Staff app, log in as `emma.vargas@example.com` (or any Staff
+   fixture), open the account avatar → **Enviar comentarios**, and send one.
+   While an Administrator sees the app as someone (Test 67) the send answers
+   «Mientras ves la app como otra persona no puedes enviar comentarios.»
+5. Each Administrator except the sender gets the inbox entry «Comentario
+   nuevo» («Llegó un problema desde la app de clientas. Revísalo en la web de
+   administración.») and, on a development build, its push.
+
+The Maestro journeys `send-feedback.yaml` in both apps' `.maestro` run steps
+1–4 (Test 19).
+
+### B. Triage it on the admin web
+
+1. Log in to the admin web as `paola.mendoza@example.com` and open
+   **Comentarios**. The subtitle counts the «Nuevo» ones; the table shows
+   Fecha, Tipo, Comentario, App, Versión («1.0.1 (3) · Android 14»), and the
+   Estado pill. Filter by Estado (Todos, Nuevo, Revisado, Resuelto) and App
+   (Las dos, App de clientas, App del personal); the filters live in the
+   address.
+2. Open a row: the panel shows the whole text, Fecha, App, Rol, Correo,
+   Versión, and Sistema. Choose **Resuelto**, write «Qué cambiamos», and
+   **Guardar**: «Guardamos el comentario.» and the pill turns Resuelto.
+3. **Exportar CSV** downloads `comentarios-aaaa-mm-dd.csv` with every comment:
+   Fecha, App, Tipo, Comentario, Versión, Estado, Qué cambiamos (what Google's
+   production questionnaire asks for). The export and every triage write an
+   audit record (`feedback.exported`, `feedback.triaged`).
+
+### C. Through the API
+
+- `POST /api/v1/feedback` with a Bearer credential, an `Idempotency-Key`
+  UUID, and `{type, text, appVersion, appBuild, platform, osVersion}` answers
+  `201 {id, createdAt}`; the same key replays the answer, another body with it
+  answers `409 idempotency_key_reused`, a text under 10 or over 2,000
+  characters or an unknown field (such as `role`) answers `400`. The eleventh
+  in 24 hours from one Account answers `429 feedback_limit_reached`.
+- `GET /api/v1/administrator/feedback?status=&app=&page=&pageSize=`,
+  `GET /api/v1/administrator/feedback/export`, and
+  `POST /api/v1/administrator/feedback/{id}/triage` with
+  `{status, changeNote}` are the Administrator's; any other Role answers
+  `403 feedback_access_denied`.
