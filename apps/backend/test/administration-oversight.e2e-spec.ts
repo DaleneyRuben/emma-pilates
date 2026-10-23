@@ -74,6 +74,14 @@ describe('administration oversight endpoints (e2e)', () => {
     jest.clearAllMocks();
   });
 
+  it('no longer serves the retired Credit list (PAY-005)', async () => {
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/credits')
+      .set('authorization', bearer)
+      .expect(404);
+    expect(oversight.listCredits).not.toHaveBeenCalled();
+  });
+
   it('narrows the Evaluation list to one Branch without caching it', async () => {
     await request(app.getHttpServer())
       .get(`/api/v1/administrator/evaluations?${range}&branchId=${centro}`)
