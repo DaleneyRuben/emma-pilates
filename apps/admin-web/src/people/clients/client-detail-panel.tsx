@@ -90,7 +90,10 @@ function PlanBlock({
       {view.status === "active" ? (
         <div className="flex flex-wrap gap-2 px-3 py-2">
           <AllowanceAdjustmentAction clientId={clientId} reason="courtesy" />
-          <AllowanceAdjustmentAction clientId={clientId} reason="class_return" />
+          <AllowanceAdjustmentAction
+            clientId={clientId}
+            reason="class_return"
+          />
         </div>
       ) : null}
     </SummaryBlock>

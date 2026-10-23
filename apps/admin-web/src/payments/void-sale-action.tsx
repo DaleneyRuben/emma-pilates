@@ -1,4 +1,7 @@
-import { getListAdminPaymentsQueryKey, voidPayment } from "@pilates/api-contracts";
+import {
+  getListAdminPaymentsQueryKey,
+  voidPayment,
+} from "@pilates/api-contracts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { adminFetch } from "../api/fetcher";
