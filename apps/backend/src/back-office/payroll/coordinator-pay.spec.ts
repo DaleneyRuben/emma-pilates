@@ -115,9 +115,9 @@ describe('renewal rate', () => {
         monthOfOperation(opening, new Date(`${month}T00:00:00.000Z`)),
       );
 
-    expect(monthOfOperation(opening, new Date('2026-01-01T00:00:00.000Z'))).toBe(
-      1,
-    );
+    expect(
+      monthOfOperation(opening, new Date('2026-01-01T00:00:00.000Z')),
+    ).toBe(1);
     expect(target('2026-01-01')).toBe(80);
     expect(target('2026-06-01')).toBe(80);
     expect(target('2026-07-01')).toBe(85);
