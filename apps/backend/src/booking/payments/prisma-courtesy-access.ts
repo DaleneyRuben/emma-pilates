@@ -15,6 +15,7 @@ import {
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { boliviaDate } from '../../time/bolivia-time';
+import { grantFounderPlace } from './prisma-founder-membership';
 import {
   AdministrationError,
   requireAdministrator,
@@ -159,6 +160,7 @@ export const createPrismaCourtesyAccess = (
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: 0,
         creditAppliedCentavos: 0,
+        discountCentavos: 0,
         amountDueCentavos: 0,
         startsOn: allocated.startsOn,
         method: PaymentMethod.COURTESY,
@@ -187,6 +189,12 @@ export const createPrismaCourtesyAccess = (
         activatedAt: now,
       },
       select: { id: true },
+    });
+    await grantFounderPlace(transaction, {
+      clientId: command.clientId,
+      paymentId: payment.id,
+      now,
+      courtesy: true,
     });
 
     const actor = auditActorOf(principal);
@@ -245,6 +253,8 @@ export const createPrismaCourtesyAccess = (
         durationDaysSnapshot: true,
         classAllowanceSnapshot: true,
         planPriceCentavos: true,
+        discountCentavos: true,
+        discountReason: true,
         creditAppliedCentavos: true,
         amountDueCentavos: true,
         startsOn: true,
@@ -263,6 +273,8 @@ export const createPrismaCourtesyAccess = (
       durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
       classAllowance: row.classAllowanceSnapshot,
       planPriceCentavos: row.planPriceCentavos,
+      discountCentavos: row.discountCentavos,
+      discountReason: row.discountReason === 'founder' ? 'founder' : null,
       creditAppliedCentavos: row.creditAppliedCentavos,
       amountDueCentavos: row.amountDueCentavos,
       startsOn: row.startsOn.toISOString().slice(0, 10),

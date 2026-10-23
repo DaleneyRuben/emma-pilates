@@ -47,6 +47,11 @@ import {
   todayOf,
 } from './prisma-start-date-allocation';
 import { loadActiveSubscription as sharedLoadActiveSubscription } from './subscription-allocation';
+import {
+  founderSaleOf,
+  grantFounderPlace,
+  priceFounderSale,
+} from './prisma-founder-membership';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -59,6 +64,8 @@ export type PurchaseIntentView = {
   classAllowance: number;
   planPriceCentavos: number;
   creditReservedCentavos: number;
+  discountCentavos: number;
+  discountReason: string | null;
   amountDueCentavos: number;
   state: 'open' | 'submitted' | 'expired';
   receiptAttached: boolean;
@@ -78,6 +85,8 @@ export type PaymentView = {
   classAllowance: number;
   planPriceCentavos: number;
   creditAppliedCentavos: number;
+  discountCentavos: number;
+  discountReason: string | null;
   amountDueCentavos: number;
   startsOn: string;
   submittedAt: Date;
@@ -176,6 +185,8 @@ const intentSelect = {
   classAllowanceSnapshot: true,
   planPriceCentavos: true,
   creditReservedCentavos: true,
+  discountCentavos: true,
+  discountReason: true,
   amountDueCentavos: true,
   startsOn: true,
   receiptImageAssetId: true,
@@ -195,6 +206,8 @@ const paymentSelect = {
   classAllowanceSnapshot: true,
   planPriceCentavos: true,
   creditAppliedCentavos: true,
+  discountCentavos: true,
+  discountReason: true,
   amountDueCentavos: true,
   startsOn: true,
   method: true,
@@ -219,6 +232,8 @@ const toIntentView = (row: IntentRow): PurchaseIntentView => ({
   classAllowance: row.classAllowanceSnapshot,
   planPriceCentavos: row.planPriceCentavos,
   creditReservedCentavos: row.creditReservedCentavos,
+  discountCentavos: row.discountCentavos,
+  discountReason: row.discountReason,
   amountDueCentavos: row.amountDueCentavos,
   state: intentStates[row.state],
   receiptAttached: row.receiptImageAssetId !== null,
@@ -238,6 +253,8 @@ const toPaymentView = (row: PaymentRow): PaymentView => ({
   classAllowance: row.classAllowanceSnapshot,
   planPriceCentavos: row.planPriceCentavos,
   creditAppliedCentavos: row.creditAppliedCentavos,
+  discountCentavos: row.discountCentavos,
+  discountReason: row.discountReason,
   amountDueCentavos: row.amountDueCentavos,
   startsOn: row.startsOn.toISOString().slice(0, 10),
   submittedAt: row.submittedAt,
@@ -721,16 +738,28 @@ export function createPrismaPaymentCommands(
       active: eligible.active,
     });
     const credit = await readLedgerSummary(transaction, input.clientId);
+    const priced = await priceFounderSale(transaction, {
+      clientId: input.clientId,
+      classAllowance: plan.classAllowance,
+      priceCentavos: plan.priceCentavos,
+      creditAppliedCentavos: 0,
+    });
     if (
       input.requireFullCredit &&
-      credit.availableCentavos < plan.priceCentavos
+      credit.availableCentavos < plan.priceCentavos - priced.discountCentavos
     ) {
       throw rule('credit_insufficient', 'Credit does not cover the Plan price');
     }
-    const applied = Math.min(credit.availableCentavos, plan.priceCentavos);
-    const amountDue = plan.priceCentavos - applied;
-    const method =
-      amountDue === 0 ? PaymentMethod.CREDIT_ONLY : PaymentMethod.CASH;
+    const sale = founderSaleOf({
+      method: PaymentMethod.CASH,
+      classAllowance: plan.classAllowance,
+      priceCentavos: plan.priceCentavos,
+      creditAppliedCentavos: Math.min(
+        credit.availableCentavos,
+        plan.priceCentavos - priced.discountCentavos,
+      ),
+      discount: priced,
+    });
 
     const payment = await transaction.payment.create({
       data: {
@@ -741,13 +770,15 @@ export function createPrismaPaymentCommands(
         weeklyClassCapSnapshot: plan.weeklyClassCap,
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: plan.priceCentavos,
-        creditAppliedCentavos: applied,
-        amountDueCentavos: amountDue,
+        creditAppliedCentavos: sale.creditAppliedCentavos,
+        discountCentavos: sale.discountCentavos,
+        discountReason: sale.discountReason,
+        amountDueCentavos: sale.amountDueCentavos,
         startsOn: allocated.startsOn,
-        method,
+        method: sale.method,
         state: PaymentState.CONFIRMED,
         collectedAtBranchId:
-          method === PaymentMethod.CASH ? input.branchId : null,
+          sale.method === PaymentMethod.CASH ? input.branchId : null,
         submittedByAccountId: input.principal.accountId,
         submittedAt: now,
         decidedByAccountId: input.principal.accountId,
@@ -757,11 +788,11 @@ export function createPrismaPaymentCommands(
       select: paymentSelect,
     });
 
-    if (applied > 0) {
+    if (sale.creditAppliedCentavos > 0) {
       const reservation = await transaction.creditReservation.create({
         data: {
           clientId: input.clientId,
-          amountCentavos: applied,
+          amountCentavos: sale.creditAppliedCentavos,
           paymentId: payment.id,
           state: CreditReservationState.SPENT,
           reservedAt: now,
@@ -777,7 +808,7 @@ export function createPrismaPaymentCommands(
           data: {
             clientId: input.clientId,
             kind,
-            amountCentavos: applied,
+            amountCentavos: sale.creditAppliedCentavos,
             occurredAt: now,
             reservationId: reservation.id,
             actorKind: CreditLedgerActorKind.ACCOUNT,
@@ -807,16 +838,22 @@ export function createPrismaPaymentCommands(
       input.principal,
       now,
     );
+    await grantFounderPlace(transaction, {
+      clientId: input.clientId,
+      paymentId: payment.id,
+      now,
+      courtesy: false,
+    });
     await recordPaymentAudit(transaction, {
       actionCode:
-        method === PaymentMethod.CASH
+        sale.method === PaymentMethod.CASH
           ? 'payment.cash_confirmed'
           : 'payment.credit_only_confirmed',
       principal: input.principal,
       payment,
       priorState: null,
       newState: 'confirmed',
-      branchId: method === PaymentMethod.CASH ? input.branchId : null,
+      branchId: sale.method === PaymentMethod.CASH ? input.branchId : null,
       now,
     });
     await notifyPaymentConfirmed(transaction, {
@@ -956,9 +993,15 @@ export function createPrismaPaymentCommands(
             });
             const now = dependencies.now();
             const credit = await readLedgerSummary(transaction, clientId);
+            const priced = await priceFounderSale(transaction, {
+              clientId,
+              classAllowance: plan.classAllowance,
+              priceCentavos: plan.priceCentavos,
+              creditAppliedCentavos: 0,
+            });
             const reserved = Math.min(
               credit.availableCentavos,
-              plan.priceCentavos,
+              plan.priceCentavos - priced.discountCentavos,
             );
 
             const intent = await transaction.purchaseIntent.create({
@@ -971,7 +1014,10 @@ export function createPrismaPaymentCommands(
                 classAllowanceSnapshot: plan.classAllowance,
                 planPriceCentavos: plan.priceCentavos,
                 creditReservedCentavos: reserved,
-                amountDueCentavos: plan.priceCentavos - reserved,
+                discountCentavos: priced.discountCentavos,
+                discountReason: priced.discountReason,
+                amountDueCentavos:
+                  plan.priceCentavos - priced.discountCentavos - reserved,
                 startsOn: allocated.startsOn,
                 createdByAccountId: principal.accountId,
                 createdAt: now,
@@ -1170,6 +1216,8 @@ export function createPrismaPaymentCommands(
               classAllowanceSnapshot: intent.classAllowanceSnapshot,
               planPriceCentavos: intent.planPriceCentavos,
               creditAppliedCentavos: intent.creditReservedCentavos,
+              discountCentavos: intent.discountCentavos,
+              discountReason: intent.discountReason,
               amountDueCentavos: intent.amountDueCentavos,
               startsOn: intent.startsOn,
               method: PaymentMethod.TRANSFER,
@@ -1361,6 +1409,12 @@ export function createPrismaPaymentCommands(
         principal,
         now,
       );
+      await grantFounderPlace(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+        now,
+        courtesy: false,
+      });
       await recordPaymentAudit(transaction, {
         actionCode: 'payment.transfer_confirmed',
         principal,
