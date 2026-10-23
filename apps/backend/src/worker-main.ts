@@ -117,8 +117,11 @@ async function bootstrap(): Promise<void> {
         return evaluations.sendDueEvaluationReminders();
       },
     },
-    emptySessionChecks: {
-      execute: () => sessionStartChecks.checkEmptySessions(),
+    minimumBookingsChecks: {
+      execute: () => sessionStartChecks.checkMinimumBookings(),
+    },
+    windowCloseSnapshots: {
+      execute: () => sessionStartChecks.recordWindowCloseBookings(),
     },
     startedSessionWaitlists: {
       execute: () => sessionStartChecks.closeStartedWaitlists(),
