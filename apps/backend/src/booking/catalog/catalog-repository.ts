@@ -1,7 +1,8 @@
 export type PlanSummary = {
   id: string;
   name: string;
-  durationMonths: number;
+  durationDays: number;
+  weeklyClassCap: number | null;
   classAllowance: number;
   priceCentavos: number;
   displayOrder: number;
@@ -42,11 +43,12 @@ export type SubscriptionSummary = {
   id: string;
   planId: string;
   planNameSnapshot: string;
-  durationMonthsSnapshot: number;
+  durationDaysSnapshot: number;
   originalClassAllowance: number;
   remainingClassAllowance: number;
   startsOn: Date;
   endsOn: Date;
+  extraClassesLine: string | null;
 };
 
 export type PromotionSummary = {

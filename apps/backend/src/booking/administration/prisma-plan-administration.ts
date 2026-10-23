@@ -5,21 +5,22 @@ import {
   requireAdministrator,
 } from './administration-errors';
 import { catalogWrites, trimmed } from './catalog-writes';
+import { isValidPlanValidity } from '../catalog/plan-validity';
 
 export type PlanInput = {
   name: string;
-  durationMonths: number;
+  durationDays: number;
+  weeklyClassCap: number | null;
   classAllowance: number;
   priceCentavos: number;
   displayOrder: number;
 };
 
-const planDurations = new Set([1, 3, 6, 12]);
-
-const planSelect = {
+export const planSelect = {
   id: true,
   name: true,
-  durationMonths: true,
+  durationDays: true,
+  weeklyClassCap: true,
   classAllowance: true,
   priceCentavos: true,
   displayOrder: true,
@@ -28,7 +29,7 @@ const planSelect = {
 
 const requirePlanValues = (input: PlanInput) => {
   if (
-    !planDurations.has(input.durationMonths) ||
+    !isValidPlanValidity(input) ||
     input.name.trim() === '' ||
     input.classAllowance < 1 ||
     input.priceCentavos < 1
@@ -75,7 +76,8 @@ export const createPrismaPlanAdministration = (
       const {
         planId,
         name,
-        durationMonths,
+        durationDays,
+        weeklyClassCap,
         classAllowance,
         priceCentavos,
         displayOrder,
@@ -90,7 +92,8 @@ export const createPrismaPlanAdministration = (
           where: { id: planId },
           data: {
             name,
-            durationMonths,
+            durationDays,
+            weeklyClassCap,
             classAllowance,
             priceCentavos,
             displayOrder,

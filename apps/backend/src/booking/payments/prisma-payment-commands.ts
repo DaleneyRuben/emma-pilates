@@ -34,10 +34,10 @@ import {
   settleReservation,
 } from './purchase-intent-settlement';
 import { evaluatePurchaseEligibility } from './purchase-eligibility';
-import {
-  computeSubscriptionTerm,
-  type SubscriptionDurationMonths,
-} from './subscription-term';
+import { deprecatedDurationMonths } from '../catalog/plan-validity';
+import { computeSubscriptionTerm } from './subscription-term';
+import { grantGiftClass } from './allowance-adjustments';
+import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -45,6 +45,7 @@ export type PurchaseIntentView = {
   id: string;
   planId: string;
   planName: string;
+  durationDays: number;
   durationMonths: number;
   classAllowance: number;
   planPriceCentavos: number;
@@ -58,10 +59,11 @@ export type PurchaseIntentView = {
 
 export type PaymentView = {
   id: string;
-  method: 'transfer' | 'cash' | 'credit_only';
+  method: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
   state: 'pending' | 'confirmed' | 'rejected';
   planId: string;
   planName: string;
+  durationDays: number;
   durationMonths: number;
   classAllowance: number;
   planPriceCentavos: number;
@@ -145,6 +147,7 @@ const paymentMethods: Record<PaymentMethod, PaymentView['method']> = {
   [PaymentMethod.TRANSFER]: 'transfer',
   [PaymentMethod.CASH]: 'cash',
   [PaymentMethod.CREDIT_ONLY]: 'credit_only',
+  [PaymentMethod.COURTESY]: 'courtesy',
 };
 const paymentStates: Record<PaymentState, PaymentView['state']> = {
   [PaymentState.PENDING]: 'pending',
@@ -157,7 +160,8 @@ const intentSelect = {
   clientId: true,
   planId: true,
   planNameSnapshot: true,
-  durationMonthsSnapshot: true,
+  durationDaysSnapshot: true,
+  weeklyClassCapSnapshot: true,
   classAllowanceSnapshot: true,
   planPriceCentavos: true,
   creditReservedCentavos: true,
@@ -174,7 +178,8 @@ const paymentSelect = {
   planId: true,
   purchaseIntentId: true,
   planNameSnapshot: true,
-  durationMonthsSnapshot: true,
+  durationDaysSnapshot: true,
+  weeklyClassCapSnapshot: true,
   classAllowanceSnapshot: true,
   planPriceCentavos: true,
   creditAppliedCentavos: true,
@@ -185,6 +190,7 @@ const paymentSelect = {
   decidedAt: true,
   rejectionReason: true,
   subscription: { select: { id: true } },
+  plan: { select: { hiddenAt: true } },
 } as const;
 
 type IntentRow = Prisma.PurchaseIntentGetPayload<{
@@ -196,7 +202,8 @@ const toIntentView = (row: IntentRow): PurchaseIntentView => ({
   id: row.id,
   planId: row.planId,
   planName: row.planNameSnapshot,
-  durationMonths: row.durationMonthsSnapshot,
+  durationDays: row.durationDaysSnapshot,
+  durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
   classAllowance: row.classAllowanceSnapshot,
   planPriceCentavos: row.planPriceCentavos,
   creditReservedCentavos: row.creditReservedCentavos,
@@ -213,7 +220,8 @@ const toPaymentView = (row: PaymentRow): PaymentView => ({
   state: paymentStates[row.state],
   planId: row.planId,
   planName: row.planNameSnapshot,
-  durationMonths: row.durationMonthsSnapshot,
+  durationDays: row.durationDaysSnapshot,
+  durationMonths: deprecatedDurationMonths(row.durationDaysSnapshot),
   classAllowance: row.classAllowanceSnapshot,
   planPriceCentavos: row.planPriceCentavos,
   creditAppliedCentavos: row.creditAppliedCentavos,
@@ -410,7 +418,8 @@ export function createPrismaPaymentCommands(
         select: {
           id: true,
           name: true,
-          durationMonths: true,
+          durationDays: true,
+          weeklyClassCap: true,
           classAllowance: true,
           priceCentavos: true,
           hiddenAt: true,
@@ -528,7 +537,7 @@ export function createPrismaPaymentCommands(
   ): Promise<string> => {
     const term = computeSubscriptionTerm(
       boliviaDate(now),
-      payment.durationMonthsSnapshot as SubscriptionDurationMonths,
+      payment.durationDaysSnapshot,
     );
     const subscription = await transaction.subscription.create({
       data: {
@@ -536,7 +545,8 @@ export function createPrismaPaymentCommands(
         planId: payment.planId,
         paymentId: payment.id,
         planNameSnapshot: payment.planNameSnapshot,
-        durationMonthsSnapshot: payment.durationMonthsSnapshot,
+        durationDaysSnapshot: payment.durationDaysSnapshot,
+        weeklyClassCapSnapshot: payment.weeklyClassCapSnapshot,
         originalClassAllowance: payment.classAllowanceSnapshot,
         remainingClassAllowance: payment.classAllowanceSnapshot,
         startsOn: term.startsOn,
@@ -578,6 +588,24 @@ export function createPrismaPaymentCommands(
         },
       });
     }
+
+    await grantGiftClass(transaction, {
+      clientId: payment.clientId,
+      subscriptionId: subscription.id,
+      paymentId: payment.id,
+      method: paymentMethods[payment.method],
+      hidden: payment.plan.hiddenAt !== null,
+      priceCentavos: payment.planPriceCentavos,
+      // BKM-010 makes the Founder Membership real; until then nobody is one.
+      founder: false,
+      earlierRealPayment: await hasEarlierRealPayment(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+      }),
+      authorAccountId: principal.accountId,
+      authorRole: auditActorOf(principal).role,
+      now,
+    });
 
     return subscription.id;
   };
@@ -673,7 +701,8 @@ export function createPrismaPaymentCommands(
         clientId: input.clientId,
         planId: plan.id,
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
+        weeklyClassCapSnapshot: plan.weeklyClassCap,
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: plan.priceCentavos,
         creditAppliedCentavos: applied,
@@ -863,7 +892,8 @@ export function createPrismaPaymentCommands(
                 clientId,
                 planId: plan.id,
                 planNameSnapshot: plan.name,
-                durationMonthsSnapshot: plan.durationMonths,
+                durationDaysSnapshot: plan.durationDays,
+                weeklyClassCapSnapshot: plan.weeklyClassCap,
                 classAllowanceSnapshot: plan.classAllowance,
                 planPriceCentavos: plan.priceCentavos,
                 creditReservedCentavos: reserved,
@@ -1065,7 +1095,8 @@ export function createPrismaPaymentCommands(
               planId: intent.planId,
               purchaseIntentId: intent.id,
               planNameSnapshot: intent.planNameSnapshot,
-              durationMonthsSnapshot: intent.durationMonthsSnapshot,
+              durationDaysSnapshot: intent.durationDaysSnapshot,
+              weeklyClassCapSnapshot: intent.weeklyClassCapSnapshot,
               classAllowanceSnapshot: intent.classAllowanceSnapshot,
               planPriceCentavos: intent.planPriceCentavos,
               creditAppliedCentavos: intent.creditReservedCentavos,

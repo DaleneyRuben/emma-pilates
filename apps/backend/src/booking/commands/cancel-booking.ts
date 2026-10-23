@@ -1,4 +1,5 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { isInsideCancellationWindow } from '../studio-settings/studio-settings';
 import { BookingAccessDeniedError } from './create-booking';
 
 type BookingForCancellation = {
@@ -23,10 +24,9 @@ type CancelBookingDependencies = {
     subscriptionId: string;
     cancelledByAccountId: string;
   }): Promise<void>;
+  cancellationWindowMinutes(): Promise<number>;
   now(): Date;
 };
-
-const cancellationWindowMilliseconds = 2.5 * 60 * 60 * 1_000;
 
 const assertAccess = (
   booking: BookingForCancellation,
@@ -64,8 +64,11 @@ export const cancelBooking = async (
   assertAccess(booking, dependencies.principal);
 
   if (
-    booking.session.startsAt.getTime() - dependencies.now().getTime() <=
-    cancellationWindowMilliseconds
+    isInsideCancellationWindow(
+      booking.session.startsAt,
+      dependencies.now(),
+      await dependencies.cancellationWindowMinutes(),
+    )
   ) {
     throw new Error('Booking is inside the Cancellation Window');
   }

@@ -21,8 +21,8 @@ INSERT INTO booking.clients (id, name, referral_code, updated_at) VALUES
  ('00000000-0000-0000-0000-000000000001', 'Ana', 'ana-test', now());
 INSERT INTO system.accounts (id, email, client_id, updated_at) VALUES
  ('00000000-0000-0000-0000-000000000001', 'ana@example.com', '00000000-0000-0000-0000-000000000001', now());
-INSERT INTO booking.plans (id, name, duration_months, class_allowance, price_centavos, display_order, updated_at) VALUES
- ('00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 1, 8, 30000, 0, now());
+INSERT INTO booking.plans (id, name, duration_days, class_allowance, price_centavos, display_order, updated_at) VALUES
+ ('00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 30, 8, 30000, 0, now());
 INSERT INTO booking.class_types (id, name, description, duration_minutes, default_capacity, updated_at) VALUES
  ('00000000-0000-0000-0000-000000000001', 'Reformer Pilates', 'Pilates con Reformer', 60, 8, now());
 INSERT INTO booking.session_schedules (id, branch_id, class_type_id, trainer_staff_member_id, weekday, starts_at_local, duration_minutes, capacity, effective_from, updated_at) VALUES
@@ -31,7 +31,12 @@ INSERT INTO booking.sessions (id, session_schedule_id, branch_id, class_type_id,
  ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '2026-09-14 09:00-04', '2026-09-14 10:00-04', 8, now());
 
 -- Invalid scalar values must fail, including null-sensitive state combinations.
-SELECT pg_temp.expect_failure('UPDATE booking.plans SET duration_months = 2', '23514');
+SELECT pg_temp.expect_failure('UPDATE booking.plans SET duration_days = 45', '23514');
+SELECT pg_temp.expect_failure('UPDATE booking.plans SET duration_days = NULL', '23502');
+SELECT pg_temp.expect_failure('UPDATE booking.plans SET weekly_class_cap = 3', '23514');
+SELECT pg_temp.expect_failure('UPDATE booking.plans SET duration_days = 60, weekly_class_cap = 5', '23514');
+UPDATE booking.plans SET duration_days = 60, weekly_class_cap = 3;
+UPDATE booking.plans SET duration_days = 30, weekly_class_cap = NULL;
 SELECT pg_temp.expect_failure('UPDATE booking.plans SET class_allowance = 0', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.plans SET price_centavos = -1', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.plans SET display_order = -1', '23514');
@@ -64,24 +69,26 @@ UPDATE booking.sessions SET starts_at = '2026-09-14 09:30-04' WHERE id = '000000
 SELECT pg_temp.expect_failure('UPDATE booking.sessions SET cancelled_by_account_id = ''00000000-0000-0000-0000-000000000001'' WHERE state = ''cancelled''', '23514');
 UPDATE booking.sessions SET cancellation_cause = 'no_substitute_trainer', cancelled_by_account_id = '00000000-0000-0000-0000-000000000001' WHERE state = 'cancelled';
 
-INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at) VALUES
- ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 1, 8, 8, '2026-01-31', '2026-02-28', '2026-01-31 12:00-04', now());
+INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at) VALUES
+ ('00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', '00000000-0000-0000-0000-000000000001', 'Paquete de 8 clases', 30, 8, 8, '2026-01-31', '2026-02-28', '2026-01-31 12:00-04', now());
+SELECT pg_temp.expect_failure('UPDATE booking.subscriptions SET duration_days_snapshot = 31', '23514');
+SELECT pg_temp.expect_failure('UPDATE booking.subscriptions SET weekly_class_cap_snapshot = 4', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.subscriptions SET remaining_class_allowance = -1', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.subscriptions SET remaining_class_allowance = 9', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.subscriptions SET ends_on = starts_on - 1', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.subscriptions SET state = ''expired''', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.subscriptions SET expired_at = now()', '23514');
-SELECT pg_temp.expect_failure('INSERT INTO booking.subscriptions SELECT ''00000000-0000-0000-0000-000000000002'', client_id, plan_id, plan_name_snapshot, duration_months_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, state, activated_at, expired_at, created_at, updated_at FROM booking.subscriptions', '23505');
+SELECT pg_temp.expect_failure('INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, state, activated_at, expired_at, created_at, updated_at) SELECT ''00000000-0000-0000-0000-000000000002'', client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, state, activated_at, expired_at, created_at, updated_at FROM booking.subscriptions', '23505');
 UPDATE booking.subscriptions SET state = 'expired', expired_at = now();
-INSERT INTO booking.subscriptions SELECT '00000000-0000-0000-0000-000000000002', client_id, plan_id, plan_name_snapshot, duration_months_snapshot, original_class_allowance, remaining_class_allowance, '2026-03-01', '2026-04-01', 'active', now(), NULL, now(), now() FROM booking.subscriptions;
+INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, state, activated_at, expired_at, created_at, updated_at) SELECT '00000000-0000-0000-0000-000000000002', client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, '2026-03-01', '2026-04-01', 'active', now(), NULL, now(), now() FROM booking.subscriptions;
 SELECT pg_temp.expect_failure('DELETE FROM booking.plans', '23001');
 SELECT pg_temp.expect_failure('DELETE FROM booking.class_types', '23001');
 SELECT pg_temp.expect_failure('DELETE FROM booking.session_schedules', '23001');
 
 -- Hiding frees a normalized catalog name but does not rewrite the snapshot.
-SELECT pg_temp.expect_failure('INSERT INTO booking.plans SELECT ''00000000-0000-0000-0000-000000000002'', '' paquete de 8 CLASES '', duration_months, class_allowance, price_centavos, display_order, hidden_at, created_at, updated_at FROM booking.plans', '23505');
+SELECT pg_temp.expect_failure('INSERT INTO booking.plans (id, name, duration_days, class_allowance, price_centavos, display_order, hidden_at, created_at, updated_at) SELECT ''00000000-0000-0000-0000-000000000002'', '' paquete de 8 CLASES '', duration_days, class_allowance, price_centavos, display_order, hidden_at, created_at, updated_at FROM booking.plans', '23505');
 UPDATE booking.plans SET hidden_at = now();
-INSERT INTO booking.plans SELECT '00000000-0000-0000-0000-000000000002', ' paquete de 8 CLASES ', duration_months, class_allowance, price_centavos, display_order, NULL, now(), now() FROM booking.plans;
+INSERT INTO booking.plans (id, name, duration_days, class_allowance, price_centavos, display_order, hidden_at, created_at, updated_at) SELECT '00000000-0000-0000-0000-000000000002', ' paquete de 8 CLASES ', duration_days, class_allowance, price_centavos, display_order, NULL, now(), now() FROM booking.plans;
 SELECT pg_temp.expect_failure('UPDATE booking.plans SET hidden_at = NULL', '23505');
 
 INSERT INTO booking.promotions (id, headline, description, display_starts_on, display_ends_on, display_order, updated_at) VALUES

@@ -29,6 +29,7 @@ import type {
   PlanSummary,
   SessionDetail,
 } from '../catalog/catalog-repository';
+import { deprecatedDurationMonths } from '../catalog/plan-validity';
 import type { ClientProfile } from './client-profile';
 import type { ClientSubscriptionView } from './client-subscription';
 import {
@@ -82,7 +83,9 @@ const civilDate = (date: Date): string => date.toISOString().slice(0, 10);
 const toPlanDto = (plan: PlanSummary): PlanDto => ({
   id: plan.id,
   name: plan.name,
-  durationMonths: plan.durationMonths,
+  durationDays: plan.durationDays,
+  weeklyClassCap: plan.weeklyClassCap,
+  durationMonths: deprecatedDurationMonths(plan.durationDays),
   classAllowance: plan.classAllowance,
   priceCentavos: plan.priceCentavos,
 });
@@ -169,6 +172,7 @@ export class ClientProfileController {
                 view.subscription.remainingClassAllowance,
               startsOn: civilDate(view.subscription.startsOn),
               endsOn: civilDate(view.subscription.endsOn),
+              extraClassesLine: view.subscription.extraClassesLine,
             },
     };
   }

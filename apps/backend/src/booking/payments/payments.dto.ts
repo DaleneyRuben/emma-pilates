@@ -35,7 +35,14 @@ export class PurchaseIntentDto {
   @ApiProperty()
   planName!: string;
 
-  @ApiProperty({ enum: [1, 3, 6, 12] })
+  @ApiProperty({ enum: [30, 60, 90] })
+  durationDays!: number;
+
+  @ApiProperty({
+    enum: [1, 2, 3],
+    deprecated: true,
+    description: 'durationDays / 30, for builds that still read months',
+  })
   durationMonths!: number;
 
   @ApiProperty({ minimum: 1 })
@@ -70,8 +77,8 @@ export class PaymentDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only'] })
-  method!: 'transfer' | 'cash' | 'credit_only';
+  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only', 'courtesy'] })
+  method!: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
 
   @ApiProperty({ enum: ['pending', 'confirmed', 'rejected'] })
   state!: 'pending' | 'confirmed' | 'rejected';
@@ -82,7 +89,14 @@ export class PaymentDto {
   @ApiProperty()
   planName!: string;
 
-  @ApiProperty({ enum: [1, 3, 6, 12] })
+  @ApiProperty({ enum: [30, 60, 90] })
+  durationDays!: number;
+
+  @ApiProperty({
+    enum: [1, 2, 3],
+    deprecated: true,
+    description: 'durationDays / 30, for builds that still read months',
+  })
   durationMonths!: number;
 
   @ApiProperty({ minimum: 1 })

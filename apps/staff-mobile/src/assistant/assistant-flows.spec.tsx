@@ -4,6 +4,7 @@ import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilate
 import { jsonResponse } from "../test-support";
 import {
   expiredOverview,
+  giftedOverview,
   minute,
   soonBooking,
   session,
@@ -48,6 +49,7 @@ describe("Assistant Client flows", () => {
     });
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("5 clases restantes")).toBeOnTheScreen();
+    expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
     expect(screen.getByText("Vence el 12 de octubre de 2026")).toBeOnTheScreen();
     expect(screen.getByText("Activa")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
@@ -56,6 +58,14 @@ describe("Assistant Client flows", () => {
     expect(screen.getByRole("button", { name: "Ver historial completo" })).toBeOnTheScreen();
     expect(screen.getAllByText("Emma Vargas · Centro")).toHaveLength(2);
     expect(screen.getByText("Mat Pilates")).toBeOnTheScreen();
+  });
+
+  it("shows the gift class with its origin on the Client summary", async () => {
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () => jsonResponse(giftedOverview),
+    });
+    expect(screen.getByText("Clases extra: 1 · Regalo de bienvenida")).toBeOnTheScreen();
   });
 
   it("lists the Client's Bookings in their three states, cancels one after confirming, and shows the history by month", async () => {
@@ -210,6 +220,7 @@ describe("Assistant Client flows", () => {
               state: "confirmed",
               planId: "plan-8",
               planName: "Paquete de 8 clases",
+              durationDays: 30,
               durationMonths: 1,
               classAllowance: 8,
               planPriceCentavos: 56_000,
@@ -244,12 +255,17 @@ describe("Assistant Client flows", () => {
     });
     expect(screen.getByText("Bs 500")).toBeOnTheScreen();
     expect(screen.getByText("Bs 720")).toBeOnTheScreen();
+    // BKM-005: S09 states validity in days, never months.
+    expect(screen.getByText("8 clases · válido por 30 días")).toBeOnTheScreen();
+    expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
 
     await fireEvent.press(screen.getByRole("button", { name: "Paquete de 8 clases" }));
     await waitFor(() => {
       expect(screen.getByLabelText("Confirmar pago en efectivo")).toBeOnTheScreen();
     });
     expect(screen.getByText("Precio del plan")).toBeOnTheScreen();
+    // Follow-up 178: S10's plan card carries the same terms line as S09.
+    expect(screen.getByText("8 clases · válido por 30 días")).toBeOnTheScreen();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Crédito aplicado")).toBeOnTheScreen();
     expect(screen.getByText("Bs 60")).toBeOnTheScreen();
@@ -266,7 +282,7 @@ describe("Assistant Client flows", () => {
     });
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("8 clases")).toBeOnTheScreen();
-    expect(screen.getByText("Válido hasta el 22 de octubre de 2026")).toBeOnTheScreen();
+    expect(screen.getByText("Vence el 22 de octubre de 2026")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Volver al cliente" }));
     await waitFor(() => {

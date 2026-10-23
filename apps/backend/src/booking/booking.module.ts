@@ -152,6 +152,7 @@ import { promotionContactsWiring } from './promotion-contacts/promotion-contacts
 import { promotionsConsentWiring } from './promotions-consent/promotions-consent-wiring';
 import { acquisitionWiring } from './acquisition/acquisition-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
+import { studioSettingsWiring } from './studio-settings/studio-settings-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
 
 @Module({
@@ -190,6 +191,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionContactsWiring.controllers,
     ...promotionsConsentWiring.controllers,
     ...acquisitionWiring.controllers,
+    ...studioSettingsWiring.controllers,
     ...clientPhotoWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
@@ -454,6 +456,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
             remainingClassAllowance: subscription.remainingClassAllowance,
             startsOn: subscription.startsOn,
             endsOn: subscription.endsOn,
+            extraClassesLine: subscription.extraClassesLine,
           });
 
           return loadClientSubscription({
@@ -585,6 +588,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...promotionsConsentWiring.providers(PRISMA_CLIENT),
     ...acquisitionWiring.providers(PRISMA_CLIENT),
+    ...studioSettingsWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
   ],
 })

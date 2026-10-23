@@ -9,6 +9,7 @@ import {
   BackLink,
   BodyText,
   colors,
+  describePlanTerms,
   formatBolivianos,
   Heading,
   PrimaryButton,
@@ -129,7 +130,7 @@ export function ConfirmCashPaymentScreen({
               <BodyText>{describeClasses(result.payment.classAllowance)}</BodyText>
               {activated ? (
                 <BodyText style={styles.muted}>
-                  {`Válido hasta el ${formatCivilDate(activated.endsOn)}`}
+                  {`Vence el ${formatCivilDate(activated.endsOn)}`}
                 </BodyText>
               ) : null}
               <BodyText style={styles.muted}>
@@ -165,6 +166,7 @@ export function ConfirmCashPaymentScreen({
         <ScrollView contentContainerStyle={styles.content}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{quote.name}</Text>
+            <BodyText>{describePlanTerms(quote)}</BodyText>
             <Line label="Precio del plan" value={formatBolivianos(quote.priceCentavos)} />
             {quote.creditAppliedCentavos > 0 ? (
               <Line
