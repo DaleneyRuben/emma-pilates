@@ -38,6 +38,7 @@ describe('soft delete schema', () => {
       'system.accounts',
       'system.authentication_sessions',
       'system.authentication_throttle_events',
+      'system.feedback',
       'system.idempotency_records',
       'system.image_assets',
       'system.image_variants',
