@@ -150,6 +150,9 @@ export function FeedbackScreen({
   );
 }
 
+// Prompts 25 and S27: a 560 pt column on the tablet, the full width on a phone.
+const column = { alignSelf: "center", maxWidth: 560, width: "100%" } as const;
+
 const styles = StyleSheet.create({
   attached: {
     ...surfaces.flatCard,
@@ -175,8 +178,8 @@ const styles = StyleSheet.create({
   counterRow: { flexDirection: "row", justifyContent: "space-between" },
   failure: { color: colors.errorText },
   field: { gap: spacing.sm },
-  footer: { paddingTop: spacing.md },
-  form: { gap: spacing.lg, paddingBottom: spacing.lg },
+  footer: { ...column, paddingTop: spacing.md },
+  form: { ...column, gap: spacing.lg, paddingBottom: spacing.lg },
   hint: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.note },
   label: {
     color: colors.textMuted,
@@ -187,7 +190,7 @@ const styles = StyleSheet.create({
   },
   screen: { gap: spacing.lg },
   textArea: { minHeight: 160, paddingBottom: spacing.md, paddingTop: spacing.md },
-  thanks: { alignItems: "stretch", gap: spacing.lg, paddingTop: spacing.xxl },
+  thanks: { ...column, alignItems: "stretch", gap: spacing.lg, paddingTop: spacing.xxl },
   thanksIcon: {
     alignItems: "center",
     alignSelf: "center",
