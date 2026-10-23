@@ -795,7 +795,7 @@ Acceptance criteria: at least 12 testers opted in on the day REL-006's closed re
 | ID | Priority | Surface | Work item | Depends on | Effort | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | BE-027 | P1 | Backend | Diagnosis fixes: promote the waitlist when capacity rises; audit Attendance corrections | — | 1 d | ready |
-| MOB-070 | P1 | Client app | Diagnosis fixes in the Client app: Reschedule idempotency, the waitlist offered inside the window, specific rejection messages, phone validation, hard-coded copy | BKM-004 | 1.5–2 d | ready |
+| MOB-070 | P1 | Client app | Diagnosis fixes in the Client app: Reschedule idempotency, the waitlist offered inside the window, specific rejection messages, phone validation, hard-coded copy | BKM-004 | 1.5–2 d | done |
 | STAFF-005 | P1 | Staff app | Diagnosis fixes in the Staff app: HTTP errors on the Trainer screens, a failed receipt download, notification taps for the Assistant, the version label | — | 1.5–2 d | ready |
 | UX-003, UX-004 | P1 | Apps | *Existing rows.* Early refusals for the Assistant, refetch on focus | UX-001 | 1–2 d left | ready |
 | NOT-003 | P1 | Backend/apps | Class reminders 24 h and 2 h before; fix the exact-date expiry reminder | — | 1–2 d | ready |
@@ -818,6 +818,47 @@ apply after the decisions. The credit and report findings go away with PAY-005.
 - **STAFF-005:** both Trainer screens check the HTTP status and show «Reintentar». A failed receipt download shows an error, and the Administrator cannot confirm without seeing the receipt. The Assistant's notifications open the Client. «versión» comes from the app config. The attendance screen moves out of `navigation.tsx`.
 
 Acceptance criteria: one test per finding, red before the fix.
+
+**MOB-070 done 2026-10-23** (branch `feature/mob-070-client-fixes`, stacked on
+`feature/bkm-004-studio-settings` / #158). Red `a4837f43` → green `84ca30de`.
+
+- **Reschedule idempotency.** `reschedule-screen.tsx` sends one
+  `Idempotency-Key` per confirmation screen and reuses it, the same pattern
+  as `book-evaluation-screen.tsx`. Covered in `my-bookings.spec.tsx`.
+- **Waitlist inside the window.** Session detail hides «Unirme a la lista de
+  espera» until `useStudioRules` knows the window and the Session is still
+  outside it, and shows «Falta poco para la clase, así que la lista de espera
+  ya cerró.» The server already refuses the join as `booking_access_denied`
+  (403), so no new code was added there.
+- **Named refusals.** `booking-rejection-copy.ts` maps the problem code, never
+  the text: `booking_cancellation_window`, `reschedule_outside_window`,
+  `reschedule_target_ineligible`, `session_full`, plus
+  `weekly_class_cap_reached` and `subscription_not_started`. Those last two
+  are not answered by this branch's API; they land with BKM-007 and BKM-006.
+  `booking-rejections.spec.tsx` feeds each code and expects its line.
+- **Phone.** Editar perfil accepts only a Bolivian mobile (`+591` and eight
+  digits starting with 7) and still clears a blank field. A number without
+  the prefix is refused, so a saved phone is what WhatsApp can dial.
+- **Copy.** «Paquetes desde» already comes from `plansFromPriceCentavos`
+  (BKM-004, `studio-rules-copy.spec.tsx`); nothing new was built for it.
+  Perfil's «versión» reads `Constants.expoConfig.version` (1.0.1 in
+  `app.json`). Follow-up 132 stays 🕓 pending: the design canvas was not
+  created.
+
+**Verified.** Client Jest: the six touched suites, 38 passed
+(`my-bookings`, `session-detail`, `booking-rejections`, `bolivian-mobile`,
+`profile-screen`, `email-change`), plus `studio-rules-copy` 4 passed.
+ESLint and Prettier clean on the touched files. **Not verified:** no device
+walk (iPhone 16 Pro, iPad Pro 11, Android) and no Maestro, by the item's
+instruction. Test 76 of `docs/testing-guide.md` records the hand steps.
+
+**Decisions.** The weekly-cap code is `weekly_class_cap_reached` and the
+before-start-date code is `subscription_not_started`, chosen to match the
+existing `snake_case` booking codes; BKM-006 and BKM-007 should answer those
+exact codes. A Bolivian mobile must include `+591` (a bare `71234567` is
+refused) and spacing is kept, because the API stores the trimmed text. The
+Waitlist offer stays hidden while the studio rules have not loaded, the same
+rule 05 already uses for Cancelar and Reprogramar.
 
 #### NOT-003 · Class reminders
 

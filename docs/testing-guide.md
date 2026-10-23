@@ -45,15 +45,15 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
-| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 76 |
+| 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69, 76 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75 |
 | 12 Mi plan | 5, 18, 71 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Mis referidos, 17 Mi crédito | 10, 18 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 76 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
-| 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
+| 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53, 76 |
 
 | Staff app | Tests |
 | --- | --- |
@@ -614,7 +614,11 @@ share. A full Session keeps the count at «0 de M» beside the same grey
 **Lleno** pill as the list (never red) and greys the bar. **Reservar**
 creates a real Booking and lands on **Mis reservas** with a "Reserva
 confirmada" notice and the updated class balance. A full Session offers
-**Unirme a la lista de espera**, and a Client without remaining classes sees
+**Unirme a la lista de espera** while it is still outside the Cancellation
+Window. Inside it (a full class less than 2 h 30 away, or whatever window
+the studio rules currently hold) the button is gone and the note reads
+«Falta poco para la clase, así que la lista de espera ya cerró.» (Test 76).
+A Client without remaining classes sees
 the disabled button with a link to the Plans.
 
 **Mis reservas** lists upcoming Bookings and Waitlist entries. A Booking more
@@ -1532,7 +1536,8 @@ card you should see the rows **Mi plan**, **Evaluación nutricional**, **Mis
 evaluaciones**, **Mis referidos**, **Mi crédito**, **Notificaciones**, and
 **Cambiar contraseña**, each with its line icon in Palo de rosa and a quiet
 19 pt chevron (Icono tenue, MOB-041) at its right end, an outlined
-**Cerrar sesión** button, and the footer "Emma Pilates Studio · versión 1.0".
+**Cerrar sesión** button, and the footer "Emma Pilates Studio · versión 1.0.1"
+(the installed app version, Test 76).
 With unread notifications the Notificaciones row shows the count in a Palo de
 rosa profundo pill («9+» above nine), and so does the **Perfil** tab itself
 from every screen (VoiceOver reads "Perfil, 2 notificaciones sin leer").
@@ -5922,3 +5927,42 @@ D. **When the rules cannot be read** (stop the API while an app is open on
 Only these values are stored and shown by BKM-004; the rules that use the
 others (the 2-booking check, Start Dates, founders, invites, tax, the paid
 Evaluation, the renewal bonus) arrive with their own backlog items.
+
+## Test 76: the Client app's diagnosis fixes (MOB-070)
+
+Load the fixtures (Test 5A) and start the API and the Client app (Test 5B).
+These are the Client findings of the diagnosis's section 1.8. Devices were
+not walked for this item; the automated tests cover each one.
+
+A. **Reprogramar sends one key.** As `lucia@example.com`, open a Booking
+   inside the window (**No cancelable**, **Reprogramar**) and confirm a
+   same-day class. The `POST /api/v1/bookings/{id}/reschedule` carries an
+   `Idempotency-Key` UUID, and a second tap of **Confirmar cambio** sends
+   the same key, so the API replays the first answer instead of moving the
+   Booking twice.
+B. **The Waitlist closes with the window.** Open a full Session more than
+   2 h 30 away: **Unirme a la lista de espera** is there. Open one inside
+   the window: the button is gone and the note reads «Falta poco para la
+   clase, así que la lista de espera ya cerró.» The same note appears while
+   the studio rules have not loaded yet.
+C. **A refusal names the rule.** Cancel a Booking the API refuses with
+   `409 booking_cancellation_window`: Mis reservas reads «Ya no se puede
+   cancelar: falta menos que la ventana de cancelación.», not «Inténtalo de
+   nuevo». A refused reschedule reads, by code:
+   `reschedule_outside_window` «Solo puedes reprogramar dentro de la ventana
+   de cancelación.», `reschedule_target_ineligible` «Esa clase no está
+   disponible para reprogramar.», `session_full` «La clase ya no tiene
+   cupos.». Two codes are mapped and not yet answered by this API:
+   `weekly_class_cap_reached` «Ya alcanzaste el máximo de clases de esta
+   semana.» (BKM-007) and `subscription_not_started` «Tu plan todavía no
+   empieza: podrás reservar desde su fecha de inicio.» (BKM-006). Any other
+   failure keeps «Inténtalo de nuevo».
+D. **The phone is a Bolivian mobile.** Perfil → **Editar**. Type
+   `+54 9 11 1234 5678` or `71234567` and tap **Guardar cambios**: nothing
+   is saved, and the field reads «Escribe un celular de Bolivia, por ejemplo
+   +591 71234567.» `+591 71234567` saves, and clearing the field still saves
+   a null phone.
+E. **The version and the price.** Perfil's footer reads «Emma Pilates Studio
+   · versión 1.0.1», the version in `apps/client-mobile/app.json`, not a
+   fixed «versión 1.0». Inicio's buy card still prices «Paquetes desde» from
+   the cheapest visible Plan (Test 75 C).
