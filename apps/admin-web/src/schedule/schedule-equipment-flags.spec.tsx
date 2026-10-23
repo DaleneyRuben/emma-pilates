@@ -65,10 +65,11 @@ describe("AW02 equipment flags", () => {
         { exact: false },
       ),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Equipos" })).toHaveAttribute(
-      "href",
-      "/back-office/equipos",
-    );
+    expect(
+      within(screen.getByText(/^2 sesiones/)).getByRole("link", {
+        name: "Equipos",
+      }),
+    ).toHaveAttribute("href", "/back-office/equipos");
     expect(
       screen.getByRole("button", {
         name: "Mat Pilates, 16:00, Daniela Ortiz, 10 de 10 lugares, 3 en lista de espera",
