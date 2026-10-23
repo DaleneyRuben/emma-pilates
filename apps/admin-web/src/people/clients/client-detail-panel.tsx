@@ -4,6 +4,7 @@ import {
   type AdminClientDetailDto,
 } from "@pilates/api-contracts";
 import { queryOptions, useQuery } from "@tanstack/react-query";
+import { useState, type ReactNode } from "react";
 import { adminFetch } from "../../api/fetcher";
 import { isApiError } from "../../api/problem";
 import {
@@ -15,9 +16,13 @@ import {
   SidePanelFooter,
 } from "../../components/panel/side-panel";
 import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
+import { Button } from "../../components/ui/button";
 import { StatusPill } from "../../components/ui/status-pill";
+import { PageNotice } from "../../components/page/page-notice";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
+import { useAdminRole } from "../../session/admin-role";
+import { ClientProfileForm } from "./client-profile-form";
 import { CloseClientAccountAction } from "./close-client-account-action";
 
 const clientDetailQueryOptions = (clientId: string) =>
@@ -79,7 +84,13 @@ function PlanBlock({ view }: { view: AdminClientDetailDto["subscription"] }) {
   );
 }
 
-function ClientSummary({ client }: { client: AdminClientDetailDto }) {
+function ClientSummary({
+  client,
+  contact,
+}: {
+  client: AdminClientDetailDto;
+  contact: ReactNode;
+}) {
   return (
     <>
       <p className="text-nota text-texto-tenue">
@@ -96,22 +107,16 @@ function ClientSummary({ client }: { client: AdminClientDetailDto }) {
       {client.accountStatus === "disabled" ? (
         <StatusPill tone="neutral">Cuenta desactivada</StatusPill>
       ) : null}
-      <SummaryBlock title="Contacto">
-        <SummaryRow label="Correo">{client.email}</SummaryRow>
-        <SummaryRow label="Teléfono">
-          {client.phone === null ? (
-            <span className="text-texto-muy-tenue">Sin teléfono</span>
-          ) : (
-            <span className="tabular">{client.phone}</span>
-          )}
-        </SummaryRow>
-      </SummaryBlock>
+      {contact}
       <PlanBlock view={client.subscription} />
-      <SummaryBlock title="Crédito">
-        <SummaryRow label="Saldo disponible" figure>
-          {formatBolivianos(client.creditAvailableCentavos)}
-        </SummaryRow>
-      </SummaryBlock>
+      {/* ADR-0102: the Coordinator's detail carries no amount. */}
+      {client.creditAvailableCentavos === undefined ? null : (
+        <SummaryBlock title="Crédito">
+          <SummaryRow label="Saldo disponible" figure>
+            {formatBolivianos(client.creditAvailableCentavos)}
+          </SummaryRow>
+        </SummaryBlock>
+      )}
       <SummaryBlock title="Referidos">
         <SummaryRow label="Clientas referidas" figure>
           {client.referredClientCount === 0
@@ -128,8 +133,24 @@ function ClientSummary({ client }: { client: AdminClientDetailDto }) {
   );
 }
 
-// AW22: a support summary of one Client, read-only; its only action is
-// closing the Account (follow-up 66).
+function ContactBlock({ client }: { client: AdminClientDetailDto }) {
+  return (
+    <SummaryBlock title="Contacto">
+      <SummaryRow label="Correo">{client.email}</SummaryRow>
+      <SummaryRow label="Teléfono">
+        {client.phone === null ? (
+          <span className="text-texto-muy-tenue">Sin teléfono</span>
+        ) : (
+          <span className="tabular">{client.phone}</span>
+        )}
+      </SummaryRow>
+    </SummaryBlock>
+  );
+}
+
+// AW22: a support summary of one Client. «Editar perfil» corrects the name
+// and phone (IDN-009, follow-up 156); closing the Account (follow-up 66) is
+// the Administrator's alone (ADR-0102).
 export function ClientDetailPanel({
   clientId,
   onClosed,
@@ -138,6 +159,9 @@ export function ClientDetailPanel({
   onClosed: (notice: string) => void;
 }) {
   const query = useQuery(clientDetailQueryOptions(clientId));
+  const role = useAdminRole();
+  const [editing, setEditing] = useState(false);
+  const [saved, setSaved] = useState(false);
 
   return (
     <>
@@ -157,14 +181,50 @@ export function ClientDetailPanel({
             />
           )
         ) : (
-          <ClientSummary client={query.data} />
+          <>
+            {saved ? (
+              <PageNotice>Guardamos los cambios del perfil.</PageNotice>
+            ) : null}
+            <ClientSummary
+              client={query.data}
+              contact={
+                editing ? (
+                  <ClientProfileForm
+                    client={query.data}
+                    onCancel={() => setEditing(false)}
+                    onSaved={() => {
+                      setEditing(false);
+                      setSaved(true);
+                    }}
+                  />
+                ) : (
+                  <ContactBlock client={query.data} />
+                )
+              }
+            />
+          </>
         )}
       </SidePanelBody>
-      {/* AW22: a deactivated account has nothing left to close. */}
+      {/* AW22: a deactivated account has nothing left to edit or close. */}
       {query.data === undefined ||
       query.data.accountStatus === "disabled" ? null : (
         <SidePanelFooter>
-          <CloseClientAccountAction client={query.data} onClosed={onClosed} />
+          {editing ? null : (
+            <Button
+              variant="neutral"
+              size="sm"
+              className="self-start"
+              onClick={() => {
+                setSaved(false);
+                setEditing(true);
+              }}
+            >
+              Editar perfil
+            </Button>
+          )}
+          {role === "administrator" ? (
+            <CloseClientAccountAction client={query.data} onClosed={onClosed} />
+          ) : null}
         </SidePanelFooter>
       )}
     </>
