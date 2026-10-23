@@ -37,6 +37,8 @@ import {
   isSubscriptionEffective,
 } from './purchase-eligibility';
 import { deprecatedDurationMonths } from '../catalog/plan-validity';
+import { createFreezeCommands } from './prisma-freeze';
+import { createFreezeReads } from './prisma-freeze-reads';
 import {
   allocateStartDate,
   endSubscriptionEarly,
@@ -334,6 +336,11 @@ export function createPrismaPaymentCommands(
 ) {
   const recordNotification =
     dependencies.recordNotification ?? defaultNotificationRecorder;
+  const freezes = createFreezeCommands(prisma, {
+    now: dependencies.now,
+    recordNotification,
+  });
+  const freezeReads = createFreezeReads(prisma);
 
   const serializable = <Result>(
     work: (transaction: Transaction) => Promise<Result>,
@@ -1710,6 +1717,10 @@ export function createPrismaPaymentCommands(
     confirmTransfer,
     rejectTransfer,
     recordCashPayment,
+    requestFreeze: freezes.requestFreeze,
+    decideFreeze: freezes.decideFreeze,
+    listRequestedFreezes: freezeReads.listRequestedFreezes,
+    readFreezeReview: freezeReads.readFreezeReview,
     completeCreditPurchase,
     readOpenPurchaseIntent,
     readCurrentPayment,

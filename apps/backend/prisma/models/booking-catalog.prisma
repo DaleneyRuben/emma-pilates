@@ -147,6 +147,7 @@ model Subscription {
   payment                 Payment?          @relation(fields: [paymentId], references: [id], onDelete: Restrict)
   bookings                Booking[]
   evaluations             Evaluation[]
+  freezes                 Freeze[]
 
   @@unique([id, clientId])
   @@index([clientId, startsOn])

@@ -197,6 +197,7 @@ model Account {
   createdPurchaseIntents    PurchaseIntent[]        @relation("PurchaseIntentCreatedBy")
   submittedPayments         Payment[]               @relation("PaymentSubmittedBy")
   decidedPayments           Payment[]               @relation("PaymentDecidedBy")
+  decidedFreezes            Freeze[]                @relation("FreezeDecidedBy")
   creditLedgerEntries       CreditLedgerEntry[]     @relation("CreditLedgerActor")
   createdAvailabilityBlocks AvailabilityBlock[]     @relation("AvailabilityBlockCreatedBy")
   endedAvailabilityBlocks   AvailabilityBlock[]     @relation("AvailabilityBlockEndedBy")

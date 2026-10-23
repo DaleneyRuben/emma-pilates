@@ -5,6 +5,14 @@ enum FounderMembershipStatus {
   @@schema("booking")
 }
 
+enum FreezeState {
+  REQUESTED @map("requested")
+  APPROVED  @map("approved")
+  REFUSED   @map("refused")
+
+  @@schema("booking")
+}
+
 enum StaffRole {
   TRAINER       @map("trainer")
   NUTRITIONIST  @map("nutritionist")
@@ -37,6 +45,7 @@ model Client {
   evaluations         Evaluation[]
   promotionsConsents  ClientPromotionsConsent[]
   founderMembership   FounderMembership?
+  freezes             Freeze[]
 
   @@map("clients")
   @@schema("booking")
@@ -59,6 +68,32 @@ model FounderMembership {
 
   @@index([status, number])
   @@map("founder_memberships")
+  @@schema("booking")
+}
+
+// BKM-012 / booking ADR-0010: one request per Subscription. A refused request
+// still counts, so the unique live row is the once-per-Plan rule.
+model Freeze {
+  id                 String      @id @default(uuid()) @db.Uuid
+  subscriptionId     String      @unique @map("subscription_id") @db.Uuid
+  clientId           String      @map("client_id") @db.Uuid
+  startsOn           DateTime    @map("starts_on") @db.Date
+  endsOn             DateTime    @map("ends_on") @db.Date
+  reason             String
+  state              FreezeState @default(REQUESTED)
+  decidedByAccountId String?     @map("decided_by_account_id") @db.Uuid
+  decidedAt          DateTime?   @map("decided_at") @db.Timestamptz(3)
+  auditRecordId      String?     @map("audit_record_id") @db.Uuid
+  createdAt          DateTime    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt          DateTime?   @map("deleted_at") @db.Timestamptz(3)
+  subscription       Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Restrict)
+  client             Client       @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  decidedByAccount   Account?     @relation("FreezeDecidedBy", fields: [decidedByAccountId], references: [id], onDelete: Restrict)
+
+  @@index([clientId, state])
+  @@index([decidedByAccountId])
+  @@map("freezes")
   @@schema("booking")
 }
 

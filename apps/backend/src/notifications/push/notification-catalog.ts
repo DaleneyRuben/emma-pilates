@@ -34,6 +34,15 @@ const catalog: Record<string, PushPresentation> = {
     },
   },
   payment_submitted: { sound: true, lockScreen: 'entry' },
+  freeze_requested: { sound: true, lockScreen: 'entry' },
+  freeze_approved: { sound: true, lockScreen: 'entry' },
+  freeze_refused: {
+    sound: true,
+    lockScreen: {
+      title: 'Congelamiento',
+      body: 'Revisa tu plan en la app.',
+    },
+  },
   payment_rejected: {
     sound: true,
     lockScreen: {
