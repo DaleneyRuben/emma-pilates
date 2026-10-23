@@ -173,6 +173,13 @@ export class ReferredClientDto {
   @ApiProperty({ enum: ['pending', 'awarded'] })
   state!: 'pending' | 'awarded';
 
+  @ApiProperty({
+    enum: ['registered', 'class_booked', 'bought'],
+    description:
+      "BKM-014: the invitation's status. Older releases ignore it and read state.",
+  })
+  invitationStatus!: 'registered' | 'class_booked' | 'bought';
+
   @ApiProperty({ format: 'date-time' })
   createdAt!: Date;
 

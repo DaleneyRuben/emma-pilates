@@ -14,13 +14,28 @@ import { decideInvitation } from './guest-pass';
 
 type Transaction = Prisma.TransactionClient;
 
+const details = {
+  guest_pass_monthly_limit: 'A host invites one friend a month',
+  guest_pass_already_used: 'A Guest Pass is once in a lifetime',
+} as const;
+
+export type GuestPassCode = keyof typeof details;
+
 export class GuestPassError extends Error {
-  constructor(
-    readonly code: 'guest_pass_monthly_limit' | 'guest_pass_already_used',
-  ) {
-    super(code);
+  readonly status = 409;
+
+  constructor(readonly code: GuestPassCode) {
+    super(details[code]);
+    this.name = 'GuestPassError';
   }
 }
+
+export const guestPassProblem = (
+  error: unknown,
+): { code: GuestPassCode; detail: string; status: number } | null =>
+  error instanceof GuestPassError
+    ? { code: error.code, detail: error.message, status: error.status }
+    : null;
 
 const passPlan = {
   name: 'Pase de invitada',

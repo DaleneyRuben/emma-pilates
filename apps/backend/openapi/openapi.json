@@ -10086,6 +10086,15 @@
               "awarded"
             ]
           },
+          "invitationStatus": {
+            "type": "string",
+            "enum": [
+              "registered",
+              "class_booked",
+              "bought"
+            ],
+            "description": "BKM-014: the invitation's status. Older releases ignore it and read state."
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -10104,6 +10113,7 @@
           "referredClientId",
           "referredName",
           "state",
+          "invitationStatus",
           "createdAt"
         ]
       },

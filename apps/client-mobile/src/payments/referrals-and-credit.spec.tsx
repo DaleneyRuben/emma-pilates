@@ -49,7 +49,7 @@ async function openPerfil(fetcher: ReturnType<typeof routeFetcher>) {
   );
   await fireEvent.press(screen.getByRole("button", { name: /Perfil/ }));
   await waitFor(() => {
-    expect(screen.getByRole("button", { name: "Mis referidos" })).toBeOnTheScreen();
+    expect(screen.getByRole("button", { name: "Invita a una amiga" })).toBeOnTheScreen();
   });
   return screen;
 }
@@ -69,6 +69,7 @@ describe("Referrals and Credit", () => {
             referredClientId: "client-2",
             referredName: "Sofía G.",
             state: "awarded",
+            invitationStatus: "bought",
             createdAt: "2026-09-10T15:00:00.000Z",
             awardedAt: "2026-09-12T15:00:00.000Z",
             awardCentavos: 6000,
@@ -77,6 +78,7 @@ describe("Referrals and Credit", () => {
             referredClientId: "client-3",
             referredName: "Mariana P.",
             state: "pending",
+            invitationStatus: "registered",
             createdAt: "2026-09-18T15:00:00.000Z",
             awardedAt: null,
             awardCentavos: null,
@@ -90,39 +92,35 @@ describe("Referrals and Credit", () => {
       expect(screen.getByText("Bs 60")).toBeOnTheScreen();
     });
     expect(screen.getByRole("button", { name: "Mi crédito: Bs 60" })).toBeOnTheScreen();
-    await fireEvent.press(screen.getByRole("button", { name: "Mis referidos" }));
+    await fireEvent.press(screen.getByRole("button", { name: "Invita a una amiga" }));
 
     await waitFor(() => {
       expect(screen.getByText("REF-LUCIA")).toBeOnTheScreen();
     });
+    expect(screen.getByText("Invita a una amiga")).toBeOnTheScreen();
     expect(
       screen.getByText(
-        "Comparte tu código. Cuando un amigo se registre y haga su primer pago, ganas crédito.",
+        "Comparte tu código. Tu amiga recibe una clase gratis, una sola vez. Cuando compre su primer plan, tú ganas una clase.",
       ),
     ).toBeOnTheScreen();
-    expect(screen.getByText("Tu crédito")).toBeOnTheScreen();
-    expect(screen.getByText("Bs 60")).toBeOnTheScreen();
-    // MOB-041: 16's «Tu crédito» row ends in the 19 pt Palo de rosa chevron.
-    expect(
-      screen
-        .getAllByTestId("chevron", { includeHiddenElements: true })
-        .map((chevron) => chevron.props.stroke),
-    ).toContain("#B78380");
+    expect(screen.queryByText("Tu crédito")).toBeNull();
     expect(screen.queryByText("›")).toBeNull();
     expect(screen.getByText("Tus invitaciones")).toBeOnTheScreen();
     expect(screen.getByText("Sofía G.")).toBeOnTheScreen();
     expect(screen.getByText("Primer pago el 12 de septiembre")).toBeOnTheScreen();
-    expect(screen.getByText("Crédito ganado")).toBeOnTheScreen();
+    expect(screen.getByText("Compró su plan")).toBeOnTheScreen();
     expect(screen.getByText("Mariana P.")).toBeOnTheScreen();
     expect(screen.getByText("Se registró el 18 de septiembre")).toBeOnTheScreen();
-    expect(screen.getByText("Esperando su primer pago")).toBeOnTheScreen();
+    expect(screen.getByText("Registrada")).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Compartir" }));
     expect(share).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining("REF-LUCIA") }),
     );
 
-    await fireEvent.press(screen.getByRole("button", { name: "Tu crédito: Bs 60" }));
+    // Screen 17 stays until PAY-005 (#157) removes it; 16 no longer links to it.
+    await fireEvent.press(screen.getByRole("button", { name: "Volver" }));
+    await fireEvent.press(screen.getByText("Mi crédito"));
     await waitFor(() => {
       expect(screen.getByText("Saldo a favor")).toBeOnTheScreen();
     });

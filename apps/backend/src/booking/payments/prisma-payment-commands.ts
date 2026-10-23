@@ -90,12 +90,15 @@ export type CreditActivityEntry = {
   occurredAt: Date;
 };
 
+export type InvitationStatus = 'registered' | 'class_booked' | 'bought';
+
 export type ReferralsView = {
   referralCode: string;
   referrals: {
     referredClientId: string;
     referredName: string;
     state: 'pending' | 'awarded';
+    invitationStatus: InvitationStatus;
     createdAt: Date;
     awardedAt: Date | null;
     awardCentavos: number | null;
@@ -1478,21 +1481,42 @@ export function createPrismaPaymentCommands(
           createdAt: true,
           awardedAt: true,
           awardCentavos: true,
-          referred: { select: { id: true, name: true } },
+          referred: {
+            select: {
+              id: true,
+              name: true,
+              guestPassesReceived: {
+                where: { deletedAt: null },
+                select: { bookingId: true, rewardedAt: true, rewardOwed: true },
+                take: 1,
+              },
+            },
+          },
         },
       }),
     ]);
 
     return {
       referralCode: client.referralCode,
-      referrals: referrals.map((referral) => ({
-        referredClientId: referral.referred.id,
-        referredName: abbreviateName(referral.referred.name),
-        state: referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
-        createdAt: referral.createdAt,
-        awardedAt: referral.awardedAt,
-        awardCentavos: referral.awardCentavos,
-      })),
+      referrals: referrals.map((referral) => {
+        const pass = referral.referred.guestPassesReceived[0] ?? null;
+        const invitationStatus: InvitationStatus = (() => {
+          if (pass === null) return 'registered';
+          if (pass.rewardedAt !== null || pass.rewardOwed) return 'bought';
+          if (pass.bookingId !== null) return 'class_booked';
+          return 'registered';
+        })();
+        return {
+          referredClientId: referral.referred.id,
+          referredName: abbreviateName(referral.referred.name),
+          state:
+            referral.state === ReferralState.AWARDED ? 'awarded' : 'pending',
+          invitationStatus,
+          createdAt: referral.createdAt,
+          awardedAt: referral.awardedAt,
+          awardCentavos: referral.awardCentavos,
+        };
+      }),
     };
   };
 
