@@ -233,6 +233,88 @@ describe('Prisma schedule administration', () => {
     ).resolves.toBe('session_overlap');
   });
 
+  it('promotes the Waitlist in queue order when an Administrator raises capacity', async () => {
+    const session = await schedules().createSession(
+      {
+        branchId: centro,
+        classTypeId: mat,
+        trainerStaffMemberId: staff('daniela'),
+        startsAt: bolivia('2026-09-26', '18:00'),
+        durationMinutes: 50,
+        capacity: 1,
+      },
+      await administrator(),
+    );
+    const [ana, bea] = await Promise.all(
+      (['ana', 'bea'] as const).map((key) =>
+        world.prisma.client.findUniqueOrThrow({
+          where: { id: deterministicId(`test-client:${key}`) },
+          select: {
+            id: true,
+            subscriptions: { select: { id: true } },
+            account: { select: { id: true } },
+          },
+        }),
+      ),
+    );
+    await world.prisma.booking.create({
+      data: {
+        sessionId: session.id,
+        clientId: ana.id,
+        subscriptionId: ana.subscriptions[0].id,
+        createdByAccountId: ana.account!.id,
+      },
+    });
+    const earlier = await world.prisma.waitlistEntry.create({
+      data: {
+        sessionId: session.id,
+        clientId: bea.id,
+        joinedByAccountId: bea.account!.id,
+        joinedAt: new Date('2026-09-21T16:00:00.000Z'),
+      },
+    });
+    const waiting = await world.prisma.client.create({
+      data: {
+        name: 'Waiting Client',
+        referralCode: 'REF-WAITING-CAPACITY',
+        account: {
+          create: { email: 'waiting-capacity@example.com' },
+        },
+      },
+      select: { id: true, account: { select: { id: true } } },
+    });
+    const later = await world.prisma.waitlistEntry.create({
+      data: {
+        sessionId: session.id,
+        clientId: waiting.id,
+        joinedByAccountId: waiting.account!.id,
+        joinedAt: new Date('2026-09-21T17:00:00.000Z'),
+      },
+    });
+
+    await schedules().updateSession(
+      { sessionId: session.id, capacity: 2 },
+      await administrator(),
+    );
+
+    const promoted = await world.prisma.waitlistEntry.findUniqueOrThrow({
+      where: { id: earlier.id },
+      select: { closureReason: true, promotedBookingId: true },
+    });
+    const stillWaiting = await world.prisma.waitlistEntry.findUniqueOrThrow({
+      where: { id: later.id },
+      select: { closedAt: true },
+    });
+    expect(promoted.closureReason).toBe('PROMOTED');
+    expect(promoted.promotedBookingId).toEqual(expect.any(String));
+    expect(stillWaiting.closedAt).toBeNull();
+    await expect(
+      world.prisma.booking.count({
+        where: { sessionId: session.id, state: 'BOOKED', clientId: bea.id },
+      }),
+    ).resolves.toBe(1);
+  });
+
   it('creates a one-off Session for the minutes given', async () => {
     const session = await schedules().createSession(
       {
