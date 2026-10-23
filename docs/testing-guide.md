@@ -46,7 +46,7 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 80 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 81 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 81, 85 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77, 81, 82, 84 |
 | 12 Mi plan | 5, 18, 71, 76, 77, 81, 82, 84 |
@@ -61,7 +61,7 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 77 |
 | S26 Reportar una falla (Entrenadora) | 77 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 78, 79, 80, 81, 82 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 78, 79, 80, 81, 82, 85 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 81, 84 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20, 78 |
@@ -5582,7 +5582,7 @@ command.
 | Cancel the same Booking twice, or a Booking of a cancelled Session | `409 booking_not_cancellable` |
 | Leave a Waitlist Entry that was already closed (promoted, left, or its Session started) | `409 waitlist_entry_not_active` |
 | Book as `mariana@example.com` (no Plan) or `sofia@example.com` (expired) | `409 no_eligible_subscription` |
-| Book a fourth class in the same Monday–Sunday week on a cap-3 Plan, or join that week's Waitlist, with no extra class left (Test 78) | `409 weekly_cap_reached` |
+| Book a fourth class in the same Monday–Sunday week on a cap-3 Plan, or join that week's Waitlist, with no extra class left (Test 85) | `409 weekly_cap_reached` |
 | Reschedule outside the window, to another day, or a cancelled Booking | `409 reschedule_outside_window`, `reschedule_target_ineligible`, `booking_not_reschedulable` (Test 61) |
 
 **Payments** (`mariana@example.com`; Test 7, «Buying a Plan through
@@ -6371,10 +6371,10 @@ C. **The gift.** The first approved Payment in a Client's life adds one
    adds the form).
 
 Spending an extra class waits for the base allowance to run out, and for the
-Weekly Cap (Test 78). Cancelling a Booking funded by an extra class restores
+Weekly Cap (Test 85). Cancelling a Booking funded by an extra class restores
 the class to the base pool.
 
-## Test 78: the weekly cap (BKM-007)
+## Test 85: the weekly cap (BKM-007)
 
 A capped Plan limits the classes a Client books from her base allowance in
 one Monday–Sunday week in America/La_Paz
@@ -6414,7 +6414,7 @@ E. **The screens.** Reservar (03) and the Session detail (04) show «Te quedan
 A campaign grants extra classes with reason `campaign` to every Client whose
 live Subscription covers today in Bolivia. A Client without one is skipped
 and named. It never changes a price. A sibling branch (BKM-007) will also
-add a Test 78; that conflict is expected.
+add a Test 78; that conflict is resolved here as Test 85.
 
 A. **The page (AW21).** Log in as `paola.mendoza@example.com` /
    `emma-local-2026`. On **Clientes**, at 1440 px and at 420 px (open the
