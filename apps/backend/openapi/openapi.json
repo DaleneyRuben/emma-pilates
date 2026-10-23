@@ -4405,6 +4405,109 @@
         ]
       }
     },
+    "/api/v1/administrator/clients/{clientId}/courtesy-access": {
+      "post": {
+        "operationId": "grantCourtesyAccess",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantCourtesyAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CourtesyAccess"
+        ]
+      }
+    },
+    "/api/v1/administrator/clients/{clientId}/allowance-adjustments": {
+      "post": {
+        "operationId": "recordAllowanceAdjustment",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordAllowanceAdjustmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllowanceAdjustmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AllowanceAdjustment"
+        ]
+      }
+    },
     "/api/v1/accounts/current/closure": {
       "post": {
         "operationId": "closeCurrentClientAccount",
@@ -7985,6 +8088,11 @@
           "endsOn": {
             "type": "string",
             "format": "date"
+          },
+          "extraClassesLine": {
+            "type": "string",
+            "nullable": true,
+            "description": "«Clases extra: 1 · Regalo de bienvenida» when extra classes remain"
           }
         },
         "required": [
@@ -9619,7 +9727,8 @@
             "enum": [
               "transfer",
               "cash",
-              "credit_only"
+              "credit_only",
+              "courtesy"
             ]
           },
           "state": {
@@ -9916,7 +10025,8 @@
             "enum": [
               "transfer",
               "cash",
-              "credit_only"
+              "credit_only",
+              "courtesy"
             ]
           },
           "state": {
@@ -10673,6 +10783,63 @@
           "pageSize",
           "totalItems",
           "pendingCount"
+        ]
+      },
+      "GrantCourtesyAccessDto": {
+        "type": "object",
+        "properties": {
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil date of the last day of access: today up to one year ahead."
+          }
+        },
+        "required": [
+          "endsOn"
+        ]
+      },
+      "RecordAllowanceAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "classes": {
+            "type": "number",
+            "description": "A signed number of classes, never zero"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "courtesy",
+              "class_return"
+            ]
+          }
+        },
+        "required": [
+          "classes",
+          "reason"
+        ]
+      },
+      "AllowanceAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classes": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "courtesy",
+              "class_return"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "classes",
+          "reason"
         ]
       },
       "CloseAccountRequestDto": {

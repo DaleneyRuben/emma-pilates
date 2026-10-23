@@ -75,6 +75,11 @@ function PlanBlock({ view }: { view: AdminClientDetailDto["subscription"] }) {
       <SummaryRow label="Clases disponibles" figure>
         {current.remainingClassAllowance} de {current.originalClassAllowance}
       </SummaryRow>
+      {current.extraClassesLine ? (
+        <p className="px-3 py-2 text-nota text-texto">
+          {current.extraClassesLine}
+        </p>
+      ) : null}
     </SummaryBlock>
   );
 }
