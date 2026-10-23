@@ -77,8 +77,8 @@ export class PaymentDto {
   @ApiProperty({ format: 'uuid' })
   id!: string;
 
-  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only'] })
-  method!: 'transfer' | 'cash' | 'credit_only';
+  @ApiProperty({ enum: ['transfer', 'cash', 'credit_only', 'courtesy'] })
+  method!: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
 
   @ApiProperty({ enum: ['pending', 'confirmed', 'rejected'] })
   state!: 'pending' | 'confirmed' | 'rejected';

@@ -57,7 +57,7 @@ export type PurchaseIntentView = {
 
 export type PaymentView = {
   id: string;
-  method: 'transfer' | 'cash' | 'credit_only';
+  method: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
   state: 'pending' | 'confirmed' | 'rejected';
   planId: string;
   planName: string;
@@ -145,6 +145,7 @@ const paymentMethods: Record<PaymentMethod, PaymentView['method']> = {
   [PaymentMethod.TRANSFER]: 'transfer',
   [PaymentMethod.CASH]: 'cash',
   [PaymentMethod.CREDIT_ONLY]: 'credit_only',
+  [PaymentMethod.COURTESY]: 'courtesy',
 };
 const paymentStates: Record<PaymentState, PaymentView['state']> = {
   [PaymentState.PENDING]: 'pending',
