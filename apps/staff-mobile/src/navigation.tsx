@@ -19,6 +19,7 @@ import { CancelSessionScreen } from "./administrator/cancel-session-screen";
 import { PendingPaymentsScreen } from "./administrator/pending-payments-screen";
 import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
 import { AssistantWorkspaceProvider } from "./assistant/assistant-workspace";
+import { createCoordinatorStack } from "./coordinator/coordinator-stack";
 import { AssistantRescheduleScreen } from "./assistant/assistant-reschedule-screen";
 import { AssistantSessionDetailScreen } from "./assistant/assistant-session-detail-screen";
 import { BrowseSessionsScreen } from "./assistant/browse-sessions-screen";
@@ -50,6 +51,7 @@ import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
 import { TrainerRosterScreen } from "./trainer/trainer-roster-screen";
 import { StaffFetcherContext, unavailableFetcher } from "./staff-fetcher";
+import { StaffRoleContext } from "./staff-role";
 
 const accountScreens = {
   Profile: StaffProfileScreen,
@@ -108,6 +110,7 @@ const NutritionistStack = createNativeStackNavigator({
 const roleNavigation: Record<StaffRole, ReturnType<typeof createStaticNavigation>> = {
   administrator: createStaticNavigation(AdministratorStack),
   assistant: createStaticNavigation(AssistantStack),
+  coordinator: createStaticNavigation(createCoordinatorStack(accountScreens)),
   nutritionist: createStaticNavigation(NutritionistStack),
   trainer: createStaticNavigation(TrainerStack),
 };
@@ -188,20 +191,22 @@ export function StaffNavigation({
       <MobileQueryProvider accountId={accountId}>
         <StaffFetcherContext.Provider value={fetcher}>
           <AssistantWorkspaceProvider>
-            <ImpersonationContext.Provider value={impersonationState}>
-              {impersonation === undefined ? (
-                navigator
-              ) : (
-                <SafeAreaProvider initialMetrics={windowMetrics} style={styles.underBanner}>
-                  <UnderBanner>{navigator}</UnderBanner>
-                  <ImpersonationBanner
-                    impersonation={impersonation}
-                    onExit={onExit}
-                    onExpire={onExpire}
-                  />
-                </SafeAreaProvider>
-              )}
-            </ImpersonationContext.Provider>
+            <StaffRoleContext.Provider value={role}>
+              <ImpersonationContext.Provider value={impersonationState}>
+                {impersonation === undefined ? (
+                  navigator
+                ) : (
+                  <SafeAreaProvider initialMetrics={windowMetrics} style={styles.underBanner}>
+                    <UnderBanner>{navigator}</UnderBanner>
+                    <ImpersonationBanner
+                      impersonation={impersonation}
+                      onExit={onExit}
+                      onExpire={onExpire}
+                    />
+                  </SafeAreaProvider>
+                )}
+              </ImpersonationContext.Provider>
+            </StaffRoleContext.Provider>
           </AssistantWorkspaceProvider>
         </StaffFetcherContext.Provider>
       </MobileQueryProvider>

@@ -2,6 +2,7 @@ import type { StaffProfileDto } from "@pilates/api-contracts";
 
 const roleLabels: Record<StaffProfileDto["role"], string> = {
   administrator: "Administración",
+  coordinator: "Coordinación",
   assistant: "Asistente",
   nutritionist: "Nutricionista",
   trainer: "Entrenadora",
@@ -12,6 +13,9 @@ export function roleLabel(role: StaffProfileDto["role"]): string {
 }
 
 export function branchesLabel(profile: StaffProfileDto): string {
-  if (profile.role === "administrator") return "Todas las sucursales";
+  // The Administrator and the Coordinator hold every Branch implicitly.
+  if (profile.role === "administrator" || profile.role === "coordinator") {
+    return "Todas las sucursales";
+  }
   return profile.branches.map((branch) => branch.name).join(", ");
 }
