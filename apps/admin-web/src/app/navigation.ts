@@ -10,6 +10,7 @@ export type AdminPath =
   | "/catalogo/sucursales"
   | "/back-office/clientes"
   | "/back-office/fundadoras"
+  | "/back-office/congelamientos"
   | "/back-office/pagos"
   | "/back-office/insumos"
   | "/back-office/evaluaciones-nutricionales"
@@ -94,6 +95,13 @@ export const navigationGroups: readonly NavigationGroup[] = [
         screen: "AW21",
         list: true,
         studioWide: "los clientes son del estudio, no de una sede.",
+      },
+      {
+        label: "Congelamientos",
+        to: "/back-office/congelamientos",
+        screen: "AW38",
+        list: true,
+        studioWide: "los congelamientos son del estudio, no de una sede.",
       },
       {
         label: "Fundadoras",

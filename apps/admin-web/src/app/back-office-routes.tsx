@@ -22,6 +22,15 @@ const clientsRoute = createRoute({
   ),
 });
 
+const freezesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/congelamientos",
+  component: lazyRouteComponent(
+    () => import("../oversight/freezes/freezes-route"),
+    "FreezesRoute",
+  ),
+});
+
 const foundersRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/fundadoras",
@@ -106,6 +115,7 @@ const expenseCategoriesRoute = createRoute({
 export const backOfficeRoutes = [
   clientsRoute,
   foundersRoute,
+  freezesRoute,
   paymentsRoute,
   suppliesRoute,
   withdrawalsRoute,
