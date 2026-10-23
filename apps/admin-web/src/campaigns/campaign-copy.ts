@@ -16,7 +16,8 @@ export const skippedLine = (
 ): string | null => {
   if (skipped.length === 0) return null;
   const names = skipped.map((client) => client.name).join(", ");
-  return `${clientas(skipped.length)} no tiene un plan vigente${skipped.length === 1 ? "" : "n"}: ${names}.`;
+  const verb = skipped.length === 1 ? "no tiene" : "no tienen";
+  return `${clientas(skipped.length)} ${verb} un plan vigente: ${names}.`;
 };
 
 export const skippedPreview = (
