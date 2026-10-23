@@ -232,6 +232,7 @@ Each of these was sent as the next message in the existing design session for th
 | [193](./followups/193-mi-plan-extra-classes.md) | `12` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008, booking ADR-0006) | 🕓 pending (190–192 reserved by BKM-006) |
 | [194](./followups/194-client-summary-extra-classes.md) | `S06` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008) | 🕓 pending (190–192 reserved by BKM-006) |
 | [195](./followups/195-admin-client-detail-extra-classes.md) | `AW22` shows «Clases extra: 1 · Regalo de bienvenida» under «Clases disponibles» when the API returns the line; no courtesy form (BKM-008, PAY-006) | 🕓 pending (190–192 reserved by BKM-006) |
+| [196](./followups/196-admin-campaign-grant.md) | `AW21` gains «Dar clases de campaña», opening the campaign grant on the same screen's address; no new screen and no sidebar entry (BKM-015, decisions §5.4) | 🕓 pending |
 
 ## Status
 

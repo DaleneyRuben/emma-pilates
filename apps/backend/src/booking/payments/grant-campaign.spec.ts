@@ -125,19 +125,20 @@ describe('grantCampaign', () => {
       },
     ]);
 
-    const result = await grantCampaign(
+    await grantCampaign(
       { name: 'Inicio de año', classes: 1, idempotencyKey: 'key' },
       deps,
     );
-
-    expect(result).not.toHaveProperty('discountCentavos');
-    expect(result).not.toHaveProperty('priceCentavos');
-    expect(deps.record).toHaveBeenCalledWith(
-      expect.not.objectContaining({
-        discountCentavos: expect.anything(),
-        priceCentavos: expect.anything(),
-      }),
-    );
+    expect(deps.record).toHaveBeenCalledTimes(1);
+    expect(deps.record).toHaveBeenCalledWith({
+      clientId: 'live-client',
+      subscriptionId: 'live-subscription',
+      classes: 1,
+      reason: 'campaign',
+      authorAccountId: 'administrator-account',
+      campaignName: 'Inicio de año',
+      now: deps.now,
+    });
   });
 
   it('refuses a class count outside 1 to 4', async () => {

@@ -64,6 +64,8 @@ import type {
   AvailabilityBlockReplacementDto,
   BranchDto,
   BranchInputDto,
+  CampaignPreviewDto,
+  CampaignResultDto,
   ChangeCurrentPasswordDto,
   ChangeStaffBranchesDto,
   ChangeStaffRoleDto,
@@ -111,6 +113,7 @@ import type {
   GetExpenseReportParams,
   GetIncomeReportParams,
   GetPaymentReceiptParams,
+  GrantCampaignDto,
   GrantCourtesyAccessDto,
   ImpersonationDto,
   IncomeReportDto,
@@ -17455,6 +17458,298 @@ export const useRecordAllowanceAdjustment = <
     getRecordAllowanceAdjustmentMutationOptions(options),
     queryClient,
   );
+};
+
+export type previewCampaignResponse200 = {
+  data: CampaignPreviewDto;
+  status: 200;
+};
+
+export type previewCampaignResponseSuccess = previewCampaignResponse200 & {
+  headers: Headers;
+};
+export type previewCampaignResponse = previewCampaignResponseSuccess;
+
+export const getPreviewCampaignUrl = () => {
+  return `/api/v1/administrator/campaigns/preview`;
+};
+
+export const previewCampaign = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<previewCampaignResponse> => {
+  const res = await (fetchFn ?? fetch)(getPreviewCampaignUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: previewCampaignResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as previewCampaignResponse;
+};
+
+export const getPreviewCampaignQueryKey = () => {
+  return [`/api/v1/administrator/campaigns/preview`] as const;
+};
+
+export const getPreviewCampaignQueryOptions = <
+  TData = Awaited<ReturnType<typeof previewCampaign>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<Awaited<ReturnType<typeof previewCampaign>>, TError, TData>
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getPreviewCampaignQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof previewCampaign>>> = ({
+    signal,
+  }) => previewCampaign({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof previewCampaign>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type PreviewCampaignQueryResult = NonNullable<
+  Awaited<ReturnType<typeof previewCampaign>>
+>;
+export type PreviewCampaignQueryError = unknown;
+
+export function usePreviewCampaign<
+  TData = Awaited<ReturnType<typeof previewCampaign>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof previewCampaign>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof previewCampaign>>,
+          TError,
+          Awaited<ReturnType<typeof previewCampaign>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function usePreviewCampaign<
+  TData = Awaited<ReturnType<typeof previewCampaign>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof previewCampaign>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof previewCampaign>>,
+          TError,
+          Awaited<ReturnType<typeof previewCampaign>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function usePreviewCampaign<
+  TData = Awaited<ReturnType<typeof previewCampaign>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof previewCampaign>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function usePreviewCampaign<
+  TData = Awaited<ReturnType<typeof previewCampaign>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof previewCampaign>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getPreviewCampaignQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type grantCampaignResponse201 = {
+  data: CampaignResultDto;
+  status: 201;
+};
+
+export type grantCampaignResponseSuccess = grantCampaignResponse201 & {
+  headers: Headers;
+};
+export type grantCampaignResponse = grantCampaignResponseSuccess;
+
+export const getGrantCampaignUrl = () => {
+  return `/api/v1/administrator/campaigns`;
+};
+
+export const grantCampaign = async (
+  grantCampaignDto: GrantCampaignDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<grantCampaignResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getGrantCampaignUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(grantCampaignDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: grantCampaignResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as grantCampaignResponse;
+};
+
+export const getGrantCampaignMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof grantCampaign>>,
+    TError,
+    GrantCampaignMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof grantCampaign>>,
+  TError,
+  GrantCampaignMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["grantCampaign"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof grantCampaign>>,
+    GrantCampaignMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return grantCampaign(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type GrantCampaignMutationResult = NonNullable<
+  Awaited<ReturnType<typeof grantCampaign>>
+>;
+export type GrantCampaignMutationBody = GrantCampaignDto;
+export type GrantCampaignMutationError = unknown;
+export type GrantCampaignMutationVariables = { data: GrantCampaignDto };
+
+export const useGrantCampaign = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof grantCampaign>>,
+      TError,
+      GrantCampaignMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof grantCampaign>>,
+  TError,
+  GrantCampaignMutationVariables,
+  TContext
+> => {
+  return useMutation(getGrantCampaignMutationOptions(options), queryClient);
 };
 
 export type closeCurrentClientAccountResponse200 = {

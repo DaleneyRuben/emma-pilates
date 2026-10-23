@@ -9,6 +9,7 @@ export type AdminPath =
   | "/catalogo/planes"
   | "/catalogo/sucursales"
   | "/back-office/clientes"
+  | "/back-office/clientes/campana"
   | "/back-office/pagos"
   | "/back-office/insumos"
   | "/back-office/evaluaciones-nutricionales"
@@ -92,6 +93,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/clientes",
         screen: "AW21",
         list: true,
+        subPages: ["/back-office/clientes/campana"],
         studioWide: "los clientes son del estudio, no de una sede.",
       },
       {

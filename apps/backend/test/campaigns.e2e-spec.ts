@@ -7,6 +7,7 @@ import { App } from 'supertest/types';
 import {
   CampaignController,
   campaignGrant,
+  campaignPreview,
 } from '../src/booking/payments/campaign.controller';
 import { grantCampaign } from '../src/booking/payments/grant-campaign';
 import type { AuthenticatedPrincipal } from '../src/system-identity/authentication/resolve-authenticated-principal';
@@ -19,11 +20,7 @@ const key = '33333333-3333-4333-8333-333333333333';
 
 const principal = (
   role:
-    | 'assistant'
-    | 'administrator'
-    | 'trainer'
-    | 'nutritionist'
-    | 'coordinator',
+    'assistant' | 'administrator' | 'trainer' | 'nutritionist' | 'coordinator',
 ): AuthenticatedPrincipal =>
   ({
     accountId: `${role}-account`,
@@ -39,9 +36,10 @@ const principal = (
 describe('campaign endpoint', () => {
   let app: INestApplication<App>;
   let signedIn: AuthenticatedPrincipal = principal('administrator');
-  const record = jest.fn<
-    () => Promise<{ id: string; classes: number; reason: 'campaign' }>
-  >();
+  const record =
+    jest.fn<
+      () => Promise<{ id: string; classes: number; reason: 'campaign' }>
+    >();
 
   beforeAll(async () => {
     const module = await Test.createTestingModule({
@@ -80,6 +78,19 @@ describe('campaign endpoint', () => {
             }),
         },
         {
+          provide: campaignPreview,
+          useValue: () =>
+            Promise.resolve({
+              recipientCount: 1,
+              skipped: [
+                {
+                  clientId: '22222222-2222-4222-8222-222222222222',
+                  name: 'Sofía',
+                },
+              ],
+            }),
+        },
+        {
           provide: authenticatedPrincipalResolver,
           useValue: () => Promise.resolve(signedIn),
         },
@@ -99,6 +110,26 @@ describe('campaign endpoint', () => {
       classes: 1,
       reason: 'campaign',
     });
+  });
+
+  it('answers who would receive a campaign before one is granted', async () => {
+    signedIn = principal('administrator');
+
+    await request(app.getHttpServer())
+      .get('/api/v1/administrator/campaigns/preview')
+      .set('authorization', bearer)
+      .expect(200)
+      .expect(
+        ({
+          body,
+        }: {
+          body: { recipientCount: number; skipped: { name: string }[] };
+        }) => {
+          expect(body.recipientCount).toBe(1);
+          expect(body.skipped.map((client) => client.name)).toEqual(['Sofía']);
+        },
+      );
+    expect(record).not.toHaveBeenCalled();
   });
 
   it('answers 201 with the granted and skipped Clients', async () => {

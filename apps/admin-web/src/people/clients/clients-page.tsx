@@ -1,5 +1,6 @@
 import type { AdminClientDto } from "@pilates/api-contracts";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 import { createColumnHelper } from "@tanstack/react-table";
 import { CatalogPage, RowOpener } from "../../catalog/catalog-page";
 import type { SearchChange } from "../../catalog/catalog-search";
@@ -108,6 +109,14 @@ export function ClientsPage({
       what="las clientas"
       emptyMessage={<EmptyDirectory searching={search.q !== undefined} />}
       panelTitles={{ create: "Detalle de cliente", edit: (row) => row.name }}
+      actions={
+        <Link
+          to="/back-office/clientes/campana"
+          className="inline-flex h-[38px] items-center rounded-control bg-primario px-4 text-cuerpo font-medium text-blanco shadow-boton hover:bg-primario-hover"
+        >
+          Dar clases de campaña
+        </Link>
+      }
       filter={
         <SearchFilter
           label="Buscar por nombre, correo o teléfono"

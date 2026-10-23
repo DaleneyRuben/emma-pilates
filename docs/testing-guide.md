@@ -79,7 +79,7 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 77 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 77, 78 |
 | AW23–AW24 Personal | 26, 31, 72 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -6012,3 +6012,22 @@ C. **The gift.** The first approved Payment in a Client's life adds one
 Spending an extra class waits for the base allowance to run out, and for the
 Weekly Cap (BKM-007). Cancelling a Booking funded by an extra class restores
 the class to the base pool.
+
+## Test 78: campaign extra classes (BKM-015)
+
+A campaign grants extra classes with reason `campaign` to every Client whose
+live Subscription covers today in Bolivia. A Client without one is skipped
+and named. It never changes a price. A sibling branch (BKM-007) will also
+add a Test 78; that conflict is expected.
+
+A. **The page (AW21).** Log in as `paola.mendoza@example.com` /
+   `emma-local-2026`. On **Clientes**, at 1440 px and at 420 px (open the
+   menu with «Abrir menú»), press **Dar clases de campaña**. The page says
+   how many clientas will receive it and names who has no live Plan. Write
+   «Inicio de año», leave **Clases extra** at 1, press **Dar las clases**,
+   then **Confirmar campaña**. The result names how many received a class
+   and who was skipped. Open one recipient's detail: «Clases extra: 1 ·
+   Campaña» when the campaign is her first grant.
+B. **The denial.** The same `POST /api/v1/administrator/campaigns` as Camila
+   answers `403` and writes nothing. The header `Idempotency-Key` is a UUID;
+   sending the same call again grants nothing more.

@@ -78,10 +78,9 @@ describe("AW21 Campaña", () => {
     await waitFor(() => expect(submitted).toHaveLength(1));
     expect(submitted[0]).toEqual({ name: "Inicio de año", classes: 1 });
     expect(
-      await screen.findByText("1 clienta recibió 1 clase extra."),
-    ).toBeVisible();
-    expect(
-      screen.getByText("1 clienta no tiene un plan vigente: Sofía."),
+      await screen.findByText(
+        "1 clienta recibió 1 clase extra. 1 clienta no tiene un plan vigente: Sofía.",
+      ),
     ).toBeVisible();
   });
 });
