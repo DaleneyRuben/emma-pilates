@@ -63,6 +63,10 @@ import type {
   AvailabilityBlockReplacementDto,
   BranchDto,
   BranchInputDto,
+  CashCloseDto,
+  CashCloseHistoryDto,
+  CashCloseInputDto,
+  CashTodayDto,
   ChangeCurrentPasswordDto,
   ChangeStaffBranchesDto,
   ChangeStaffRoleDto,
@@ -110,10 +114,12 @@ import type {
   GetExpenseReportParams,
   GetIncomeReportParams,
   GetPaymentReceiptParams,
+  GetTodayCashCloseParams,
   ImpersonationDto,
   IncomeReportDto,
   InviteClientDto,
   ListAdminBranchesParams,
+  ListAdminCashClosesParams,
   ListAdminClassTypesParams,
   ListAdminClientsParams,
   ListAdminCreditsParams,
@@ -25348,6 +25354,536 @@ export function useGetExpenseReport<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions = getGetExpenseReportQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getTodayCashCloseResponse200 = {
+  data: CashTodayDto;
+  status: 200;
+};
+
+export type getTodayCashCloseResponseSuccess = getTodayCashCloseResponse200 & {
+  headers: Headers;
+};
+export type getTodayCashCloseResponse = getTodayCashCloseResponseSuccess;
+
+export const getGetTodayCashCloseUrl = (params: GetTodayCashCloseParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/cash-closes/today?${stringifiedParams}`
+    : `/api/v1/cash-closes/today`;
+};
+
+export const getTodayCashClose = async (
+  params: GetTodayCashCloseParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getTodayCashCloseResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetTodayCashCloseUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getTodayCashCloseResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getTodayCashCloseResponse;
+};
+
+export const getGetTodayCashCloseQueryKey = (
+  params?: GetTodayCashCloseParams,
+) => {
+  return [`/api/v1/cash-closes/today`, ...(params ? [params] : [])] as const;
+};
+
+export const getGetTodayCashCloseQueryOptions = <
+  TData = Awaited<ReturnType<typeof getTodayCashClose>>,
+  TError = unknown,
+>(
+  params: GetTodayCashCloseParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTodayCashClose>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetTodayCashCloseQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getTodayCashClose>>
+  > = ({ signal }) =>
+    getTodayCashClose(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getTodayCashClose>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetTodayCashCloseQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getTodayCashClose>>
+>;
+export type GetTodayCashCloseQueryError = unknown;
+
+export function useGetTodayCashClose<
+  TData = Awaited<ReturnType<typeof getTodayCashClose>>,
+  TError = unknown,
+>(
+  params: GetTodayCashCloseParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTodayCashClose>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTodayCashClose>>,
+          TError,
+          Awaited<ReturnType<typeof getTodayCashClose>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTodayCashClose<
+  TData = Awaited<ReturnType<typeof getTodayCashClose>>,
+  TError = unknown,
+>(
+  params: GetTodayCashCloseParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTodayCashClose>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getTodayCashClose>>,
+          TError,
+          Awaited<ReturnType<typeof getTodayCashClose>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetTodayCashClose<
+  TData = Awaited<ReturnType<typeof getTodayCashClose>>,
+  TError = unknown,
+>(
+  params: GetTodayCashCloseParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTodayCashClose>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetTodayCashClose<
+  TData = Awaited<ReturnType<typeof getTodayCashClose>>,
+  TError = unknown,
+>(
+  params: GetTodayCashCloseParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getTodayCashClose>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetTodayCashCloseQueryOptions(params, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type recordCashCloseResponse201 = {
+  data: CashCloseDto;
+  status: 201;
+};
+
+export type recordCashCloseResponseSuccess = recordCashCloseResponse201 & {
+  headers: Headers;
+};
+export type recordCashCloseResponse = recordCashCloseResponseSuccess;
+
+export const getRecordCashCloseUrl = () => {
+  return `/api/v1/cash-closes`;
+};
+
+export const recordCashClose = async (
+  cashCloseInputDto: CashCloseInputDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recordCashCloseResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRecordCashCloseUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(cashCloseInputDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordCashCloseResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordCashCloseResponse;
+};
+
+export const getRecordCashCloseMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recordCashClose>>,
+    TError,
+    RecordCashCloseMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recordCashClose>>,
+  TError,
+  RecordCashCloseMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recordCashClose"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recordCashClose>>,
+    RecordCashCloseMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return recordCashClose(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecordCashCloseMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recordCashClose>>
+>;
+export type RecordCashCloseMutationBody = CashCloseInputDto;
+export type RecordCashCloseMutationError = unknown;
+export type RecordCashCloseMutationVariables = { data: CashCloseInputDto };
+
+export const useRecordCashClose = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recordCashClose>>,
+      TError,
+      RecordCashCloseMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recordCashClose>>,
+  TError,
+  RecordCashCloseMutationVariables,
+  TContext
+> => {
+  return useMutation(getRecordCashCloseMutationOptions(options), queryClient);
+};
+
+export type listAdminCashClosesResponse200 = {
+  data: CashCloseHistoryDto;
+  status: 200;
+};
+
+export type listAdminCashClosesResponseSuccess =
+  listAdminCashClosesResponse200 & {
+    headers: Headers;
+  };
+export type listAdminCashClosesResponse = listAdminCashClosesResponseSuccess;
+
+export const getListAdminCashClosesUrl = (
+  params: ListAdminCashClosesParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/v1/administrator/cash-closes?${stringifiedParams}`
+    : `/api/v1/administrator/cash-closes`;
+};
+
+export const listAdminCashCloses = async (
+  params: ListAdminCashClosesParams,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listAdminCashClosesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListAdminCashClosesUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAdminCashClosesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAdminCashClosesResponse;
+};
+
+export const getListAdminCashClosesQueryKey = (
+  params?: ListAdminCashClosesParams,
+) => {
+  return [
+    `/api/v1/administrator/cash-closes`,
+    ...(params ? [params] : []),
+  ] as const;
+};
+
+export const getListAdminCashClosesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listAdminCashCloses>>,
+  TError = unknown,
+>(
+  params: ListAdminCashClosesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCashCloses>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListAdminCashClosesQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listAdminCashCloses>>
+  > = ({ signal }) =>
+    listAdminCashCloses(params, { signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listAdminCashCloses>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListAdminCashClosesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listAdminCashCloses>>
+>;
+export type ListAdminCashClosesQueryError = unknown;
+
+export function useListAdminCashCloses<
+  TData = Awaited<ReturnType<typeof listAdminCashCloses>>,
+  TError = unknown,
+>(
+  params: ListAdminCashClosesParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCashCloses>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminCashCloses>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminCashCloses>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminCashCloses<
+  TData = Awaited<ReturnType<typeof listAdminCashCloses>>,
+  TError = unknown,
+>(
+  params: ListAdminCashClosesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCashCloses>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listAdminCashCloses>>,
+          TError,
+          Awaited<ReturnType<typeof listAdminCashCloses>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListAdminCashCloses<
+  TData = Awaited<ReturnType<typeof listAdminCashCloses>>,
+  TError = unknown,
+>(
+  params: ListAdminCashClosesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCashCloses>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListAdminCashCloses<
+  TData = Awaited<ReturnType<typeof listAdminCashCloses>>,
+  TError = unknown,
+>(
+  params: ListAdminCashClosesParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listAdminCashCloses>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListAdminCashClosesQueryOptions(params, options);
 
   const query = useQuery(queryOptions, queryClient) as UseQueryResult<
     TData,
