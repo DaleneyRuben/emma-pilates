@@ -130,7 +130,6 @@ describe('Assistant Client overview', () => {
     findLatestSubscription: jest.fn().mockResolvedValue(null),
     findUpcoming: jest.fn().mockResolvedValue(upcoming),
     findAttendedBookings: jest.fn().mockResolvedValue(history),
-    readAvailableCredit: jest.fn().mockResolvedValue(6_000),
   };
 
   it('composes the Client, Subscription state, next Booking, last two attended classes, and no Credit (PAY-005)', async () => {
@@ -242,7 +241,6 @@ describe('Assistant Plan quotes and cash Payment', () => {
           principal: assistant,
           findClient: jest.fn().mockResolvedValue(clientRecord),
           listVisiblePlans: jest.fn().mockResolvedValue(plans),
-          readAvailableCredit: jest.fn().mockResolvedValue(6_000),
         },
       ),
     ).resolves.toEqual({

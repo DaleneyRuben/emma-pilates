@@ -78,7 +78,6 @@ export interface AdministratorClientDirectory {
   findLatestSubscription: (
     clientId: string,
   ) => Promise<ClientSubscriptionSummary | null>;
-  readAvailableCredit: (clientId: string) => Promise<number>;
   readClosureOutlook: (
     clientId: string,
     now: Date,
@@ -116,7 +115,7 @@ export const readAdministratorClient = async (
   const client = await directory.read(command.clientId);
   if (client === null) throw new AdministrationError('client_not_found');
   const instant = now();
-  const [subscription, creditAvailableCentavos, closure] = await Promise.all([
+  const [subscription, closure] = await Promise.all([
     describeSubscription(client.id, {
       today: boliviaDate(instant),
       findActiveSubscription: (clientId, onDate) =>
@@ -124,8 +123,8 @@ export const readAdministratorClient = async (
       findLatestSubscription: (clientId) =>
         directory.findLatestSubscription(clientId),
     }),
-    directory.readAvailableCredit(client.id),
     directory.readClosureOutlook(client.id, instant),
   ]);
-  return { ...client, subscription, creditAvailableCentavos, closure };
+  // Credit is retired (booking ADR-0009); the field stays as a zero.
+  return { ...client, subscription, creditAvailableCentavos: 0, closure };
 };

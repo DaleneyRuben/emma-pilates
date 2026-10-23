@@ -68,7 +68,6 @@ const directory = (
   read: jest.fn().mockResolvedValue(lucia),
   findActiveSubscription: jest.fn().mockResolvedValue(subscription),
   findLatestSubscription: jest.fn().mockResolvedValue(subscription),
-  readAvailableCredit: jest.fn().mockResolvedValue(105_000),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
   ...overrides,
 });
@@ -163,7 +162,6 @@ describe('Administrator Client detail', () => {
     const clients = directory({
       findActiveSubscription: jest.fn().mockResolvedValue(null),
       findLatestSubscription: jest.fn().mockResolvedValue(expired),
-      readAvailableCredit: jest.fn().mockResolvedValue(0),
     });
 
     await expect(
