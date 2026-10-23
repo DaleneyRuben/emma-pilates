@@ -13,21 +13,33 @@ the Assistant always collects a Plan's full price in cash.
 
 ## 1. `S09`
 
-Remove the **«Teléfono · Con crédito disponible»** frame, its green notice
-«Este cliente tiene Bs 60 de crédito disponible.», and the per-card
-«Con crédito aplicado» lines; remove the same notice from the tablet frame,
-so the context band takes the whole row. The **«Teléfono · Sin crédito»**
-frame stays; rename its caption to **«Teléfono»**. The description above the
-frames ends after «…para quién se registra el pago.». In the notes card,
-delete the «Crédito» entry and, in the «Tablet» entry, «y el aviso de
-crédito comparten fila».
+- The iOS frame «Teléfono · Sin crédito» keeps its content; its caption
+  becomes **«Teléfono · iOS»** over «Precios de lista».
+- The Android frame «Teléfono · Con crédito disponible» stays as the Android
+  frame: remove its green notice («Este cliente tiene Bs 60 de crédito
+  disponible.» and «Se aplica automáticamente a esta compra.»), and every
+  card shows one price, the list price, in the iOS frame's style (Lora 22px,
+  weight 500, `#4A4A4A`, no strikethrough, no green): Bs 560, Bs 780,
+  Bs 1.050, Bs 2.100. Its caption becomes **«Teléfono · Android»** over
+  «Mismos planes y precios».
+- The tablet frame drops the green notice, so the context band takes the
+  whole row, and its cards show the list prices the same way; its
+  sub-caption «Con crédito aplicado» becomes **«Precios de lista»**.
+- The description above the frames ends after «…para quién se registra el
+  pago.». In the notes card, delete the «Crédito» entry; the «Tablet» entry
+  reads «Rejilla de dos columnas bajo la banda de contexto.».
 
 ## 2. `S10`
 
-Remove the **«Desglose con crédito aplicado»** frame and the «Crédito
-aplicado − Bs 60» line wherever it is drawn. The summary shows the Plan and
-the amount to collect, which is its price. Delete the «Crédito» entry of the
-notes card.
+- In «Teléfono · Confirmación» and «Tablet · Confirmación», remove the
+  «Crédito aplicado − Bs 60» line. «Precio del plan» stays, and «Monto a
+  cobrar en efectivo» equals it: **Bs 350** (the sample Plan price these
+  frames already draw).
+- The success frame's line reads «Se cobraron Bs 350 en efectivo a Valeria
+  Áñez. Su plan ya está activo.».
+- The phone confirmation's sub-caption «Desglose con crédito aplicado»
+  becomes **«Precio del plan y monto a cobrar»**.
+- Delete the «Crédito» entry of the notes card.
 
 ## 3. Handoff README
 
@@ -35,5 +47,5 @@ notes card.
 
 ## Leave untouched
 
-The Plan cards, the context band, «Registrar pago», the success state, and
-every other Staff screen.
+The Plan cards' layout, the context band, «Confirmar pago recibido», the
+success state's layout, and every other Staff screen.

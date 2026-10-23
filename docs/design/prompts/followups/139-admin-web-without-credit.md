@@ -52,23 +52,28 @@ Keep the file as history, with a single banner across its first frame:
 
 ## 5. `AW28` and `AW29`
 
-- `AW28`: the amount cell shows only the amount; remove «con Bs 60,00 de
+- `AW28`: the amount cell shows only the amount, the Plan price
+  **Bs 560,00** (desktop row and narrow card); remove «con Bs 60,00 de
   crédito» and the «Crédito a la vista» note.
 - `AW29`: remove the **«Escritorio · Con crédito aplicado»** frame and the
   «Precio del plan» and «Crédito aplicado» lines; delete the «Crédito en el
   resumen» note. The summary is «Monto a verificar», «Fecha», «Método».
 
-## 6. `AW34`
+## 6. `AW34` and `Sistema de Diseño`
 
-The studio-wide list in its notes drops «Créditos (AW27)».
+`AW34`'s studio-wide list in its notes drops «Créditos (AW27)», and the
+design system's density note lists «Nómina, Clientes, Referidos, Pagos y
+Categorías de gasto».
 
 ## 7. Handoff README
 
 - Sidebar order: *Promociones* (Promociones, Referidos).
 - Studio-wide exceptions: drop **AW27 Créditos**.
 - `AW22`: «contacto, plan, referidos». `AW26`: «Read-only, 3 columns; the
-  studio-wide count whatever the search; no-results state». `AW27`: «Retired
-  by PAY-005». `AW28` and `AW29`: no Credit lines.
+  studio-wide count whatever the search; no-results state», and its note says
+  there is no status column. `AW27`: «Retired by PAY-005», row and note.
+  `AW28` and `AW29`: no Credit lines, and confirming a payment «activates the
+  subscription» (no Credit consumed).
 
 ## Leave untouched
 
