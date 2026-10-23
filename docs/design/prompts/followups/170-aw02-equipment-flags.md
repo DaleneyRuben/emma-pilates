@@ -14,7 +14,7 @@ A future, not cancelled Session whose capacity exceeds the working Equipment of 
 - the block's left border in Advertencia `#C9A15B` instead of Palo de rosa (a full Session already uses it; the triangle tells them apart);
 - the block's accessible label ends with «, faltan equipos: 7 reformers funcionando para 8 lugares».
 
-Draw it on two blocks of the desktop frame: Thursday 07:00 «Reformer Intermedio · Camila Rojas» (3/8) and Friday 08:00 «Reformer Intermedio» (5/8), with Reformer 5 out of service in the story. In the narrow day list the same two cards carry the triangle and the line «Faltan equipos · 7 de 8» in 12 px Advertencia texto under the time line.
+Draw it on two blocks of the desktop frame: Friday 07:00 and Saturday 11:00 «Reformer Intermedio · Camila Rojas», with Reformer 5 out of service in the story. In the narrow day list the Reformer Intermedio card of the day shown carries the triangle and the line «Faltan equipos · 7 de 8» in 12 px Advertencia texto under the time line.
 
 ## 2. The notice above the week
 
