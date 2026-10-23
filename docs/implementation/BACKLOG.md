@@ -820,7 +820,9 @@ apply after the decisions. The credit and report findings go away with PAY-005.
 Acceptance criteria: one test per finding, red before the fix.
 
 **MOB-070 done 2026-10-23** (branch `feature/mob-070-client-fixes`, stacked on
-`feature/bkm-004-studio-settings` / #158). Red `a4837f43` → green `84ca30de`.
+`feature/bkm-004-studio-settings` / #158,
+[pull request #181](https://github.com/DaleneyRuben/emma-pilates/pull/181)).
+Red `a4837f43` → green `84ca30de`.
 
 - **Reschedule idempotency.** `reschedule-screen.tsx` sends one
   `Idempotency-Key` per confirmation screen and reuses it, the same pattern
