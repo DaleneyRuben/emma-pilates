@@ -23,7 +23,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | 13 | Evaluación nutricional | `13` | ✅ |
 | 14 | Confirmar evaluación | `14` | ✅ |
 | 15 | Mis evaluaciones | `15` | ✅ |
-| 16 | Mis referidos | `16` | ✅ |
+| 16 | Invita a una amiga | `16` | ✅ (follow-up 196 pending) |
 | 17 | Mi crédito | `17` | ✅ |
 | 18 | Perfil | `18` | ✅ |
 | 19 | Notificaciones | `19` | ✅ |
@@ -236,6 +236,7 @@ Each of these was sent as the next message in the existing design session for th
 | [193](./followups/193-mi-plan-extra-classes.md) | `12` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008, booking ADR-0006) | 🕓 pending (190–192 reserved by BKM-006) |
 | [194](./followups/194-client-summary-extra-classes.md) | `S06` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008) | 🕓 pending (190–192 reserved by BKM-006) |
 | [195](./followups/195-admin-client-detail-extra-classes.md) | `AW22` shows «Clases extra: 1 · Regalo de bienvenida» under «Clases disponibles» when the API returns the line; no courtesy form (BKM-008, PAY-006) | 🕓 pending (190–192 reserved by BKM-006) |
+| [196](./followups/196-invita-a-una-amiga.md) | `16` becomes «Invita a una amiga»: the code, the free-class explanation, and each invitation's status (Registrada, Clase reservada, Compró su plan); the credit row goes (BKM-014, booking ADR-0009) | 🕓 pending |
 
 ## Status
 
