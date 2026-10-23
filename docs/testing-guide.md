@@ -46,6 +46,9 @@ can be found by its design name.
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
+| 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 75 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71 |
+
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77 |
 | 12 Mi plan | 5, 18, 71, 76, 77, 78 |
@@ -61,6 +64,9 @@ can be found by its design name.
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 77 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 77, 79 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 75 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
+
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 80 |
@@ -83,6 +89,11 @@ can be found by its design name.
 | AW23–AW24 Personal | 26, 31, 72 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72, 80 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 79 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 75 |
+| AW23–AW24 Personal | 26, 31, 72, 75 |
+| AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+
 
 ## Before you begin
 
@@ -403,11 +414,14 @@ In Swagger, open `POST /api/v1/client-registrations` and send:
 {
   "name": "Ana Clienta",
   "email": "ana+1@example.com",
-  "password": "a local test password"
+  "password": "a local test password",
+  "acquisitionChannel": "instagram"
 }
 ```
 
-Expected response code: `202`.
+Expected response code: `202`. `acquisitionChannel` is «¿Cómo nos
+conociste?» (BKM-011, Test 75); a request without it, as older store builds
+send, still registers and records `unknown`.
 
 The response looks like this:
 
@@ -1874,7 +1888,9 @@ stays enabled. Should two Assistants race, the confirmation still answers
 ### E. Invite a new Client and manage the invitation
 
 From **Buscar cliente** tap **+ Nuevo cliente**. Fill **Nombre**, **Correo
-electrónico**, and optionally **Teléfono (opcional)**; the form explains
+electrónico**, and optionally **Teléfono (opcional)**, pick one answer under
+**¿Cómo nos conociste?**, and optionally type a **Código de referido
+(opcional)** (Test 75); the form explains
 "Enviaremos un enlace de activación al correo. Vence en 7 días." **Crear
 cuenta** creates the pending Client, queues the activation email (the worker
 delivers it to the local capture), and opens her overview with the card
@@ -3350,6 +3366,8 @@ The following are not ready for manual product testing:
   BKM-007;
 - accrued revenue by validity days: decisions §11 asks for it beside the
   cash view, and Test 81 shows only cash. STU-002 owns the accrued view;
+- the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
+  the Role arrives with IDN-009, so today only the Administrator can (Test 75);
 
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
@@ -6180,3 +6198,81 @@ describes.
 The migration `20261023230000_cost_budget_lines` needs owner approval before
 it runs on a shared database. The accrued-revenue view (decisions §11) is
 not on this page.
+## Test 82: how a Client found the studio, and referral codes (BKM-011)
+
+«¿Cómo nos conociste?» is asked at registration (Client app `01`) and by the
+Assistant (`S05`), with eight answers: Instagram, TikTok, Facebook, Google,
+Recomendación de una amiga, Una instructora, Pasé por el estudio, Otro. An
+optional Referral Code, a Client's (`REF-…`) or a Trainer's personal code,
+wins over the answer: a Client's code makes her `friend`, a Trainer's
+`trainer`, and the Trainer is the one BKO-006 pays for. The Administrator sets
+a Trainer's code on `AW24` and corrects a Client's attribution on `AW22`
+(the Coordinator joins once IDN-009 adds that Role). Use the fixtures
+(Test 5 A) and the admin web (Test 23).
+
+### A. Give a Trainer her code (AW24)
+
+1. In the admin web open **Personal** and click **Emma Vargas** (a Trainer).
+   Under the Branches the panel shows **Código personal** with its own
+   **Guardar código**.
+2. Type `emma` and click **Guardar código** (or press Enter): the field reads
+   `EMMA` and «Código guardado: EMMA.» appears. The panel's **Guardar** still
+   saves only Role and Branches.
+3. Open **Andrea Suárez** (another Trainer), type `EMMA`, and save: «Ese
+   código ya lo tiene otra clienta o instructora.». Type `REF-ANDREA`: «Usa
+   de 3 a 20 letras, números o guiones, sin empezar con REF-.».
+4. Open **Camila Rojas** (Assistant): no **Código personal**.
+
+The API is `GET`/`PUT /api/v1/administrator/staff-members/{id}/referral-code`
+(`{"referralCode": "EMMA"}`, `null` removes it); each change writes the audit
+record `staff_member.referral_code_changed`.
+
+### B. Register with the question and a code (Client app `01`)
+
+1. In the Client app tap **Regístrate**. Under **Confirmar contraseña** the
+   form asks **¿Cómo nos conociste?** with the eight chips; one can be
+   chosen at a time.
+2. Fill the form and tap **Crear cuenta** without choosing: «Elige cómo nos
+   conociste.» and nothing is sent.
+3. Choose **Instagram**, open **¿Tienes un código de referido?** (the field
+   says «De una amiga o de tu instructora.»), type `emma`, and create the
+   account. «Revisa tu correo» follows.
+4. A code nobody holds answers «Revisa el código de referido.» under the
+   field and creates nothing.
+
+Through Swagger, `POST /api/v1/client-registrations` with
+`"acquisitionChannel": "instagram", "referralCode": "emma"` does the same; the
+same request without `acquisitionChannel` (an older store build) still answers
+`202` and records `unknown`; an unknown code answers `400`
+`referral_code_invalid`.
+
+### C. The Assistant's new Client (`S05`)
+
+Log in to the Staff app as `camila.rojas@example.com`, tap **+ Nuevo
+cliente**, fill the name and email, and tap **Crear cuenta** without an
+answer: «Elige cómo nos conociste.». Choose **Pasé por el estudio**, type
+`EMMA` in **Código de referido (opcional)**, and create: her overview opens as
+before. A code nobody holds answers «No encontramos ese código. Revísalo o
+déjalo vacío.» under the code and creates nothing.
+
+### D. Read and correct it on the Client detail (`AW22`)
+
+1. In **Clientes** open the Client from B or C. The block **¿Cómo nos
+   conociste?** reads **Canal** «Una instructora» with «Ella respondió:
+   Instagram» (or «Pasé por el estudio») under it, **Código** `EMMA`, and
+   **La trajo la instructora** «Emma Vargas». A Client from before the
+   question reads «Sin dato».
+2. Click **Corregir**, choose **TikTok**, empty **Código (opcional)**, and
+   click **Guardar**: the block reads «TikTok» alone. An unknown code keeps
+   the form open with «No encontramos ese código. Revísalo o déjalo vacío.»;
+   no answer chosen says «Elige cómo nos conoció.».
+
+The API is `GET`/`PUT /api/v1/administrator/clients/{id}/acquisition`
+(`{"channel": "tiktok", "referralCode": null}`), Administrator only for now;
+each correction writes `client_acquisition.corrected` with the previous and
+new channel and code. Check the rows with
+`select declared_channel, channel, referral_code, referrer_client_id,
+referrer_staff_member_id from booking.client_acquisitions;` on your database:
+Clients that existed before the migration got `unknown`, or `friend` with the
+referrer when a Referral named one.
+

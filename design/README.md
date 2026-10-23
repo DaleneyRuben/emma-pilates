@@ -252,7 +252,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 
 | File | Screen | Purpose |
 |---|---|---|
-| `01` | Iniciar sesión | Email + password login, registration with «Confirmar contraseña», «Revisa tu correo» verification states, incorrect-credentials and throttled login, and the registration form's temporary device or network limit |
+| `01` | Iniciar sesión | Email + password login, registration with «Confirmar contraseña», the required «¿Cómo nos conociste?» chips (eight answers, single choice; a Referral Code decides the attribution), «Revisa tu correo» verification states, incorrect-credentials and throttled login, and the registration form's temporary device or network limit |
 | `02` | Inicio | Promotions carousel, next class, plan status; one full-width 16:9 card per page with position dots, a loading placeholder, the section hidden without published Promotions, a 720 px card on tablet |
 | `03` | Reservar | Browse sessions by day |
 | `04` | Detalle de sesión | Session detail + book |
@@ -285,7 +285,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `S02` | Mi agenda | Trainer |
 | `S03` | Lista de asistentes | Trainer — attendance marking |
 | `S04` | Buscar cliente | Front desk |
-| `S05` | Nuevo cliente | Front desk — email + optional phone, activation-link invitation; «Crear cuenta» opens `S06`; the self-registered state's «Ver cliente» opens her `S06` |
+| `S05` | Nuevo cliente | Front desk — email + optional phone, the required «¿Cómo nos conociste?» chips and an optional Referral Code (a Client's or a Trainer's; the code decides the attribution), activation-link invitation; «Crear cuenta» opens `S06`; the self-registered state's «Ver cliente» opens her `S06` |
 | `S06` | Resumen del cliente | Front desk — also manages a pending invitation, or offers a new verification link to a pending Client who registered herself; while her Plan is active «Registrar pago en efectivo» is disabled with «Podrá comprar otro plan cuando este termine.» (UX-003) |
 | `S07` | Reservar una clase | Front desk (on behalf of a client); the Session she already holds a Booking in carries the neutral «Ya reservada» pill instead of the seat count (UX-003) |
 | `S08` | Detalle de sesión | Front desk; a Session she already booked shows «La clienta ya tiene esta clase reservada.» in place of «Reservar» (UX-003) |
@@ -331,9 +331,9 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW19` | Sucursales | Two-column table (Nombre / Dirección); feeds the top-bar selector; no delete; Estado filter; archived Branches carry a neutral «Archivada» pill |
 | `AW20` | Formulario de sucursal | Side panel; nombre + dirección only; edit mode carries a fixed note about linked records; edit offers «Archivar sucursal» (refused while Sessions or a weekly schedule depend on it) |
 | `AW21` | Clientes | Read-only directory, 4 columns, search only, paginated; **no primary action**; after a closure from `AW22` it reloads without her and shows «Cuenta de … cerrada.»; a Client who never bought a Plan shows the neutral «Sin plan» pill |
-| `AW22` | Detalle de cliente | Read-only side panel: contacto, plan, crédito, referidos; **no Guardar**; one quiet footer action «Cerrar cuenta» (Error outline) opening a consequences confirmation, refused while a transfer payment awaits review; a pending Account shows «Pendiente de activación» under «Cliente desde»; a deactivated Account shows the neutral «Cuenta desactivada» pill and no «Cerrar cuenta» |
+| `AW22` | Detalle de cliente | Side panel: contacto, plan, crédito, referidos, and «¿Cómo nos conociste?» (canal, código, quién la trajo) whose own «Corregir» is the only edit; **no panel Guardar**; one quiet footer action «Cerrar cuenta» (Error outline) opening a consequences confirmation, refused while a transfer payment awaits review; a pending Account shows «Pendiente de activación» under «Cliente desde»; a deactivated Account shows the neutral «Cuenta desactivada» pill and no «Cerrar cuenta» |
 | `AW23` | Personal | Team accounts, 4 columns, role filter; row → `AW24`; Estado column (Activo · Pendiente · Desactivado); the Role stays a Divisor tag; the Rol filter is the only filter (no name search) |
-| `AW24` | Formulario de personal | One role (2×2 grid), assigned branches, email + optional phone, activation-link invitation and pending states; edit shows the contact read-only and changes only Role and Branches; «Desactivar cuenta» with a confirmation; your own and a deactivated Account open read-only; no «Restablecer contraseña» |
+| `AW24` | Formulario de personal | One role (2×2 grid), assigned branches, email + optional phone, activation-link invitation and pending states; edit shows the contact read-only and changes only Role and Branches; a Trainer's edit also holds her «Código personal» with its own «Guardar código»; «Desactivar cuenta» with a confirmation; your own and a deactivated Account open read-only; no «Restablecer contraseña» |
 | `AW25` | Evaluaciones nutricionales | Read-only list, date range + nutritionist filter, no status column; empty state; follows the top-bar Branch; Horario's week stepper; «Primera evaluación» / «Seguimiento»; one labelled card per Evaluation at 420 px |
 | `AW26` | Referidos | Read-only, 4 columns, Crédito otorgado / Pendiente pill; studio-wide counts whatever the search; no-results state |
 | `AW27` | Créditos | Read-only, 3 columns, right-aligned tabular amounts, total row; four movements (Crédito ganado · Reservado para un pago · Usado en un pago · Devuelto al saldo); the total shows only without a search; empty and no-results states |

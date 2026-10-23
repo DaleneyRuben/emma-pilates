@@ -66,7 +66,7 @@
         </div>
       </div>
 
-      <div style="display:flex;align-items:stretch;min-height:740px;">
+      <div style="display:flex;align-items:stretch;min-height:960px;">
         <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
           <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
@@ -187,6 +187,8 @@
                 </div>
               </div>
 
+              <div style="display:flex;flex-direction:column;gap:9px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Cómo nos conociste?</span><button style="border:none;background:transparent;padding:0;color:#B78380;font-size:13px;cursor:pointer;" style-hover="color:#9C6764;">Corregir</button></div><div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;"><span style="font-size:12.5px;color:#766D69;">Canal</span><span style="display:flex;flex-direction:column;align-items:flex-end;gap:2px;"><span style="font-size:13.5px;color:#4A4A4A;">Una instructora</span><span style="font-size:12px;color:#766D69;">Ella respondió: Instagram</span></span></div><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;"><span style="font-size:12.5px;color:#766D69;">Código</span><span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">CARLA</span></div><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;"><span style="font-size:12.5px;color:#766D69;">La trajo la instructora</span><span style="font-size:13.5px;color:#4A4A4A;">Carla Ríos</span></div></div></div>
+
             </div>
             <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;">
               <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
@@ -207,7 +209,7 @@
         </div>
       </sc-if>
       <div style="width:560px;background:rgba(74,58,48,0.22);border:1px solid #D8C9BB;border-radius:14px;padding:28px 0 28px 152px;">
-        <div style="width:408px;height:632px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+        <div style="width:408px;height:790px;background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px 0 0 12px;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
             <div style="display:flex;align-items:center;gap:12px;min-width:0;">
               <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">LM</div>
@@ -262,6 +264,8 @@
                 </div>
               </div>
             </div>
+
+              <div style="display:flex;flex-direction:column;gap:9px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Cómo nos conociste?</span><button style="border:none;background:transparent;padding:0;color:#B78380;font-size:13px;cursor:pointer;" style-hover="color:#9C6764;">Corregir</button></div><div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;"><span style="font-size:12.5px;color:#766D69;">Canal</span><span style="font-size:13.5px;color:#7A716D;">Sin dato</span></div></div></div>
           </div>
           <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;">
             <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
@@ -401,7 +405,176 @@
           </div>
         </div>
       </div>
+    </div><div style="display:flex;flex-direction:column;gap:14px;">
+    <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:3px;">
+        <div style="font-size:13px;font-weight:500;">Escritorio · Corregir canal</div>
+        <div style="font-size:12px;color:#766D69;">«Corregir» abre el bloque como formulario: canal, código y Guardar o Cancelar</div>
+      </div>
+    </sc-if>
+    <div style="width:1440px;border:1px solid #D8C9BB;border-radius:14px;overflow:hidden;background:#FAF7F2;box-shadow:0 18px 44px rgba(74,58,48,0.10);">
+      <div style="height:44px;display:flex;align-items:center;gap:14px;padding:0 16px;background:#EDE4DA;border-bottom:1px solid #D8C9BB;">
+        <div style="display:flex;gap:7px;">
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+          <div style="width:11px;height:11px;border-radius:50%;background:#D2C0B2;"></div>
+        </div>
+        <div style="flex:1;max-width:420px;height:26px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:999px;background:#FAF7F2;border:1px solid #E0D3C6;font-size:11px;color:#766D69;">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>
+          admin.emmapilates.bo/back-office/clientes/andrea-cespedes
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;height:44px;background:#FFFFFF;border-bottom:1px solid #E4D8CC;">
+        <div style="width:236px;flex:none;display:flex;align-items:center;padding:0 20px;border-right:1px solid #E4D8CC;">
+          <span style="font-family:Lora,Georgia,serif;font-size:21px;line-height:1;">Emma</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-between;padding:0 18px;">
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FAF7F2;font-size:12.5px;color:#4A4A4A;cursor:pointer;" style-hover="border-color:#B78380;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#B78380" stroke-width="1.6"><path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11z"></path><circle cx="12" cy="10" r="2.4"></circle></svg>
+            Sucursal Equipetrol
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <button style="height:30px;display:flex;align-items:center;gap:9px;padding:0 8px 0 4px;border:none;border-radius:8px;background:transparent;cursor:pointer;" style-hover="background:#FAF7F2;">
+            <div style="width:26px;height:26px;border-radius:50%;background:#D8BDB8;color:#7A4F4B;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;">MF</div>
+            <span style="font-size:12.5px;color:#4A4A4A;">María Fernanda Loza</span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#766D69" stroke-width="2"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:stretch;min-height:960px;">
+        <nav style="width:236px;flex:none;background:#FFFFFF;border-right:1px solid #E4D8CC;padding:18px 12px;display:flex;flex-direction:column;gap:4px;">
+          <a href="#" style="display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><rect x="3.5" y="5" width="17" height="15" rx="2.5"></rect><path d="M3.5 10h17M8 3.5v3M16 3.5v3"></path></svg>
+            Horario
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Catálogo</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Tipos de clase</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Planes</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Sucursales</a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#B78380;font-weight:500;">Back Office</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;background:#EFE0DC;color:#8A5D59;font-weight:500;">Clientes</a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Pagos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:#EFE0DC;color:#8A5D59;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">6</span></a>
+          <a href="#" style="display:flex;align-items:center;justify-content:space-between;height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Insumos<span style="min-width:20px;height:18px;padding:0 6px;border-radius:999px;background:rgba(201,154,78,0.18);color:#9A7434;font-size:10px;font-weight:600;display:flex;align-items:center;justify-content:center;">3</span></a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Evaluaciones nutricionales</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Personal</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Nómina</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Gastos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Categorías de gasto</a>
+          <a href="#" style="margin-top:10px;display:flex;align-items:center;gap:10px;height:36px;padding:0 12px;border-radius:8px;font-size:13px;color:#4A4A4A;font-weight:500;" style-hover="background:#FDF7F2;color:#4A4A4A;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.7"><path d="M4 20V9M10 20V4M16 20v-8M22 20H2"></path></svg>
+            Reporte
+          </a>
+          <div style="margin-top:10px;padding:0 12px 6px;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#7A716D;font-weight:500;">Promociones</div>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Promociones</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Referidos</a>
+          <a href="#" style="display:block;height:32px;line-height:32px;padding:0 12px 0 22px;border-radius:8px;font-size:13px;color:#6E6663;" style-hover="background:#FDF7F2;color:#4A4A4A;">Créditos</a>
+        </nav>
+
+        <main style="flex:1;min-width:0;background:#FAF7F2;position:relative;">
+          <div style="padding:24px 26px;display:flex;flex-direction:column;gap:16px;">
+            <div style="display:flex;flex-direction:column;gap:5px;">
+              <h2 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:27px;line-height:1.1;">Clientes</h2>
+              <div style="font-size:12.5px;color:#766D69;">148 clientas · 96 con plan activo</div>
+            </div>
+            <div style="height:34px;max-width:360px;display:flex;align-items:center;gap:8px;padding:0 12px;border:1px solid #E4D8CC;border-radius:8px;background:#FFFFFF;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7A716D" stroke-width="1.8"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16l4.5 4.5"></path></svg>
+              <span style="font-size:12.5px;color:#7A716D;">Buscar por nombre, correo o teléfono</span>
+            </div>
+            <div style="background:#FFFFFF;border:1px solid #E4D8CC;border-radius:12px;overflow:hidden;">
+              <div style="display:grid;grid-template-columns:1.7fr 1.8fr 1.5fr 120px;align-items:center;gap:16px;padding:11px 20px;background:#FDFAF6;border-bottom:1px solid #E4D8CC;font-size:10.5px;letter-spacing:0.14em;text-transform:uppercase;color:#7A716D;font-weight:500;">
+                <div>Nombre</div><div>Contacto</div><div>Plan</div><div>Estado</div>
+              </div>
+              <div style="display:grid;grid-template-columns:1.7fr 1.8fr 1.5fr 120px;align-items:center;gap:16px;padding:14px 20px;background:#FDF7F2;border-bottom:1px solid #F2EBE2;font-size:13px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Andrea Céspedes</span><span>andrea.cespedes@gmail.com</span><span>Mensual 16 clases</span><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;justify-self:start;">Activo</span></div>
+              <div style="display:grid;grid-template-columns:1.7fr 1.8fr 1.5fr 120px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;font-size:13px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Camila Vargas Ortiz</span><span>cvargas@hotmail.com</span><span>Paquete de 12 clases</span><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;justify-self:start;">Activo</span></div>
+              <div style="display:grid;grid-template-columns:1.7fr 1.8fr 1.5fr 120px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;font-size:13px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Lucía Mendoza</span><span>lucia.mendoza@gmail.com</span><span style="color:#7A716D;">Sin plan activo</span><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(178,93,75,0.14);color:#94493A;font-size:11.5px;font-weight:500;justify-self:start;">Expirado</span></div>
+              <div style="display:grid;grid-template-columns:1.7fr 1.8fr 1.5fr 120px;align-items:center;gap:16px;padding:14px 20px;border-bottom:1px solid #F2EBE2;font-size:13px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Daniela Rojas Peña</span><span>daniela.rojas@outlook.com</span><span>Trimestral 36 clases</span><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;justify-self:start;">Activo</span></div>
+              <div style="display:grid;grid-template-columns:1.7fr 1.8fr 1.5fr 120px;align-items:center;gap:16px;padding:14px 20px;font-size:13px;color:#6E6663;"><span style="font-size:14px;font-weight:500;color:#4A4A4A;">Fernanda Salvatierra</span><span>fer.salvatierra@gmail.com</span><span>Paquete de 8 clases</span><span style="display:inline-flex;align-items:center;padding:6px 12px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11.5px;font-weight:500;justify-self:start;">Activo</span></div>
+            </div>
+          </div>
+          <div style="position:absolute;inset:0;background:rgba(74,58,48,0.22);"></div>
+
+          <aside style="position:absolute;top:0;right:0;bottom:0;width:408px;background:#FFFFFF;border-left:1px solid #E4D8CC;box-shadow:-14px 0 34px rgba(74,58,48,0.14);display:flex;flex-direction:column;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:18px 22px;border-bottom:1px solid #EFE6DC;">
+              <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+                <div style="width:40px;height:40px;flex:none;border-radius:50%;background:#EFE0DC;color:#8A5D59;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;">AC</div>
+                <div style="display:flex;flex-direction:column;gap:3px;min-width:0;">
+                  <h3 style="margin:0;font-family:Lora,Georgia,serif;font-weight:400;font-size:22px;line-height:1.1;">Andrea Céspedes</h3>
+                  <span style="font-size:11.5px;color:#766D69;">Cliente desde 12/04/2024</span>
+                </div>
+              </div>
+              <button style="width:30px;height:30px;flex:none;display:flex;align-items:center;justify-content:center;border:1px solid #E4D8CC;border-radius:8px;background:#FAF7F2;cursor:pointer;" style-hover="border-color:#B78380;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6E6663" stroke-width="1.9" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"></path></svg>
+              </button>
+            </div>
+            <div style="flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:22px;overflow:hidden;">
+
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Contacto</span>
+                <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                    <span style="font-size:12.5px;color:#766D69;">Correo</span>
+                    <span style="font-size:13.5px;color:#4A4A4A;">andrea.cespedes@gmail.com</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                    <span style="font-size:12.5px;color:#766D69;">Teléfono</span>
+                    <span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">+591 707 12 458</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Plan</span>
+                <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                    <span style="font-size:14.5px;font-weight:500;color:#4A4A4A;">Mensual 16 clases</span>
+                    <span style="display:inline-flex;align-items:center;padding:5px 11px;border-radius:999px;background:rgba(124,148,115,0.14);color:#5F7457;font-size:11px;font-weight:500;white-space:nowrap;">Activo</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                    <span style="font-size:12.5px;color:#766D69;">Vigencia</span>
+                    <span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">01/08/2026 – 31/08/2026</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                    <span style="font-size:12.5px;color:#766D69;">Clases disponibles</span>
+                    <span style="font-size:13.5px;color:#4A4A4A;">11 de 16</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Crédito</span>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;">
+                  <span style="font-size:12.5px;color:#766D69;">Saldo disponible</span>
+                  <span style="font-size:15px;font-weight:500;color:#4A4A4A;font-variant-numeric:tabular-nums;">Bs 120,00</span>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:9px;">
+                <span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Referidos</span>
+                <div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;">
+                    <span style="font-size:12.5px;color:#766D69;">Clientas referidas</span>
+                    <span style="font-size:13.5px;color:#4A4A4A;font-variant-numeric:tabular-nums;">3</span>
+                  </div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;">
+                    <span style="font-size:12.5px;color:#766D69;">Código</span>
+                    <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">ANDREA24</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:9px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Cómo nos conociste?</span></div><div style="display:flex;flex-direction:column;gap:12px;padding:12px;border:1px solid #EFE6DC;border-radius:10px;background:#FAF7F2;"><label style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Canal</span><select style="height:44px;width:100%;padding:0 36px 0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;"><option selected>Instagram</option><option>TikTok</option><option>Facebook</option><option>Google</option><option>Recomendación de una amiga</option><option>Una instructora</option><option>Pasé por el estudio</option><option>Otro</option></select></label><label style="display:flex;flex-direction:column;gap:6px;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">Código (opcional)</span><input type="text" value="CARLA" style="height:44px;width:100%;padding:0 12px;border:1px solid #D8C9BB;border-radius:8px;background:#FFFFFF;color:#4A4A4A;font-size:14px;" /><span style="font-size:12px;line-height:1.5;color:#766D69;">De una clienta o de una instructora. Si lo escribes, decide el canal.</span></label><div style="display:flex;gap:8px;"><button style="height:30px;padding:0 12px;border:none;border-radius:8px;background:#B78380;color:#FFFFFF;font-size:13px;font-weight:500;cursor:pointer;">Guardar</button><button style="height:30px;padding:0 12px;border:none;border-radius:8px;background:transparent;color:#6E6663;font-size:13px;cursor:pointer;">Cancelar</button></div></div></div>
+
+            </div>
+            <div style="padding:14px 22px;border-top:1px solid #EFE6DC;display:flex;justify-content:flex-start;">
+              <button style="height:34px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;" style-hover="background:rgba(178,93,75,0.06);">Cerrar cuenta</button>
+            </div>
+          </aside>
+        </main>
+      </div>
     </div>
+  </div>
 
     <div style="display:flex;flex-direction:column;gap:14px;">
       <sc-if value="{{ showCaptions }}" hint-placeholder-val="{{ true }}">
@@ -468,6 +641,7 @@
             <span style="font-size:12.5px;color:#766D69;">3 referidas</span>
             <span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">ANDREA24</span>
           </div>
+          <div style="display:flex;flex-direction:column;gap:9px;"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;"><span style="font-size:10.5px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:#766D69;">¿Cómo nos conociste?</span><button style="border:none;background:transparent;padding:0;color:#B78380;font-size:13px;cursor:pointer;" style-hover="color:#9C6764;">Corregir</button></div><div style="border:1px solid #EFE6DC;border-radius:10px;overflow:hidden;"><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;border-bottom:1px solid #EFE6DC;"><span style="font-size:12.5px;color:#766D69;">Canal</span><span style="font-size:13.5px;color:#4A4A4A;">Una instructora</span></div><div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;background:#FAF7F2;"><span style="font-size:12.5px;color:#766D69;">Código</span><span style="padding:4px 10px;border:1px solid #E4D8CC;border-radius:6px;background:#FFFFFF;font-family:ui-monospace,'SF Mono',Menlo,monospace;font-size:12.5px;letter-spacing:0.06em;color:#6E6663;">CARLA</span></div></div></div>
           <button style="align-self:flex-start;margin-top:4px;height:36px;padding:0 14px;border:1px solid #B25D4B;border-radius:8px;background:#FFFFFF;color:#B25D4B;font-size:13px;font-weight:500;cursor:pointer;">Cerrar cuenta</button>
         </div>
       </div>
@@ -566,7 +740,8 @@
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Bloques por tema</span>Contacto, plan, crédito y referidos: el orden en que se atiende una consulta de soporte.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cerrar cuenta</span>La confirmación enumera solo lo que le pasa a esta clienta y termina en «Esta acción no se puede deshacer.». Si tiene una transferencia en revisión, el cierre se rechaza y el diálogo remite a Pagos. Tras cerrar, AW21 se recarga sin ella y con el aviso de éxito.</div>
       <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">Cifras alineadas</span>Crédito y referidos van a la derecha en cifras tabulares para leerse de un vistazo.</div>
-    </div>
+      <div style="display:flex;flex-direction:column;gap:6px;"><span style="color:#4A4A4A;font-weight:500;">¿Cómo nos conociste?</span>Canal, código y quién la trajo; «Sin dato» si se registró antes de la pregunta. «Corregir» es la única edición del panel: un código, si se escribe, decide el canal. Un código que nadie tiene deja el formulario abierto con "No encontramos ese código. Revísalo o déjalo vacío." (BKM-011).</div>
+  </div>
   </div>
 
 </div>

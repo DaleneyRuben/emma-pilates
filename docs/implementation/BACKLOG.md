@@ -474,6 +474,9 @@ wait for Google, Apple, and testers.
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | ready |
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | ready |
 | PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | done |
+| BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | done (6f8f47df registration, de271070 Assistant flow, bc106c51 + bcee395d correction and Trainer codes, d8a6008a + 3a7f3b96 apps, cab4a4b0 admin web, 3a77ac3c design export; see the notes under «BKM-011») |
+| PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
+
 | PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | ready |
 | BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
@@ -689,6 +692,8 @@ Acceptance criteria:
 
 - A Client registered with a Trainer's code is attributed to that Trainer whatever channel she picked.
 - The channel is required on new registrations, but older store builds without the field still register (the default is `unknown`).
+
+Evidence (2026-10-23): `booking.client_acquisitions` keeps the answer (`declared_channel`), the attribution (`channel`), the code, and the referrer, one live row per Client; check constraints make a Client's code `friend` and a Trainer's `trainer`; the migration backfills existing Clients (`unknown`, or `friend` from a Referral). `staff_members.referral_code` is unique among live rows and a personal code may not start with `REF-`, so it never collides with a Client's. Registration and the Assistant's invitation take an optional `acquisitionChannel` (absent → `unknown`) and `referralCode`; a Client's code still starts the PAY-001 Referral (credit untouched for PAY-005). `GET`/`PUT /administrator/clients/{id}/acquisition` and `/administrator/staff-members/{id}/referral-code`, audited as `client_acquisition.corrected` and `staff_member.referral_code_changed`. Coordinator seam: `acquisitionEditorRoles` in `booking/acquisition/client-acquisition.ts` lists only `administrator`; IDN-009 adds `coordinator` there. Tests: backend unit 993, integration 367 passed and 6 skipped of 373 (incl. two new specs), e2e acquisition 13, admin web 527, Playwright 17, mobile-core 350, client 188, staff 155. Verified: API by curl (Trainer code wins over Instagram, no channel → `unknown`, unknown code → 400); admin web in a browser at 1440 and 420 px (Código personal set and refused in use, Corregir with TikTok, unknown code and missing channel); Client registration on the iPhone 16 Pro and iPad Pro 11-inch (M4) (chips, «Elige cómo nos conociste.», code helper); Staff «Nuevo cliente» end to end on both through the updated Maestro journey (row stored as `walk_in`). Not verified: Android (the emulator's system server kept dying under host memory pressure, Maestro could not start); the Client app on the dev build (it loaded a stale bundle, Expo Go was used). Follow-ups 140–143 exported (144 unused).
 
 #### PAY-006 · Payment controls
 

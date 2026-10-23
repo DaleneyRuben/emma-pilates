@@ -30,6 +30,8 @@ model Client {
   referralReceived    Referral?       @relation("ReferralReferred")
   evaluations         Evaluation[]
   promotionsConsents  ClientPromotionsConsent[]
+  acquisitions        ClientAcquisition[] @relation("AcquiredClient")
+  acquisitionsReferred ClientAcquisition[] @relation("AcquisitionReferrerClient")
 
   @@map("clients")
   @@schema("booking")
@@ -40,6 +42,9 @@ model StaffMember {
   name                String
   phone               String?
   role                StaffRole
+  // BKM-011: a Trainer's personal Referral Code, set by the Administrator.
+  // Unique among live rows: a partial index in the BKM-011 migration.
+  referralCode        String?                 @map("referral_code")
   profileImageAssetId String?                 @unique @map("profile_image_asset_id") @db.Uuid
   createdAt           DateTime                @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt           DateTime                @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -53,6 +58,7 @@ model StaffMember {
   evaluationSlots     EvaluationSlot[]
   salaryPayments      SalaryPayment[]
   impersonations      ImpersonationSession[]
+  acquisitionsReferred ClientAcquisition[]
 
   @@map("staff_members")
   @@schema("booking")
@@ -126,5 +132,48 @@ model ClientPromotionsConsent {
 
   @@index([clientId])
   @@map("client_promotions_consents")
+  @@schema("booking")
+}
+
+// BKM-011: how a Client found the studio («¿Cómo nos conociste?»). `unknown`
+// is for Clients registered before the question existed or by a store build
+// that does not ask it.
+enum AcquisitionChannel {
+  INSTAGRAM @map("instagram")
+  TIKTOK    @map("tiktok")
+  FACEBOOK  @map("facebook")
+  GOOGLE    @map("google")
+  FRIEND    @map("friend")
+  TRAINER   @map("trainer")
+  WALK_IN   @map("walk_in")
+  OTHER     @map("other")
+  UNKNOWN   @map("unknown")
+
+  @@schema("booking")
+}
+
+// A Client's attribution (BKM-011, Booking ADR-0009): the channel she picked,
+// the effective channel, and the Referral Code that decided it. A code wins:
+// a Client's code makes the channel `friend`, a Trainer's `trainer`. One live
+// row per Client (partial unique index) and at most one referrer, present
+// exactly when a code is (check constraints in the migration).
+model ClientAcquisition {
+  id                    String             @id @default(uuid()) @db.Uuid
+  clientId              String             @map("client_id") @db.Uuid
+  declaredChannel       AcquisitionChannel @map("declared_channel")
+  channel               AcquisitionChannel
+  referralCode          String?            @map("referral_code")
+  referrerClientId      String?            @map("referrer_client_id") @db.Uuid
+  referrerStaffMemberId String?            @map("referrer_staff_member_id") @db.Uuid
+  createdAt             DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt             DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt             DateTime?          @map("deleted_at") @db.Timestamptz(3)
+  client                Client             @relation("AcquiredClient", fields: [clientId], references: [id], onDelete: Restrict)
+  referrerClient        Client?            @relation("AcquisitionReferrerClient", fields: [referrerClientId], references: [id], onDelete: Restrict)
+  referrerStaffMember   StaffMember?       @relation(fields: [referrerStaffMemberId], references: [id], onDelete: Restrict)
+
+  @@index([referrerClientId])
+  @@index([referrerStaffMemberId])
+  @@map("client_acquisitions")
   @@schema("booking")
 }
