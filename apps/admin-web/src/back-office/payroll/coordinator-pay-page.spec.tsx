@@ -37,7 +37,13 @@ describe("Pago a la coordinadora", () => {
     let approved = 0;
     server.use(
       ...signedInHandlers(),
-      http.get(apiUrl(statementsPath), () => jsonResponse([statement])),
+      http.get(apiUrl(statementsPath), () =>
+        jsonResponse(
+          approved === 0
+            ? [statement]
+            : [{ ...statement, state: "approved", salaryPaymentId: "pay-1" }],
+        ),
+      ),
       http.post(apiUrl(`${statementsPath}/statement-1/approve`), () => {
         approved += 1;
         return jsonResponse({
@@ -71,7 +77,7 @@ describe("Pago a la coordinadora", () => {
       await screen.findByRole("heading", { level: 1, name: "Horario" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Esa sección es solo para administración."),
+      await screen.findByText("Esa sección es solo para administración."),
     ).toBeInTheDocument();
     await waitFor(() => expect(router.state.location.pathname).toBe("/"));
   });

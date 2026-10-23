@@ -136,6 +136,12 @@ export const navigationGroups: readonly NavigationGroup[] = [
         studioWide: "los pagos a instructoras son del estudio, no de una sede.",
       },
       {
+        label: "Pago a la coordinadora",
+        to: "/back-office/pago-coordinadora",
+        screen: "AW11",
+        studioWide: "el pago a la coordinadora es del estudio, no de una sede.",
+      },
+      {
         label: "Nómina",
         to: "/back-office/nomina",
         screen: "AW11",
