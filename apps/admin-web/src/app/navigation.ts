@@ -97,18 +97,18 @@ export const navigationGroups: readonly NavigationGroup[] = [
         studioWide: "los clientes son del estudio, no de una sede.",
       },
       {
-        label: "Congelamientos",
-        to: "/back-office/congelamientos",
-        screen: "AW38",
-        list: true,
-        studioWide: "los congelamientos son del estudio, no de una sede.",
-      },
-      {
         label: "Fundadoras",
         to: "/back-office/fundadoras",
         screen: "AW37",
         list: true,
         studioWide: "las fundadoras son del estudio, no de una sede.",
+      },
+      {
+        label: "Congelamientos",
+        to: "/back-office/congelamientos",
+        screen: "AW38",
+        list: true,
+        studioWide: "los congelamientos son del estudio, no de una sede.",
       },
       {
         label: "Pagos",

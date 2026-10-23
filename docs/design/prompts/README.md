@@ -104,6 +104,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
 | [AW36](./admin-web/36-reglas-del-estudio.md) | Reglas del estudio | `AW36` | ✅ (Claude Design canvas, 2026-10-23, `55bbe4cc`; the admin web is built in BKM-004) |
 | [AW37](./admin-web/37-fundadoras.md) | Fundadoras | `AW37` | not yet generated (BKM-010; the admin web is built from the prompt) |
+| [AW38](./admin-web/38-congelamientos.md) | Congelamientos | `AW38` | not yet generated (BKM-012; the admin web is built from the prompt) |
 
 ## Follow-ups (`followups/`)
 
@@ -234,6 +235,8 @@ Each of these was sent as the next message in the existing design session for th
 | [191](./followups/191-next-plan-and-renewal.md) | «Siguiente plan desde …» on `12`, renewal reminder on `19`, cash stays enabled on `S06` (BKM-006) | 🕓 pending |
 | [192](./followups/192-founder-prices.md) | Discounted price and struck list price on `08`, `09`, and `S09` for a founder; the single class stays at list price (BKM-010) | 🕓 pending |
 | [193](./followups/193-founder-renewal-banner.md) | «Renueva antes del …» on `12` while a founder holds a current Subscription (BKM-010) | 🕓 pending |
+| [194](./followups/194-freeze-request.md) | Freeze request and status on `12`; booking refusal on `04` (BKM-012) | 🕓 pending |
+| [195](./followups/195-freeze-review.md) | Congelamientos list on the admin web and the Administrator's Staff review (BKM-012) | 🕓 pending |
 
 ## Status
 

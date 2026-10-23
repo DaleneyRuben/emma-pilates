@@ -41,7 +41,7 @@ A discount of 15 % on every Plan except the single class, held by one of the fir
 _Avoid_: VIP, loyalty discount
 
 **Freeze**:
-A pause of a Subscription on a Plan of 90 days or more: once per Subscription, up to 15 days, never starting in the past. The client asks with dates and a reason; an Administrator approves or refuses it. During it the client cannot book and Bookings inside it are cancelled with their class returned; the end date moves by exactly the frozen days ([ADR-0010](./docs/adr/0010-freeze-quarterly-subscriptions.md)).
+A pause of a Subscription on a Plan of 90 days or more: once per Subscription, up to 15 days, never starting in the past. The client asks with dates and a reason; an Administrator approves or refuses it. During it the client cannot book and Bookings inside it are cancelled with their class returned the same way a cancellation returns it; the end date moves by exactly the frozen days ([ADR-0010](./docs/adr/0010-freeze-quarterly-subscriptions.md)).
 _Avoid_: Pause, hold, suspension
 
 **Courtesy Access**:

@@ -81,6 +81,7 @@ can be found by its design name.
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
 | AW37 Fundadoras | 78 |
+| AW38 Congelamientos | 79 |
 | AW23–AW24 Personal | 26, 31, 72 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -6053,3 +6054,32 @@ F. **Fundadoras (AW37).** As Paola, open **Back Office → Fundadoras**. The
    the day (`dd/mm/aaaa`), and **Activa** or **Perdida**. There is no
    create action. At 420 px each membership is a card. An empty studio
    reads «Todavía no hay fundadoras.»
+
+## Test 79: the freeze (BKM-012)
+
+A Plan of 90 days or more may be frozen once, for up to 15 days, never
+starting in the past
+([booking ADR-0010](../booking/docs/adr/0010-freeze-quarterly-subscriptions.md)).
+The Client asks; Paola approves or refuses. Run the API and the fixtures as
+in Tests 2 and 5. The Client app and the Staff app were not walked on a
+device for this item. The admin approval is the browser check.
+
+A. **The request (12).** As a Client with **Trimestral 36 clases**, open
+   **Mi plan**. The form asks for a start, an end, and a reason. A 10-day
+   request is accepted and the screen says it is in review. A 30-day or
+   60-day Plan, a second request, more than 15 days, or a start in the past
+   answers `409` `freeze_not_allowed` and «Este plan no se puede congelar.»
+B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
+   names the Client, the Plan, the dates, and the reason, with **Aprobar**
+   and **Rechazar**. Approving moves the Subscription end by exactly the
+   frozen days and cancels Bookings already inside the window; the class
+   returns the same way a cancellation does. The Payment amount does not
+   change. The Client receives a push and an inbox notification.
+C. **The booking.** A Session inside an approved Freeze answers `409`
+   `booking_during_freeze` and «Tu plan está congelado hasta el {fecha}.»
+   A Session outside it books as before.
+D. **The founder.** A founder whose Subscription was frozen is not ended by
+   the nightly job: the stored end already includes the frozen days.
+E. **Who decides.** An Assistant, a Trainer, a Nutritionist, and a Client
+   get `403` on the decision. A Coordinator principal is rejected too;
+   IDN-009 makes that role real.
