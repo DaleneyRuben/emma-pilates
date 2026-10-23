@@ -316,6 +316,7 @@ export * from "./transferInstructionsDto";
 export * from "./unreadNotificationCountDto";
 export * from "./upcomingBookingDto";
 export * from "./upcomingBookingDtoKind";
+export * from "./updateAdminClientProfileDto";
 export * from "./updateClientProfileDto";
 export * from "./updateStudioSettingsDto";
 export * from "./uploadStatusDto";

@@ -13,7 +13,8 @@ export const principal = (
     | 'administrator'
     | 'assistant'
     | 'trainer'
-    | 'nutritionist' = 'administrator',
+    | 'nutritionist'
+    | 'coordinator' = 'administrator',
   staffMemberId = 'admin-staff',
 ): AuthenticatedPrincipal => ({
   accountId: 'admin-account',

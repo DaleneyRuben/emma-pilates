@@ -11,6 +11,7 @@ const staffRoles = [
   'nutritionist',
   'assistant',
   'administrator',
+  'coordinator',
 ] as const satisfies readonly StaffRoleName[];
 const staffStatuses = [
   'pending',

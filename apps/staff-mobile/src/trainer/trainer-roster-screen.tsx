@@ -1,3 +1,4 @@
+import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
 import {
   BackLink,
   BodyText,
@@ -14,7 +15,6 @@ import {
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";

@@ -70,6 +70,7 @@ const directory = (
   findLatestSubscription: jest.fn().mockResolvedValue(subscription),
   readAvailableCredit: jest.fn().mockResolvedValue(105_000),
   readClosureOutlook: jest.fn().mockResolvedValue(outlook),
+  saveProfile: jest.fn(),
   ...overrides,
 });
 
