@@ -32,7 +32,7 @@ you are starting with no project knowledge.
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
-| Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
+| Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); Inicio from the last profile when the phone has no connection (Test 75); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
 | Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
 
@@ -45,7 +45,7 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70 |
 | 12 Mi plan | 5, 18, 71 |
@@ -1624,14 +1624,15 @@ que necesite tu atención."
 
 The apps are online-first. When the device loses connectivity, a banner reads
 "Sin conexión. Mostrando la última información guardada." and only the class
-schedule, upcoming Bookings, and the Subscription summary stay visible from the
-Account-scoped cache; everything else needs the connection back. The banner
+schedule, upcoming Bookings, the Subscription summary, and the signed-in
+Client's own profile stay visible from the Account-scoped cache; everything
+else needs the connection back. The banner
 follows the device's connectivity (NetInfo feeds TanStack Query's
 `onlineManager`), so on the Android emulator `adb shell svc wifi disable`
 and `adb shell svc data disable` show it (and `enable` hides it); the iOS
 Simulator shares the Mac's network, so there it is easiest on a device with
 airplane mode. Test 71 walks the other states (load errors, action errors,
-link screens).
+link screens), and Test 75 walks Inicio's own offline copy.
 
 ### Time zones
 
@@ -5599,7 +5600,8 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
 3. **Offline.** Cut the device's network as Test 9 F describes: the banner
    «Sin conexión. Mostrando la última información guardada.» sits above
    every screen until the network is back, and the screens of step 1 that
-   were already loaded keep their data.
+   were already loaded keep their data. Inicio is the exception of Test 75:
+   it keeps the last profile and says so in its own line.
 4. **A render error.** Test 1 describes «Algo salió mal» with
    **Reintentar**; it needs a defect to appear (a temporary `throw` in a
    screen, never committed), so it is read there, not here.
@@ -5834,3 +5836,23 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 75: Inicio without a connection
+
+Inicio needs the signed-in Client's profile, which the other screens do not.
+Load the fixtures (Test 5A), start the API and the Client app (Test 5B), and
+sign in as `lucia@example.com`. Open **Inicio** once while the API answers,
+so the phone has a profile to keep: «Hola, Lucía» and her plan card.
+
+1. **The last profile.** Cut the device's network as Test 9 F describes
+   and open **Inicio** again (leave the app and come back, or pull to
+   refresh). The greeting and the plan card stay, and a line on the screen
+   reads «Sin conexión. Mostrando tus datos de la última vez.» The banner
+   of Test 71 still sits above the screen; this line is Inicio's own.
+2. **Nothing saved.** Sign out, cut the network before the next sign-in,
+   and open **Inicio** on a phone that has never loaded it: «No pudimos
+   cargar tu inicio.» with **Reintentar**, and no «última vez» line. A
+   first launch with no connection has nothing to show.
+3. **The connection returns.** Restore the network (Test 9 F). The screen
+   refetches on its own, the «última vez» line goes away, and the greeting
+   is the profile the API answers now.
