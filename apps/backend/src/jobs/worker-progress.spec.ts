@@ -73,7 +73,7 @@ describe('worker progress (ADR-0066)', () => {
             lastSuccessAt: minutesAgo(13),
           },
           {
-            job: 'empty_session_check',
+            job: 'minimum_bookings_check',
             intervalMs: 60_000,
             lastSuccessAt: minutesAgo(5),
           },
@@ -82,7 +82,7 @@ describe('worker progress (ADR-0066)', () => {
     ).toEqual([
       'queue_stuck:uploads.finalize.v1',
       'sweep_stale:purchase_intent_expiry',
-      'sweep_stale:empty_session_check',
+      'sweep_stale:minimum_bookings_check',
     ]);
   });
 });

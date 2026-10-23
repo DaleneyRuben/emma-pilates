@@ -469,7 +469,7 @@ wait for Google, Apple, and testers.
 | BKM-006 | P0 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | ready |
 | BKM-008 | P0 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | ready |
 | BKM-007 | P0 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | ready |
-| BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | ready |
+| BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | done (919ef391, a6c21924, 938d0e56, 1db2fa8e; evidence below) |
 | PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | ready |
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | ready |
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | ready |
@@ -598,6 +598,8 @@ Acceptance criteria:
 
 - Worker integration tests cover 1 booking (cancelled), 2 (taught), a restart in the middle (idempotent), and a minimum changed in the settings.
 - The snapshot exists for every taught Session.
+
+Evidence: `session-start-checks.integration-spec.ts` and `window-close-snapshot.integration-spec.ts` cover one Booking (cancelled, class returned, both notices), two (stays scheduled), a restart mid-sweep, and a minimum raised in Studio Settings. On `pilates_bkm009_dev` the worker cancelled a Session moved inside the lead time with one Booking: cause `minimum_not_met`, the Booking cancelled as `session_cancelled` with no actor, and the class returned. The inbox walks of Test 13 passed on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator, in both apps: the Client's notice names the other Sessions with places and opens Mis Reservas, and the Trainer's notice opens her agenda. The two scheduled Sessions already inside the Cancellation Window held a `bookings_at_window_close` value; the cancelled one held none. Open: the inbox lists the notice under Anteriores once its push has been read, so a Client who opens the inbox after the push sees no unread dot.
 
 #### PAY-005 · No more money credit
 

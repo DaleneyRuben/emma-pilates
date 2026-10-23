@@ -188,7 +188,13 @@ export const createPrismaSessionExceptions = (
             startsAt,
             endsAt: new Date(startsAt.getTime() + durationMinutes * minuteMs),
             isException: true,
-            ...(startChanged ? { emptyBookingCheckCompletedAt: null } : {}),
+            // A moved Session is checked and snapshotted again at its new time.
+            ...(startChanged
+              ? {
+                  minimumBookingsCheckCompletedAt: null,
+                  bookingsAtWindowClose: null,
+                }
+              : {}),
           },
           select: sessionSelect,
         });
