@@ -133,6 +133,7 @@ describe('Courtesy Access endpoint (e2e, REL-011)', () => {
       .expect(400);
     await request(app.getHttpServer())
       .post(route)
+      .set('idempotency-key', idempotencyKey)
       .send({ endsOn: '2026-11-30' })
       .expect(401);
     expect(grant).not.toHaveBeenCalled();
