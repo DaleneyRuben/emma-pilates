@@ -59,7 +59,7 @@ describe("Cerrar caja (S25)", () => {
 
     expect(screen.getByText("Bs 520")).toBeOnTheScreen();
     expect(screen.getByText("3 ventas en efectivo hoy en Centro")).toBeOnTheScreen();
-    expect(screen.getByText("Jueves 23 de octubre · Centro")).toBeOnTheScreen();
+    expect(screen.getByText("Viernes 23 de octubre · Centro")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Cerrar caja" })).toBeDisabled();
 
     await fireEvent.changeText(screen.getByLabelText("Efectivo contado"), "520");
