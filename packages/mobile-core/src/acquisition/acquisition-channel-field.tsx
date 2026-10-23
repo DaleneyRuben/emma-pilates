@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Keyboard, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { fontFamilies } from "../ui/fonts";
 import { colors, radii, spacing, typography } from "../ui/tokens";
@@ -46,7 +46,12 @@ export function AcquisitionChannelField({
               accessibilityRole="radio"
               accessibilityState={{ checked: selected }}
               key={option.value}
-              onPress={() => onChange(option.value)}
+              onPress={() => {
+                // A chip keeps an open keyboard (taps are "handled"), and the
+                // phone pad has no return key to close it over the submit.
+                Keyboard.dismiss();
+                onChange(option.value);
+              }}
               style={[
                 styles.chip,
                 selected ? styles.chipSelected : null,
