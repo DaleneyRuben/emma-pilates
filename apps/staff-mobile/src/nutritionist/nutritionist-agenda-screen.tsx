@@ -18,6 +18,8 @@ import {
   surfaces,
   TextButton,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
@@ -77,6 +79,9 @@ export function NutritionistAgendaScreen() {
     { limit: agendaPageSize },
     { fetcher, query: { refetchOnMount: "always" } },
   );
+  const queryKeys = [getListNutritionistAgendaQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [cancelling, setCancelling] = useState<NutritionistAgendaEntryDto | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -163,12 +168,12 @@ export function NutritionistAgendaScreen() {
         </BodyText>
       ) : null}
       {groups.length === 0 ? (
-        <View style={styles.empty}>
+        <ScrollView contentContainerStyle={styles.empty} refreshControl={refreshControl}>
           <Text style={styles.emptyTitle}>No tienes evaluaciones agendadas.</Text>
           <BodyText>Revisa tu disponibilidad para que las clientas puedan reservar.</BodyText>
-        </View>
+        </ScrollView>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
           {groups.map((group) => (
             <View key={group.date} style={styles.group}>
               <View style={styles.groupHeader}>

@@ -1,4 +1,8 @@
 import {
+  getGetCurrentClientCreditQueryKey,
+  getGetCurrentClientProfileQueryKey,
+  getGetCurrentClientSubscriptionQueryKey,
+  getGetUnreadNotificationCountQueryKey,
   useGetCurrentClientCredit,
   useGetCurrentClientProfile,
   useGetCurrentClientSubscription,
@@ -20,6 +24,7 @@ import {
   typography,
   UnreadCountPill,
   useMobileIdentity,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
@@ -89,6 +94,12 @@ export function ProfileScreen() {
   const subscription = useGetCurrentClientSubscription(queryOptions);
   const unread = useGetUnreadNotificationCount(queryOptions);
   const credit = useGetCurrentClientCredit(queryOptions);
+  useRefetchOnFocus([
+    getGetCurrentClientProfileQueryKey(),
+    getGetCurrentClientSubscriptionQueryKey(),
+    getGetUnreadNotificationCountQueryKey(),
+    getGetCurrentClientCreditQueryKey(),
+  ]);
   const photoUri = useClientPhoto(
     profile.data?.status === 200 ? (profile.data.data.photo?.imageAssetId ?? null) : null,
   );

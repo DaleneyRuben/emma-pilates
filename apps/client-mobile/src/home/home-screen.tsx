@@ -1,4 +1,9 @@
 import {
+  getGetCurrentClientProfileQueryKey,
+  getGetCurrentClientReferralsQueryKey,
+  getGetCurrentClientSubscriptionQueryKey,
+  getListEvaluationsQueryKey,
+  getListPromotionsQueryKey,
   useGetCurrentClientProfile,
   useGetCurrentClientReferrals,
   useGetCurrentClientSubscription,
@@ -18,10 +23,11 @@ import {
   spacing,
   surfaces,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
-import { useState } from "react";
-import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useClientFetcher } from "../client-fetcher";
 import {
   describeAllowance,
@@ -131,18 +137,18 @@ export function HomeScreen() {
   const evaluations = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const referrals = useGetCurrentClientReferrals(queryOptions);
   const promotions = useListPromotions(queryOptions);
-  const [refreshing, setRefreshing] = useState(false);
+  const queryKeys = [
+    getGetCurrentClientProfileQueryKey(),
+    getGetCurrentClientSubscriptionQueryKey(),
+    getListEvaluationsQueryKey({ scope: "upcoming" }),
+    getGetCurrentClientReferralsQueryKey(),
+    getListPromotionsQueryKey(),
+  ];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const retry = () => {
     void Promise.all([profile.refetch(), subscription.refetch()]);
-  };
-
-  const refresh = async () => {
-    setRefreshing(true);
-    await Promise.all(
-      [profile, subscription, evaluations, referrals, promotions].map((query) => query.refetch()),
-    );
-    setRefreshing(false);
   };
 
   if (profile.isPending || subscription.isPending) {
@@ -184,13 +190,7 @@ export function HomeScreen() {
     <Screen style={styles.screen}>
       <ScrollView
         contentContainerStyle={styles.content}
-        refreshControl={
-          <RefreshControl
-            onRefresh={() => void refresh()}
-            refreshing={refreshing}
-            tintColor={colors.primary}
-          />
-        }
+        refreshControl={refreshControl}
         testID="home-scroll"
       >
         <Heading accessibilityLabel="Inicio">{`Hola, ${firstName(profile.data.data.name)}`}</Heading>

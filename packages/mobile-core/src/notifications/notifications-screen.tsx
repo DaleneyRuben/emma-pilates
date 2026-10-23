@@ -20,6 +20,8 @@ import { colors, radii, spacing, typography } from "../ui/tokens";
 import { formatNotificationTime } from "./notification-time";
 import { usePushNotifications } from "./push-notifications";
 import { LoadingState } from "../ui/loading-state";
+import { usePullToRefresh } from "../query/pull-to-refresh";
+import { useRefetchOnFocus } from "../query/refetch-on-focus";
 
 const pageSize = 50;
 
@@ -101,6 +103,9 @@ export function NotificationsScreen({
         queryKey: getGetUnreadNotificationCountQueryKey(),
       }),
     ]);
+  const queryKeys = [getListNotificationsQueryKey(params), getGetUnreadNotificationCountQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
   const markRead = useMarkNotificationRead({
     fetcher,
     mutation: { onSuccess: () => void invalidate() },
@@ -173,7 +178,11 @@ export function NotificationsScreen({
           />
         ) : undefined,
       )}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={refreshControl}
+        testID="notifications-scroll"
+      >
         <DeniedNotice />
         {unread.length > 0 ? (
           <>

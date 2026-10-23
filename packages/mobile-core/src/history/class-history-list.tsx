@@ -1,5 +1,6 @@
 import type { ClassHistoryEntryDto } from "@pilates/api-contracts";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import type { ReactElement } from "react";
+import { type RefreshControlProps, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { formatSessionDate } from "../time/session-format";
 import { fontFamilies } from "../ui/fonts";
@@ -16,6 +17,8 @@ type ClassHistoryListProps = {
   entries: ClassHistoryEntryDto[];
   /** «Has asistido a» on the Client's own history (07), «Ha asistido a» on S22. */
   lead: string;
+  /** The pull-to-refresh control of the screen that owns the list (UX-004). */
+  refreshControl?: ReactElement<RefreshControlProps>;
 };
 
 function HistoryRow({ entry, last }: { entry: ClassHistoryEntryDto; last: boolean }) {
@@ -44,9 +47,9 @@ function HistoryRow({ entry, last }: { entry: ClassHistoryEntryDto; last: boolea
  * The attended classes of 07 and S22: a «N clases desde <mes>» summary, then
  * one group per month whose rows sit between rules on the screen (MOB-040).
  */
-export function ClassHistoryList({ entries, lead }: ClassHistoryListProps) {
+export function ClassHistoryList({ entries, lead, refreshControl }: ClassHistoryListProps) {
   return (
-    <ScrollView contentContainerStyle={styles.content}>
+    <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
       <View style={styles.summary}>
         <Text style={styles.lead}>{lead}</Text>
         <Text style={styles.figure}>{summarizeClassHistory(entries)}</Text>

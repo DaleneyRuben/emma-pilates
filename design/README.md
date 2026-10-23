@@ -153,6 +153,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 - Reduce Motion: no fade and no breath; the still logo appears after the same 400ms.
 - Announced as progress with the screen's Spanish label («Cargando clases»); the image itself is not read.
 - Not for busy buttons, pull-to-refresh, the Promotions placeholder card, image placeholders, or errors.
+- Every list refreshes in the background when it regains focus (a tab comes back, a screen it opened closes) and on pull, with the native pull-to-refresh control in Palo de rosa; what is on screen stays until the fresh answer replaces it.
 
 ### Launch screen (Client and Staff)
 

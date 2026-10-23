@@ -1,4 +1,8 @@
-import { useListAvailabilityBlocks, type AvailabilityBlockDto } from "@pilates/api-contracts";
+import {
+  type AvailabilityBlockDto,
+  getListAvailabilityBlocksQueryKey,
+  useListAvailabilityBlocks,
+} from "@pilates/api-contracts";
 import {
   BodyText,
   Chevron,
@@ -12,6 +16,8 @@ import {
   spacing,
   surfaces,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -59,6 +65,9 @@ export function AvailabilityScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const queryKeys = [getListAvailabilityBlocksQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
     <ScreenTopBar
@@ -121,7 +130,7 @@ export function AvailabilityScreen() {
           />
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView contentContainerStyle={styles.list} refreshControl={refreshControl}>
           <View style={styles.sectionHeader}>
             <Text style={styles.label}>Horarios semanales</Text>
             <BodyText style={styles.muted}>

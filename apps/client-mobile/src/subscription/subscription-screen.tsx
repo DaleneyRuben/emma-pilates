@@ -1,4 +1,7 @@
-import { useGetCurrentClientSubscription } from "@pilates/api-contracts";
+import {
+  getGetCurrentClientSubscriptionQueryKey,
+  useGetCurrentClientSubscription,
+} from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
@@ -11,6 +14,8 @@ import {
   spacing,
   surfaces,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -49,6 +54,9 @@ export function SubscriptionScreen() {
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const queryKeys = [getGetCurrentClientSubscriptionQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
     <>
@@ -95,7 +103,7 @@ export function SubscriptionScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {status === "expiring_soon" ? (
           <View style={styles.warning}>
             <Text style={styles.warningText}>

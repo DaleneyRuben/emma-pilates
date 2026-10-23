@@ -1,4 +1,5 @@
 import {
+  getListSessionAvailabilityQueryKey,
   useListBranches,
   useListClassTypes,
   useListSessionAvailability,
@@ -17,6 +18,8 @@ import {
   SessionCard,
   spacing,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useMemo, useState } from "react";
@@ -87,6 +90,9 @@ export function BrowseSessionsScreen() {
       query: { enabled: branchId !== undefined, refetchOnMount: "always" },
     },
   );
+  const queryKeys = [getListSessionAvailabilityQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const branchList = branches.data?.status === 200 ? branches.data.data : [];
   const classTypeList = classTypes.data?.status === 200 ? classTypes.data.data : [];
@@ -208,15 +214,19 @@ export function BrowseSessionsScreen() {
           }}
         />
       ) : visibleSessions.length === 0 ? (
-        <View style={styles.empty}>
+        <ScrollView contentContainerStyle={styles.empty} refreshControl={refreshControl}>
           <BodyText>
             {classTypeId === allClassTypes
               ? "No hay clases este día."
               : "No hay clases con este filtro"}
           </BodyText>
-        </View>
+        </ScrollView>
       ) : (
-        <ScrollView contentContainerStyle={styles.list}>
+        <ScrollView
+          contentContainerStyle={styles.list}
+          refreshControl={refreshControl}
+          testID="browse-sessions-scroll"
+        >
           {visibleSessions.map((session) => (
             <SessionCard
               accessibilityLabel={`${session.classTypeName} ${formatTimeRange(session.startsAt, session.endsAt)}`}

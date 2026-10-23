@@ -1,4 +1,9 @@
-import { useGetCurrentClientCredit, useGetCurrentClientReferrals } from "@pilates/api-contracts";
+import {
+  getGetCurrentClientCreditQueryKey,
+  getGetCurrentClientReferralsQueryKey,
+  useGetCurrentClientCredit,
+  useGetCurrentClientReferrals,
+} from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
@@ -11,6 +16,8 @@ import {
   surfaces,
   TextButton,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
@@ -30,6 +37,9 @@ export function CreditScreen() {
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const credit = useGetCurrentClientCredit(queryOptions);
   const referrals = useGetCurrentClientReferrals(queryOptions);
+  const queryKeys = [getGetCurrentClientCreditQueryKey(), getGetCurrentClientReferralsQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
     <>
@@ -66,7 +76,7 @@ export function CreditScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         <View style={styles.balance}>
           {hasCredit ? <BodyText style={styles.balanceLabel}>Saldo a favor</BodyText> : null}
           <Text style={styles.amount}>{formatBolivianos(availableCentavos)}</Text>

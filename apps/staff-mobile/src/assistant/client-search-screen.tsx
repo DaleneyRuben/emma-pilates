@@ -1,4 +1,7 @@
-import { useSearchAssistantClients } from "@pilates/api-contracts";
+import {
+  getSearchAssistantClientsQueryKey,
+  useSearchAssistantClients,
+} from "@pilates/api-contracts";
 import {
   AvatarCircle,
   BodyText,
@@ -11,6 +14,8 @@ import {
   spacing,
   surfaces,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
@@ -63,6 +68,9 @@ export function ClientSearchScreen() {
     { query },
     { fetcher, query: { enabled: searching, refetchOnMount: "always" } },
   );
+  const queryKeys = [getSearchAssistantClientsQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
   const clients = results.data?.status === 200 ? results.data.data : [];
   const workspace = useAssistantWorkspace();
   const selectedId = workspace.split ? workspace.panel?.clientId : undefined;
@@ -104,7 +112,11 @@ export function ClientSearchScreen() {
           <BodyText style={styles.hint}>Revisa el nombre o crea la cuenta del cliente.</BodyText>
         </View>
       ) : (
-        <ScrollView contentContainerStyle={styles.list} keyboardShouldPersistTaps="handled">
+        <ScrollView
+          contentContainerStyle={styles.list}
+          keyboardShouldPersistTaps="handled"
+          refreshControl={refreshControl}
+        >
           {clients.map((client) => (
             <Pressable
               accessibilityLabel={`Ver cliente ${client.name}`}

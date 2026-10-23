@@ -1,4 +1,6 @@
 import {
+  getGetCurrentClientCreditQueryKey,
+  getGetCurrentClientReferralsQueryKey,
   type ReferredClientDto,
   useGetCurrentClientCredit,
   useGetCurrentClientReferrals,
@@ -17,6 +19,8 @@ import {
   spacing,
   surfaces,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, Share, StyleSheet, Text, View } from "react-native";
@@ -68,6 +72,9 @@ export function ReferralsScreen() {
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const referrals = useGetCurrentClientReferrals(queryOptions);
   const credit = useGetCurrentClientCredit(queryOptions);
+  const queryKeys = [getGetCurrentClientReferralsQueryKey(), getGetCurrentClientCreditQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const header = (
     <>
@@ -102,7 +109,7 @@ export function ReferralsScreen() {
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         <View style={styles.codeCard}>
           <BodyText style={styles.codeLabel}>Tu código</BodyText>
           <Text style={styles.code}>{referralCode}</Text>
