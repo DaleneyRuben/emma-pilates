@@ -152,6 +152,7 @@ import { promotionContactsWiring } from './promotion-contacts/promotion-contacts
 import { promotionsConsentWiring } from './promotions-consent/promotions-consent-wiring';
 import { promotionsWiring } from './promotions/promotions-wiring';
 import { clientPhotoWiring } from './client/client-photo-wiring';
+import { first90DaysWiring } from './first-90-days/first-90-days-wiring';
 
 @Module({
   imports: [SystemIdentityModule, NotificationsModule],
@@ -189,6 +190,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionContactsWiring.controllers,
     ...promotionsConsentWiring.controllers,
     ...clientPhotoWiring.controllers,
+    ...first90DaysWiring.controllers,
     EvaluationSlotsController,
     ClientEvaluationsController,
     NutritionistEvaluationsController,
@@ -583,6 +585,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
     ...promotionContactsWiring.providers(PRISMA_CLIENT),
     ...promotionsConsentWiring.providers(PRISMA_CLIENT),
     ...clientPhotoWiring.providers(PRISMA_CLIENT),
+    ...first90DaysWiring.providers(PRISMA_CLIENT),
   ],
 })
 export class BookingModule {}
