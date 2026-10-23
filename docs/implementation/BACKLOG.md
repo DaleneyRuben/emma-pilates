@@ -880,7 +880,7 @@ Decisions (blanket approval, 2026-10-23):
 
 Open question: the Staff app's «Mis pagos» screen is not built. Follow-up 202 stays pending. The Coordinator Role is not wired (IDN-009); denial is by default.
 
-Evidence: the hand-checked September is 32,200 centavos (3 students 6,500, 6 students 8,100, a no-show counted in 5 students 7,300, one `minimum_not_met` 2,500, 10 % of a Bs 780 first Plan 7,800). A second approval creates no second Salary Payment. Daniela does not see Emma's statement. An Assistant is denied the list and the approval. Migration `20261023230100_trainer_pay_statements` needs owner approval; it ran only on `pilates_bko006_dev` and `pilates_test_bko006`, which were dropped. The Staff app was not walked. Follow-up 202 stays pending.
+Evidence: the hand-checked September is 32,200 centavos (3 students 6,500, 6 students 8,100, a no-show counted in 5 students 7,300, one `minimum_not_met` 2,500, 10 % of a Bs 780 first Plan 7,800). A second approval creates no second Salary Payment. Daniela does not see Emma's statement. An Assistant is denied the list and the approval. Migration `20261023230100_trainer_pay_statements` needs owner approval; it ran only on `pilates_bko006_dev` and `pilates_test_bko006`, which were dropped. The Staff app was not walked. Follow-up 202 stays pending. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/186.
 
 #### BKO-007 · Coordinator pay
 

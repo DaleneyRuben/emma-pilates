@@ -6225,40 +6225,6 @@ a Trainer's code on `AW24` and corrects a Client's attribution on `AW22`
    de 3 a 20 letras, números o guiones, sin empezar con REF-.».
 4. Open **Camila Rojas** (Assistant): no **Código personal**.
 
-## Test 83: trainer pay and «Mis pagos» (BKO-006)
-
-A Trainer is paid from the rates in force: Bs 65 per class with up to 4
-students, plus Bs 8 from the fifth, counted on the Bookings the Session held
-when the cancellation window closed (a no-show counts), Bs 25 when a Session
-was cancelled because the minimum was not met, and 10 % of what a Client she
-brought actually paid for her first Plan, in the month that Payment was
-approved. Paola is the Administrator. Camila, the Assistant, cannot approve
-and cannot list the statements. Log in as Test 24 describes.
-
-1. **Calculate the month.** In the admin web open **Pagos a instructoras**
-   (above Nómina). The month stepper cannot go past the current month. Press
-   **Calcular mes**. Each Trainer with a line appears as a card: her name,
-   «Borrador», the total (`Bs 322,00`, never centavos), and a table of
-   Concepto, Detalle, and Monto.
-2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
-   Nómina gains one Salary Payment for that total. Pressing again, or
-   calculating the month again, does not add a second payment.
-3. **The figures.** A class of 3 students is Bs 65,00. A class of 6 is
-   Bs 81,00. A no-show counts in the snapshot. A Session cancelled for the
-   minimum is Bs 25,00. A first Plan of Bs 780,00 pays Bs 78,00, once, even
-   if she buys again.
-4. **Narrow browser.** At 420 px the cards stack and the line table becomes
-   labelled cards. The sidebar opens from **Abrir menú**.
-5. **Her own only.** `GET /api/v1/trainer/pay-statements` as Emma returns
-   only Emma's statements. As Daniela it does not include Emma's. As Camila
-   it answers `403` `back_office_access_denied`, and so does approval.
-
-The Staff app's «Mis pagos» row is not built: follow-up 202 stays pending.
-The Coordinator Role is not wired (IDN-009); anyone who is not a Trainer or
-the Administrator is denied. The migration
-`20261023230100_trainer_pay_statements` needs owner approval before it runs
-on a shared database.
-
 The API is `GET`/`PUT /api/v1/administrator/staff-members/{id}/referral-code`
 (`{"referralCode": "EMMA"}`, `null` removes it); each change writes the audit
 record `staff_member.referral_code_changed`.
@@ -6311,4 +6277,39 @@ new channel and code. Check the rows with
 referrer_staff_member_id from booking.client_acquisitions;` on your database:
 Clients that existed before the migration got `unknown`, or `friend` with the
 referrer when a Referral named one.
+
+## Test 83: trainer pay and «Mis pagos» (BKO-006)
+
+A Trainer is paid from the rates in force: Bs 65 per class with up to 4
+students, plus Bs 8 from the fifth, counted on the Bookings the Session held
+when the cancellation window closed (a no-show counts), Bs 25 when a Session
+was cancelled because the minimum was not met, and 10 % of what a Client she
+brought actually paid for her first Plan, in the month that Payment was
+approved. Paola is the Administrator. Camila, the Assistant, cannot approve
+and cannot list the statements. Log in as Test 24 describes.
+
+1. **Calculate the month.** In the admin web open **Pagos a instructoras**
+   (above Nómina). The month stepper cannot go past the current month. Press
+   **Calcular mes**. Each Trainer with a line appears as a card: her name,
+   «Borrador», the total (`Bs 322,00`, never centavos), and a table of
+   Concepto, Detalle, and Monto.
+2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
+   Nómina gains one Salary Payment for that total. Pressing again, or
+   calculating the month again, does not add a second payment.
+3. **The figures.** A class of 3 students is Bs 65,00. A class of 6 is
+   Bs 81,00. A no-show counts in the snapshot. A Session cancelled for the
+   minimum is Bs 25,00. A first Plan of Bs 780,00 pays Bs 78,00, once, even
+   if she buys again.
+4. **Narrow browser.** At 420 px the cards stack and the line table becomes
+   labelled cards. The sidebar opens from **Abrir menú**.
+5. **Her own only.** `GET /api/v1/trainer/pay-statements` as Emma returns
+   only Emma's statements. As Daniela it does not include Emma's. As Camila
+   it answers `403` `back_office_access_denied`, and so does approval.
+
+The Staff app's «Mis pagos» row is not built: follow-up 202 stays pending.
+The Coordinator Role is not wired (IDN-009); anyone who is not a Trainer or
+the Administrator is denied. The migration
+`20261023230100_trainer_pay_statements` needs owner approval before it runs
+on a shared database. Pull request:
+https://github.com/DaleneyRuben/emma-pilates/pull/186.
 
