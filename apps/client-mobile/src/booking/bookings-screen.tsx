@@ -31,6 +31,7 @@ import { useState } from "react";
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
+import { bookingRejectionMessage, problemCode } from "./booking-rejection-copy";
 import type { ConfirmedBooking } from "./session-detail-screen";
 import {
   formatSessionDate,
@@ -179,7 +180,10 @@ export function BookingsScreen({
     try {
       const response = await cancelBooking(cancelling.bookingId, undefined, fetcher);
       if (response.status !== 204) {
-        setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
+        setFailure(
+          bookingRejectionMessage(problemCode(response.data)) ??
+            "No pudimos cancelar la reserva. Inténtalo de nuevo.",
+        );
       }
     } catch {
       setFailure("No pudimos cancelar la reserva. Inténtalo de nuevo.");
