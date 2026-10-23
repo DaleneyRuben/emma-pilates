@@ -99,4 +99,14 @@ describe("the Coordinator's Staff app", () => {
     const reads = fetcher.mock.calls.map(([input]) => String(input));
     expect(reads.some((path) => path.includes("client-invitations"))).toBe(false);
   });
+
+  it("names her Role «Coordinación» and every Branch on Perfil", async () => {
+    const { screen } = await openAsCoordinator();
+
+    await fireEvent.press(screen.getByRole("button", { name: "Tu cuenta" }));
+    await waitFor(() => {
+      expect(screen.getByText("Coordinación")).toBeOnTheScreen();
+    });
+    expect(screen.getByText("Todas las sucursales")).toBeOnTheScreen();
+  });
 });
