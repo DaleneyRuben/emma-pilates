@@ -63,6 +63,7 @@ describe('ClientProfileController', () => {
     await expect(controller.subscription(bearer)).resolves.toEqual({
       status: 'expiring_soon',
       nextSubscription: null,
+      founderRenewalDeadline: null,
       subscription: {
         id: 'subscription-id',
         planName: 'Paquete de 8 clases',
@@ -75,11 +76,17 @@ describe('ClientProfileController', () => {
   });
 
   it('returns none without a Subscription', async () => {
-    loadSubscription.mockResolvedValue({ status: 'none', subscription: null });
+    loadSubscription.mockResolvedValue({
+      status: 'none',
+      subscription: null,
+      nextSubscription: null,
+      founderRenewalDeadline: null,
+    });
 
     await expect(controller.subscription(bearer)).resolves.toEqual({
       status: 'none',
       nextSubscription: null,
+      founderRenewalDeadline: null,
       subscription: null,
     });
   });

@@ -33,6 +33,7 @@ describe('loadClientSubscription', () => {
       status: 'active',
       subscription: active,
       nextSubscription: null,
+      founderRenewalDeadline: null,
     });
   });
 
@@ -52,6 +53,7 @@ describe('loadClientSubscription', () => {
       status: 'expiring_soon',
       subscription: expiring,
       nextSubscription: null,
+      founderRenewalDeadline: null,
     });
     expect(findActiveSubscription).toHaveBeenCalledWith('client-id', today);
   });
@@ -72,6 +74,7 @@ describe('loadClientSubscription', () => {
       status: 'expired',
       subscription: expired,
       nextSubscription: null,
+      founderRenewalDeadline: null,
     });
     expect(findLatestSubscription).toHaveBeenCalledWith('client-id');
   });
@@ -89,6 +92,7 @@ describe('loadClientSubscription', () => {
       status: 'none',
       subscription: null,
       nextSubscription: null,
+      founderRenewalDeadline: null,
     });
   });
 
@@ -108,6 +112,27 @@ describe('loadClientSubscription', () => {
       status: 'active',
       subscription: active,
       nextSubscription: next,
+      founderRenewalDeadline: null,
+    });
+  });
+
+  it('names the founder renewal deadline from the current Subscription real end', async () => {
+    const active = subscription(4);
+
+    await expect(
+      loadClientSubscription({
+        principal,
+        today,
+        findActiveSubscription: jest.fn().mockResolvedValue(active),
+        findLatestSubscription: jest.fn(),
+        findFutureSubscription: jest.fn().mockResolvedValue(null),
+        readFounderRenewal: jest.fn().mockResolvedValue({ gapDays: 7 }),
+      }),
+    ).resolves.toEqual({
+      status: 'active',
+      subscription: active,
+      nextSubscription: null,
+      founderRenewalDeadline: '2026-10-02',
     });
   });
 

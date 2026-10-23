@@ -66,6 +66,32 @@ export const decideFounderGap = (input: {
     : { lose: false };
 };
 
+// The shown price is the discounted one. The list price travels beside it
+// only when a discount applies, so older builds keep reading priceCentavos.
+export const priceFounderPlans = <
+  T extends {
+    classAllowance: number;
+    priceCentavos: number;
+  },
+>(
+  plans: T[],
+  input: { founder: boolean; percent: number },
+): Array<T & { listPriceCentavos?: number }> =>
+  plans.map((plan) => {
+    if (!input.founder) return plan;
+    const priced = founderDiscount({
+      classAllowance: plan.classAllowance,
+      priceCentavos: plan.priceCentavos,
+      percent: input.percent,
+    });
+    if (priced.discountCentavos === 0) return plan;
+    return {
+      ...plan,
+      priceCentavos: priced.amountDueCentavos,
+      listPriceCentavos: plan.priceCentavos,
+    };
+  });
+
 export const founderRenewalDeadline = (
   realEnd: Date,
   rules: Pick<FounderRules, 'founderGapDays'>,

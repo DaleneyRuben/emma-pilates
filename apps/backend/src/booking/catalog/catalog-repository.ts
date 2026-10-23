@@ -5,6 +5,8 @@ export type PlanSummary = {
   weeklyClassCap: number | null;
   classAllowance: number;
   priceCentavos: number;
+  // Present only for a founder, and only when the Plan is discounted.
+  listPriceCentavos?: number;
   displayOrder: number;
 };
 

@@ -78,6 +78,10 @@ import {
 } from './payments/payments.controller';
 import { createPrismaPaymentCommands } from './payments/prisma-payment-commands';
 import {
+  priceFounderPlanList,
+  readFounderRenewal,
+} from './payments/prisma-founder-membership';
+import {
   ClientEvaluationsController,
   evaluationCommands,
   EvaluationSlotsController,
@@ -471,17 +475,41 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
               repository
                 .findFutureSubscription(clientId, after)
                 .then((found) => (found === null ? null : toSummary(found))),
+            readFounderRenewal: (clientId) =>
+              readFounderRenewal(prisma, clientId),
           });
         },
     },
     {
       provide: planCatalog,
       inject: [PRISMA_CLIENT],
-      useFactory: (prisma: PrismaClient): PlanCatalogHandler => ({
-        list: () => createCatalogRepository(prisma).listVisiblePlans(),
-        find: (planId) =>
-          createCatalogRepository(prisma).findVisiblePlan(planId),
-      }),
+      useFactory: (prisma: PrismaClient): PlanCatalogHandler => {
+        const clientIdOf = (
+          principal: import('../system-identity/authentication/resolve-authenticated-principal').AuthenticatedPrincipal,
+        ) =>
+          principal.identity.kind === 'client'
+            ? principal.identity.clientId
+            : null;
+        return {
+          list: async (principal) =>
+            priceFounderPlanList(
+              prisma,
+              clientIdOf(principal),
+              await createCatalogRepository(prisma).listVisiblePlans(),
+            ),
+          find: async (planId, principal) => {
+            const plan =
+              await createCatalogRepository(prisma).findVisiblePlan(planId);
+            if (plan === null) return null;
+            const [priced] = await priceFounderPlanList(
+              prisma,
+              clientIdOf(principal),
+              [plan],
+            );
+            return priced ?? null;
+          },
+        };
+      },
     },
     {
       provide: branchCatalog,

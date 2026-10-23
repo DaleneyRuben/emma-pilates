@@ -86,6 +86,7 @@ describe('client discovery (e2e)', () => {
           useValue: () =>
             Promise.resolve({
               status: 'active',
+              founderRenewalDeadline: null,
               subscription: {
                 id: 'subscription-id',
                 planName: 'Paquete de 8 clases',
@@ -111,7 +112,7 @@ describe('client discovery (e2e)', () => {
                   displayOrder: 0,
                 },
               ]),
-            find: findPlan,
+            find: (planId: string) => findPlan(planId),
           },
         },
         {
@@ -195,6 +196,7 @@ describe('client discovery (e2e)', () => {
       .expect(200)
       .expect({
         status: 'active',
+        founderRenewalDeadline: null,
         subscription: {
           id: 'subscription-id',
           planName: 'Paquete de 8 clases',
