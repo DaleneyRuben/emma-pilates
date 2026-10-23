@@ -40,7 +40,8 @@ describe("Trainer screens on an HTTP error", () => {
       <App
         runtime={createStaffRuntime(
           routeFetcher({
-            "/api/v1/trainer/sessions": () => jsonResponse({ code: "forbidden" }, status),
+            "/api/v1/trainer/sessions": () =>
+              status === 200 ? jsonResponse([]) : jsonResponse({ code: "forbidden" }, status),
             "/api/v1/staff-members/current": profile,
             "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 0 }),
           }),

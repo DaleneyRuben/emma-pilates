@@ -17,7 +17,11 @@ import {
   typography,
   useMountedAt,
 } from "@pilates/mobile-core";
-import { useGetTrainerSessionRoster, type TrainerRosterBookingDto } from "@pilates/api-contracts";
+import {
+  getTrainerSessionRoster,
+  useGetTrainerSessionRoster,
+  type TrainerRosterBookingDto,
+} from "@pilates/api-contracts";
 import { createStaticNavigation, useNavigation } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
@@ -62,6 +66,7 @@ import { StaffChangePasswordScreen } from "./profile/staff-change-password-scree
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
+import { requireOk } from "./trainer/require-ok";
 import { StaffFetcherContext, unavailableFetcher, useStaffFetcher } from "./staff-fetcher";
 import { createTrainerApi } from "./trainer-api";
 
@@ -83,7 +88,13 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
   const fetcher = useStaffFetcher();
   const roster = useGetTrainerSessionRoster(route.params.sessionId, {
     fetcher,
-    query: { refetchOnMount: "always" },
+    query: {
+      queryFn: ({ signal }) =>
+        getTrainerSessionRoster(route.params.sessionId, { signal }, fetcher).then((response) =>
+          requireOk(response, "The roster could not be loaded"),
+        ),
+      refetchOnMount: "always",
+    },
   });
   // The Trainer's taps sit over the saved outcomes, so a refetch never undoes a tap.
   const [edits, setEdits] = useState<Record<string, AttendanceOutcome>>({});
@@ -98,7 +109,7 @@ function TrainerRosterScreen({ route }: { route: { params: { sessionId: string }
         <LoadingState label="Cargando lista" />
       </Screen>
     );
-  if (roster.isError || roster.data === undefined)
+  if (roster.isError || roster.data === undefined || roster.data.status !== 200)
     return (
       <Screen>
         <QueryFailure
