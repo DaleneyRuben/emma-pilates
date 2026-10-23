@@ -467,7 +467,7 @@ wait for Google, Apple, and testers.
 | BKM-004 | P0 | Backend/admin web/apps | `StudioSettings`: one versioned row for the configurable rules, a «Reglas del estudio» page for the Administrator, and a public rules endpoint that replaces the hard-coded copy in the apps | DOC-008 | 2.5–3.5 d | done (`37284cfa` table, `8c9e795d` window, `7744ac91` endpoints, `6e2475e7`/`fc1b481e`/`4201ebc2` apps, `6dd904ed` AW36; evidence below) |
 | BKM-005 | P0 | All surfaces | Plans by days (30/60/90) with a weekly cap field, and the eight real Plans | DOC-008, BKM-004 | 3–4 d | done (`6541a63a` days, `0b2a0633` AW04, `14fb2000` tester Plan; evidence below) |
 | BKM-006 | P0 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | done |
-| BKM-008 | P0 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | ready |
+| BKM-008 | P0 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | done |
 | BKM-007 | P0 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | ready |
 | BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | ready |
 | PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | ready |
@@ -602,6 +602,35 @@ Acceptance criteria:
 - The gift class is applied once per Client, survives a retry (idempotent), and never goes to a founder.
 - Every adjustment has an audit record.
 - Only the Administrator can create `courtesy` or `class_return` adjustments (PAY-006).
+
+Evidence (BKM-008, 2026-10-23, branch `feature/bkm-008-extra-classes`, stacked on BKM-005 at `6675fc38`, [PR #170](https://github.com/DaleneyRuben/emma-pilates/pull/170)).
+
+Commits: `2f640844` failing gift and consumption tests, `09ee117d` the decision and the consumption order, `ca7be1dd` the adjustment and the gift once, `c61f443b` spending base before extra, `84352736` the administrator endpoint, `9bbd7af5` the extra-class line on the three surfaces, `dd729e15` follow-ups 193–195 left pending.
+
+Decisions:
+
+- Extra classes are their own rows, not a column on the Subscription. The base pool stays `remaining_class_allowance`; the extra pool is the signed sum of the live adjustments.
+- Spending an extra class writes a negative adjustment with reason `consumption`, authored by the Account that created the Booking. `class_return` stays an Administrator's grant, so the enum has six values. The five reasons a person sees are «Regalo de bienvenida», «Invitación», «Campaña», «Cortesía», and «Clase devuelta».
+- The gift author is the Account that approved the Payment, with that Account's role. A courtesy or hidden Plan calls the same decision and is declined. `isFounder` returns the flag the caller passes; the confirmation hook passes `false` until BKM-010 makes the Founder Membership real.
+- The weekly cap is not built. `chooseAllowanceSource` is the seam BKM-007 calls, passing a base of zero once the cap blocks it.
+- The admin endpoint records `courtesy` and `class_return` only, and denies every other principal. PAY-006 adds the form. The contract adds an optional `extraClassesLine` on the shared subscription summary, and the courtesy method the courtesy grant already writes.
+- Migration `20261023150000_allowance_adjustments` was applied only to `pilates_test_bkm008` and `pilates_bkm008_dev`, both dropped when the item paused. It needs owner approval before any shared, staging, or production database.
+
+Verified (2026-10-23, API on 3125 over `pilates_bkm008_dev`, admin web on 5195, Metro 8114):
+
+- **API.** Paola's `POST /api/v1/administrator/clients/{clientId}/allowance-adjustments` with one courtesy class answered `201`. The same call as Camila answered `403`.
+- **Admin web**, Chromium at 1440 px and 420 px. Lucía's detail panel reads «Clases extra: 1 · Cortesía» under **Clases disponibles**.
+- **Client app**, iPhone 16 Pro, iPad Pro 11-inch (M4), and the Android emulator. Lucía's **Mi plan** reads «Clases extra: 1 · Cortesía» under the allowance.
+
+- **Staff app**, the same three devices. Camila's summary of Lucía (S06) reads «Clases extra: 1 · Cortesía» under «5 clases restantes». On the iPad the summary opens beside the search.
+
+Open questions:
+
+- An Assistant who records the Client's first cash Payment is the gift's author. The ADR says the gift is applied by the system. Left as the approving Account so the audit row can name a person.
+- The Coordinator Role does not exist (IDN-009). The endpoint denies every principal who is not an Administrator, and the e2e covers a coordinator only by casting a principal the use case rejects. The denial becomes a real role when IDN-009 adds it.
+- Cancelling a Booking funded by an extra class restores the class to the base pool, not the extra pool. A `consumed_from` column was not added; the mandated migration is the one file above.
+- Waitlist promotion still spends only the base allowance. A Client whose only remaining class is extra is not promoted.
+- Two Bookings in one serializable transaction cannot both spend the last base class. Two that both read a positive extra sum can each write a negative row. No check keeps the live sum at zero or above.
 
 #### BKM-007 · Weekly cap
 

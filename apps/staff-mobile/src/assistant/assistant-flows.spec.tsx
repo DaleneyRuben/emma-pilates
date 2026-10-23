@@ -4,6 +4,7 @@ import { boliviaCivilDate, civilDateRange, clearMobileQueryCache } from "@pilate
 import { jsonResponse } from "../test-support";
 import {
   expiredOverview,
+  giftedOverview,
   minute,
   soonBooking,
   session,
@@ -48,6 +49,7 @@ describe("Assistant Client flows", () => {
     });
     expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(screen.getByText("5 clases restantes")).toBeOnTheScreen();
+    expect(screen.queryByText("Clases extra: 1 · Regalo de bienvenida")).toBeNull();
     expect(screen.getByText("Vence el 12 de octubre de 2026")).toBeOnTheScreen();
     expect(screen.getByText("Activa")).toBeOnTheScreen();
     expect(screen.getByRole("button", { name: "Reservar clase" })).toBeEnabled();
@@ -56,6 +58,14 @@ describe("Assistant Client flows", () => {
     expect(screen.getByRole("button", { name: "Ver historial completo" })).toBeOnTheScreen();
     expect(screen.getAllByText("Emma Vargas · Centro")).toHaveLength(2);
     expect(screen.getByText("Mat Pilates")).toBeOnTheScreen();
+  });
+
+  it("shows the gift class with its origin on the Client summary", async () => {
+    const screen = await openLucia({
+      ...assistantRoutes(),
+      "/api/v1/assistant/clients/client-lucia": () => jsonResponse(giftedOverview),
+    });
+    expect(screen.getByText("Clases extra: 1 · Regalo de bienvenida")).toBeOnTheScreen();
   });
 
   it("lists the Client's Bookings in their three states, cancels one after confirming, and shows the history by month", async () => {

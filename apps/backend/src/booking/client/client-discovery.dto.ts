@@ -88,6 +88,14 @@ export class ClientSubscriptionSummaryDto {
 
   @ApiProperty({ format: 'date' })
   endsOn!: string;
+
+  @ApiPropertyOptional({
+    type: String,
+    nullable: true,
+    description:
+      '«Clases extra: 1 · Regalo de bienvenida» when extra classes remain',
+  })
+  extraClassesLine?: string | null;
 }
 
 export class ClientSubscriptionDto {

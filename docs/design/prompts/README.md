@@ -231,6 +231,9 @@ Each of these was sent as the next message in the existing design session for th
 | [179](./followups/179-plans-by-days-corrections.md) | Record of how 175 and 178 were applied: `AW05` draws «Vigencia» and «Tope semanal» as segmented buttons (the admin web keeps selects), `S09` draws four of the eight Plans (BKM-005) | ✅ applied (same canvas and commit `20a8da54`) |
 | [190](./followups/190-start-date-chooser.md) | Start Date chip row on `09` and `S10`: «Fecha de inicio», «Hoy», weekday chips, «Día de apertura» (BKM-006) | 🕓 pending |
 | [191](./followups/191-next-plan-and-renewal.md) | «Siguiente plan desde …» on `12`, renewal reminder on `19`, cash stays enabled on `S06` (BKM-006) | 🕓 pending |
+| [193](./followups/193-mi-plan-extra-classes.md) | `12` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008, booking ADR-0006) | 🕓 pending (190–192 reserved by BKM-006) |
+| [194](./followups/194-client-summary-extra-classes.md) | `S06` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008) | 🕓 pending (190–192 reserved by BKM-006) |
+| [195](./followups/195-admin-client-detail-extra-classes.md) | `AW22` shows «Clases extra: 1 · Regalo de bienvenida» under «Clases disponibles» when the API returns the line; no courtesy form (BKM-008, PAY-006) | 🕓 pending (190–192 reserved by BKM-006) |
 
 ## Status
 

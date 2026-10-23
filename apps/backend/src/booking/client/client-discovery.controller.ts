@@ -185,6 +185,7 @@ export class ClientProfileController {
                 view.subscription.remainingClassAllowance,
               startsOn: civilDate(view.subscription.startsOn),
               endsOn: civilDate(view.subscription.endsOn),
+              extraClassesLine: view.subscription.extraClassesLine,
             },
     };
   }

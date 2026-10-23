@@ -454,6 +454,7 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
             remainingClassAllowance: subscription.remainingClassAllowance,
             startsOn: subscription.startsOn,
             endsOn: subscription.endsOn,
+            extraClassesLine: subscription.extraClassesLine,
           });
 
           return loadClientSubscription({

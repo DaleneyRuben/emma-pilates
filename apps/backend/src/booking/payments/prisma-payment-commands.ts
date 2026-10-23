@@ -47,6 +47,8 @@ import {
   todayOf,
 } from './prisma-start-date-allocation';
 import { loadActiveSubscription as sharedLoadActiveSubscription } from './subscription-allocation';
+import { grantGiftClass } from './allowance-adjustments';
+import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -203,6 +205,7 @@ const paymentSelect = {
   decidedAt: true,
   rejectionReason: true,
   subscription: { select: { id: true } },
+  plan: { select: { hiddenAt: true } },
 } as const;
 
 type IntentRow = Prisma.PurchaseIntentGetPayload<{
@@ -634,6 +637,24 @@ export function createPrismaPaymentCommands(
         },
       });
     }
+
+    await grantGiftClass(transaction, {
+      clientId: payment.clientId,
+      subscriptionId: subscription.id,
+      paymentId: payment.id,
+      method: paymentMethods[payment.method],
+      hidden: payment.plan.hiddenAt !== null,
+      priceCentavos: payment.planPriceCentavos,
+      // BKM-010 makes the Founder Membership real; until then nobody is one.
+      founder: false,
+      earlierRealPayment: await hasEarlierRealPayment(transaction, {
+        clientId: payment.clientId,
+        paymentId: payment.id,
+      }),
+      authorAccountId: principal.accountId,
+      authorRole: auditActorOf(principal).role,
+      now,
+    });
 
     return subscription.id;
   };

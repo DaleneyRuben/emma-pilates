@@ -48,7 +48,7 @@ can be found by its design name.
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77 |
-| 12 Mi plan | 5, 18, 71, 76, 77 |
+| 12 Mi plan | 5, 18, 71, 76, 77, 78 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Mis referidos, 17 Mi crédito | 10, 18 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
@@ -59,7 +59,7 @@ can be found by its design name.
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 77 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 77 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
@@ -79,7 +79,7 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78 |
 | AW23–AW24 Personal | 26, 31, 72 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -6013,3 +6013,33 @@ D. **A booking before the Start Date (04).** End the current Subscription
 The reminder that names the renewal arrives with the worker's Plan reminder
 (Test 7). An Evaluation booked before the Start Date still answers the
 existing ineligible-subscription refusal.
+
+## Test 78: extra classes (BKM-008)
+
+An extra class is an `AllowanceAdjustment` on the Subscription: a signed
+number of classes, a reason, an author, and a time
+([booking ADR-0006](../booking/docs/adr/0006-weekly-cap-and-extra-classes.md)).
+The line a person sees names the first grant: «Clases extra: 1 · Cortesía»,
+«Clases extra: 1 · Regalo de bienvenida», «Clases extra: 1 · Invitación»,
+«Clases extra: 1 · Campaña», or «Clases extra: 1 · Clase devuelta». Run the
+API and the fixtures as in Tests 2 and 5.
+
+A. **The Administrator records one.** As Paola,
+   `POST /api/v1/administrator/clients/{clientId}/allowance-adjustments`
+   with `{ "classes": 1, "reason": "courtesy" }` answers `201`. The same call
+   as Camila answers `403`. `class_return` is the other reason the endpoint
+   accepts; any other reason answers `400`.
+B. **The three surfaces.** Open that Client's **Mi plan** (12), her summary
+   as Camila (S06), and her detail in the admin web (AW22, at 1440 px and at
+   420 px). Each reads «Clases extra: 1 · Cortesía». A Client with no extra
+   class shows no line.
+C. **The gift.** The first approved Payment in a Client's life adds one
+   class with reason `gift_new_client`, and the line then reads «Clases extra:
+   1 · Regalo de bienvenida». A founder and a courtesy Plan do not get it,
+   and a second Payment does not add it again. The automated suites cover
+   that grant; no screen records the first cash Payment's gift yet (PAY-006
+   adds the form).
+
+Spending an extra class waits for the base allowance to run out, and for the
+Weekly Cap (BKM-007). Cancelling a Booking funded by an extra class restores
+the class to the base pool.
