@@ -20,7 +20,7 @@ Using the Emma Pilates Studio design system (Prompt 00) and the same shell as Ho
 2. AW31's month stepper («‹ octubre de 2026 ›»; the next-month arrow disabled on the current month).
 3. When the month has past days with cash sales and no close, an Advertencia notice (Advertencia tint, 1 px Advertencia border at 40 %, radius 12) above the table: title «2 días con ventas en efectivo sin cierre» (14 px medium), line «Revisa con recepción qué pasó esos días.» (Nota). No notice when every such day is closed.
 4. A table in AW13's card and density, one row per day of the month that had cash sales or a close, newest first, never a future day. Columns:
-   - «Fecha» — «jue 23/10» (weekday and `dd/mm`), tabular;
+   - «Fecha» — «vie 23/10» (weekday and `dd/mm`), tabular;
    - «Estado» — a status pill: «Cerrada» (Éxito), «Sin cierre» (Advertencia; a past day with cash sales and no close), «Abierta» (Neutral; today, not closed yet);
    - «Esperado» — the expected cash at the close, right-aligned; on a day without a close, the day's cash sales in Texto tenue;
    - «Contado» — right-aligned, «—» in Texto tenue without a close;

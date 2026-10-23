@@ -10,7 +10,7 @@ Using the Emma Pilates Studio design system (Prompt 00) and the centered-card la
 
 **Language:** all visible copy is neutral Spanish (Bolivia), informal «tú» address. Amounts as everywhere else in the app: whole bolivianos without decimals («Bs 520»), centavos only when there are some («Bs 512,50»), tabular figures.
 
-**Navigation chrome:** header with a back arrow that returns to the screen it came from (S04 for the Assistant, S11 for the Administrator), the title «Cerrar caja» (Lora, as S10's), and under it a 13 px `#766D69` line with today and the Branch: «Jueves 23 de octubre · Centro». No tab bar.
+**Navigation chrome:** header with a back arrow that returns to the screen it came from (S04 for the Assistant, S11 for the Administrator), the title «Cerrar caja» (Lora, as S10's), and under it a 13 px `#766D69` line with today and the Branch: «Viernes 23 de octubre · Centro». No tab bar.
 
 **Branch choice:** when the person can close more than one Branch (the Administrator always; an Assistant assigned to several), S10's Branch chips appear under the header, «Sucursal», one chip per Branch, the first selected. An Assistant with one Branch sees no chips.
 
