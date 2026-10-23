@@ -52,6 +52,7 @@ SELECT pg_temp.expect_failure('UPDATE booking.sessions SET state = ''cancelled''
 SELECT pg_temp.expect_failure('UPDATE booking.sessions SET state = ''cancelled'', cancelled_at = now()', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.sessions SET cancellation_cause = ''zero_bookings''', '23514');
 SELECT pg_temp.expect_failure('UPDATE booking.sessions SET state = ''cancelled'', cancelled_at = now(), cancellation_cause = ''no_substitute_trainer''', '23514');
+SELECT pg_temp.expect_failure('UPDATE booking.sessions SET state = ''cancelled'', cancelled_at = now(), cancellation_cause = ''minimum_not_met'', cancelled_by_account_id = created_by.id FROM (SELECT id FROM system.accounts LIMIT 1) AS created_by', '23514');
 
 -- Back-to-back Sessions are valid. Overlaps fail for each resource independently.
 INSERT INTO booking.sessions (id, branch_id, class_type_id, trainer_staff_member_id, starts_at, ends_at, capacity, is_exception, updated_at)
