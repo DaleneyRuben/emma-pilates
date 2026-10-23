@@ -9,6 +9,7 @@ import {
   useMockServer,
 } from "../../test/msw";
 import {
+  acquisitionHandler,
   clientPage,
   clientsPath,
   lucia,
@@ -63,7 +64,7 @@ describe("AW22 Cerrar cuenta", () => {
   beforeEach(() => {
     listReads = 0;
     closures.length = 0;
-    server.use(...signedInHandlers());
+    server.use(...signedInHandlers(), acquisitionHandler());
   });
 
   it("lists what closing does for this Client before asking to confirm", async () => {

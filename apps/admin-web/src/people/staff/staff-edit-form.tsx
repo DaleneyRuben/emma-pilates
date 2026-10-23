@@ -27,6 +27,7 @@ import { staffProblem } from "./staff-problems";
 import { useStaffChange } from "./staff-queries";
 import { StaffContact } from "./staff-read-only";
 import { StaffRoleFields } from "./staff-role-fields";
+import { TrainerReferralCodeField } from "./trainer-referral-code-field";
 
 const sameSet = (a: readonly string[], b: readonly string[]) =>
   a.length === b.length && a.every((id) => b.includes(id));
@@ -124,6 +125,9 @@ export function StaffEditForm({
                 : ""
             }`}
           />
+          {member.role === "trainer" ? (
+            <TrainerReferralCodeField staffMemberId={member.id} />
+          ) : null}
           {failure === null ? null : (
             <p role="alert" className="text-nota text-error-texto">
               {failure}

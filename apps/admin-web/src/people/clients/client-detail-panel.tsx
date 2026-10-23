@@ -18,6 +18,7 @@ import { SummaryBlock, SummaryRow } from "../../components/panel/summary-rows";
 import { StatusPill } from "../../components/ui/status-pill";
 import { formatCivilDate } from "../../lib/bolivia-time";
 import { formatBolivianos } from "../../lib/money";
+import { ClientAcquisitionBlock } from "./client-acquisition-block";
 import { CloseClientAccountAction } from "./close-client-account-action";
 
 const clientDetailQueryOptions = (clientId: string) =>
@@ -124,6 +125,7 @@ function ClientSummary({ client }: { client: AdminClientDetailDto }) {
           </span>
         </SummaryRow>
       </SummaryBlock>
+      <ClientAcquisitionBlock clientId={client.id} />
     </>
   );
 }
