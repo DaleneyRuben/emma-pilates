@@ -24,6 +24,7 @@ describe("admin navigation", () => {
         items: [
           "Clientes",
           "Pagos",
+          "Caja",
           "Insumos",
           "Evaluaciones nutricionales",
           "Personal",
