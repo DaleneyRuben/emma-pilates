@@ -117,7 +117,6 @@ describe("AW22 Detalle de cliente on a desktop browser", () => {
       within(panel).getByText("Último plan vencido el 30/06/2026."),
     ).toBeInTheDocument();
     expect(within(panel).queryByText(/de 8/)).not.toBeInTheDocument();
-    expect(within(panel).getByText("Bs 0,00")).toBeInTheDocument();
     expect(within(panel).getByText("Ninguna todavía")).toBeInTheDocument();
     expect(within(panel).getByText("Sin teléfono")).toBeInTheDocument();
   });

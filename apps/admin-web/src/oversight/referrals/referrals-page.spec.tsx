@@ -153,7 +153,7 @@ describe("AW26 Referidos on a desktop browser", () => {
       ),
     ).toBeInTheDocument();
     expect(
-      within(table).getByRole("columnheader", { name: "Estado" }),
+      within(table).getByRole("columnheader", { name: "Fecha de registro" }),
     ).toBeInTheDocument();
     expect(screen.getByText("Sin resultados")).toBeVisible();
     expect(screen.getByRole("button", { name: "Siguiente" })).toBeDisabled();
