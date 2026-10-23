@@ -177,6 +177,14 @@ describe('development fixtures', () => {
     expect(roles).toContain('assistant');
     expect(roles).toContain('administrator');
     expect(roles).toContain('nutritionist');
+    // IDN-009: Carolina Rivas, the Coordinator, holds every Branch implicitly.
+    expect(
+      fixtures.staffMembers.find((member) => member.role === 'coordinator'),
+    ).toMatchObject({
+      name: 'Carolina Rivas',
+      email: 'carolina.rivas@example.com',
+      branchIds: [],
+    });
 
     for (const schedule of fixtures.sessionSchedules) {
       expect(
