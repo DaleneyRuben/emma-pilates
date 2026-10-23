@@ -11,6 +11,8 @@ export type ClientSubscriptionSummary = {
   endsOn: Date;
   /** «Clases extra: 1 · Regalo de bienvenida», or null when none remain. */
   extraClassesLine: string | null;
+  /** Classes left this week. Null when the Plan has no cap. */
+  classesLeftThisWeek?: number | null;
 };
 
 export const toSubscriptionSummary = (

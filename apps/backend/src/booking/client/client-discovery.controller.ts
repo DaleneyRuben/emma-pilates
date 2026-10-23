@@ -43,6 +43,7 @@ import {
   UpdateClientProfileDto,
 } from './client-discovery.dto';
 import { denyNonClients } from './deny-non-clients';
+import { classesLeftThisWeekQuery } from '../booking-controller-support';
 
 export const clientProfile = Symbol('clientProfile');
 export const clientSubscription = Symbol('clientSubscription');
@@ -173,6 +174,7 @@ export class ClientProfileController {
               startsOn: civilDate(view.subscription.startsOn),
               endsOn: civilDate(view.subscription.endsOn),
               extraClassesLine: view.subscription.extraClassesLine,
+              classesLeftThisWeek: view.subscription.classesLeftThisWeek,
             },
     };
   }
@@ -273,6 +275,11 @@ export class SessionDetailController {
   constructor(
     @Inject(sessionDetail)
     private readonly findSessionDetail: SessionDetailHandler,
+    @Inject(classesLeftThisWeekQuery)
+    private readonly classesLeft: (
+      clientId: string,
+      at: Date,
+    ) => Promise<number | null>,
     @Inject(authenticatedPrincipalResolver)
     private readonly principalResolver: PrincipalResolver,
   ) {}
@@ -289,7 +296,10 @@ export class SessionDetailController {
     if (parsedSessionId === null) {
       throw invalidRequest('Invalid Session identifier');
     }
-    await authenticateBearer(this.principalResolver, authorization);
+    const principal = await authenticateBearer(
+      this.principalResolver,
+      authorization,
+    );
     const detail = await this.findSessionDetail(parsedSessionId);
 
     if (detail === null) {
@@ -299,6 +309,13 @@ export class SessionDetailController {
       });
     }
 
-    return detail;
+    if (principal.identity.kind !== 'client') return detail;
+    return {
+      ...detail,
+      classesLeftThisWeek: await this.classesLeft(
+        principal.identity.clientId,
+        detail.startsAt,
+      ),
+    };
   }
 }

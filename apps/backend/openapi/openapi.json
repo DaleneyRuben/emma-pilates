@@ -7818,6 +7818,12 @@
           "waitlistCount": {
             "type": "number",
             "minimum": 0
+          },
+          "classesLeftThisWeek": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client."
           }
         },
         "required": [
@@ -8093,6 +8099,12 @@
             "type": "string",
             "nullable": true,
             "description": "«Clases extra: 1 · Regalo de bienvenida» when extra classes remain"
+          },
+          "classesLeftThisWeek": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Classes left this week from the base allowance. Absent without a cap."
           }
         },
         "required": [
@@ -8273,6 +8285,12 @@
           "waitlistCount": {
             "type": "number",
             "minimum": 0
+          },
+          "classesLeftThisWeek": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Classes left this week from the base allowance. Absent without a cap."
           }
         },
         "required": [
@@ -10194,6 +10212,12 @@
           "waitlistCount": {
             "type": "number",
             "minimum": 0
+          },
+          "classesLeftThisWeek": {
+            "type": "number",
+            "minimum": 0,
+            "nullable": true,
+            "description": "Classes left this week from the base allowance. Absent when the Plan has no cap or the caller is not a Client."
           },
           "sessionScheduleId": {
             "type": "string",
