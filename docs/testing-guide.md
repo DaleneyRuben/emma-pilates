@@ -3330,7 +3330,8 @@ The following are not ready for manual product testing:
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 75);
 - the mobile apps were not walked for BKM-014: the invitation screen was
-  verified by Jest, not on a device (Test 79);
+  verified by Jest and the registration rules by curl, not on a device
+  (Test 79);
 - the Weekly Cap at booking: BKM-005 stores and shows it («hasta 3 por
   semana»), but a fourth Booking in the same week still goes through until
   BKM-007; the Start Date chosen at purchase and early renewal arrive with

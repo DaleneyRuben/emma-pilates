@@ -1,9 +1,12 @@
 # BKM-014 — Guest Pass migration review
 
-Status: **proposed 2026-10-23 under the blanket backlog-decision approval**.
-Creating the migration still needs the owner's approval. Until then this
-review is the decision, and the migration is applied only to disposable
-databases this item creates.
+Status: **written 2026-10-23 as `20261023220000_guest_passes`**.
+Applying it to a shared, staging, or production database still needs the
+owner's approval. Until then it is applied only to disposable databases this
+item creates: `pilates_bkm014_migration_review` (the diff review),
+`pilates_test_bkm014_admin` (the integration admin database), and
+`pilates_bkm014_dev` (the API smoke). All three are dropped when the item
+finishes.
 
 ## Why a table
 

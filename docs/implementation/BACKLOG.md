@@ -479,7 +479,7 @@ wait for Google, Apple, and testers.
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
 | NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
 | BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | ready |
-| BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | ready |
+| BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | done |
 | BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | ready |
 | BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | ready |
 | BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | ready |
@@ -740,6 +740,37 @@ request is refused. Booking during the Freeze is refused with its own message.
 Acceptance criteria: a second guest pass for the same friend is refused, and
 so is the last place. The reward is applied once, at the friend's first
 approved Payment.
+
+Evidence (BKM-014, 2026-10-23, branch `feature/bkm-014-invite-a-friend`). This branch merges BKM-011 (`feature/bkm-011-acquisition-channel`, PR #162) and BKM-008 (`feature/bkm-008-extra-classes`, PR #170) at `dc02ec16`, because the host's reward is an allowance adjustment and the invitation reuses the referral code. PAY-005's credit removal (PR #157) is a sibling and is not in this branch. The credit fields stay the deprecated zeros that branch established, and the credit screen disappears when #157 merges. This item's screen 16 no longer shows credit or Bs 60; screen 17 and the profile credit row stay until then.
+
+Commits after `dc02ec16`: `491b50fb` failing booking rules, `5d5eb782` failing invite and reward rules, `b04d79a3` the decision, `a9cc4dae` failing the reward on the first Payment, `b77d8010` the grant and the reward once, `b1d76ad8` follow-up 196 left pending, `5cbb4229` each invitation's status, `6efc5673` the registration slice, `4dbbf772` Test 79.
+
+Decisions:
+
+- Courtesy Access does not fit. It grants the hidden 16-class «Acceso de prueba» Plan and refuses a Client who already holds a Subscription. A Guest Pass is one courtesy class, opened by registration with a Client's code, and it must not count as a first Plan. The path is a `GuestPass` row plus a hidden one-class Plan «Pase de invitada», created on first use, with a confirmed courtesy Payment of Bs 0 and a `courtesy` adjustment. The gift decision already declines a courtesy Payment, a hidden Plan, and a price of 0, so the pass never takes a founder place and never triggers the gift class. Confirmation still passes `founder: false` until BKM-010.
+- Registration and the Assistant's invitation reuse BKM-011. There is no second registration path. A host invites one friend a calendar month in America/La_Paz (`invitesPerHostPerMonth`). A second pass for the same friend is refused by the partial unique index `guest_passes_friend_live_key`.
+- The last place is refused only when the eligible Subscription is the courtesy one, with `guest_pass_last_place`. A paying Client still takes that place. A second booking on a spent pass answers `guest_pass_already_used`.
+- The host's reward reuses `recordAllowanceAdjustment` with reason `invite_converted`, once, at the friend's first approved Payment. With no current Subscription the pass is marked `rewardOwed` and the class lands on the next one she activates. A retry finds the pass already rewarded.
+- Contracts stay additive (ADR-0016). `GET /api/v1/clients/current/referrals` adds `invitationStatus` (`registered`, `class_booked`, `bought`). Older releases ignore it and keep reading `state`.
+- Screen 16 is amended by follow-up 196, left `🕓 pending`. The app is built to that text because no export exists for this item. Home and Perfil name the row «Invita a una amiga» so the screen is reachable by that name.
+- Migration `20261023220000_guest_passes` was applied only to `pilates_bkm014_migration_review`, `pilates_test_bkm014_admin`, and `pilates_bkm014_dev`, all dropped when the item finished. It needs owner approval before any shared, staging, or production database. Soft delete only (ADR-0086).
+
+Verified (2026-10-23):
+
+- Integration `test/database/guest-pass.integration-spec.ts`: 7 passed. A second invitation in the same La Paz month is refused and the next month succeeds; the last place is refused for the pass and taken by a paying Client; a second class answers `guest_pass_already_used`; the reward lands once on Lucía's current Subscription and, for a host with none, on her next one; the pass grants no gift, and the friend's first real Payment still does.
+- Unit: guest-pass decision specs, the context-boundary suite (2 passed after the shared slice), and the Client screen specs for referrals, home shortcuts, and the top bar.
+- API on port 3132 over `pilates_bkm014_dev`. `POST /api/v1/client-registrations` with `REF-LUCIA` answered `202`, and `booking.guest_passes` gained one row: hidden Plan «Pase de invitada», confirmed courtesy Payment of Bs 0, remaining allowance 0, one `courtesy` adjustment. A second registration the same month answered `409` `guest_pass_monthly_limit`. `GET /api/v1/clients/current/referrals` as Lucía returned `invitationStatus: registered` and the credit fields stayed empty.
+
+The mobile apps were not walked on a device. This item did not take the simulator lock and did not run Maestro.
+
+Open questions:
+
+- The courtesy adjustment's author is the friend's own new Account at self-registration, or the Assistant's Account at the front desk, with role null on the registration path. The reward's author is the Account that approved the friend's Payment, matching the gift. The pass's courtesy author being the friend herself is odd; it stays because the adjustment requires an Account and registration has no staff actor.
+- A second `openGuestPass` for the same friend is refused by the unique index (Prisma P2002) and is not translated into a named `GuestPassError`. A second registration of the same friend is already refused by the one-Referral rule, so the index is a backstop. The acceptance test covers the second class, not a second registration.
+- The Coordinator Role does not exist (IDN-009).
+- A cancelled guest-pass Booking does not clear `bookingId` or restore the courtesy class. Cancelling restores the base allowance, so a cancelled pass class still counts as used.
+- Waitlist promotion does not know the last-place rule. A guest pass could be promoted into the last place.
+- The confirmation still writes the Bs 60 credit ledger entry. PAY-005 (#157) removes it. This branch does not.
 
 #### BKM-013 · First 90 days
 
