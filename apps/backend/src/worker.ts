@@ -77,6 +77,9 @@ type WorkerDependencies = {
   subscriptionReminders: {
     execute(): Promise<{ reminded: number }>;
   };
+  founderMemberships: {
+    execute(): Promise<{ ended: number }>;
+  };
   purchaseIntentExpiry: {
     execute(): Promise<{ expired: number }>;
   };
@@ -163,6 +166,10 @@ export const startWorker = async (
           {
             job: 'subscription_reminders',
             execute: () => dependencies.subscriptionReminders.execute(),
+          },
+          {
+            job: 'founder_memberships',
+            execute: () => dependencies.founderMemberships.execute(),
           },
         ],
       },

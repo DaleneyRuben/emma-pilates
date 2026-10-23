@@ -39,6 +39,7 @@ const startWithPush = async () => {
     pendingAccountCleanup: idle({ cleaned: 0 }),
     imageUploadCleanup: idle({ cleaned: 0 }),
     subscriptionReminders: idle({ reminded: 0 }),
+    founderMemberships: idle({ ended: 0 }),
     purchaseIntentExpiry: idle({ expired: 0 }),
     sessionSchedules: idle({ schedules: 0, created: 0, skipped: 0 }),
     evaluationSlots: idle({ blocks: 0, created: 0, skipped: 0 }),
