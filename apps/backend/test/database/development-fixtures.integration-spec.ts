@@ -59,9 +59,7 @@ describe('development fixtures', () => {
     await expect(prisma.referral.count()).resolves.toBe(
       fixtures.referrals.length,
     );
-    await expect(prisma.creditLedgerEntry.count()).resolves.toBe(
-      fixtures.creditLedgerEntries.length,
-    );
+    await expect(prisma.creditLedgerEntry.count()).resolves.toBe(0);
   });
 
   it('restores drifted Session times on re-application without touching Session state', async () => {
@@ -105,7 +103,7 @@ describe('development fixtures', () => {
     ).resolves.toEqual([{ id: materializedId }]);
   });
 
-  it('lets Sofía read Bs 60 of referral credit and both referrals through the payment reads', async () => {
+  it('lets Sofía read her referral code and both pending referrals, and no Credit, through the payment reads', async () => {
     const account = await prisma.account.findFirstOrThrow({
       where: { email: 'sofia@example.com', deletedAt: null },
       select: { id: true, clientId: true },
@@ -120,14 +118,14 @@ describe('development fixtures', () => {
     });
 
     await expect(commands.readCreditSummary(sofia)).resolves.toMatchObject({
-      availableCentavos: 6000,
+      availableCentavos: 0,
       reservedCentavos: 0,
     });
     await expect(commands.readReferrals(sofia)).resolves.toMatchObject({
       referralCode: 'REF-SOFIA',
       referrals: [
         { referredName: 'Mariana P.', state: 'pending' },
-        { referredName: 'Valeria Q.', state: 'awarded', awardCentavos: 6000 },
+        { referredName: 'Valeria Q.', state: 'pending', awardCentavos: null },
       ],
     });
   });
