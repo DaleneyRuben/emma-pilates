@@ -64,7 +64,9 @@ describe("AW37 Fundadoras", () => {
       await screen.findByText("Todavía no hay fundadoras."),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("El lugar se otorga al confirmarse el primer pago real."),
+      screen.getByText(
+        "El lugar se otorga al confirmarse el primer pago real.",
+      ),
     ).toBeInTheDocument();
   });
 });

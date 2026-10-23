@@ -17,9 +17,10 @@ export const founderListQueryOptions = () =>
         .data as FounderMembershipPageDto,
     select: (page) => ({
       ...page,
-      items: page.items.map(
-        (item): FounderRow => ({ ...item, id: item.membershipId }),
-      ),
+      items: page.items.map((item): FounderRow => ({
+        ...item,
+        id: item.membershipId,
+      })),
       totalItems: page.items.length,
     }),
   });
