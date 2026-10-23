@@ -1,4 +1,7 @@
-import { remindExpiringSubscriptions } from './remind-expiring-subscriptions';
+import {
+  remindExpiringSubscriptions,
+  subscriptionEndsWithinReminderWindow,
+} from './remind-expiring-subscriptions';
 
 const today = new Date('2026-09-21T00:00:00.000Z');
 
@@ -33,7 +36,29 @@ describe('remindExpiringSubscriptions', () => {
     });
   });
 
-  it('does nothing when no Subscription ends in three days', async () => {
+  it('includes a Subscription that ends today or within three days and has no reminder yet', () => {
+    const endingInThreeDays = new Date('2026-09-24T00:00:00.000Z');
+    const endingTomorrow = new Date('2026-09-22T00:00:00.000Z');
+    const endingToday = new Date('2026-09-21T00:00:00.000Z');
+    const endingInFourDays = new Date('2026-09-25T00:00:00.000Z');
+    const alreadyEnded = new Date('2026-09-20T00:00:00.000Z');
+
+    expect(subscriptionEndsWithinReminderWindow(endingInThreeDays, today)).toBe(
+      true,
+    );
+    expect(subscriptionEndsWithinReminderWindow(endingTomorrow, today)).toBe(
+      true,
+    );
+    expect(subscriptionEndsWithinReminderWindow(endingToday, today)).toBe(true);
+    expect(subscriptionEndsWithinReminderWindow(endingInFourDays, today)).toBe(
+      false,
+    );
+    expect(subscriptionEndsWithinReminderWindow(alreadyEnded, today)).toBe(
+      false,
+    );
+  });
+
+  it('does nothing when no Subscription ends within three days', async () => {
     const record = jest.fn();
 
     await expect(

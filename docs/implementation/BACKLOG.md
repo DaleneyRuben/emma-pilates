@@ -818,6 +818,41 @@ Acceptance criteria: one test per finding, red before the fix.
 Acceptance criteria: worker tests cover a restart in the middle without a
 duplicate reminder.
 
+Decisions (blanket approval, 2026-10-23), taken before the code:
+
+- Idempotency is the existing `system.notifications` unique key
+  `(account_id, business_event_key)`, already used by `createNotificationRecorder`
+  so a repeated record neither inserts nor queues a second push. No reminder
+  column and no migration. Keys: `class-reminder-day:{bookingId}` and
+  `class-reminder-hour:{bookingId}` (Booking plus kind, as specified).
+- Windows follow the Evaluation reminder rule (NUT-001 D18): the 24 h reminder
+  is due from `starts_at − 24 h` until `starts_at − 2 h`, and only when the
+  Booking was created before that window; the 2 h reminder is due from
+  `starts_at − 2 h` until the Session starts. A restart inside either window
+  finds the same key already recorded. A Booking made inside the 24 h window
+  gets only the 2 h reminder. A cancelled, rescheduled, or already-started
+  Booking gets neither.
+- Copy, for owner approval: title «Recordatorio» for both; 24 h
+  «Mañana tienes {clase} a las {hora}.»; 2 h
+  «Tu clase de {clase} empieza en 2 horas.». `{hora}` is the Bolivia wall
+  clock (`HH:mm`). Category `reminder`. Destination `{ type: 'booking', id }`
+  so an inbox tap opens the Booking the way other booking notices do.
+- Push follows ADR-0070 (Session reminders are audible) and ADR-0025 (the
+  lock screen does not name the class): sound on, lock-screen title
+  «Recordatorio», body «Tienes una clase próxima. Abre la app para ver el
+  detalle.». The existing push dispatch transport is unchanged.
+- The expiry reminder stays one per Subscription
+  (`subscription-expiring:{subscriptionId}`). It matches an active
+  Subscription whose `ends_on` is today through three Bolivia days ahead,
+  and whose Account has no live `subscription_expiring` row for that key.
+  The message stays «Tu plan vence en 3 días.» even when fewer days remain,
+  so the inbox copy already on screen 19 does not change.
+- The class-reminder sweep runs every minute on the existing worker runner,
+  beside the Evaluation reminder sweep. The expiry sweep stays hourly: a
+  missed day is recovered by the window, not by a tighter interval.
+- Screen 19 already renders `notification.message`, so the new sentences
+  appear in the inbox without a design change. No follow-up.
+
 #### REL-014 · Apple Developer Program (individual)
 
 - The user enrolls with their own Apple Account (two-factor on, legal name as on the ID) and pays $99 a year. As an individual, the seller name on the App Store is the user's legal name, not the studio's, the same as on Play.

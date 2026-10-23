@@ -1,5 +1,10 @@
 import type { NewNotification } from './prisma-notification-store';
 
+export const subscriptionEndsWithinReminderWindow = (
+  endsOn: Date,
+  today: Date,
+): boolean => endsOn < today && today < endsOn;
+
 // The renewal reminder goes out 3 days before the paid-through date.
 const reminderLeadDays = 3;
 const dayMilliseconds = 24 * 60 * 60 * 1_000;
