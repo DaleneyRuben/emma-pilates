@@ -164,6 +164,7 @@ import type {
   ReadinessResponseDto,
   RecordAllowanceAdjustmentDto,
   RecordCashPaymentDto,
+  RecordFrontDeskTransferDto,
   ReferralsDto,
   RejectPaymentDto,
   RequestEmailChangeDto,
@@ -204,6 +205,8 @@ import type {
   UpdateStudioSettingsDto,
   UploadStatusDto,
   VerifyClientEmailDto,
+  VoidSaleDto,
+  VoidedSaleDto,
   WithdrawalPageDto,
 } from "./models";
 
@@ -16611,6 +16614,147 @@ export const useRecordAssistantCashPayment = <
   );
 };
 
+export type recordAssistantFrontDeskTransferResponse201 = {
+  data: PaymentDto;
+  status: 201;
+};
+
+export type recordAssistantFrontDeskTransferResponseSuccess =
+  recordAssistantFrontDeskTransferResponse201 & {
+    headers: Headers;
+  };
+export type recordAssistantFrontDeskTransferResponse =
+  recordAssistantFrontDeskTransferResponseSuccess;
+
+export const getRecordAssistantFrontDeskTransferUrl = (clientId: string) => {
+  return `/api/v1/assistant/clients/${clientId}/transfer-payments`;
+};
+
+export const recordAssistantFrontDeskTransfer = async (
+  clientId: string,
+  recordFrontDeskTransferDto: RecordFrontDeskTransferDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recordAssistantFrontDeskTransferResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getRecordAssistantFrontDeskTransferUrl(clientId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(recordFrontDeskTransferDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordAssistantFrontDeskTransferResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordAssistantFrontDeskTransferResponse;
+};
+
+export const getRecordAssistantFrontDeskTransferMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recordAssistantFrontDeskTransfer>>,
+    TError,
+    RecordAssistantFrontDeskTransferMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recordAssistantFrontDeskTransfer>>,
+  TError,
+  RecordAssistantFrontDeskTransferMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recordAssistantFrontDeskTransfer"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recordAssistantFrontDeskTransfer>>,
+    RecordAssistantFrontDeskTransferMutationVariables
+  > = (props) => {
+    const { clientId, data } = props ?? {};
+
+    return recordAssistantFrontDeskTransfer(
+      clientId,
+      data,
+      fetchOptions,
+      fetcherFn,
+    );
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecordAssistantFrontDeskTransferMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recordAssistantFrontDeskTransfer>>
+>;
+export type RecordAssistantFrontDeskTransferMutationBody =
+  RecordFrontDeskTransferDto;
+export type RecordAssistantFrontDeskTransferMutationError = unknown;
+export type RecordAssistantFrontDeskTransferMutationVariables = {
+  clientId: string;
+  data: RecordFrontDeskTransferDto;
+};
+
+export const useRecordAssistantFrontDeskTransfer = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recordAssistantFrontDeskTransfer>>,
+      TError,
+      RecordAssistantFrontDeskTransferMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recordAssistantFrontDeskTransfer>>,
+  TError,
+  RecordAssistantFrontDeskTransferMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRecordAssistantFrontDeskTransferMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type listAdminClientsResponse200 = {
   data: AdminClientPageDto;
   status: 200;
@@ -17455,6 +17599,128 @@ export const useRecordAllowanceAdjustment = <
     getRecordAllowanceAdjustmentMutationOptions(options),
     queryClient,
   );
+};
+
+export type voidPaymentResponse200 = {
+  data: VoidedSaleDto;
+  status: 200;
+};
+
+export type voidPaymentResponseSuccess = voidPaymentResponse200 & {
+  headers: Headers;
+};
+export type voidPaymentResponse = voidPaymentResponseSuccess;
+
+export const getVoidPaymentUrl = (paymentId: string) => {
+  return `/api/v1/administrator/payments/${paymentId}/void`;
+};
+
+export const voidPayment = async (
+  paymentId: string,
+  voidSaleDto: VoidSaleDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<voidPaymentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getVoidPaymentUrl(paymentId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(voidSaleDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: voidPaymentResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as voidPaymentResponse;
+};
+
+export const getVoidPaymentMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof voidPayment>>,
+    TError,
+    VoidPaymentMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof voidPayment>>,
+  TError,
+  VoidPaymentMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["voidPayment"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof voidPayment>>,
+    VoidPaymentMutationVariables
+  > = (props) => {
+    const { paymentId, data } = props ?? {};
+
+    return voidPayment(paymentId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type VoidPaymentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof voidPayment>>
+>;
+export type VoidPaymentMutationBody = VoidSaleDto;
+export type VoidPaymentMutationError = unknown;
+export type VoidPaymentMutationVariables = {
+  paymentId: string;
+  data: VoidSaleDto;
+};
+
+export const useVoidPayment = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof voidPayment>>,
+      TError,
+      VoidPaymentMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof voidPayment>>,
+  TError,
+  VoidPaymentMutationVariables,
+  TContext
+> => {
+  return useMutation(getVoidPaymentMutationOptions(options), queryClient);
 };
 
 export type closeCurrentClientAccountResponse200 = {

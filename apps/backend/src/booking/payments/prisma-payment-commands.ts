@@ -48,6 +48,7 @@ import {
 } from './prisma-start-date-allocation';
 import { loadActiveSubscription as sharedLoadActiveSubscription } from './subscription-allocation';
 import { grantGiftClass } from './allowance-adjustments';
+import { createFrontDeskTransfer } from './front-desk-transfer';
 import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
@@ -72,7 +73,7 @@ export type PurchaseIntentView = {
 export type PaymentView = {
   id: string;
   method: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
-  state: 'pending' | 'confirmed' | 'rejected';
+  state: 'pending' | 'confirmed' | 'rejected' | 'voided';
   planId: string;
   planName: string;
   durationDays: number;
@@ -166,6 +167,7 @@ const paymentStates: Record<PaymentState, PaymentView['state']> = {
   [PaymentState.PENDING]: 'pending',
   [PaymentState.CONFIRMED]: 'confirmed',
   [PaymentState.REJECTED]: 'rejected',
+  [PaymentState.VOIDED]: 'voided',
 };
 
 const intentSelect = {
@@ -1677,6 +1679,23 @@ export function createPrismaPaymentCommands(
     confirmTransfer,
     rejectTransfer,
     recordCashPayment,
+    recordFrontDeskTransfer: (
+      command: {
+        clientId: string;
+        planId: string;
+        branchId: string;
+        imageAssetId: string;
+        startsOn?: string;
+      },
+      principal: AuthenticatedPrincipal,
+      idempotencyKey: string,
+    ) =>
+      createFrontDeskTransfer(prisma, {
+        now: dependencies.now,
+        recordNotification,
+      })
+        .record(command, principal, idempotencyKey)
+        .then((stored) => readPaymentView(stored.id)),
     completeCreditPurchase,
     readOpenPurchaseIntent,
     readCurrentPayment,

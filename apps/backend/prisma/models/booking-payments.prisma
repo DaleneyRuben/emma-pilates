@@ -19,6 +19,7 @@ enum PaymentState {
   PENDING   @map("pending")
   CONFIRMED @map("confirmed")
   REJECTED  @map("rejected")
+  VOIDED    @map("voided")
 
   @@schema("booking")
 }
@@ -116,6 +117,10 @@ model Payment {
   decidedByAccountId     String?            @map("decided_by_account_id") @db.Uuid
   decidedAt              DateTime?          @map("decided_at") @db.Timestamptz(3)
   rejectionReason        String?            @map("rejection_reason")
+  // A void corrects a mistake: who, when, and why (booking ADR-0012).
+  voidedAt               DateTime?          @map("voided_at") @db.Timestamptz(3)
+  voidedByAccountId      String?            @map("voided_by_account_id") @db.Uuid
+  voidReason             String?            @map("void_reason")
   createdAt              DateTime           @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt              DateTime           @updatedAt @map("updated_at") @db.Timestamptz(3)
   client                 Client             @relation(fields: [clientId], references: [id], onDelete: Restrict)
@@ -124,6 +129,7 @@ model Payment {
   collectedAtBranch      Branch?            @relation(fields: [collectedAtBranchId], references: [id], onDelete: Restrict)
   submittedByAccount     Account            @relation("PaymentSubmittedBy", fields: [submittedByAccountId], references: [id], onDelete: Restrict)
   decidedByAccount       Account?           @relation("PaymentDecidedBy", fields: [decidedByAccountId], references: [id], onDelete: Restrict)
+  voidedByAccount        Account?           @relation("PaymentVoidedBy", fields: [voidedByAccountId], references: [id], onDelete: Restrict)
   subscription           Subscription?
   creditReservation      CreditReservation?
   qualifiedReferral      Referral?
@@ -136,6 +142,7 @@ model Payment {
   @@index([planId])
   @@index([collectedAtBranchId, decidedAt])
   @@index([decidedByAccountId, decidedAt])
+  @@index([voidedByAccountId])
   @@map("payments")
   @@schema("booking")
 }

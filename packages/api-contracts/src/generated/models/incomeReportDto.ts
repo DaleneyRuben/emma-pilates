@@ -6,6 +6,7 @@
  */
 import type { IncomeByMethodDto } from "./incomeByMethodDto";
 import type { IncomeMonthDto } from "./incomeMonthDto";
+import type { VoidedIncomeDto } from "./voidedIncomeDto";
 
 export interface IncomeReportDto {
   from: string;
@@ -17,4 +18,6 @@ export interface IncomeReportDto {
   byMethod: IncomeByMethodDto;
   months: IncomeMonthDto[];
   generatedAt: string;
+  /** Voided sales in the window. Visible with their reason, never in the totals. */
+  voided: VoidedIncomeDto[];
 }

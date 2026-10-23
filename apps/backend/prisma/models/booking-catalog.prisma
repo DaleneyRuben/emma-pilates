@@ -147,6 +147,8 @@ model Subscription {
   remainingClassAllowance Int               @map("remaining_class_allowance")
   startsOn                DateTime          @map("starts_on") @db.Date
   endsOn                  DateTime          @map("ends_on") @db.Date
+  // A void may end the Subscription the day before it started (ADR-0012).
+  endedByVoid             Boolean           @default(false) @map("ended_by_void")
   state                   SubscriptionState @default(ACTIVE)
   activatedAt             DateTime          @map("activated_at") @db.Timestamptz(3)
   expiredAt               DateTime?         @map("expired_at") @db.Timestamptz(3)

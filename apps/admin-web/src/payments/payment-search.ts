@@ -6,6 +6,7 @@ export const paymentStatuses = [
   "pending",
   "confirmed",
   "rejected",
+  "voided",
 ] as const;
 export type PaymentStatusFilter = (typeof paymentStatuses)[number];
 

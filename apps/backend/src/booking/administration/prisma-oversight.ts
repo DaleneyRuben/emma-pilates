@@ -259,19 +259,39 @@ export const createPrismaOversight = (
     principal: AuthenticatedPrincipal,
   ) => {
     requireAdministrator(principal);
-    const payments = await prisma.payment.findMany({
-      where: {
-        state: PaymentState.CONFIRMED,
-        decidedAt: { gte: query.from, lt: query.until },
-        ...(query.branchId === undefined
-          ? {}
-          : {
-              method: PaymentMethod.CASH,
-              collectedAtBranchId: query.branchId,
-            }),
-      },
-      select: { method: true, amountDueCentavos: true, decidedAt: true },
-    });
+    const branch =
+      query.branchId === undefined
+        ? {}
+        : {
+            method: PaymentMethod.CASH,
+            collectedAtBranchId: query.branchId,
+          };
+    const [payments, voided] = await Promise.all([
+      prisma.payment.findMany({
+        where: {
+          state: PaymentState.CONFIRMED,
+          decidedAt: { gte: query.from, lt: query.until },
+          ...branch,
+        },
+        select: { method: true, amountDueCentavos: true, decidedAt: true },
+      }),
+      // A voided sale leaves the totals and stays visible with its reason.
+      prisma.payment.findMany({
+        where: {
+          state: PaymentState.VOIDED,
+          voidedAt: { gte: query.from, lt: query.until },
+          ...branch,
+        },
+        select: {
+          id: true,
+          clientId: true,
+          voidReason: true,
+          amountDueCentavos: true,
+          voidedAt: true,
+        },
+        orderBy: [{ voidedAt: 'asc' }, { id: 'asc' }],
+      }),
+    ]);
     const byMethod = { cash: 0, transfer: 0, credit_only: 0 };
     const months = new Map<string, number>();
     for (const payment of payments) {
@@ -291,8 +311,23 @@ export const createPrismaOversight = (
         .sort(([left], [right]) => left.localeCompare(right))
         .map(([month, totalCentavos]) => ({ month, totalCentavos })),
       generatedAt: dependencies.now(),
+      voided: voided.map((payment) => ({
+        paymentId: payment.id,
+        clientId: payment.clientId,
+        voidReason: payment.voidReason ?? '',
+        amountDueCentavos: payment.amountDueCentavos,
+        voidedAt: payment.voidedAt!,
+      })),
     };
   },
 });
 
 export type Oversight = ReturnType<typeof createPrismaOversight>;
+
+export type VoidedIncomeRow = {
+  paymentId: string;
+  clientId: string;
+  voidReason: string;
+  amountDueCentavos: number;
+  voidedAt: Date;
+};

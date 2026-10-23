@@ -7,6 +7,7 @@ const pills = {
   pending: { tone: "advertencia", label: "Pendiente" },
   confirmed: { tone: "exito", label: "Confirmado" },
   rejected: { tone: "error", label: "Rechazado" },
+  voided: { tone: "neutral", label: "Anulado" },
 } as const;
 
 export function PaymentStatePill({ state }: { state: AdminPaymentDtoState }) {

@@ -34,6 +34,8 @@ import { AssistantApiError, createAssistantApi } from "./assistant-api";
 import { describeClasses, formatCivilDate } from "./assistant-format";
 import { ClientBanner } from "./client-banner";
 import type { ClientContext } from "./client-overview-screen";
+import { FrontDeskReceiptCard, type FrontDeskReceipt } from "./front-desk-receipt-card";
+import { InvoiceDataCard, invoiceChoiceFrom, type InvoiceChoice } from "./invoice-data-card";
 
 type ConfirmNavigation = {
   goBack: () => void;
@@ -99,6 +101,30 @@ export function ConfirmCashPaymentScreen({
   const studioRules = useStudioRules(fetcher);
   const today = boliviaCivilDate(new Date());
   const [startsOn, setStartsOn] = useState(today);
+  const [invoice, setInvoice] = useState<InvoiceChoice>(invoiceChoiceFrom);
+  const [receipt, setReceipt] = useState<FrontDeskReceipt | null>(null);
+  const [receiptPending, setReceiptPending] = useState(false);
+
+  const photograph = async () => {
+    if (branchId === null || receiptPending) return;
+    setReceiptPending(true);
+    setFailure(null);
+    try {
+      const photographed = await api.photographTransferReceipt();
+      if (photographed === null) return;
+      await api.recordFrontDeskTransfer(clientId, quote.id, branchId, photographed.imageAssetId, startsOn);
+      setReceipt(photographed);
+      setFailure("Comprobante enviado. Queda pendiente de revisión.");
+    } catch (error) {
+      const code = error instanceof AssistantApiError ? error.code : null;
+      setFailure(
+        (code !== null ? paymentProblems[code] : undefined) ??
+          "No pudimos enviar el comprobante. Inténtalo de nuevo.",
+      );
+    } finally {
+      setReceiptPending(false);
+    }
+  };
 
   const confirm = async () => {
     if (branchId === null) return;
@@ -223,6 +249,8 @@ export function ConfirmCashPaymentScreen({
               </View>
             </View>
           ) : null}
+          <InvoiceDataCard onChange={setInvoice} value={invoice} />
+          <FrontDeskReceiptCard onPhotograph={() => void photograph()} receipt={receipt} />
           <BodyText style={styles.muted}>
             Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.
           </BodyText>

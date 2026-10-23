@@ -1,7 +1,8 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { requireAdministrator } from '../administration/administration-errors';
 
-export type AdministratorPaymentState = 'pending' | 'confirmed' | 'rejected';
+export type AdministratorPaymentState =
+  'pending' | 'confirmed' | 'rejected' | 'voided';
 export type AdministratorPaymentStatusFilter =
   AdministratorPaymentState | 'all';
 
@@ -20,6 +21,8 @@ export type AdministratorPaymentRow = {
   submittedAt: Date;
   decidedAt: Date | null;
   receiptAvailable: boolean;
+  /** Present only on a voided sale (PAY-006). */
+  voidReason: string | null;
 };
 
 export type AdministratorPaymentPage = {

@@ -115,6 +115,7 @@ describe('administration endpoints (e2e)', () => {
       byMethod: { cash: 78_000, transfer: 0, credit_only: 0 },
       months: [{ month: '2026-09-01', totalCentavos: 78_000 }],
       generatedAt: new Date('2026-09-23T12:00:00.000Z'),
+      voided: [],
     });
     oversight.listReferrals.mockResolvedValue({
       items: [],
