@@ -97,6 +97,11 @@ export const readCurrentStudioSettings = async (
   client: Client,
 ): Promise<StudioSettings> => toSettings(await currentRow(client));
 
+export const readCancellationWindowMinutes = async (
+  client: Client,
+): Promise<number> =>
+  (await readCurrentStudioSettings(client)).cancellationWindowMinutes;
+
 const serializable = { isolationLevel: 'Serializable' } as const;
 
 export const createPrismaStudioSettings = (
