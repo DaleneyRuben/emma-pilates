@@ -48,9 +48,9 @@ export const describeClosureForAdministrator = (
                 : `; pierde las ${left} clases que le quedan`
           }.`,
         ]),
-    ...(client.creditAvailableCentavos > 0
+    ...((client.creditAvailableCentavos ?? 0) > 0
       ? [
-          `Pierde su crédito de ${formatBolivianos(client.creditAvailableCentavos)}.`,
+          `Pierde su crédito de ${formatBolivianos(client.creditAvailableCentavos ?? 0)}.`,
         ]
       : []),
     "Se cierra su sesión en todos sus dispositivos y su correo queda libre.",

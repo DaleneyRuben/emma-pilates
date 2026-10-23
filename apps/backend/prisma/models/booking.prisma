@@ -3,6 +3,7 @@ enum StaffRole {
   NUTRITIONIST  @map("nutritionist")
   ASSISTANT     @map("assistant")
   ADMINISTRATOR @map("administrator")
+  COORDINATOR   @map("coordinator")
 
   @@schema("booking")
 }

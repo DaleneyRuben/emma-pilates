@@ -92,7 +92,7 @@ export const luciaDetail: AdminClientDetailDto = {
   },
 };
 
-const member = (
+export const member = (
   suffix: string,
   name: string,
   extra: Partial<StaffMemberDto> = {},
