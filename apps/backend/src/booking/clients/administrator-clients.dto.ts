@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { z } from 'zod';
 import { clientAccountStatuses } from '../assistant/assistant.dto';
 import type { ClientAccountStatus } from '../assistant/assistant-clients';
@@ -111,8 +111,12 @@ export class AdminClientDetailDto {
   @ApiProperty({ type: ClientSubscriptionDto })
   subscription!: ClientSubscriptionDto;
 
-  @ApiProperty({ minimum: 0, description: 'Available Credit in BOB centavos' })
-  creditAvailableCentavos!: number;
+  @ApiPropertyOptional({
+    minimum: 0,
+    description:
+      'Available Credit in BOB centavos; absent for the Coordinator, who sees no amount (ADR-0102)',
+  })
+  creditAvailableCentavos?: number;
 
   @ApiProperty()
   referralCode!: string;
@@ -136,4 +140,22 @@ export const parseClientDirectoryQuery = (value: unknown) =>
     .transform(({ q, ...paging }) =>
       q === undefined || q === '' ? paging : { ...paging, query: q },
     )
+    .safeParse(value);
+
+// IDN-009 (AW22 «Editar perfil»): the name and phone; the login email stays
+// the Client's own (IDN-008).
+export class UpdateAdminClientProfileDto {
+  @ApiProperty({ minLength: 1, maxLength: 100 })
+  name!: string;
+
+  @ApiProperty({ type: String, nullable: true, maxLength: 30 })
+  phone!: string | null;
+}
+
+export const parseUpdateAdminClientProfile = (value: unknown) =>
+  z
+    .strictObject({
+      name: z.string().max(100),
+      phone: z.string().max(30).nullable(),
+    })
     .safeParse(value);

@@ -28,6 +28,7 @@ const roles: Record<StaffRoleName, StaffRole> = {
   nutritionist: StaffRole.NUTRITIONIST,
   assistant: StaffRole.ASSISTANT,
   administrator: StaffRole.ADMINISTRATOR,
+  coordinator: StaffRole.COORDINATOR,
 };
 const roleNames = Object.fromEntries(
   Object.entries(roles).map(([name, role]) => [role, name]),

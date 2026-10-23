@@ -118,6 +118,33 @@ export class AdministratorPayStatementsController extends BackOfficeController {
   }
 }
 
+// BKO-007: the Coordinator never reads her own statement. The endpoint
+// exists so the denial is explicit rather than a missing route.
+@Controller({ path: 'coordinator/pay-statements', version: '1' })
+@ApiBearerAuth()
+export class CoordinatorPayStatementsController extends BackOfficeController {
+  constructor(
+    @Inject(backOfficeOperations) operations: BackOfficeOperations,
+    @Inject(authenticatedPrincipalResolver) resolver: PrincipalResolver,
+  ) {
+    super(operations, resolver);
+  }
+
+  @Get()
+  @ApiOperation({ operationId: 'listCoordinatorPayStatements' })
+  @ApiOkResponse({ type: PayStatementDto, isArray: true })
+  @Header('Cache-Control', 'no-store')
+  async list(
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<PayStatementDto[]> {
+    const principal = await this.authenticate(authorization);
+    const statements = await run(() =>
+      this.operations.payStatements.listOwnStatements(principal),
+    );
+    return statements.map(toDto);
+  }
+}
+
 @Controller({ path: 'trainer/pay-statements', version: '1' })
 @ApiBearerAuth()
 export class TrainerPayStatementsController extends BackOfficeController {

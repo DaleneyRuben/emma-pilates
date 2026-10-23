@@ -79,6 +79,9 @@ enum PayStatementLineKind {
   CLASS            @map("class")
   MINIMUM_NOT_MET  @map("minimum_not_met")
   COMMISSION       @map("commission")
+  BASE             @map("base")
+  NEW_CLIENT       @map("new_client")
+  BONUS            @map("bonus")
 
   @@schema("back_office")
 }

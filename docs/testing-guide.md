@@ -31,6 +31,10 @@ you are starting with no project knowledge.
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 75) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
+| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
+
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
@@ -82,7 +86,7 @@ can be found by its design name.
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 76 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 83 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 83, 84 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 80, 81 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78, 79 |
@@ -562,6 +566,7 @@ Evaluation slots, and these active Accounts. Every fixture Account uses the pass
 | `andrea.suarez@example.com`  | Trainer       | Leads Pilates Prenatal in Equipetrol          |
 | `camila.rojas@example.com`   | Assistant     | Assigned to Centro                            |
 | `paola.mendoza@example.com`  | Administrator | Covers every Branch                           |
+| `carolina.rivas@example.com` | Coordinator   | Every Branch; operations without money (ADR-0102) |
 | `gabriela.flores@example.com`| Nutritionist  | Assigned to Centro                            |
 
 The 30-day window starts on the day you run the command. With the worker
@@ -3369,7 +3374,8 @@ The following are not ready for manual product testing:
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 75);
 - «Mis pagos» in the Staff app: the API answers a Trainer (Test 83), but
-  the screen waits on follow-up 202, which stays pending;
+  the screen waits on follow-up 202, which stays pending. The Coordinator
+  has no such screen: only the Administrator sees her statement (Test 84);
 
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
@@ -3387,6 +3393,10 @@ The following are not ready for manual product testing:
 - iOS store builds and TestFlight (gate 9), and the Play closed test and
   production release (REL-003 to REL-007);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
+- the Coordinator's counts-only statistics (attendance, occupancy, new
+  Clients, renewals), which STU-003 builds on Studio Management's facts
+  (ADR-0103), and her «Para contactar» list, which BKM-013 adds to the admin
+  web and to her Staff app stack;
 - the admin web's «No tienes permiso…» refusal copies, an email change for
   an Account that is not active (`account_not_active`), and a registration
   that refers to itself (`referral_self_reference`): each needs a state the
@@ -6312,4 +6322,103 @@ the Administrator is denied. The migration
 `20261023230100_trainer_pay_statements` needs owner approval before it runs
 on a shared database. Pull request:
 https://github.com/DaleneyRuben/emma-pilates/pull/186.
+
+## Test 84: coordinator pay (BKO-007)
+
+The Coordinator is paid a base of Bs 3.500,00, plus Bs 50,00 for each new
+Client on a 30-day Plan and Bs 80,00 on a 60- or 90-day Plan, and a bonus of
+Bs 400,00 when the month's renewal rate reaches the target in Reglas del
+estudio: 80 % in months 1 to 6 from the Opening Date, 85 % in months 7 to
+12, and 90 % from month 13. A Client renewed when she bought another Plan
+before hers ended or within 7 days after. A single class, a gift class, an
+invited friend, and a Client a Trainer brought pay nothing. Only Paola sees
+it. Carolina, the Coordinator, does not, not even her own. Log in as Test
+24 describes.
+
+1. **Open the page.** In the admin web as Paola open **Pago a la
+   coordinadora** (under Pagos a instructoras). The month stepper cannot go
+   past the current month. The card names Carolina, «Borrador» or
+   «Aprobado», the total (`Bs 4.030,00`, never centavos), and a table of
+   Concepto, Detalle, and Monto. An empty month says «Este mes no tiene un
+   pago calculado.» There is no Calcular mes: the worker drafts it.
+2. **Approve once.** Press **Aprobar**. The card reads «Aprobado» and
+   Nómina gains one Salary Payment for that total. Pressing again does not
+   add a second payment.
+3. **The figures.** A new Client on a 30-day Plan is Bs 50,00. One on a
+   60- or 90-day Plan is Bs 80,00. A single class, a gift class, and a
+   Client a Trainer brought do not appear. The bonus of Bs 400,00 appears
+   when the rate reaches the target and not one point below.
+4. **She cannot see it.** Sign in as `carolina.rivas@example.com`. The
+   sidebar has no **Pago a la coordinadora**. Typing
+   `/back-office/pago-coordinadora` returns to Horario with «Esa sección es
+   solo para administración.» `GET /api/v1/coordinator/pay-statements` and
+   `GET /api/v1/administrator/pay-statements?month=2026-12` answer `403`
+   `back_office_access_denied`, and so does approval.
+5. **Narrow browser.** At 420 px the card stacks and the line table becomes
+   labelled cards. The sidebar opens from **Abrir menú**.
+
+Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/188.
+
+Follow-up 203 stays pending. The migration
+`20261023230200_coordinator_pay_line_kinds` needs owner approval before it
+runs on a shared database.
+## Test 75: work as the Coordinator (IDN-009)
+
+The Coordinator runs the studio's operation without seeing money
+([ADR-0102](./adr/0102-coordinator-role-without-money.md)). The fixtures
+(Test 5 A) include her: `carolina.rivas@example.com`, with the fixture
+password, holding every Branch.
+
+### A. The admin web
+
+1. Start the API and the admin web (Test 24) and sign in as
+   `carolina.rivas@example.com`. The sidebar shows only **Horario**,
+   **Clientes**, and **Personal**; the account menu names her Role
+   «Coordinación».
+2. In **Horario**, create a one-off Session, move one to another Trainer,
+   and cancel one that has Bookings (Test 25): everything works as for the
+   Administrator, at every Branch.
+3. Type `/back-office/pagos` (or `/reporte`, `/back-office/nomina`,
+   `/promociones`) in the address bar: you land on Horario with «Esa
+   sección es solo para administración.».
+4. In **Clientes**, open a Client: no «Crédito» row, no «Cerrar cuenta»,
+   and no «Bs» anywhere. Press **Editar perfil**, change the phone, and
+   **Guardar cambios**: «Guardamos los cambios del perfil.» and the new
+   phone. Empty the name to see «Escribe el nombre de la clienta.». The
+   email stays read-only («La clienta cambia su correo desde su app.»).
+5. In **Personal**, there is no «Nuevo miembro»; opening a member shows
+   her details read-only with «Solo administración invita y cambia roles.».
+6. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
+   for the Administrator, and **Personal → Nuevo miembro** offers the Role
+   **Coordinador**, which replaces the Branch chips with «Todas las
+   sucursales (implícito por el rol)».
+
+### B. The Staff app
+
+1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. She
+   lands on **Buscar cliente** without «+ Nuevo cliente» and with
+   **Cancelar una clase**, which opens the Administrator's cancellation
+   screens (Test 10 D).
+2. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
+   for the Assistant (Test 11 B and C) at any Branch, but there is no
+   «Registrar pago en efectivo». A Client without a Plan reads «La clienta
+   necesita un plan activo para reservar.».
+3. Perfil reads «Coordinación» and «Todas las sucursales».
+4. As the Administrator, Perfil → «Ver la app como…» lists her under
+   «Coordinación»; seeing the app as her shows the same stack under the
+   banner (Test 67).
+
+### C. The API
+
+Every endpoint has an explicit decision for the Administrator and the
+Coordinator in `apps/backend/test/database/authorization-matrix.ts`; the
+integration spec `authorization-matrix.integration-spec.ts` boots the API on
+a disposable database and checks each one (Test 8, integration tests). By
+hand, with her bearer token from Swagger (Test 3): `GET
+/api/v1/administrator/payments`, `GET /api/v1/administrator/reports/income`,
+and `GET /api/v1/assistant/clients/{id}/plan-quotes` answer `403`;
+`PATCH /api/v1/administrator/clients/{id}` with `{"name": "…", "phone":
+null}` answers the refreshed detail without `creditAvailableCentavos`, and
+`system.audit_records` gains `client.profile_corrected` with
+`actor_role = coordinator` and only the changed field names.
 

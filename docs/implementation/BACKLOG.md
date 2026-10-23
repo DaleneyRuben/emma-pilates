@@ -481,6 +481,9 @@ wait for Google, Apple, and testers.
 | BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
 | NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | done |
+| IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | done (22c81c81; evidence below). Schema `e8390f9d`; admin-web session red `4b83f3e7` → `91f12934`; staff red `6684d0df` → `56eebbde`; operations red `fd06a8ad` → `db534ca6`; schedule red `0534aa8c` → `05fd60c0`; profile endpoint red `7fcb5de5` → `722ad126`; authorization matrix `41f5e250`; contracts `329a9415`; admin web red `0843bbd1`/`8073598e`/`ebbb2d6a` → `30d676c0`/`0f96e7b9`/`950bbabc`; Playwright `cc200115`; Staff app red `ec115e2e` → `e1511505`; Maestro `c357c97c`; testing guide Test 75 `e8938f7a`. Verified: backend unit 975, e2e 268, integration 92 suites / 367 tests (6 skipped, pre-existing), the matrix over all 170 endpoints for both Roles; `check:api` and `check:api-compat` clean; admin-web Jest 531, Playwright 19/19 (new coordinator journey finds no «Bs»); staff-mobile Jest 155, mobile-core 116; lint, Prettier, tsc clean. Browser walk at 1440 and 420 px as Carolina (Horario edit panel, money URL notice, Clientes «Editar perfil» saved, no «Bs», Personal read-only, drawer) and as Paola (Coordinador role option with implicit Branches). API curl as Carolina: Client search 200, payments 403. Walked on 2026-10-23 as Carolina on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator: Client search, a Client's overview without cash or «Nuevo cliente», and «Cancelar clase». Decisions: counts-only statistics deferred to STU-003 (ADR-0103 rejects on-the-fly indicators); Coordinator reads Staff but never invites or changes Roles/Branches; reads Branches and Class Types, not the Plan list; Assistant overview sends her Credit 0 (ADR-0016), the admin detail omits it; Evaluations oversight stays with the Administrator until NUT-003. Open questions: should the Coordinator see AW25 Evaluations and correct pending staff emails? development-fixtures.ts (oversized) grew by one staff entry.) |
+| NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
+
 | BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | ready |
 | BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | ready |
 | BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | ready |
@@ -488,7 +491,7 @@ wait for Google, Apple, and testers.
 | BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | ready |
 | BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | done |
 | BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | done |
-| BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | ready |
+| BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | done |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
 
 #### Closed-test enablement
@@ -890,6 +893,18 @@ Evidence: the hand-checked September is 32,200 centavos (3 students 6,500, 6 stu
 
 Acceptance criteria: the renewal-rate unit tests cover the 7-day edge and the
 month-of-operation targets.
+
+Decisions (blanket approval, 2026-10-23):
+
+- The statement reuses BKO-006's `PayStatement`, draft, approval, and `SalaryPayment`. A migration adds the line kinds `base`, `new_client`, and `bonus`. The base, the Bs 50, the Bs 80, and the Bs 400 are the decisions' figures, in centavos, not a new rate table: the renewal targets already live on `StudioSettingsVersion`.
+- A new Client is the first confirmed Plan Payment of her life whose `decidedAt` falls in the month, paid by transfer or cash. A 30-day Plan pays Bs 50. A 60- or 90-day Plan pays Bs 80. A Plan of one class (the single class) pays nothing, and so does a Client whose live acquisition names a Trainer. A gift class and an invited friend are not a Plan Payment, so they pay nothing. Courtesy and Evaluation Payments are not a new Client.
+- «Renewed» is a Subscription of at least 30 days that ends in the month and whose next Subscription for the same Client starts on or before the end plus 7 days. The rate is renewed over ending, rounded. A month with nothing ending has no rate and no bonus. The bonus lands at the target and not one point below. The target is the settings column for the month of operation: the Opening Date's month is month 1. With no Opening Date the month being drafted is month 1, so the target is 80 %.
+- The worker drafts the Coordinator in the same hourly pass as the Trainers, for the previous Bolivia month and the current one, and only when a Coordinator exists. A draft is replaced while it is a draft. Approval freezes it and creates the Salary Payment. Approving twice creates nothing more.
+- Only the Administrator lists and approves. `GET /api/v1/coordinator/pay-statements` denies the Coordinator, and so do the Administrator's list and the approval. The admin page has no `coordinator` flag, so typing the address returns her to Horario.
+
+Open question: none. Follow-up 203 stays pending.
+
+Evidence: the hand-checked December is 403,000 centavos (base 350,000, one 30-day new Client 5,000, one 60-day 8,000, a single class 0, a Client a Trainer brought 0, and the bonus at 100 % against an 80 % month-1 target 40,000). A second approval creates no second Salary Payment. Carolina is denied the list, her own endpoint, and the approval. Migration `20261023230200_coordinator_pay_line_kinds` needs owner approval. Follow-up 203 stays pending. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/188.
 
 #### REL-011 · Tester access on production
 

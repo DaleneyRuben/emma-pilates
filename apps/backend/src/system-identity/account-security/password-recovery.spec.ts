@@ -135,7 +135,7 @@ describe('password recovery', () => {
           idleExpiresAt: new Date('2026-08-31T18:30:00.000Z'),
           absoluteExpiresAt: new Date('2026-09-01T06:00:00.000Z'),
         },
-        sessionEligibility: 'administrator',
+        sessionEligibility: 'admin_web',
       });
     });
 

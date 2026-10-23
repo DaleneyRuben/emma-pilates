@@ -21,7 +21,13 @@ const reasonValues: Record<AdjustmentReason, AllowanceAdjustmentReason> = {
 export type AdjustmentAuthor = {
   accountId: string;
   /** The approving Account for a gift, the Administrator otherwise. */
-  role: 'ADMINISTRATOR' | 'ASSISTANT' | 'TRAINER' | 'NUTRITIONIST' | null;
+  role:
+    | 'ADMINISTRATOR'
+    | 'ASSISTANT'
+    | 'TRAINER'
+    | 'NUTRITIONIST'
+    | 'COORDINATOR'
+    | null;
 };
 
 export type RecordedAdjustment = {

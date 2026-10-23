@@ -60,6 +60,7 @@ import {
 import { AdministratorFinanceController } from './finance/finance.controller';
 import {
   AdministratorPayStatementsController,
+  CoordinatorPayStatementsController,
   TrainerPayStatementsController,
 } from './payroll/pay-statements.controller';
 import { AdministratorSuppliesController } from './supplies/supplies.controller';
@@ -392,5 +393,6 @@ export const backOfficeControllers = [
   AdministratorExpenseReportController,
   AdministratorFinanceController,
   AdministratorPayStatementsController,
+  CoordinatorPayStatementsController,
   TrainerPayStatementsController,
 ];

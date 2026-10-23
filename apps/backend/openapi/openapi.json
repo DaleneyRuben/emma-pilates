@@ -1853,7 +1853,8 @@
                 "trainer",
                 "nutritionist",
                 "assistant",
-                "administrator"
+                "administrator",
+                "coordinator"
               ],
               "type": "string"
             }
@@ -4373,6 +4374,51 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminClientDetailDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorClients"
+        ]
+      },
+      "patch": {
+        "operationId": "updateAdminClientProfile",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminClientProfileDto"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -7358,6 +7404,36 @@
         ]
       }
     },
+    "/api/v1/coordinator/pay-statements": {
+      "get": {
+        "operationId": "listCoordinatorPayStatements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayStatementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CoordinatorPayStatements"
+        ]
+      }
+    },
     "/api/v1/trainer/pay-statements": {
       "get": {
         "operationId": "listOwnPayStatements",
@@ -7789,7 +7865,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -7844,7 +7921,8 @@
             "enum": [
               "trainer",
               "assistant",
-              "nutritionist"
+              "nutritionist",
+              "coordinator"
             ]
           },
           "expiresAt": {
@@ -8978,7 +9056,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branches": {
@@ -9024,7 +9103,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -9118,7 +9198,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -9157,7 +9238,8 @@
               "trainer",
               "nutritionist",
               "assistant",
-              "administrator"
+              "administrator",
+              "coordinator"
             ]
           },
           "branchIds": {
@@ -11365,7 +11447,7 @@
           "creditAvailableCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Available Credit in BOB centavos"
+            "description": "Available Credit in BOB centavos; absent for the Coordinator, who sees no amount (ADR-0102)"
           },
           "referralCode": {
             "type": "string"
@@ -11386,10 +11468,28 @@
           "accountStatus",
           "clientSince",
           "subscription",
-          "creditAvailableCentavos",
           "referralCode",
           "referredClientCount",
           "closure"
+        ]
+      },
+      "UpdateAdminClientProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 30
+          }
+        },
+        "required": [
+          "name",
+          "phone"
         ]
       },
       "AdminPaymentDto": {
@@ -13613,7 +13713,10 @@
             "enum": [
               "class",
               "minimum_not_met",
-              "commission"
+              "commission",
+              "base",
+              "new_client",
+              "bonus"
             ]
           },
           "detail": {

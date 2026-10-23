@@ -212,6 +212,7 @@ import type {
   TransferInstructionsDto,
   UnreadNotificationCountDto,
   UpcomingBookingDto,
+  UpdateAdminClientProfileDto,
   UpdateClientProfileDto,
   UpdateStudioSettingsDto,
   UploadStatusDto,
@@ -17143,6 +17144,141 @@ export function useGetAdminClient<
   return withQueryKey(query, queryOptions.queryKey);
 }
 
+export type updateAdminClientProfileResponse200 = {
+  data: AdminClientDetailDto;
+  status: 200;
+};
+
+export type updateAdminClientProfileResponseSuccess =
+  updateAdminClientProfileResponse200 & {
+    headers: Headers;
+  };
+export type updateAdminClientProfileResponse =
+  updateAdminClientProfileResponseSuccess;
+
+export const getUpdateAdminClientProfileUrl = (clientId: string) => {
+  return `/api/v1/administrator/clients/${clientId}`;
+};
+
+export const updateAdminClientProfile = async (
+  clientId: string,
+  updateAdminClientProfileDto: UpdateAdminClientProfileDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<updateAdminClientProfileResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getUpdateAdminClientProfileUrl(clientId),
+    {
+      ...options,
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(updateAdminClientProfileDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateAdminClientProfileResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateAdminClientProfileResponse;
+};
+
+export const getUpdateAdminClientProfileMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof updateAdminClientProfile>>,
+    TError,
+    UpdateAdminClientProfileMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof updateAdminClientProfile>>,
+  TError,
+  UpdateAdminClientProfileMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["updateAdminClientProfile"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof updateAdminClientProfile>>,
+    UpdateAdminClientProfileMutationVariables
+  > = (props) => {
+    const { clientId, data } = props ?? {};
+
+    return updateAdminClientProfile(clientId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type UpdateAdminClientProfileMutationResult = NonNullable<
+  Awaited<ReturnType<typeof updateAdminClientProfile>>
+>;
+export type UpdateAdminClientProfileMutationBody = UpdateAdminClientProfileDto;
+export type UpdateAdminClientProfileMutationError = unknown;
+export type UpdateAdminClientProfileMutationVariables = {
+  clientId: string;
+  data: UpdateAdminClientProfileDto;
+};
+
+export const useUpdateAdminClientProfile = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof updateAdminClientProfile>>,
+      TError,
+      UpdateAdminClientProfileMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof updateAdminClientProfile>>,
+  TError,
+  UpdateAdminClientProfileMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getUpdateAdminClientProfileMutationOptions(options),
+    queryClient,
+  );
+};
+
 export type listAdminPaymentsResponse200 = {
   data: AdminPaymentPageDto;
   status: 200;
@@ -27993,6 +28129,190 @@ export const useApprovePayStatement = <TError = unknown, TContext = unknown>(
     queryClient,
   );
 };
+
+export type listCoordinatorPayStatementsResponse200 = {
+  data: PayStatementDto[];
+  status: 200;
+};
+
+export type listCoordinatorPayStatementsResponseSuccess =
+  listCoordinatorPayStatementsResponse200 & {
+    headers: Headers;
+  };
+export type listCoordinatorPayStatementsResponse =
+  listCoordinatorPayStatementsResponseSuccess;
+
+export const getListCoordinatorPayStatementsUrl = () => {
+  return `/api/v1/coordinator/pay-statements`;
+};
+
+export const listCoordinatorPayStatements = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listCoordinatorPayStatementsResponse> => {
+  const res = await (fetchFn ?? fetch)(getListCoordinatorPayStatementsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCoordinatorPayStatementsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listCoordinatorPayStatementsResponse;
+};
+
+export const getListCoordinatorPayStatementsQueryKey = () => {
+  return [`/api/v1/coordinator/pay-statements`] as const;
+};
+
+export const getListCoordinatorPayStatementsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListCoordinatorPayStatementsQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listCoordinatorPayStatements>>
+  > = ({ signal }) =>
+    listCoordinatorPayStatements({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListCoordinatorPayStatementsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listCoordinatorPayStatements>>
+>;
+export type ListCoordinatorPayStatementsQueryError = unknown;
+
+export function useListCoordinatorPayStatements<
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+          TError,
+          Awaited<ReturnType<typeof listCoordinatorPayStatements>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCoordinatorPayStatements<
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+          TError,
+          Awaited<ReturnType<typeof listCoordinatorPayStatements>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListCoordinatorPayStatements<
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListCoordinatorPayStatements<
+  TData = Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listCoordinatorPayStatements>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListCoordinatorPayStatementsQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
 
 export type listOwnPayStatementsResponse200 = {
   data: PayStatementDto[];

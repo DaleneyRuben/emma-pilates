@@ -11,7 +11,7 @@ import {
 } from './assistant-clients';
 
 const staff = (
-  role: 'assistant' | 'administrator' | 'trainer',
+  role: 'assistant' | 'administrator' | 'trainer' | 'coordinator',
   branchIds: string[],
 ): AuthenticatedPrincipal => ({
   accountId: 'staff-account',
@@ -156,6 +156,28 @@ describe('Assistant Client overview', () => {
     });
   });
 
+  it('shows the Coordinator the same overview without the Credit amount (ADR-0102)', async () => {
+    const readAvailableCredit = jest.fn().mockResolvedValue(6_000);
+
+    await expect(
+      readClientOverview(
+        { clientId: 'client-id' },
+        {
+          ...dependencies,
+          principal: staff('coordinator', []),
+          readAvailableCredit,
+        },
+      ),
+    ).resolves.toEqual({
+      client: clientRecord,
+      subscription: { status: 'active', subscription },
+      nextBooking: upcoming[0],
+      recentHistory: history.slice(0, 2),
+      creditAvailableCentavos: 0,
+    });
+    expect(readAvailableCredit).not.toHaveBeenCalled();
+  });
+
   it('reports a missing Client', async () => {
     await expect(
       readClientOverview(
@@ -205,6 +227,37 @@ describe('Assistant Client Bookings and history', () => {
         },
       ),
     ).resolves.toEqual(upcoming.map((item) => ({ ...item, actionable: true })));
+  });
+
+  it('lets the Coordinator search Clients and act on their Bookings at every Branch (ADR-0102)', async () => {
+    const coordinator = staff('coordinator', []);
+    await expect(
+      searchClients(
+        { query: 'Luc' },
+        { principal: coordinator, search: jest.fn().mockResolvedValue([]) },
+      ),
+    ).resolves.toEqual([]);
+    await expect(
+      listAssistantClientBookings(
+        { clientId: 'client-id' },
+        {
+          principal: coordinator,
+          now: () => now,
+          findClient: jest.fn().mockResolvedValue(clientRecord),
+          findUpcoming: jest.fn().mockResolvedValue(upcoming),
+        },
+      ),
+    ).resolves.toEqual(upcoming.map((item) => ({ ...item, actionable: true })));
+    await expect(
+      listAssistantClientHistory(
+        { clientId: 'client-id' },
+        {
+          principal: coordinator,
+          findClient: jest.fn().mockResolvedValue(clientRecord),
+          findAttendedBookings: jest.fn().mockResolvedValue(history),
+        },
+      ),
+    ).resolves.toEqual(history);
   });
 
   it('lists the attended classes of the Client', async () => {
@@ -263,6 +316,20 @@ describe('Assistant Plan quotes and cash Payment', () => {
         },
       ],
     });
+  });
+
+  it('never quotes prices to the Coordinator, who does not sell (ADR-0102)', async () => {
+    await expect(
+      quotePlansForClient(
+        { clientId: 'client-id' },
+        {
+          principal: staff('coordinator', []),
+          findClient: jest.fn().mockResolvedValue(clientRecord),
+          listVisiblePlans: jest.fn().mockResolvedValue(plans),
+          readAvailableCredit: jest.fn().mockResolvedValue(6_000),
+        },
+      ),
+    ).rejects.toBeInstanceOf(BookingAccessDeniedError);
   });
 
   it('records the cash Payment and returns the activated Subscription', async () => {
