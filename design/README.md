@@ -141,7 +141,7 @@ All numeric columns, money, dates, and counts use `font-variant-numeric: tabular
 
 ### Row chevrons (Client and Staff)
 
-- A tappable card or list row ends in a 19px `#B78380` chevron (stroke 1.3, polyline `9.5,5 16.5,12 9.5,19`), vertically centred after the row's text or value: `02`'s full-width «Reservar una clase» shortcut, the Session rows of `03`, `S07`, and `S13`, `16`'s «Tu crédito», the agenda rows of `S02` and `S15`, `S04`'s results, `S11`'s payments, `S16`'s blocks. `02`'s two half-width tiles carry none.
+- A tappable card or list row ends in a 19px `#B78380` chevron (stroke 1.3, polyline `9.5,5 16.5,12 9.5,19`), vertically centred after the row's text or value: `02`'s full-width «Reservar una clase» shortcut, the Session rows of `03`, `S07`, and `S13`, the agenda rows of `S02` and `S15`, `S04`'s results, `S11`'s payments, `S16`'s blocks. `02`'s two half-width tiles carry none.
 - The Perfil menu rows of `18` and `S23` end in the same chevron in `#C4BAB6`, after the row's value or unread count.
 - The «Sucursal:» picker of `03`, `S07`, and `S13` ends in a 16px `#766D69` chevron pointing down (`6,9.5 12,15.5 18,9.5`); `02`'s disabled shortcut ends in a 19px `#C4BAB6` lock instead of the chevron.
 - Rows between rules (`07`, `S22`) and the notification rows of `19` and `S20` carry no chevron.
@@ -261,8 +261,8 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `13` | Evaluación nutricional | Book a nutrition assessment: only days of months not yet used in the next 30 days, the Branch (and Nutritionist) per turno when there are several, turnos close 3 h before they start; used-month state only when no unused month has turnos, and a no-active-plan state with «Ver planes» (`08`); the used-month title names the used month («de este mes» or «de septiembre») |
 | `14` | Confirmar evaluación | Confirmation step; cancelling is from `15` («desde Mis evaluaciones») |
 | `15` | Mis evaluaciones | Assessment history: one per month, so up to two «Próximas» across a month boundary; «Cancelar» outside the last 3 h («Ya no se puede cancelar» inside), and the sheet says the month is freed; the sheet frees «este mes» or the Evaluation's month by name; the empty state offers next month's free Evaluation once this month's took place |
-| `16` | Mis referidos | Referral code + status |
-| `17` | Mi crédito | Credit balance and movements |
+| `16` | Mis referidos | The referral code with Compartir and the line «Pronto podrás invitar a una amiga a una clase gratis.» (PAY-005) |
+| `17` | Mi crédito | Retired by PAY-005; not reachable |
 | `18` | Perfil | Profile and settings; «Evaluación nutricional» (opens `13`) sits between «Mi plan» and «Mis evaluaciones»; the «Notificaciones» row shows the unread count before its chevron; the summary card's 56 px circle shows the Client's photo (centre crop) or her initials; the quiet Error-tone link «Cerrar mi cuenta» under «Cerrar sesión» is the only route to `24`; a «Promociones» card with the «Recibir promociones de Emma Pilates» switch (ADR-0098) sits between the menu and «Cerrar sesión» |
 | `19` | Notificaciones | Notification list — seven types, including the studio-cancelled Evaluation (opens `15`); its last sentence names the freed month («otra este mes», or «otra para octubre» when the Evaluation was in a later month) |
 | `20` | Recuperar contraseña | Request a reset link by email; neutral sent and temporary-limit states |
