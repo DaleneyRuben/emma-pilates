@@ -52,6 +52,7 @@ describe('closing a Client Account with Payments and Credit (PostgreSQL)', () =>
           planPriceCentavos: chosen.priceCentavos,
           creditAppliedCentavos: 0,
           amountDueCentavos: chosen.priceCentavos,
+          startsOn: new Date('2026-09-21T00:00:00.000Z'),
           method: 'CASH',
           state: 'CONFIRMED',
           collectedAtBranchId: (await transaction.branch.findFirstOrThrow()).id,

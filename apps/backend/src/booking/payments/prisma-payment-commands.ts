@@ -25,7 +25,6 @@ import {
 } from '../../notifications/prisma-notification-store';
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
 import { BookingAccessDeniedError } from '../commands/create-booking';
 import { summarizeCredit, type CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
@@ -58,8 +57,20 @@ import {
   settleReservation,
 } from './purchase-intent-settlement';
 import { invoiceColumns, type InvoiceData } from './invoice-data/invoice-data';
-import { evaluatePurchaseEligibility } from './purchase-eligibility';
-import { computeSubscriptionTerm } from './subscription-term';
+import {
+  evaluatePurchaseEligibility,
+  isSubscriptionEffective,
+} from './purchase-eligibility';
+import {
+  allocateStartDate,
+  endSubscriptionEarly,
+  loadFutureSubscriptionId,
+  parseRequestedStartDate,
+  readStartDateRules,
+  subscriptionTermFor,
+  todayOf,
+} from './prisma-start-date-allocation';
+import { loadActiveSubscription as sharedLoadActiveSubscription } from './subscription-allocation';
 
 type Transaction = Prisma.TransactionClient;
 
@@ -110,6 +121,35 @@ const isUniqueViolation = (error: unknown): boolean =>
   error !== null &&
   'code' in error &&
   error.code === 'P2002';
+
+const uniqueDetail = (error: unknown): string => {
+  if (!isUniqueViolation(error)) return '';
+  const known = error as {
+    message?: string;
+    meta?: { target?: unknown; driverAdapterError?: { message?: string } };
+  };
+  const target = Array.isArray(known.meta?.target)
+    ? known.meta.target.join(',')
+    : '';
+  return `${target} ${known.message ?? ''} ${known.meta?.driverAdapterError?.message ?? ''}`;
+};
+
+const raiseUniqueSaleConflict = (error: unknown): never => {
+  const detail = uniqueDetail(error);
+  if (
+    detail.includes('subscriptions_one_future') ||
+    detail.includes('a future subscription already exists')
+  ) {
+    throw rule(
+      'future_subscription_exists',
+      'A future Subscription already exists',
+    );
+  }
+  throw rule(
+    'purchase_intent_open_exists',
+    'An open Purchase Intent already exists',
+  );
+};
 
 const hashRequest = (request: unknown): Uint8Array<ArrayBuffer> =>
   toPrismaBytes(createHash('sha256').update(JSON.stringify(request)).digest());
@@ -215,36 +255,11 @@ export function createPrismaPaymentCommands(
     return result;
   };
 
-  const loadActiveSubscription = async (
+  const loadActiveSubscription = (
     transaction: Transaction,
     clientId: string,
     now: Date,
-  ) => {
-    const active = await transaction.subscription.findFirst({
-      where: { clientId, state: SubscriptionState.ACTIVE },
-      orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
-      select: {
-        id: true,
-        endsOn: true,
-        remainingClassAllowance: true,
-        _count: {
-          select: {
-            bookings: {
-              where: { state: 'BOOKED', session: { startsAt: { gt: now } } },
-            },
-          },
-        },
-      },
-    });
-    return active === null
-      ? null
-      : {
-          id: active.id,
-          endsOn: active.endsOn,
-          remainingClassAllowance: active.remainingClassAllowance,
-          futureBookedCount: active._count.bookings,
-        };
-  };
+  ) => sharedLoadActiveSubscription(transaction, clientId, now);
 
   const expireSubscription = (
     transaction: Transaction,
@@ -306,10 +321,17 @@ export function createPrismaPaymentCommands(
       }),
     ]);
 
+    const today = todayOf(now);
+    const futureSubscriptionId = await loadFutureSubscriptionId(
+      transaction,
+      input.clientId,
+      today,
+    );
     const eligibility = evaluatePurchaseEligibility({
-      today: boliviaDate(now),
+      today,
       plan,
       activeSubscription: active,
+      futureSubscriptionId,
       openPurchaseIntentId: openIntent?.id ?? null,
       pendingPaymentId: pendingPayment?.id ?? null,
     });
@@ -323,8 +345,29 @@ export function createPrismaPaymentCommands(
     }
 
     // evaluatePurchaseEligibility has thrown when the Plan is not purchasable.
-    return plan!;
+    return { plan: plan!, active, today };
   };
+
+  const committedStartDate = async (
+    transaction: Transaction,
+    input: {
+      clientId: string;
+      requested: Date | null;
+      today: Date;
+      active: Awaited<ReturnType<typeof loadActiveSubscription>>;
+    },
+  ) =>
+    allocateStartDate({
+      today: input.today,
+      requested: input.requested,
+      rules: await readStartDateRules(transaction),
+      active: input.active,
+      futureSubscriptionId: await loadFutureSubscriptionId(
+        transaction,
+        input.clientId,
+        input.today,
+      ),
+    });
 
   const loadOwnedIntent = async (
     transaction: Transaction,
@@ -392,8 +435,8 @@ export function createPrismaPaymentCommands(
     principal: AuthenticatedPrincipal,
     now: Date,
   ): Promise<string> => {
-    const term = computeSubscriptionTerm(
-      boliviaDate(now),
+    const term = subscriptionTermFor(
+      payment.startsOn,
       payment.durationDaysSnapshot,
     );
     const subscription = await transaction.subscription.create({
@@ -505,6 +548,7 @@ export function createPrismaPaymentCommands(
     input: {
       clientId: string;
       planId: string;
+      startsOn?: string;
       principal: AuthenticatedPrincipal;
       branchId: string | null;
       requireFullCredit: boolean;
@@ -520,9 +564,16 @@ export function createPrismaPaymentCommands(
       input.clientId,
       ...(referral ? [referral.referrerClientId] : []),
     ]);
-    const plan = await assertEligible(transaction, {
+    const eligible = await assertEligible(transaction, {
       clientId: input.clientId,
       planId: input.planId,
+    });
+    const plan = eligible.plan;
+    const allocated = await committedStartDate(transaction, {
+      clientId: input.clientId,
+      requested: parseRequestedStartDate(input.startsOn),
+      today: eligible.today,
+      active: eligible.active,
     });
     const credit = await readLedgerSummary(transaction, input.clientId);
     if (
@@ -547,6 +598,7 @@ export function createPrismaPaymentCommands(
         planPriceCentavos: plan.priceCentavos,
         creditAppliedCentavos: applied,
         amountDueCentavos: amountDue,
+        startsOn: allocated.startsOn,
         method,
         state: PaymentState.CONFIRMED,
         collectedAtBranchId:
@@ -592,6 +644,19 @@ export function createPrismaPaymentCommands(
       }
     }
 
+    if (
+      allocated.subscriptionIdToEndEarly !== null &&
+      allocated.endsOn !== undefined
+    ) {
+      await endSubscriptionEarly(transaction, {
+        subscriptionId: allocated.subscriptionIdToEndEarly,
+        endsOn: allocated.endsOn,
+        startsOn: allocated.startsOn,
+        principal: input.principal,
+        now,
+        paymentId: payment.id,
+      });
+    }
     const subscriptionId = await activateSubscription(
       transaction,
       payment,
@@ -625,6 +690,7 @@ export function createPrismaPaymentCommands(
       clientId: string;
       planId: string;
       branchId: string;
+      startsOn?: string;
       invoiceData?: InvoiceData | null;
     },
     principal: AuthenticatedPrincipal,
@@ -632,58 +698,70 @@ export function createPrismaPaymentCommands(
   ): Promise<PaymentView> => {
     requireCashCollector(principal, command.branchId);
 
-    const stored = await serializable((transaction) =>
-      withIdempotency(
-        transaction,
-        {
-          accountId: principal.accountId,
-          command: 'record_cash_payment',
-          idempotencyKey,
-          request: command,
-        },
-        () =>
-          settleImmediatePayment(transaction, {
-            clientId: command.clientId,
-            planId: command.planId,
-            principal,
-            branchId: command.branchId,
-            requireFullCredit: false,
-            invoiceData: command.invoiceData,
-          }),
-      ),
-    );
+    try {
+      const stored = await serializable((transaction) =>
+        withIdempotency(
+          transaction,
+          {
+            accountId: principal.accountId,
+            command: 'record_cash_payment',
+            idempotencyKey,
+            request: command,
+          },
+          () =>
+            settleImmediatePayment(transaction, {
+              clientId: command.clientId,
+              planId: command.planId,
+              startsOn: command.startsOn,
+              principal,
+              branchId: command.branchId,
+              requireFullCredit: false,
+              invoiceData: command.invoiceData,
+            }),
+        ),
+      );
 
-    return readPaymentView(stored.id);
+      return readPaymentView(stored.id);
+    } catch (error) {
+      if (isUniqueViolation(error)) raiseUniqueSaleConflict(error);
+      throw error;
+    }
   };
 
   const completeCreditPurchase = async (
-    command: { planId: string },
+    command: { planId: string; startsOn?: string },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ): Promise<PaymentView> => {
     const clientId = requireClient(principal);
 
-    const stored = await serializable((transaction) =>
-      withIdempotency(
-        transaction,
-        {
-          accountId: principal.accountId,
-          command: 'complete_credit_purchase',
-          idempotencyKey,
-          request: command,
-        },
-        () =>
-          settleImmediatePayment(transaction, {
-            clientId,
-            planId: command.planId,
-            principal,
-            branchId: null,
-            requireFullCredit: true,
-          }),
-      ),
-    );
+    try {
+      const stored = await serializable((transaction) =>
+        withIdempotency(
+          transaction,
+          {
+            accountId: principal.accountId,
+            command: 'complete_credit_purchase',
+            idempotencyKey,
+            request: command,
+          },
+          () =>
+            settleImmediatePayment(transaction, {
+              clientId,
+              planId: command.planId,
+              startsOn: command.startsOn,
+              principal,
+              branchId: null,
+              requireFullCredit: true,
+            }),
+        ),
+      );
 
-    return readPaymentView(stored.id);
+      return readPaymentView(stored.id);
+    } catch (error) {
+      if (isUniqueViolation(error)) raiseUniqueSaleConflict(error);
+      throw error;
+    }
   };
 
   const readPaymentView = async (paymentId: string): Promise<PaymentView> =>
@@ -705,7 +783,7 @@ export function createPrismaPaymentCommands(
     );
 
   const createPurchaseIntent = async (
-    command: { planId: string },
+    command: { planId: string; startsOn?: string },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ): Promise<PurchaseIntentView> => {
@@ -719,13 +797,20 @@ export function createPrismaPaymentCommands(
             accountId: principal.accountId,
             command: 'create_purchase_intent',
             idempotencyKey,
-            request: { planId: command.planId },
+            request: { planId: command.planId, startsOn: command.startsOn },
           },
           async () => {
             await lockClients(transaction, [clientId]);
-            const plan = await assertEligible(transaction, {
+            const eligible = await assertEligible(transaction, {
               clientId,
               planId: command.planId,
+            });
+            const plan = eligible.plan;
+            const allocated = await committedStartDate(transaction, {
+              clientId,
+              requested: parseRequestedStartDate(command.startsOn),
+              today: eligible.today,
+              active: eligible.active,
             });
             const now = dependencies.now();
             const credit = await readLedgerSummary(transaction, clientId);
@@ -745,6 +830,7 @@ export function createPrismaPaymentCommands(
                 planPriceCentavos: plan.priceCentavos,
                 creditReservedCentavos: reserved,
                 amountDueCentavos: plan.priceCentavos - reserved,
+                startsOn: allocated.startsOn,
                 createdByAccountId: principal.accountId,
                 createdAt: now,
                 expiresAt: new Date(
@@ -785,12 +871,7 @@ export function createPrismaPaymentCommands(
 
       return readIntentView(stored.id);
     } catch (error) {
-      if (isUniqueViolation(error)) {
-        throw rule(
-          'purchase_intent_open_exists',
-          'An open Purchase Intent already exists',
-        );
-      }
+      if (isUniqueViolation(error)) raiseUniqueSaleConflict(error);
       throw error;
     }
   };
@@ -948,6 +1029,7 @@ export function createPrismaPaymentCommands(
               planPriceCentavos: intent.planPriceCentavos,
               creditAppliedCentavos: intent.creditReservedCentavos,
               amountDueCentavos: intent.amountDueCentavos,
+              startsOn: intent.startsOn,
               method: PaymentMethod.TRANSFER,
               state: PaymentState.PENDING,
               submittedByAccountId: principal.accountId,
@@ -1065,33 +1147,53 @@ export function createPrismaPaymentCommands(
         payment.clientId,
         now,
       );
-      if (active !== null) {
-        const eligibility = (() => {
-          try {
-            return evaluatePurchaseEligibility({
-              today: boliviaDate(now),
-              plan: {
-                hiddenAt: null,
-                priceCentavos: payment.planPriceCentavos,
-              },
-              activeSubscription: active,
-              openPurchaseIntentId: null,
-              pendingPaymentId: null,
-            });
-          } catch {
+      const today = todayOf(now);
+      const allocated = await (async () => {
+        try {
+          return await committedStartDate(transaction, {
+            clientId: payment.clientId,
+            requested: payment.startsOn,
+            today,
+            active,
+          });
+        } catch (error) {
+          if (
+            error instanceof PaymentRuleError &&
+            error.code === 'future_subscription_exists'
+          ) {
             throw rule(
               'payment_confirmation_conflict',
-              'The Client already has an active Subscription',
+              'The Client already has a future Subscription',
             );
           }
-        })();
-        if (eligibility.subscriptionIdToExpire !== null) {
-          await expireSubscription(
-            transaction,
-            eligibility.subscriptionIdToExpire,
-            now,
-          );
+          throw error;
         }
+      })();
+      if (allocated.startsOn.getTime() !== payment.startsOn.getTime()) {
+        throw rule(
+          'payment_confirmation_conflict',
+          'The committed Start Date no longer matches the renewal',
+        );
+      }
+      if (
+        active !== null &&
+        active.endsOn.getTime() < today.getTime() &&
+        !isSubscriptionEffective(active, today)
+      ) {
+        await expireSubscription(transaction, active.id, now);
+      }
+      if (
+        allocated.subscriptionIdToEndEarly !== null &&
+        allocated.endsOn !== undefined
+      ) {
+        await endSubscriptionEarly(transaction, {
+          subscriptionId: allocated.subscriptionIdToEndEarly,
+          endsOn: allocated.endsOn,
+          startsOn: allocated.startsOn,
+          principal,
+          now,
+          paymentId: payment.id,
+        });
       }
 
       await transaction.payment.update({

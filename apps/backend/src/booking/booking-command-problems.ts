@@ -18,6 +18,7 @@ export const commandProblem = (error: Error): HttpException | null => {
       'no_eligible_subscription',
       'No eligible Subscription',
     ],
+
     'Client already has an overlapping Booking': [
       'booking_overlap',
       'Client already has an overlapping Booking',
@@ -60,6 +61,19 @@ export const commandProblem = (error: Error): HttpException | null => {
       'Attendance roster is incomplete',
     ],
   };
+  const beforeStart =
+    /^Booking is before the Start Date: (\d{4}-\d{2}-\d{2})$/.exec(
+      error.message,
+    );
+  if (beforeStart !== null) {
+    return new HttpException(
+      {
+        code: 'booking_before_start_date',
+        detail: `Booking is before the Start Date: ${beforeStart[1]}`,
+      },
+      HttpStatus.CONFLICT,
+    );
+  }
   const problem = problems[error.message];
 
   return problem === undefined

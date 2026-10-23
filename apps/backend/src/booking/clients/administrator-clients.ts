@@ -138,6 +138,7 @@ export const readAdministratorClient = async (
         directory.findActiveSubscription(clientId, onDate),
       findLatestSubscription: (clientId) =>
         directory.findLatestSubscription(clientId),
+      findFutureSubscription: () => Promise.resolve(null),
     }),
     actor.role === 'coordinator'
       ? Promise.resolve(null)

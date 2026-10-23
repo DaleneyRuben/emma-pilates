@@ -16,6 +16,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiProperty,
+  ApiPropertyOptional,
 } from '@nestjs/swagger';
 import { z } from 'zod';
 import { authenticatedPrincipalResolver } from '../../system-identity/authentication/authentication.controller';
@@ -45,9 +46,18 @@ export class GrantCourtesyAccessDto {
       'Bolivia civil date of the last day of access: today up to one year ahead.',
   })
   endsOn!: string;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
 }
 
-const grantSchema = z.object({ endsOn: z.iso.date() }).strict();
+const grantSchema = z
+  .object({ endsOn: z.iso.date(), startsOn: z.iso.date().optional() })
+  .strict();
 
 const invalidRequest = (detail: string): BadRequestException =>
   new BadRequestException({ code: 'invalid_request', detail });
@@ -102,6 +112,11 @@ export class CourtesyAccessController {
           {
             clientId: id,
             endsOn: new Date(`${parsed.data.endsOn}T00:00:00.000Z`),
+            ...(parsed.data.startsOn === undefined
+              ? {}
+              : {
+                  startsOn: new Date(`${parsed.data.startsOn}T00:00:00.000Z`),
+                }),
           },
           principal,
           key,

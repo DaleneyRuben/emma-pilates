@@ -30,6 +30,8 @@ export interface PaymentReviewDto {
   creditAppliedCentavos: number;
   /** @minimum 0 */
   amountDueCentavos: number;
+  /** Chosen Start Date. Absent on responses older builds ignore. */
+  startsOn?: string;
   submittedAt: string;
   /** @nullable */
   decidedAt?: string | null;

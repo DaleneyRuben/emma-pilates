@@ -466,7 +466,7 @@ wait for Google, Apple, and testers.
 | DOC-008 | P0 | Docs | Record Emma's rules in the glossaries and ADRs before any code changes | — | 1.5–2 d | done (44b47adc; booking ADR-0005 to ADR-0012, ADR-0101 to ADR-0106, Studio Management glossary) |
 | BKM-004 | P0 | Backend/admin web/apps | `StudioSettings`: one versioned row for the configurable rules, a «Reglas del estudio» page for the Administrator, and a public rules endpoint that replaces the hard-coded copy in the apps | DOC-008 | 2.5–3.5 d | done (`37284cfa` table, `8c9e795d` window, `7744ac91` endpoints, `6e2475e7`/`fc1b481e`/`4201ebc2` apps, `6dd904ed` AW36; evidence below) |
 | BKM-005 | P0 | All surfaces | Plans by days (30/60/90) with a weekly cap field, and the eight real Plans | DOC-008, BKM-004 | 3–4 d | done (`6541a63a` days, `0b2a0633` AW04, `14fb2000` tester Plan; evidence below) |
-| BKM-006 | P0 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | ready |
+| BKM-006 | P0 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | done |
 | BKM-008 | P0 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | ready |
 | BKM-007 | P0 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | ready |
 | BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | done (919ef391, a6c21924, 938d0e56, 1db2fa8e; evidence below) |
@@ -563,6 +563,32 @@ Acceptance criteria:
 - A Client with 3 days and 2 classes left buys a renewal, and it starts the day after the current one ends. A Client with 10 days and no classes left starts her renewal today, and the current Plan ends yesterday.
 - Before the opening date, the opening date is offered even when it is 30 days away.
 - `subscription_not_expired` no longer blocks a purchase. The concurrency tests cover two renewals racing.
+
+Evidence (BKM-006, 2026-10-23, branch `feature/bkm-006-start-date`, stacked on `feature/bkm-005-plans-by-days` at `6675fc38`, [PR #169](https://github.com/DaleneyRuben/emma-pilates/pull/169)). Rules red `ce1f6aae`, rules green `b018f18c`, purchase flow `b8ee2b7a`, the chip row and the next-plan line `e5478300`, a missing next plan `29fa0eea`. The next-plan row shrinks on a phone: red `554be4be`, green `4c46979f`.
+
+Decisions taken:
+
+- `starts_on` on the Purchase Intent and the Payment is NOT NULL after a backfill from the Bolivia confirmation date. `Subscription.startsOn` stays the date the booking check reads.
+- A current Subscription and one future Subscription may both be active. `now()` is not immutable, so the old one-active index is replaced by two constraint triggers, `subscriptions_one_current` and `subscriptions_one_future`, compared with the row's `activated_at` in Bolivia. A current row is one whose start is on or before that day and whose end still covers it.
+- Ending a Subscription early writes `endsOn` in the same transaction and audits `subscription.ended_early`. It is not an expiry.
+- A transfer whose stored Start Date no longer matches the renewal (the Client booked more classes while the Payment was pending) confirms as `payment_confirmation_conflict`.
+- A booking before the Start Date is `booking_before_start_date` (409). The English detail carries the civil date; the apps write «Podrás reservar a partir del {date}.» Waitlist promotion stays silent. Reschedule stays on the same day.
+- `subscription_not_expired` stays in the catalog and the controller still maps it. The purchase flow does not raise it.
+- The Administrator client detail returns `nextSubscription: null` and does not load the future Plan. The Client and Assistant overviews do.
+- Courtesy Access uses the same Start Date window. `endsOn` stays the last day the Administrator chose.
+- Follow-ups 190 and 191 are pending. No export was run.
+
+Verified (2026-10-23, API on 3124 over `pilates_bkm006_dev`, Metro 8114 for the Client app and 8116 for the Staff app):
+
+- **API.** Sofía's `POST /api/v1/purchase-intents` with `startsOn` 2026-11-02 answered `201` and echoed the date; 2026-12-31 answered `409`. A Booking on a date the covering Subscription has not reached answered `409` `booking_before_start_date` with the civil date in the detail.
+- **Client app**, iPhone 16 Pro, iPad Pro 11-inch (M4), and the Android emulator. Lucía's **Mi plan** reads «Siguiente plan desde 13 de noviembre de 2026»; on the two phones the date wraps inside the card. **Renovar plan** opens **Elige tu plan**, and **Paquete de 8 clases** shows **Fecha de inicio** with **Hoy 23** selected and the following days. Booking the Monday 07:00 Reformer at Centro, after her current Plan was ended on 25 October and the next one moved to 28 October, answered «Podrás reservar a partir del 28 de octubre.»
+- **Staff app**, the same three devices. Camila's **Confirmar pago en efectivo** for Sofía shows the same chip row, **Hoy 23** selected, above **Confirmar pago recibido**.
+
+Open:
+
+- An evaluation booked before the Start Date is still the existing ineligible-subscription refusal, not `booking_before_start_date`.
+- Migration `20261023140000_start_date` was applied only to `pilates_bkm006_dev` and to disposable databases created from `pilates_test_bkm006`. It needs the owner's approval before any shared database.
+- The renewal reminder copy is written; the worker's Plan reminder was not walked on a device.
 
 #### BKM-008 · Extra classes and the gift class
 

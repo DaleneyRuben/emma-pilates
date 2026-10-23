@@ -135,6 +135,7 @@ export function ClientOverviewScreen({
     hasActiveSubscription &&
     ((data.subscription.subscription?.remainingClassAllowance ?? 0) > 0 ||
       (data.nextBooking ?? null) !== null);
+  const futurePlan = data.subscription.nextSubscription ?? null;
 
   return (
     <Screen style={styles.screen}>
@@ -172,7 +173,7 @@ export function ClientOverviewScreen({
           />
           {sells ? (
             <OutlinedButton
-              disabled={planStillEffective}
+              disabled={planStillEffective || futurePlan !== null}
               label="Registrar pago en efectivo"
               onPress={() => navigation.navigate("SelectPlan", context)}
               testID="client-overview-cash-payment"
@@ -180,6 +181,9 @@ export function ClientOverviewScreen({
           ) : null}
           {sells && planStillEffective ? (
             <BodyText style={styles.note}>Podrá comprar otro plan cuando este termine.</BodyText>
+          ) : null}
+          {sells && futurePlan !== null ? (
+            <BodyText style={styles.note}>Ya tiene un plan siguiente.</BodyText>
           ) : null}
           {hasActiveSubscription ? (
             <TextButton

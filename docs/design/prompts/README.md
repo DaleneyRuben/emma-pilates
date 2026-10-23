@@ -249,6 +249,8 @@ Each of these was sent as the next message in the existing design session for th
 | [141](./followups/141-assistant-new-client-acquisition.md) | The same question and an optional «Código de referido (opcional)» in the Assistant's `S05` (BKM-011): the chips after the phone in the phone, Android, and tablet frames, new «Falta el canal» and «Código desconocido» frames, and the `S05` README row | ✅ applied (Claude Design canvas, 2026-10-23, `3a77ac3c`; the apps and admin web are built in BKM-011) |
 | [142](./followups/142-client-detail-acquisition.md) | `AW22` gains a «¿Cómo nos conociste?» block after «Referidos» (canal, «Ella respondió», código, who brought her; «Sin dato» before the question) with its own «Corregir», a new «Corregir canal» frame (select, code, Guardar/Cancelar), and the `AW22` README row (BKM-011) | ✅ applied (Claude Design canvas, 2026-10-23, `3a77ac3c`; the apps and admin web are built in BKM-011) |
 | [143](./followups/143-trainer-personal-code.md) | A Trainer's «Código personal» with its own «Guardar código» on `AW24`'s edit frames, a new «Código personal · en uso» frame, and the `AW24` README row (BKM-011); 144 stays reserved and unused | ✅ applied (Claude Design canvas, 2026-10-23, `3a77ac3c`; the apps and admin web are built in BKM-011) |
+| [190](./followups/190-start-date-chooser.md) | Start Date chip row on `09` and `S10`: «Fecha de inicio», «Hoy», weekday chips, «Día de apertura» (BKM-006) | 🕓 pending |
+| [191](./followups/191-next-plan-and-renewal.md) | «Siguiente plan desde …» on `12`, renewal reminder on `19`, cash stays enabled on `S06` (BKM-006) | 🕓 pending |
 
 ## Status
 

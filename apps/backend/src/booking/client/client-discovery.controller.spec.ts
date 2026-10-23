@@ -62,6 +62,7 @@ describe('ClientProfileController', () => {
 
     await expect(controller.subscription(bearer)).resolves.toEqual({
       status: 'expiring_soon',
+      nextSubscription: null,
       subscription: {
         id: 'subscription-id',
         planName: 'Paquete de 8 clases',
@@ -78,6 +79,7 @@ describe('ClientProfileController', () => {
 
     await expect(controller.subscription(bearer)).resolves.toEqual({
       status: 'none',
+      nextSubscription: null,
       subscription: null,
     });
   });

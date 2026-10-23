@@ -15,4 +15,6 @@ export interface RecordCashPaymentDto {
    * @nullable
    */
   invoiceData?: InvoiceDataDto | null;
+  /** Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it. */
+  startsOn?: string;
 }

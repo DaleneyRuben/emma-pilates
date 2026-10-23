@@ -83,6 +83,7 @@ export type AssistantClientOperations = {
       clientId: string;
       planId: string;
       branchId: string;
+      startsOn?: string;
       invoiceData: InvoiceData | null;
     },
     principal: AuthenticatedPrincipal,
@@ -194,6 +195,9 @@ export class AssistantClientsController {
       subscription: {
         status: overview.subscription.status,
         subscription: toSubscriptionDto(overview.subscription.subscription),
+        nextSubscription: toSubscriptionDto(
+          overview.subscription.nextSubscription,
+        ),
       },
     };
   }
@@ -290,6 +294,9 @@ export class AssistantClientsController {
           planId: parsed.planId,
           branchId: parsed.branchId,
           invoiceData: parsed.invoiceData,
+          ...(parsed.startsOn === undefined
+            ? {}
+            : { startsOn: parsed.startsOn }),
         },
         principal,
         key,

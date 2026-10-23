@@ -144,7 +144,7 @@ describe('Administrator Client detail', () => {
       }),
     ).resolves.toEqual({
       ...lucia,
-      subscription: { status: 'active', subscription },
+      subscription: { status: 'active', subscription, nextSubscription: null },
       creditAvailableCentavos: 105_000,
       closure: outlook,
     });
@@ -173,7 +173,11 @@ describe('Administrator Client detail', () => {
         now: () => now,
       }),
     ).resolves.toMatchObject({
-      subscription: { status: 'expired', subscription: expired },
+      subscription: {
+        status: 'expired',
+        subscription: expired,
+        nextSubscription: null,
+      },
       creditAvailableCentavos: 0,
     });
   });

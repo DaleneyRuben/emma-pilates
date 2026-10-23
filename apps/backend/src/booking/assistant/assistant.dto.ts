@@ -105,6 +105,13 @@ export class RecordCashPaymentDto {
       'PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»',
   })
   invoiceData?: InvoiceDataDto | null;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
 }
 
 export const parseRecordCashPayment = (
@@ -113,12 +120,14 @@ export const parseRecordCashPayment = (
   planId: string;
   branchId: string;
   invoiceData: InvoiceData | null;
+  startsOn?: string;
 } | null => {
   const result = z
     .strictObject({
       planId: uuid,
       branchId: uuid,
       invoiceData: invoiceDataField,
+      startsOn: z.iso.date().optional(),
     })
     .safeParse(value);
   return result.success ? result.data : null;

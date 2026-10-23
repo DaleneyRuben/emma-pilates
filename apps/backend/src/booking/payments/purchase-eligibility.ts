@@ -1,3 +1,4 @@
+import { decideRenewal } from './early-renewal';
 import { PaymentRuleError } from './payment-errors';
 
 export type PurchasablePlan = {
@@ -7,6 +8,7 @@ export type PurchasablePlan = {
 
 export type ActiveSubscriptionFacts = {
   id: string;
+  startsOn: Date;
   endsOn: Date;
   remainingClassAllowance: number;
   futureBookedCount: number;
@@ -16,6 +18,7 @@ export type PurchaseEligibilityContext = {
   today: Date;
   plan: PurchasablePlan | null;
   activeSubscription: ActiveSubscriptionFacts | null;
+  futureSubscriptionId: string | null;
   openPurchaseIntentId: string | null;
   pendingPaymentId: string | null;
 };
@@ -38,7 +41,10 @@ export const isSubscriptionEffective = (
     subscription.futureBookedCount > 0);
 
 // What blocks any new Subscription for the Client, however it is granted: an
-// open Intent, a pending Payment, or a Subscription still in use.
+// open Intent, a pending Payment, or a future Subscription already queued.
+// An effective Subscription no longer blocks a purchase (booking ADR-0005):
+// it is an Early Renewal. subscription_not_expired stays in the error catalog
+// so older store builds still parse it, and nothing here raises it.
 export const evaluateAllocationEligibility = (
   context: Omit<PurchaseEligibilityContext, 'plan'>,
 ): PurchaseEligibility => {
@@ -57,15 +63,34 @@ export const evaluateAllocationEligibility = (
   if (context.activeSubscription === null) {
     return { subscriptionIdToExpire: null };
   }
-  if (isSubscriptionEffective(context.activeSubscription, context.today)) {
+  if (context.futureSubscriptionId !== null) {
     throw new PaymentRuleError(
-      'subscription_not_expired',
-      'The current Subscription is still active',
+      'future_subscription_exists',
+      'A future Subscription already exists',
     );
+  }
+  // A Subscription that still holds is shortened by the renewal when it has
+  // no classes left, not expired. One that no longer holds is reported so the
+  // caller expires it; ending it early is only the renewal that starts today.
+  if (isSubscriptionEffective(context.activeSubscription, context.today)) {
+    return { subscriptionIdToExpire: null };
   }
 
   return { subscriptionIdToExpire: context.activeSubscription.id };
 };
+
+export const renewalOf = (
+  context: PurchaseEligibilityContext,
+  requested: Date | null,
+) =>
+  context.activeSubscription === null
+    ? null
+    : decideRenewal({
+        today: context.today,
+        current: context.activeSubscription,
+        futureSubscriptionId: context.futureSubscriptionId,
+        requested,
+      });
 
 export const evaluatePurchaseEligibility = (
   context: PurchaseEligibilityContext,
