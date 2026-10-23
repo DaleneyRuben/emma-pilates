@@ -315,13 +315,7 @@ describe('Prisma payment lifecycle (review, expiry, and cash)', () => {
     for (let award = 0; award < 10; award += 1) await seedAward(buyer.clientId);
 
     await expect(
-      codeOf(
-        commands().completeCreditPurchase(
-          { planId: plan.id },
-          buyer,
-          randomUUID(),
-        ),
-      ),
+      codeOf(commands().completeCreditPurchase(buyer)),
     ).resolves.toBe('credit_insufficient');
     await expect(
       prisma.payment.count({ where: { clientId: buyer.clientId } }),

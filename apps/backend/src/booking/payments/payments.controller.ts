@@ -260,11 +260,11 @@ export class CreditPurchasesController extends AuthenticatedPaymentController {
     const parsed = parseCreatePurchaseIntent(body);
     if (parsed === null)
       throw invalidRequest('Invalid Credit purchase request');
-    const key = requireIdempotencyKey(idempotencyKey);
+    requireIdempotencyKey(idempotencyKey);
     const principal = await this.authenticate(authorization);
 
     return runPaymentCommand(() =>
-      this.commands.completeCreditPurchase(parsed, principal, key),
+      this.commands.completeCreditPurchase(principal),
     );
   }
 }
