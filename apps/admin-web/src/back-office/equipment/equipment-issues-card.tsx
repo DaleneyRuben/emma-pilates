@@ -29,7 +29,7 @@ function IssueRow({
   onResolve?: (issue: EquipmentIssueDto) => void;
 }) {
   return (
-    <li className="flex flex-wrap items-start justify-between gap-3 border-t border-divisor px-4 py-3 first:border-t-0">
+    <li className="flex flex-col gap-3 border-t border-divisor px-4 py-3 first:border-t-0 md:flex-row md:items-start md:justify-between">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
         <p className="text-cuerpo font-medium text-texto">{issueName(issue)}</p>
         <p className="text-cuerpo text-texto">{issue.description}</p>
