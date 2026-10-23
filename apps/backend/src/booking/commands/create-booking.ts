@@ -1,4 +1,5 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { assertWeeklyCapAllows } from './weekly-cap-decision';
 
 export class BookingAccessDeniedError extends Error {
   constructor() {
@@ -15,6 +16,13 @@ type SessionForBooking = {
   state: 'scheduled' | 'cancelled';
 };
 
+export type WeeklyCapSubscription = {
+  id: string;
+  weeklyClassCap?: number | null;
+  baseFundedBookingsThisWeek?: number;
+  extraClasses?: number;
+};
+
 type CreateBookingDependencies = {
   principal: AuthenticatedPrincipal;
   loadSession(sessionId: string): Promise<SessionForBooking | null>;
@@ -22,7 +30,7 @@ type CreateBookingDependencies = {
   findEligibleSubscription(input: {
     clientId: string;
     onDate: Date;
-  }): Promise<{ id: string } | null>;
+  }): Promise<WeeklyCapSubscription | null>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -97,6 +105,8 @@ export const createBooking = async (
   if (subscription === null) {
     throw new Error('No eligible Subscription');
   }
+
+  assertWeeklyCapAllows(subscription);
 
   if (
     await dependencies.hasOverlappingBooking({

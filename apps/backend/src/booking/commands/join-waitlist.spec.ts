@@ -84,6 +84,7 @@ describe('joinWaitlist', () => {
         { sessionId: 'session-id' },
         {
           ...dependencies,
+          create: jest.fn().mockResolvedValue({ id: 'waitlist-entry-id' }),
           findEligibleSubscription: jest.fn().mockResolvedValue({
             id: 'subscription-id',
             weeklyClassCap: 3,
