@@ -64,8 +64,9 @@ describe('Equipment faults reported from a Session and the capacity flags', () =
     sessions[key] = session.id;
   };
 
+  // The development fixtures' own Sessions end in October.
   const flagged = async (
-    from = '2026-09-01T00:00:00.000Z',
+    from = '2026-11-01T00:00:00.000Z',
     until = '2027-01-01T00:00:00.000Z',
   ) =>
     (
@@ -126,7 +127,7 @@ describe('Equipment faults reported from a Session and the capacity flags', () =
       'Reformer Pilates',
       'emma.vargas@example.com',
       '2026-09-21T13:00:00.000Z',
-      8,
+      9,
     );
     await createSession(
       'mat',
@@ -153,7 +154,7 @@ describe('Equipment faults reported from a Session and the capacity flags', () =
       where: { id: sessions.c },
       data: {
         state: 'CANCELLED',
-        cancellationCause: 'NO_SUBSTITUTE_TRAINER',
+        cancellationCause: 'ZERO_BOOKINGS',
         cancelledAt: fixtureNow,
       },
     });
@@ -165,6 +166,9 @@ describe('Equipment faults reported from a Session and the capacity flags', () =
 
   it('flags only future Sessions with more places than working Equipment of a registered kind', async () => {
     await expect(flagged()).resolves.toEqual([['big', 'reformer', 9, 8]]);
+    await expect(
+      flagged('2026-09-21T00:00:00.000Z', '2026-09-21T15:00:00.000Z'),
+    ).resolves.toEqual([]);
     await expect(
       codeOf(
         equipment().listFlaggedSessions(
