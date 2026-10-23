@@ -16,6 +16,7 @@ import {
   type ClientInvitationView,
   type EmailPurpose,
   type InvitationAudit,
+  type InviteClientCommand,
   type InviteClientResult,
   type StoredAuthenticationToken,
 } from './client-invitations-model';
@@ -171,7 +172,7 @@ const renewActivation = async (
 };
 
 export const inviteClient = async (
-  command: { name: string; email: string; phone: string | null },
+  command: InviteClientCommand,
   principal: AuthenticatedPrincipal,
   dependencies: ClientInvitationDependencies,
 ): Promise<InviteClientResult> => {

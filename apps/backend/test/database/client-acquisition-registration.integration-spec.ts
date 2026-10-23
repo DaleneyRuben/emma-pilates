@@ -1,6 +1,9 @@
 import { randomUUID } from 'node:crypto';
 import { PgBoss } from 'pg-boss';
 import { PrismaClient } from '../../src/generated/prisma/client';
+import type { AuthenticatedPrincipal } from '../../src/system-identity/authentication/resolve-authenticated-principal';
+import { inviteClient } from '../../src/system-identity/invitations/client-invitations';
+import { PrismaClientInvitationUnitOfWork } from '../../src/system-identity/invitations/prisma-client-invitation-unit-of-work';
 import { PrismaClientRegistrationUnitOfWork } from '../../src/system-identity/registration/prisma-client-registration-unit-of-work';
 import {
   RegisterClient,
@@ -148,5 +151,57 @@ describe('Client acquisition at self-registration (PostgreSQL)', () => {
         prisma.account.findFirst({ where: { email: address } }),
       ).resolves.toBeNull();
     }
+  });
+
+  it('records the channel and a Trainer code the Assistant typed for a new Client', async () => {
+    const code = `ROSA${suffix()}`;
+    const trainer = await prisma.staffMember.create({
+      data: { name: 'Rosa Entrenadora', role: 'TRAINER', referralCode: code },
+    });
+    const assistant: AuthenticatedPrincipal = {
+      accountId: randomUUID(),
+      authenticationSessionId: 'session',
+      identity: {
+        kind: 'staff',
+        staffMemberId: randomUUID(),
+        role: 'assistant',
+        branchIds: [],
+      },
+    };
+    const invited = await inviteClient(
+      {
+        name: 'Alumna de Rosa',
+        email: email(),
+        phone: null,
+        acquisitionChannel: 'walk_in',
+        referralCode: code,
+      },
+      assistant,
+      {
+        unitOfWork: new PrismaClientInvitationUnitOfWork({
+          prisma,
+          boss,
+          digestEmail: digestTestEmail,
+        }),
+        tokenIssuer: authenticationTokens,
+        linkCipher: new AuthenticationLinkCipher(
+          'local-test-key',
+          Buffer.alloc(32, 7),
+        ),
+        now: () => new Date(Date.now() + 60_000),
+        newId: randomUUID,
+        newReferralCode: () => `REF-${randomUUID()}`,
+      },
+    );
+
+    await expect(
+      prisma.clientAcquisition.findFirstOrThrow({
+        where: { clientId: invited.clientId, deletedAt: null },
+      }),
+    ).resolves.toMatchObject({
+      declaredChannel: 'WALK_IN',
+      channel: 'TRAINER',
+      referrerStaffMemberId: trainer.id,
+    });
   });
 });
