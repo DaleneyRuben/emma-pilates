@@ -39,6 +39,7 @@
     "listAdminEvaluations",
     "cancelAdminEvaluation",
     "listAdminReferrals",
+    "listFounderMemberships",
     "listAdminCredits",
     "getIncomeReport",
     "listAdminSupplies",
