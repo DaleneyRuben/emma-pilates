@@ -1,9 +1,8 @@
 # Follow-up — The Coordinator's stack in the Staff app
 
-Targets: **S04 (Buscar cliente)**, **S06 (Resumen del cliente)**, **S13
-(Cancelar una clase)**, **S23 (Perfil)**, **S24 (Ver la app como…)**, and the
+Targets: **S04 (Buscar cliente)**, **S06 (Resumen del cliente)**, **S23 (Perfil)**, **S24 (Ver la app como…)**, and the
 **generated handoff `design/README.md`** (the staff navigation bullets and
-the S04, S06, S13, S23, S24 rows). Send [30](./30-invariants-checklist.md)
+the S04, S06, S23, S24 rows). Send [30](./30-invariants-checklist.md)
 alongside this follow-up.
 
 ---
@@ -33,8 +32,8 @@ necesita un plan activo para reservar.» where the cash action was.
 
 ## 3. `S13` — reached from her root
 
-S13's back link reads «← Clientes» in her stack instead of «← Pagos». The
-list and S14 are unchanged.
+S13 does not change: its back arrow returns to S04 in her stack, as it
+returns to S11 in the Administrator's. S14 is unchanged.
 
 ## 4. `S23` — the Role line
 

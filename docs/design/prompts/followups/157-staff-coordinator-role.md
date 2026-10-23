@@ -14,9 +14,9 @@ invites, changes a Role or Branches, or deactivates anyone.
 
 ## 1. `AW23` — the Role filter and tag
 
-- The Role filter chips become **Todos · Entrenador · Asistente ·
-  Administrador · Nutricionista · Coordinador** (the new chip last), in the
-  labels AW23 already uses.
+- The Role filter's list becomes **Todos · Entrenador · Asistente ·
+  Administrador · Nutricionista · Coordinador** (the new option last), in
+  the labels AW23 already uses.
 - A sample row «Carolina Rivas · carolina.rivas@example.com · Coordinador ·
   Todas · Activo», with the neutral Role tag and «Todas» in the Sucursales
   column like the Administrator's.

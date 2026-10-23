@@ -1,7 +1,7 @@
 # Follow-up — The admin web for the Coordinator
 
-Targets: **AW02 (Horario)**, **AW33 (Menú de usuario)**, the **Sistema de Diseño (Prompt 00)** (the sidebar sample in
-«06 · Navegación»), and the **generated handoff `design/README.md`** (the
+Targets: **AW02 (Horario)**, **AW33 (Menú de usuario)**, and the
+**generated handoff `design/README.md`** (the AW02 and AW33 rows and the
 admin navigation bullets). Send [30](./30-invariants-checklist.md)
 alongside this follow-up.
 
