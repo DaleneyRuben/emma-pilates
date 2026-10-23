@@ -55,7 +55,6 @@ const fakeTransaction = (overrides: Partial<ClosureTransaction> = {}): Fake => {
     cancelFutureEvaluations: record('cancelFutureEvaluations', 1),
     releaseOpenPurchaseIntent: record('releaseOpenPurchaseIntent', true),
     endSubscription: record('endSubscription', { forfeitedClasses: 4 }),
-    forfeitCredit: record('forfeitCredit', 6000),
     promoteWaitlists: record('promoteWaitlists', undefined),
     endPromotionsConsent: record('endPromotionsConsent', null),
     keepPromotionContact: record('keepPromotionContact', undefined),
