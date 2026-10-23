@@ -770,6 +770,18 @@ Acceptance criteria:
 - A no-show or a cancellation less than 3 h before counts as used. Each held Evaluation records Bs 50 owed to the Nutritionist as a cost, which BKO-005 shows.
 - Mis evaluaciones stops calling every past Evaluation «Realizada».
 
+Decisions (blanket approval, 2026-10-23; booking ADR-0011):
+
+- Included means the covering Subscription's `durationDaysSnapshot` is 90 or more. One included Evaluation per Subscription, inside its date range; unused, it is lost. A second Evaluation in the same range is paid.
+- The price and the Nutritionist fee are read from the current Studio Settings row (`evaluationPriceCentavos` 7000, `nutritionistFeeCentavos` 5000). Nothing hard-codes Bs 70 or Bs 50.
+- A paid Evaluation is a Payment with `kind = evaluation` and no Subscription. Plan Payments stay `kind = plan`. The Payment still names a Plan (the Client's active one) so the existing checks hold; the Subscription consistency trigger skips an evaluation Payment.
+- The Founder discount does not apply (ADR-0011). Founder membership is not built yet (BKM-010), so the assertion is that the charged price equals the settings price with no percent taken off.
+- A transfer holds the slot for 24 hours from submission, then the worker releases it and rejects the Payment. The worker has no Account, so `cancelled_by` and `decided_by` stay null and the rejection reason is «El pago de la evaluación venció». An evaluation transfer has no purchase intent. Cash at the front desk is not on this branch: `settleImmediatePayment` activates a Subscription, and an evaluation Payment must not.
+- A cancellation inside 3 hours is refused (`evaluation_cancellation_window_closed`), so the booked row stays and the included Evaluation stays used. An early cancellation frees it. A no-show is a new `no_show` state, recorded by the Nutritionist or an Administrator after the start, and it also stays used. The Nutritionist cost is `nutritionist_cost_centavos` on the booked row, written when an included Evaluation is booked and when an evaluation transfer is confirmed. It stays null while the transfer is pending. There is no separate held state. BKO-005 reads it later.
+- History labels, derived, not stored: «Incluida», «Pagada», «No asistió», «Cancelada». A pending transfer is not history.
+
+Open questions: none. The owner did not say who records a no-show; the Nutritionist and an Administrator do, after the start.
+
 Acceptance criteria:
 
 - A quarterly Client books free once per Plan. An 8-class Client sees Bs 70 and the QR flow.

@@ -237,6 +237,8 @@ Each of these was sent as the next message in the existing design session for th
 | [196](./followups/196-front-desk-receipt-and-invoice.md) | `S10` gains the front-desk receipt photograph and the smallest «Datos para la factura» card (PAY-006, decisions §4.2 and §4.5) | 🕓 pending |
 | [197](./followups/197-void-sale-on-payments.md) | `AW28` gains «Anular venta» with a required reason and an «Anulado» filter (PAY-006, decisions §4.3) | 🕓 pending |
 | [198](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006) | 🕓 pending |
+| [199](./followups/199-evaluation-price-and-history.md) | `13` and `14` name an included Evaluation or the settings price; `15` stops saying every past Evaluation is «Realizada» (NUT-003) | 🕓 pending |
+| [200](./followups/200-evaluation-income-apart.md) | `AW16` splits Plan income and Evaluation income under the method line (NUT-003) | 🕓 pending |
 
 ## Status
 
