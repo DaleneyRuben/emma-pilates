@@ -36,7 +36,7 @@ por sucursal — las reglas son del estudio, no de una sede.»
    sin actualizarlas.» No button in the title row.
 2. A white card (12 px radius, 1 px Borde, 24 px padding) titled «Puedes
    cambiar» (Lora 22) with, under it in Texto tenue 11.5 px, «Versión 3 ·
-   guardada el 23/10/2026 por Paola Mendoza» («Versión 1 · valores
+   guardada el 23/10/2026 por María Fernanda Loza» («Versión 1 · valores
    iniciales» before anyone saved). Inside, the design system's form fields
    (44 px controls, label above, helper below):
    - A two-column row: «Mínimo de reservas por clase» (value 2, helper «Una
@@ -71,7 +71,7 @@ por sucursal — las reglas son del estudio, no de una sede.»
 2. **Escritorio · Guardado** — after a save: AW21's Éxito result line above
    the first card, «Guardamos las reglas del estudio.»; «Mínimo de reservas
    por clase» reads 3, «Fecha de apertura» 01/12/2026, and the version line
-   «Versión 4 · guardada el 23/10/2026 por Paola Mendoza».
+   «Versión 4 · guardada el 23/10/2026 por María Fernanda Loza».
 3. **Escritorio · Valores fuera de rango** — «Mínimo de reservas por clase»
    0 and «Impuestos sobre las ventas (%)» 120, each with its Error border and
    message under it: «Entre 1 y 20 reservas.» and «Un porcentaje entre 0 y

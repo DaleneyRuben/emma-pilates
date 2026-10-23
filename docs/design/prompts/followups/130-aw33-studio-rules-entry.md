@@ -18,10 +18,11 @@ account menu opens it.
 ## 1. The menu row
 
 In AW33's popover, the first row under the divider becomes **Reglas del
-estudio** (36 px, 13.5 px, Texto, hover `#FAF3EC`, no icon), above «Cambiar
-contraseña» and «Cerrar sesión», which keep their order and tones. It opens
-AW36 and closes the popover. In the narrow frame's bottom sheet it is the
-first row too.
+estudio** (36 px, 13.5 px, Texto, the same hover as its siblings, with a
+15 px outline sliders icon in Texto secundario like their lock and exit
+icons), above «Cambiar contraseña» and «Cerrar sesión», which keep their
+order and tones. It opens AW36 and closes the popover. In the narrow frame's
+bottom sheet it is the first row too (48 px, 14.5 px, a 17 px icon).
 
 ## 2. The handoff README
 
