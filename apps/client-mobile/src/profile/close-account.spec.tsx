@@ -100,12 +100,12 @@ describe("Cerrar mi cuenta", () => {
       "Cancelamos tus 2 reservas futuras y tu evaluación nutricional pendiente. No se descuenta nada.",
       "Sales de 1 lista de espera.",
       "Tu plan Mensual 16 clases termina hoy. No se devuelve dinero y pierdes las 11 clases que te quedan.",
-      "Pierdes tu crédito de Bs 120.",
       "Cerramos tu sesión en todos tus dispositivos.",
       "Tu correo queda libre por si quieres registrarte de nuevo.",
     ]) {
       expect(screen.getByText(line)).toBeOnTheScreen();
     }
+    expect(screen.queryByText(/crédito/)).toBeNull();
     expect(screen.getByRole("button", { name: "Cerrar mi cuenta" })).toBeDisabled();
 
     await fireEvent.changeText(screen.getByLabelText("Contraseña"), "secret");

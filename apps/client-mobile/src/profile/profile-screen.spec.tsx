@@ -134,7 +134,6 @@ describe("Client Profile", () => {
       "evaluation",
       "evaluations",
       "referrals",
-      "credit",
       "notifications",
       "password",
     ]) {
@@ -142,6 +141,8 @@ describe("Client Profile", () => {
         screen.getByTestId(`profile-row-icon-${row}`, { includeHiddenElements: true }),
       ).toBeOnTheScreen();
     }
+    // PAY-005 retired Credit: Perfil has no «Mi crédito» row.
+    expect(screen.queryByRole("button", { name: /Mi crédito/ })).toBeNull();
   });
 
   // MOB-041: 18 ends every menu row in the 19 pt Icono tenue chevron.
