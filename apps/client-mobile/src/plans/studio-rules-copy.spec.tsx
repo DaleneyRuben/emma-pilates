@@ -18,6 +18,8 @@ const profile = {
 const plan = {
   id: "plan-8",
   name: "8 clases",
+  durationDays: 30,
+  weeklyClassCap: null,
   durationMonths: 1,
   classAllowance: 8,
   priceCentavos: 59_000,
