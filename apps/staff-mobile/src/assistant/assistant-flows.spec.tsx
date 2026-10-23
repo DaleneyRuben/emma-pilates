@@ -240,7 +240,7 @@ describe("Assistant Client flows", () => {
     });
     expect(screen.getByText("Registrando pago para: Lucía Fernández")).toBeOnTheScreen();
     await waitFor(() => {
-      expect(screen.getByText("Este cliente tiene Bs 60 de crédito disponible.")).toBeOnTheScreen();
+      expect(screen.getByText("Esta clienta tiene Bs 60 de crédito disponible.")).toBeOnTheScreen();
     });
     expect(screen.getByText("Bs 500")).toBeOnTheScreen();
     expect(screen.getByText("Bs 720")).toBeOnTheScreen();

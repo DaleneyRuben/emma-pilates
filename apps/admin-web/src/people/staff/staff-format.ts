@@ -3,9 +3,9 @@ import type { StaffRole } from "../people-search";
 
 // AW23's labels: a Role is a fixed category, drawn as a neutral label.
 export const roleLabels: Record<StaffRole, string> = {
-  trainer: "Entrenador",
+  trainer: "Entrenadora",
   assistant: "Asistente",
-  administrator: "Administrador",
+  administrator: "Administración",
   nutritionist: "Nutricionista",
 };
 

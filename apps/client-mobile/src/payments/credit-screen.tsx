@@ -115,7 +115,7 @@ export function CreditScreen() {
         ) : (
           <>
             <BodyText style={styles.centered}>
-              Aún no tienes crédito. Invita a tus amigos para ganar.
+              Aún no tienes crédito. Invita a tus amigas para ganar.
             </BodyText>
             <PrimaryButton label="Ver mi código" onPress={() => navigation.navigate("Referrals")} />
           </>

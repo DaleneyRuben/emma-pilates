@@ -172,7 +172,7 @@ export function ClientBookingsScreen({
     try {
       await api.leaveWaitlist(item.waitlistEntryId);
     } catch {
-      setFailure("No pudimos sacar al cliente de la lista de espera. Inténtalo de nuevo.");
+      setFailure("No pudimos sacar a la clienta de la lista de espera. Inténtalo de nuevo.");
     } finally {
       await refresh();
     }

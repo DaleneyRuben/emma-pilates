@@ -91,7 +91,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/clientes",
         screen: "AW21",
         list: true,
-        studioWide: "los clientes son del estudio, no de una sede.",
+        studioWide: "las clientas son del estudio, no de una sede.",
       },
       {
         label: "Pagos",
