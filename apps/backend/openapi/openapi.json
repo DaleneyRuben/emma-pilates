@@ -4530,6 +4530,53 @@
         ]
       }
     },
+    "/api/v1/administrator/clients/{clientId}/allowance-adjustments": {
+      "post": {
+        "operationId": "recordAllowanceAdjustment",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordAllowanceAdjustmentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AllowanceAdjustmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AllowanceAdjustment"
+        ]
+      }
+    },
     "/api/v1/accounts/current/closure": {
       "post": {
         "operationId": "closeCurrentClientAccount",
@@ -8897,6 +8944,11 @@
           "endsOn": {
             "type": "string",
             "format": "date"
+          },
+          "extraClassesLine": {
+            "type": "string",
+            "nullable": true,
+            "description": "«Clases extra: 1 · Regalo de bienvenida» when extra classes remain"
           }
         },
         "required": [
@@ -11755,6 +11807,50 @@
         },
         "required": [
           "endsOn"
+        ]
+      },
+      "RecordAllowanceAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "classes": {
+            "type": "number",
+            "description": "A signed number of classes, never zero"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "courtesy",
+              "class_return"
+            ]
+          }
+        },
+        "required": [
+          "classes",
+          "reason"
+        ]
+      },
+      "AllowanceAdjustmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "classes": {
+            "type": "number"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "courtesy",
+              "class_return"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "classes",
+          "reason"
         ]
       },
       "CloseAccountRequestDto": {

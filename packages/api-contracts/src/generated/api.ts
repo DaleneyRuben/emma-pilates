@@ -49,6 +49,7 @@ import type {
   AdminSupplyPageDto,
   AdminWebPasswordRecoveryResultDto,
   AdministratorSessionAvailabilityDto,
+  AllowanceAdjustmentDto,
   AssistantCashPaymentDto,
   AssistantClientBookingDto,
   AssistantClientDto,
@@ -176,6 +177,7 @@ import type {
   PromotionsConsentDto,
   PurchaseIntentDto,
   ReadinessResponseDto,
+  RecordAllowanceAdjustmentDto,
   RecordCashPaymentDto,
   ReferralsDto,
   RejectPaymentDto,
@@ -17488,6 +17490,142 @@ export const useGrantCourtesyAccess = <TError = unknown, TContext = unknown>(
 > => {
   return useMutation(
     getGrantCourtesyAccessMutationOptions(options),
+    queryClient,
+  );
+};
+
+export type recordAllowanceAdjustmentResponse201 = {
+  data: AllowanceAdjustmentDto;
+  status: 201;
+};
+
+export type recordAllowanceAdjustmentResponseSuccess =
+  recordAllowanceAdjustmentResponse201 & {
+    headers: Headers;
+  };
+export type recordAllowanceAdjustmentResponse =
+  recordAllowanceAdjustmentResponseSuccess;
+
+export const getRecordAllowanceAdjustmentUrl = (clientId: string) => {
+  return `/api/v1/administrator/clients/${clientId}/allowance-adjustments`;
+};
+
+export const recordAllowanceAdjustment = async (
+  clientId: string,
+  recordAllowanceAdjustmentDto: RecordAllowanceAdjustmentDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<recordAllowanceAdjustmentResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(
+    getRecordAllowanceAdjustmentUrl(clientId),
+    {
+      ...options,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(recordAllowanceAdjustmentDto),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordAllowanceAdjustmentResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordAllowanceAdjustmentResponse;
+};
+
+export const getRecordAllowanceAdjustmentMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof recordAllowanceAdjustment>>,
+    TError,
+    RecordAllowanceAdjustmentMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof recordAllowanceAdjustment>>,
+  TError,
+  RecordAllowanceAdjustmentMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["recordAllowanceAdjustment"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof recordAllowanceAdjustment>>,
+    RecordAllowanceAdjustmentMutationVariables
+  > = (props) => {
+    const { clientId, data } = props ?? {};
+
+    return recordAllowanceAdjustment(clientId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RecordAllowanceAdjustmentMutationResult = NonNullable<
+  Awaited<ReturnType<typeof recordAllowanceAdjustment>>
+>;
+export type RecordAllowanceAdjustmentMutationBody =
+  RecordAllowanceAdjustmentDto;
+export type RecordAllowanceAdjustmentMutationError = unknown;
+export type RecordAllowanceAdjustmentMutationVariables = {
+  clientId: string;
+  data: RecordAllowanceAdjustmentDto;
+};
+
+export const useRecordAllowanceAdjustment = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof recordAllowanceAdjustment>>,
+      TError,
+      RecordAllowanceAdjustmentMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof recordAllowanceAdjustment>>,
+  TError,
+  RecordAllowanceAdjustmentMutationVariables,
+  TContext
+> => {
+  return useMutation(
+    getRecordAllowanceAdjustmentMutationOptions(options),
     queryClient,
   );
 };

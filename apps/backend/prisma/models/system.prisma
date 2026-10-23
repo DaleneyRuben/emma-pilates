@@ -213,6 +213,7 @@ model Account {
   reportedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueReportedBy")
   resolvedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueResolvedBy")
   contactedAlerts           ContactAlert[]          @relation("ContactAlertContactedBy")
+  allowanceAdjustments      AllowanceAdjustment[]   @relation("AllowanceAdjustmentAuthor")
 
   @@map("accounts")
   @@schema("system")

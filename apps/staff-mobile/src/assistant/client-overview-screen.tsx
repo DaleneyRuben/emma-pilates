@@ -75,6 +75,7 @@ function SubscriptionCard({
         </View>
       </View>
       <BodyText>{`${subscription.remainingClassAllowance} clases restantes`}</BodyText>
+      {subscription.extraClassesLine ? <BodyText>{subscription.extraClassesLine}</BodyText> : null}
       <BodyText style={styles.muted}>
         {`${active ? "Vence el" : "Venció el"} ${formatCivilDate(subscription.endsOn)}`}
       </BodyText>

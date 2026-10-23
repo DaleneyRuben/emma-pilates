@@ -78,6 +78,7 @@ export const luciaDetail: AdminClientDetailDto = {
       remainingClassAllowance: 5,
       startsOn: "2026-09-01",
       endsOn: "2026-09-30",
+      extraClassesLine: null,
     },
   },
   creditAvailableCentavos: 105_000,

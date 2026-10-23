@@ -218,12 +218,17 @@ describe('Booking catalog repository', () => {
         },
       });
       const repository = createCatalogRepository(tx);
+      const read = {
+        ...data,
+        allowanceAdjustments: [],
+        extraClassesLine: null,
+      };
       expect(
         await repository.findActiveSubscription(client.id, data.startsOn),
-      ).toEqual(data);
+      ).toEqual(read);
       expect(
         await repository.findActiveSubscription(client.id, data.endsOn),
-      ).toEqual(data);
+      ).toEqual(read);
       expect(
         await repository.findActiveSubscription(
           client.id,

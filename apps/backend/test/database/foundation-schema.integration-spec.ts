@@ -34,6 +34,7 @@ describe('foundation migration', () => {
       'back_office.supplies',
       'back_office.supply_restocks',
       'back_office.withdrawals',
+      'booking.allowance_adjustments',
       'booking.attendance_records',
       'booking.availability_blocks',
       'booking.bookings',

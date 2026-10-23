@@ -135,6 +135,7 @@ export const paymentSelect = {
   decidedAt: true,
   rejectionReason: true,
   subscription: { select: { id: true } },
+  plan: { select: { hiddenAt: true } },
 } as const;
 
 export type IntentRow = Prisma.PurchaseIntentGetPayload<{

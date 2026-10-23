@@ -19,6 +19,7 @@ model Client {
   deletedAt           DateTime?       @map("deleted_at") @db.Timestamptz(3)
   account             Account?
   subscriptions       Subscription[]
+  allowanceAdjustments AllowanceAdjustment[]
   bookings            Booking[]
   waitlistEntries     WaitlistEntry[]
   profileImageAsset   ImageAsset?     @relation("ClientProfileImage", fields: [profileImageAssetId], references: [id], onDelete: Restrict)
