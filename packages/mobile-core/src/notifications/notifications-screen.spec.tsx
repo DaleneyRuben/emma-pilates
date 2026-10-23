@@ -109,6 +109,23 @@ describe("NotificationsScreen", () => {
     expect(screen.getByRole("button", { name: "Marcar leídas" })).toBeOnTheScreen();
   });
 
+  it("refetches the inbox on a pull (UX-004)", async () => {
+    const screen = await renderScreen(
+      createFetcher([
+        { items: items.slice(2), hasMore: false, nextCursor: null },
+        { items, hasMore: false, nextCursor: null },
+      ]),
+    );
+    await waitFor(() => expect(screen.getByText("Anteriores")).toBeOnTheScreen());
+    expect(screen.queryByText("Sin leer")).not.toBeOnTheScreen();
+
+    const [control] = screen.getByTestId("notifications-scroll").children;
+    if (typeof control === "string") throw new Error("The control is the first child");
+    await fireEvent(control, "refresh");
+
+    await waitFor(() => expect(screen.getByText("Sin leer")).toBeOnTheScreen());
+  });
+
   it("marks a notification read when opened and reports its destination", async () => {
     const fetcher = createFetcher([{ items, hasMore: false, nextCursor: null }]);
     const onOpen = jest.fn();

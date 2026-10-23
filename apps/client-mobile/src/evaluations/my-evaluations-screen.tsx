@@ -19,6 +19,8 @@ import {
   TextButton,
   typography,
   useMountedAt,
+  usePullToRefresh,
+  useRefetchOnFocus,
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -117,6 +119,9 @@ export function MyEvaluationsScreen({
   const queryOptions = { fetcher, query: { refetchOnMount: "always" } } as const;
   const upcoming = useListEvaluations({ scope: "upcoming" }, queryOptions);
   const past = useListEvaluations({ scope: "past" }, queryOptions);
+  const queryKeys = [getListEvaluationsQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
 
   const confirmCancel = async () => {
     if (cancelling === null) return;
@@ -185,7 +190,7 @@ export function MyEvaluationsScreen({
           {failure}
         </BodyText>
       ) : null}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {items.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>No tienes evaluaciones próximas.</Text>

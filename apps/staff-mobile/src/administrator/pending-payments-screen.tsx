@@ -1,4 +1,4 @@
-import { useListPendingPayments } from "@pilates/api-contracts";
+import { getListPendingPaymentsQueryKey, useListPendingPayments } from "@pilates/api-contracts";
 import {
   AvatarCircle,
   BodyText,
@@ -17,6 +17,8 @@ import {
   surfaces,
   TextButton,
   typography,
+  usePullToRefresh,
+  useRefetchOnFocus,
   useTransientNotice,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
@@ -47,6 +49,9 @@ export function PendingPaymentsScreen({
     fetcher,
     query: { refetchOnMount: "always" },
   });
+  const queryKeys = [getListPendingPaymentsQueryKey()];
+  useRefetchOnFocus(queryKeys);
+  const refreshControl = usePullToRefresh(queryKeys);
   // Confirming or rejecting returns here with a two-second notice.
   const paymentsNotice = useTransientNotice(route.params?.notice, noticeMilliseconds, () =>
     navigation.setParams({ notice: undefined }),
@@ -98,7 +103,7 @@ export function PendingPaymentsScreen({
   return (
     <Screen style={styles.screen}>
       {header}
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} refreshControl={refreshControl}>
         {payments.length === 0 ? (
           <View style={styles.empty}>
             <Text style={styles.emptyTitle}>No hay pagos pendientes.</Text>

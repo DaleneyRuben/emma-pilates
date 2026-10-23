@@ -235,17 +235,18 @@ describe("Client Profile", () => {
 
   it("edits the name and phone and saves them through the API", async () => {
     const saved = jest.fn();
+    // Perfil refetches when it regains focus (UX-004), so the read answers
+    // with the saved profile once the PATCH has landed, as the API does.
+    let current: { name: string; phone: string | null } = profile;
     const screen = await openProfile(
       createClientRuntime(
         routeFetcher({
           ...readRoutes,
+          "/api/v1/clients/current": () => jsonResponse(current),
           "PATCH /api/v1/clients/current": (init) => {
             saved(JSON.parse(String(init?.body)));
-            return jsonResponse({
-              ...profile,
-              name: "Sofía Guzmán Vega",
-              phone: null,
-            });
+            current = { ...profile, name: "Sofía Guzmán Vega", phone: null };
+            return jsonResponse(current);
           },
         }),
       ),
