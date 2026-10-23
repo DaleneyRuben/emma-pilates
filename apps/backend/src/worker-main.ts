@@ -115,7 +115,7 @@ async function bootstrap(): Promise<void> {
       execute: () => evaluations.sendDueEvaluationReminders(),
     },
     minimumBookingsChecks: {
-      execute: () => sessionStartChecks.checkEmptySessions(),
+      execute: () => sessionStartChecks.checkMinimumBookings(),
     },
     windowCloseSnapshots: {
       execute: () => sessionStartChecks.recordWindowCloseBookings(),

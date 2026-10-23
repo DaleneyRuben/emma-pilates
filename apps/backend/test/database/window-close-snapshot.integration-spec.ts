@@ -70,7 +70,12 @@ describe('Prisma Session start checks: Bookings at the window close', () => {
     // the snapshot alone.
     await world.prisma.booking.updateMany({
       where: { sessionId: taught.id, clientId: valeria.clientId },
-      data: { state: 'CANCELLED', cancelledAt: new Date() },
+      data: {
+        state: 'CANCELLED',
+        cancelledAt: new Date(),
+        cancelledByAccountId: valeria.accountId,
+        cancellationCause: 'CLIENT_REQUEST',
+      },
     });
     world.setClock(new Date(closes.getTime() + 60 * minute));
     await expect(world.checks().recordWindowCloseBookings()).resolves.toEqual({
