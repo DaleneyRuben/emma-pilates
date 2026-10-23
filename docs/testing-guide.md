@@ -47,8 +47,8 @@ can be found by its design name.
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52 |
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77 |
-| 12 Mi plan | 5, 18, 71, 76, 77 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77, 78 |
+| 12 Mi plan | 5, 18, 71, 76, 77, 78 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Mis referidos, 17 Mi crédito | 10, 18 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
@@ -60,7 +60,7 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 77 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 77, 78 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
@@ -80,6 +80,7 @@ can be found by its design name.
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72 |
+| AW37 Fundadoras | 78 |
 | AW23–AW24 Personal | 26, 31, 72 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -6013,3 +6014,42 @@ D. **A booking before the Start Date (04).** End the current Subscription
 The reminder that names the renewal arrives with the worker's Plan reminder
 (Test 7). An Evaluation booked before the Start Date still answers the
 existing ineligible-subscription refusal.
+
+## Test 78: founder membership (BKM-010)
+
+The first 40 Clients whose first real Payment is confirmed hold a Founder
+Membership: 15 % off every Plan except the single class, lost for good after
+a gap of more than 7 days
+([booking ADR-0008](../booking/docs/adr/0008-founder-membership.md)).
+Run the API and the fixtures as in Tests 2 and 5. The Client app and the
+Staff app were not walked on a device for this item; the prices and the
+banner are covered by their unit tests. The admin list is the browser check.
+
+A. **The place.** Confirm a real Payment (cash or an approved transfer) for
+   a Client who has never paid. She receives the next number, from 1 to 40.
+   The 41st distinct Client receives none. A Courtesy Access (Bs 0) takes
+   no place. A second real Payment for a founder does not take a second
+   number.
+B. **The price (08, 09, S09).** As a founder, **Elige tu plan** shows the
+   discounted price, with the list price struck through under it. The
+   single class (1 class, Bs 80) shows only its list price. A Client who is
+   not a founder sees only the list price. The Assistant's quote shows the
+   same pair, and the cash to collect is the discounted price minus any
+   credit. The first real Payment itself is at list price; the discount
+   starts on the next purchase.
+C. **The banner (12).** As a founder with a current Subscription, **Mi
+   plan** shows «Renueva antes del {fecha}.» The date is the current
+   Subscription's real end plus 7 days. No banner when she has no current
+   Subscription, or when the membership is lost.
+D. **The gap.** A nightly job ends a membership when more than 7 days pass
+   after the stored end with no next Start Date. A gap of 7 days keeps it.
+   A lost membership does not return on a later Payment. Running the job
+   twice ends nothing the second time. The Client receives a push and an
+   inbox notification titled «Membresía fundadora».
+E. **The income report.** A founder's later sale shows the list price, the
+   discount (`discountReason` `founder`), and the amount paid.
+F. **Fundadoras (AW37).** As Paola, open **Back Office → Fundadoras**. The
+   subtitle reads «n de 40 lugares». Each row shows the number, the name,
+   the day (`dd/mm/aaaa`), and **Activa** or **Perdida**. There is no
+   create action. At 420 px each membership is a card. An empty studio
+   reads «Todavía no hay fundadoras.»
