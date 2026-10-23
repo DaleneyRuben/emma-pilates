@@ -477,7 +477,7 @@ wait for Google, Apple, and testers.
 | PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | ready |
 | BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
-| NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
+| NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | done |
 | BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | ready |
 | BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | ready |
 | BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | ready |
@@ -780,7 +780,9 @@ Decisions (blanket approval, 2026-10-23; booking ADR-0011):
 - A cancellation inside 3 hours is refused (`evaluation_cancellation_window_closed`), so the booked row stays and the included Evaluation stays used. An early cancellation frees it. A no-show is a new `no_show` state, recorded by the Nutritionist or an Administrator after the start, and it also stays used. The Nutritionist cost is `nutritionist_cost_centavos` on the booked row, written when an included Evaluation is booked and when an evaluation transfer is confirmed. It stays null while the transfer is pending. There is no separate held state. BKO-005 reads it later.
 - History labels, derived, not stored: «Incluida», «Pagada», «No asistió», «Cancelada». A pending transfer is not history.
 
-Open questions: none. The owner did not say who records a no-show; the Nutritionist and an Administrator do, after the start.
+Open questions: none. The owner did not say who records a no-show; the Nutritionist and an Administrator do, after the start. The slot list still marks a free slot bookable when the Client has no covering Plan; booking refuses that Client. Whether the list should say so is left for follow-up 199.
+
+Evidence: commits `2d1a4dda` (offer), `f983b5d5` (rules, payments, income split), `ff8add18` (decisions, Test 80, follow-ups 199 and 200). Migrations `20261023210000_evaluation_payments` and `20261023210100_evaluation_payment_constraints` need owner approval; they ran only on disposable databases. Verified: integration suites for the rules, bookings, timeline, availability, schema, and income report (28 tests); admin report page spec; client evaluations spec for the Bs 70 QR start. Curl on API 3131 against `pilates_nut003_dev`: Lucía (Paquete de 8) sees `included: false`, `priceCentavos: 7000`; the old book returns `evaluation_payment_required`; the QR book holds the slot with a pending evaluation Payment and no Subscription; Paola's confirm writes the Bs 50 cost, creates no Subscription, and the October income report is plan 0 and evaluation 7000. Sofía, whose Plan is expired, is refused with `no_eligible_subscription`. Playwright Chromium at 1440 and 420 on admin web 5201: Evaluaciones nutricionales lists Lucía's held row, and Reporte shows «Planes Bs 780,00 · Evaluaciones Bs 0,00» before that confirm. Mobile apps were not walked on a device. Cash at the front desk is not built. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/180.
 
 Acceptance criteria:
 
