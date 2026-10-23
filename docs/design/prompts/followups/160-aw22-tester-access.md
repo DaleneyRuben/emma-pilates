@@ -44,7 +44,8 @@ confirming a Payment on `AW29`, follow-up 53/55 convention):
 - **Done:** the dialog closes and the panel stays open. The Plan block now
   reads «Acceso de prueba» with the Éxito «Activo» pill, «Vigencia» from today
   to the chosen date, and «Clases disponibles» «16 de 16». An Éxito line sits
-  above the footer buttons: «Acceso de prueba activo hasta el 22 nov 2026.»
+  above the footer buttons: «Acceso de prueba activo hasta el 22/11/2026.»
+  (the design system's `dd/mm/aaaa`).
   The **Acceso de prueba** button disappears, because she now has an active
   Plan. Draw this frame.
 - **Refused:** the dialog stays open with an Error notice above its buttons,
