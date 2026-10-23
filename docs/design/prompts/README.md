@@ -32,7 +32,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [22](./client/22-edit-profile.md) | Editar perfil | `22` | ✅ |
 | [23](./client/23-change-password-signed-in.md) | Cambiar contraseña (sesión iniciada) | `23` | ✅ |
 | [24](./client/24-close-account.md) | Cerrar mi cuenta | `24` | ✅ |
-| [25](./client/25-send-feedback.md) | Enviar comentarios | `25` | 🕓 pending (REL-012; the app is built from the prompt) |
+| [25](./client/25-send-feedback.md) | Enviar comentarios | `25` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 
 ## Staff app (`staff/`)
 
@@ -62,7 +62,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S22](./staff/22-assistant-client-history.md) | Historial de la clienta (Asistente) | `S22` | ✅ |
 | [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | ✅ |
 | [S24](./staff/24-administrator-view-as.md) | Ver la app como… (Administración) | `S24` | ✅ (Claude Design canvas, 2026-10-22, `e81417e9`; the app side is stage 3 of FUT-001) |
-| [S27](./staff/27-send-feedback.md) | Enviar comentarios (todos los roles) | `S27` | 🕓 pending (REL-012; S25 and S26 are taken by sibling items) |
+| [S27](./staff/27-send-feedback.md) | Enviar comentarios (todos los roles) | `S27` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 
 ## Admin web (`admin-web/`)
 
@@ -104,7 +104,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW33](./admin-web/33-user-menu.md) | Menú de usuario y cambiar contraseña | `AW33` | ✅ |
 | [AW34](./admin-web/34-branch-selector.md) | Selector de sucursal | `AW34` | ✅ |
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
-| [AW38](./admin-web/38-comentarios.md) | Comentarios | `AW38` | 🕓 pending (REL-012; AW36 and AW37 are taken by sibling items) |
+| [AW38](./admin-web/38-comentarios.md) | Comentarios | `AW38` | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 
 ## Follow-ups (`followups/`)
 
@@ -224,8 +224,8 @@ Each of these was sent as the next message in the existing design session for th
 | [108](./followups/108-impersonation-entry-and-banner.md) | The «Ver la app como…» row on `S23`'s Administrator frame (opens the new `S24`), the fixed Palo de rosa profundo impersonation banner («Viendo como {name}» over «{role} · Quedan {n} min», «Salir») in one new frame each on `S02`/`S04`/`S15`, a «Franja de suplantación» card in the design system's section 06, and the README (`S24` row, «Impersonation banner (Staff)», navigation) (FUT-001, ADR-0100) | ✅ applied (Claude Design canvas, 2026-10-22, `e81417e9`: the two-line banner settled before sending, `85f89753`; the app side is stage 3 of FUT-001) |
 | [109](./followups/109-assistant-refuse-early.md) | The Assistant's flows refuse early (UX-003, UX-001 findings S2 and S3): `S07`'s phone and tablet frames mark the Session the Client already booked with the neutral «Ya reservada» pill, `S08` gains a fourth phone frame «Ya reservada» whose action zone holds only «La clienta ya tiene esta clase reservada.», `S06`'s active phone frame and a new «Tablet · Plan activo» frame disable «Registrar pago en efectivo» with «Podrá comprar otro plan cuando este termine.», and the README's `S06`/`S07`/`S08` rows and seat-pill rules say so | ✅ applied (Claude Design canvas, 2026-10-22, `58d20bd9`; the Staff app is built in UX-003) |
 | [115](./followups/115-lists-refresh-on-focus-and-pull.md) | Every list refreshes when it regains focus and on pull (UX-004, UX-001 finding C1): one bullet in the README's «Loading state (Client and Staff)» naming the background refetch and the native pull-to-refresh control in Palo de rosa; no numbered screen changes (109–114 are reserved by UX-003, UX-005, UX-006, UX-009, UX-010 and UX-012) | ✅ applied (Claude Design canvas, 2026-10-22, `7b761df1`; the apps are built in UX-004) |
-| [165](./followups/165-perfil-feedback-row.md) | The «Enviar comentarios» row: last in `18`'s menu card with a speech-bubble line icon (opens the new `25`), and after «Cambiar contraseña» in every `S23` frame (opens the new `S27`); README inventory rows (REL-012) | 🕓 pending |
-| [166](./followups/166-admin-comentarios-entry.md) | «Comentarios» alone in a last sidebar group after Promociones (opens the new `AW38`), in the design system's sidebar card and the README's order (REL-012) | 🕓 pending |
+| [165](./followups/165-perfil-feedback-row.md) | The «Enviar comentarios» row: last in `18`'s menu card with a speech-bubble line icon (opens the new `25`), and after «Cambiar contraseña» in every `S23` frame (opens the new `S27`); README inventory rows (REL-012) | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
+| [166](./followups/166-admin-comentarios-entry.md) | «Comentarios» alone in a last sidebar group after Promociones (opens the new `AW38`), in the design system's sidebar card and the README's order (REL-012) | ✅ applied (Claude Design canvas, 2026-10-23, `6125f04d`; the canvas «REL-012 Enviar comentarios» could not be deleted from the agent session, the user deletes it with `/artifacts`) |
 
 ## Status
 
