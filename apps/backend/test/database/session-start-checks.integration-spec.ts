@@ -131,7 +131,7 @@ describe('Prisma Session start checks', () => {
       prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
     ).resolves.toMatchObject({
       state: 'SCHEDULED',
-      emptyBookingCheckCompletedAt: null,
+      minimumBookingsCheckCompletedAt: null,
     });
 
     clock = due;
@@ -146,7 +146,7 @@ describe('Prisma Session start checks', () => {
       cancellationCause: 'ZERO_BOOKINGS',
       cancelledAt: due,
       cancelledByAccountId: null,
-      emptyBookingCheckCompletedAt: due,
+      minimumBookingsCheckCompletedAt: due,
     });
     await expect(
       prisma.waitlistEntry.findUniqueOrThrow({ where: { id: entry.id } }),
@@ -204,7 +204,7 @@ describe('Prisma Session start checks', () => {
       prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
     ).resolves.toMatchObject({
       state: 'SCHEDULED',
-      emptyBookingCheckCompletedAt: due,
+      minimumBookingsCheckCompletedAt: due,
     });
 
     await bookings.cancel({ bookingId: booking.id }, lucia);
@@ -217,7 +217,7 @@ describe('Prisma Session start checks', () => {
       prisma.session.findUniqueOrThrow({ where: { id: session.id } }),
     ).resolves.toMatchObject({
       state: 'SCHEDULED',
-      emptyBookingCheckCompletedAt: due,
+      minimumBookingsCheckCompletedAt: due,
     });
     await expect(trainerNotices()).resolves.toHaveLength(noticesBefore);
   });
@@ -284,7 +284,7 @@ describe('Prisma Session start checks', () => {
       cancellationCause: 'NO_SUBSTITUTE_TRAINER',
       cancelledAt,
       cancelledByAccountId: administratorAccountId,
-      emptyBookingCheckCompletedAt: null,
+      minimumBookingsCheckCompletedAt: null,
     });
     await expect(trainerNotices()).resolves.toHaveLength(noticesBefore);
   });
@@ -354,7 +354,7 @@ describe('Prisma Session start checks', () => {
       include: { bookings: { where: { state: 'BOOKED' } } },
     });
     expect(landed).toBeDefined();
-    expect(after.emptyBookingCheckCompletedAt).toEqual(clock);
+    expect(after.minimumBookingsCheckCompletedAt).toEqual(clock);
     if (landed!.status === 'fulfilled') {
       expect(after).toMatchObject({
         state: 'SCHEDULED',

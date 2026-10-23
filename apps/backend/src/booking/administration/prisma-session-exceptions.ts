@@ -188,7 +188,7 @@ export const createPrismaSessionExceptions = (
             startsAt,
             endsAt: new Date(startsAt.getTime() + durationMinutes * minuteMs),
             isException: true,
-            ...(startChanged ? { emptyBookingCheckCompletedAt: null } : {}),
+            ...(startChanged ? { minimumBookingsCheckCompletedAt: null } : {}),
           },
           select: sessionSelect,
         });

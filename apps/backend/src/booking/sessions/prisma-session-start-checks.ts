@@ -51,7 +51,7 @@ export const createPrismaSessionStartChecks = (
               state: true,
               startsAt: true,
               endsAt: true,
-              emptyBookingCheckCompletedAt: true,
+              minimumBookingsCheckCompletedAt: true,
               classType: { select: { name: true } },
               trainer: { select: { account: { select: { id: true } } } },
               _count: {
@@ -69,7 +69,7 @@ export const createPrismaSessionStartChecks = (
           });
           if (
             session.state !== SessionState.SCHEDULED ||
-            session.emptyBookingCheckCompletedAt !== null ||
+            session.minimumBookingsCheckCompletedAt !== null ||
             !isEmptySessionCheckDue(session, now)
           ) {
             return 'skipped';
@@ -78,7 +78,7 @@ export const createPrismaSessionStartChecks = (
           if (session._count.bookings > 0) {
             await transaction.session.update({
               where: { id: session.id },
-              data: { emptyBookingCheckCompletedAt: now },
+              data: { minimumBookingsCheckCompletedAt: now },
             });
             return 'checked';
           }
@@ -89,7 +89,7 @@ export const createPrismaSessionStartChecks = (
               state: SessionState.CANCELLED,
               cancellationCause: SessionCancellationCause.ZERO_BOOKINGS,
               cancelledAt: now,
-              emptyBookingCheckCompletedAt: now,
+              minimumBookingsCheckCompletedAt: now,
             },
           });
           await transaction.waitlistEntry.updateMany({
@@ -137,7 +137,7 @@ export const createPrismaSessionStartChecks = (
     const candidates = await prisma.session.findMany({
       where: {
         state: SessionState.SCHEDULED,
-        emptyBookingCheckCompletedAt: null,
+        minimumBookingsCheckCompletedAt: null,
         startsAt: {
           lte: new Date(now.getTime() + emptyCheckLeadMilliseconds),
         },
