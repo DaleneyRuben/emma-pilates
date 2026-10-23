@@ -648,7 +648,7 @@ Acceptance criteria:
 - The 41st Client gets no membership. A gap of 8 days ends it, and a gap of 7 does not.
 - The income report shows list price, discount, and paid amount.
 
-Evidence (BKM-010, 2026-10-23, branch `feature/bkm-010-founder-membership`, stacked on `feature/bkm-006-start-date` at `922843a7`). Rules red `8dfee14c`, rules green `a63f894e`, nightly loss red `d344f33b`, nightly loss green `ea63768b`, founder plan prices red `780fb578`, schema `6ed3df24`, grant and discount `71869500`, worker `fba925ee`, income and list `86276611`, prices and deadline `41f371b6`, contract `33636e8a`, screens `ac3d1cc2`.
+Evidence (BKM-010, 2026-10-23, branch `feature/bkm-010-founder-membership`, stacked on `feature/bkm-006-start-date` at `922843a7`, [PR #173](https://github.com/DaleneyRuben/emma-pilates/pull/173)). Rules red `8dfee14c`, rules green `a63f894e`, nightly loss red `d344f33b`, nightly loss green `ea63768b`, founder plan prices red `780fb578`, schema `6ed3df24`, grant and discount `71869500`, worker `fba925ee`, income and list `86276611`, prices and deadline `41f371b6`, contract `33636e8a`, screens `ac3d1cc2`.
 
 Decisions taken:
 
@@ -668,6 +668,8 @@ Decisions taken:
 Verified:
 
 - Integration (`pilates_test_bkm010`): the 41st Client gets no membership; a later Plan is discounted by exactly 15 % and the single class is not; Courtesy Access takes no place; two concurrent confirms receive 1 and 2; a gap of 8 ends it and a gap of 7 does not; a second run ends nothing; a lost membership does not return; the income report shows list price, discount, and paid amount; an Assistant and a cast Coordinator are refused the list.
+- API on 3128 over `pilates_bkm010_dev` (dropped after). Camila's cash sale for Sofía answered `201` at list price (`discountCentavos` 0) and granted number 1. Sofía's plan list then showed 47600 beside list 56000. Her subscription named `founderRenewalDeadline` 2026-11-28. Paola's founders list answered 1 of 40, Sofía, active.
+- Admin web on 5197, Playwright Chromium. At 1440 px the table shows number 1, Sofía Guzmán, 23/10/2026, Activa, subtitle «1 de 40 lugares», Fundadoras active under Clientes, no create action. At 420 px the same row is a card behind «Abrir menú».
 
 Open:
 
