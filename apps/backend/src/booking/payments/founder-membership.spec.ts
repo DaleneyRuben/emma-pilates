@@ -116,7 +116,7 @@ describe('founder gap', () => {
         rules,
         membership,
         latestRealEnd: civil('2026-10-20'),
-        nextStart: civil('2026-10-28'),
+        nextStart: civil('2026-10-27'),
       }),
     ).toEqual({ lose: false });
     expect(
@@ -125,7 +125,7 @@ describe('founder gap', () => {
         rules,
         membership,
         latestRealEnd: civil('2026-10-20'),
-        nextStart: civil('2026-10-29'),
+        nextStart: civil('2026-10-28'),
       }),
     ).toEqual({ lose: true, reason: 'gap' });
     expect(
