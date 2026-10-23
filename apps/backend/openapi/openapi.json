@@ -5331,6 +5331,63 @@
         ]
       }
     },
+    "/api/v1/administrator/contact-alerts": {
+      "get": {
+        "operationId": "listContactAlerts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContactAlertListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ContactAlerts"
+        ]
+      }
+    },
+    "/api/v1/administrator/contact-alerts/{clientId}/contacted": {
+      "post": {
+        "operationId": "markClientContacted",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ContactAlerts"
+        ]
+      }
+    },
     "/api/v1/evaluation-slots": {
       "get": {
         "operationId": "listEvaluationSlots",
@@ -11782,6 +11839,64 @@
         },
         "required": [
           "imageAssetId"
+        ]
+      },
+      "ContactAlertItemDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "startedOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Start Date of the first real Plan, Bolivia civil date"
+          },
+          "reasons": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "no_booking_7_days",
+                "fewer_than_2_classes_by_day_15",
+                "fewer_than_4_classes_in_first_30_days"
+              ]
+            }
+          }
+        },
+        "required": [
+          "clientId",
+          "name",
+          "phone",
+          "startedOn",
+          "reasons"
+        ]
+      },
+      "ContactAlertListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContactAlertItemDto"
+            }
+          },
+          "totalItems": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "items",
+          "totalItems"
         ]
       },
       "EvaluationSlotDto": {

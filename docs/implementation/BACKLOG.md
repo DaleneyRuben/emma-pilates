@@ -481,7 +481,7 @@ wait for Google, Apple, and testers.
 | BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | ready |
 | BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | ready |
 | BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | ready |
-| BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | ready |
+| BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | done (c0bf32ec; evidence below) |
 | BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | done (640306cc, 60f50324, 2ef9df18, d8798346, 830ece53; evidence below) |
 | BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | ready |
 | BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | ready |
@@ -677,6 +677,28 @@ Acceptance criteria:
 - An authorization matrix test lists every endpoint and checks Administrator ✓ and Coordinator ✓/✗.
 - The admin web for a Coordinator shows no amount anywhere: the Playwright journey searches the page text for «Bs».
 - The Coordinator's pay is invisible to her.
+
+#### BKM-013 · First 90 days
+
+Done on 2026-10-23, branch `feature/bkm-013-first-90-days`, stacked on #159.
+Commits: `1c160144` date rules, `9ab7dcf2` persistence, `b3237068` worker job,
+`f565709d` list and mark, `2da80840` admin page, `c0bf32ec` Staff screen.
+Migration `20261023182540_first_90_days` (needs approval).
+
+Verified: backend unit 32 passed, integration 10 passed on
+`pilates_test_bkm013`, lint clean. AW39 in Chromium at 1440 and 420 px as
+Paola and as Carolina: the list, the count badge, «Abrir WhatsApp»
+(`wa.me/591…`), and «Contactada» removing the row with «Marcaste a Valeria
+Quiroga como contactada.». Carolina's page shows no «Bs». S28 on the iPhone
+16 Pro, the iPad Pro 11-inch (M4), and the Android emulator: Lucía with
+«Menos de 4 clases en su primer mes», «Abrir WhatsApp», and «Contactada»; the
+empty state «Nadie para contactar por ahora.» was seen on the iPhone first.
+The inbox message reached Sofía on all three devices.
+
+Open: the inbox card draws the message body and not the title («Tu primera
+semana» never appears; the push carries the title). The four titles need the
+owner's approval. A Client leaves the list as soon as she books, and a
+cancellation can put her back.
 
 #### NUT-003 · Nutritionist rules
 

@@ -213,6 +213,11 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/administrator/clients/{clientId}': both('allow'),
   'PATCH /api/v1/administrator/clients/{clientId}': both('allow'),
   'POST /api/v1/administrator/clients/{clientId}/closure': administratorOnly(),
+  'GET /api/v1/administrator/contact-alerts': both('allow'),
+  'POST /api/v1/administrator/contact-alerts/{clientId}/contacted': both(
+    'allow',
+    { realIds: { clientId: 'clientId' } },
+  ),
 
   // Staff: details for the schedule; access decisions stay with the
   // Administrator.

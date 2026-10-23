@@ -1,5 +1,6 @@
 import {
   getSearchAssistantClientsQueryKey,
+  useListContactAlerts,
   useSearchAssistantClients,
 } from "@pilates/api-contracts";
 import {
@@ -15,6 +16,7 @@ import {
   surfaces,
   TextButton,
   typography,
+  UnreadCountPill,
   usePullToRefresh,
   useRefetchOnFocus,
 } from "@pilates/mobile-core";
@@ -31,7 +33,7 @@ import { ClientDetailPanel } from "./client-panel";
 
 export type ClientSearchNavigation = {
   navigate: {
-    (screen: "NewClient" | "CancelClass"): void;
+    (screen: "NewClient" | "CancelClass" | "ContactList"): void;
     (screen: "ClientOverview", params: { clientId: string }): void;
   };
 };
@@ -62,6 +64,11 @@ export function ClientSearchScreen() {
   const coordinator = useStaffRole() === "coordinator";
   const [text, setText] = useState("");
   const [query, setQuery] = useState("");
+  const alerts = useListContactAlerts({
+    fetcher,
+    query: { enabled: coordinator },
+  });
+  const contactCount = alerts.data?.status === 200 ? alerts.data.data.totalItems : 0;
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(text.trim()), debounceMilliseconds);
@@ -105,11 +112,23 @@ export function ClientSearchScreen() {
         value={text}
       />
       {coordinator ? (
-        <TextButton
-          label="Cancelar una clase"
-          onPress={() => navigation.navigate("CancelClass")}
-          testID="client-search-cancel-class"
-        />
+        <>
+          <TextButton
+            label="Cancelar una clase"
+            onPress={() => navigation.navigate("CancelClass")}
+            testID="client-search-cancel-class"
+          />
+          <Pressable
+            accessibilityLabel="Para contactar"
+            accessibilityRole="button"
+            onPress={() => navigation.navigate("ContactList")}
+            style={styles.contactListButton}
+            testID="client-search-contact-list"
+          >
+            <Text style={styles.contactListLabel}>Para contactar</Text>
+            <UnreadCountPill count={contactCount} testID="contact-list-count" />
+          </Pressable>
+        </>
       ) : (
         <NewClientButton onPress={() => navigation.navigate("NewClient")} />
       )}
@@ -174,6 +193,18 @@ export function ClientSearchScreen() {
 }
 
 const styles = StyleSheet.create({
+  contactListButton: {
+    alignItems: "center",
+    borderColor: colors.primary,
+    borderRadius: radii.control,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: spacing.sm,
+    justifyContent: "center",
+    minHeight: 48,
+    paddingHorizontal: spacing.lg,
+  },
+  contactListLabel: { color: colors.primaryDeep, fontSize: typography.body, fontWeight: "500" },
   contact: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   empty: { alignItems: "center", gap: spacing.sm, paddingVertical: spacing.xl },
   emptyTitle: {

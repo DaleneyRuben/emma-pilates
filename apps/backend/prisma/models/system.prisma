@@ -211,6 +211,7 @@ model Account {
   createdEquipment          Equipment[]             @relation("EquipmentCreatedBy")
   reportedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueReportedBy")
   resolvedEquipmentIssues   EquipmentIssue[]        @relation("EquipmentIssueResolvedBy")
+  contactedAlerts           ContactAlert[]          @relation("ContactAlertContactedBy")
 
   @@map("accounts")
   @@schema("system")

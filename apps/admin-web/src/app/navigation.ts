@@ -11,6 +11,7 @@ export type AdminPath =
   | "/catalogo/planes"
   | "/catalogo/sucursales"
   | "/back-office/clientes"
+  | "/back-office/para-contactar"
   | "/back-office/pagos"
   | "/back-office/insumos"
   | "/back-office/equipos"
@@ -43,7 +44,7 @@ export type NavigationItem = {
    * waiting in Pagos, or the selected Branch's low-stock Supplies in the
    * warning tint beside Insumos.
    */
-  badge?: "pendingPayments" | "lowStock";
+  badge?: "pendingPayments" | "lowStock" | "contactAlerts";
   /**
    * Its sub-pages keep it marked: every page under it (AW31 is a view of
    * Insumos), or only the listed ones where siblings share its prefix
@@ -99,6 +100,14 @@ export const navigationGroups: readonly NavigationGroup[] = [
         list: true,
         coordinator: true,
         studioWide: "los clientes son del estudio, no de una sede.",
+      },
+      {
+        label: "Para contactar",
+        to: "/back-office/para-contactar",
+        screen: "AW39",
+        coordinator: true,
+        badge: "contactAlerts",
+        studioWide: "las clientas son del estudio, no de una sede.",
       },
       {
         label: "Pagos",

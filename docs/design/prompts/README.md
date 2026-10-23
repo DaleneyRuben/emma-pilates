@@ -62,6 +62,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | ✅ |
 | [S24](./staff/24-administrator-view-as.md) | Ver la app como… (Administración) | `S24` | ✅ (Claude Design canvas, 2026-10-22, `e81417e9`; the app side is stage 3 of FUT-001) |
 | [S26](./staff/26-trainer-report-fault.md) | Reportar una falla (Entrenadora) | `S26` | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
+| [S28](./staff/28-coordinator-contact-list.md) | Para contactar (Coordinación) | `S28` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 
 ## Admin web (`admin-web/`)
 
@@ -105,6 +106,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
 | [AW36](./admin-web/36-reglas-del-estudio.md) | Reglas del estudio | `AW36` | ✅ (Claude Design canvas, 2026-10-23, `55bbe4cc`; the admin web is built in BKM-004) |
 | [AW37](./admin-web/37-equipos.md) | Equipos | `AW37` | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
+| [AW39](./admin-web/39-para-contactar.md) | Para contactar | `AW39` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 
 ## Follow-ups (`followups/`)
 
@@ -237,6 +239,9 @@ Each of these was sent as the next message in the existing design session for th
 | [177](./followups/177-plan-end-reads-vence-el.md) | `02`'s plan card and `12`'s dates block name the end «Vence el …» instead of «Pagado hasta» (BKM-005, booking ADR-0005) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |
 | [178](./followups/178-plans-by-days-assistant.md) | `S09`'s cards in days with the cap, `S10`'s plan card terms in days and its success line «Vence el …» (BKM-005) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |
 | [179](./followups/179-plans-by-days-corrections.md) | Record of how 175 and 178 were applied: `AW05` draws «Vigencia» and «Tope semanal» as segmented buttons (the admin web keeps selects), `S09` draws four of the eight Plans (BKM-005) | ✅ applied (same canvas and commit `20a8da54`) |
+| [185](./followups/185-aw02-para-contactar-entry.md) | «Para contactar» in the admin sidebar (BKM-013): after «Clientes» in `AW02`'s Administrator and Coordinator frames, with a count badge; amends checklist 30 §5; design system and README (`AW39` row) | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
+| [186](./followups/186-s04-para-contactar-entry.md) | «Para contactar» under «Cancelar una clase» on `S04`'s Coordinator frame, with a count pill, opening the new `S28`; README (BKM-013) | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
+| [187](./followups/187-lifecycle-messages-inbox.md) | The first-90-days message in `19`'s list («Tu primera semana», opens nothing); amends checklist 30 §8 to eight Client types; README (BKM-013) | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 
 ## Status
 

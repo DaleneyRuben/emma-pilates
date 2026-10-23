@@ -13,9 +13,17 @@ test.describe("the Coordinator's admin web", () => {
   test("shows operations without a single amount", async ({ page }) => {
     await signIn(page, "/", fixtures.coordinator);
 
+    // Lucía, Valeria, and Isabel start a paid Plan inside the first 90 days
+    // with no Booking, so the worker's first pass badges those three.
+    await expect(
+      sidebar(page).getByRole("link", {
+        name: "Para contactar, 3 para contactar",
+      }),
+    ).toBeVisible();
     await expect(sidebar(page).getByRole("link")).toHaveText([
       "Horario",
       "Clientes",
+      "Para contactar3",
       "Personal",
     ]);
     await expect(

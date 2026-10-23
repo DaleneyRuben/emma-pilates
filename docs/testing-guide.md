@@ -29,7 +29,7 @@ you are starting with no project knowledge.
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 78) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 78) | The counts-only statistics come with STU-003; «Para contactar» is Test 79 |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
@@ -52,7 +52,7 @@ can be found by its design name.
 | 12 Mi plan | 5, 18, 71, 76 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Mis referidos, 17 Mi crédito | 10, 18 |
-| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60 |
+| 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 79 |
 | 20 Recuperar contraseña, 21 Crea tu contraseña | 1, 5, 6, 57, 71 |
 | 22 Editar perfil, 23 Cambiar contraseña, 24 Cerrar mi cuenta | 9, 34, 35, 49, 50, 52, 53 |
 
@@ -61,7 +61,7 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 77 |
 | S26 Reportar una falla (Entrenadora) | 77 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 78 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 78, 79 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20, 78 |
@@ -69,6 +69,7 @@ can be found by its design name.
 | S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 78 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
+| S28 Para contactar (Coordinación) | 79 |
 
 | Admin web | Tests |
 | --- | --- |
@@ -83,6 +84,7 @@ can be found by its design name.
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78 |
+| AW39 Para contactar | 79 |
 | AW23–AW24 Personal | 26, 31, 72, 78 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -6152,3 +6154,35 @@ and `GET /api/v1/assistant/clients/{id}/plan-quotes` answer `403`;
 null}` answers the refreshed detail without `creditAvailableCentavos`, and
 `system.audit_records` gains `client.profile_corrected` with
 `actor_role = coordinator` and only the changed field names.
+
+## Test 79: the first 90 days (BKM-013)
+
+A new Client gets a message on day 2, at the end of week 1, on day 30, and
+on day 90, and she appears on **Para contactar** when she stops booking.
+
+### A. The admin web
+
+1. Sign in as `paola.mendoza@example.com` (Test 24). The sidebar shows
+   **Para contactar** after **Clientes**, with a count.
+2. Open it. Each row names the Client, her phone, the reason («7 días sin
+   reservar», «Menos de 2 clases a los 15 días», «Menos de 4 clases en su
+   primer mes»), and the day she started. **Abrir WhatsApp** opens
+   `wa.me` with her number, and **Contactada** removes her with «Marcaste a
+   {nombre} como contactada.».
+3. At 420 px the same rows become cards behind **Abrir menú**.
+4. Sign in as `carolina.rivas@example.com`: she sees the same page and no
+   «Bs» anywhere. A Trainer does not see the entry.
+
+### B. The Staff app
+
+Log in as `carolina.rivas@example.com` (Test 9 E). **Buscar cliente** shows
+**Para contactar** under **Cancelar una clase**. It opens the same list:
+the Client, her phone, the reason, **Abrir WhatsApp**, and **Contactada**.
+With nobody to write to it reads «Nadie para contactar por ahora.».
+
+### C. The Client app
+
+The messages arrive in **Notificaciones** (Perfil). The four titles are
+«Tu segunda clase», «Tu primera semana», «Tu primer mes», and «Tres meses
+con nosotras». The inbox card draws the message body and not the title
+(noted on the BKM-013 row; the title is what the push shows).

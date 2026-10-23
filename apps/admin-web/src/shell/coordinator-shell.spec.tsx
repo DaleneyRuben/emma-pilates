@@ -23,7 +23,7 @@ describe("the admin web for the Coordinator", () => {
       within(sidebar)
         .getAllByRole("link")
         .map((link) => link.textContent),
-    ).toEqual(["Horario", "Clientes", "Personal"]);
+    ).toEqual(["Horario", "Clientes", "Para contactar", "Personal"]);
     expect(within(sidebar).queryByText("Catálogo")).not.toBeInTheDocument();
     expect(within(sidebar).queryByText("Promociones")).not.toBeInTheDocument();
   });
