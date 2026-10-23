@@ -254,7 +254,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `06` | Reprogramar | Move a booking |
 | `07` | Historial de clases | Past classes |
 | `08` | Elegir plan | Plan catalog |
-| `09` | Detalle del plan | Plan detail; the total is the price drawn minus the Credit applied, never below zero |
+| `09` | Detalle del plan | Plan detail; the total is the Plan price |
 | `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash); the QR is the only transfer instruction, drawn whole and tappable, with «Ampliar» and «Guardar QR» under it and a light full-screen «QR ampliado» view |
 | `11` | Estado del pago | Pending/confirmed/rejected states |
 | `12` | Mi plan | Active plan, sessions left, expiry |
