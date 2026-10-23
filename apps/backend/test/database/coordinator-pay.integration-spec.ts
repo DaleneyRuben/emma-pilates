@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { BackOfficeError } from '../../src/back-office/back-office-errors';
+import { coordinatorMonthFacts } from '../../src/back-office/payroll/coordinator-pay-facts';
 import { createPrismaPayStatements } from '../../src/back-office/payroll/prisma-pay-statements';
 import { deterministicId } from '../../src/development-fixtures/deterministic-id';
 import {
@@ -18,7 +19,7 @@ const codeOf = async (work: Promise<unknown>): Promise<string> => {
   }
 };
 
-const september = new Date('2026-09-01T00:00:00.000Z');
+const december = new Date('2026-12-01T00:00:00.000Z');
 const openingRates = {
   classCentavos: 6_500,
   includedStudents: 4,
@@ -39,13 +40,8 @@ describe('coordinator pay statements', () => {
       now: () => fixtureNow,
       factsOfMonth: () =>
         Promise.resolve({ rates: openingRates, trainers: [] }),
-      coordinatorFactsOfMonth: () =>
-        Promise.resolve({
-          staffMemberId: deterministicId('staff-member:carolina'),
-          newClients: [],
-          renewalRatePercent: null,
-          renewalTargetPercent: 80,
-        }),
+      coordinatorFactsOfMonth: (from, until) =>
+        coordinatorMonthFacts(world.prisma, from, until),
     });
   const administrator = () => world.principalOf('paola.mendoza@example.com');
   const coordinator = () => world.principalOf('carolina.rivas@example.com');
@@ -90,7 +86,7 @@ describe('coordinator pay statements', () => {
           current.renewalTargetMonths7To12Percent,
         renewalTargetFromMonth13Percent:
           current.renewalTargetFromMonth13Percent,
-        openingDate: new Date('2026-09-15T00:00:00.000Z'),
+        openingDate: new Date('2026-12-15T00:00:00.000Z'),
         createdByAccountId: admin.accountId,
       },
     });
@@ -169,21 +165,76 @@ describe('coordinator pay statements', () => {
         },
       });
     };
-    await buy('Mensual', 30, 8, new Date('2026-09-04T15:00:00.000Z'), false);
-    await buy('Bimestral', 60, 16, new Date('2026-09-06T15:00:00.000Z'), false);
+    await buy('Mensual', 30, 8, new Date('2026-12-04T15:00:00.000Z'), false);
+    await buy('Bimestral', 60, 16, new Date('2026-12-06T15:00:00.000Z'), false);
     await buy(
       'Clase suelta',
       30,
       1,
-      new Date('2026-09-08T15:00:00.000Z'),
+      new Date('2026-12-08T15:00:00.000Z'),
       false,
     );
-    await buy('Traída', 60, 16, new Date('2026-09-09T15:00:00.000Z'), true);
+    await buy('Traída', 60, 16, new Date('2026-12-09T15:00:00.000Z'), true);
+    const renew = async (endsOn: Date, nextStartsOn: Date | null) => {
+      const clientId = randomUUID();
+      const planId = randomUUID();
+      await prisma.plan.create({
+        data: {
+          id: planId,
+          name: `Renovación ${planId.slice(0, 4)}`,
+          durationDays: 30,
+          classAllowance: 8,
+          priceCentavos: 78_000,
+          displayOrder: 91,
+          hiddenAt: new Date('2026-12-01T00:00:00.000Z'),
+        },
+      });
+      await prisma.client.create({
+        data: {
+          id: clientId,
+          name: `Renueva ${clientId.slice(0, 4)}`,
+          referralCode: `REF-${clientId.slice(0, 8)}`,
+        },
+      });
+      const subscription = async (startsOn: Date, ends: Date) => {
+        await prisma.subscription.create({
+          data: {
+            clientId,
+            planId,
+            planNameSnapshot: 'Mensual',
+            durationDaysSnapshot: 30,
+            originalClassAllowance: 8,
+            remainingClassAllowance: 0,
+            startsOn,
+            endsOn: ends,
+            activatedAt: startsOn,
+          },
+        });
+      };
+      await subscription(
+        new Date(endsOn.getTime() - 29 * 24 * 60 * 60 * 1000),
+        endsOn,
+      );
+      if (nextStartsOn !== null) {
+        await subscription(
+          nextStartsOn,
+          new Date(nextStartsOn.getTime() + 29 * 24 * 60 * 60 * 1000),
+        );
+      }
+    };
+    await renew(
+      new Date('2026-12-10T00:00:00.000Z'),
+      new Date('2026-12-17T00:00:00.000Z'),
+    );
+    await renew(
+      new Date('2026-12-12T00:00:00.000Z'),
+      new Date('2026-12-19T00:00:00.000Z'),
+    );
 
-    const drafted = await statements().draftMonth(september);
+    const drafted = await statements().draftMonth(december);
     expect(drafted.drafted).toBe(1);
     const listed = await statements().listStatements(
-      { month: september },
+      { month: december },
       admin,
     );
     expect(listed).toEqual([
@@ -213,7 +264,7 @@ describe('coordinator pay statements', () => {
 
     await expect(
       codeOf(
-        statements().listStatements({ month: september }, await coordinator()),
+        statements().listStatements({ month: december }, await coordinator()),
       ),
     ).resolves.toBe('back_office_access_denied');
     await expect(
@@ -228,9 +279,7 @@ describe('coordinator pay statements', () => {
       codeOf(statements().listOwnStatements(await coordinator())),
     ).resolves.toBe('back_office_access_denied');
     await expect(
-      codeOf(
-        statements().listStatements({ month: september }, await trainer()),
-      ),
+      codeOf(statements().listStatements({ month: december }, await trainer())),
     ).resolves.toBe('back_office_access_denied');
   });
 });

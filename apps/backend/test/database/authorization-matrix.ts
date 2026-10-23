@@ -90,6 +90,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/branches': publicRoute,
   'GET /api/v1/class-types': publicRoute,
   'GET /api/v1/promotions': publicRoute,
+  'GET /api/v1/studio-rules': publicRoute,
   'GET /api/v1/promotion-images/{imageAssetId}/{kind}/{deliveryVersion}':
     publicRoute,
 
@@ -152,6 +153,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/evaluation-slots': both('deny'),
   'GET /api/v1/evaluation-slots/{slotId}': both('deny'),
   'POST /api/v1/evaluation-slots/{slotId}/evaluations': both('deny'),
+  'POST /api/v1/evaluation-slots/{slotId}/evaluation-payments': both('deny'),
   'GET /api/v1/evaluations': both('deny'),
   'DELETE /api/v1/evaluations/{evaluationId}': both('deny'),
 
@@ -159,10 +161,13 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/sessions/{sessionId}/attendance': both('deny', {
     body: { outcomes: [{ bookingId: uuid, outcome: 'attended' }] },
   }),
+  'GET /api/v1/coordinator/pay-statements': both('deny'),
+  'GET /api/v1/trainer/pay-statements': both('deny'),
   'GET /api/v1/trainer/sessions': both('deny'),
   'GET /api/v1/trainer/sessions/{sessionId}/roster': both('deny'),
   'GET /api/v1/nutritionist/evaluations': both('deny'),
   'DELETE /api/v1/nutritionist/evaluations/{evaluationId}': administratorOnly(),
+  'POST /api/v1/nutritionist/evaluations/{evaluationId}/no-show': both('deny'),
   'GET /api/v1/nutritionist/availability-blocks': both('deny'),
   'POST /api/v1/nutritionist/availability-blocks': both('deny'),
   'POST /api/v1/nutritionist/availability-blocks/{blockId}/replacement':
@@ -195,6 +200,8 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/assistant/clients/{clientId}/class-history': both('allow'),
   // Selling and registering new Clients stay at the front desk.
   'GET /api/v1/assistant/clients/{clientId}/plan-quotes': administratorOnly(),
+  'POST /api/v1/assistant/clients/{clientId}/transfer-payments':
+    administratorOnly(),
   'POST /api/v1/assistant/clients/{clientId}/cash-payments':
     administratorOnly(),
   'POST /api/v1/assistant/client-invitations': administratorOnly(),
@@ -212,12 +219,22 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'GET /api/v1/administrator/clients': both('allow'),
   'GET /api/v1/administrator/clients/{clientId}': both('allow'),
   'PATCH /api/v1/administrator/clients/{clientId}': both('allow'),
+  'GET /api/v1/administrator/clients/{clientId}/acquisition': both('allow'),
+  'PUT /api/v1/administrator/clients/{clientId}/acquisition': both('allow'),
+  'POST /api/v1/administrator/clients/{clientId}/courtesy-access':
+    administratorOnly(),
+  'POST /api/v1/administrator/clients/{clientId}/allowance-adjustments':
+    administratorOnly(),
   'POST /api/v1/administrator/clients/{clientId}/closure': administratorOnly(),
 
   // Staff: details for the schedule; access decisions stay with the
   // Administrator.
   'GET /api/v1/administrator/staff-members': both('allow'),
   'GET /api/v1/administrator/staff-members/{staffMemberId}': both('allow'),
+  'GET /api/v1/administrator/staff-members/{staffMemberId}/referral-code':
+    administratorOnly(),
+  'PUT /api/v1/administrator/staff-members/{staffMemberId}/referral-code':
+    administratorOnly(),
   'POST /api/v1/administrator/staff-members': administratorOnly(),
   'POST /api/v1/administrator/staff-members/{staffMemberId}/activation-link':
     administratorOnly(),
@@ -275,6 +292,7 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
     administratorOnly(),
   'POST /api/v1/administrator/payments/{paymentId}/reject': administratorOnly(),
   'GET /api/v1/administrator/payments': administratorOnly(),
+  'POST /api/v1/administrator/payments/{paymentId}/void': administratorOnly(),
 
   // Promotions and their contacts.
   'GET /api/v1/administrator/promotions': administratorOnly(),
@@ -305,6 +323,14 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/supplies/{supplyId}/restocks':
     administratorOnly(),
   'GET /api/v1/administrator/withdrawals': administratorOnly(),
+  'GET /api/v1/administrator/pay-statements': administratorOnly({
+    query: '?month=2026-09',
+  }),
+  'POST /api/v1/administrator/pay-statements/draft': administratorOnly({
+    query: '?month=2026-09',
+  }),
+  'POST /api/v1/administrator/pay-statements/{statementId}/approve':
+    administratorOnly(),
   'GET /api/v1/administrator/salary-payments': administratorOnly(),
   'POST /api/v1/administrator/salary-payments': administratorOnly(),
   'PUT /api/v1/administrator/salary-payments/{salaryPaymentId}':
@@ -317,6 +343,13 @@ export const authorizationMatrix: Record<string, MatrixRow> = {
   'POST /api/v1/administrator/expenses': administratorOnly(),
   'PUT /api/v1/administrator/expenses/{expenseId}': administratorOnly(),
   'GET /api/v1/administrator/reports/expenses': administratorOnly(),
+  'GET /api/v1/administrator/reports/finance': administratorOnly({
+    query: '?month=2026-09',
+  }),
+  'POST /api/v1/administrator/reports/finance/opening-budget':
+    administratorOnly(),
+  'GET /api/v1/administrator/studio-settings': administratorOnly(),
+  'PUT /api/v1/administrator/studio-settings': administratorOnly(),
 };
 
 /** A concrete address for a templated path. */

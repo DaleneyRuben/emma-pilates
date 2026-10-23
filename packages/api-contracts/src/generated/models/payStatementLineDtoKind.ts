@@ -12,4 +12,7 @@ export const PayStatementLineDtoKind = {
   class: "class",
   minimum_not_met: "minimum_not_met",
   commission: "commission",
+  base: "base",
+  new_client: "new_client",
+  bonus: "bonus",
 } as const;

@@ -8,6 +8,7 @@ import {
   type BackOfficeActor,
 } from '../back-office-errors';
 import { recordBackOfficeAudit } from '../prisma-audit';
+import { coordinatorPay } from './coordinator-pay';
 import { trainerPay } from './trainer-pay';
 import type { TrainerMonthFacts } from './trainer-pay-facts';
 export type CoordinatorMonthFacts = {
@@ -29,21 +30,20 @@ const monthStart = (month: Date) =>
 const monthEnd = (month: Date) =>
   new Date(Date.UTC(month.getUTCFullYear(), month.getUTCMonth() + 1, 1));
 
-const lineKind = (kind: 'class' | 'minimum_not_met' | 'commission') =>
-  kind === 'class'
-    ? 'CLASS'
-    : kind === 'minimum_not_met'
-      ? 'MINIMUM_NOT_MET'
-      : 'COMMISSION';
+const lineKinds = {
+  class: 'CLASS',
+  minimum_not_met: 'MINIMUM_NOT_MET',
+  commission: 'COMMISSION',
+  base: 'BASE',
+  new_client: 'NEW_CLIENT',
+  bonus: 'BONUS',
+} as const;
 
-const kindText = (
-  kind: 'CLASS' | 'MINIMUM_NOT_MET' | 'COMMISSION',
-): 'class' | 'minimum_not_met' | 'commission' =>
-  kind === 'CLASS'
-    ? 'class'
-    : kind === 'MINIMUM_NOT_MET'
-      ? 'minimum_not_met'
-      : 'commission';
+type LineKind = keyof typeof lineKinds;
+
+const kindText = (kind: (typeof lineKinds)[LineKind]): LineKind =>
+  (Object.entries(lineKinds).find(([, value]) => value === kind)?.[0] ??
+    'class') as LineKind;
 
 const statementSelect = {
   id: true,
@@ -122,6 +122,26 @@ export const createPrismaPayStatements = (
       );
       drafted += 1;
     }
+    const coordinatorFacts = dependencies.coordinatorFactsOfMonth
+      ? await dependencies.coordinatorFactsOfMonth(from, monthEnd(from))
+      : null;
+    if (
+      coordinatorFacts?.staffMemberId !== null &&
+      coordinatorFacts?.staffMemberId !== undefined
+    ) {
+      const pay = coordinatorPay(coordinatorFacts);
+      const staffMemberId = coordinatorFacts.staffMemberId;
+      await prisma.$transaction((transaction) =>
+        replaceDraft(transaction, {
+          staffMemberId,
+          month: from,
+          lines: pay.lines,
+          totalCentavos: pay.totalCentavos,
+          now,
+        }),
+      );
+      drafted += 1;
+    }
     return { drafted };
   };
 
@@ -131,7 +151,7 @@ export const createPrismaPayStatements = (
       staffMemberId: string;
       month: Date;
       lines: {
-        kind: 'class' | 'minimum_not_met' | 'commission';
+        kind: LineKind;
         detail: string;
         amountCentavos: number;
       }[];
@@ -169,7 +189,7 @@ export const createPrismaPayStatements = (
         lines: {
           create: input.lines.map((line, position) => ({
             id: randomUUID(),
-            kind: lineKind(line.kind),
+            kind: lineKinds[line.kind],
             detail: line.detail,
             amountCentavos: line.amountCentavos,
             position,

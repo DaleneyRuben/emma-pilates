@@ -7404,6 +7404,36 @@
         ]
       }
     },
+    "/api/v1/coordinator/pay-statements": {
+      "get": {
+        "operationId": "listCoordinatorPayStatements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayStatementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CoordinatorPayStatements"
+        ]
+      }
+    },
     "/api/v1/trainer/pay-statements": {
       "get": {
         "operationId": "listOwnPayStatements",
@@ -13683,7 +13713,10 @@
             "enum": [
               "class",
               "minimum_not_met",
-              "commission"
+              "commission",
+              "base",
+              "new_client",
+              "bonus"
             ]
           },
           "detail": {
