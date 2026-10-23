@@ -61,3 +61,81 @@ ALTER TABLE "back_office"."equipment_issues" ADD CONSTRAINT "equipment_issues_re
 
 -- AddForeignKey
 ALTER TABLE "back_office"."equipment_issues" ADD CONSTRAINT "equipment_issues_resolved_by_account_id_fkey" FOREIGN KEY ("resolved_by_account_id") REFERENCES "system"."accounts"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- PostgreSQL invariants Prisma cannot express (BKO-004, ADR-0106).
+
+-- Equipment -----------------------------------------------------------------
+
+ALTER TABLE "back_office"."equipment"
+  ADD CONSTRAINT "equipment_number_check" CHECK ("number" BETWEEN 1 AND 99);
+
+-- A retired number may be registered again.
+CREATE UNIQUE INDEX "equipment_branch_kind_active_number_key"
+  ON "back_office"."equipment" ("branch_id", "kind", "number")
+  WHERE "archived_at" IS NULL;
+
+-- What a piece of Equipment is never changes; retiring it is final.
+CREATE FUNCTION "back_office"."protect_equipment"()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NEW."branch_id" <> OLD."branch_id"
+        OR NEW."kind" <> OLD."kind"
+        OR NEW."number" <> OLD."number"
+        OR NEW."created_by_account_id" <> OLD."created_by_account_id"
+        OR NEW."created_at" <> OLD."created_at" THEN
+        RAISE EXCEPTION 'equipment identity is immutable' USING ERRCODE = '55000';
+    END IF;
+    IF OLD."archived_at" IS NOT NULL AND NEW."archived_at" IS DISTINCT FROM OLD."archived_at" THEN
+        RAISE EXCEPTION 'equipment archival is final' USING ERRCODE = '55000';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER "equipment_protect"
+    BEFORE UPDATE ON "back_office"."equipment"
+    FOR EACH ROW EXECUTE FUNCTION "back_office"."protect_equipment"();
+
+CREATE TRIGGER "equipment_reject_delete"
+    BEFORE DELETE ON "back_office"."equipment"
+    FOR EACH ROW EXECUTE FUNCTION "back_office"."reject_history_delete"();
+
+-- Equipment Issues ----------------------------------------------------------
+
+ALTER TABLE "back_office"."equipment_issues"
+  ADD CONSTRAINT "equipment_issues_values_check" CHECK (
+    length(btrim("description")) BETWEEN 1 AND 500
+    AND ("resolved_at" IS NULL) = ("resolved_by_account_id" IS NULL)
+  );
+
+-- Resolving is the only change, and it happens once.
+CREATE FUNCTION "back_office"."protect_equipment_issue"()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    IF NEW."equipment_id" <> OLD."equipment_id"
+        OR NEW."description" <> OLD."description"
+        OR NEW."out_of_service" <> OLD."out_of_service"
+        OR NEW."reported_by_account_id" <> OLD."reported_by_account_id"
+        OR NEW."reported_at" <> OLD."reported_at" THEN
+        RAISE EXCEPTION 'equipment issue report is immutable' USING ERRCODE = '55000';
+    END IF;
+    IF OLD."resolved_at" IS NOT NULL
+        AND (NEW."resolved_at" IS DISTINCT FROM OLD."resolved_at"
+            OR NEW."resolved_by_account_id" IS DISTINCT FROM OLD."resolved_by_account_id") THEN
+        RAISE EXCEPTION 'equipment issue resolution is final' USING ERRCODE = '55000';
+    END IF;
+    RETURN NEW;
+END;
+$$;
+
+CREATE TRIGGER "equipment_issues_protect"
+    BEFORE UPDATE ON "back_office"."equipment_issues"
+    FOR EACH ROW EXECUTE FUNCTION "back_office"."protect_equipment_issue"();
+
+CREATE TRIGGER "equipment_issues_reject_delete"
+    BEFORE DELETE ON "back_office"."equipment_issues"
+    FOR EACH ROW EXECUTE FUNCTION "back_office"."reject_history_delete"();
