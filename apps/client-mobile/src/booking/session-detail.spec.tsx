@@ -36,8 +36,10 @@ const classType = {
   // (WEB-027, booking ADR-0004).
   durationMinutes: 60,
 };
-const startsAt = new Date(Date.now() + 60 * 60 * 1_000);
+// Outside the seeded 2 h 30 window, so a full Session still offers the Waitlist.
+const startsAt = new Date(Date.now() + 4 * 60 * 60 * 1_000);
 const endsAt = new Date(startsAt.getTime() + 75 * 60 * 1_000);
+const insideWindowStartsAt = new Date(Date.now() + 60 * 60 * 1_000);
 const { from, until } = civilDateRange(boliviaCivilDate(new Date()));
 const listUrl = `/api/v1/sessions?branchId=branch-centro&from=${encodeURIComponent(from)}&until=${encodeURIComponent(until)}&limit=100`;
 
@@ -74,6 +76,7 @@ async function openDetail(
   remaining = 5,
   availableSeats = 3,
   runtime: Parameters<typeof createClientRuntime>[1] = {},
+  sessionStartsAt = startsAt,
 ) {
   let subscriptionRemaining = remaining;
   const fetcher = routeFetcher({
@@ -81,8 +84,20 @@ async function openDetail(
     "/api/v1/clients/current/subscription": () => jsonResponse(subscription(subscriptionRemaining)),
     "/api/v1/branches": () => jsonResponse([branch]),
     "/api/v1/class-types": () => jsonResponse([classType]),
-    [listUrl]: () => jsonResponse([listed(availableSeats)]),
-    "/api/v1/sessions/session-1": () => jsonResponse(detail(availableSeats)),
+    [listUrl]: () =>
+      jsonResponse([
+        {
+          ...listed(availableSeats),
+          startsAt: sessionStartsAt.toISOString(),
+          endsAt: new Date(sessionStartsAt.getTime() + 75 * 60 * 1_000).toISOString(),
+        },
+      ]),
+    "/api/v1/sessions/session-1": () =>
+      jsonResponse({
+        ...detail(availableSeats),
+        startsAt: sessionStartsAt.toISOString(),
+        endsAt: new Date(sessionStartsAt.getTime() + 75 * 60 * 1_000).toISOString(),
+      }),
     ...routes,
   });
   const screen = await render(<App runtime={createClientRuntime(fetcher, runtime)} />);
@@ -156,6 +171,8 @@ describe("Client Session detail", () => {
       },
       5,
       0,
+      {},
+      insideWindowStartsAt,
     );
 
     expect(
