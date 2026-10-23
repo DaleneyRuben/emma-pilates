@@ -26,11 +26,11 @@ INSERT INTO system.accounts (id, email, client_id, updated_at) VALUES
 INSERT INTO system.accounts (id, email, staff_member_id, updated_at) VALUES
   ('00000000-0000-0000-0000-000000000d03', 'carla@example.com', '00000000-0000-0000-0000-000000000a01', now()),
   ('00000000-0000-0000-0000-000000000d04', 'paola@example.com', '00000000-0000-0000-0000-000000000a02', now());
-INSERT INTO booking.plans (id, name, duration_months, class_allowance, price_centavos, display_order, updated_at) VALUES
-  ('00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 1, 8, 30000, 0, now());
-INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at) VALUES
-  ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 1, 8, 8, '2026-09-01', '2026-10-31', now(), now()),
-  ('00000000-0000-0000-0000-000000000f02', '00000000-0000-0000-0000-000000000c02', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 1, 8, 8, '2026-09-01', '2026-10-31', now(), now());
+INSERT INTO booking.plans (id, name, duration_days, class_allowance, price_centavos, display_order, updated_at) VALUES
+  ('00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 30000, 0, now());
+INSERT INTO booking.subscriptions (id, client_id, plan_id, plan_name_snapshot, duration_days_snapshot, original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at) VALUES
+  ('00000000-0000-0000-0000-000000000f01', '00000000-0000-0000-0000-000000000c01', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 8, '2026-09-01', '2026-10-31', now(), now()),
+  ('00000000-0000-0000-0000-000000000f02', '00000000-0000-0000-0000-000000000c02', '00000000-0000-0000-0000-000000000e01', 'Paquete de 8 clases', 30, 8, 8, '2026-09-01', '2026-10-31', now(), now());
 
 -- Carla publishes Mondays 09:00-13:00 at Centro and 13:00-14:00 next to it.
 INSERT INTO booking.availability_blocks (id, nutritionist_staff_member_id, branch_id, weekday, starts_at_local, ends_at_local, effective_from, created_by_account_id, updated_at) VALUES
