@@ -21,6 +21,7 @@ const coordinator: AuthenticatedPrincipal = {
   },
 };
 const now = () => new Date('2026-09-10T12:00:00Z');
+const cancellationWindowMinutes = () => Promise.resolve(150);
 const session = {
   id: 'session-id',
   branchId: 'any-branch-id',
@@ -79,6 +80,7 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
         hasLiveBooking: jest.fn().mockResolvedValue(false),
         hasActiveEntry: jest.fn().mockResolvedValue(false),
         create,
+        cancellationWindowMinutes,
         now,
       },
     );
@@ -96,6 +98,7 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
         principal: coordinator,
         loadBooking: jest.fn().mockResolvedValue(booking),
         cancel,
+        cancellationWindowMinutes,
         now,
       },
     );
@@ -121,6 +124,7 @@ describe('the Coordinator acting for a Client (ADR-0102)', () => {
         countLiveBookings: jest.fn().mockResolvedValue(0),
         hasOverlappingBooking: jest.fn().mockResolvedValue(false),
         reschedule,
+        cancellationWindowMinutes,
         // Rescheduling happens inside the Cancellation Window, on the same day.
         now: () => new Date('2026-09-11T14:30:00Z'),
       },
