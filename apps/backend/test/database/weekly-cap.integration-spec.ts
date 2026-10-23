@@ -15,6 +15,16 @@ import {
 // Monday 14 September, before every Session the cap cases book.
 const now = new Date('2026-09-14T14:00:00.000Z');
 
+const cappedSubscription = {
+  durationMonthsSnapshot: 3,
+  durationDaysSnapshot: 90,
+  originalClassAllowance: 16,
+  weeklyClassCapSnapshot: 3,
+  remainingClassAllowance: 8,
+  startsOn: new Date('2026-09-01'),
+  endsOn: new Date('2026-11-29'),
+};
+
 const principalFor = (fixture: { accountId: string; clientId: string }) => ({
   accountId: fixture.accountId,
   authenticationSessionId: randomUUID(),
@@ -70,15 +80,7 @@ describe('weekly cap', () => {
     });
     await prisma.subscription.update({
       where: { id: fixture.subscriptionId },
-      data: {
-        durationMonthsSnapshot: 3,
-        durationDaysSnapshot: 90,
-        originalClassAllowance: 16,
-        weeklyClassCapSnapshot: 3,
-        remainingClassAllowance: 8,
-        startsOn: new Date('2026-09-01'),
-        endsOn: new Date('2026-11-29'),
-      },
+      data: cappedSubscription,
     });
     const commands = new PrismaBookingCommands(prisma, () => now);
     const principal = principalFor(fixture);
@@ -127,7 +129,7 @@ describe('weekly cap', () => {
     const fixture = await createFixture(prisma, {
       capacity: 1,
       now,
-      startsAt: new Date('2026-09-28T15:00:00.000Z'),
+      startsAt: new Date('2026-09-18T15:00:00.000Z'),
     });
     await prisma.subscription.update({
       where: { id: fixture.subscriptionId },
@@ -146,20 +148,11 @@ describe('weekly cap', () => {
     const capped = await createFixture(prisma, { now });
     await prisma.subscription.update({
       where: { id: capped.subscriptionId },
-      data: {
-        durationMonthsSnapshot: 3,
-        durationDaysSnapshot: 90,
-        originalClassAllowance: 16,
-        weeklyClassCapSnapshot: 3,
-        remainingClassAllowance: 8,
-        startsOn: new Date('2026-09-01'),
-        endsOn: new Date('2026-11-29'),
-      },
+      data: cappedSubscription,
     });
     for (const startsAt of [
       new Date('2026-09-15T15:00:00.000Z'),
       new Date('2026-09-16T15:00:00.000Z'),
-      new Date('2026-09-17T15:00:00.000Z'),
     ]) {
       const session = await anotherSession(
         capped,
@@ -172,6 +165,12 @@ describe('weekly cap', () => {
       { sessionId: fixture.sessionId },
       principalFor(capped),
     );
+    const third = await anotherSession(
+      capped,
+      new Date('2026-09-17T15:00:00.000Z'),
+      'after-join',
+    );
+    await commands.create({ sessionId: third.id }, principalFor(capped));
     const next = await createFixture(prisma, { now });
     await commands.joinWaitlist(
       { sessionId: fixture.sessionId },
@@ -203,5 +202,93 @@ describe('weekly cap', () => {
         select: { clientId: true },
       }),
     ).resolves.toEqual({ clientId: next.clientId });
+  });
+
+  it('never refuses a Plan with no cap', async () => {
+    const fixture = await createFixture(prisma, { now });
+    await prisma.subscription.update({
+      where: { id: fixture.subscriptionId },
+      data: { remainingClassAllowance: 8, originalClassAllowance: 8 },
+    });
+    const commands = new PrismaBookingCommands(prisma, () => now);
+    for (const [startsAt, room] of [
+      [new Date('2026-09-15T15:00:00.000Z'), 'free-a'],
+      [new Date('2026-09-16T15:00:00.000Z'), 'free-b'],
+      [new Date('2026-09-17T15:00:00.000Z'), 'free-c'],
+      [new Date('2026-09-18T15:00:00.000Z'), 'free-d'],
+    ] as const) {
+      const session = await anotherSession(fixture, startsAt, room);
+      await commands.create({ sessionId: session.id }, principalFor(fixture));
+    }
+
+    await expect(
+      prisma.booking.count({
+        where: { subscriptionId: fixture.subscriptionId, state: 'BOOKED' },
+      }),
+    ).resolves.toBe(4);
+  });
+
+  it('treats Sunday 23:00 and Monday 00:30 as different weeks', async () => {
+    const fixture = await createFixture(prisma, { now });
+    await prisma.subscription.update({
+      where: { id: fixture.subscriptionId },
+      data: cappedSubscription,
+    });
+    const commands = new PrismaBookingCommands(prisma, () => now);
+    for (const [startsAt, room] of [
+      [new Date('2026-09-18T15:00:00.000Z'), 'edge-a'],
+      [new Date('2026-09-19T15:00:00.000Z'), 'edge-b'],
+      [new Date('2026-09-21T03:00:00.000Z'), 'edge-c'],
+    ] as const) {
+      const session = await anotherSession(fixture, startsAt, room);
+      await commands.create({ sessionId: session.id }, principalFor(fixture));
+    }
+
+    const monday = await anotherSession(
+      fixture,
+      new Date('2026-09-21T04:30:00.000Z'),
+      'edge-d',
+    );
+    await expect(
+      commands.create({ sessionId: monday.id }, principalFor(fixture)),
+    ).resolves.toEqual({ id: expect.any(String) as string });
+  });
+
+  it('reschedules inside the same week while that week is at the cap', async () => {
+    const fixture = await createFixture(prisma, {
+      now,
+      startsAt: new Date('2026-09-15T16:30:00.000Z'),
+    });
+    await prisma.subscription.update({
+      where: { id: fixture.subscriptionId },
+      data: cappedSubscription,
+    });
+    const commands = new PrismaBookingCommands(
+      prisma,
+      () => new Date('2026-09-15T15:00:00.000Z'),
+    );
+    const source = await commands.create(
+      { sessionId: fixture.sessionId },
+      principalFor(fixture),
+    );
+    for (const [startsAt, room] of [
+      [new Date('2026-09-16T15:00:00.000Z'), 'move-a'],
+      [new Date('2026-09-17T15:00:00.000Z'), 'move-b'],
+    ] as const) {
+      const session = await anotherSession(fixture, startsAt, room);
+      await commands.create({ sessionId: session.id }, principalFor(fixture));
+    }
+    const target = await anotherSession(
+      fixture,
+      new Date('2026-09-15T18:00:00.000Z'),
+      'move-c',
+    );
+
+    await expect(
+      commands.reschedule(
+        { bookingId: source.id, targetSessionId: target.id },
+        principalFor(fixture),
+      ),
+    ).resolves.toEqual({ id: expect.any(String) as string });
   });
 });

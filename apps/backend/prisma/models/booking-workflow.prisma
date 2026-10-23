@@ -55,6 +55,7 @@ model Booking {
   rescheduledFrom        Booking?                  @relation("BookingRescheduleChain")
   attendanceRecord       AttendanceRecord?
   promotedWaitlistEntry  WaitlistEntry?            @relation("WaitlistPromotion")
+  allowanceAdjustment    AllowanceAdjustment?
 
   @@unique([id, sessionId, clientId])
   @@unique([id, clientId, subscriptionId])
