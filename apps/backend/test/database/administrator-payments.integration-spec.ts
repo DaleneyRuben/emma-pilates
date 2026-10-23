@@ -27,7 +27,6 @@ describe('Administrator Payment list (PostgreSQL)', () => {
   const commands = (clock: Date) =>
     createPrismaPaymentCommands(prisma, {
       now: () => clock,
-      referralRewardCentavos: 6000,
     });
   const paymentIds: Record<string, string> = {};
 

@@ -20,7 +20,6 @@ describe('closing a Client Account with Payments and Credit (PostgreSQL)', () =>
   const payments = () =>
     createPrismaPaymentCommands(world.prisma, {
       now: () => closureNow,
-      referralRewardCentavos: 6000,
     });
 
   beforeAll(async () => {

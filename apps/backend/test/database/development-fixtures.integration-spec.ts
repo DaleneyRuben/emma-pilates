@@ -117,7 +117,6 @@ describe('development fixtures', () => {
     };
     const commands = createPrismaPaymentCommands(prisma, {
       now: () => today,
-      referralRewardCentavos: 6000,
     });
 
     await expect(commands.readCreditSummary(sofia)).resolves.toMatchObject({

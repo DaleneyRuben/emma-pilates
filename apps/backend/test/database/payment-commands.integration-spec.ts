@@ -62,7 +62,6 @@ describe('Prisma payment commands', () => {
   const commands = () =>
     createPrismaPaymentCommands(prisma, {
       now: () => now,
-      referralRewardCentavos: 6000,
     });
 
   it('creates one open Purchase Intent with frozen Plan snapshots and replays it by idempotency key', async () => {
@@ -304,7 +303,6 @@ describe('Prisma payment commands', () => {
 
     await createPrismaPaymentCommands(prisma, {
       now: () => pastNow,
-      referralRewardCentavos: 6000,
     }).createPurchaseIntent({ planId: plan.id }, principal, key);
 
     await expect(

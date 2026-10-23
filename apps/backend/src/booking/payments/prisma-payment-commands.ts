@@ -122,7 +122,6 @@ const abbreviateName = (name: string): string => {
 
 export type PaymentCommandsDependencies = {
   now: () => Date;
-  referralRewardCentavos: number;
   recordNotification?: NotificationRecorder;
 };
 
