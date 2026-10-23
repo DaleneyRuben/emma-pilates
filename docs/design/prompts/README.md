@@ -61,6 +61,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S22](./staff/22-assistant-client-history.md) | Historial de la clienta (Asistente) | `S22` | ✅ |
 | [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | ✅ |
 | [S24](./staff/24-administrator-view-as.md) | Ver la app como… (Administración) | `S24` | ✅ (Claude Design canvas, 2026-10-22, `e81417e9`; the app side is stage 3 of FUT-001) |
+| [S26](./staff/26-trainer-report-fault.md) | Reportar una falla (Entrenadora) | — | 🕓 pending (BKO-004) |
 
 ## Admin web (`admin-web/`)
 
@@ -102,6 +103,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW33](./admin-web/33-user-menu.md) | Menú de usuario y cambiar contraseña | `AW33` | ✅ |
 | [AW34](./admin-web/34-branch-selector.md) | Selector de sucursal | `AW34` | ✅ |
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
+| [AW37](./admin-web/37-equipos.md) | Equipos | — | 🕓 pending (BKO-004) |
 
 ## Follow-ups (`followups/`)
 
@@ -221,6 +223,8 @@ Each of these was sent as the next message in the existing design session for th
 | [108](./followups/108-impersonation-entry-and-banner.md) | The «Ver la app como…» row on `S23`'s Administrator frame (opens the new `S24`), the fixed Palo de rosa profundo impersonation banner («Viendo como {name}» over «{role} · Quedan {n} min», «Salir») in one new frame each on `S02`/`S04`/`S15`, a «Franja de suplantación» card in the design system's section 06, and the README (`S24` row, «Impersonation banner (Staff)», navigation) (FUT-001, ADR-0100) | ✅ applied (Claude Design canvas, 2026-10-22, `e81417e9`: the two-line banner settled before sending, `85f89753`; the app side is stage 3 of FUT-001) |
 | [109](./followups/109-assistant-refuse-early.md) | The Assistant's flows refuse early (UX-003, UX-001 findings S2 and S3): `S07`'s phone and tablet frames mark the Session the Client already booked with the neutral «Ya reservada» pill, `S08` gains a fourth phone frame «Ya reservada» whose action zone holds only «La clienta ya tiene esta clase reservada.», `S06`'s active phone frame and a new «Tablet · Plan activo» frame disable «Registrar pago en efectivo» with «Podrá comprar otro plan cuando este termine.», and the README's `S06`/`S07`/`S08` rows and seat-pill rules say so | ✅ applied (Claude Design canvas, 2026-10-22, `58d20bd9`; the Staff app is built in UX-003) |
 | [115](./followups/115-lists-refresh-on-focus-and-pull.md) | Every list refreshes when it regains focus and on pull (UX-004, UX-001 finding C1): one bullet in the README's «Loading state (Client and Staff)» naming the background refetch and the native pull-to-refresh control in Palo de rosa; no numbered screen changes (109–114 are reserved by UX-003, UX-005, UX-006, UX-009, UX-010 and UX-012) | ✅ applied (Claude Design canvas, 2026-10-22, `7b761df1`; the apps are built in UX-004) |
+| [170](./followups/170-aw02-equipment-flags.md) | `AW02` flags a future Session with more places than working Equipment of its kind (warning triangle, Advertencia border, «Faltan equipos») with a notice above the week linking to the new `AW37`, and the sidebar gains «Equipos» after «Insumos» (BKO-004, ADR-0106) | 🕓 pending |
+| [171](./followups/171-s03-report-fault-entry.md) | `S03` gains the quiet «Reportar una falla» action under the Session line, opening the new `S26` (BKO-004, ADR-0106) | 🕓 pending |
 
 ## Status
 
