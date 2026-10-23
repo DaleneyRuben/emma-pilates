@@ -143,9 +143,13 @@ describe("Staff notification destinations", () => {
         screen.getByText("Nuevo pago en efectivo confirmado para Lucía Fernández."),
       ).toBeOnTheScreen(),
     );
-    await fireEvent.press(screen.getByText("Nuevo pago en efectivo confirmado para Lucía Fernández."));
+    await fireEvent.press(
+      screen.getByText("Nuevo pago en efectivo confirmado para Lucía Fernández."),
+    );
 
     await waitFor(() => expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen());
-    expect(screen.queryByText("Nuevo pago en efectivo confirmado para Lucía Fernández.")).toBeNull();
+    expect(
+      screen.queryByText("Nuevo pago en efectivo confirmado para Lucía Fernández."),
+    ).toBeNull();
   });
 });
