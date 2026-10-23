@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { BodyText } from "../ui/body-text";
 import { fontFamilies } from "../ui/fonts";
+import { Glyph } from "../ui/glyph";
 import { FormField } from "../ui/form-field";
 import { FormScrollView } from "../ui/form-scroll-view";
 import { PrimaryButton } from "../ui/primary-button";
@@ -61,6 +62,9 @@ function TypeChips({
 function Thanks({ onBack }: { onBack: () => void }) {
   return (
     <View style={styles.thanks}>
+      <View style={styles.thanksIcon}>
+        <Glyph name="message" size={30} />
+      </View>
       <Text accessibilityRole="header" style={styles.thanksTitle}>
         ¡Gracias por tu comentario!
       </Text>
@@ -184,6 +188,15 @@ const styles = StyleSheet.create({
   screen: { gap: spacing.lg },
   textArea: { minHeight: 160, paddingBottom: spacing.md, paddingTop: spacing.md },
   thanks: { alignItems: "stretch", gap: spacing.lg, paddingTop: spacing.xxl },
+  thanksIcon: {
+    alignItems: "center",
+    alignSelf: "center",
+    backgroundColor: colors.primaryTint,
+    borderRadius: radii.pill,
+    height: 64,
+    justifyContent: "center",
+    width: 64,
+  },
   thanksTitle: {
     color: colors.text,
     fontFamily: fontFamilies.heading,
