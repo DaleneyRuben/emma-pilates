@@ -6649,6 +6649,43 @@
         ]
       }
     },
+    "/api/v1/administrator/studio-facts/recompute": {
+      "post": {
+        "operationId": "recomputeStudioFacts",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudioRecomputeInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudioRecomputeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "StudioFacts"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -12031,6 +12068,38 @@
           "byCategory",
           "months",
           "generatedAt"
+        ]
+      },
+      "StudioRecomputeInputDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-10"
+          }
+        },
+        "required": [
+          "month"
+        ]
+      },
+      "StudioRecomputeDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "example": "2026-10"
+          },
+          "sessions": {
+            "type": "number"
+          },
+          "clientMonths": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "month",
+          "sessions",
+          "clientMonths"
         ]
       },
       "CreatePendingUploadDto": {

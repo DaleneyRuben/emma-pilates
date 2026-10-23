@@ -65,6 +65,7 @@
     "publishPromotion",
     "unpublishPromotion",
     "deletePromotion",
-    "getAdminPromotionImage"
+    "getAdminPromotionImage",
+    "recomputeStudioFacts"
   ]
 }
