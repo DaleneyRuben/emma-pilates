@@ -67,6 +67,8 @@ model PurchaseIntent {
   classAllowanceSnapshot Int                 @map("class_allowance_snapshot")
   planPriceCentavos      Int                 @map("plan_price_centavos")
   creditReservedCentavos Int                 @map("credit_reserved_centavos")
+  discountCentavos       Int                 @default(0) @map("discount_centavos")
+  discountReason         String?             @map("discount_reason")
   amountDueCentavos      Int                 @map("amount_due_centavos")
   startsOn               DateTime            @map("starts_on") @db.Date
   receiptImageAssetId    String?             @unique @map("receipt_image_asset_id") @db.Uuid
@@ -106,6 +108,9 @@ model Payment {
   classAllowanceSnapshot Int                @map("class_allowance_snapshot")
   planPriceCentavos      Int                @map("plan_price_centavos")
   creditAppliedCentavos  Int                @map("credit_applied_centavos")
+  // The founder discount, stored beside the list price (booking ADR-0008).
+  discountCentavos       Int                @default(0) @map("discount_centavos")
+  discountReason         String?            @map("discount_reason")
   amountDueCentavos      Int                @map("amount_due_centavos")
   startsOn               DateTime           @map("starts_on") @db.Date
   method                 PaymentMethod
