@@ -216,8 +216,9 @@ describe("AW38 Comentarios (REL-012)", () => {
       await waitFor(() => expect(saved).toBeDefined());
       expect(saved?.name).toMatch(/^comentarios-\d{4}-\d{2}-\d{2}\.csv$/);
       const text = saved === undefined ? "" : await readBlob(saved.blob);
+      // FileReader drops the byte-order mark the file starts with.
       expect(text.split("\r\n")).toEqual([
-        "\uFEFFFecha,App,Tipo,Comentario,Versión,Estado,Qué cambiamos",
+        "Fecha,App,Tipo,Comentario,Versión,Estado,Qué cambiamos",
         "22/10/2026 · 20:30,App de clientas,Problema,No puedo ver mis reservas de mañana en la lista.,1.0.1 (3) · Android 14,Nuevo,",
         '21/10/2026 · 10:00,App del personal,Sugerencia,"Sería útil ver la lista de la clase siguiente, con comas, y «comillas».",1.0.1 (4) · iOS 18.2,Resuelto,Agregamos la próxima clase en Mi agenda (1.0.2).',
         "",
