@@ -17,6 +17,7 @@ export * from "./auth/session-api";
 export * from "./auth/session-manager";
 export * from "./booking/seat-pill";
 export * from "./booking/session-card";
+export * from "./booking/studio-rules";
 export * from "./encoding/base64";
 export * from "./history/class-history-groups";
 export * from "./history/class-history-list";
