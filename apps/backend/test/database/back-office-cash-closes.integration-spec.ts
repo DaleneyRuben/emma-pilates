@@ -52,13 +52,18 @@ describe('Prisma Back Office cash closes', () => {
       );
   };
 
-  // PAY-006 will void a sale; until then a decided Payment is final, so the
-  // spec moves one out of «confirmed» the only way the schema allows today.
+  // PAY-006 will void a sale; until then a cash Payment is confirmed for good
+  // (a final decision, and payments_method_fields_check). This disposable
+  // database steps around both, as PAY-006's migration will for «voided».
   const voidOutsideTheRules = (paymentId: string) =>
     world.prisma.$transaction(async (transaction) => {
       await transaction.$executeRaw`SET LOCAL session_replication_role = replica`;
       await transaction.$executeRaw`
-        UPDATE "booking"."payments" SET "state" = 'rejected'
+        ALTER TABLE "booking"."payments"
+        DROP CONSTRAINT "payments_method_fields_check"`;
+      await transaction.$executeRaw`
+        UPDATE "booking"."payments"
+        SET "state" = 'rejected', "rejection_reason" = 'Venta anulada'
         WHERE "id" = ${paymentId}::uuid`;
     });
 
