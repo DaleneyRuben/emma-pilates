@@ -83,7 +83,9 @@ describe("A failed receipt download", () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByRole("button", { name: "Revisar pago de Carla Mendoza" })).toBeOnTheScreen();
+      expect(
+        screen.getByRole("button", { name: "Revisar pago de Carla Mendoza" }),
+      ).toBeOnTheScreen();
     });
     await fireEvent.press(screen.getByRole("button", { name: "Revisar pago de Carla Mendoza" }));
 
