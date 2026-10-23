@@ -82,9 +82,20 @@ export class AdminReferralDto {
   referrerReferralCount!: number;
   @ApiProperty() referredName!: string;
   @ApiProperty({ format: 'date-time' }) registeredAt!: Date;
-  @ApiProperty({ type: String, format: 'date-time', nullable: true })
+  @ApiProperty({
+    type: String,
+    format: 'date-time',
+    nullable: true,
+    deprecated: true,
+    description: 'Deprecated (PAY-005): no Referral is awarded any more',
+  })
   awardedAt!: Date | null;
-  @ApiProperty({ enum: ['pending', 'awarded'] }) state!: 'pending' | 'awarded';
+  @ApiProperty({
+    enum: ['pending', 'awarded'],
+    deprecated: true,
+    description: 'Deprecated (PAY-005): no Referral is awarded any more',
+  })
+  state!: 'pending' | 'awarded';
 }
 
 export class AdminReferralPageDto {
@@ -94,7 +105,9 @@ export class AdminReferralPageDto {
   @ApiProperty() pageSize!: number;
   @ApiProperty() totalItems!: number;
   @ApiProperty({
-    description: "The studio's awarded Referrals, whatever the search",
+    deprecated: true,
+    description:
+      "Deprecated (PAY-005): the studio's Referrals awarded before Credit was retired",
   })
   awardedCount!: number;
   @ApiProperty({
@@ -106,7 +119,11 @@ export class AdminReferralPageDto {
 export class IncomeByMethodDto {
   @ApiProperty() cash!: number;
   @ApiProperty() transfer!: number;
-  @ApiProperty() credit_only!: number;
+  @ApiProperty({
+    deprecated: true,
+    description: 'Deprecated (PAY-005): Credit-only Payments carry no money',
+  })
+  credit_only!: number;
 }
 
 export class IncomeMonthDto {

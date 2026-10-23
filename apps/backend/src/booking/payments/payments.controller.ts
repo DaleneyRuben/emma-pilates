@@ -247,7 +247,12 @@ export class CreditPurchasesController extends AuthenticatedPaymentController {
   }
 
   @Post()
-  @ApiOperation({ operationId: 'completeCreditPurchase' })
+  @ApiOperation({
+    operationId: 'completeCreditPurchase',
+    deprecated: true,
+    description:
+      'Credit was retired (PAY-005): always refused with credit_insufficient',
+  })
   @ApiHeader(idempotencyHeader)
   @ApiBody({ type: CreatePurchaseIntentDto })
   @ApiCreatedResponse({ type: PaymentDto })
@@ -308,7 +313,11 @@ export class ClientCreditController extends AuthenticatedPaymentController {
   }
 
   @Get()
-  @ApiOperation({ operationId: 'getCurrentClientCredit' })
+  @ApiOperation({
+    operationId: 'getCurrentClientCredit',
+    deprecated: true,
+    description: 'Credit was retired (PAY-005): reads zero with no activity',
+  })
   @ApiOkResponse({ type: CreditDto })
   @Header('Cache-Control', 'no-store')
   async read(

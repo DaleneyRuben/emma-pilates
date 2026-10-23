@@ -8,5 +8,9 @@
 export interface IncomeByMethodDto {
   cash: number;
   transfer: number;
+  /**
+   * Deprecated (PAY-005): Credit-only Payments carry no money
+   * @deprecated
+   */
   credit_only: number;
 }

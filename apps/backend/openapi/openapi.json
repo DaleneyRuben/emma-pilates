@@ -3293,56 +3293,6 @@
         ]
       }
     },
-    "/api/v1/administrator/credits": {
-      "get": {
-        "operationId": "listAdminCredits",
-        "parameters": [
-          {
-            "name": "pageSize",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "page",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "type": "number"
-            }
-          },
-          {
-            "name": "query",
-            "required": false,
-            "in": "query",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AdminCreditPageDto"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "bearer": []
-          }
-        ],
-        "summary": "",
-        "tags": [
-          "AdministratorOversight"
-        ]
-      }
-    },
     "/api/v1/administrator/reports/income": {
       "get": {
         "operationId": "getIncomeReport",
@@ -3573,6 +3523,8 @@
     },
     "/api/v1/credit-purchases": {
       "post": {
+        "deprecated": true,
+        "description": "Credit was retired (PAY-005): always refused with credit_insufficient",
         "operationId": "completeCreditPurchase",
         "parameters": [
           {
@@ -3647,6 +3599,8 @@
     },
     "/api/v1/clients/current/credit": {
       "get": {
+        "deprecated": true,
+        "description": "Credit was retired (PAY-005): reads zero with no activity",
         "operationId": "getCurrentClientCredit",
         "parameters": [],
         "responses": {
@@ -9082,14 +9036,18 @@
           "awardedAt": {
             "type": "string",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): no Referral is awarded any more"
           },
           "state": {
             "type": "string",
             "enum": [
               "pending",
               "awarded"
-            ]
+            ],
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): no Referral is awarded any more"
           }
         },
         "required": [
@@ -9122,7 +9080,8 @@
           },
           "awardedCount": {
             "type": "number",
-            "description": "The studio's awarded Referrals, whatever the search"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): the studio's Referrals awarded before Credit was retired"
           },
           "pendingCount": {
             "type": "number",
@@ -9138,74 +9097,6 @@
           "pendingCount"
         ]
       },
-      "AdminCreditBalanceDto": {
-        "type": "object",
-        "properties": {
-          "clientId": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "clientName": {
-            "type": "string"
-          },
-          "availableCentavos": {
-            "type": "number",
-            "description": "BOB centavos"
-          },
-          "lastMovementAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "lastMovementKind": {
-            "type": "string",
-            "enum": [
-              "earned",
-              "reserved",
-              "spent",
-              "returned"
-            ],
-            "description": "The last ledger entry: a Referral award, a reservation for an open purchase, its spend at confirmation, or its release"
-          }
-        },
-        "required": [
-          "clientId",
-          "clientName",
-          "availableCentavos",
-          "lastMovementAt",
-          "lastMovementKind"
-        ]
-      },
-      "AdminCreditPageDto": {
-        "type": "object",
-        "properties": {
-          "items": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/AdminCreditBalanceDto"
-            }
-          },
-          "page": {
-            "type": "number"
-          },
-          "pageSize": {
-            "type": "number"
-          },
-          "totalItems": {
-            "type": "number"
-          },
-          "outstandingCentavos": {
-            "type": "number",
-            "description": "Studio-wide available Credit, BOB centavos"
-          }
-        },
-        "required": [
-          "items",
-          "page",
-          "pageSize",
-          "totalItems",
-          "outstandingCentavos"
-        ]
-      },
       "IncomeByMethodDto": {
         "type": "object",
         "properties": {
@@ -9216,7 +9107,9 @@
             "type": "number"
           },
           "credit_only": {
-            "type": "number"
+            "type": "number",
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit-only Payments carry no money"
           }
         },
         "required": [
@@ -9411,7 +9304,8 @@
           "creditReservedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit held for this purchase"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -9514,7 +9408,9 @@
           },
           "creditAppliedCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -9590,14 +9486,19 @@
         "properties": {
           "availableCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Always 0"
           },
           "reservedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit held for a Payment under review"
+            "deprecated": true,
+            "description": "Always 0"
           },
           "activity": {
+            "deprecated": true,
+            "description": "Always empty",
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CreditActivityDto"
@@ -9626,7 +9527,9 @@
             "enum": [
               "pending",
               "awarded"
-            ]
+            ],
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; a Referral made since stays pending"
           },
           "createdAt": {
             "format": "date-time",
@@ -9635,11 +9538,13 @@
           "awardedAt": {
             "type": "string",
             "format": "date-time",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           },
           "awardCentavos": {
             "type": "number",
-            "nullable": true
+            "nullable": true,
+            "deprecated": true
           }
         },
         "required": [
@@ -9801,7 +9706,9 @@
           },
           "creditAppliedCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since, kept for store builds"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -10023,7 +9930,8 @@
           "creditAvailableCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Available Credit in BOB centavos"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           }
         },
         "required": [
@@ -10124,7 +10032,8 @@
           "creditAppliedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit this purchase would spend"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "amountDueCentavos": {
             "type": "number",
@@ -10147,7 +10056,9 @@
         "properties": {
           "creditAvailableCentavos": {
             "type": "number",
-            "minimum": 0
+            "minimum": 0,
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "plans": {
             "type": "array",
@@ -10361,7 +10272,8 @@
           "creditAvailableCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Available Credit in BOB centavos"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; always 0"
           },
           "referralCode": {
             "type": "string"
@@ -10413,12 +10325,13 @@
           "creditAppliedCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit taken off the Plan price"
+            "deprecated": true,
+            "description": "Deprecated (PAY-005): Credit was retired; 0 on every Payment made since"
           },
           "amountDueCentavos": {
             "type": "number",
             "minimum": 1,
-            "description": "The Plan price less the Credit applied: what was transferred"
+            "description": "What was transferred: the Plan price"
           },
           "state": {
             "type": "string",
@@ -10535,7 +10448,8 @@
           "forfeitedCreditCentavos": {
             "type": "number",
             "minimum": 0,
-            "description": "Credit forfeited through the account_closure ledger entry"
+            "description": "Deprecated (PAY-005): always 0 since Credit was retired; kept for store builds",
+            "deprecated": true
           }
         },
         "required": [
