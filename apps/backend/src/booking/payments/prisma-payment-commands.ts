@@ -9,6 +9,7 @@ import {
   ImageAssetPurpose,
   ImageAssetState,
   ImageMediaType,
+  PaymentKind,
   PaymentMethod,
   PaymentState,
   PrismaClient,
@@ -26,6 +27,7 @@ import {
 import { auditActorOf } from '../../system-identity/authentication/audit-actor';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import { confirmEvaluationTransfer as confirmEvaluationPayment } from '../evaluations/evaluation-payment';
 import { summarizeCredit, type CreditSummary } from './credit-summary';
 import { PaymentRuleError } from './payment-errors';
 import {
@@ -1210,6 +1212,20 @@ export function createPrismaPaymentCommands(
 
     const paymentId = await serializable(async (transaction) => {
       const payment = await loadTransferPayment(transaction, command.paymentId);
+      if (payment.kind === PaymentKind.EVALUATION) {
+        const settings =
+          await transaction.studioSettingsVersion.findFirstOrThrow({
+            orderBy: { version: 'desc' },
+            select: { nutritionistFeeCentavos: true },
+          });
+        await confirmEvaluationPayment(transaction, {
+          paymentId: payment.id,
+          principal,
+          now: dependencies.now(),
+          feeCentavos: settings.nutritionistFeeCentavos,
+        });
+        return payment.id;
+      }
       if (payment.state === PaymentState.CONFIRMED) return payment.id;
       if (payment.state === PaymentState.REJECTED) {
         throw rule(

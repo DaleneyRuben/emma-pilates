@@ -142,6 +142,7 @@ export const paymentSelect = {
   amountDueCentavos: true,
   startsOn: true,
   method: true,
+  kind: true,
   state: true,
   submittedAt: true,
   decidedAt: true,

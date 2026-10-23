@@ -132,6 +132,12 @@ export class IncomeByMethodDto {
   @ApiProperty() credit_only!: number;
 }
 
+export class IncomeByKindDto {
+  @ApiProperty({ description: 'Plan Payments, BOB centavos' }) plan!: number;
+  @ApiProperty({ description: 'Evaluation Payments, BOB centavos' })
+  evaluation!: number;
+}
+
 export class IncomeMonthDto {
   @ApiProperty({
     format: 'date',
@@ -193,6 +199,7 @@ export class IncomeReportDto {
   })
   discountCentavos!: number;
   @ApiProperty({ type: IncomeByMethodDto }) byMethod!: IncomeByMethodDto;
+  @ApiProperty({ type: IncomeByKindDto }) byKind!: IncomeByKindDto;
   @ApiProperty({ type: IncomeMonthDto, isArray: true })
   months!: IncomeMonthDto[];
   @ApiProperty({

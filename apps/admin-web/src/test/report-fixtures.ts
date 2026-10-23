@@ -25,6 +25,7 @@ export const studioIncome: IncomeReportDto = {
   totalCentavos: 228_000,
   ...noDiscount,
   byMethod: { cash: 78_000, transfer: 150_000, credit_only: 0 },
+  byKind: { plan: 221_000, evaluation: 7_000 },
   months: [
     { month: "2026-08-01", totalCentavos: 78_000 },
     { month: "2026-09-01", totalCentavos: 150_000 },
@@ -38,6 +39,7 @@ export const centroIncome: IncomeReportDto = {
   totalCentavos: 78_000,
   ...noDiscount,
   byMethod: { cash: 78_000, transfer: 0, credit_only: 0 },
+  byKind: { plan: 78_000, evaluation: 0 },
   months: [{ month: "2026-08-01", totalCentavos: 78_000 }],
   voided: [],
 };
@@ -82,6 +84,7 @@ export const emptyIncome = (branchId: string | null): IncomeReportDto => ({
   totalCentavos: 0,
   ...noDiscount,
   byMethod: { cash: 0, transfer: 0, credit_only: 0 },
+  byKind: { plan: 0, evaluation: 0 },
   months: [],
   voided: [],
 });

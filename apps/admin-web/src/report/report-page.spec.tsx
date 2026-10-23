@@ -91,6 +91,11 @@ describe("AW16 Reporte on a desktop browser", () => {
         "Efectivo Bs 780,00 · Transferencias Bs 1.500,00",
       ),
     ).toBeVisible();
+    expect(
+      within(tile("Ingresos")).getByText(
+        "Planes Bs 2.210,00 · Evaluaciones Bs 70,00",
+      ),
+    ).toBeVisible();
     expect(within(tile("Gastos")).getByText("Bs 4.380,50")).toBeVisible();
     expect(
       within(tile("Gastos")).getByText(

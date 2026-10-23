@@ -4441,6 +4441,62 @@
         ]
       }
     },
+    "/api/v1/assistant/clients/{clientId}/transfer-payments": {
+      "post": {
+        "operationId": "recordAssistantFrontDeskTransfer",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecordFrontDeskTransferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AssistantClients"
+        ]
+      }
+    },
     "/api/v1/administrator/clients": {
       "get": {
         "operationId": "listAdminClients",
@@ -4607,7 +4663,8 @@
                 "all",
                 "pending",
                 "confirmed",
-                "rejected"
+                "rejected",
+                "voided"
               ],
               "type": "string"
             }
@@ -4826,6 +4883,53 @@
         "summary": "",
         "tags": [
           "Campaign"
+        ]
+      }
+    },
+    "/api/v1/administrator/payments/{paymentId}/void": {
+      "post": {
+        "operationId": "voidPayment",
+        "parameters": [
+          {
+            "name": "paymentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VoidSaleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VoidedSaleDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "VoidSale"
         ]
       }
     },
@@ -6145,6 +6249,52 @@
         ]
       }
     },
+    "/api/v1/evaluation-slots/{slotId}/evaluation-payments": {
+      "post": {
+        "operationId": "bookPaidEvaluation",
+        "parameters": [
+          {
+            "name": "slotId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ClientEvaluationDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "EvaluationSlots"
+        ]
+      }
+    },
     "/api/v1/evaluations": {
       "get": {
         "operationId": "listEvaluations",
@@ -6282,6 +6432,36 @@
     "/api/v1/nutritionist/evaluations/{evaluationId}": {
       "delete": {
         "operationId": "cancelNutritionistEvaluation",
+        "parameters": [
+          {
+            "name": "evaluationId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "NutritionistEvaluations"
+        ]
+      }
+    },
+    "/api/v1/nutritionist/evaluations/{evaluationId}/no-show": {
+      "post": {
+        "operationId": "recordEvaluationNoShow",
         "parameters": [
           {
             "name": "evaluationId",
@@ -10717,6 +10897,23 @@
           "credit_only"
         ]
       },
+      "IncomeByKindDto": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "number",
+            "description": "Plan Payments, BOB centavos"
+          },
+          "evaluation": {
+            "type": "number",
+            "description": "Evaluation Payments, BOB centavos"
+          }
+        },
+        "required": [
+          "plan",
+          "evaluation"
+        ]
+      },
       "IncomeMonthDto": {
         "type": "object",
         "properties": {
@@ -10766,6 +10963,38 @@
           "amountDueCentavos"
         ]
       },
+      "VoidedIncomeDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "voidReason": {
+            "type": "string",
+            "description": "Why the Administrator voided the sale"
+          },
+          "amountDueCentavos": {
+            "type": "number",
+            "description": "Left out of the totals, BOB centavos"
+          },
+          "voidedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "paymentId",
+          "clientId",
+          "voidReason",
+          "amountDueCentavos",
+          "voidedAt"
+        ]
+      },
       "IncomeReportDto": {
         "type": "object",
         "properties": {
@@ -10797,6 +11026,9 @@
           "byMethod": {
             "$ref": "#/components/schemas/IncomeByMethodDto"
           },
+          "byKind": {
+            "$ref": "#/components/schemas/IncomeByKindDto"
+          },
           "months": {
             "type": "array",
             "items": {
@@ -10813,6 +11045,13 @@
           "generatedAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "voided": {
+            "description": "Voided sales in the window. Visible with their reason, never in the totals.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VoidedIncomeDto"
+            }
           }
         },
         "required": [
@@ -10823,9 +11062,11 @@
           "listPriceCentavos",
           "discountCentavos",
           "byMethod",
+          "byKind",
           "months",
           "sales",
-          "generatedAt"
+          "generatedAt",
+          "voided"
         ]
       },
       "AdminBranchPageDto": {
@@ -11084,7 +11325,8 @@
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "planId": {
@@ -11242,6 +11484,15 @@
               "awarded"
             ]
           },
+          "invitationStatus": {
+            "type": "string",
+            "enum": [
+              "registered",
+              "class_booked",
+              "bought"
+            ],
+            "description": "BKM-014: the invitation's status. Older releases ignore it and read state."
+          },
           "createdAt": {
             "format": "date-time",
             "type": "string"
@@ -11260,6 +11511,7 @@
           "referredClientId",
           "referredName",
           "state",
+          "invitationStatus",
           "createdAt"
         ]
       },
@@ -11387,7 +11639,8 @@
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "planId": {
@@ -11995,6 +12248,35 @@
           "payment"
         ]
       },
+      "RecordFrontDeskTransferDto": {
+        "type": "object",
+        "properties": {
+          "planId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Branch of the front desk"
+          },
+          "imageAssetId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The photographed transfer receipt, already READY"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
+          }
+        },
+        "required": [
+          "planId",
+          "branchId",
+          "imageAssetId"
+        ]
+      },
       "AdminClientDto": {
         "type": "object",
         "properties": {
@@ -12256,7 +12538,8 @@
             "enum": [
               "pending",
               "confirmed",
-              "rejected"
+              "rejected",
+              "voided"
             ]
           },
           "submittedAt": {
@@ -12298,6 +12581,11 @@
                 "$ref": "#/components/schemas/InvoiceIssuedMarkDto"
               }
             ]
+          },
+          "voidReason": {
+            "type": "string",
+            "nullable": true,
+            "description": "Why the sale was voided; null unless the state is voided"
           }
         },
         "required": [
@@ -12314,7 +12602,8 @@
           "receiptAvailable",
           "method",
           "invoiceData",
-          "invoiceIssued"
+          "invoiceIssued",
+          "voidReason"
         ]
       },
       "AdminPaymentPageDto": {
@@ -12495,6 +12784,46 @@
           "classes",
           "granted",
           "skipped"
+        ]
+      },
+      "VoidSaleDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "description": "Why the sale is voided. Required, at most 300 characters."
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "VoidedSaleDto": {
+        "type": "object",
+        "properties": {
+          "paymentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "voided"
+            ]
+          },
+          "voidReason": {
+            "type": "string"
+          },
+          "cancelledBookings": {
+            "type": "number",
+            "minimum": 0
+          }
+        },
+        "required": [
+          "paymentId",
+          "state",
+          "voidReason",
+          "cancelledBookings"
         ]
       },
       "CloseAccountRequestDto": {
@@ -13341,7 +13670,15 @@
           },
           "bookable": {
             "type": "boolean",
-            "description": "Published, unbooked, more than 3 hours away, and in a month the Client has not used"
+            "description": "Published, unbooked, more than 3 hours away, and covered by an active Subscription"
+          },
+          "included": {
+            "type": "boolean",
+            "description": "True when the covering Plan of 90 days or longer still includes its Evaluation"
+          },
+          "priceCentavos": {
+            "type": "number",
+            "description": "Settings price in centavos; 0 when the Evaluation is included"
           }
         },
         "required": [
@@ -13352,7 +13689,9 @@
           "branchId",
           "branchName",
           "nutritionistName",
-          "bookable"
+          "bookable",
+          "included",
+          "priceCentavos"
         ]
       },
       "EvaluationDayDto": {
@@ -13455,11 +13794,24 @@
             "type": "string",
             "format": "uuid"
           },
+          "included": {
+            "type": "boolean"
+          },
+          "priceCentavos": {
+            "type": "number",
+            "description": "Charged centavos; 0 when included or unpaid"
+          },
+          "paymentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
           "state": {
             "type": "string",
             "enum": [
               "booked",
-              "cancelled"
+              "cancelled",
+              "no_show"
             ]
           },
           "startsAt": {
@@ -13496,6 +13848,9 @@
         "required": [
           "id",
           "slotId",
+          "included",
+          "priceCentavos",
+          "paymentId",
           "state",
           "startsAt",
           "endsAt",

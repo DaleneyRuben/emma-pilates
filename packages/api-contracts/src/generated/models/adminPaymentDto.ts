@@ -46,4 +46,9 @@ export interface AdminPaymentDto {
    * @nullable
    */
   invoiceIssued: InvoiceIssuedMarkDto | null;
+  /**
+   * Why the sale was voided; null unless the state is voided
+   * @nullable
+   */
+  voidReason: string | null;
 }

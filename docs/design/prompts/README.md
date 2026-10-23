@@ -266,6 +266,8 @@ Each of these was sent as the next message in the existing design session for th
 | [202](./followups/197-void-sale-on-payments.md) | `AW28` gains «Anular venta» with a required reason and an «Anulado» filter (PAY-006, decisions §4.3). Numbered 202 here because 197 is the campaign line. | 🕓 pending |
 | [203](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006). Numbered 203 here because 198 is the founder banner. | 🕓 pending |
 | [204](./followups/196-invita-a-una-amiga.md) | `16` becomes «Invita a una amiga»: the code, the free-class explanation, and each invitation's status (Registrada, Clase reservada, Compró su plan); the credit row goes (BKM-014, booking ADR-0009). Numbered 204 here because 196 is the weekly-cap line. | 🕓 pending |
+| [205](./followups/199-evaluation-price-and-history.md) | `13` and `14` name an included Evaluation or the settings price; `15` stops saying every past Evaluation is «Realizada» (NUT-003). Numbered 205 here because 199 is the freeze request. | 🕓 pending |
+| [206](./followups/200-evaluation-income-apart.md) | `AW16` splits Plan income and Evaluation income under the method line (NUT-003). Numbered 206 here because 200 is the freeze review. | 🕓 pending |
 
 ## Status
 

@@ -195,6 +195,7 @@ export * from "./grantCampaignDto";
 export * from "./grantCourtesyAccessDto";
 export * from "./impersonationDto";
 export * from "./impersonationDtoRole";
+export * from "./incomeByKindDto";
 export * from "./incomeByMethodDto";
 export * from "./incomeMonthDto";
 export * from "./incomeReportDto";
