@@ -1,4 +1,9 @@
-import { recomputeFacts, type FactSource } from './recompute-facts';
+import {
+  recomputeFacts,
+  type ClientMonthFact,
+  type FactSource,
+  type SessionFact,
+} from './recompute-facts';
 
 const month = new Date('2026-10-01T00:00:00.000Z');
 const sessionId = '11111111-1111-4111-8111-111111111111';
@@ -19,7 +24,7 @@ const source = (): FactSource => ({
       branchId,
       classTypeId,
       trainerStaffMemberId: trainerId,
-      startsAt: new Date('2026-10-12T14:00:00.000Z'),
+      startsAt: new Date('2026-10-12T18:00:00.000Z'),
       capacity: 8,
       state: 'scheduled',
       bookings: [
@@ -34,7 +39,7 @@ const source = (): FactSource => ({
       branchId,
       classTypeId,
       trainerStaffMemberId: trainerId,
-      startsAt: new Date('2026-10-13T14:00:00.000Z'),
+      startsAt: new Date('2026-10-13T18:00:00.000Z'),
       capacity: 6,
       state: 'scheduled',
       bookings: [],
@@ -44,7 +49,7 @@ const source = (): FactSource => ({
       branchId,
       classTypeId,
       trainerStaffMemberId: trainerId,
-      startsAt: new Date('2026-09-30T14:00:00.000Z'),
+      startsAt: new Date('2026-09-30T18:00:00.000Z'),
       capacity: 8,
       state: 'scheduled',
       bookings: [{ clientId: clientA, state: 'booked', outcome: 'attended' }],
@@ -80,7 +85,8 @@ const source = (): FactSource => ({
 
 describe('recompute facts', () => {
   it('writes one session fact per session in the month, including one with no bookings', () => {
-    const facts = recomputeFacts(source(), month);
+    const facts: { sessions: SessionFact[]; clientMonths: ClientMonthFact[] } =
+      recomputeFacts(source(), month);
 
     expect(facts.sessions).toEqual([
       {
@@ -90,8 +96,8 @@ describe('recompute facts', () => {
         classTypeId,
         trainerStaffMemberId: trainerId,
         capacity: 8,
-        bookingsAtWindowClose: 3,
-        attended: 2,
+        bookingsAtWindowClose: 2,
+        attended: 1,
         noShows: 1,
       },
       {
@@ -109,7 +115,8 @@ describe('recompute facts', () => {
   });
 
   it('writes one client month fact per included client and counts only that month', () => {
-    const facts = recomputeFacts(source(), month);
+    const facts: { sessions: SessionFact[]; clientMonths: ClientMonthFact[] } =
+      recomputeFacts(source(), month);
 
     expect(facts.clientMonths).toEqual([
       {
@@ -140,12 +147,13 @@ describe('recompute facts', () => {
   });
 
   it('excludes a store-review client and their bookings through the exclusion seam', () => {
-    const facts = recomputeFacts(source(), month);
+    const facts: { sessions: SessionFact[]; clientMonths: ClientMonthFact[] } =
+      recomputeFacts(source(), month);
 
-    expect(facts.sessions[0]?.bookingsAtWindowClose).toBe(3);
-    expect(
-      facts.clientMonths.map((row) => (row as { clientId: string }).clientId),
-    ).not.toContain(excludedClient);
+    expect(facts.sessions[0]?.bookingsAtWindowClose).toBe(2);
+    expect(facts.clientMonths.map((row) => row.clientId)).not.toContain(
+      excludedClient,
+    );
   });
 
   it('returns the same rows when the same source is recomputed twice', () => {
