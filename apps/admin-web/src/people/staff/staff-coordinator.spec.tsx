@@ -45,7 +45,9 @@ describe("the Coordinator Role in Personal", () => {
     expect(within(row).getByText("Coordinador")).toBeInTheDocument();
     expect(within(row).getByText("Todas")).toBeInTheDocument();
     expect(
-      screen.getByRole("radio", { name: "Coordinador" }),
+      within(screen.getByLabelText("Rol")).getByRole("option", {
+        name: "Coordinador",
+      }),
     ).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Nuevo miembro" }));

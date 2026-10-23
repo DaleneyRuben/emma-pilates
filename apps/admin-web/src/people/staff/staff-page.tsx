@@ -11,6 +11,7 @@ import { StatusPill } from "../../components/ui/status-pill";
 import { namesById } from "../../lib/named";
 import { staffRoles, type StaffRole, type StaffSearch } from "../people-search";
 import { branchNames, roleLabels, statusPills } from "./staff-format";
+import { useAdminRole } from "../../session/admin-role";
 import { StaffPanelForm } from "./staff-panel";
 import { staffTableQueryOptions } from "./staff-queries";
 
@@ -84,12 +85,13 @@ export function StaffPage({
   const query = useQuery(staffTableQueryOptions(search));
   const branches = useQuery(everyBranchesQueryOptions());
   const names = useMemo(() => namesById(branches.data ?? []), [branches.data]);
+  const administrator = useAdminRole() === "administrator";
 
   return (
     <CatalogPage
       title="Personal"
       subtitle="El rol define qué app abre cada persona; las sucursales, dónde puede trabajar."
-      createLabel="Nuevo miembro"
+      createLabel={administrator ? "Nuevo miembro" : undefined}
       loadingMessage="Cargando al personal…"
       what="al personal"
       emptyMessage="No hay miembros con este rol."
