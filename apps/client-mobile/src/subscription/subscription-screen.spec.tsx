@@ -105,7 +105,10 @@ describe("Refreshed Mi plan (Client 12)", () => {
       },
     });
 
-    expect(screen.getByText("Siguiente plan desde 25 de septiembre de 2026")).toBeOnTheScreen();
+    const nextPlan = screen.getByText("Siguiente plan desde 25 de septiembre de 2026");
+    expect(nextPlan).toBeOnTheScreen();
+    // A long date must shrink inside the row, or it runs into the label on a phone.
+    expect(nextPlan).toHaveStyle({ flexShrink: 1 });
   });
 
   it("invites renewal while expiring soon", async () => {
