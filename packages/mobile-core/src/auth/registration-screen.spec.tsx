@@ -1,4 +1,5 @@
 import { act, fireEvent, render } from "@testing-library/react-native";
+import { Keyboard } from "react-native";
 
 import { AuthenticationApiError, type AuthenticationApi } from "./authentication-api";
 import { AuthenticationFlow } from "./authentication-flow";
@@ -159,6 +160,16 @@ describe("Client registration (01) acquisition channel", () => {
 
     expect(screen.getByRole("alert", { name: "Elige cómo nos conociste." })).toBeOnTheScreen();
     expect(api.register).not.toHaveBeenCalled();
+  });
+
+  it("closes the keyboard when she picks an answer, so «Crear cuenta» shows", async () => {
+    const dismiss = jest.spyOn(Keyboard, "dismiss");
+    const screen = await openRegistration(createApiMock());
+
+    await fireEvent.press(screen.getByRole("radio", { name: "Google" }));
+
+    expect(dismiss).toHaveBeenCalled();
+    dismiss.mockRestore();
   });
 
   it("says the code can be a friend's or the instructor's", async () => {
