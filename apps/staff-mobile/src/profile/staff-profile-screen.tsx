@@ -6,9 +6,9 @@ import {
   BodyText,
   Chevron,
   colors,
-  confirmLogout,
   initials,
   LoadingState,
+  LogoutConfirmationSheet,
   QueryFailure,
   radii,
   Screen,
@@ -20,6 +20,7 @@ import {
   useMobileIdentity,
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
+import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
@@ -68,6 +69,7 @@ export function StaffProfileScreen() {
   const navigation = useNavigation<ProfileNavigation>();
   const identity = useMobileIdentity();
   const fetcher = useStaffFetcher();
+  const [confirmingLogout, setConfirmingLogout] = useState(false);
   const profile = useGetCurrentStaffMemberProfile({
     fetcher,
     query: { refetchOnMount: "always" },
@@ -137,7 +139,7 @@ export function StaffProfileScreen() {
         <Pressable
           accessibilityLabel="Cerrar sesión"
           accessibilityRole="button"
-          onPress={() => confirmLogout(identity.logout)}
+          onPress={() => setConfirmingLogout(true)}
           style={({ pressed }) => [styles.logout, pressed && styles.logoutPressed]}
         >
           {({ pressed }) => (
@@ -148,6 +150,11 @@ export function StaffProfileScreen() {
         </Pressable>
         <BodyText style={styles.footer}>Emma Pilates Studio · versión 1.0</BodyText>
       </ScrollView>
+      <LogoutConfirmationSheet
+        logout={identity.logout}
+        onDismiss={() => setConfirmingLogout(false)}
+        visible={confirmingLogout}
+      />
     </Screen>
   );
 }
