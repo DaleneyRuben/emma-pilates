@@ -252,14 +252,19 @@ describe('founder membership', () => {
     await expect(oversight.listFounders(assistant)).rejects.toBeInstanceOf(
       AdministrationError,
     );
-    await expect(
-      oversight.listFounders({
-        ...administrator,
-        identity: {
-          ...administrator.identity,
-          role: 'coordinator' as 'administrator',
-        },
-      }),
-    ).rejects.toBeInstanceOf(AdministrationError);
+    // IDN-009 adds the coordinator role. Until then the denial is proven by a
+    // principal whose role the use case does not recognize.
+    const staff = administrator.identity as {
+      kind: 'staff';
+      staffMemberId: string;
+      branchIds: string[];
+    };
+    const coordinator = {
+      ...administrator,
+      identity: { ...staff, role: 'coordinator' as 'administrator' },
+    };
+    await expect(oversight.listFounders(coordinator)).rejects.toBeInstanceOf(
+      AdministrationError,
+    );
   });
 });
