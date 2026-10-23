@@ -58,13 +58,13 @@ can be found by its design name.
 | Staff app | Tests |
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
-| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 75 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 81 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
-| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 75 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 81 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
-| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 75 |
+| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 81 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
 
@@ -1615,7 +1615,7 @@ administración.", **Rol** (`Entrenadora`), **Sucursales** (`Centro, Equipetrol,
 Urubó`), the **Notificaciones** row (with the unread count) and the
 **Cambiar contraseña** row, both ending in the quiet chevron of 18, the
 outlined **Cerrar sesión** button, and the version footer «Emma Pilates
-Studio · versión 1.0.1» (the value in the Staff app's `app.json`, Test 75).
+Studio · versión 1.0.1» (the value in the Staff app's `app.json`, Test 81).
 Log in as
 `paola.mendoza@example.com` to see **Administración** with "Todas las
 sucursales". The staff inbox draws the same bare empty state as the Client's
@@ -1724,7 +1724,7 @@ with `Bs 500`, the **Pendiente** badge, "Transferencia · enviado el 22 de
 septiembre, 14:05", and the **Comprobante** image loaded through the
 authenticated API. If that download fails the screen says «No pudimos
 mostrar el comprobante.» with **Reintentar**, and **Confirmar pago** stays
-disabled until the image is on screen (Test 75); **Rechazar** stays
+disabled until the image is on screen (Test 81); **Rechazar** stays
 available. **Ampliar** (or tapping the image) opens it full screen
 with pinch zoom; close it with the ✕ in the top-right corner, below the status
 bar. Scroll down: **Confirmar pago** returns to the list with a two-second
@@ -1967,7 +1967,7 @@ The same data is available through Swagger as `GET
 /api/v1/sessions/{sessionId}/attendance`; other Roles get `403`. A `403`
 or `500` on Mi agenda or the roster shows «No pudimos cargar tu agenda.» or
 «No pudimos cargar la lista de asistencia.» with **Reintentar**, and a later
-success loads the screen (Test 75).
+success loads the screen (Test 81).
 
 ## Test 13: watch the worker cancel an empty Session and close a Waitlist
 
@@ -2178,7 +2178,7 @@ In the Client app as `lucia@example.com`:
 
 In the Staff app, a Trainer's "Tu clase … se canceló" notice and a
 Nutritionist's Evaluation notices open **Mi agenda**. An Assistant notice
-that names a Client opens that Client (Test 75). The Staff roots (Mi
+that names a Client opens that Client (Test 81). The Staff roots (Mi
 agenda, the results of Buscar cliente, Pagos pendientes, the Nutritionist's
 agenda, Mi disponibilidad) and both apps' Notificaciones refresh when they
 regain focus (closing the roster, a review, or a client refetches the list
@@ -5600,7 +5600,7 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    cargar los pagos pendientes.», and the Nutritionist's **Mi
    disponibilidad** «No pudimos cargar tus horarios.». A Trainer answer of
    `403` or `500` shows the same **Reintentar** instead of «Algo salió
-   mal», and a later success loads the screen (Test 75).
+   mal», and a later success loads the screen (Test 81).
 2. **An action failure.** With the API stopped, tap an action instead: a
    refused command shows its own line and keeps the form, in the pattern
    «No pudimos … Inténtalo de nuevo.» (Test 10 D's «No pudimos cancelar la
@@ -5846,7 +5846,7 @@ touching production.
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
 
-## Test 75: the Staff app's diagnosis fixes
+## Test 81: the Staff app's diagnosis fixes
 
 The five Staff findings from the diagnosis (STAFF-005). The automated
 specs cover them; a device walk was not part of that check, so walk them
