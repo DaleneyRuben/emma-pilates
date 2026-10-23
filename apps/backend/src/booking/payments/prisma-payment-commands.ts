@@ -37,6 +37,10 @@ import { evaluatePurchaseEligibility } from './purchase-eligibility';
 import { deprecatedDurationMonths } from '../catalog/plan-validity';
 import { computeSubscriptionTerm } from './subscription-term';
 import { grantGiftClass } from './allowance-adjustments';
+import {
+  collectOwedInviteReward,
+  grantInviteReward,
+} from './grant-invite-reward';
 import { hasEarlierRealPayment } from './gift-class-history';
 
 type Transaction = Prisma.TransactionClient;
@@ -588,6 +592,26 @@ export function createPrismaPaymentCommands(
         },
       });
     }
+
+    await collectOwedInviteReward(transaction, {
+      hostClientId: payment.clientId,
+      subscriptionId: subscription.id,
+      author: {
+        accountId: principal.accountId,
+        role: auditActorOf(principal).role,
+      },
+      now,
+      correlationId: payment.id,
+    });
+    await grantInviteReward(transaction, {
+      friendClientId: payment.clientId,
+      author: {
+        accountId: principal.accountId,
+        role: auditActorOf(principal).role,
+      },
+      now,
+      correlationId: payment.id,
+    });
 
     await grantGiftClass(transaction, {
       clientId: payment.clientId,

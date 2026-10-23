@@ -28,6 +28,8 @@ model Client {
   creditLedgerEntries CreditLedgerEntry[]
   referralsMade       Referral[]      @relation("ReferralReferrer")
   referralReceived    Referral?       @relation("ReferralReferred")
+  guestPassesHosted   GuestPass[]     @relation("GuestPassHost")
+  guestPassesReceived GuestPass[]     @relation("GuestPassFriend")
   evaluations         Evaluation[]
   promotionsConsents  ClientPromotionsConsent[]
   acquisitions        ClientAcquisition[] @relation("AcquiredClient")
