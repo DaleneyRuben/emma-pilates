@@ -33,6 +33,7 @@ export {
   usePushNotifications,
 } from "./notifications/push-notifications";
 export type { PushPlatform } from "./notifications/push-platform";
+export * from "./query/persistence";
 export * from "./query/provider";
 export * from "./time/mounted-at";
 export * from "./time/session-format";
