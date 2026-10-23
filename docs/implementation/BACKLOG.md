@@ -789,7 +789,7 @@ Acceptance criteria: at least 12 testers opted in on the day REL-006's closed re
 | MOB-070 | P1 | Client app | Diagnosis fixes in the Client app: Reschedule idempotency, the waitlist offered inside the window, specific rejection messages, phone validation, hard-coded copy | BKM-004 | 1.5–2 d | ready |
 | STAFF-005 | P1 | Staff app | Diagnosis fixes in the Staff app: HTTP errors on the Trainer screens, a failed receipt download, notification taps for the Assistant, the version label | — | 1.5–2 d | ready |
 | UX-003, UX-004 | P1 | Apps | *Existing rows.* Early refusals for the Assistant, refetch on focus | UX-001 | 1–2 d left | ready |
-| NOT-003 | P1 | Backend/apps | Class reminders 24 h and 2 h before; fix the exact-date expiry reminder | — | 1–2 d | ready |
+| NOT-003 | P1 | Backend/apps | Class reminders 24 h and 2 h before; fix the exact-date expiry reminder | — | 1–2 d | done |
 | REL-014 | P1 | Mobile release | Apple Developer Program as an individual (gate 9), bundle IDs, APNs key, App Store Connect records | — | 0.5 d + Apple's wait | ready |
 | REL-016 | P1 | Production | Store-review Accounts for Apple and Google: a Client with an active Plan and a Trainer, marked `store_review` and created after the reset | REL-014, REL-019 | 0.5–1 d | ready |
 | REL-015 | P1 | Mobile release | Client app on the App Store: iOS builds, TestFlight smoke test, listing, App Privacy, review notes, Universal Links, iOS push | REL-014, REL-016, the business rules | 2.5–3.5 d + review | ready |
@@ -852,6 +852,19 @@ Decisions (blanket approval, 2026-10-23), taken before the code:
   missed day is recovered by the window, not by a tighter interval.
 - Screen 19 already renders `notification.message`, so the new sentences
   appear in the inbox without a design change. No follow-up.
+
+Evidence: red `12545e8a` (rules fail closed) → green `90a951eb` (windows and
+copy) → `e8590f0e` (worker sweep, expiry window, restart test). **Verified:**
+unit `class-reminders`, `remind-expiring-subscriptions`, worker wiring, and
+the push catalog; integration `class-reminders` (restart inside the day
+window sends one, the hour reminder once, a cancelled Booking none, a late
+Booking no day reminder) and `notifications` (Valeria once, Isabel the day
+after her exact date, second run 0) on disposable `pilates_test_not003_*`
+databases. One end-to-end run of the job against `pilates_not003_dev` is
+recorded below once it has been read back. **Not verified:** a device walk
+and a real push (not required; the existing dispatch transport is unchanged).
+**Open for owner approval:** the Spanish texts above, and that no migration
+was added. No design follow-up.
 
 #### REL-014 · Apple Developer Program (individual)
 
