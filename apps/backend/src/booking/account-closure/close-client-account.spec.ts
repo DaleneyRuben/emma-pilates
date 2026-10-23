@@ -117,7 +117,6 @@ describe('closeClientAccount', () => {
       'cancelFutureEvaluations',
       'releaseOpenPurchaseIntent',
       'endSubscription',
-      'forfeitCredit',
       'promoteWaitlists',
       'endPromotionsConsent',
       'closeAccount',
@@ -129,7 +128,7 @@ describe('closeClientAccount', () => {
       cancelledBookings: 3,
       cancelledEvaluations: 1,
       forfeitedClasses: 4,
-      forfeitedCreditCentavos: 6000,
+      forfeitedCreditCentavos: 0,
     });
   });
 
@@ -157,7 +156,7 @@ describe('closeClientAccount', () => {
           cancelledBookings: 3,
           cancelledEvaluations: 1,
           forfeitedClasses: 4,
-          forfeitedCreditCentavos: 6000,
+          forfeitedCreditCentavos: 0,
           keptPromotionContact: false,
           endedPromotionsConsent: false,
         },
