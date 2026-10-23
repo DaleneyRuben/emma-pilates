@@ -350,4 +350,62 @@ describe('worker entrypoint occurrence jobs', () => {
     expect(evaluationSlots.execute).toHaveBeenCalledTimes(2);
     expect(evaluationReminders.execute).toHaveBeenCalledTimes(61);
   });
+
+  it('sweeps class reminders every minute and keeps running when one pass fails', async () => {
+    jest.useFakeTimers();
+    const boss: WorkerBoss = {
+      isInstalled: jest.fn().mockResolvedValue(true),
+      schemaVersion: jest.fn().mockResolvedValue(38),
+      start: jest.fn().mockResolvedValue(undefined),
+      work: jest.fn().mockResolvedValue('worker-id'),
+      getQueueStats: jest.fn().mockResolvedValue([]),
+      getDb: () => ({ executeSql: jest.fn().mockResolvedValue({ rows: [] }) }),
+      stop: jest.fn().mockResolvedValue(undefined),
+    };
+    const classReminders = {
+      execute: jest
+        .fn()
+        .mockResolvedValueOnce({ sent: 1 })
+        .mockRejectedValueOnce(new Error('sensitive class reminder failure'))
+        .mockResolvedValue({ sent: 0 }),
+    };
+    const emit = jest.fn();
+
+    const stopWorker = await startWorker({
+      boss,
+      authenticationEmail: null,
+      finalizeUpload: { process: jest.fn() },
+      pendingAccountCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      imageUploadCleanup: {
+        execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
+      },
+      subscriptionReminders: {
+        execute: jest.fn().mockResolvedValue({ reminded: 0 }),
+      },
+      founderMemberships: {
+        execute: jest.fn().mockResolvedValue({ ended: 0 }),
+      },
+      purchaseIntentExpiry: {
+        execute: jest.fn().mockResolvedValue({ expired: 0 }),
+      },
+      ...occurrenceJobs(),
+      classReminders,
+      serviceVersion: '1.2.3',
+      emit,
+    });
+
+    expect(classReminders.execute).toHaveBeenCalledTimes(1);
+
+    await jest.advanceTimersByTimeAsync(60 * 1_000);
+    expect(classReminders.execute).toHaveBeenCalledTimes(2);
+    expect(emit).toHaveBeenCalledWith({
+      event: 'class_reminders_failed',
+      serviceVersion: '1.2.3',
+    });
+    expect(JSON.stringify(emit.mock.calls)).not.toContain('sensitive');
+
+    await stopWorker();
+  });
 });

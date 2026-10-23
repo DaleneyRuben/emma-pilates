@@ -26,6 +26,20 @@ const catalog: Record<string, PushPresentation> = {
       body: 'Tienes una cita próxima. Abre la app para ver el detalle.',
     },
   },
+  class_reminder_day: {
+    sound: true,
+    lockScreen: {
+      title: 'Recordatorio',
+      body: 'Tienes una clase próxima. Abre la app para ver el detalle.',
+    },
+  },
+  class_reminder_hour: {
+    sound: true,
+    lockScreen: {
+      title: 'Recordatorio',
+      body: 'Tienes una clase próxima. Abre la app para ver el detalle.',
+    },
+  },
   evaluation_cancelled_by_studio: {
     sound: true,
     lockScreen: {

@@ -165,7 +165,7 @@ describe('Notification store', () => {
     );
 
     await expect(job.execute()).resolves.toEqual({ reminded: 1 });
-    await expect(job.execute()).resolves.toEqual({ reminded: 1 });
+    await expect(job.execute()).resolves.toEqual({ reminded: 0 });
 
     const reminders = await prisma.notification.findMany({
       where: { accountId: valeriaAccount.id, type: 'subscription_expiring' },
@@ -177,6 +177,29 @@ describe('Notification store', () => {
         'Tu plan vence en 3 días. Renueva cuando quieras y elige tu fecha de inicio.',
       destinationType: 'subscription',
     });
+  });
+
+  it('still reminds a Subscription the day after the exact three-day date was missed', async () => {
+    const isabelAccount = await prisma.account.findFirstOrThrow({
+      where: { email: 'isabel@example.com', deletedAt: null },
+      select: { id: true },
+    });
+    await prisma.notification.deleteMany({
+      where: { accountId: isabelAccount.id, type: 'subscription_expiring' },
+    });
+    const job = createSubscriptionReminderJob(
+      prisma,
+      () => new Date('2026-10-03T15:00:00.000Z'),
+    );
+
+    await expect(job.execute()).resolves.toEqual({ reminded: 1 });
+    await expect(job.execute()).resolves.toEqual({ reminded: 0 });
+
+    await expect(
+      prisma.notification.count({
+        where: { accountId: isabelAccount.id, type: 'subscription_expiring' },
+      }),
+    ).resolves.toBe(1);
   });
 
   it('pages after a cursor and marks single and all notifications read', async () => {

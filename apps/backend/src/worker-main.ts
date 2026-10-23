@@ -16,6 +16,7 @@ import { createPurchaseIntentExpiryJob } from './booking/payments/purchase-inten
 import { createNotificationRecorder } from './notifications/prisma-notification-store';
 import { createPushDeliveryRuntime } from './notifications/push/push-delivery-runtime';
 import { createFirst90DaysJob } from './booking/first-90-days/prisma-first-90-days';
+import { createClassReminderJob } from './notifications/class-reminder-job';
 import { createSubscriptionReminderJob } from './notifications/subscription-reminder-job';
 import { createFounderMembershipJob } from './booking/payments/founder-membership-job';
 import { CleanupExpiredPendingAccounts } from './system-identity/registration/cleanup-expired-pending-accounts';
@@ -122,6 +123,7 @@ async function bootstrap(): Promise<void> {
     evaluationReminders: {
       execute: () => evaluations.sendDueEvaluationReminders(),
     },
+    classReminders: createClassReminderJob(prisma, now, recordNotification),
     minimumBookingsChecks: {
       execute: () => sessionStartChecks.checkMinimumBookings(),
     },
