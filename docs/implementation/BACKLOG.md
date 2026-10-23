@@ -904,7 +904,7 @@ Decisions (blanket approval, 2026-10-23):
 
 Open question: none. Follow-up 203 stays pending.
 
-Evidence: the hand-checked December is 403,000 centavos (base 350,000, one 30-day new Client 5,000, one 60-day 8,000, a single class 0, a Client a Trainer brought 0, and the bonus at 100 % against an 80 % month-1 target 40,000). A second approval creates no second Salary Payment. Carolina is denied the list, her own endpoint, and the approval. Migration `20261023230200_coordinator_pay_line_kinds` needs owner approval. Follow-up 203 stays pending.
+Evidence: the hand-checked December is 403,000 centavos (base 350,000, one 30-day new Client 5,000, one 60-day 8,000, a single class 0, a Client a Trainer brought 0, and the bonus at 100 % against an 80 % month-1 target 40,000). A second approval creates no second Salary Payment. Carolina is denied the list, her own endpoint, and the approval. Migration `20261023230200_coordinator_pay_line_kinds` needs owner approval. Follow-up 203 stays pending. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/188.
 
 #### REL-011 · Tester access on production
 

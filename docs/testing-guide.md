@@ -6357,6 +6357,8 @@ it. Carolina, the Coordinator, does not, not even her own. Log in as Test
 5. **Narrow browser.** At 420 px the card stacks and the line table becomes
    labelled cards. The sidebar opens from **Abrir menú**.
 
+Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/188.
+
 Follow-up 203 stays pending. The migration
 `20261023230200_coordinator_pay_line_kinds` needs owner approval before it
 runs on a shared database.
