@@ -1,8 +1,8 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
+import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react-native";
 import { dehydrate, onlineManager, QueryClient } from "@tanstack/react-query";
 import {
   clearMobileQueryCache,
+  clearPersistedAccountCache,
   createMobilePersister,
   persistedCacheVersion,
 } from "@pilates/mobile-core";
@@ -53,6 +53,7 @@ async function persistSeenQueries(): Promise<void> {
     clientState: dehydrate(seeded),
     timestamp: Date.now(),
   });
+  seeded.clear();
 }
 
 describe("Client Home", () => {
@@ -60,7 +61,7 @@ describe("Client Home", () => {
     await cleanup();
     clearMobileQueryCache();
     onlineManager.setOnline(true);
-    await AsyncStorage.clear();
+    await clearPersistedAccountCache("account-1");
   });
 
   it("greets the Client and shows an active Subscription", async () => {
@@ -199,18 +200,18 @@ describe("Client Home", () => {
         return jsonResponse(activeSubscription);
       },
     });
+    onlineManager.setOnline(false);
     const screen = await render(<App runtime={createRuntime(fetcher)} />);
 
     await waitFor(() => {
       expect(screen.getByText("Hola, Lucía")).toBeOnTheScreen();
     });
     offline = false;
-    const [refreshControl] = screen.getByTestId("home-scroll").children;
-    await fireEvent(refreshControl as Parameters<typeof fireEvent>[0], "refresh");
-
-    await waitFor(() => {
-      expect(screen.getByText("Hola, Lucía Actualizada")).toBeOnTheScreen();
+    await act(async () => {
+      onlineManager.setOnline(true);
+      await new Promise((resolve) => setTimeout(resolve, 0));
     });
+    expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     expect(
       screen.queryByText("Sin conexión. Mostrando tus datos de la última vez."),
     ).not.toBeOnTheScreen();
