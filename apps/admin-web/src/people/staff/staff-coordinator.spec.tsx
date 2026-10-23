@@ -81,7 +81,7 @@ describe("the Coordinator Role in Personal", () => {
     await user.click(
       await screen.findByRole("button", { name: "Emma Vargas" }),
     );
-    const panel = await screen.findByRole("dialog", { name: "Editar miembro" });
+    const panel = await screen.findByRole("dialog", { name: "Emma Vargas" });
     expect(
       screen.queryByRole("button", { name: "Nuevo miembro" }),
     ).not.toBeInTheDocument();

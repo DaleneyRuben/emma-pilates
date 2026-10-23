@@ -95,7 +95,11 @@ export function StaffPage({
       loadingMessage="Cargando al personal…"
       what="al personal"
       emptyMessage="No hay miembros con este rol."
-      panelTitles={{ create: "Nuevo miembro", edit: "Editar miembro" }}
+      panelTitles={{
+        create: "Nuevo miembro",
+        // The Coordinator only reads a member (follow-up 157).
+        edit: administrator ? "Editar miembro" : (member) => member.name,
+      }}
       filter={
         <ListFilter
           label="Rol"
