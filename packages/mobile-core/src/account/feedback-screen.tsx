@@ -121,6 +121,7 @@ export function FeedbackScreen({
               onChangeText={setText}
               placeholder="Escribe aquí tu comentario"
               style={styles.textArea}
+              testID="feedback-text"
               textAlignVertical="top"
               value={text}
             />
