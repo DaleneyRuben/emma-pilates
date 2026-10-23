@@ -40,6 +40,14 @@ describe('the monthly result', () => {
     expect(result.budgetSubtotalCentavos).toBe(1_925_000);
     expect(result.contingencyCentavos).toBe(192_500);
     expect(result.budgetTotalCentavos).toBe(2_117_500);
+    expect(result.taxRatePercent).toBe(16);
+    expect(result.breakEvenCentavos).toBe(
+      breakEvenCentavos({
+        fixedCostsCentavos: 2_117_500,
+        variableCostsCentavos: 15_000,
+        taxRatePercent: 16,
+      }),
+    );
     expect(result.resultCentavos).toBe(4_000_000 - 640_000 - 850_000 - 15_000);
   });
 });

@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -58,6 +57,7 @@ import {
   SalaryPaymentInputDto,
   WithdrawalPageDto,
 } from './back-office.dto';
+import { AdministratorFinanceController } from './finance/finance.controller';
 import { AdministratorSuppliesController } from './supplies/supplies.controller';
 
 export {
@@ -359,30 +359,6 @@ export class AdministratorExpenseReportController extends BackOfficeController {
     super(operations, resolver);
   }
 
-  @Get('finance')
-  @ApiOperation({ operationId: 'getMonthResult' })
-  @ApiQuery({ name: 'month', required: true, example: '2026-11' })
-  @ApiOkResponse({ schema: { type: 'object' } })
-  @Header('Cache-Control', 'no-store')
-  async finance(
-    @Headers('authorization') authorization: string | undefined,
-    @Query('month') month: string,
-  ) {
-    if (!/^\d{4}-\d{2}$/.test(month)) {
-      throw new BadRequestException({
-        code: 'invalid_request',
-        detail: 'Invalid month',
-      });
-    }
-    const principal = await this.authenticate(authorization);
-    return run(() =>
-      this.operations.finance.monthResult(
-        { month: new Date(`${month}-01T00:00:00.000Z`) },
-        principal,
-      ),
-    );
-  }
-
   @Get('expenses')
   @ApiOperation({ operationId: 'getExpenseReport' })
   @ApiQuery({ name: 'from', required: true, format: 'date-time' })
@@ -410,4 +386,5 @@ export const backOfficeControllers = [
   AdministratorExpenseCategoriesController,
   AdministratorExpensesController,
   AdministratorExpenseReportController,
+  AdministratorFinanceController,
 ];

@@ -36,11 +36,18 @@ export const monthlyResult = (input: {
     (total, amount) => total + amount,
     0,
   );
+  const budgetTotalCentavos = budgetSubtotalCentavos + contingencyCentavos;
   return {
+    taxRatePercent: input.taxRatePercent,
     taxCentavos,
     budgetSubtotalCentavos,
     contingencyCentavos,
-    budgetTotalCentavos: budgetSubtotalCentavos + contingencyCentavos,
+    budgetTotalCentavos,
+    breakEvenCentavos: breakEvenCentavos({
+      fixedCostsCentavos: budgetTotalCentavos,
+      variableCostsCentavos: input.nutritionistCostCentavos,
+      taxRatePercent: input.taxRatePercent,
+    }),
     lines: input.budgetLines.map((line) => ({
       name: line.name,
       budgetCentavos: line.monthlyCentavos,

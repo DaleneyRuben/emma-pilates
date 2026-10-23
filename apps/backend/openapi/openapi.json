@@ -7016,6 +7016,70 @@
         ]
       }
     },
+    "/api/v1/administrator/reports/finance": {
+      "get": {
+        "operationId": "getMonthResult",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-11",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MonthResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFinance"
+        ]
+      }
+    },
+    "/api/v1/administrator/reports/finance/opening-budget": {
+      "post": {
+        "operationId": "seedOpeningBudget",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OpeningBudgetSeedDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFinance"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -12954,6 +13018,108 @@
           "byCategory",
           "months",
           "generatedAt"
+        ]
+      },
+      "BudgetLineResultDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "budgetCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "actualCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          }
+        },
+        "required": [
+          "name",
+          "budgetCentavos",
+          "actualCentavos"
+        ]
+      },
+      "MonthResultDto": {
+        "type": "object",
+        "properties": {
+          "month": {
+            "type": "string",
+            "format": "date",
+            "description": "First day of the month"
+          },
+          "cashIncomeCentavos": {
+            "type": "number",
+            "description": "Confirmed Payments, BOB centavos"
+          },
+          "taxRatePercent": {
+            "type": "number",
+            "description": "Percent of cash income"
+          },
+          "taxCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "budgetSubtotalCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "contingencyPercent": {
+            "type": "number",
+            "description": "Percent of the budget subtotal"
+          },
+          "contingencyCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "budgetTotalCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BudgetLineResultDto"
+            }
+          },
+          "nutritionistCostCentavos": {
+            "type": "number",
+            "description": "BOB centavos owed to the Nutritionist"
+          },
+          "resultCentavos": {
+            "type": "number",
+            "description": "Cash income less tax, actual costs, and the Nutritionist"
+          },
+          "breakEvenCentavos": {
+            "type": "number",
+            "description": "Cash income that covers the budget and the Nutritionist"
+          }
+        },
+        "required": [
+          "month",
+          "cashIncomeCentavos",
+          "taxRatePercent",
+          "taxCentavos",
+          "budgetSubtotalCentavos",
+          "contingencyPercent",
+          "contingencyCentavos",
+          "budgetTotalCentavos",
+          "lines",
+          "nutritionistCostCentavos",
+          "resultCentavos",
+          "breakEvenCentavos"
+        ]
+      },
+      "OpeningBudgetSeedDto": {
+        "type": "object",
+        "properties": {
+          "seeded": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "seeded"
         ]
       },
       "CreatePendingUploadDto": {

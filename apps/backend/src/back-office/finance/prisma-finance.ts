@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import type { PrismaClient } from '../../generated/prisma/client';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
 import { requireAdministrator } from '../back-office-errors';
 import { contingencyPercent, openingBudgetLines } from './opening-budget';
 import { monthlyResult } from './monthly-result';
@@ -14,10 +13,10 @@ export type MonthFacts = {
   nutritionistCostCentavos: number;
 };
 
-const monthStart = (instant: Date) => {
-  const civil = boliviaDate(instant).toISOString().slice(0, 10);
-  return new Date(`${civil.slice(0, 7)}-01T00:00:00.000Z`);
-};
+// The controller already hands a civil month (YYYY-MM-01 at UTC midnight,
+// ADR-0057). Reading it back through Bolivia would land on the previous month.
+const monthStart = (month: Date) =>
+  new Date(Date.UTC(month.getUTCFullYear(), month.getUTCMonth(), 1));
 
 // BKO-005: «Finanzas». Cash income, the tax from Studio Settings, the fixed
 // cost budget against what was actually paid, the Nutritionist's cost, and
