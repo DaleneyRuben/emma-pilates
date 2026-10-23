@@ -69,9 +69,10 @@ export const evaluateAllocationEligibility = (
       'A future Subscription already exists',
     );
   }
-  // A Subscription that still reaches today is shortened by the renewal, not
-  // expired: its remaining days are the Start Date the Client chose.
-  if (context.activeSubscription.endsOn.getTime() >= context.today.getTime()) {
+  // A Subscription that still holds is shortened by the renewal when it has
+  // no classes left, not expired. One that no longer holds is reported so the
+  // caller expires it; ending it early is only the renewal that starts today.
+  if (isSubscriptionEffective(context.activeSubscription, context.today)) {
     return { subscriptionIdToExpire: null };
   }
 

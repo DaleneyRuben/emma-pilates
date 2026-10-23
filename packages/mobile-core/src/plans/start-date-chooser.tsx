@@ -64,9 +64,7 @@ function StartDateChip({
       testID={`start-date-${option.date}`}
     >
       <Text style={[styles.weekday, selected && styles.selectedText]}>{weekday}</Text>
-      {day === "" ? null : (
-        <Text style={[styles.day, selected && styles.selectedText]}>{day}</Text>
-      )}
+      {day === "" ? null : <Text style={[styles.day, selected && styles.selectedText]}>{day}</Text>}
     </Pressable>
   );
 }
