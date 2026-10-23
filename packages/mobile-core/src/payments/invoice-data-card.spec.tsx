@@ -70,9 +70,7 @@ describe("InvoiceDataCard", () => {
     const screen = await render(<Harness initial={invoiceChoiceFrom(null)} />);
 
     expect(screen.getByText("Datos para la factura")).toBeOnTheScreen();
-    expect(screen.getByRole("button", { name: "Sin factura" })).toHaveAccessibilityState({
-      selected: true,
-    });
+    expect(screen.getByRole("button", { name: "Sin factura" })).toBeSelected();
     expect(screen.getByText("Tu compra se registra sin datos de factura.")).toBeOnTheScreen();
     expect(screen.queryByLabelText("NIT o CI")).toBeNull();
   });
@@ -84,9 +82,7 @@ describe("InvoiceDataCard", () => {
     await fireEvent.changeText(screen.getByLabelText("NIT o CI"), "4567891");
     await fireEvent.changeText(screen.getByLabelText("Nombre o razón social"), "Ana Pérez");
 
-    expect(screen.getByRole("button", { name: "Con factura" })).toHaveAccessibilityState({
-      selected: true,
-    });
+    expect(screen.getByRole("button", { name: "Con factura" })).toBeSelected();
     expect(screen.getByLabelText("NIT o CI")).toHaveProp("value", "4567891");
     expect(screen.getByLabelText("Nombre o razón social")).toHaveProp("value", "Ana Pérez");
     expect(screen.queryByText("Tu compra se registra sin datos de factura.")).toBeNull();
