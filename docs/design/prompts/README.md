@@ -229,6 +229,8 @@ Each of these was sent as the next message in the existing design session for th
 | [177](./followups/177-plan-end-reads-vence-el.md) | `02`'s plan card and `12`'s dates block name the end «Vence el …» instead of «Pagado hasta» (BKM-005, booking ADR-0005) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |
 | [178](./followups/178-plans-by-days-assistant.md) | `S09`'s cards in days with the cap, `S10`'s plan card terms in days and its success line «Vence el …» (BKM-005) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |
 | [179](./followups/179-plans-by-days-corrections.md) | Record of how 175 and 178 were applied: `AW05` draws «Vigencia» and «Tope semanal» as segmented buttons (the admin web keeps selects), `S09` draws four of the eight Plans (BKM-005) | ✅ applied (same canvas and commit `20a8da54`) |
+| [190](./followups/190-start-date-chooser.md) | Start Date chip row on `09` and `S10`: «Fecha de inicio», «Hoy», weekday chips, «Día de apertura» (BKM-006) | 🕓 pending |
+| [191](./followups/191-next-plan-and-renewal.md) | «Siguiente plan desde …» on `12`, renewal reminder on `19`, cash stays enabled on `S06` (BKM-006) | 🕓 pending |
 
 ## Status
 

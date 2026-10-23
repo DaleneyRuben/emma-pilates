@@ -118,10 +118,7 @@ export function ClientOverviewScreen({
     data.subscription.status === "active" || data.subscription.status === "expiring_soon";
   // The API's subscription_not_expired rule: a Plan paid through today blocks
   // a new one while it still holds classes or a future Booking (UX-003).
-  const planStillEffective =
-    hasActiveSubscription &&
-    ((data.subscription.subscription?.remainingClassAllowance ?? 0) > 0 ||
-      (data.nextBooking ?? null) !== null);
+  const futurePlan = data.subscription.nextSubscription ?? null;
 
   return (
     <Screen style={styles.screen}>
@@ -158,13 +155,13 @@ export function ClientOverviewScreen({
             testID="client-overview-book"
           />
           <OutlinedButton
-            disabled={planStillEffective}
+            disabled={futurePlan !== null}
             label="Registrar pago en efectivo"
             onPress={() => navigation.navigate("SelectPlan", context)}
             testID="client-overview-cash-payment"
           />
-          {planStillEffective ? (
-            <BodyText style={styles.note}>Podrá comprar otro plan cuando este termine.</BodyText>
+          {futurePlan !== null ? (
+            <BodyText style={styles.note}>Ya tiene un plan siguiente.</BodyText>
           ) : null}
           {hasActiveSubscription ? (
             <TextButton

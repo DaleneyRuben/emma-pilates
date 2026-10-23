@@ -4405,6 +4405,62 @@
         ]
       }
     },
+    "/api/v1/administrator/clients/{clientId}/courtesy-access": {
+      "post": {
+        "operationId": "grantCourtesyAccess",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantCourtesyAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CourtesyAccess"
+        ]
+      }
+    },
     "/api/v1/accounts/current/closure": {
       "post": {
         "operationId": "closeCurrentClientAccount",
@@ -8016,6 +8072,16 @@
                 "$ref": "#/components/schemas/ClientSubscriptionSummaryDto"
               }
             ]
+          },
+          "nextSubscription": {
+            "nullable": true,
+            "description": "The one future Subscription from an Early Renewal. Absent when there is none.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientSubscriptionSummaryDto"
+              }
+            ]
           }
         },
         "required": [
@@ -9502,6 +9568,11 @@
           "planId": {
             "type": "string",
             "format": "uuid"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
           }
         },
         "required": [
@@ -9577,6 +9648,11 @@
           "expiresAt": {
             "format": "date-time",
             "type": "string"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date. Absent on responses older builds ignore."
           }
         },
         "required": [
@@ -9619,7 +9695,8 @@
             "enum": [
               "transfer",
               "cash",
-              "credit_only"
+              "credit_only",
+              "courtesy"
             ]
           },
           "state": {
@@ -9670,6 +9747,11 @@
           "amountDueCentavos": {
             "type": "number",
             "minimum": 0
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date. Absent on responses older builds ignore."
           },
           "submittedAt": {
             "format": "date-time",
@@ -9916,7 +9998,8 @@
             "enum": [
               "transfer",
               "cash",
-              "credit_only"
+              "credit_only",
+              "courtesy"
             ]
           },
           "state": {
@@ -9967,6 +10050,11 @@
           "amountDueCentavos": {
             "type": "number",
             "minimum": 0
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date. Absent on responses older builds ignore."
           },
           "submittedAt": {
             "format": "date-time",
@@ -10354,6 +10442,11 @@
             "type": "string",
             "format": "uuid",
             "description": "Branch where the cash was collected"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
           }
         },
         "required": [
@@ -10673,6 +10766,24 @@
           "pageSize",
           "totalItems",
           "pendingCount"
+        ]
+      },
+      "GrantCourtesyAccessDto": {
+        "type": "object",
+        "properties": {
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil date of the last day of access: today up to one year ahead."
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it."
+          }
+        },
+        "required": [
+          "endsOn"
         ]
       },
       "CloseAccountRequestDto": {

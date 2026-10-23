@@ -16,11 +16,13 @@ import {
   describeWeeklyCap,
   formatCancellationWindow,
   LoadingState,
+  boliviaCivilDate,
   PrimaryButton,
   QueryFailure,
   Screen,
   ScreenTopBar,
   spacing,
+  StartDateChooser,
   surfaces,
   typography,
   useStudioRules,
@@ -42,6 +44,8 @@ type PlanDetailNavigation = {
 const purchaseErrorCopy: Record<string, string> = {
   subscription_not_expired: "Tu plan actual sigue activo. Podrás comprar uno nuevo cuando venza.",
   plan_not_purchasable: "Este plan no está disponible para compra.",
+  start_date_out_of_window: "Esa fecha de inicio no está disponible.",
+  future_subscription_exists: "Ya tienes un plan siguiente.",
 };
 
 const problemCode = (data: unknown): string | null =>
@@ -52,7 +56,7 @@ const problemCode = (data: unknown): string | null =>
 // Follow-up 176: validity in days (booking ADR-0005); BKM-006 replaces the
 // confirmation day with the chosen Start Date.
 const validityCopy = (durationDays: number): string =>
-  `${durationDays} días de vigencia desde que se confirma tu pago.`;
+  `${durationDays} días de vigencia desde la fecha de inicio.`;
 
 export function PlanDetailScreen({ route }: { route: { params: { planId: string } } }) {
   const navigation = useNavigation<PlanDetailNavigation>();
@@ -69,6 +73,8 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
   });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const today = boliviaCivilDate(new Date());
+  const [startsOn, setStartsOn] = useState(today);
 
   if (plan.isPending) {
     return (
@@ -102,7 +108,11 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
     const headers = { "idempotency-key": randomUUID() };
     try {
       if (total === 0) {
-        const purchase = await completeCreditPurchase({ planId: detail.id }, { headers }, fetcher);
+        const purchase = await completeCreditPurchase(
+          { planId: detail.id, startsOn },
+          { headers },
+          fetcher,
+        );
         if (purchase.status !== 201) {
           setError(
             purchaseErrorCopy[problemCode(purchase.data) ?? ""] ??
@@ -121,7 +131,11 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
         return;
       }
 
-      const created = await createPurchaseIntent({ planId: detail.id }, { headers }, fetcher);
+      const created = await createPurchaseIntent(
+        { planId: detail.id, startsOn },
+        { headers },
+        fetcher,
+      );
       if (created.status === 201) {
         await queryClient.invalidateQueries({ queryKey: getGetCurrentPurchaseIntentQueryKey() });
         navigation.navigate("Payment", { purchaseIntentId: created.data.id });
@@ -165,6 +179,15 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
             </BodyText>
           )}
           <BodyText>{validityCopy(detail.durationDays)}</BodyText>
+          {studioRules === undefined ? null : (
+            <StartDateChooser
+              openingDate={studioRules.openingDate}
+              selected={startsOn}
+              startDateLimitDays={studioRules.startDateLimitDays}
+              today={today}
+              onSelect={setStartsOn}
+            />
+          )}
           {detail.weeklyClassCap === null ? null : (
             <BodyText>{`${describeWeeklyCap(detail.weeklyClassCap)}.`}</BodyText>
           )}
