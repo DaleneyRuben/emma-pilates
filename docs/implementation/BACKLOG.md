@@ -617,7 +617,7 @@ Acceptance criteria: a fourth booking in the same week on a cap-3 Plan is
 refused with its own message unless an extra class is left, and so is joining
 that week's waitlist. The waitlist test proves the skip.
 
-Evidence (BKM-007, 2026-10-23, branch `feature/bkm-007-weekly-cap`, stacked on BKM-008 at `246055c2`).
+Evidence (BKM-007, 2026-10-23, branch `feature/bkm-007-weekly-cap`, stacked on BKM-008 at `246055c2`, [PR #172](https://github.com/DaleneyRuben/emma-pilates/pull/172)).
 
 Commits: `319b3a4e` failing week and copy tests, `71ee0f72` the Bolivia week and the classes left, `8ce5e268` failing booking and waitlist tests, `d4117d08` the refusal, `8f015cac` failing persistence tests, `6400a603` the count and the refusal on a persisted booking, `bfa57695` the classes-left field and the problem code, `5ac895fa` the line on Reservar and the Session detail.
 
