@@ -50,7 +50,7 @@ Perfil, title «Enviar comentarios». No tab bar.
 
 1. **iOS · Vacío** — nothing chosen, button disabled.
 2. **iOS · Listo** — «Problema» chosen, a two-line comment typed («No puedo
-   ver mis reservas de mañana en la lista.»), count «46 / 2000», button
+   ver mis reservas de mañana en la lista.»), count «48 / 2000», button
    enabled.
 3. **iOS · Límite del día** — the same, with an Error-tone line above the
    button: «Ya enviaste 10 comentarios hoy. Puedes enviar otro mañana.»
