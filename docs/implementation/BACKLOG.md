@@ -483,7 +483,7 @@ wait for Google, Apple, and testers.
 | BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | ready |
 | BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | ready |
 | BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | ready |
-| BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | ready |
+| BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | done |
 | BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | ready |
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | ready |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
@@ -839,6 +839,18 @@ Session at capacity 8.
 
 Acceptance criteria: with the owner's example figures, the break-even works out
 to about Bs 36,270 (the diagnosis's check).
+
+Decisions (blanket approval, 2026-10-23):
+
+- The break-even on the page uses the budget total, contingencies included, plus the month's Nutritionist cost. The owner's check stays a unit test: fixed 2,117,500 plus variable 929,500 at 16 % is 3,627,381 centavos (about Bs 36,270). With no Nutritionist cost the page shows Bs 25,208.33, which is 21,175 / 0.84.
+- Contingencies are 10 % of the subtotal, computed, not stored. The page shows them as «Imprevistos (10 %)» with no actual.
+- A budget line's actual is the month's Expenses whose category has the same name. Salary payments are not a budget line.
+- The month is the civil month the endpoint already parsed. Reading that UTC midnight back through Bolivia time landed on the previous month, so the window uses the date as given.
+- The accrued-revenue view is not built. Decisions section 11 asks for cash and accrued by validity days, plus classes still owed. This item's acceptance criterion is the break-even, so the accrued view is an open question for STU-002.
+
+Open question: the accrued view (decisions section 11) is not on this page. STU-002 owns it.
+
+Evidence: commits `139ba193` (the calculation), `efe932a6` (the budget table and `GET /api/v1/administrator/reports/finance?month=YYYY-MM`), `e365b270` (the Finanzas tab, the seed endpoint, the integration test), `8836d881` (Test 81 and follow-up 201). The owner's break-even is 3,627,381 centavos. Verified: monthly-result unit 2 passed; back-office e2e 7 passed; finance e2e 1 passed (invalid month 400, seed, Assistant 403); integration on `pilates_test_bko005` 1 passed (seed, one Alquiler expense of Bs 8,500, month result, Assistant `back_office_access_denied`); admin report and finance specs 17 passed. Playwright Chromium at 1440 and 420, admin web on 5205, API on 3135, `pilates_bko005_dev`: Paola opens Reporte (Ingresos Bs 780,00, Plan and Evaluation split kept), then Finanzas, loads the opening budget, and sees Imprevistos Bs 1.925,00, Total Bs 21.175,00, and Punto de equilibrio Bs 25.208,33. At 420 the figures stack, the budget is labelled cards, and the sidebar opens from «Abrir menú». Migration `20261023230000_cost_budget_lines` needs owner approval; it ran only on those two disposable databases, which were dropped. The accrued-revenue view is not built. Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/183.
 
 #### BKO-006 · Trainer pay
 
