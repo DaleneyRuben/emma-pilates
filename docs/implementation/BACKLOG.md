@@ -577,7 +577,7 @@ Acceptance criteria:
 - Every adjustment has an audit record.
 - Only the Administrator can create `courtesy` or `class_return` adjustments (PAY-006).
 
-Evidence (BKM-008, 2026-10-23, branch `feature/bkm-008-extra-classes`, stacked on BKM-005 at `6675fc38`).
+Evidence (BKM-008, 2026-10-23, branch `feature/bkm-008-extra-classes`, stacked on BKM-005 at `6675fc38`, [PR #170](https://github.com/DaleneyRuben/emma-pilates/pull/170)).
 
 Commits: `2f640844` failing gift and consumption tests, `09ee117d` the decision and the consumption order, `ca7be1dd` the adjustment and the gift once, `c61f443b` spending base before extra, `84352736` the administrator endpoint, `9bbd7af5` the extra-class line on the three surfaces, `dd729e15` follow-ups 193–195 left pending.
 
