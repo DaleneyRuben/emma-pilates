@@ -70,7 +70,7 @@ can be found by its design name.
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19, 80 |
-| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
+| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 83 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
 
@@ -82,7 +82,7 @@ can be found by its design name.
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 76 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 83 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 80, 81 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78, 79 |
@@ -3368,6 +3368,8 @@ The following are not ready for manual product testing:
   cash view, and Test 81 shows only cash. STU-002 owns the accrued view;
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 75);
+- «Mis pagos» in the Staff app: the API answers a Trainer (Test 83), but
+  the screen waits on follow-up 202, which stays pending;
 
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
@@ -6222,6 +6224,40 @@ a Trainer's code on `AW24` and corrects a Client's attribution on `AW22`
    código ya lo tiene otra clienta o instructora.». Type `REF-ANDREA`: «Usa
    de 3 a 20 letras, números o guiones, sin empezar con REF-.».
 4. Open **Camila Rojas** (Assistant): no **Código personal**.
+
+## Test 83: trainer pay and «Mis pagos» (BKO-006)
+
+A Trainer is paid from the rates in force: Bs 65 per class with up to 4
+students, plus Bs 8 from the fifth, counted on the Bookings the Session held
+when the cancellation window closed (a no-show counts), Bs 25 when a Session
+was cancelled because the minimum was not met, and 10 % of what a Client she
+brought actually paid for her first Plan, in the month that Payment was
+approved. Paola is the Administrator. Camila, the Assistant, cannot approve
+and cannot list the statements. Log in as Test 24 describes.
+
+1. **Calculate the month.** In the admin web open **Pagos a instructoras**
+   (above Nómina). The month stepper cannot go past the current month. Press
+   **Calcular mes**. Each Trainer with a line appears as a card: her name,
+   «Borrador», the total (`Bs 322,00`, never centavos), and a table of
+   Concepto, Detalle, and Monto.
+2. **Approve once.** Press **Aprobar** on one card. It reads «Aprobado» and
+   Nómina gains one Salary Payment for that total. Pressing again, or
+   calculating the month again, does not add a second payment.
+3. **The figures.** A class of 3 students is Bs 65,00. A class of 6 is
+   Bs 81,00. A no-show counts in the snapshot. A Session cancelled for the
+   minimum is Bs 25,00. A first Plan of Bs 780,00 pays Bs 78,00, once, even
+   if she buys again.
+4. **Narrow browser.** At 420 px the cards stack and the line table becomes
+   labelled cards. The sidebar opens from **Abrir menú**.
+5. **Her own only.** `GET /api/v1/trainer/pay-statements` as Emma returns
+   only Emma's statements. As Daniela it does not include Emma's. As Camila
+   it answers `403` `back_office_access_denied`, and so does approval.
+
+The Staff app's «Mis pagos» row is not built: follow-up 202 stays pending.
+The Coordinator Role is not wired (IDN-009); anyone who is not a Trainer or
+the Administrator is denied. The migration
+`20261023230100_trainer_pay_statements` needs owner approval before it runs
+on a shared database.
 
 The API is `GET`/`PUT /api/v1/administrator/staff-members/{id}/referral-code`
 (`{"referralCode": "EMMA"}`, `null` removes it); each change writes the audit

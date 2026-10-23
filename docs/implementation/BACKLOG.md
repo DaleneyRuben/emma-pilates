@@ -487,7 +487,7 @@ wait for Google, Apple, and testers.
 | BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | ready |
 | BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | ready |
 | BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | done |
-| BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | ready |
+| BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | done |
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | ready |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
 
@@ -868,6 +868,19 @@ Evidence: commits `139ba193` (the calculation), `efe932a6` (the budget table and
 
 Acceptance criteria: a fixture month with known figures gives the hand-checked
 total, and denial tests stop one Trainer from reading another's statement.
+
+Decisions (blanket approval, 2026-10-23):
+
+- Rates live in `PayRateRule`, one dated row. The opening row is Bs 65 with 4 included students, Bs 8 from the fifth, Bs 25 for a `minimum_not_met` Session, and 10 % of `amountDueCentavos`. A later change inserts a row; the statement reads the row in force at the month start, so no code edit is needed.
+- A taught class is a scheduled Session whose `startsAt` falls in the month and whose `bookingsAtWindowClose` is set. A no-show counts because the snapshot already counted her. A Session with no snapshot yet is not paid. A `minimum_not_met` cancellation pays Bs 25 instead, and no other cancellation pays. A substitute is the Trainer on the Session.
+- The commission is 10 % of the first confirmed Plan Payment of a Client whose live acquisition names that Trainer, in the month of `decidedAt`. A founder discount is already in `amountDueCentavos`. Courtesy, credit-only, and Evaluation Payments are not a first Plan. A voided Payment does not count. The same Client never pays a second commission.
+- The worker drafts once an hour, for the previous Bolivia month and the current one, and only for a Trainer who has a line. A draft is replaced while it is a draft. Approval freezes it and creates the `SalaryPayment` (`paidOn` is the approval day, Bolivia). Approving twice creates nothing more. There is no separate paid state: the Salary Payment is the payment.
+- A Trainer reads only her own statements. An Assistant, a Nutritionist, and a Client are denied. The Coordinator Role is not wired on this branch (IDN-009); the read and the approval deny anyone who is not a Trainer or an Administrator, so a Coordinator is denied by default.
+- «Mis pagos» is a new admin-web page, because the Staff app was not walked. The Staff screen is follow-up 202 and stays pending.
+
+Open question: the Staff app's «Mis pagos» screen is not built. Follow-up 202 stays pending. The Coordinator Role is not wired (IDN-009); denial is by default.
+
+Evidence: the hand-checked September is 32,200 centavos (3 students 6,500, 6 students 8,100, a no-show counted in 5 students 7,300, one `minimum_not_met` 2,500, 10 % of a Bs 780 first Plan 7,800). A second approval creates no second Salary Payment. Daniela does not see Emma's statement. An Assistant is denied the list and the approval. Migration `20261023230100_trainer_pay_statements` needs owner approval; it ran only on `pilates_bko006_dev` and `pilates_test_bko006`, which were dropped. The Staff app was not walked. Follow-up 202 stays pending.
 
 #### BKO-007 · Coordinator pay
 
