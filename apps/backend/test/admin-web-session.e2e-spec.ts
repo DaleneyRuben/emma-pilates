@@ -183,11 +183,11 @@ describe('admin-web Authentication Sessions (e2e)', () => {
 
     it('keeps the browser session of a Coordinator (ADR-0102)', async () => {
       const coordinator = {
-        kind: 'staff',
+        kind: 'staff' as const,
         staffMemberId: 'staff-member-id',
-        role: 'coordinator',
-        branchIds: [],
-      } as const;
+        role: 'coordinator' as const,
+        branchIds: [] as string[],
+      };
       resolvePrincipal.mockResolvedValue({
         ...administrator,
         identity: coordinator,
