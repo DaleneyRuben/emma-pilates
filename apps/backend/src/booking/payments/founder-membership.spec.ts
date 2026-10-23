@@ -4,6 +4,7 @@ import {
   founderDiscount,
   founderRenewalDeadline,
   isFounder,
+  priceFounderPlans,
 } from './founder-membership';
 
 const day = 24 * 60 * 60 * 1_000;
@@ -31,6 +32,25 @@ describe('founder discount', () => {
         percent: 15,
       }),
     ).toEqual({ discountCentavos: 1_500, amountDueCentavos: 8_501 });
+  });
+
+  it('shows a founder the discounted price and keeps the list price beside it', () => {
+    const plans = [
+      { classAllowance: 8, priceCentavos: 56_000 },
+      { classAllowance: 1, priceCentavos: 8_000 },
+    ];
+
+    expect(priceFounderPlans(plans, { founder: true, percent: 15 })).toEqual([
+      {
+        classAllowance: 8,
+        priceCentavos: 47_600,
+        listPriceCentavos: 56_000,
+      },
+      { classAllowance: 1, priceCentavos: 8_000 },
+    ]);
+    expect(priceFounderPlans(plans, { founder: false, percent: 15 })).toEqual(
+      plans,
+    );
   });
 
   it('never discounts the single class', () => {
