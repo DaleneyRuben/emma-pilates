@@ -118,9 +118,17 @@ model Payment {
   subscription           Subscription?
   creditReservation      CreditReservation?
   qualifiedReferral      Referral?
+  // PAY-007 (ADR-0012): the NIT or CI and the name or business name for the
+  // invoice, both or neither («Sin factura»), and the «Factura emitida» mark.
+  invoiceTaxId             String?   @map("invoice_tax_id")
+  invoiceName              String?   @map("invoice_name")
+  invoiceIssuedAt          DateTime? @map("invoice_issued_at") @db.Timestamptz(3)
+  invoiceIssuedByAccountId String?   @map("invoice_issued_by_account_id") @db.Uuid
+  invoiceIssuedByAccount   Account?  @relation("PaymentInvoiceIssuedBy", fields: [invoiceIssuedByAccountId], references: [id], onDelete: Restrict)
 
   @@unique([id, clientId])
   @@unique([id, clientId, planId])
+  @@index([invoiceIssuedByAccountId])
   @@index([clientId, state, submittedAt, id])
   @@index([state, submittedAt, id])
   @@index([method, decidedAt, id])
