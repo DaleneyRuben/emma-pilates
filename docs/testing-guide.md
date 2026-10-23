@@ -8,7 +8,7 @@ you are starting with no project knowledge.
 | Area                         | What you can test now                                                                                                           | Current limit                                                                                                                                                 |
 | ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Client mobile app            | Use the real email-only Login, registration, pending-email, recovery-request, verification, activation, and password-recovery screens on the iPhone and iPad Simulators or the Android emulator, then Home, class browsing and booking, Mis reservas, history, Plans and transfer payment, Mi plan, referrals and Credit, Perfil with the profile photo, the inbox, and password change with the fixture Accounts (Tests 5, 9, 10); change the login email from Editar perfil and confirm it from the captured link (Test 34); the Promotions carousel on Inicio once the admin web publishes a Promotion (Test 18); every list refreshes when it regains focus and on pull (Test 5 B, Test 18) | Push notifications need a development build, not Expo Go (Test 46); Evaluations are reached from Perfil and Home (Tests 15, 18) |
-| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
+| Staff mobile app             | Open the separate Staff Login app on the iPhone and iPad Simulators or the Android emulator, log in with a fixture Staff Account, and verify that Client registration is unavailable; review transfers and cancel a Session as the Administrator (Test 10); search, invite, book, and take cash for a Client as the Assistant (Test 11); see the agenda and record attendance as a Trainer (Test 12); report an equipment fault from a Session as a Trainer (Test 75) | — the Nutritionist agenda and Mi disponibilidad work too (Test 15) |
 | Nutritionist Evaluations (API) | Publish, replace, and end Availability Blocks as the fixture Nutritionist; browse slots, book, list, and cancel Evaluations as a Client; see the agenda and cancel as staff through Swagger or curl (Test 7) | The same journeys work in both apps (Test 15); reminders need the worker and real time to pass |
 | Local development fixtures   | Load deterministic Branches, Plans, Class Types, Sessions, Subscription states, referrals, the Nutritionist's Availability Blocks, and active Client and Staff Accounts with one command | Sessions beyond the fixtures' first 30 days appear only while the worker runs (it extends Session Schedules hourly); the fixtures ship no Promotion or receipt image (create them in the admin web, Test 33, or through Swagger, Test 32) |
 | Backend health               | Confirm that the API is alive, ready (PostgreSQL reachable and every migration applied), and passing the read-only smoke checks; read its JSON request logs | The worker is checked only through its heartbeat log; email, push, and object storage are not part of readiness |
@@ -24,7 +24,7 @@ you are starting with no project knowledge.
 | Mobile error reporting       | Force an error in either app on the development builds and read the event a local receiver gets, then the same in Better Stack (Test 47) | Native crashes and release names need a build made since EXT-013; source maps upload only from EAS release builds with the Better Stack token |
 | Database backups             | Run the daily backup job against MinIO, check the bucket against the retention rules, and restore the dump into a throwaway database (Test 43) | Production dumps go to R2 from Northflank's `backup` job; the drill needs the read-only restore token |
 | Automated checks             | Run mobile identity, backend, API-contract, type, lint, and build checks                                                        | Database integration tests require Docker Desktop or an explicitly disposable PostgreSQL test database                                                        |
-| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
+| Admin web                    | Log in as the fixture Administrator, see the neutral rejection and the throttling countdown, request recovery, use the user menu, change the password, and log out (Test 24); then open the admin shell: the sidebar sections, the top bar, the Branch selector, and the narrow-browser drawer (Test 23); build the week in Horario (one-off Sessions, weekly schedules from a date, Trainer swaps, last-resort cancellation) and manage Sucursales, Tipos de clase, and Planes (Test 25); look up Clients and create, change, and deactivate Staff Members, and correct, resend, reopen, or cancel a pending invitation (Test 26); review, confirm, and reject transfer Payments with the enlarged receipt (Test 27); run Supplies, Withdrawals, payroll, Expenses, and Expense Categories (Test 28); register Equipment, record and resolve its faults, and see Horario flag the Sessions with more places than working machines (Test 75); read the Evaluation, Referral, and Credit lists (Test 29); read the income and expense report for every Branch or one (Test 30); run the Playwright critical journeys against the built app and a disposable database (Test 31); create, publish, reorder, unpublish, and delete Promotions with their images (Test 33); reach the production API through the production admin web and see its origin and cookie checks (Test 38); make a page crash and recover inside the shell (Test 64); see the logo while the admin web loads and while a slow page arrives (Test 66) | Activation and recovery links are read from `.data/email-capture` (Test 34), not from a mailbox; the Playwright journeys run in Chromium only |
 | Public pages                 | Open the privacy, support, and account-deletion pages locally or at `app.emmapilatesstudio.com` and check their headers (Test 58) | Static text with no form: a deletion request is an email to `soporte@`, closed by an operator from AW22 |
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
@@ -58,7 +58,8 @@ can be found by its design name.
 | Staff app | Tests |
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
-| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 77 |
+| S26 Reportar una falla (Entrenadora) | 77 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
@@ -73,9 +74,10 @@ can be found by its design name.
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
 | AW36 Reglas del estudio (from AW33) | 75 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
-| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
+| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 77 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 76 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
+| AW37 Equipos | 77 |
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
@@ -3372,6 +3374,8 @@ The following are not ready for manual product testing:
   that refers to itself (`referral_self_reference`): each needs a state the
   API never lets a tester reach, so the Jest and e2e suites cover them
   (Tests 70 and 72);
+- the Coordinator resolving an equipment fault: the Role arrives with
+  IDN-009, so until then only an Administrator resolves one (Test 75);
 - the inbox's fallback for a notification type the push catalog does not
   know («Emma Pilates» / «Tienes una notificación nueva.», silent): nothing
   sends one until a new type ships;
@@ -6006,3 +6010,79 @@ E. **The end date.** As Camila register cash for a Client on the 60-day Plan
 
 The cap is only stored and shown here: booking more than the cap in one week
 still works until BKM-007.
+
+## Test 77: equipment, its faults, and the capacity flags (BKO-004)
+
+The studio registers each reformer, cadillac, and mat per Branch; a Trainer
+reports a fault from a Session of her agenda; an Administrator resolves it;
+and Horario flags the future Sessions with more places than working machines
+of their kind (ADR-0106, back-office glossary «Equipment», «Equipment Issue»,
+and «Equipment Kind of a Class Type»). The kind of a Session comes from its
+Class Type's name: «Reformer Pilates» uses reformers, «Mat Pilates» mats, and
+«Pilates Prenatal» nothing, so it is never flagged. The system never changes
+a capacity.
+
+1. Run the API and the admin web against a migrated copy of the fixtures
+   database (Test 23), and log in to the admin web as
+   `paola.mendoza@example.com`. Open **Back Office → Equipos** (AW37).
+   Expected: «Todavía no hay equipos en esta sucursal.» with «Nuevo equipo».
+2. Register Centro's machines with «Nuevo equipo»: Tipo Reformer, Número 1,
+   «Guardar», and so on up to Reformer 12 (the fixture Reformer Sessions hold
+   12 places), plus a few cadillacs and mats. Expected: «Agregamos
+   Reformer 1.», each kind in its own section in number order, every piece
+   «Funciona», and the subtitle «Sucursal Centro · N equipos · 0 fuera de
+   servicio». Registering Reformer 3 again shows «Ya hay un Reformer 3 en esta
+   sucursal.» under Número (`409 equipment_number_taken`). To register many at
+   once, `POST /api/v1/administrator/equipment` with
+   `{"branchId", "kind": "reformer", "number": n}` in Swagger.
+3. Open **Horario** on next week. Expected: no warning yet, because 12
+   working reformers cover 12 places.
+4. Press «Registrar falla» on Reformer 5, write what happened, tick «No se
+   puede usar», and press «Registrar». Expected: «Registramos la falla de
+   Reformer 5.», the fault in **Fallas · Abiertas** with «Reportó Paola
+   Mendoza · dd/mm/aaaa · hh:mm» and the «Fuera de servicio» pill, Reformer 5
+   «Fuera de servicio» in its section, and «1 fuera de servicio» in the
+   subtitle. A fault without the tick shows «Se puede usar» and the piece
+   «Con falla»; it changes no flag.
+5. Open **Horario** on next week again. Expected: every future Reformer
+   Pilates Session with 12 places carries the warning triangle, an amber left
+   border, and «Faltan equipos · 11 de 12», its accessible name ends «faltan
+   equipos: 11 reformers funcionando para 12 lugares», and above the week
+   «N sesiones de esta semana tienen más lugares que reformers funcionando.
+   Baja su capacidad o revisa Equipos.» links to AW37. Mat and Prenatal
+   Sessions, cancelled Sessions, and Sessions already started are never
+   flagged. Lower one Session's capacity to 11 in AW03: its flag goes away.
+   (`GET /api/v1/administrator/equipment-flags?branchId&from&until`, at most
+   92 days apart.)
+6. Staff app as `emma.vargas@example.com` (Test 12): open a Reformer Pilates
+   Session of hers at Centro from Mi agenda. Expected: «Reportar una falla»
+   under the Session line on S03, before and after the class. Press it.
+   Expected: S26 «Reportar una falla» with the Session line, «¿Qué equipo?»,
+   the Branch's pieces as chips grouped «Reformers» first (the Session's
+   kind), Reformer 5 with «· fuera de servicio», «¿Qué pasó?», «No se puede
+   usar», and «Enviar reporte» disabled until a chip is chosen and the text
+   holds something. Choose Reformer 3, write a description, tick the box,
+   and send. Expected: «Gracias por avisar» and «Administración ya puede ver
+   la falla de Reformer 3.»; «Volver a la lista» returns to S03. On AW37 the
+   fault shows «Reportó Emma Vargas». A Branch with no Equipment shows «Sin
+   equipos registrados». On the iPad the form sits in a 560 pt column.
+7. Only the Trainer who leads the Session can use it: as Daniela, `GET
+   /api/v1/trainer/sessions/{Emma's session}/equipment` answers `403
+   back_office_access_denied`, and so does every
+   `/api/v1/administrator/equipment…` path for an Assistant, a Trainer, or a
+   Nutritionist.
+8. Back on AW37, press «Marcar resuelta» on Reformer 5's fault and confirm.
+   Expected: «Marcamos resuelta la falla de Reformer 5.», the fault under
+   **Resueltas** with «Resuelta por Paola Mendoza · …», no button there,
+   Reformer 5 «Funciona» again (or «Con falla» while another open fault
+   remains), and Horario's flags gone. Resolving it again through Swagger
+   answers `409 equipment_issue_resolved`.
+9. Press «Dar de baja» on a piece and confirm. Expected: «Dimos de baja
+   Reformer 12.», the piece gone from the list and from the counts (so
+   12-place Reformer Sessions are flagged again with «11 de 12»), its faults
+   kept; the number can be registered again. In `psql` the row keeps
+   `archived_at`; nothing is ever deleted (`back_office.equipment`,
+   `back_office.equipment_issues`).
+10. Check AW37 and Horario at 1440 px and 420 px (stacked cards, the fault
+    rows stacked, the day list's cards with «Faltan equipos»), and S26 on the
+    iPhone, the iPad, and the Android emulator.

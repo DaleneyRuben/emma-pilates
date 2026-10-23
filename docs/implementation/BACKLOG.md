@@ -482,7 +482,7 @@ wait for Google, Apple, and testers.
 | BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | ready |
 | BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | ready |
 | BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | ready |
-| BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | ready |
+| BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | done (640306cc, 60f50324, 2ef9df18, d8798346, 830ece53; evidence below) |
 | BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | ready |
 | BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | ready |
 | BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | ready |
@@ -731,6 +731,8 @@ the list empties as Clients book or are marked.
 
 Acceptance criteria: one reformer out of service flags every future reformer
 Session at capacity 8.
+
+Evidence: the integration specs cover the number uniqueness, the fault history, and the capacity flags. On `pilates_bko004_dev`, AW37 listed the equipment and its open faults, and Horario showed «1 sesión de esta semana tiene más lugares que reformers funcionando» with the flagged Session reading «Faltan equipos · 11 de 12», checked at 1440 px and 420 px. Emma reported a fault from her Centro Session on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator; each ended on «Gracias por avisar». Open: the fixture Branch already held equipment from an earlier walk, so the empty state was confirmed by the page spec, not in the browser.
 
 #### BKO-005 · Taxes, budget, and the monthly result
 

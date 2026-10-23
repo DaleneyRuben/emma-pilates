@@ -11,6 +11,7 @@ export type AdminPath =
   | "/back-office/clientes"
   | "/back-office/pagos"
   | "/back-office/insumos"
+  | "/back-office/equipos"
   | "/back-office/evaluaciones-nutricionales"
   | "/back-office/personal"
   | "/back-office/nomina"
@@ -110,6 +111,7 @@ export const navigationGroups: readonly NavigationGroup[] = [
         badge: "lowStock",
         subPages: true,
       },
+      { label: "Equipos", to: "/back-office/equipos", screen: "AW37" },
       {
         label: "Evaluaciones nutricionales",
         to: "/back-office/evaluaciones-nutricionales",

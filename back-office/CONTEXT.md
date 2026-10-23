@@ -37,8 +37,16 @@ The end-of-day count of a Branch's cash: the expected cash (the day's cash Payme
 _Avoid_: Arqueo (in code), shift close
 
 **Equipment**:
-A numbered machine of a Branch — a reformer, a cadillac, or the mat area — whose faults are logged as Equipment Issues (date, description, out of service, resolved). A Trainer reports a fault; an Administrator or the Coordinator resolves it. Sessions whose capacity exceeds the working machines are flagged ([ADR-0106](../docs/adr/0106-log-equipment-faults.md)).
-_Avoid_: Asset, Supply (a Supply is consumable)
+A numbered machine of a Branch — a reformer, a cadillac, or a mat — whose faults are logged as Equipment Issues. Its kind and number («Reformer 3») identify it within the Branch; an Administrator registers it and retires it (archived, never deleted, so its Issues stay). The mat area is registered as one Equipment per mat place, so mat Sessions are checked the same way as the machines. A piece of Equipment is **working** unless it is retired or has an open Equipment Issue marked out of service. Sessions whose capacity exceeds the working Equipment of their kind at their Branch are flagged on the schedule so someone lowers the capacity; the system never changes a capacity itself ([ADR-0106](../docs/adr/0106-log-equipment-faults.md)). A kind with no Equipment registered at the Branch is not checked.
+_Avoid_: Asset, Machine (in code), Supply (a Supply is consumable)
+
+**Equipment Kind of a Class Type**:
+Which Equipment a Session uses is read from its Class Type's name (BKO-004): the first of the words «reformer», «cadillac», and «mat» found in it as a whole word, ignoring case and accents («Reformer Pilates» → reformer, «Mat Pilates» → mat). A Class Type whose name holds none of them («Pilates Prenatal») uses no counted Equipment and its Sessions are never flagged. Naming the Class Type is therefore how the Administrator links it to a kind; there is no separate setting.
+_Avoid_: Equipment needs (that free-text field of the Class Type is a description for Clients and is not read)
+
+**Equipment Issue**:
+A fault reported on one piece of Equipment: when and by whom it was reported, a description, whether the machine is out of service, and, once fixed, when and by whom it was resolved. A Trainer reports it from a Session of her agenda, choosing among the Equipment of that Session's Branch; an Administrator may also record one. Only an Administrator resolves it (the Coordinator joins with IDN-009). A resolved Issue is kept as history and never reopened; a new fault is a new Issue.
+_Avoid_: Ticket, Incident, Falla (in code)
 
 **Cost Budget Line**:
 The monthly amount budgeted for an expense line (rent, the Coordinator, the front desk, utilities, software, cleaning, the accountant, maintenance, advertising, supplies), plus a contingency of 10 % of their sum, compared with what was actually spent. The fee owed to the Nutritionist for each Evaluation held (Bs 50) is a cost too.

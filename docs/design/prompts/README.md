@@ -61,6 +61,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [S22](./staff/22-assistant-client-history.md) | Historial de la clienta (Asistente) | `S22` | ✅ |
 | [S23](./staff/23-staff-profile.md) | Perfil (todos los roles) | `S23` | ✅ |
 | [S24](./staff/24-administrator-view-as.md) | Ver la app como… (Administración) | `S24` | ✅ (Claude Design canvas, 2026-10-22, `e81417e9`; the app side is stage 3 of FUT-001) |
+| [S26](./staff/26-trainer-report-fault.md) | Reportar una falla (Entrenadora) | `S26` | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
 
 ## Admin web (`admin-web/`)
 
@@ -103,6 +104,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW34](./admin-web/34-branch-selector.md) | Selector de sucursal | `AW34` | ✅ |
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
 | [AW36](./admin-web/36-reglas-del-estudio.md) | Reglas del estudio | `AW36` | ✅ (Claude Design canvas, 2026-10-23, `55bbe4cc`; the admin web is built in BKM-004) |
+| [AW37](./admin-web/37-equipos.md) | Equipos | `AW37` | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
 
 ## Follow-ups (`followups/`)
 
@@ -224,6 +226,8 @@ Each of these was sent as the next message in the existing design session for th
 | [115](./followups/115-lists-refresh-on-focus-and-pull.md) | Every list refreshes when it regains focus and on pull (UX-004, UX-001 finding C1): one bullet in the README's «Loading state (Client and Staff)» naming the background refetch and the native pull-to-refresh control in Palo de rosa; no numbered screen changes (109–114 are reserved by UX-003, UX-005, UX-006, UX-009, UX-010 and UX-012) | ✅ applied (Claude Design canvas, 2026-10-22, `7b761df1`; the apps are built in UX-004) |
 | [130](./followups/130-aw33-studio-rules-entry.md) | `AW33`'s menu gains a first row «Reglas del estudio» that opens the new `AW36` (BKM-004, ADR-0101), above «Cambiar contraseña»; the README gains the `AW36` row and the `AW33 → AW36` navigation | ✅ applied (Claude Design canvas, 2026-10-23, `55bbe4cc`, with `AW36`; the admin web is built in BKM-004) |
 | [131](./followups/131-rules-copy-from-studio-settings.md) | README only: «Studio rules in copy» says the «2 h 30» of `05`/`09`/`S21`/`AW03` and `02`'s «Paquetes desde» price are Studio Settings values read from the API, with what each screen shows while they are unknown; no numbered screen changes (BKM-004, ADR-0101) | ✅ applied (README only, same canvas and commit `55bbe4cc`; the apps are built in BKM-004) |
+| [170](./followups/170-aw02-equipment-flags.md) | `AW02` flags a future Session with more places than working Equipment of its kind (warning triangle, Advertencia border, «Faltan equipos») with a notice above the week linking to the new `AW37`, and the sidebar gains «Equipos» after «Insumos» (BKO-004, ADR-0106) | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
+| [171](./followups/171-s03-report-fault-entry.md) | `S03` gains the quiet «Reportar una falla» action under the Session line, opening the new `S26` (BKO-004, ADR-0106) | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
 | [175](./followups/175-plans-by-days-admin.md) | `AW04` gains «Vigencia» (30/60/90 días) and «Tope semanal» columns, `AW05` a «Vigencia» select and a «Tope semanal» select (disabled at 30 días); amends checklist 30 §1 to the eight Plans by days of the decisions' table 2.1 (BKM-005, booking ADR-0005/0006) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |
 | [176](./followups/176-plans-by-days-client-catalog.md) | `08`'s cards and `09`'s validity lines in days («válido por 30 días», «30 días de vigencia…»), plus «hasta 3 por semana» / «Hasta 3 clases por semana.» on capped Plans (BKM-005) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |
 | [177](./followups/177-plan-end-reads-vence-el.md) | `02`'s plan card and `12`'s dates block name the end «Vence el …» instead of «Pagado hasta» (BKM-005, booking ADR-0005) | ✅ applied (Claude Design canvas, 2026-10-23, `20a8da54`; the canvas could not be deleted from the agent session, see BKM-005 notes; the apps are built in BKM-005) |

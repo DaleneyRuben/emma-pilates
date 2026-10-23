@@ -49,7 +49,7 @@ A hidden Plan an Administrator grants through a Bs 0 courtesy Payment, so a pers
 _Avoid_: Free plan, trial
 
 **Class Type**:
-The catalog definition of a kind of class — e.g. "Reformer Pilates", "Mat Pilates" — with a short client-facing description, a default capacity, and equipment needs. A Class Type has no duration: how long a class lasts belongs to each Session and Session Schedule ([ADR-0004](./docs/adr/0004-session-owns-its-duration.md)).
+The catalog definition of a kind of class — e.g. "Reformer Pilates", "Mat Pilates" — with a short client-facing description, a default capacity, and equipment needs. A Class Type has no duration: how long a class lasts belongs to each Session and Session Schedule ([ADR-0004](./docs/adr/0004-session-owns-its-duration.md)). Its name also tells which Equipment its Sessions use (Back Office, «Equipment Kind of a Class Type»).
 _Avoid_: Class (when referring to the catalog entry)
 
 **Session**:

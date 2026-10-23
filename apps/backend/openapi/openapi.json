@@ -5950,6 +5950,401 @@
         ]
       }
     },
+    "/api/v1/administrator/equipment": {
+      "get": {
+        "operationId": "listEquipment",
+        "parameters": [
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentListDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipment"
+        ]
+      },
+      "post": {
+        "operationId": "createEquipment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipment"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment/{equipmentId}/archive": {
+      "post": {
+        "operationId": "archiveEquipment",
+        "parameters": [
+          {
+            "name": "equipmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipment"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment/{equipmentId}/issues": {
+      "post": {
+        "operationId": "reportEquipmentIssue",
+        "parameters": [
+          {
+            "name": "equipmentId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipmentIssueInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssueDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipment"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-issues": {
+      "get": {
+        "operationId": "listEquipmentIssues",
+        "parameters": [
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "enum": [
+                "open",
+                "resolved"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssuePageDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentIssues"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-issues/{issueId}/resolve": {
+      "post": {
+        "operationId": "resolveEquipmentIssue",
+        "parameters": [
+          {
+            "name": "issueId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssueDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentIssues"
+        ]
+      }
+    },
+    "/api/v1/administrator/equipment-flags": {
+      "get": {
+        "operationId": "listEquipmentFlaggedSessions",
+        "parameters": [
+          {
+            "name": "until",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "from",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "branchId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/EquipmentFlaggedSessionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorEquipmentFlags"
+        ]
+      }
+    },
+    "/api/v1/trainer/sessions/{sessionId}/equipment": {
+      "get": {
+        "operationId": "listTrainerSessionEquipment",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionEquipmentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSessionEquipment"
+        ]
+      }
+    },
+    "/api/v1/trainer/sessions/{sessionId}/equipment-issues": {
+      "post": {
+        "operationId": "reportTrainerEquipmentIssue",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SessionEquipmentIssueInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EquipmentIssueDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerSessionEquipment"
+        ]
+      }
+    },
     "/api/v1/administrator/supplies": {
       "get": {
         "operationId": "listAdminSupplies",
@@ -11898,6 +12293,280 @@
         },
         "required": [
           "installationId"
+        ]
+      },
+      "EquipmentDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ]
+          },
+          "number": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "working",
+              "faulty",
+              "out_of_service"
+            ],
+            "description": "out_of_service with an open Issue that takes it out of service, faulty with only other open Issues"
+          },
+          "openIssueCount": {
+            "type": "number"
+          },
+          "archivedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "branchId",
+          "kind",
+          "number",
+          "status",
+          "openIssueCount",
+          "archivedAt"
+        ]
+      },
+      "EquipmentListDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentDto"
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "EquipmentInputDto": {
+        "type": "object",
+        "properties": {
+          "branchId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ]
+          },
+          "number": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 99
+          }
+        },
+        "required": [
+          "branchId",
+          "kind",
+          "number"
+        ]
+      },
+      "EquipmentIssueInputDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "outOfService": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "description",
+          "outOfService"
+        ]
+      },
+      "EquipmentIssueDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "equipmentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "equipmentKind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ]
+          },
+          "equipmentNumber": {
+            "type": "number"
+          },
+          "description": {
+            "type": "string"
+          },
+          "outOfService": {
+            "type": "boolean"
+          },
+          "reportedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reportedByName": {
+            "type": "string"
+          },
+          "resolvedAt": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "resolvedByName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "equipmentId",
+          "equipmentKind",
+          "equipmentNumber",
+          "description",
+          "outOfService",
+          "reportedAt",
+          "reportedByName",
+          "resolvedAt",
+          "resolvedByName"
+        ]
+      },
+      "EquipmentIssuePageDto": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentIssueDto"
+            }
+          },
+          "page": {
+            "type": "number"
+          },
+          "pageSize": {
+            "type": "number"
+          },
+          "totalItems": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "pageSize",
+          "totalItems"
+        ]
+      },
+      "EquipmentFlaggedSessionDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ]
+          },
+          "capacity": {
+            "type": "number"
+          },
+          "workingCount": {
+            "type": "number",
+            "description": "Working Equipment of the kind at the Branch"
+          }
+        },
+        "required": [
+          "sessionId",
+          "kind",
+          "capacity",
+          "workingCount"
+        ]
+      },
+      "SessionEquipmentDto": {
+        "type": "object",
+        "properties": {
+          "sessionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "reformer",
+              "cadillac",
+              "mat"
+            ],
+            "nullable": true,
+            "description": "The kind its Class Type uses; null when it uses none"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EquipmentDto"
+            }
+          }
+        },
+        "required": [
+          "sessionId",
+          "kind",
+          "items"
+        ]
+      },
+      "SessionEquipmentIssueInputDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "outOfService": {
+            "type": "boolean"
+          },
+          "equipmentId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "description",
+          "outOfService",
+          "equipmentId"
         ]
       },
       "AdminSupplyDto": {
