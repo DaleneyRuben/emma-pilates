@@ -1,5 +1,8 @@
 // Occurrence job doubles shared by the worker entrypoint specs.
 export const occurrenceJobs = () => ({
+  first90Days: {
+    execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
+  },
   pushDispatch: { dispatch: jest.fn() },
   pushReceipts: {
     execute: jest
