@@ -78,7 +78,7 @@ stay (accounting, security, legal obligations) may remain, disclosed in the
 privacy policy. Closing a Client Account (Perfil → «Cerrar mi cuenta», or an
 Administrator from the admin web after an email request) now erases the name,
 email, phone, password, and profile photo in the closure transaction. The
-Payments, Bookings, Credit, and attendance stay, soft-deleted (ADR-0086),
+Payments, Bookings, and attendance stay, soft-deleted (ADR-0086),
 under «Cliente eliminado» for the studio's accounting, which the privacy and
 deletion pages disclose.
 
@@ -106,6 +106,33 @@ the answers stay **not shared**. Re-check them if the studio ever sends from
 the app or the API through the WhatsApp Business Platform.
 
 The form's «delete» answers are **Yes** with the deletion URL above.
+
+## Added since the 2026-10-19 draft
+
+Paste these when the forms are filled. None of them changes a declaration
+already made; each adds a data type the closed-test build collects.
+
+**Feedback text (REL-012, «Enviar comentarios»).** Both apps. Data type
+**Other user-generated content**, collected, not shared. Purposes: App
+functionality (the studio reads it to fix the app) and Account management
+(the Administrator triages it). Optional: a person can use the app without
+sending any. The text, the app version, and the device kind are kept while
+the Account is open and erased with it on closure. It is not used for
+advertising.
+
+**NIT or CI and business name (PAY-007, invoice data).** Client app, and the
+Staff app when the Assistant records a sale. Data type **Other financial
+info**, collected, not shared. Purpose: Account management and Fraud
+prevention, security, and compliance (the studio issues the invoice outside
+the app). Optional: «Sin factura» records the sale with none. Closing the
+Account erases the NIT or CI and the name and keeps the mark that an invoice
+was issued, which the accounting record needs.
+
+**How she found the studio (BKM-011).** Client app, at registration. Data
+type **Other info**, collected, not shared. Purpose: App functionality and
+Analytics (the studio counts where new Clients come from; no third party
+receives it). Required on new registrations. It stays with the accounting
+record after closure, like the Payments.
 
 ## Related gaps found by the audit
 
