@@ -102,17 +102,32 @@ describe('studio facts', () => {
       await context.pool.query(
         `INSERT INTO booking.subscriptions
            (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot,
-            original_class_allowance, remaining_class_allowance, starts_on, ends_on, activated_at, updated_at)
-         VALUES ($1, $2, $3, 'Test Plan', 1, 8, 6, $4, $5, $6, CURRENT_TIMESTAMP)`,
+            original_class_allowance, remaining_class_allowance, starts_on, ends_on,
+            state, activated_at, expired_at, updated_at)
+         VALUES ($1, $2, $3, 'Test Plan', 1, 8, 6, $4, $5,
+            $6::"booking"."SubscriptionState", $7, $8, CURRENT_TIMESTAMP)`,
         [
           subscriptionIds[index],
           clientId,
           planId,
           index === 2 ? '2026-09-01' : '2026-10-20',
-          index === 2 ? '2026-09-30' : '2026-11-18',
+          index === 2 ? '2026-09-30' : '2026-10-31',
+          index === 2 ? 'expired' : 'active',
           '2026-10-01T04:00:00.000Z',
+          index === 2 ? '2026-10-01T04:00:00.000Z' : null,
         ],
       );
+      if (index !== 2) {
+        await context.pool.query(
+          `INSERT INTO booking.subscriptions
+             (id, client_id, plan_id, plan_name_snapshot, duration_months_snapshot,
+              original_class_allowance, remaining_class_allowance, starts_on, ends_on,
+              state, activated_at, expired_at, updated_at)
+           VALUES ($1, $2, $3, 'Next Plan', 1, 8, 8, '2026-11-01', '2026-11-30',
+              'expired', $4, $4, CURRENT_TIMESTAMP)`,
+          [randomUUID(), clientId, planId, '2026-11-01T04:00:00.000Z'],
+        );
+      }
     }
     await insertSession(context.pool, {
       id: sessionId,
@@ -169,14 +184,14 @@ describe('studio facts', () => {
       now: () => new Date('2026-10-23T15:00:00.000Z'),
     });
     const firstSessions = await context.pool.query(
-      `SELECT session_id, session_date, branch_id, class_type_id, trainer_staff_member_id,
-              capacity, bookings_at_window_close, attended, no_shows
+      `SELECT session_id, session_date::text AS session_date, branch_id, class_type_id,
+              trainer_staff_member_id, capacity, bookings_at_window_close, attended, no_shows
        FROM studio.session_facts
        WHERE deleted_at IS NULL
        ORDER BY session_date`,
     );
     const firstClients = await context.pool.query(
-      `SELECT client_id, month, plan_days, classes_booked, classes_attended, renewed
+      `SELECT client_id, month::text AS month, plan_days, classes_booked, classes_attended, renewed
        FROM studio.client_month_facts
        WHERE deleted_at IS NULL
        ORDER BY client_id`,
@@ -185,7 +200,7 @@ describe('studio facts', () => {
     expect(firstSessions.rows).toEqual([
       {
         session_id: sessionId,
-        session_date: monthFrom('2026-10-12'),
+        session_date: '2026-10-12',
         branch_id: branchId,
         class_type_id: classTypeId,
         trainer_staff_member_id: trainerId,
@@ -196,7 +211,7 @@ describe('studio facts', () => {
       },
       {
         session_id: emptySessionId,
-        session_date: monthFrom('2026-10-13'),
+        session_date: '2026-10-13',
         branch_id: branchId,
         class_type_id: classTypeId,
         trainer_staff_member_id: trainerId,
@@ -211,7 +226,7 @@ describe('studio facts', () => {
         const original = clients.indexOf(clientId);
         return {
           client_id: clientId,
-          month,
+          month: '2026-10-01',
           plan_days: original === 2 ? 0 : 12,
           classes_booked: original === 2 ? 0 : 1,
           classes_attended: original === 0 ? 1 : 0,
@@ -243,5 +258,3 @@ describe('studio facts', () => {
     expect(after.rows).toEqual(before.rows);
   });
 });
-
-const monthFrom = (day: string): Date => new Date(`${day}T00:00:00.000Z`);
