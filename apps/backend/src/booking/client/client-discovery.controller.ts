@@ -162,7 +162,7 @@ export class ClientProfileController {
     return {
       status: view.status,
       nextSubscription:
-        view.nextSubscription === null
+        view.nextSubscription == null
           ? null
           : {
               id: view.nextSubscription.id,
