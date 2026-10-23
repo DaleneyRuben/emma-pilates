@@ -83,7 +83,20 @@ export interface AdministratorClientDirectory {
     clientId: string,
     now: Date,
   ) => Promise<ClientClosureOutlook>;
+  saveProfile: (
+    input: ClientProfileCorrection,
+  ) => Promise<AdministratorClientRecord>;
 }
+
+export type ClientProfileCorrection = {
+  clientId: string;
+  name: string;
+  phone: string | null;
+  actorAccountId: string;
+  actorRole: 'administrator' | 'coordinator';
+  occurredAt: Date;
+  previous: { name: string; phone: string | null };
+};
 
 type Dependencies = {
   directory: AdministratorClientDirectory;
@@ -129,3 +142,14 @@ export const readAdministratorClient = async (
   ]);
   return { ...client, subscription, creditAvailableCentavos, closure };
 };
+
+export const updateAdministratorClientProfile = (
+  command: { clientId: string; name: string; phone: string | null },
+  principal: AuthenticatedPrincipal,
+  dependencies: Dependencies,
+): Promise<AdministratorClientRecord> =>
+  Promise.reject(
+    new Error(
+      `not implemented ${String([command, principal, dependencies].length)}`,
+    ),
+  );
