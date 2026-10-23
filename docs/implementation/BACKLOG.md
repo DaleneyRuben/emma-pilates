@@ -564,7 +564,7 @@ Acceptance criteria:
 - Before the opening date, the opening date is offered even when it is 30 days away.
 - `subscription_not_expired` no longer blocks a purchase. The concurrency tests cover two renewals racing.
 
-Evidence (BKM-006, 2026-10-23, branch `feature/bkm-006-start-date`, stacked on `feature/bkm-005-plans-by-days` at `6675fc38`, PR #164). Rules red `ce1f6aae`, rules green `b018f18c`, purchase flow `b8ee2b7a`, the chip row and the next-plan line `e5478300`, a missing next plan `29fa0eea`. The next-plan row shrinks on a phone: red `554be4be`, green `4c46979f`.
+Evidence (BKM-006, 2026-10-23, branch `feature/bkm-006-start-date`, stacked on `feature/bkm-005-plans-by-days` at `6675fc38`, [PR #169](https://github.com/DaleneyRuben/emma-pilates/pull/169)). Rules red `ce1f6aae`, rules green `b018f18c`, purchase flow `b8ee2b7a`, the chip row and the next-plan line `e5478300`, a missing next plan `29fa0eea`. The next-plan row shrinks on a phone: red `554be4be`, green `4c46979f`.
 
 Decisions taken:
 
