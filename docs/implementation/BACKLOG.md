@@ -928,7 +928,7 @@ states.
 
 #### STU-001 · Evidence
 
-Done 2026-10-23. Studio Management is a new context with schema `studio` and
+Done 2026-10-23. [Pull request #187](https://github.com/DaleneyRuben/emma-pilates/pull/187). Studio Management is a new context with schema `studio` and
 two fact tables, `session_facts` and `client_month_facts`. A recompute reads
 Booking by named query (no Booking import, no write back) and upserts its own
 rows; a second run with the same source leaves `updated_at` unchanged. The
