@@ -60,7 +60,7 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 77 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 77 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 77, 79 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
@@ -79,10 +79,10 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78 |
+| AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78, 79 |
 | AW23–AW24 Personal | 26, 31, 72 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
-| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 79 |
 
 ## Before you begin
 
@@ -6043,3 +6043,40 @@ C. **The gift.** The first approved Payment in a Client's life adds one
 Spending an extra class waits for the base allowance to run out, and for the
 Weekly Cap (BKM-007). Cancelling a Booking funded by an extra class restores
 the class to the base pool.
+
+## Test 79: payment controls (PAY-006)
+
+A sale stays as it was recorded. The Assistant cannot edit or delete a
+Payment. Only the Administrator voids one, and only with a reason
+([decisions §4.3](./decisiones-emma-pilates.md),
+[booking ADR-0012](../booking/docs/adr/0012-sales-controls-and-invoice-data.md)).
+A void corrects a mistake: no money is returned. Run the API and the
+fixtures as in Tests 2 and 5. Paola is the Administrator and Camila the
+Assistant.
+
+A. **Front-desk receipt.** As Camila, open a Client and **Confirmar pago en
+   efectivo** (S10). **Fotografiar comprobante** sends the receipt. The
+   Payment stays pending. As Paola, the same receipt appears on **Revisar
+   pago** (S12) and on **Pagos** (AW28). Approving it uses that existing
+   review. Cash still confirms on the spot with **Confirmar pago recibido**,
+   and an older build that omits the new fields still confirms cash.
+B. **Invoice card.** On that same S10 screen, **Datos para la factura**
+   starts on **Sin factura**. **Con factura** asks for **NIT o CI** and
+   **Nombre o razón social**. Both can stay empty. This branch does not
+   store them; PAY-007 owns the columns and the «Factura emitida» mark.
+C. **Anular venta.** As Paola, on **Pagos**, filter **Confirmado** and press
+   **Anular venta**. The button stays disabled until **Motivo** has text.
+   After the void the row is **Anulado** and shows the reason. The income
+   report drops that amount from the totals and lists the sale under
+   **Ventas anuladas** with the same reason. The Subscription no longer
+   covers today, future Bookings are cancelled, and Attendance already
+   taken stays. A second void is refused.
+D. **Courtesy.** On the Client detail (AW22), with an active Plan,
+   **Agregar clase de cortesía** and **Devolver una clase** record one
+   class. Camila, a Trainer, and a Nutritionist get `403` on that endpoint
+   and on the void. The Coordinator Role is not on this branch; the denial
+   covers a cast principal the use case rejects.
+
+The migrations `20261023190000_void_payment_values` and
+`20261023190100_void_payment` need owner approval before they run on a
+shared database.

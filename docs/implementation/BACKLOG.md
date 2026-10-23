@@ -473,7 +473,7 @@ wait for Google, Apple, and testers.
 | PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | ready |
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | ready |
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | ready |
-| PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
+| PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | done |
 | PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | ready |
 | BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
@@ -698,6 +698,32 @@ Acceptance criteria:
 Acceptance criteria: denial tests prove that the Assistant, Coordinator,
 Trainer, and Nutritionist get 403 on void and courtesy. A voided sale leaves the
 income report and stays visible with its reason.
+
+Evidence (PAY-006, 2026-10-23, branch `feature/pay-006-payment-controls`). This branch merges BKM-006 (`feature/bkm-006-start-date`, PR #169) and BKM-008 (`feature/bkm-008-extra-classes`, PR #170) at `1c0f2bad`. The testing guide and this backlog will collide with BKM-007's Test 78 and BKM-015's Test 78.
+
+Decisions:
+
+- A void is its own use case, controller, provider, and Prisma module. `prisma-payment-commands.ts` and `administrator.controller.ts` were already too large to grow. The front-desk transfer is likewise its own module, with a thin method on the payment commands.
+- PostgreSQL cannot use a new enum value in the transaction that adds it, so the void is two migrations: `20261023190000_void_payment_values` and `20261023190100_void_payment`. Both need owner approval. They were applied only to disposable databases and those databases are dropped at the end of the item.
+- A void is a state, never a DELETE (ADR-0086). The foreign key on `voided_by_account_id` is ON DELETE RESTRICT. `protect_payment` allows exactly one transition, confirmed to voided, and only the three void columns move. A voided cash, credit-only, or courtesy Payment still satisfies the method check. A voided Payment keeps its Subscription: the consistency trigger requires exactly one for confirmed and for voided.
+- The Subscription ends by setting `ends_on` to yesterday in America/La_Paz and `ended_by_void` to true. Its state stays active. `ended_by_void` exists because `subscriptions_values_check` requires `ends_on >= starts_on` and a CHECK cannot read the Payment. A void that ends a Plan before it started would fail that check otherwise.
+- Future Bookings are cancelled inside the void transaction with cause `payment_voided`, using the account-closure future-booking query and the existing waitlist promotion. The existing `cancelBooking` command cannot be that path: it is Client-only, restores a class, and refuses an Administrator. Attendance rows stay. No money is returned and no credit is released. A pending Payment is not voidable. A second void is refused.
+- The income report sums confirmed Payments only. A voided sale in the window is returned on an additive `voided` list with its reason and leaves the totals.
+- The Administrator's payment list stays a transfer queue. A voided cash sale would never appear there, so the voided filter and the unfiltered list also include voided sales of every method, with the reason.
+- The Coordinator Role does not exist on this branch (IDN-009). Void and courtesy deny every principal who is not an Administrator. The denial tests cover a coordinator by casting a principal the use case rejects, matching BKM-008.
+- The invoice card on S10 matches PAY-007's fields (NIT or CI, name or business name, both optional, «Sin factura» allowed). It is not an import of PAY-007's component, and this branch does not add the invoice columns, the «Factura emitida» mark, the CSV, or the filter. Those stay PAY-007's. Reconcile the card with PAY-007's component when both merge.
+- A front-desk transfer is `POST /api/v1/assistant/clients/{clientId}/transfer-payments`. It creates a pending transfer Payment with a receipt the Assistant owns, notifies Administrators with the existing `payment_submitted` push, and is approved on the existing review. It does not set `collected_at_branch_id` (the method check forbids that on a transfer); the Branch is audit metadata. Cash confirmation stays as it was. Older builds omit the new fields and still confirm cash.
+- Courtesy and class return reuse `POST /api/v1/administrator/clients/{clientId}/allowance-adjustments`. PAY-006 adds the admin form only. The 403 tests already exist in `allowance-adjustments.e2e-spec.ts`.
+
+Open questions:
+
+- The invoice fields on a front-desk receipt are not stored. PAY-007 owns `invoiceTaxId` and `invoiceName`. When both branches merge, the card must send those fields and the cash and transfer commands must persist them.
+- The Coordinator denial is a cast principal. IDN-009 should replace that cast with the real role.
+- The void does not go through `cancelBooking`. That command restores a class and refuses an Administrator. The void cancels future Bookings in its own transaction and does not restore a class, because a void corrects a mistake.
+
+Migrations needing owner approval: `20261023190000_void_payment_values`, `20261023190100_void_payment`.
+
+Verified: recorded after the surface checks. The pull request URL is recorded in a follow-up commit.
 
 #### PAY-007 · Invoice data
 

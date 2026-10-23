@@ -234,6 +234,9 @@ Each of these was sent as the next message in the existing design session for th
 | [193](./followups/193-mi-plan-extra-classes.md) | `12` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008, booking ADR-0006) | 🕓 pending (190–192 reserved by BKM-006) |
 | [194](./followups/194-client-summary-extra-classes.md) | `S06` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008) | 🕓 pending (190–192 reserved by BKM-006) |
 | [195](./followups/195-admin-client-detail-extra-classes.md) | `AW22` shows «Clases extra: 1 · Regalo de bienvenida» under «Clases disponibles» when the API returns the line; no courtesy form (BKM-008, PAY-006) | 🕓 pending (190–192 reserved by BKM-006) |
+| [196](./followups/196-front-desk-receipt-and-invoice.md) | `S10` gains the front-desk receipt photograph and the smallest «Datos para la factura» card (PAY-006, decisions §4.2 and §4.5) | 🕓 pending |
+| [197](./followups/197-void-sale-on-payments.md) | `AW28` gains «Anular venta» with a required reason and an «Anulado» filter (PAY-006, decisions §4.3) | 🕓 pending |
+| [198](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006) | 🕓 pending |
 
 ## Status
 
