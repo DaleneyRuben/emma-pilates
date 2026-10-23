@@ -5,13 +5,18 @@ import {
   StaffRole,
 } from '../../generated/prisma/enums';
 import type { Prisma } from '../../generated/prisma/client';
-import type { AdministratorActor } from './administration-errors';
+import {
+  auditRoleOf,
+  type AdministratorActor,
+  type OperationsActor,
+} from './administration-errors';
 
-// Administrator catalog and schedule changes are audited in the same
+// Catalog and schedule changes (the Administrator's, or the Coordinator's on
+// the schedule) are audited in the same
 // transaction as the change (ADR-0055). Callers pass the catalogued code.
 export const recordAdministratorAudit = (
   transaction: Prisma.TransactionClient,
-  actor: AdministratorActor,
+  actor: AdministratorActor | OperationsActor,
   record: {
     actionCode: string;
     targetType: 'branch' | 'class_type' | 'plan' | 'session';
@@ -27,7 +32,7 @@ export const recordAdministratorAudit = (
       outcome: AuditOutcome.SUCCEEDED,
       actorKind: AuditActorKind.ACCOUNT,
       actorAccountId: actor.accountId,
-      actorRole: StaffRole.ADMINISTRATOR,
+      actorRole: StaffRole[auditRoleOf(actor)],
       targetType: record.targetType,
       targetId: record.targetId,
       branchId: record.branchId ?? null,

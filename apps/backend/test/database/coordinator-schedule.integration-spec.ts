@@ -63,7 +63,7 @@ describe('the Coordinator on the schedule', () => {
       },
       await coordinator(),
     );
-    expect(created.created).toBeGreaterThan(0);
+    expect(created.schedule).toMatchObject({ branchId: urubo, weekday: 6 });
 
     const batch = await createPrismaScheduleBatch(world.prisma, {
       now: () => fixtureNow,
@@ -74,7 +74,7 @@ describe('the Coordinator on the schedule', () => {
         trainerStaffMemberId: staff('daniela'),
         capacity: 8,
         effectiveFrom: civil('2026-09-22'),
-        rows: [{ weekday: 0, startsAtLocal: '10:00', durationMinutes: 50 }],
+        rows: [{ weekday: 5, startsAtLocal: '10:00', durationMinutes: 50 }],
       },
       await coordinator(),
     );

@@ -100,6 +100,14 @@ export const requireOperations = (
   };
 };
 
+// The audit actor Role of a schedule or catalog change (ADR-0055, ADR-0102).
+export const auditRoleOf = (
+  actor: AdministratorActor | OperationsActor,
+): 'ADMINISTRATOR' | 'COORDINATOR' =>
+  'role' in actor && actor.role === 'coordinator'
+    ? 'COORDINATOR'
+    : 'ADMINISTRATOR';
+
 // Constraint names arrive only in the driver cause (see NUT-002 notes).
 export const databaseCause = (error: unknown): string => {
   const meta = (
