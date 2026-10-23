@@ -35,7 +35,8 @@ you are starting with no project knowledge.
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
-| Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
+| Mobile builds and stores     | EAS development builds (Test 45), local release builds for the launch screen and the QR save (Tests 51, 65), the staging variant beside the store app (Test 55), Play Internal testing on production (Test 48), and the release bundle smoke (Test 19); raising a Session's capacity promotes its Waitlist, and an Attendance correction is audited (Test 75) | Each EAS build spends one of the month's 15; iOS store builds wait for gate 9 |
+| Capacity and Attendance (API) | Raise a full Session's capacity and watch the Waitlist take the new seats in queue order; correct a saved Attendance and read the audit record that names both outcomes (Test 75) | The admin web and the Staff app show the same results only after you look there; this check is curl |
 
 ## Where each designed screen is tested
 
@@ -76,7 +77,7 @@ can be found by its design name.
 | AW01 Iniciar sesión, AW30 Recuperar contraseña, AW32 Crear contraseña, AW33 Menú de usuario | 24, 31, 44 |
 | AW36 Reglas del estudio (from AW33) | 75 |
 | AW34 Selector de sucursal, the shell, the narrow drawer, «Página no encontrada» | 23, 31, 64, 66, 72 |
-| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 77, 78 |
+| AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69, 77, 78, 89 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 76 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
 | AW37 Equipos | 77 |
@@ -1996,7 +1997,8 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
    classes then appear in the Client's **Ver historial** as «Ha asistido a»
    with the month group of Test 5 B.
 4. Open the roster again: the saved outcomes are restored, and a changed
-   outcome can be saved as a correction.
+   outcome can be saved as a correction. A correction writes an audit record
+   naming both outcomes (Test 75); the first save does not.
 
 The same data is available through Swagger as `GET
 /api/v1/trainer/sessions?on=YYYY-MM-DD`, `GET
@@ -2461,7 +2463,8 @@ shows how to log in and authorize). Other Roles get
 3. **Single Sessions**: `POST /api/v1/administrator/sessions` adds a one-off
    Session; `PATCH …/{id}` changes its start, Trainer, or capacity. Overlaps
    answer `409 session_overlap`, and capacity below the booked count answers
-   `409 capacity_below_bookings`.
+   `409 capacity_below_bookings`. Raising the capacity promotes the Waitlist
+   into the new seats (Test 75).
 4. **Oversight**: `GET evaluations?from=…&until=…&branchId=…` (booked
    Evaluations of one Branch, each with `kind` `first` or `follow_up`),
    `DELETE evaluations/{id}` (cancels it for the Client), `GET
@@ -5927,7 +5930,6 @@ touching production.
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
 
-
 ## Test 75: the studio rules (BKM-004)
 
 The rules the apps and the API follow live in one versioned Studio Settings
@@ -6524,3 +6526,43 @@ gains one `invite_converted` adjustment, and a second approval adds nothing.
 A host with no current Subscription gets it on the next one she buys. The
 friend's own first real Payment still gets the gift class: the free class
 never counted as a first Plan.
+
+## Test 89: raise a Session's capacity and correct an Attendance (BE-027)
+
+Both checks are the API only, with curl against a disposable database. No
+phone or browser is involved. Use a copy of the fixtures so the rows you add
+never land on a database you keep.
+
+```sh
+createdb -T pilates_dev_sim pilates_test_be027
+```
+
+Point `apps/backend/.env`'s `DATABASE_URL` at
+`postgresql://$USER@localhost:5433/pilates_test_be027` and start the API on a
+free port (`PORT=3133 pnpm --filter @pilates/backend start`). Log in as Test 3
+describes (`POST /api/v1/authentication-sessions`, password
+`emma-local-2026`) and keep each credential.
+
+1. **A higher capacity promotes the Waitlist.** As `paola.mendoza@example.com`,
+   create a one-off Session of capacity 1 more than 2.5 hours ahead
+   (`POST /api/v1/administrator/sessions`, Test 21 step 3). Book it as
+   `valeria@example.com` (`POST /api/v1/sessions/{id}/bookings` with an
+   `idempotency-key`). Join its Waitlist as `lucia@example.com`, then as
+   `isabel@example.com` (`POST …/waitlist-entries`; Isabel has no classes left,
+   so she can wait but cannot be promoted). Raise the capacity to 2
+   (`PATCH /api/v1/administrator/sessions/{id}` `{"capacity": 2}`). Lucía's
+   Waitlist Entry closes as `promoted` and she has a Booking; Isabel's Entry
+   stays open, because one new seat promotes only the first eligible entry.
+   Lucía's inbox (`GET /api/v1/notifications`) reads «Cupo liberado». Lowering
+   the capacity back to 1 is refused (`409 capacity_below_bookings`) and
+   neither Booking changes. `dropdb pilates_test_be027` when you finish.
+2. **A correction names both outcomes.** Book a Session that has already
+   ended (back-date one with `psql` as Test 13 does, or pick one that ended
+   today) as `lucia@example.com`. As `emma.vargas@example.com`, save the roster
+   (`POST /api/v1/sessions/{id}/attendance`, `{"outcomes": [{"bookingId",
+   "outcome": "attended"}]}`). That first save writes no audit record. Save
+   it again with `"outcome": "no_show"`. In `psql`,
+   `system.audit_records` holds one `attendance.corrected` row for that
+   Booking whose `metadata` is `{"previousOutcome": "attended", "outcome":
+   "no_show"}`, with Emma's Account and role `trainer`. Saving `no_show`
+   again writes nothing new. Another Role still gets `403`.
