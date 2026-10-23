@@ -98,7 +98,7 @@ describe("AW24 under the Administrator's email limit", () => {
       "sara@emmapilates.bo",
     );
     await user.click(
-      within(panel).getByRole("radio", { name: "Administrador" }),
+      within(panel).getByRole("radio", { name: "Administración" }),
     );
     await user.click(within(panel).getByRole("button", { name: "Guardar" }));
 
