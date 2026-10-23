@@ -74,7 +74,7 @@ export function SelectPlanScreen({ route }: { route: { params: ClientContext } }
       {creditAvailableCentavos > 0 ? (
         <View style={styles.credit}>
           <Text style={styles.creditText}>
-            {`Este cliente tiene ${formatBolivianos(creditAvailableCentavos)} de crédito disponible.`}
+            {`Esta clienta tiene ${formatBolivianos(creditAvailableCentavos)} de crédito disponible.`}
           </Text>
         </View>
       ) : null}

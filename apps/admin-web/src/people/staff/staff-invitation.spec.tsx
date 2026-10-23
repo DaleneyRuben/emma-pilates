@@ -176,7 +176,7 @@ describe("AW24 Nuevo miembro with a known email", () => {
       within(within(panel).getByRole("group", { name: "Rol" })).getByRole(
         "radio",
         {
-          name: "Administrador",
+          name: "Administración",
         },
       ),
     );
@@ -200,7 +200,7 @@ describe("AW24 Nuevo miembro with a known email", () => {
       within(within(panel).getByRole("group", { name: "Rol" })).getByRole(
         "radio",
         {
-          name: "Administrador",
+          name: "Administración",
         },
       ),
     );

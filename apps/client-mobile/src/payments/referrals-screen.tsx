@@ -119,7 +119,7 @@ export function ReferralsScreen() {
           />
         </View>
         <BodyText style={styles.explanation}>
-          Comparte tu código. Cuando un amigo se registre y haga su primer pago, ganas crédito.
+          Comparte tu código. Cuando una amiga se registre y haga su primer pago, ganas crédito.
         </BodyText>
         <Pressable
           accessibilityLabel={`Tu crédito: ${creditValue}`}

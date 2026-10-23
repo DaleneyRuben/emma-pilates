@@ -97,7 +97,7 @@ describe("Referrals and Credit", () => {
     });
     expect(
       screen.getByText(
-        "Comparte tu código. Cuando un amigo se registre y haga su primer pago, ganas crédito.",
+        "Comparte tu código. Cuando una amiga se registre y haga su primer pago, ganas crédito.",
       ),
     ).toBeOnTheScreen();
     expect(screen.getByText("Tu crédito")).toBeOnTheScreen();
@@ -151,7 +151,7 @@ describe("Referrals and Credit", () => {
       expect(screen.getByText("Bs 0")).toBeOnTheScreen();
     });
     expect(
-      screen.getByText("Aún no tienes crédito. Invita a tus amigos para ganar."),
+      screen.getByText("Aún no tienes crédito. Invita a tus amigas para ganar."),
     ).toBeOnTheScreen();
 
     await fireEvent.press(screen.getByRole("button", { name: "Ver mi código" }));

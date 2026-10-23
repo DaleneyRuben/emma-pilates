@@ -53,7 +53,7 @@ describe("AW24 Editar miembro", () => {
     expect(within(panel).queryByLabelText("Nombre")).not.toBeInTheDocument();
     expect(within(panel).getByText("emma@emmapilates.bo")).toBeVisible();
     expect(
-      within(panel).getByRole("radio", { name: "Entrenador" }),
+      within(panel).getByRole("radio", { name: "Entrenadora" }),
     ).toBeChecked();
     expect(
       within(panel).getByRole("checkbox", { name: "Centro" }),
@@ -156,7 +156,7 @@ describe("AW24 Editar miembro", () => {
     const { panel, user } = await openMember("Emma Vargas");
 
     await user.click(
-      within(panel).getByRole("radio", { name: "Administrador" }),
+      within(panel).getByRole("radio", { name: "Administración" }),
     );
     expect(
       within(panel).getByText("Todas las sucursales (implícito por el rol)"),
@@ -322,7 +322,7 @@ describe("AW24 Editar miembro", () => {
         "Esta cuenta está desactivada: ya no puede entrar.",
       ),
     ).toBeVisible();
-    expect(within(panel).getByText("Entrenador")).toBeVisible();
+    expect(within(panel).getByText("Entrenadora")).toBeVisible();
     expect(within(panel).getByText("Centro")).toBeVisible();
     expect(
       within(panel).queryByRole("button", { name: "Guardar" }),
