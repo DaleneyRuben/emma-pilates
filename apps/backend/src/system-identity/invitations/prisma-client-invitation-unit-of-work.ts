@@ -1,5 +1,6 @@
 import type { PgBoss } from 'pg-boss';
 import { recordClientAcquisition } from '../../booking/acquisition/record-client-acquisition';
+import { openGuestPass } from '../../booking/payments/open-guest-pass';
 import { toPrismaBytes } from '../../database/prisma-bytes';
 import {
   AuditActorKind,
@@ -31,15 +32,17 @@ export class PrismaClientInvitationUnitOfWork implements ClientInvitationUnitOfW
   execute<Result>(
     work: (transaction: ClientInvitationTransaction) => Promise<Result>,
   ): Promise<Result> {
+    const now = this.dependencies.now ?? (() => new Date());
     return this.dependencies.prisma.$transaction((transaction) =>
       work(
         createInvitationTransaction(
           transaction,
+          now,
           new PrismaClientRegistrationTransaction(
             transaction,
             this.dependencies.boss,
             (email) => this.dependencies.digestEmail(email),
-            this.dependencies.now ?? (() => new Date()),
+            now,
           ),
         ),
       ),
@@ -57,6 +60,7 @@ const staffRoles: Record<InvitationAudit['actorRole'], StaffRole> = {
 // lookups, the Account edits, and the audit trail.
 const createInvitationTransaction = (
   transaction: Prisma.TransactionClient,
+  now: () => Date,
   registration: PrismaClientRegistrationTransaction,
 ): ClientInvitationTransaction => ({
   findAccountByEmail: async (email): Promise<ExistingAccount | null> => {
@@ -173,12 +177,20 @@ const createInvitationTransaction = (
         },
       },
     });
-    // BKM-011: no Referral here; the Guest Pass flow (BKM-014) adds its own.
-    await recordClientAcquisition(transaction, {
+    // BKM-011 records the channel; a Client's code also opens the Guest Pass.
+    const holder = await recordClientAcquisition(transaction, {
       clientId: invitation.clientId,
       declaredChannel: invitation.acquisitionChannel,
       referralCode: invitation.referredByCode,
     });
+    if (holder?.kind === 'client') {
+      await openGuestPass(transaction, {
+        hostClientId: holder.clientId,
+        friendClientId: invitation.clientId,
+        authorAccountId: invitation.accountId,
+        now: now(),
+      });
+    }
   },
   replaceStaffInvitationActivation: (input) =>
     registration.replaceStaffInvitationActivation(input),

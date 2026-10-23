@@ -258,6 +258,7 @@ describe('client payment reads and Credit-only purchases', () => {
           referredClientId: 'client-2',
           referredName: 'Sofía G.',
           state: 'awarded',
+          invitationStatus: 'bought',
           createdAt: new Date('2026-09-21T15:00:00.000Z'),
           awardedAt: new Date('2026-09-21T15:00:00.000Z'),
           awardCentavos: 6000,

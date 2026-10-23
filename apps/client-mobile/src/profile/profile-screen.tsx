@@ -162,7 +162,7 @@ export function ProfileScreen() {
           />
           <MenuRow
             icon="referrals"
-            label="Mis referidos"
+            label="Invita a una amiga"
             onPress={() => navigation.navigate("Referrals")}
           />
           <MenuRow

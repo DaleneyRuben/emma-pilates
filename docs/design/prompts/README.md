@@ -23,7 +23,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | 13 | Evaluación nutricional | `13` | ✅ |
 | 14 | Confirmar evaluación | `14` | ✅ |
 | 15 | Mis evaluaciones | `15` | ✅ |
-| 16 | Mis referidos | `16` | ✅ |
+| 16 | Invita a una amiga | `16` | ✅ (follow-up 196 pending) |
 | 17 | Mi crédito | `17` | ✅ |
 | 18 | Perfil | `18` | ✅ |
 | 19 | Notificaciones | `19` | ✅ |
@@ -265,6 +265,7 @@ Each of these was sent as the next message in the existing design session for th
 | [201](./followups/196-front-desk-receipt-and-invoice.md) | `S10` gains the front-desk receipt photograph and the smallest «Datos para la factura» card (PAY-006, decisions §4.2 and §4.5). Numbered 201 here because 196 is the weekly-cap line. | 🕓 pending |
 | [202](./followups/197-void-sale-on-payments.md) | `AW28` gains «Anular venta» with a required reason and an «Anulado» filter (PAY-006, decisions §4.3). Numbered 202 here because 197 is the campaign line. | 🕓 pending |
 | [203](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006). Numbered 203 here because 198 is the founder banner. | 🕓 pending |
+| [204](./followups/196-invita-a-una-amiga.md) | `16` becomes «Invita a una amiga»: the code, the free-class explanation, and each invitation's status (Registrada, Clase reservada, Compró su plan); the credit row goes (BKM-014, booking ADR-0009). Numbered 204 here because 196 is the weekly-cap line. | 🕓 pending |
 
 ## Status
 

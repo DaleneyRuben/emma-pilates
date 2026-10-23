@@ -4,6 +4,7 @@
  * Emma Pilates API
  * OpenAPI spec version: 1.0.0
  */
+import type { ReferredClientDtoInvitationStatus } from "./referredClientDtoInvitationStatus";
 import type { ReferredClientDtoState } from "./referredClientDtoState";
 
 export interface ReferredClientDto {
@@ -11,6 +12,8 @@ export interface ReferredClientDto {
   /** First name and surname initial */
   referredName: string;
   state: ReferredClientDtoState;
+  /** BKM-014: the invitation's status. Older releases ignore it and read state. */
+  invitationStatus: ReferredClientDtoInvitationStatus;
   createdAt: string;
   /** @nullable */
   awardedAt?: string | null;

@@ -307,6 +307,7 @@ export * from "./recordCashPaymentDto";
 export * from "./recordFrontDeskTransferDto";
 export * from "./referralsDto";
 export * from "./referredClientDto";
+export * from "./referredClientDtoInvitationStatus";
 export * from "./referredClientDtoState";
 export * from "./rejectPaymentDto";
 export * from "./requestEmailChangeDto";

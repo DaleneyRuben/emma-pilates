@@ -167,6 +167,8 @@ model Subscription {
   evaluations             Evaluation[]
   allowanceAdjustments    AllowanceAdjustment[]
   freezes                 Freeze[]
+  guestPasses             GuestPass[]
+  guestPassRewards        GuestPass[]           @relation("GuestPassReward")
 
   @@unique([id, clientId])
   @@index([clientId, startsOn])

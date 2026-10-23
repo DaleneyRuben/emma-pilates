@@ -39,6 +39,7 @@ import {
 } from './eligible-subscription';
 import { fundBooking } from './weekly-cap-funding';
 import { readWeeklyCapPosition } from './weekly-cap-count';
+import { decideGuestPassBooking } from '../payments/guest-pass';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -846,6 +847,32 @@ export class PrismaBookingCommands {
           })
           .then((booking) => booking !== null),
       create: async (input) => {
+        const pass = await transaction.guestPass.findFirst({
+          where: {
+            friendClientId: input.clientId,
+            bookingId: null,
+            deletedAt: null,
+          },
+          select: { id: true, courtesySubscriptionId: true },
+        });
+        if (
+          pass !== null &&
+          pass.courtesySubscriptionId === input.subscriptionId
+        ) {
+          const taken = await transaction.booking.count({
+            where: { sessionId: input.sessionId, state: 'BOOKED' },
+          });
+          const session = await transaction.session.findUniqueOrThrow({
+            where: { id: input.sessionId },
+            select: { capacity: true },
+          });
+          const decision = decideGuestPassBooking({
+            placesLeft: session.capacity - taken,
+            guestPassesAlreadyUsed: 0,
+          });
+          if (decision !== null) throw new Error(decision.code);
+        }
+
         const session = await transaction.session.findUniqueOrThrow({
           where: { id: input.sessionId },
           select: { startsAt: true },
@@ -859,7 +886,27 @@ export class PrismaBookingCommands {
           createBooking: () =>
             transaction.booking.create({ data: input, select: { id: true } }),
         });
-        if (booking === null) throw new Error('No eligible Subscription');
+        if (booking === null) {
+          const spent = await transaction.guestPass.findFirst({
+            where: {
+              friendClientId: input.clientId,
+              bookingId: { not: null },
+              deletedAt: null,
+            },
+            select: { id: true },
+          });
+          throw new Error(
+            spent === null
+              ? 'No eligible Subscription'
+              : 'guest_pass_already_used',
+          );
+        }
+        if (pass !== null) {
+          await transaction.guestPass.update({
+            where: { id: pass.id },
+            data: { bookingId: booking.id },
+          });
+        }
         return booking;
       },
       now: this.now,

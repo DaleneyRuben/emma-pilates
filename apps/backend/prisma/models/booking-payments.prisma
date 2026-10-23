@@ -227,3 +227,33 @@ model Referral {
   @@map("referrals")
   @@schema("booking")
 }
+
+// BKM-014, decisions §5.3: one free class in a friend's life, granted when
+// she registers with a Client's Referral Code. The courtesy Subscription is
+// hidden and never a first Plan. The Booking is set when she spends it, and
+// the reward Subscription is the host's current one, or her next one. One
+// live pass per friend, and one live Booking, are partial unique indexes:
+// a removed row must not block another (ADR-0086).
+model GuestPass {
+  id                     String        @id @default(uuid()) @db.Uuid
+  hostClientId           String        @map("host_client_id") @db.Uuid
+  friendClientId         String        @map("friend_client_id") @db.Uuid
+  courtesySubscriptionId String        @unique @map("courtesy_subscription_id") @db.Uuid
+  bookingId              String?       @map("booking_id") @db.Uuid
+  rewardSubscriptionId   String?       @map("reward_subscription_id") @db.Uuid
+  rewardedAt             DateTime?     @map("rewarded_at") @db.Timestamptz(3)
+  // Set when she buys and the host has no current Subscription, so the next
+  // one she activates collects the class.
+  rewardOwed             Boolean       @default(false) @map("reward_owed")
+  createdAt              DateTime      @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt              DateTime?     @map("deleted_at") @db.Timestamptz(3)
+  host                   Client        @relation("GuestPassHost", fields: [hostClientId], references: [id], onDelete: Restrict)
+  friend                 Client        @relation("GuestPassFriend", fields: [friendClientId], references: [id], onDelete: Restrict)
+  courtesySubscription   Subscription  @relation(fields: [courtesySubscriptionId], references: [id], onDelete: Restrict)
+  booking                Booking?      @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  rewardSubscription     Subscription? @relation("GuestPassReward", fields: [rewardSubscriptionId], references: [id], onDelete: Restrict)
+
+  @@index([hostClientId, createdAt])
+  @@map("guest_passes")
+  @@schema("booking")
+}

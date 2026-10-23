@@ -59,12 +59,15 @@ export type CreditActivityEntry = {
   occurredAt: Date;
 };
 
+export type InvitationStatus = 'registered' | 'class_booked' | 'bought';
+
 export type ReferralsView = {
   referralCode: string;
   referrals: {
     referredClientId: string;
     referredName: string;
     state: 'pending' | 'awarded';
+    invitationStatus: InvitationStatus;
     createdAt: Date;
     awardedAt: Date | null;
     awardCentavos: number | null;
