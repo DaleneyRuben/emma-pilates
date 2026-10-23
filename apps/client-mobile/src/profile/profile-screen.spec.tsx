@@ -153,7 +153,7 @@ describe("Client Profile", () => {
     const chevrons = screen
       .getAllByTestId("chevron", { includeHiddenElements: true })
       .filter((chevron) => chevron.props.stroke === "#C4BAB6");
-    expect(chevrons).toHaveLength(7);
+    expect(chevrons).toHaveLength(6);
     for (const chevron of chevrons) {
       expect(chevron).toHaveProp("width", 19);
     }

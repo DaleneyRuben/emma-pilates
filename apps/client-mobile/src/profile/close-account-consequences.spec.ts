@@ -6,7 +6,6 @@ const always = [
 ];
 
 const nothing = {
-  availableCreditCentavos: 0,
   bookings: [],
   evaluations: [],
   latestPayment: null,
@@ -24,7 +23,6 @@ describe("describeAccountClosure", () => {
   it("names every consequence with its numbers", () => {
     expect(
       describeAccountClosure({
-        availableCreditCentavos: 12_000,
         bookings: [{ kind: "booking" }, { kind: "booking" }, { kind: "waitlist" }],
         evaluations: [{ state: "booked" }],
         latestPayment: { method: "transfer", state: "confirmed" },
