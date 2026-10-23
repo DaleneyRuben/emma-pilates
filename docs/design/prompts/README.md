@@ -106,6 +106,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW35](./admin-web/35-contactos-promociones.md) | Contactos para promociones | `AW35` | ✅ |
 | [AW36](./admin-web/36-reglas-del-estudio.md) | Reglas del estudio | `AW36` | ✅ (Claude Design canvas, 2026-10-23, `55bbe4cc`; the admin web is built in BKM-004) |
 | [AW37](./admin-web/37-equipos.md) | Equipos | `AW37` | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
+| [AW38](./admin-web/37-fundadoras.md) | Fundadoras | `AW38` | not yet generated (BKM-010; the prompt file is still `37-fundadoras.md`; the sidebar uses AW38 because AW37 is Equipos) |
 | [AW39](./admin-web/39-para-contactar.md) | Para contactar | `AW39` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
 
 ## Follow-ups (`followups/`)
@@ -251,11 +252,13 @@ Each of these was sent as the next message in the existing design session for th
 | [143](./followups/143-trainer-personal-code.md) | A Trainer's «Código personal» with its own «Guardar código» on `AW24`'s edit frames, a new «Código personal · en uso» frame, and the `AW24` README row (BKM-011); 144 stays reserved and unused | ✅ applied (Claude Design canvas, 2026-10-23, `3a77ac3c`; the apps and admin web are built in BKM-011) |
 | [190](./followups/190-start-date-chooser.md) | Start Date chip row on `09` and `S10`: «Fecha de inicio», «Hoy», weekday chips, «Día de apertura» (BKM-006) | 🕓 pending |
 | [191](./followups/191-next-plan-and-renewal.md) | «Siguiente plan desde …» on `12`, renewal reminder on `19`, cash stays enabled on `S06` (BKM-006) | 🕓 pending |
+| [192](./followups/192-founder-prices.md) | Discounted price and struck list price on `08`, `09`, and `S09` for a founder; the single class stays at list price (BKM-010) | 🕓 pending |
 | [193](./followups/193-mi-plan-extra-classes.md) | `12` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008, booking ADR-0006) | 🕓 pending (190–192 reserved by BKM-006) |
 | [194](./followups/194-client-summary-extra-classes.md) | `S06` shows «Clases extra: 1 · Regalo de bienvenida» under the remaining classes when the API returns the line (BKM-008) | 🕓 pending (190–192 reserved by BKM-006) |
 | [195](./followups/195-admin-client-detail-extra-classes.md) | `AW22` shows «Clases extra: 1 · Regalo de bienvenida» under «Clases disponibles» when the API returns the line; no courtesy form (BKM-008, PAY-006) | 🕓 pending (190–192 reserved by BKM-006) |
 | [196](./followups/196-weekly-cap-classes-left.md) | `03` and `04` show «Te quedan N clases esta semana» from `classesLeftThisWeek`; absent without a cap; zero stays honest when an extra class remains (BKM-007) | 🕓 pending |
 | [197](./followups/196-admin-campaign-grant.md) | `AW21` gains «Dar clases de campaña», opening the campaign grant on the same screen's address; no new screen and no sidebar entry (BKM-015, decisions §5.4). Numbered 197 here because 196 is the weekly-cap line. | 🕓 pending |
+| [198](./followups/193-founder-renewal-banner.md) | «Renueva antes del …» on `12` while a founder holds a current Subscription (BKM-010). Numbered 198 here because 193 is the extra-classes line. | 🕓 pending |
 
 ## Status
 

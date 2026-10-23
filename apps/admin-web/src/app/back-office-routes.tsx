@@ -42,6 +42,15 @@ const campaignRoute = createRoute({
   ),
 });
 
+const foundersRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/fundadoras",
+  component: lazyRouteComponent(
+    () => import("../oversight/founders/founders-route"),
+    "FoundersRoute",
+  ),
+});
+
 const staffRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/personal",
@@ -128,6 +137,7 @@ export const backOfficeRoutes = [
   clientsRoute,
   contactAlertsRoute,
   campaignRoute,
+  foundersRoute,
   paymentsRoute,
   suppliesRoute,
   withdrawalsRoute,

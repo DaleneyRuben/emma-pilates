@@ -168,7 +168,12 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
         <View style={styles.card}>
           <Text style={styles.planName}>{detail.name}</Text>
           <BodyText>{describeValidity(detail.durationDays)}</BodyText>
-          <Text style={styles.price}>{price}</Text>
+          <View style={styles.priceRow}>
+            {detail.listPriceCentavos === undefined ? null : (
+              <Text style={styles.listPrice}>{formatBolivianos(detail.listPriceCentavos)}</Text>
+            )}
+            <Text style={styles.price}>{price}</Text>
+          </View>
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Qué incluye</Text>
@@ -247,12 +252,18 @@ const styles = StyleSheet.create({
     fontSize: typography.titleSecondary,
     fontWeight: "500",
   },
+  listPrice: {
+    color: colors.textSubtle,
+    fontSize: typography.note,
+    textDecorationLine: "line-through",
+  },
   price: {
     color: colors.text,
     fontFamily: "Lora_500Medium",
     fontSize: typography.price,
     marginTop: spacing.sm,
   },
+  priceRow: { alignItems: "flex-end", gap: spacing.xs },
   row: { flexDirection: "row", justifyContent: "space-between" },
   screen: { gap: spacing.lg },
   section: { gap: spacing.sm },

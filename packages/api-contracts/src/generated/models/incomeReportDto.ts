@@ -6,6 +6,7 @@
  */
 import type { IncomeByMethodDto } from "./incomeByMethodDto";
 import type { IncomeMonthDto } from "./incomeMonthDto";
+import type { IncomeSaleDto } from "./incomeSaleDto";
 
 export interface IncomeReportDto {
   from: string;
@@ -14,7 +15,13 @@ export interface IncomeReportDto {
   branchId: string | null;
   /** Confirmed Payments, BOB centavos */
   totalCentavos: number;
+  /** List price of the confirmed sales, BOB centavos */
+  listPriceCentavos: number;
+  /** Discounts on the confirmed sales, BOB centavos */
+  discountCentavos: number;
   byMethod: IncomeByMethodDto;
   months: IncomeMonthDto[];
+  /** Sales that carry a discount, with list price and amount paid */
+  sales: IncomeSaleDto[];
   generatedAt: string;
 }

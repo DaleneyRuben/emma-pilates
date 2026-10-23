@@ -33,6 +33,7 @@ import {
   AdminCreditPageDto,
   AdminEvaluationPageDto,
   AdminReferralPageDto,
+  FounderMembershipPageDto,
   IncomeReportDto,
   parseEvaluationListQuery,
   parseIncomeQuery,
@@ -134,6 +135,17 @@ export class AdministratorOversightController extends AdministrationController {
     const input = parsed(parseSearchListQuery(query), 'Invalid Credit filters');
     const principal = await this.authenticate(authorization);
     return run(() => this.operations.oversight.listCredits(input, principal));
+  }
+
+  @Get('founder-memberships')
+  @ApiOperation({ operationId: 'listFounderMemberships' })
+  @ApiOkResponse({ type: FounderMembershipPageDto })
+  @Header('Cache-Control', 'no-store')
+  async founders(
+    @Headers('authorization') authorization: string | undefined,
+  ): Promise<FounderMembershipPageDto> {
+    const principal = await this.authenticate(authorization);
+    return run(() => this.operations.oversight.listFounders(principal));
   }
 
   @Get('reports/income')

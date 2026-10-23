@@ -254,6 +254,9 @@ export class AssistantClientsController {
         durationMonths: deprecatedDurationMonths(plan.durationDays),
         classAllowance: plan.classAllowance,
         priceCentavos: plan.priceCentavos,
+        ...(plan.listPriceCentavos === undefined
+          ? {}
+          : { listPriceCentavos: plan.listPriceCentavos }),
         creditAppliedCentavos: plan.creditAppliedCentavos,
         amountDueCentavos: plan.amountDueCentavos,
       })),

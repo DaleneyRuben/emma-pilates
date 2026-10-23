@@ -121,6 +121,13 @@ export class ClientSubscriptionDto {
       'The one future Subscription from an Early Renewal. Absent when there is none.',
   })
   nextSubscription?: ClientSubscriptionSummaryDto | null;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'A founder renews before this date. Absent when she is not a founder or has no current Subscription.',
+  })
+  founderRenewalDeadline?: string | null;
 }
 
 export class PlanDto {
@@ -153,6 +160,13 @@ export class PlanDto {
 
   @ApiProperty({ minimum: 0, description: 'Money Amount in BOB centavos' })
   priceCentavos!: number;
+
+  @ApiPropertyOptional({
+    minimum: 0,
+    description:
+      'List price when priceCentavos is a founder discount. Absent otherwise, so older builds ignore it.',
+  })
+  listPriceCentavos?: number;
 }
 
 export class BranchDto {

@@ -210,14 +210,14 @@ export const quotePlansForClient = async (
   command: { clientId: string },
   dependencies: ClientLookup & {
     principal: AuthenticatedPrincipal;
-    listVisiblePlans(): Promise<PlanSummary[]>;
+    listVisiblePlans(clientId: string): Promise<PlanSummary[]>;
     readAvailableCredit(clientId: string): Promise<number>;
   },
 ): Promise<PlanQuotes> => {
   requireSeller(dependencies.principal);
   const client = await requireClient(command.clientId, dependencies);
   const [plans, creditAvailableCentavos] = await Promise.all([
-    dependencies.listVisiblePlans(),
+    dependencies.listVisiblePlans(client.id),
     dependencies.readAvailableCredit(client.id),
   ]);
 

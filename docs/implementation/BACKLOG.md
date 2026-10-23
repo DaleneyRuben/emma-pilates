@@ -471,7 +471,7 @@ wait for Google, Apple, and testers.
 | BKM-007 | P0 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | done |
 | BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | done (919ef391, a6c21924, 938d0e56, 1db2fa8e; evidence below) |
 | PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | ready |
-| BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | ready |
+| BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | done |
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | done (6f8f47df registration, de271070 Assistant flow, bc106c51 + bcee395d correction and Trainer codes, d8a6008a + 3a7f3b96 apps, cab4a4b0 admin web, 3a77ac3c design export; see the notes under «BKM-011») |
 | PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
 | PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | done (cd03688c storage and mark, fcc8fabd API, bad49a81 Staff app, 6fc42238 Client app, 73534ba8 AW28, caf26876 design 145–147; evidence below) |
@@ -742,6 +742,38 @@ Acceptance criteria:
 
 - The 41st Client gets no membership. A gap of 8 days ends it, and a gap of 7 does not.
 - The income report shows list price, discount, and paid amount.
+
+Evidence (BKM-010, 2026-10-23, branch `feature/bkm-010-founder-membership`, stacked on `feature/bkm-006-start-date` at `922843a7`, [PR #173](https://github.com/DaleneyRuben/emma-pilates/pull/173)). Rules red `8dfee14c`, rules green `a63f894e`, nightly loss red `d344f33b`, nightly loss green `ea63768b`, founder plan prices red `780fb578`, schema `6ed3df24`, grant and discount `71869500`, worker `fba925ee`, income and list `86276611`, prices and deadline `41f371b6`, contract `33636e8a`, screens `ac3d1cc2`.
+
+Decisions taken:
+
+- 15 % rounds half up to the nearest centavo (`Math.round`), computed once and stored on the Payment as `discountCentavos` with `discountReason = founder`. Display reads the stored amount.
+- The first real Payment is at list price. The discount starts on the next purchase, while the membership is active. Credit applies after the discount. A sale that credit covers completely is `CREDIT_ONLY`. Courtesy stays courtesy and never takes a place.
+- The single class is `classAllowance <= 1`. This branch's fixtures do not load the Bs 80 Plan (REL-018 does); the integration test creates one.
+- A number is unique forever, not only among live rows, so a lost membership never frees its place. `deletedAt` stays (ADR-0086).
+- Two confirms share `pg_advisory_xact_lock` on `founder-membership-places`. The unique `number` is the backstop.
+- `isFounder` answers whether the Client holds an active membership. A lost membership answers false.
+- Plan `priceCentavos` is the amount shown. `listPriceCentavos` is present only when a founder discount applies, so an older build still reads the list price from `priceCentavos`.
+- Mi plan shows no banner when there is no current Subscription. The deadline is the current Subscription's real end plus 7 days.
+- The founders list is Administrator only on this branch. A Coordinator principal is rejected. IDN-009 makes that role real.
+- The nightly job counts the Subscription's stored end. Freeze days wait for BKM-012.
+- Grant and loss audits use the system actor: `founder_membership.granted` and `founder_membership.lost`.
+- Follow-ups 192 and 193, and screen AW37, are pending. No export was run. The admin page was built to the AW37 prompt.
+
+Verified:
+
+- Integration (`pilates_test_bkm010`): the 41st Client gets no membership; a later Plan is discounted by exactly 15 % and the single class is not; Courtesy Access takes no place; two concurrent confirms receive 1 and 2; a gap of 8 ends it and a gap of 7 does not; a second run ends nothing; a lost membership does not return; the income report shows list price, discount, and paid amount; an Assistant and a cast Coordinator are refused the list.
+- API on 3128 over `pilates_bkm010_dev` (dropped after). Camila's cash sale for Sofía answered `201` at list price (`discountCentavos` 0) and granted number 1. Sofía's plan list then showed 47600 beside list 56000. Her subscription named `founderRenewalDeadline` 2026-11-28. Paola's founders list answered 1 of 40, Sofía, active.
+- Admin web on 5197, Playwright Chromium. At 1440 px the table shows number 1, Sofía Guzmán, 23/10/2026, Activa, subtitle «1 de 40 lugares», Fundadoras active under Clientes, no create action. At 420 px the same row is a card behind «Abrir menú».
+
+Open:
+
+- Combining the discount with the gift class or with Campaigns lands when BKM-008 and BKM-010 meet. This branch does not copy `decideGiftClass`.
+- BKM-012 will pass frozen days into the nightly job. Until then the job uses the stored end.
+- IDN-009 makes Coordinator a real role for the founders list.
+- Migration `20261023180000_founder_membership` needs the owner's approval before any shared database. It was applied only to disposable databases created for this item.
+- Invite-a-friend (BKM-014) is not built here and is not blocked.
+- The Client app and the Staff app were not walked on a device. The devices were in use by other items.
 
 #### BKM-011 · Acquisition channel and codes
 

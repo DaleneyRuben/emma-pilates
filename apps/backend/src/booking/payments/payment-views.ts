@@ -17,6 +17,8 @@ export type PurchaseIntentView = {
   classAllowance: number;
   planPriceCentavos: number;
   creditReservedCentavos: number;
+  discountCentavos: number;
+  discountReason: string | null;
   amountDueCentavos: number;
   state: 'open' | 'submitted' | 'expired';
   receiptAttached: boolean;
@@ -36,6 +38,8 @@ export type PaymentView = {
   classAllowance: number;
   planPriceCentavos: number;
   creditAppliedCentavos: number;
+  discountCentavos: number;
+  discountReason: string | null;
   amountDueCentavos: number;
   startsOn: string;
   submittedAt: Date;
@@ -108,6 +112,8 @@ export const intentSelect = {
   classAllowanceSnapshot: true,
   planPriceCentavos: true,
   creditReservedCentavos: true,
+  discountCentavos: true,
+  discountReason: true,
   amountDueCentavos: true,
   startsOn: true,
   receiptImageAssetId: true,
@@ -127,6 +133,8 @@ export const paymentSelect = {
   classAllowanceSnapshot: true,
   planPriceCentavos: true,
   creditAppliedCentavos: true,
+  discountCentavos: true,
+  discountReason: true,
   amountDueCentavos: true,
   startsOn: true,
   method: true,
@@ -154,6 +162,8 @@ export const toIntentView = (row: IntentRow): PurchaseIntentView => ({
   classAllowance: row.classAllowanceSnapshot,
   planPriceCentavos: row.planPriceCentavos,
   creditReservedCentavos: row.creditReservedCentavos,
+  discountCentavos: row.discountCentavos,
+  discountReason: row.discountReason,
   amountDueCentavos: row.amountDueCentavos,
   state: intentStates[row.state],
   receiptAttached: row.receiptImageAssetId !== null,
@@ -173,6 +183,8 @@ export const toPaymentView = (row: PaymentRow): PaymentView => ({
   classAllowance: row.classAllowanceSnapshot,
   planPriceCentavos: row.planPriceCentavos,
   creditAppliedCentavos: row.creditAppliedCentavos,
+  discountCentavos: row.discountCentavos,
+  discountReason: row.discountReason,
   amountDueCentavos: row.amountDueCentavos,
   startsOn: row.startsOn.toISOString().slice(0, 10),
   submittedAt: row.submittedAt,
