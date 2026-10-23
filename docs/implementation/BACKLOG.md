@@ -723,7 +723,13 @@ Open questions:
 
 Migrations needing owner approval: `20261023190000_void_payment_values`, `20261023190100_void_payment`.
 
-Verified: recorded after the surface checks. The pull request URL is recorded in a follow-up commit.
+Verified (2026-10-23, API on 3129 over `pilates_pay006_dev`, admin web on 5173 because the API trusts `http://localhost:5173`):
+
+- **API.** Camila's cash confirmation of Lucía answered `201` with a confirmed Payment and the gift class. The same Payment voided by Paola answered `200`. A blank reason answered `400` `void_reason_required`. A second void answered `409` `payment_already_voided`. Camila, Emma (Trainer), and Gabriela (Nutritionist) got `403` on the void. Camila got `403` on courtesy. Paola's class return answered `201`. The voided filter lists the sale with its reason.
+- **Admin web**, Chromium at 1440 px and 420 px. Pagos filtered to Anulado shows the reason. Lucía's detail shows «Agregar clase de cortesía» and «Devolver una clase». At 420 px the sidebar opens from «Abrir menú».
+- **Staff devices.** Not walked. The simulator lock was free, and the iPhone, iPad, and Android emulator were not started: the front-desk photograph needs a camera and a READY upload, which the integration test and the card spec cover. Metro was not started.
+
+The pull request URL is recorded in a follow-up commit.
 
 #### PAY-007 · Invoice data
 
