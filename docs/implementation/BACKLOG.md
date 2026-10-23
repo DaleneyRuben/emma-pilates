@@ -620,7 +620,7 @@ Acceptance criteria:
 - No Payment row changes (no discount).
 - The admin page submits the command and shows the granted and skipped counts.
 
-Evidence (BKM-015, 2026-10-23, branch `feature/bkm-015-campaigns`, stacked on BKM-008 at `246055c2`).
+Evidence (BKM-015, 2026-10-23, branch `feature/bkm-015-campaigns`, stacked on BKM-008 at `246055c2`, [PR #171](https://github.com/DaleneyRuben/emma-pilates/pull/171)).
 
 Commits: `2cf7b502` failing grant tests, `4a9d5c0c` failing database grant, `1db51660` failing endpoint, `fffdcc74` failing page, `5e4bf813` the bulk grant, `ea71b9db` failing skipped copy, `5905c772` the verb that agrees.
 
