@@ -74,6 +74,12 @@ export const normalizeInvoiceData = (
   return { taxId, name };
 };
 
+/** The Payment columns a sale writes; «Sin factura» leaves both empty. */
+export const invoiceColumns = (invoiceData?: InvoiceData | null) => ({
+  invoiceTaxId: invoiceData?.taxId ?? null,
+  invoiceName: invoiceData?.name ?? null,
+});
+
 export const readClientLastInvoiceData = async (
   principal: AuthenticatedPrincipal,
   { gateway }: { gateway: InvoiceDataGateway },

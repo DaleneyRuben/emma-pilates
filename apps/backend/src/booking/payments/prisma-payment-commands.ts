@@ -33,6 +33,7 @@ import {
   scheduleReceiptDeletion,
   settleReservation,
 } from './purchase-intent-settlement';
+import { invoiceColumns, type InvoiceData } from './invoice-data/invoice-data';
 import { evaluatePurchaseEligibility } from './purchase-eligibility';
 import {
   computeSubscriptionTerm,
@@ -641,6 +642,7 @@ export function createPrismaPaymentCommands(
       principal: AuthenticatedPrincipal;
       branchId: string | null;
       requireFullCredit: boolean;
+      invoiceData?: InvoiceData | null;
     },
   ): Promise<{ id: string }> => {
     const now = dependencies.now();
@@ -687,6 +689,7 @@ export function createPrismaPaymentCommands(
         decidedByAccountId: input.principal.accountId,
         decidedAt: now,
         createdAt: now,
+        ...invoiceColumns(input.invoiceData),
       },
       select: paymentSelect,
     });
@@ -751,7 +754,12 @@ export function createPrismaPaymentCommands(
   };
 
   const recordCashPayment = async (
-    command: { clientId: string; planId: string; branchId: string },
+    command: {
+      clientId: string;
+      planId: string;
+      branchId: string;
+      invoiceData?: InvoiceData | null;
+    },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ): Promise<PaymentView> => {
@@ -773,6 +781,7 @@ export function createPrismaPaymentCommands(
             principal,
             branchId: command.branchId,
             requireFullCredit: false,
+            invoiceData: command.invoiceData,
           }),
       ),
     );
@@ -1027,7 +1036,7 @@ export function createPrismaPaymentCommands(
   };
 
   const submitTransfer = async (
-    command: { purchaseIntentId: string },
+    command: { purchaseIntentId: string; invoiceData?: InvoiceData | null },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ): Promise<PaymentView> => {
@@ -1075,6 +1084,7 @@ export function createPrismaPaymentCommands(
               submittedByAccountId: principal.accountId,
               submittedAt: now,
               createdAt: now,
+              ...invoiceColumns(command.invoiceData),
             },
             select: { id: true },
           });
