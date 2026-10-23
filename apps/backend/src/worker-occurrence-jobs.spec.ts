@@ -45,9 +45,6 @@ describe('worker entrypoint occurrence jobs', () => {
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
-      first90Days: {
-        execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
-      },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
@@ -122,9 +119,6 @@ describe('worker entrypoint occurrence jobs', () => {
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
-      },
-      first90Days: {
-        execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
       },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
@@ -201,9 +195,6 @@ describe('worker entrypoint occurrence jobs', () => {
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
-      },
-      first90Days: {
-        execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
       },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
@@ -291,9 +282,6 @@ describe('worker entrypoint occurrence jobs', () => {
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
-      },
-      first90Days: {
-        execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
       },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),

@@ -68,8 +68,7 @@ export function ClientSearchScreen() {
     fetcher,
     query: { enabled: coordinator },
   });
-  const contactCount =
-    alerts.data?.status === 200 ? alerts.data.data.totalItems : 0;
+  const contactCount = alerts.data?.status === 200 ? alerts.data.data.totalItems : 0;
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(text.trim()), debounceMilliseconds);

@@ -45,9 +45,6 @@ describe('worker entrypoint', () => {
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
-      first90Days: {
-        execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
-      },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
@@ -178,9 +175,6 @@ describe('worker entrypoint', () => {
       imageUploadCleanup: {
         execute: jest.fn().mockResolvedValue({ cleaned: 0 }),
       },
-      first90Days: {
-        execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
-      },
       subscriptionReminders: {
         execute: jest
           .fn()
@@ -242,9 +236,6 @@ describe('worker entrypoint', () => {
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
       },
-      first90Days: {
-        execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
-      },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),
       },
@@ -303,9 +294,6 @@ describe('worker entrypoint', () => {
       },
       subscriptionReminders: {
         execute: jest.fn().mockResolvedValue({ reminded: 0 }),
-      },
-      first90Days: {
-        execute: jest.fn().mockResolvedValue({ messages: 0, alerts: 0 }),
       },
       purchaseIntentExpiry: {
         execute: jest.fn().mockResolvedValue({ expired: 0 }),

@@ -66,7 +66,9 @@ describe("AW39 Para contactar", () => {
     );
     renderAdmin("/back-office/para-contactar");
     expect(
-      await screen.findByText("3 clientas · seguimiento de sus primeros 90 días"),
+      await screen.findByText(
+        "3 clientas · seguimiento de sus primeros 90 días",
+      ),
     ).toBeVisible();
     const row = (await screen.findByText("Valeria Quiroga")).closest(
       "tr",

@@ -35,7 +35,7 @@ const daniela = {
   reasons: ["fewer_than_2_classes_by_day_15", "no_booking_7_days"],
 };
 
-const list = (items: typeof valeria[]) => jsonResponse({ items, totalItems: items.length });
+const list = (items: (typeof valeria)[]) => jsonResponse({ items, totalItems: items.length });
 
 const coordinatorRoutes = (extra: Parameters<typeof routeFetcher>[0] = {}) => ({
   ...assistantRoutes(),

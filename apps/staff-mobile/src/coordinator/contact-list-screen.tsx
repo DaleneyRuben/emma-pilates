@@ -66,10 +66,7 @@ function ContactCard({
       <View style={styles.actions}>
         {href === null ? null : (
           <View style={styles.action}>
-            <OutlinedButton
-              label="Abrir WhatsApp"
-              onPress={() => void Linking.openURL(href)}
-            />
+            <OutlinedButton label="Abrir WhatsApp" onPress={() => void Linking.openURL(href)} />
           </View>
         )}
         <View style={styles.action}>
