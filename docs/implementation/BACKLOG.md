@@ -419,6 +419,516 @@ Findings of the UI/UX audit of 2026-10-22 ([UX-001](../design/UX-001-uiux-audit.
 | UX-013 | P3 | All surfaces | Accessibility audit: dynamic type at the largest setting, VoiceOver and TalkBack reading order on the roots and the booking flow, Reduce Motion on the loading states, keyboard order on the admin panels; a findings document and the items it produces | UX-002, UX-003, UX-004 | — | ready | UX-001 finding X3: not audited in UX-001. |
 | UX-014 | P3 | Mobile core | Move the five hand-drawn confirmation sheets (`05` Mis reservas, `15` Mis evaluaciones, `S06` invitation card, `S15` Nutritionist agenda, `S17` block change; `S21` Assistant bookings) onto the shared `ConfirmationSheet` of UX-002, dropping their copies of the sheet styles | UX-002, UX-003, UX-004 | — | ready | Left out of UX-002 on 2026-10-22 because UX-003 and UX-004 edit those screens at the same time; stack it after both merge. |
 
+## Launch queue (Emma's rules, recorded 2026-10-23)
+
+Everything needed to open Emma Pilates in December 2026 with the rules in
+[`decisiones-emma-pilates.md`](../decisiones-emma-pilates.md), which answers the
+[diagnosis](../diagnostico-emma-pilates.md) and wins wherever the two disagree.
+The diagnosis's phases 1, 2 and 3 are all in, adjusted to the decisions. Its
+phase 4 is out: no SIAT invoicing, no WhatsApp integration. The catering
+details are still missing, so its item stays blocked. Where an existing
+row's notes disagree with this section (REL-005's reviewer Client without a
+Plan, for example), this section wins.
+
+**Groups.** The queue is ordered by when each item must be live:
+
+1. **Blocks the Google Play closed test.** The Client app needs 12 testers opted in for 14 days in a row before Google accepts a production application (personal account, REL-002), so this is the launch's critical path.
+2. **Before the studio opens.**
+3. **After the studio opens.** An item with a deadline names it.
+
+**Priorities in this queue.** P0 is group 1. P1 is group 2. P2 is group 3 with
+a deadline, and P3 is group 3 without one.
+
+**Effort** is in d: days of work for one person with AI assistance, at this
+repository's pace and standards (red → green → refactor, glossary and ADR when
+a rule changes, a design follow-up in `docs/design/prompts/followups/` before
+a screen changes, the testing guide, and surface verification on the iPhone 16 Pro,
+iPad, and Android emulator, plus the browser at 1440/420 px). It excludes the
+wait for Google, Apple, and testers.
+
+**Rules that apply to every item here:**
+
+- Store builds are in testers' hands from group 1 on. Contract changes therefore follow ADR-0016: deprecate fields, never remove them, until the baseline moves.
+- Avoid new native modules. Both apps use the `appVersion` runtime policy, so JavaScript-only work reaches the closed-test build through EAS Update. A native module needs a new store build, and each one spends one of the 15 free Android builds a month. The start-date picker in BKM-006 is therefore a JavaScript chip row, because only 15 dates are possible.
+- Launch-test and store-review rows (REL-011, REL-016) never count toward income, KPIs, first-plan rules (gift class, founders, commissions, invite rewards), or pay statements.
+- Staging stays paused unless someone is testing on it (AGENTS.md).
+
+### Group 1: blocks the closed test
+
+| ID | Priority | Surface | Work item | Depends on | Effort | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| REL-011 | P0 | All surfaces | Tester access on production: a courtesy Plan only the Administrator can grant, launch-test Sessions, and one command that ends the launch test cleanly | — | 2.5–3.5 d | ready |
+| REL-012 | P0 | All surfaces | «Enviar comentarios»: in-app feedback from both apps, with a list on the admin web for triage and for Google's production questionnaire | — | 2–2.5 d | ready |
+| REL-003 | P0 | Mobile release | *Existing row.* Store listings: finish the feature graphic and screenshots, and drop every mention of the Bs 60 credit from the descriptions | REL-002, WEB-021 | 1 d | ready |
+| REL-004 | P0 | Mobile release | *Existing row.* Data safety: add the feedback text (REL-012). The NIT/CI of PAY-007 is added to the form when it ships | REL-012 | 0.5 d | ready |
+| REL-005 | P0 | Mobile release | *Existing row.* App content: the Client reviewer Account now gets an active launch-test Plan through REL-011, so the reviewer can book | REL-011 | 0.5 d | ready |
+| REL-009 | P0 | Mobile release | *Existing row.* The next store builds of both apps from `main`, with the final icons, the launch screen (MOB-068), the intent filters (LNK-001), and REL-012. Client goes to the closed track, Staff to Internal testing | REL-012 | 0.5–1 d | in progress |
+| REL-013 | P0 | Mobile release | Recruit and onboard the closed-test testers: 15 to 20 Android users with Google accounts (12 is the minimum), a Google Group as the tester list, an install-and-register guide, and an opt-in tracker | — | 0.5 d + the user's time | ready |
+| REL-006 | P0 | Mobile release | *Existing row.* Start the closed test: the closed track «Prueba cerrada» (Bolivia), Google's review of the first closed release, then 14 days with at least 12 testers opted in, and at least one update shipped from feedback during the test | REL-003, REL-004, REL-005, REL-009, REL-011, REL-013 | 0.5 d + 14 days | in progress |
+
+#### REL-011 · Tester access on production
+
+The testers register on production with their own email. They are the
+studio's first Clients. They need classes so they can book without paying, and
+the opening must leave no confusing rows behind.
+
+- Data: a `purpose` on `Subscription`, `Payment`, and `Session` (`regular` by default, plus `launch_test` and `store_review`), and the Payment method `courtesy`. The Plan price may be 0 only on a hidden Plan.
+- The Administrator, and only the Administrator, grants «Acceso de prueba» from the Client detail on the admin web (AW21). This creates a confirmed `courtesy` Payment of Bs 0 for a hidden Plan of N classes, valid until a chosen date. The grant is audited, and the Client gets the usual push.
+- The admin-web Session form gets a «Clase de prueba» checkbox. Only Clients holding a launch-test Subscription see and book launch-test Sessions, and both apps label them «Clase de prueba».
+- «Terminar la prueba» on the admin web (with a typed confirmation) cancels every future launch-test Session with the cause `launch_test_ended` (one inbox notice, no push per Session) and expires every launch-test Subscription. Nothing is deleted (soft delete only).
+- The income report, every list with money in it, and later the analytics (STU-001) and pay statements (BKO-006, BKO-007) exclude these rows. A Client whose first real Plan comes after the test still counts as new: gift class, founder, and commissions all apply.
+- The production rows of REL-006's earlier smoke test (the user's Client, Plan, and Payment) are re-marked `launch_test` by a one-off command, and the income report shows Bs 0 for October.
+
+Acceptance criteria:
+
+- An Assistant and a Client never see or buy the tester Plan, through the API or the apps. The API returns 403 or 404 to anyone but the Administrator.
+- A tester books, cancels, reschedules, and joins the waitlist on a launch-test Session. A regular Client can neither see nor book one.
+- After «Terminar la prueba», no future launch-test Session is bookable, no tester has an active Subscription, the income report is unchanged, and every row still exists with its purpose.
+- Integration tests cover the grant, the visibility rule, the end command, and the report exclusion. The testing guide has the steps.
+
+#### REL-012 · «Enviar comentarios»
+
+Google asks what feedback the testers gave and what changed because of it.
+
+- An «Enviar comentarios» row on Perfil in both apps opens a form with a type (Problema, Sugerencia, Otro), a text of 10 to 2,000 characters, and the app version, build, platform, OS version, and Role attached automatically. No screenshots, which keeps Data safety simple.
+- Backend: a `Feedback` table in System Identity, `POST /api/v1/feedback` for any authenticated Account (idempotent, rate-limited to 10 a day), and a push to the Administrators.
+- Admin web «Comentarios»: a list with filters by status (Nuevo, Revisado, Resuelto) and app, a detail view with the internal note «Qué cambiamos», and a CSV export.
+
+Acceptance criteria:
+
+- A tester sends feedback from Android, iPhone, and iPad. It appears on the admin web within a minute, with its metadata.
+- The Administrator moves it to Resuelto with a note, and the CSV holds date, type, text, version, and note: what Google's questionnaire asks for.
+- JavaScript only: it reaches the current store build through EAS Update if REL-009's build slips.
+
+#### REL-013 · Closed-test testers
+
+- I write the WhatsApp message and a one-page guide in `docs/store/closed-test-testers.md`: join the Google Group, accept the opt-in link, install from Play with the same Google account, register with your own email, ask the studio for test access, and use the app and send feedback at least twice a week.
+- A tracker (a sheet the user keeps; it holds names and emails, so it stays out of the repository) shows who opted in and on which day.
+- The user grants REL-011 access to each tester the day they register.
+
+Acceptance criteria: at least 12 testers opted in on the day REL-006's closed release is approved. The target is 15 to 20, because a tester who leaves early puts the 14-day count at risk.
+
+### Group 2: before the studio opens
+
+Order is the build order; items without a dependency on each other can run in
+parallel sessions. If the end of November arrives without all of it, the
+decisions' fallback (section 14) opens with the **minimum set** marked ★, and
+the rest lands in December. In that fallback the Coordinator gets no Account until IDN-009 ships, and the Evaluations are hidden for the 0.5 d it takes until NUT-003 ships.
+
+| ID | Priority | Surface | Work item | Depends on | Effort | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| DOC-008 ★ | P1 | Docs | Record Emma's rules in the glossaries and ADRs before any code changes | — | 1.5–2 d | ready |
+| BKM-004 ★ | P1 | Backend/admin web/apps | `StudioSettings`: one versioned row for the configurable rules, a «Reglas del estudio» page for the Administrator, and a public rules endpoint that replaces the hard-coded copy in the apps | DOC-008 | 2.5–3.5 d | ready |
+| BKM-005 ★ | P1 | All surfaces | Plans by days (30/60/90) with a weekly cap field, and the eight real Plans | DOC-008, BKM-004 | 3–4 d | ready |
+| BKM-006 ★ | P1 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | ready |
+| BKM-008 ★ | P1 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | ready |
+| BKM-007 ★ | P1 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | ready |
+| BKM-009 ★ | P1 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | ready |
+| PAY-005 ★ | P1 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | ready |
+| BKM-010 ★ | P1 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | ready |
+| BKM-011 ★ | P1 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | ready |
+| PAY-006 ★ | P1 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
+| PAY-007 ★ | P1 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | ready |
+| BKO-003 ★ | P1 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
+| IDN-009 | P1 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | ready |
+| NUT-003 | P1 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
+| BE-027 | P1 | Backend | Diagnosis fixes: promote the waitlist when capacity rises; audit Attendance corrections | — | 1 d | ready |
+| MOB-070 | P1 | Client app | Diagnosis fixes in the Client app: Reschedule idempotency, the waitlist offered inside the window, specific rejection messages, phone validation, hard-coded copy | BKM-004 | 1.5–2 d | ready |
+| STAFF-005 | P1 | Staff app | Diagnosis fixes in the Staff app: HTTP errors on the Trainer screens, a failed receipt download, notification taps for the Assistant, the version label | — | 1.5–2 d | ready |
+| UX-003, UX-004 | P1 | Apps | *Existing rows.* Early refusals for the Assistant, refetch on focus | UX-001 | 1–2 d left | ready |
+| REL-014 ★ | P1 | Mobile release | Apple Developer Program as an individual (gate 9), bundle IDs, APNs key, App Store Connect records | — | 0.5 d + Apple's wait | ready |
+| REL-016 ★ | P1 | Production | Store-review Accounts for Apple and Google: a Client with an active Plan and a Trainer, marked `store_review` | REL-011, REL-014 | 0.5–1 d | ready |
+| REL-015 ★ | P1 | Mobile release | Client app on the App Store: iOS builds, TestFlight smoke test, listing, App Privacy, review notes, Universal Links, iOS push | REL-014, REL-016, the ★ items | 2.5–3.5 d + review | ready |
+| REL-017 | P1 | Mobile release | Staff app on iPhone through EAS ad hoc internal distribution | REL-014 | 1–1.5 d | ready |
+| REL-007 ★ | P1 | Mobile release | *Existing row.* Apply for production access on Play with the feedback log, then a staged rollout | REL-006 (14 days), REL-012 | 0.5–1 d + Google's review | blocked |
+| REL-010 | P1 | Mobile release | *Existing row.* Real authentication email on an Android phone and an iPhone together | REL-007, REL-015 | 0.5 d | blocked |
+| REL-018 ★ | P1 | Production | Go-live: end the launch test, load the real catalog, schedule, Staff, and settings, then a final production check | everything ★ | 1 d | ready |
+
+#### DOC-008 · Emma's rules in the domain docs
+
+- Update `booking/CONTEXT.md`, `back-office/CONTEXT.md`, and `system-identity/CONTEXT.md` with the new terms: Plan by days, Start Date, Early Renewal, Weekly Cap, Allowance Adjustment, Gift Class, Founder Membership, Guest Pass, Acquisition Channel, Minimum Bookings, Freeze, Cash Close, Invoice Data, Coordinator, Paid Evaluation, Feedback, Launch Test, and Studio Settings. Retire the Bs 60 Referral Reward and Credit.
+- Write ADRs that supersede the old rules: plans by days with start date and renewal; weekly cap and extra classes; minimum bookings; founders; the end of credit and the start of invite-a-friend; the Coordinator's permissions; paid evaluations; cash close and invoice data; the Studio Management (analytics) context.
+
+Acceptance criteria: every rule in the decisions document maps to a glossary
+term or an ADR. Superseded ADRs say so in their status, and the context map
+lists the new context.
+
+#### BKM-004 · `StudioSettings`
+
+- Settings: a versioned table holding cancellation window 2.5 h, minimum bookings 2, check lead 3 h, start-date limit 14 d, founder places 40, founder discount 15 %, founder gap 7 d, invite rules, tax 16 %, Evaluation price Bs 70, Nutritionist cost Bs 50, renewal targets 80/85/90 %, and the opening date.
+- The admin web edits the subset the decisions call configurable: minimum bookings, tax, renewal targets, pay rates (BKO-006), and the opening date. Each change is audited with its old and new value.
+- `GET /api/v1/studio-rules` (public, cached): the apps read the cancellation window, the evaluation price, and the «Paquetes desde» price from it instead of hard-coding them.
+
+Acceptance criteria:
+
+- The 2.5 h constant exists only in the settings, not in the six places the diagnosis lists. One unit test proves that changing the setting changes cancellation, the waitlist, the copy in both apps, and the plan detail.
+- A change on the web reaches the apps without a new build.
+
+#### BKM-005 · Plans by days
+
+- `Plan.durationDays` (30, 60, 90) and `Plan.weeklyClassCap` (empty, 3, or 4). `durationMonths` stays deprecated in the contract.
+- The Subscription end is the start plus the days minus one, in La Paz time.
+- The admin-web Plan form (AW04/AW05) and every app copy («Válido por 30 días», «Vence el …») change to match.
+- REL-018 loads the eight Plans from the decisions' table 2.1.
+
+Acceptance criteria:
+
+- A 60-day Plan bought for 1 December ends on 29 January.
+- No screen says «mes» or «meses» about a Plan's validity.
+- The old monthly Plans still in production are hidden, not deleted.
+
+#### BKM-006 · Start date and early renewal
+
+- At purchase (Client QR, front-desk cash or QR), the start date is chosen from today to today + 14, defaulting to today. The control is a JavaScript chip row, because no native date picker is wanted.
+- Booking is possible only on or after the start date and only once the Payment is approved. While a Payment is pending, the app shows «Pago en revisión».
+- Early renewal: with an effective Subscription, the Client can buy the next Plan. It starts the day after the current one ends. Only one future Subscription is allowed.
+- Mi plan shows «Siguiente plan desde …». The expiry reminder (3 days before) invites renewal. The assistant's cash flow allows it too.
+
+Acceptance criteria:
+
+- A booking before the start date is refused with its own message.
+- A Client with 3 days left buys a renewal, and its Subscription starts the day after the current one ends.
+- `subscription_not_expired` no longer blocks a purchase. The concurrency tests cover two renewals racing.
+
+#### BKM-008 · Extra classes and the gift class
+
+- `AllowanceAdjustment`: Subscription, ± classes, reason (`gift_new_client`, `invite_converted`, `campaign`, `courtesy`, `class_return`), author, and time.
+- Extra classes are consumed after the base allowance runs out, or when the weekly cap blocks a booking (BKM-007).
+- The gift class: +1 automatically when the first Payment in the Client's life is approved. Founders do not get it, and launch-test or courtesy Plans are not a first Plan.
+- Mi plan, the Client summary (S06), and the admin web show «Clases extra: 1 · Regalo de bienvenida».
+
+Acceptance criteria:
+
+- The gift class is applied once per Client, survives a retry (idempotent), and never goes to a founder.
+- Every adjustment has an audit record.
+- Only the Administrator can create `courtesy` or `class_return` adjustments (PAY-006).
+
+#### BKM-007 · Weekly cap
+
+- Only on Plans with a cap. The week runs Monday to Sunday in La Paz time.
+- The check runs on Client booking, Assistant booking, Reschedule (cap-neutral if it stays in the same week), and waitlist promotion, which skips a capped Client and promotes the next one.
+- Extra classes do not count: past the cap, a booking uses an extra class if one is left.
+- Reservar and the Session detail show «Te quedan N clases esta semana».
+
+Acceptance criteria: a fourth booking in the same week on a cap-3 Plan is
+refused with its own message unless an extra class is left. The waitlist test
+proves the skip.
+
+#### BKM-009 · Minimum bookings
+
+- Replaces BOOK-004's zero-booking check at 2 h. At 3 h before the start, a Session with fewer than the minimum (2) confirmed bookings is cancelled with the cause `minimum_not_met`.
+- Each booked Client gets the class back and a push and inbox message that names the other Sessions with places that day. The Trainer gets a notice. The waitlist closes.
+- New: at the window close (2.5 h before), a snapshot stores `bookingsAtWindowClose` on the Session. BKO-006 pays from it, so it must run from opening day.
+
+Acceptance criteria:
+
+- Worker integration tests cover 1 booking (cancelled), 2 (taught), a restart in the middle (idempotent), and a minimum changed in the settings.
+- The snapshot exists for every taught Session.
+
+#### PAY-005 · No more money credit
+
+- Remove the Bs 60 award, the credit reservation in purchase intents, purchase with credit, Mi crédito, the credit line on Pago, the admin «Créditos» list, and the `REFERRAL_REWARD` variable.
+- Keep the Client's referral code: BKM-011 and BKM-014 use it. Credit fields stay in the contract as deprecated zeros until the baseline moves. Existing rows stay; nothing is deleted.
+- The Mis referidos screen becomes BKM-014's «Invita a una amiga». Until BKM-014 ships, it shows the code and «Pronto podrás invitar a una amiga a una clase gratis».
+- The diagnosis's credit-balance bug and the report total that leaves credit out both disappear with this.
+
+Acceptance criteria: no screen or email shows credit or Bs 60, and a store
+build from before this item still works against the API.
+
+#### BKM-010 · Founder membership
+
+- `FounderMembership`: Client, number 1–40, since, status (active or lost), and reason.
+- Assignment follows the user's answer to question 1; the default is the first 40 distinct Clients whose first real Plan is approved.
+- 15 % off any Plan except the single class, stored on the Payment as `discountCentavos` and `discountReason = founder`. It is not combined with the gift class or campaigns, but invite-a-friend still applies.
+- Lost automatically and for good when more than 7 days pass between one Plan's end and the next Plan's start (a nightly job, audited, with a push to the Client). A Freeze (BKM-012) does not count as a gap.
+- Screens: discounted price on Elige tu plan and on the Assistant's quote, a banner in Mi plan with the deadline («Renueva antes del …»), and the admin-web list «Fundadoras (n/40)».
+
+Acceptance criteria:
+
+- The 41st Client gets no membership. A gap of 8 days ends it, and a gap of 7 does not.
+- The income report shows list price, discount, and paid amount.
+
+#### BKM-011 · Acquisition channel and codes
+
+- «¿Cómo nos conociste?» at Client registration and in the Assistant's new-Client flow, with the options Instagram, TikTok, Facebook, Google, Recomendación de una amiga, Una instructora, Pasé por el estudio, Otro.
+- An optional code: a Client's referral code or a Trainer's personal code (new on `StaffMember`, created by the Administrator). When a code is given, it wins over the chosen channel.
+- `ClientAcquisition` stores the channel, the referrer (Client or Trainer), and the code. The Administrator and the Coordinator can correct it on the Client detail.
+
+Acceptance criteria:
+
+- A Client registered with a Trainer's code is attributed to that Trainer whatever channel she picked.
+- The channel is required on new registrations, but older store builds without the field still register (the default is `unknown`).
+
+#### PAY-006 · Payment controls
+
+- Front-desk QR: the Assistant photographs or uploads the receipt for a Client's purchase. The Payment is pending, and the Administrator approves it as with an in-app QR (same push, same review screen).
+- Sales are immutable for the Assistant. «Anular venta» exists for the Administrator only, with a required reason. The Payment becomes `voided`, its Subscription ends, and future bookings are cancelled with the class not returned; what exactly happens is the user's answer to question 6.
+- Courtesy and class-return adjustments (BKM-008) are only for the Administrator.
+- Everything is audited: who, what, when, and for which Client.
+
+Acceptance criteria: denial tests prove that the Assistant, Coordinator,
+Trainer, and Nutritionist get 403 on void and courtesy. A voided sale leaves the
+income report and stays visible with its reason.
+
+#### PAY-007 · Invoice data
+
+- On every sale: NIT or CI and a name or business name. Both are prefilled from the Client's last sale. «Sin factura» is allowed if the user says so (question 10).
+- The Administrator marks «Factura emitida», which records who and when.
+- The admin-web payments list gets the filter «Sin factura emitida» and a CSV for the accountant.
+- REL-004's Data safety form is updated.
+
+Acceptance criteria: the mark can be set and undone only by the Administrator,
+both actions audited. The filter and the CSV match.
+
+#### BKO-003 · Daily cash close
+
+- Staff app (Assistant): «Cerrar caja». It shows the expected cash (cash sales at the branch since the last close), the counted cash, the difference, and a note. One close per shift; question 9 confirms it.
+- Admin web: the history of closes with any difference highlighted, and a day with cash sales but no close flagged.
+- The Coordinator never sees it.
+
+Acceptance criteria: the expected amount equals the sum of the cash Payments in
+the window, including a sale voided after the close (shown as an adjustment).
+Integration tests cover two closes on the same day.
+
+#### IDN-009 · Coordinator Role
+
+- A new Staff Role, `coordinator`. Its permissions follow the decisions' table 7 and are deny-by-default on every endpoint.
+- Admin web: the schedule, Sessions, Trainer swaps, cancelling a Session with bookings, Clients (detail and profile editing, which is new for the Administrator too), Staff (details and schedules), and the counts-only statistics. Payments, reports, payroll, expenses, supplies' money, promotions, and settings are hidden.
+- Staff app: her own stack. It has Client search and bookings like the Assistant's, without cash or sales, plus Cancelar clase and «Para contactar» (BKM-013).
+
+Acceptance criteria:
+
+- An authorization matrix test lists every endpoint and checks Administrator ✓ and Coordinator ✓/✗.
+- The admin web for a Coordinator shows no amount anywhere: the Playwright journey searches the page text for «Bs».
+- The Coordinator's pay is invisible to her.
+
+#### NUT-003 · Nutritionist rules
+
+- Replaces «one Evaluation a month with an active Plan». A 90-day Plan (or a longer one) includes one free Evaluation, used within its validity. Every other Client pays Bs 70 (from the settings), by QR in the app (approved by the Administrator) or in cash at the front desk.
+- A paid Evaluation is a Payment of kind `evaluation`, with no Subscription. The slot is held while the Payment is pending, for the time question 7 settles.
+- A no-show or a cancellation less than 3 h before counts as used. Each held Evaluation records Bs 50 owed to the Nutritionist as a cost, which BKO-005 shows.
+- Mis evaluaciones stops calling every past Evaluation «Realizada».
+
+Acceptance criteria:
+
+- A quarterly Client books free once per Plan. An 8-class Client sees Bs 70 and the QR flow.
+- The cost of 3 held Evaluations in a month is Bs 150.
+- The income report shows Evaluation income apart from Plans.
+
+#### BE-027, MOB-070, STAFF-005 · Diagnosis fixes before real users
+
+These are the medium findings from the diagnosis's section 1.8 that still
+apply after the decisions. The credit and report findings go away with PAY-005.
+
+- **BE-027:** raising a Session's capacity promotes the waitlist, and an Attendance correction writes an audit record with the previous outcome.
+- **MOB-070:** Reschedule sends an Idempotency-Key. The app stops offering the waitlist inside the window. Business rejections get their own messages (window, destination not eligible, full, weekly cap, before the start date). Phone numbers are validated as Bolivian mobile numbers. «Paquetes desde» comes from the catalog, and «versión» from the app config.
+- **STAFF-005:** both Trainer screens check the HTTP status and show «Reintentar». A failed receipt download shows an error, and the Administrator cannot confirm without seeing the receipt. The Assistant's notifications open the Client. «versión» comes from the app config. The attendance screen moves out of `navigation.tsx`.
+
+Acceptance criteria: one test per finding, red before the fix.
+
+#### REL-014 · Apple Developer Program (individual)
+
+- The user enrolls with their own Apple Account (two-factor on, legal name as on the ID) and pays $99 a year. As an individual, the seller name on the App Store is the user's legal name, not the studio's, the same as on Play.
+- I then register the bundle IDs `com.emmapilates.client` and `com.emmapilates.staff`, create the APNs key and load it into EAS, set the associated domains, and create both App Store Connect records.
+
+Acceptance criteria: the iOS dev builds receive a real push through APNs, and
+`links.` serves an `apple-app-site-association` file with the team ID.
+
+#### REL-016 · Store-review Accounts
+
+- Two Accounts on our domain, never a real person's:
+  - `revision-tiendas@`: a Client with an active `store_review` Plan of 8 classes, renewed before each review.
+  - `revision-staff@`: a Trainer with no Sessions.
+- The review notes explain the 2.5 h rule and that a booking is for a real class: please cancel it after testing. An operational step cancels any booking the reviewer leaves behind.
+- REL-005 (Play) moves to these Accounts.
+
+Acceptance criteria: both Accounts sign in on a clean phone, the Client books
+and cancels, and their rows never reach a report.
+
+#### REL-015 · Client app on the App Store
+
+- iOS production builds, then a TestFlight internal smoke test on an iPhone and an iPad.
+- Listing in Spanish (Mexico), the App Store's Latin-American Spanish: name, subtitle, description, keywords, support and privacy URLs, and screenshots at 6.9" and 13" iPad.
+- App Privacy labels matching REL-004. The privacy manifest is checked in the build, and `ITSAppUsesNonExemptEncryption` is false. Age rating questionnaire.
+- Review notes:
+  - the demo Accounts (REL-016);
+  - that the Plans are in-person classes paid outside the app, which App Review Guideline 3.1.3(e) allows (no in-app purchase);
+  - that account deletion is in Perfil → Cerrar mi cuenta (Guideline 5.1.1(v)).
+
+  Sign in with Apple is not needed, because there is no third-party login (4.8).
+- The iOS half of LNK-001 (Universal Links) and NOT-002's iOS push are verified on the store build. Release is manual after approval.
+
+Acceptance criteria: approved by App Review, installed from the App Store on an
+iPhone, with login, purchase QR, booking, push, and an email link opening the app.
+
+#### REL-017 · Staff app on iPhone
+
+Options compared:
+
+| Option | Pros | Cons |
+| --- | --- | --- |
+| **Ad hoc through EAS internal distribution (recommended)** | No App Review; install from a link; EAS Updates work; free within the 15 iOS builds a month; fits a team of 5–10 | Each iPhone's UDID must be registered (`eas device:create`) and the app rebuilt before a new phone can install; 100 iPhones a year; the profile is renewed yearly |
+| Unlisted App Store app | Install from an App Store link, no device registration, normal updates | Full App Review for every native release, with a Staff reviewer Account; Apple may refuse an employees-only app and point to Custom Apps |
+| TestFlight (internal) | No review for internal testers; easy updates | Each staff member must be an App Store Connect user; builds expire after 90 days; Apple's terms are for beta testing, not daily operation |
+| Custom app (Apple Business Manager) | Apple's intended route for employee apps | The studio must be an organization with a D-U-N-S number and Apple Business Manager: not possible with an individual account |
+
+- Recommended: ad hoc now. Move to Unlisted only if the team grows or device changes become a burden.
+- Android Staff stays on Play Internal testing (up to 100 testers, no review).
+
+Acceptance criteria: every iPhone on the team installs the Staff app from the
+link, and an EAS Update reaches it. The device list is documented in the
+release runbook.
+
+#### REL-018 · Go-live
+
+- Run «Terminar la prueba» (REL-011).
+- Load the eight Plans and hide the old ones. Load the weekly schedule (6 classes Monday to Friday, 3 on Saturday) from the web.
+- Invite the Staff: Trainers with their codes, the Assistant, the Coordinator, and the Nutritionist with her availability.
+- Enter the settings values and the opening date, and promote the release.
+- Production check: a real QR purchase approved and voided, a cash sale with a cash close, a booking, a 3 h check on a test Session. Staging is paused afterwards.
+
+Acceptance criteria: a release checklist in `docs/runbooks/` is run and
+ticked, and the income report shows Bs 0 before the first real sale.
+
+### Group 3: after the studio opens
+
+| ID | Priority | Surface | Work item | Depends on | Effort | Deadline | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| BKM-012 | P2 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | December | ready |
+| BKO-004 | P2 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | December | ready |
+| BKO-005 | P2 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | December | ready |
+| BKO-006 | P2 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | close of month 1 | ready |
+| BKO-007 | P2 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | close of month 1 | ready |
+| NOT-003 | P2 | Backend/apps | Class reminders 24 h and 2 h before; fix the exact-date expiry reminder | — | 1–2 d | first week | ready |
+| BKM-013 | P2 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | first two weeks | ready |
+| BKM-014 | P2 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | first month | ready |
+| BKM-015 | P2 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | early January | ready |
+| STU-001 | P2 | Backend | Studio Management context: `studio` schema, `session_facts`, `client_month_facts`, nightly and on-demand recompute | DOC-008, REL-011 | 3–4 d | first month | ready |
+| STU-002 | P2 | Backend/admin web | Accrued versus cash revenue by validity days, deferred revenue, classes still owed | STU-001, BKO-005 | 2–3 d | close of month 1 | ready |
+| STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | — | ready |
+| STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | — | ready |
+| STU-005 | P3 | Admin web | Projections at 3, 6, and 12 months with three scenarios | STU-003, STU-004 | 3–4 d | — | ready |
+| STU-006 | P3 | Backend/admin web | Rules-based recommendations (the diagnosis's 14 rules) and their panel | STU-003, BKO-004 | 4–6 d | — | ready |
+| STU-007 | P3 | Backend/admin web | AI: a narrated monthly report and natural-language questions over the aggregates | STU-006 | 4–6 d | after 3 months of data | ready |
+| BKM-016 | P3 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | — | blocked |
+| MOB-071 | P3 | Client app | Inicio offline: persist the profile so Inicio renders from cache | — | 0.5 d | — | ready |
+| UX-005 to UX-014 | P2–P3 | All surfaces | *Existing rows.* The rest of the UX polish queue | UX-001 | 6–9 d | — | ready |
+| REL-008 | P3 | Delivery | *Existing row.* Release workflows in GitHub Actions | — | 2–3 d | — | later |
+| PAY-004 | P3 | Backend | *Existing row.* Remove the deprecated bank fields | — | 0.5 d | — | later |
+
+#### BKM-012 · Freeze
+
+- Only on 90-day Plans or longer, once per Plan, for up to 15 days, never starting in the past.
+- The Client asks from Mi plan with dates and a reason. The Administrator approves or refuses from the Staff app or the web, prompted by a push, and the Client gets a push with the result.
+- During the Freeze she cannot book; bookings already inside it are cancelled with the class returned. The end date moves by exactly the frozen days. A founder keeps her membership.
+
+Acceptance criteria: a 10-day Freeze moves the end 10 days, and a second
+request is refused. Booking during the Freeze is refused with its own message.
+
+#### BKO-004 · Equipment
+
+- `Equipment` (type, number) and `EquipmentIssue` (date, description, out of service, resolved).
+- A Trainer reports a fault from her agenda. The Administrator and the Coordinator resolve it. Sessions whose capacity exceeds the working machines are flagged.
+
+Acceptance criteria: one reformer out of service flags every future reformer
+Session at capacity 8.
+
+#### BKO-005 · Taxes, budget, and the monthly result
+
+- The tax rate (16 %) comes from the settings.
+- `CostBudgetLine`: the decisions' section 11, with contingencies at 10 % of 19,250 (total 21,175).
+- «Finanzas» shows cash income, tax, fixed costs (budget versus actual), Nutritionist costs, and the result per month. The current AW16 report becomes a tab of it.
+
+Acceptance criteria: with the owner's example figures, the break-even works out
+to about Bs 36,270 (the diagnosis's check).
+
+#### BKO-006 · Trainer pay
+
+- `PayRateRule`: Bs 65 per class up to 4 students, plus Bs 8 per student from the fifth, counted on `bookingsAtWindowClose` (BKM-009), with no-shows counted.
+- Bs 25 per `minimum_not_met` Session.
+- 10 % of the amount actually paid for the first Plan of each Client she brought (BKM-011), in the month that Payment was approved.
+- The worker drafts a monthly statement. The Administrator approves it, which creates the `SalaryPayment`. Each Trainer sees only her own in «Mis pagos».
+
+Acceptance criteria: a fixture month with known figures gives the hand-checked
+total, and denial tests stop one Trainer from reading another's statement.
+
+#### BKO-007 · Coordinator pay
+
+- Base Bs 3,500. Bs 50 per new Client on a 30-day Plan, Bs 80 per new Client on a 60- or 90-day Plan, and none for the single class, the gift class, or invited friends. No commission when a Trainer brought the Client.
+- Bonus of Bs 400 when the month's renewal rate reaches 80 % (months 1–6 after opening), 85 % (months 7–12), or 90 % (from month 13). «Renewed» means bought before the end or within 7 days after it.
+- Only the Administrator sees it.
+
+Acceptance criteria: the renewal-rate unit tests cover the 7-day edge and the
+month-of-operation targets.
+
+#### NOT-003 · Class reminders
+
+- Push and inbox 24 h and 2 h before each booked Session.
+- The expiry reminder uses «3 days or fewer and not yet sent» instead of exact date equality.
+
+Acceptance criteria: worker tests cover a restart in the middle without a
+duplicate reminder.
+
+#### BKM-013 · First 90 days
+
+- `LifecycleMessage`: day 2, week 1, day 30, and day 90 after the first real Plan, by push and inbox. I draft the copy and the owner approves it before release.
+- Alerts:
+  - no booking in 7 days;
+  - fewer than 2 classes by day 15, as a risk;
+  - fewer than 4 classes in the first 30 days.
+- «Para contactar» on the admin web and in the Coordinator's Staff stack, with the Client's phone, «Abrir WhatsApp» (a `wa.me` link, no integration), and «Contactada».
+
+Acceptance criteria: the job is idempotent, each milestone is sent once, and
+the list empties as Clients book or are marked.
+
+#### BKM-014 · Invita a una amiga
+
+- A friend registers with the host's code, in the app or at the front desk.
+- She gets one free class in her life, in a Session with a free place that is not the last one. This is a `GuestPass` with a one-class courtesy that never counts as a first Plan.
+- A host can invite one friend a month.
+- When the friend buys, the host gets +1 class (`invite_converted`) on her current Plan, or on her next one.
+- Mis referidos becomes «Invita a una amiga», with each invitation's status.
+
+Acceptance criteria: a second guest pass for the same friend is refused, and
+so is the last place. The reward is applied once, at the friend's first
+approved Payment.
+
+#### STU-001 to STU-007 · Studio Management
+
+As the diagnosis's part 3 describes, with these adjustments:
+
+- Analytics exclude launch-test and store-review rows.
+- The Coordinator sees counts only, never amounts.
+- Revenue is shown both as cash and as accrued by validity days.
+- AI receives aggregates only, without Client names (decisions section 13).
+
+Each item's acceptance criteria: the formulas are unit-tested against the
+diagnosis's worked examples, and every chart has its loading, empty, and error
+states.
+
+### Summary (2026-10-23)
+
+| Group | Items (new + existing) | Effort |
+| --- | --- | --- |
+| 1. Blocks the closed test | 8 (3 + 5) | 8–10 d |
+| 2. Before opening | 27 (23 + 4) | 53–71 d, of which the ★ minimum set is about 38–51 d |
+| 3. After opening | 31 (19 + 12) | 60–85 d |
+| **Total** | **66** | **≈120–165 d** |
+
+Earliest closed-test start: **Monday 2 November 2026**. Group 1 must be
+merged by 28 October and the builds submitted on 29 October. Google then
+reviews the closed release (usually 1–3 days; allow up to 7 for a new personal
+account), and at least 12 testers must be opted in. On that start date:
+
+| Step | Earliest date |
+| --- | --- |
+| Production application (REL-007) | 16 November |
+| Google's review of the application | about 7 days |
+| Client app public on Play | late November |
+
+If the testers fall short or Google rejects the application, add another 14
+days, which makes it mid-December.
+
 ## Deferred
 
 Nothing is deferred today. FUT-001, the only row this table ever held, moved to the mobile-first queue on 2026-10-22 when the user chose to build it.
