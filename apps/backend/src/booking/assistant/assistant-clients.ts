@@ -8,6 +8,7 @@ import {
   type ClientSubscriptionView,
 } from '../client/client-subscription';
 import { BookingAccessDeniedError } from '../commands/create-booking';
+import type { InvoiceData } from '../payments/invoice-data/invoice-data';
 import type { PaymentView } from '../payments/prisma-payment-commands';
 
 export class ClientNotFoundError extends Error {
@@ -231,11 +232,17 @@ export const recordAssistantCashPayment = async (
     planId: string;
     branchId: string;
     idempotencyKey: string;
+    invoiceData?: InvoiceData | null;
   },
   dependencies: {
     principal: AuthenticatedPrincipal;
     recordCashPayment(
-      command: { clientId: string; planId: string; branchId: string },
+      command: {
+        clientId: string;
+        planId: string;
+        branchId: string;
+        invoiceData: InvoiceData | null;
+      },
       principal: AuthenticatedPrincipal,
       idempotencyKey: string,
     ): Promise<PaymentView>;
@@ -249,6 +256,7 @@ export const recordAssistantCashPayment = async (
       clientId: command.clientId,
       planId: command.planId,
       branchId: command.branchId,
+      invoiceData: command.invoiceData ?? null,
     },
     dependencies.principal,
     command.idempotencyKey,
