@@ -12,6 +12,8 @@ import {
 import {
   BodyText,
   colors,
+  describeValidity,
+  describeWeeklyCap,
   formatCancellationWindow,
   LoadingState,
   PrimaryButton,
@@ -30,7 +32,7 @@ import { useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { describeValidity, formatBolivianos } from "./plan-format";
+import { formatBolivianos } from "./plan-format";
 
 type PlanDetailNavigation = {
   goBack: () => void;
@@ -47,10 +49,10 @@ const problemCode = (data: unknown): string | null =>
     ? String((data as { code: unknown }).code)
     : null;
 
-const validityCopy = (durationMonths: number): string =>
-  durationMonths === 1
-    ? "Un mes de vigencia desde que se confirma tu pago."
-    : `${durationMonths} meses de vigencia desde que se confirma tu pago.`;
+// Follow-up 176: validity in days (booking ADR-0005); BKM-006 replaces the
+// confirmation day with the chosen Start Date.
+const validityCopy = (durationDays: number): string =>
+  `${durationDays} días de vigencia desde que se confirma tu pago.`;
 
 export function PlanDetailScreen({ route }: { route: { params: { planId: string } } }) {
   const navigation = useNavigation<PlanDetailNavigation>();
@@ -151,7 +153,7 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.card}>
           <Text style={styles.planName}>{detail.name}</Text>
-          <BodyText>{describeValidity(detail.durationMonths)}</BodyText>
+          <BodyText>{describeValidity(detail.durationDays)}</BodyText>
           <Text style={styles.price}>{price}</Text>
         </View>
         <View style={styles.section}>
@@ -162,7 +164,10 @@ export function PlanDetailScreen({ route }: { route: { params: { planId: string 
               {`Cancelación sin costo hasta ${formatCancellationWindow(studioRules.cancellationWindowMinutes)} antes de cada clase.`}
             </BodyText>
           )}
-          <BodyText>{validityCopy(detail.durationMonths)}</BodyText>
+          <BodyText>{validityCopy(detail.durationDays)}</BodyText>
+          {detail.weeklyClassCap === null ? null : (
+            <BodyText>{`${describeWeeklyCap(detail.weeklyClassCap)}.`}</BodyText>
+          )}
         </View>
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Desglose</Text>
