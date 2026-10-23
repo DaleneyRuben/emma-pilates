@@ -33,6 +33,7 @@ import { PaymentStatusScreen } from "./payments/payment-status-screen";
 import { PlanDetailScreen } from "./plans/plan-detail-screen";
 import { PlansScreen } from "./plans/plans-screen";
 import { ClientChangePasswordScreen } from "./profile/change-password-screen";
+import { ClientFeedbackScreen } from "./profile/feedback-screen";
 import { CloseAccountScreen } from "./profile/close-account-screen";
 import { EditProfileScreen } from "./profile/edit-profile-screen";
 import { ClientNotificationsScreen } from "./profile/notifications-screen";
@@ -96,6 +97,7 @@ const ProfileStack = createNativeStackNavigator({
     EditProfile: EditProfileScreen,
     Notifications: ClientNotificationsScreen,
     ChangePassword: ClientChangePasswordScreen,
+    Feedback: ClientFeedbackScreen,
     CloseAccount: CloseAccountScreen,
     ...shortcutScreens,
     ...planScreens,

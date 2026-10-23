@@ -59,6 +59,7 @@ import type { StaffRole } from "./notifications/notification-destinations";
 import { StaffPushNotifications } from "./notifications/staff-push-notifications";
 import { NutritionistAgendaScreen } from "./nutritionist/nutritionist-agenda-screen";
 import { StaffChangePasswordScreen } from "./profile/staff-change-password-screen";
+import { StaffFeedbackScreen } from "./profile/staff-feedback-screen";
 import { StaffNotificationsScreen } from "./profile/staff-notifications-screen";
 import { StaffProfileScreen } from "./profile/staff-profile-screen";
 import { TrainerAgendaScreen } from "./trainer/trainer-agenda-screen";
@@ -194,6 +195,7 @@ const accountScreens = {
   Profile: StaffProfileScreen,
   Notifications: StaffNotificationsScreen,
   ChangePassword: StaffChangePasswordScreen,
+  Feedback: StaffFeedbackScreen,
 };
 
 const TrainerStack = createNativeStackNavigator({

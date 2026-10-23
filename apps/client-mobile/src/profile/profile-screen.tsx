@@ -45,6 +45,7 @@ type ProfileNavigation = {
       | "Subscription"
       | "Notifications"
       | "ChangePassword"
+      | "Feedback"
       | "CloseAccount"
       | "Referrals"
       | "Credit"
@@ -181,6 +182,11 @@ export function ProfileScreen() {
             icon="password"
             label="Cambiar contraseña"
             onPress={() => navigation.navigate("ChangePassword")}
+          />
+          <MenuRow
+            icon="feedback"
+            label="Enviar comentarios"
+            onPress={() => navigation.navigate("Feedback")}
           />
         </View>
         <PromotionsSwitch />
