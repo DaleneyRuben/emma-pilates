@@ -1699,7 +1699,11 @@ it to the Purchase Intent; the thumbnail appears as **Comprobante adjunto** and
 
 **Estado del pago** reads "Tu pago está en revisión" with "Un administrador va
 a confirmar tu comprobante pronto. Te avisaremos apenas esté listo." and a
-**Volver al inicio** button. While the transfer is under review, **Mi crédito**
+**Volver al inicio** button. The status is a white line icon on a solid
+semantic disc — an hourglass on amber while it waits, a check on green once
+it is confirmed, a cross on red if it is rejected — never an emoji
+(UX-006). VoiceOver reads the disc as "Pago en revisión", "Pago confirmado",
+or "Comprobante rechazado". While the transfer is under review, **Mi crédito**
 shows `Bs 0` disponibles and "Bs 60 están reservados para un pago en
 revisión.", and **Comprar un plan** answers with the pending Payment instead
 of a new Intent. Coming back to **Continuar al pago** with an open Intent
