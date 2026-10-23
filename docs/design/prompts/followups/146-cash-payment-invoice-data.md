@@ -19,7 +19,7 @@ cash.
 
 Between the price breakdown card (and the Branch chips when there are
 several) and the note «Confirma solo cuando tengas el efectivo en mano…», a
-card with the price card's surface (Blanco `#FFFFFF`, 1 px `#E4D8CC` border,
+card with the price card's surface (Blanco `#FFFFFF`, 1 px `#D8C9BB` border,
 16 px radius, 16 px padding, the soft card shadow) holding, 12 px apart:
 
 - **Title** «Datos para la factura» in Work Sans 16 weight 500 `#4A4A4A`.

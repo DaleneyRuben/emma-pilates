@@ -21,7 +21,7 @@ studio's own invoice; the app never says it issues one.
 ## 1. The «Datos para la factura» card (both existing frames)
 
 A new card between the upload area and the «Enviar comprobante» button, on
-the same flat card as the amount card (Blanco `#FFFFFF`, 1 px `#E4D8CC`
+the same flat card as the amount card (Blanco `#FFFFFF`, 1 px `#D8C9BB`
 border, 16 px radius, 20 px padding, no shadow), with 14 px between its
 parts:
 
@@ -48,7 +48,7 @@ attached, button enabled) and draws the card with «Con factura» selected:
 
 - Two form fields under the pills, the design system's text field (the
   uppercase 11 px `#766D69` label with 1.54 letter spacing above a 52 px
-  Blanco input with a 1 px `#D8C9BB` border and 10 px radius, Work Sans 16
+  Blanco input with a 1 px `#D8C9BB` border and 8 px radius, Work Sans 16
   `#4A4A4A`), 12 px apart:
   - «NIT O CI» with the value «4567891».
   - «NOMBRE O RAZÓN SOCIAL» with the value «Ana Pérez».
