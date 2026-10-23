@@ -853,7 +853,8 @@ Decisions (blanket approval, 2026-10-23), taken before the code:
 - Screen 19 already renders `notification.message`, so the new sentences
   appear in the inbox without a design change. No follow-up.
 
-Evidence: red `12545e8a` (rules fail closed) → green `90a951eb` (windows and
+Evidence: [pull request 177](https://github.com/DaleneyRuben/emma-pilates/pull/177).
+Red `12545e8a` (rules fail closed) → green `90a951eb` (windows and
 copy) → `e8590f0e` (worker sweep, expiry window, restart test). **Verified:**
 unit `class-reminders`, `remind-expiring-subscriptions`, worker wiring, and
 the push catalog; integration `class-reminders` (restart inside the day
