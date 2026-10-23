@@ -38,8 +38,9 @@ ephemerally: no**.
 | Financial info → Purchase history | Plans bought, Payment amount, method and state | Required | App functionality |
 | Photos and videos → Photos | Profile photo and transfer receipt, picked from the gallery | Optional (a receipt only to pay by transfer) | App functionality |
 | App activity → Other actions | Bookings, Waitlist entries, Evaluation appointments | Required | App functionality |
+| App activity → Other user-generated content | The text of «Enviar comentarios» (REL-012), with its type (Problema, Sugerencia, Otro); no screenshots | Optional | App functionality (fixing and improving the apps) |
 | App info and performance → Crash logs | Sanitized exception type and stack (Better Stack) | Required | App functionality (diagnosing errors) |
-| App info and performance → Diagnostics | App release and build number on crash reports | Required | App functionality |
+| App info and performance → Diagnostics | App release and build number on crash reports; the app version, build, platform, and OS version sent with «Enviar comentarios» | Required | App functionality |
 | Device or other IDs → Device or other IDs | Random installation ID and Expo push token | Required | App functionality (push notifications), Fraud prevention, security, and compliance (sign-in throttling) |
 
 ## Data types: Staff app
@@ -54,11 +55,20 @@ Members send:
 | Personal info → Phone number | A Client's phone, entered by the Assistant | Optional | App functionality, Account management |
 | Financial info → Purchase history | Cash Payments recorded by the Assistant, transfer approvals and rejection reasons by the Administrator | Required for those Roles | App functionality |
 | App activity → Other actions | Attendance, Bookings made for Clients, the Nutritionist's availability | Required | App functionality |
+| App activity → Other user-generated content | as in the Client app («Enviar comentarios») | Optional | App functionality |
 | App info and performance → Crash logs | as in the Client app | Required | App functionality |
 | App info and performance → Diagnostics | as in the Client app | Required | App functionality |
 | Device or other IDs → Device or other IDs | Installation ID and push token | Required | App functionality, Fraud prevention, security, and compliance |
 
 The Staff app uploads no photos.
+
+«Enviar comentarios» (REL-012) adds the **Other user-generated content**
+rows and widens **Diagnostics**: the OS version travels with a comment, never
+with a crash report. The Role is attached by the server from the Account and
+is not a new data type. A comment stays after a Client closes her Account,
+under the anonymised Account (its email becomes the `cerrada-…` placeholder),
+as the record of what testers asked for; it is never shown to other users.
+Update the Play form for both apps with REL-004 before the next store build.
 
 ## Not collected (both apps)
 
