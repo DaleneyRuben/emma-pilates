@@ -211,10 +211,10 @@ describe("AW151 Cierres de caja on a desktop browser", () => {
 
   it("moves to the previous month in the address", async () => {
     server.use(history(() => jsonResponse(october)));
-    renderAdmin("/back-office/caja?month=2026-10");
+    const { user } = renderAdmin("/back-office/caja?month=2026-10");
     await rowOf("vie 23/10");
 
-    screen.getByRole("button", { name: "Mes anterior" }).click();
+    await user.click(screen.getByRole("button", { name: "Mes anterior" }));
 
     await screen.findByText(formatMonth("2026-09"));
     expect(reads.at(-1)?.get("month")).toBe("2026-09");

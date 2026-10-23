@@ -51,6 +51,7 @@ describe("admin navigation", () => {
       "AW19",
       "AW21",
       "AW28",
+      "AW151",
       "AW08",
       "AW25",
       "AW23",
