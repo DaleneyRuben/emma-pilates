@@ -208,6 +208,7 @@ model Account {
   recordedSupplyRestocks    SupplyRestock[]         @relation("SupplyRestockRecordedBy")
   studioSettingsVersions    StudioSettingsVersion[] @relation("StudioSettingsVersionCreatedBy")
   recordedSalaryPayments    SalaryPayment[]         @relation("SalaryPaymentRecordedBy")
+  approvedPayStatements     PayStatement[]          @relation("PayStatementApprovedBy")
   recordedExpenses          Expense[]               @relation("ExpenseRecordedBy")
   allowanceAdjustments      AllowanceAdjustment[]   @relation("AllowanceAdjustmentAuthor")
 

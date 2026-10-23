@@ -57,6 +57,7 @@ model StaffMember {
   availabilityBlocks  AvailabilityBlock[]
   evaluationSlots     EvaluationSlot[]
   salaryPayments      SalaryPayment[]
+  payStatements       PayStatement[]
   impersonations      ImpersonationSession[]
   acquisitionsReferred ClientAcquisition[]
 

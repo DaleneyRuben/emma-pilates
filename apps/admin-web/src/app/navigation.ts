@@ -14,6 +14,7 @@ export type AdminPath =
   | "/back-office/evaluaciones-nutricionales"
   | "/back-office/personal"
   | "/back-office/nomina"
+  | "/back-office/pagos-instructoras"
   | "/back-office/gastos"
   | "/back-office/categorias-de-gasto"
   | "/reporte"
@@ -121,6 +122,12 @@ export const navigationGroups: readonly NavigationGroup[] = [
         to: "/back-office/personal",
         screen: "AW23",
         list: true,
+      },
+      {
+        label: "Pagos a instructoras",
+        to: "/back-office/pagos-instructoras",
+        screen: "AW11",
+        studioWide: "los pagos a instructoras son del estudio, no de una sede.",
       },
       {
         label: "Nómina",

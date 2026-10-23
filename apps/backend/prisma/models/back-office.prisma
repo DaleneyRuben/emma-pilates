@@ -51,6 +51,80 @@ model SupplyRestock {
   @@schema("back_office")
 }
 
+// BKO-006: the dated rates a Trainer statement is calculated with. A change
+// is a new row; the statement reads the row in force at the month start.
+model PayRateRule {
+  id                     String   @id @default(uuid()) @db.Uuid
+  classCentavos          Int      @map("class_centavos")
+  includedStudents       Int      @map("included_students") @db.SmallInt
+  extraStudentCentavos   Int      @map("extra_student_centavos")
+  minimumNotMetCentavos  Int      @map("minimum_not_met_centavos")
+  commissionPercent      Int      @map("commission_percent") @db.SmallInt
+  effectiveFrom          DateTime @map("effective_from") @db.Date
+  createdAt              DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@unique([effectiveFrom])
+  @@map("pay_rate_rules")
+  @@schema("back_office")
+}
+
+enum PayStatementState {
+  DRAFT    @map("draft")
+  APPROVED @map("approved")
+
+  @@schema("back_office")
+}
+
+enum PayStatementLineKind {
+  CLASS            @map("class")
+  MINIMUM_NOT_MET  @map("minimum_not_met")
+  COMMISSION       @map("commission")
+
+  @@schema("back_office")
+}
+
+// One statement per Trainer per month. A draft is replaced; approval freezes
+// it and creates the Salary Payment. A removed statement keeps its rows.
+model PayStatement {
+  id                  String            @id @default(uuid()) @db.Uuid
+  staffMemberId       String            @map("staff_member_id") @db.Uuid
+  month               DateTime          @db.Date
+  state               PayStatementState @default(DRAFT)
+  totalCentavos       Int               @map("total_centavos")
+  salaryPaymentId     String?           @unique @map("salary_payment_id") @db.Uuid
+  approvedByAccountId String?           @map("approved_by_account_id") @db.Uuid
+  approvedAt          DateTime?         @map("approved_at") @db.Timestamptz(3)
+  createdAt           DateTime          @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt           DateTime          @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt           DateTime?         @map("deleted_at") @db.Timestamptz(3)
+  staffMember         StaffMember       @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
+  salaryPayment       SalaryPayment?    @relation(fields: [salaryPaymentId], references: [id], onDelete: Restrict)
+  approvedByAccount   Account?          @relation("PayStatementApprovedBy", fields: [approvedByAccountId], references: [id], onDelete: Restrict)
+  lines               PayStatementLine[]
+
+  @@index([staffMemberId, month])
+  @@index([month, state])
+  @@index([approvedByAccountId])
+  @@map("pay_statements")
+  @@schema("back_office")
+}
+
+model PayStatementLine {
+  id               String               @id @default(uuid()) @db.Uuid
+  payStatementId   String               @map("pay_statement_id") @db.Uuid
+  kind             PayStatementLineKind
+  detail           String
+  amountCentavos   Int                  @map("amount_centavos")
+  position         Int                  @db.SmallInt
+  createdAt        DateTime             @default(now()) @map("created_at") @db.Timestamptz(3)
+  deletedAt        DateTime?            @map("deleted_at") @db.Timestamptz(3)
+  payStatement     PayStatement         @relation(fields: [payStatementId], references: [id], onDelete: Restrict)
+
+  @@index([payStatementId, position])
+  @@map("pay_statement_lines")
+  @@schema("back_office")
+}
+
 model SalaryPayment {
   id                  String      @id @default(uuid()) @db.Uuid
   staffMemberId       String      @map("staff_member_id") @db.Uuid
@@ -61,6 +135,7 @@ model SalaryPayment {
   updatedAt           DateTime    @updatedAt @map("updated_at") @db.Timestamptz(3)
   staffMember         StaffMember @relation(fields: [staffMemberId], references: [id], onDelete: Restrict)
   recordedByAccount   Account     @relation("SalaryPaymentRecordedBy", fields: [recordedByAccountId], references: [id], onDelete: Restrict)
+  payStatement        PayStatement?
 
   @@index([paidOn])
   @@index([staffMemberId, paidOn])

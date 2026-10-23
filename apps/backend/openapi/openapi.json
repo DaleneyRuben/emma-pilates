@@ -7244,6 +7244,150 @@
         ]
       }
     },
+    "/api/v1/administrator/pay-statements": {
+      "get": {
+        "operationId": "listPayStatements",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-09",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayStatementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayStatements"
+        ]
+      }
+    },
+    "/api/v1/administrator/pay-statements/draft": {
+      "post": {
+        "operationId": "draftPayStatements",
+        "parameters": [
+          {
+            "name": "month",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": "2026-09",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayStatementDraftDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayStatements"
+        ]
+      }
+    },
+    "/api/v1/administrator/pay-statements/{statementId}/approve": {
+      "post": {
+        "operationId": "approvePayStatement",
+        "parameters": [
+          {
+            "name": "statementId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PayStatementDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorPayStatements"
+        ]
+      }
+    },
+    "/api/v1/trainer/pay-statements": {
+      "get": {
+        "operationId": "listOwnPayStatements",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PayStatementDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "TrainerPayStatements"
+        ]
+      }
+    },
     "/api/v1/uploads": {
       "post": {
         "operationId": "createPendingUpload",
@@ -13459,6 +13603,94 @@
         },
         "required": [
           "seeded"
+        ]
+      },
+      "PayStatementLineDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "class",
+              "minimum_not_met",
+              "commission"
+            ]
+          },
+          "detail": {
+            "type": "string"
+          },
+          "amountCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          }
+        },
+        "required": [
+          "kind",
+          "detail",
+          "amountCentavos"
+        ]
+      },
+      "PayStatementDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffMemberId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "staffMemberName": {
+            "type": "string"
+          },
+          "month": {
+            "type": "string",
+            "format": "date"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "draft",
+              "approved"
+            ]
+          },
+          "totalCentavos": {
+            "type": "number",
+            "description": "BOB centavos"
+          },
+          "salaryPaymentId": {
+            "type": "string",
+            "format": "uuid",
+            "nullable": true
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PayStatementLineDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "staffMemberId",
+          "staffMemberName",
+          "month",
+          "state",
+          "totalCentavos",
+          "salaryPaymentId",
+          "lines"
+        ]
+      },
+      "PayStatementDraftDto": {
+        "type": "object",
+        "properties": {
+          "drafted": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "drafted"
         ]
       },
       "CreatePendingUploadDto": {

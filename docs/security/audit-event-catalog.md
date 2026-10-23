@@ -80,6 +80,7 @@ beyond what the table below names.
 | `promotion_contact.withdrawn` | Booking & Membership | An Administrator records a former Client's «stop» request: the contact's name, email, and phone are erased and `withdrawn_at` is set (BE-022) | Administrator | `promotion_contact` | — | — |
 | `promotions_consent.withdrawn` | Booking & Membership | An Administrator records a live Client's «stop» request on AW35: their open Promotions Consent gets `withdrawn_at`, and the Account stays as it is (BE-023, ADR-0098). The Client's own switch in Perfil is not audited; the consent rows are its record | Administrator | `client_promotions_consent` | — | `clientId` |
 | `studio_settings.updated` | Booking & Membership | An Administrator changes the configurable Studio Settings on «Reglas del estudio» (BKM-004, ADR-0101); the change is a new version row | Administrator | `studio_settings` | — | `version`, previous and new `minimumBookings`, `taxRatePercent`, `renewalTargetMonths1To6Percent`, `renewalTargetMonths7To12Percent`, `renewalTargetFromMonth13Percent`, `openingDate` (only those changed) |
+| `pay_statement.approved` | Back Office | An Administrator approves a Trainer's Pay Statement, which creates its Salary Payment (BKO-006) | Administrator | `pay_statement` | — | `salaryPaymentId`, `amountCentavos`, `paidOn` |
 | `salary_payment.recorded` | Back Office | An Administrator records a Salary Payment | Administrator | `salary_payment` | — | `amountCentavos`, `paidOn` |
 | `salary_payment.updated` | Back Office | An Administrator corrects a Salary Payment | Administrator | `salary_payment` | — | previous and new `staffMemberId`, `amountCentavos`, `paidOn` (only those changed) |
 | `expense.recorded` | Back Office | An Administrator records a Branch Expense | Administrator | `expense` | Expense Branch | `amountCentavos`, `incurredOn`, `expenseCategoryId` |
@@ -110,6 +111,7 @@ window.
 | Client Booking, cancellation, Reschedule, Waitlist join/leave | Routine Client activity (ADR-0055); `created_by`/`cancelled_by`/`rescheduled_by` Account columns keep who acted, including an Assistant acting for a Client. |
 | Trainer Attendance | A reporting record with `recorded_by` and no money or access effect. |
 | Automatic empty-Session cancellation, Waitlist closure, Purchase Intent expiry | System sweeps with no human actor; the rows record cause and time (BOOK-001, BOOK-004, PAY-002). |
+| Drafting a Trainer Pay Statement | The worker replaces the draft; the approval is the decision, and it is audited. |
 | Client Evaluation booking and cancellation | Routine Client activity; the Evaluation row records creator, canceller, and cause. |
 | Availability Block create, replace, end | The Nutritionist manages their own schedule; the block row records `created_by`/`ended_by`, and booked Evaluations are never changed by it. |
 | Transfer receipt upload and Purchase Intent creation | Client self-service with no decision; the Payment decision is audited instead. |

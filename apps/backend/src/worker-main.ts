@@ -23,6 +23,9 @@ import { cleanupAbandonedUploads } from './uploads/cleanup-abandoned-uploads';
 import { createObjectStorage } from './uploads/create-object-storage';
 import { createUploadCleanupGateway } from './uploads/prisma-upload-cleanup-gateway';
 import { createFinalizeUploadJobCommands } from './uploads/prisma-upload-commands';
+import { createPrismaPayStatements } from './back-office/payroll/prisma-pay-statements';
+import { trainerMonthFacts } from './back-office/payroll/trainer-pay-facts';
+import { boliviaDate } from './time/bolivia-time';
 import { startWorker } from './worker';
 
 async function bootstrap(): Promise<void> {
@@ -132,6 +135,23 @@ async function bootstrap(): Promise<void> {
       expoAccessToken: environment.EXPO_ACCESS_TOKEN,
       now,
     }),
+    trainerPayDrafts: {
+      execute: async () => {
+        const statements = createPrismaPayStatements(prisma, {
+          now,
+          factsOfMonth: (from, until) => trainerMonthFacts(prisma, from, until),
+        });
+        const current = boliviaDate(now());
+        const previous = new Date(
+          Date.UTC(current.getUTCFullYear(), current.getUTCMonth() - 1, 1),
+        );
+        const [past, present] = await Promise.all([
+          statements.draftMonth(previous),
+          statements.draftMonth(current),
+        ]);
+        return { drafted: past.drafted + present.drafted };
+      },
+    },
     retentionSweeps: createPrismaRetentionSweeps(prisma, { now }),
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit,
