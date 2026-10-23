@@ -30,7 +30,7 @@ you are starting with no project knowledge.
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
-| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
+| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the Minimum Bookings cancellation, the window-close snapshot, and the Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
@@ -560,8 +560,9 @@ and ignores schedules at an archived Branch, for an archived Class Type, or
 whose Trainer is not assigned to that Branch.
 
 The running worker also cancels, once and for good, every fixture Session that
-still has no Bookings two hours before it starts, and tells its Trainer. Book
-a class first if you want to keep it for a manual test (Test 13).
+has fewer than 2 Bookings three hours before it starts, and tells its Trainer
+and its booked Clients. Book a class with two Clients first if you want to
+keep it for a manual test (Test 13).
 
 These fixtures are for your local databases only, whose data is public and
 resettable. Never load them into production.
@@ -1962,38 +1963,60 @@ The same data is available through Swagger as `GET
 /api/v1/trainer/sessions/{sessionId}/roster`, and `POST
 /api/v1/sessions/{sessionId}/attendance`; other Roles get `403`.
 
-## Test 13: watch the worker cancel an empty Session and close a Waitlist
+## Test 13: watch the worker apply the Minimum Bookings and close a Waitlist
 
 Load the fixtures (Test 5A), start the backend, and start the worker with
 `pnpm --filter @pilates/backend start:worker`. The worker checks every minute
 (and once when it starts) for:
 
-- **Sessions starting within two hours.** A Session with no Bookings at that
-  moment is cancelled with cause `zero_bookings` and no actor, its open
-  Waitlist Entries close as `session_cancelled`, and its Trainer receives
-  "Tu clase de Mat Pilates de hoy 07:00 se canceló: no tuvo reservas." (the
-  Class Type and time vary) in the inbox, which opens their agenda. A waitlisted
-  Client receives "La clase de … a la que estabas en lista de espera fue
-  cancelada." A Session with at least one Booking stays scheduled. Either way
-  the check is recorded in `empty_booking_check_completed_at` and never runs
-  again for that Session, even if its Bookings later drop to zero. A Session
-  that drops to zero before the check stays bookable until then.
+- **Sessions starting within three hours** (the lead time in Studio
+  Settings, BKM-009). A Session with fewer Bookings than the Minimum Bookings
+  (2, editable in the admin web's Reglas del estudio, Test 75) is
+  cancelled with cause `minimum_not_met` and no actor. Each of its Bookings is
+  cancelled as `session_cancelled` with no actor and the class goes back to the
+  Client's Plan. Each booked Client receives a push and an inbox entry
+  "Tu clase de Mat Pilates de hoy 18:00 se canceló porque no llegó al mínimo
+  de reservas. Te devolvimos la clase a tu plan. Hoy hay lugar en Reformer
+  19:00 y Mat Pilates 20:00." It names the later Sessions that day at the same
+  Branch that still have places and that she has not booked (four at most,
+  then "y N más"), or ends "Hoy ya no quedan otras clases con lugar."; tapping
+  it opens Mis Reservas. The open Waitlist Entries close as
+  `session_cancelled` and each waitlisted Client receives "La clase de … a la
+  que estabas en lista de espera fue cancelada." The Trainer receives "Tu
+  clase de Mat Pilates de hoy 18:00 se canceló: no llegó al mínimo de 2
+  reservas.", which opens their agenda. A Session that reaches the minimum
+  stays scheduled. Either way the check is recorded in
+  `empty_booking_check_completed_at` (the column kept its BOOK-004 name) and
+  never runs again for that Session, even if its Bookings later drop. A
+  Session that started before the worker could check it is left alone.
+- **Sessions whose Cancellation Window has closed** (2.5 hours before the
+  start, from Studio Settings). Each scheduled Session records its live
+  Bookings in `bookings_at_window_close` once; later cancellations,
+  Reschedules, or worker restarts never change it. Trainer pay (BKO-006)
+  counts this number. A cancelled Session gets none.
 - **Sessions that have started.** Their remaining open Waitlist Entries close
   as `session_started`, without a notification.
 
 To see it without waiting for a real class, pick today's Session that starts
-in the next two hours with no Bookings (or wait until one does), keep the
-worker running for a minute, then:
+in the next three hours with one Booking or none (or book one for
+`lucia@example.com` in a Session four hours away and wait), keep the worker
+running for a minute, then:
 
 1. Log in to the Staff app as that Session's Trainer (usually
    `emma.vargas@example.com`) and open the inbox from Perfil: the
    cancellation notice is there.
-2. In the Client app as `lucia@example.com`, the Session no longer appears in
-   the class list, and `GET /api/v1/sessions/{sessionId}` returns `404`.
+2. In the Client app as `lucia@example.com`, open the inbox from Perfil: the
+   notice names the other Sessions with places, the Session no longer appears
+   in the class list, her Plan shows the class back, and `GET
+   /api/v1/sessions/{sessionId}` returns `404`.
+3. In `psql`, `SELECT cancellation_cause FROM booking.sessions WHERE id =
+   '<sessionId>'` answers `minimum_not_met`; a scheduled Session inside its
+   window has a `bookings_at_window_close` value.
 
-Book a Session in the Client app first and it stays scheduled through the
-check. The worker logs only a sanitized `empty_session_check_failed` or
-`started_waitlist_closure_failed` event if a sweep fails.
+Book the Session with two Clients first and it stays scheduled through the
+check. The worker logs only a sanitized `minimum_bookings_check_failed`,
+`window_close_snapshot_failed`, or `started_waitlist_closure_failed` event if a
+sweep fails.
 
 ## Test 14: bootstrap the first Administrator on an empty database
 
@@ -5458,8 +5481,8 @@ the admin web on `pilates_dev_sim` with the fixtures (Tests 5 A and 24).
    step 3; the API is `PATCH /api/v1/administrator/sessions/{id}`). Every
    booked Client receives «Tu clase cambió de horario» / «Tu clase de Mat
    Pilates cambió de horario: ahora es el sábado 26 de septiembre, 16:00.»
-   (the day and time vary), and Mis reservas shows the new time. The empty-Session check of Test 13 starts
-   over for the moved Session.
+   (the day and time vary), and Mis reservas shows the new time. The Minimum Bookings check and the
+   window-close snapshot of Test 13 start over for the moved Session.
 3. **The studio reassigns a Trainer.** In the same panel change the
    **Entrenadora** to Daniela Ortiz. Daniela's inbox (Staff app, Perfil →
    Notificaciones) reads «Nueva clase asignada» / «Se te asignó una clase:
@@ -5919,6 +5942,7 @@ D. **When the rules cannot be read** (stop the API while an app is open on
    estudio o desde la app.», 09 leaves the cancellation line out, and 05 and
    S21 show no **Cancelar** or **Reprogramar** until the rules load.
 
-Only these values are stored and shown by BKM-004; the rules that use the
-others (the 2-booking check, Start Dates, founders, invites, tax, the paid
+The Minimum Bookings and its lead time drive the worker's check since BKM-009
+(Test 13): raise the minimum here and the next check uses it. The rules that
+use the other values (Start Dates, founders, invites, tax, the paid
 Evaluation, the renewal bonus) arrive with their own backlog items.
