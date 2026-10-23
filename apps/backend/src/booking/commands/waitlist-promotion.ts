@@ -3,6 +3,7 @@ import { WaitlistClosureReason } from '../../generated/prisma/client';
 import type { NotificationRecorder } from '../../notifications/prisma-notification-store';
 import { boliviaDate } from '../../time/bolivia-time';
 import { promoteWaitlist } from './promote-waitlist';
+import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
 
 export type WaitlistPromotionDependencies = {
   now: () => Date;
@@ -132,6 +133,8 @@ export const promoteWaitlistInTransaction = (
           });
         }
       },
+      cancellationWindowMinutes: () =>
+        readCancellationWindowMinutes(transaction),
       now,
     },
   );

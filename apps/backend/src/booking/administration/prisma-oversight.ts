@@ -16,12 +16,14 @@ type Paging = { page: number; pageSize: number };
 
 const offset = ({ page, pageSize }: Paging) => (page - 1) * pageSize;
 
-const methodNames: Record<PaymentMethod, 'cash' | 'transfer' | 'credit_only'> =
-  {
-    [PaymentMethod.CASH]: 'cash',
-    [PaymentMethod.TRANSFER]: 'transfer',
-    [PaymentMethod.CREDIT_ONLY]: 'credit_only',
-  };
+const incomeMethodNames: Record<
+  Exclude<PaymentMethod, 'COURTESY'>,
+  'cash' | 'transfer' | 'credit_only'
+> = {
+  [PaymentMethod.CASH]: 'cash',
+  [PaymentMethod.TRANSFER]: 'transfer',
+  [PaymentMethod.CREDIT_ONLY]: 'credit_only',
+};
 
 // AW27's "Última actividad": what the last ledger entry did to the balance.
 const creditMovements: Record<
@@ -273,7 +275,9 @@ export const createPrismaOversight = (
     const byMethod = { cash: 0, transfer: 0, credit_only: 0 };
     const months = new Map<string, number>();
     for (const payment of payments) {
-      byMethod[methodNames[payment.method]] += payment.amountDueCentavos;
+      // A courtesy grant is Bs 0 and never income, so it stays out of both.
+      if (payment.method === PaymentMethod.COURTESY) continue;
+      byMethod[incomeMethodNames[payment.method]] += payment.amountDueCentavos;
       const month = `${boliviaDate(payment.decidedAt!).toISOString().slice(0, 7)}-01`;
       months.set(month, (months.get(month) ?? 0) + payment.amountDueCentavos);
     }

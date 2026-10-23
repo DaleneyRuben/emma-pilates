@@ -75,7 +75,8 @@ const plans = [
   {
     id: 'plan-8',
     name: 'Paquete de 8 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 8,
     priceCentavos: 56_000,
     displayOrder: 1,
@@ -83,7 +84,8 @@ const plans = [
   {
     id: 'plan-1',
     name: 'Clase suelta',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 1,
     priceCentavos: 5_000,
     displayOrder: 0,
@@ -269,6 +271,7 @@ describe('Assistant Plan quotes and cash Payment', () => {
       state: 'confirmed' as const,
       planId: 'plan-8',
       planName: 'Paquete de 8 clases',
+      durationDays: 30,
       durationMonths: 1,
       classAllowance: 8,
       planPriceCentavos: 56_000,

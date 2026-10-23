@@ -17,7 +17,8 @@ export type DevelopmentFixtures = {
   plans: {
     id: string;
     name: string;
-    durationMonths: number;
+    durationDays: number;
+    weeklyClassCap: number | null;
     classAllowance: number;
     priceCentavos: number;
     displayOrder: number;
@@ -62,7 +63,8 @@ export type DevelopmentFixtures = {
     clientId: string;
     planId: string;
     planNameSnapshot: string;
-    durationMonthsSnapshot: number;
+    durationDaysSnapshot: number;
+    weeklyClassCapSnapshot: number | null;
     originalClassAllowance: number;
     remainingClassAllowance: number;
     startsOn: Date;
@@ -77,7 +79,8 @@ export type DevelopmentFixtures = {
     clientId: string;
     planId: string;
     planNameSnapshot: string;
-    durationMonthsSnapshot: number;
+    durationDaysSnapshot: number;
+    weeklyClassCapSnapshot: number | null;
     classAllowanceSnapshot: number;
     planPriceCentavos: number;
     creditAppliedCentavos: number;
@@ -187,28 +190,32 @@ const planDefinitions = [
   {
     key: 'paquete-8',
     name: 'Paquete de 8 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 8,
     priceCentavos: 56_000,
   },
   {
     key: 'paquete-12',
     name: 'Paquete de 12 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 12,
     priceCentavos: 78_000,
   },
   {
     key: 'mensual-16',
     name: 'Mensual 16 clases',
-    durationMonths: 1,
+    durationDays: 30,
+    weeklyClassCap: null,
     classAllowance: 16,
     priceCentavos: 105_000,
   },
   {
     key: 'trimestral-36',
     name: 'Trimestral 36 clases',
-    durationMonths: 3,
+    durationDays: 90,
+    weeklyClassCap: 4,
     classAllowance: 36,
     priceCentavos: 210_000,
   },
@@ -576,7 +583,8 @@ export const buildDevelopmentFixtures = (input: {
         clientId: clientId(definition.client),
         planId: planId(plan.key),
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
+        weeklyClassCapSnapshot: plan.weeklyClassCap,
         originalClassAllowance: plan.classAllowance,
         remainingClassAllowance: definition.remainingClassAllowance,
         startsOn,
@@ -613,7 +621,8 @@ export const buildDevelopmentFixtures = (input: {
         clientId: clientId(definition.client),
         planId: planId(plan.key),
         planNameSnapshot: plan.name,
-        durationMonthsSnapshot: plan.durationMonths,
+        durationDaysSnapshot: plan.durationDays,
+        weeklyClassCapSnapshot: plan.weeklyClassCap,
         classAllowanceSnapshot: plan.classAllowance,
         planPriceCentavos: plan.priceCentavos,
         creditAppliedCentavos: 0,

@@ -19,7 +19,8 @@ export type AdminPath =
   | "/reporte"
   | "/promociones"
   | "/promociones/referidos"
-  | "/promociones/creditos";
+  | "/promociones/creditos"
+  | "/reglas-del-estudio";
 
 export type NavigationItem = {
   label: string;
@@ -182,8 +183,23 @@ export const navigationGroups: readonly NavigationGroup[] = [
   },
 ];
 
-export const navigationItems: readonly NavigationItem[] =
-  navigationGroups.flatMap((group) => group.items);
+/**
+ * Pages the account menu (AW33) opens rather than the sidebar; they still
+ * name the browser tab and the Branch selector's studio-wide note.
+ */
+export const accountMenuItems: readonly NavigationItem[] = [
+  {
+    label: "Reglas del estudio",
+    to: "/reglas-del-estudio",
+    screen: "AW36",
+    studioWide: "las reglas son del estudio, no de una sede.",
+  },
+];
+
+export const navigationItems: readonly NavigationItem[] = [
+  ...navigationGroups.flatMap((group) => group.items),
+  ...accountMenuItems,
+];
 
 export const findNavigationItem = (
   pathname: string,

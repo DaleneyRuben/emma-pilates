@@ -5,12 +5,15 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * durationDays / 30, for builds that still read months
+ * @deprecated
+ */
 export type PlanQuoteDtoDurationMonths =
   (typeof PlanQuoteDtoDurationMonths)[keyof typeof PlanQuoteDtoDurationMonths];
 
 export const PlanQuoteDtoDurationMonths = {
   NUMBER_1: 1,
+  NUMBER_2: 2,
   NUMBER_3: 3,
-  NUMBER_6: 6,
-  NUMBER_12: 12,
 } as const;

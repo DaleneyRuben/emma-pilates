@@ -16,6 +16,8 @@ const plans = [
   {
     id: "plan-8",
     name: "Paquete de 8 clases",
+    durationDays: 30,
+    weeklyClassCap: null,
     durationMonths: 1,
     classAllowance: 8,
     priceCentavos: 56_000,
@@ -23,6 +25,8 @@ const plans = [
   {
     id: "plan-36",
     name: "Trimestral 36 clases",
+    durationDays: 90,
+    weeklyClassCap: 4,
     durationMonths: 3,
     classAllowance: 36,
     priceCentavos: 210_000,
@@ -54,7 +58,12 @@ describe("Client Plans", () => {
       expect(screen.getByText("Elige tu plan")).toBeOnTheScreen();
       expect(screen.getByText("Paquete de 8 clases")).toBeOnTheScreen();
     });
-    expect(screen.getByText("8 clases · válido por 1 mes")).toBeOnTheScreen();
+    // BKM-005: validity in days, the Weekly Cap only on the Plans that have one.
+    expect(screen.getByText("8 clases · válido por 30 días")).toBeOnTheScreen();
+    expect(
+      screen.getByText("36 clases · válido por 90 días · hasta 4 por semana"),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
     expect(screen.getByText("Bs 560")).toBeOnTheScreen();
     expect(screen.getByText("Bs 2.100")).toBeOnTheScreen();
 
@@ -62,8 +71,13 @@ describe("Client Plans", () => {
 
     // The loading state shares the «Detalle del plan» heading, so wait for the Plan itself.
     await waitFor(() => {
-      expect(screen.getByText("Válido por 3 meses")).toBeOnTheScreen();
+      expect(screen.getByText("Válido por 90 días")).toBeOnTheScreen();
     });
+    expect(
+      screen.getByText("90 días de vigencia desde que se confirma tu pago."),
+    ).toBeOnTheScreen();
+    expect(screen.getByText("Hasta 4 clases por semana.")).toBeOnTheScreen();
+    expect(screen.queryByText(/\bmes(es)?\b/)).toBeNull();
     // 09's bar names the Plan once it loads (MOB-034).
     expect(
       within(screen.getByTestId("screen-top-bar")).getByLabelText("Trimestral 36 clases"),

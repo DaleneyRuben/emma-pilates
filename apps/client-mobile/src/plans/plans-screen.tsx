@@ -2,6 +2,7 @@ import { useListPlans, type PlanDto } from "@pilates/api-contracts";
 import {
   BodyText,
   colors,
+  describePlanTerms,
   LoadingState,
   QueryFailure,
   Screen,
@@ -14,7 +15,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { useClientFetcher } from "../client-fetcher";
-import { describePlanTerms, formatBolivianos } from "./plan-format";
+import { formatBolivianos } from "./plan-format";
 
 type PlansNavigation = {
   goBack: () => void;
@@ -32,7 +33,7 @@ function PlanCard({ plan, onPress }: { plan: PlanDto; onPress: () => void }) {
     >
       <View style={styles.cardBody}>
         <Text style={styles.planName}>{plan.name}</Text>
-        <BodyText>{describePlanTerms(plan.classAllowance, plan.durationMonths)}</BodyText>
+        <BodyText>{describePlanTerms(plan)}</BodyText>
       </View>
       <Text style={styles.price}>{formatBolivianos(plan.priceCentavos)}</Text>
     </Pressable>

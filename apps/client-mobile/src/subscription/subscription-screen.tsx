@@ -152,7 +152,7 @@ export function SubscriptionScreen() {
             <Text style={styles.dateValue}>{formatCivilDateWithYear(subscription.startsOn)}</Text>
           </View>
           <View style={styles.dateRow}>
-            <BodyText style={styles.dateLabel}>{expired ? "Venció el" : "Pagado hasta"}</BodyText>
+            <BodyText style={styles.dateLabel}>{expired ? "Venció el" : "Vence el"}</BodyText>
             <Text style={[styles.dateValue, expired && styles.expiredDate]}>
               {formatCivilDateWithYear(subscription.endsOn)}
             </Text>
