@@ -10,6 +10,16 @@ import {
 import { recordBackOfficeAudit } from '../prisma-audit';
 import { trainerPay } from './trainer-pay';
 import type { TrainerMonthFacts } from './trainer-pay-facts';
+export type CoordinatorMonthFacts = {
+  staffMemberId: string | null;
+  newClients: {
+    durationDays: number;
+    classAllowance: number;
+    broughtByTrainer: boolean;
+  }[];
+  renewalRatePercent: number | null;
+  renewalTargetPercent: number;
+};
 
 type Transaction = Prisma.TransactionClient;
 
@@ -87,6 +97,10 @@ export const createPrismaPayStatements = (
   dependencies: {
     now: () => Date;
     factsOfMonth: (from: Date, until: Date) => Promise<TrainerMonthFacts>;
+    coordinatorFactsOfMonth?: (
+      from: Date,
+      until: Date,
+    ) => Promise<CoordinatorMonthFacts>;
   },
 ) => {
   const draftMonth = async (month: Date) => {
