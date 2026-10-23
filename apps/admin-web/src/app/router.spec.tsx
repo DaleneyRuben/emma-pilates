@@ -60,6 +60,7 @@ describe("admin navigation", () => {
       "AW17",
       "AW26",
       "AW27",
+      "AW36",
     ]);
   });
 
@@ -75,6 +76,7 @@ describe("admin navigation", () => {
       "Categorías de gasto",
       "Referidos",
       "Créditos",
+      "Reglas del estudio",
     ]);
   });
 });
