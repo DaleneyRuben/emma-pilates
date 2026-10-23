@@ -1,3 +1,4 @@
+import type { DeclaredAcquisitionChannel } from '../../booking/acquisition/acquisition';
 import type { AuthenticationEmailJob } from '../../jobs/authentication-email/authentication-email-job';
 import type { EncryptedAuthenticationLink } from '../security/authentication-link-cipher';
 import type { IssuedAuthenticationToken } from '../security/authentication-token-service';
@@ -81,6 +82,8 @@ export type RegisterClientCommand = {
   email: string;
   password: string;
   referralCode?: string;
+  /** BKM-011: absent from store builds older than the question. */
+  acquisitionChannel?: DeclaredAcquisitionChannel;
 };
 
 export type RegisterClientResult = {
