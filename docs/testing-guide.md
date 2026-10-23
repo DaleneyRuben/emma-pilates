@@ -29,7 +29,8 @@ you are starting with no project knowledge.
 | Promotion Contacts           | Open AW35 from Promociones, search, export the CSV, and erase a contact on a copy of the fixtures (Test 59) | Personal data of former Clients; erasing is permanent, so never on `pilates_dev_sim` itself |
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
-| Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
+| Coordinator                  | Sign in as the fixture Coordinator on the admin web (Horario, Clientes with «Editar perfil», Personal read-only, no amount anywhere) and in the Staff app (Client search, Bookings, «Cancelar una clase», no sale and no new Client); correct a Client's name and phone as the Administrator too; read the authorization matrix of every endpoint (Test 75) | The counts-only statistics come with STU-003 and «Para contactar» with BKM-013 |
+| Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, Nutritionist, or the Coordinator for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
 | Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
@@ -547,6 +548,7 @@ Evaluation slots, and these active Accounts. Every fixture Account uses the pass
 | `andrea.suarez@example.com`  | Trainer       | Leads Pilates Prenatal in Equipetrol          |
 | `camila.rojas@example.com`   | Assistant     | Assigned to Centro                            |
 | `paola.mendoza@example.com`  | Administrator | Covers every Branch                           |
+| `carolina.rivas@example.com` | Coordinator   | Every Branch; operations without money (ADR-0102) |
 | `gabriela.flores@example.com`| Nutritionist  | Assigned to Centro                            |
 
 The 30-day window starts on the day you run the command. With the worker
@@ -3335,6 +3337,10 @@ The following are not ready for manual product testing:
 - iOS store builds and TestFlight (gate 9), and the Play closed test and
   production release (REL-003 to REL-007);
 - the Playwright journeys in Firefox or WebKit (only Chromium is installed);
+- the Coordinator's counts-only statistics (attendance, occupancy, new
+  Clients, renewals), which STU-003 builds on Studio Management's facts
+  (ADR-0103), and her «Para contactar» list, which BKM-013 adds to the admin
+  web and to her Staff app stack;
 - the admin web's «No tienes permiso…» refusal copies, an email change for
   an Account that is not active (`account_not_active`), and a registration
   that refers to itself (`referral_self_reference`): each needs a state the
@@ -5834,3 +5840,63 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 75: work as the Coordinator (IDN-009)
+
+The Coordinator runs the studio's operation without seeing money
+([ADR-0102](./adr/0102-coordinator-role-without-money.md)). The fixtures
+(Test 5 A) include her: `carolina.rivas@example.com`, with the fixture
+password, holding every Branch.
+
+### A. The admin web
+
+1. Start the API and the admin web (Test 24) and sign in as
+   `carolina.rivas@example.com`. The sidebar shows only **Horario**,
+   **Clientes**, and **Personal**; the account menu names her Role
+   «Coordinación».
+2. In **Horario**, create a one-off Session, move one to another Trainer,
+   and cancel one that has Bookings (Test 25): everything works as for the
+   Administrator, at every Branch.
+3. Type `/back-office/pagos` (or `/reporte`, `/back-office/nomina`,
+   `/promociones`) in the address bar: you land on Horario with «Esa
+   sección es solo para administración.».
+4. In **Clientes**, open a Client: no «Crédito» row, no «Cerrar cuenta»,
+   and no «Bs» anywhere. Press **Editar perfil**, change the phone, and
+   **Guardar cambios**: «Guardamos los cambios del perfil.» and the new
+   phone. Empty the name to see «Escribe el nombre de la clienta.». The
+   email stays read-only («La clienta cambia su correo desde su app.»).
+5. In **Personal**, there is no «Nuevo miembro»; opening a member shows
+   her details read-only with «Solo administración invita y cambia roles.».
+6. Sign in as `paola.mendoza@example.com`: **Editar perfil** works the same
+   for the Administrator, and **Personal → Nuevo miembro** offers the Role
+   **Coordinador**, which replaces the Branch chips with «Todas las
+   sucursales (implícito por el rol)».
+
+### B. The Staff app
+
+1. Log in to the Staff app (Test 9 E) as `carolina.rivas@example.com`. She
+   lands on **Buscar cliente** without «+ Nuevo cliente» and with
+   **Cancelar una clase**, which opens the Administrator's cancellation
+   screens (Test 10 D).
+2. Search `luc` and open Lucía: «Reservar clase» and «Ver reservas» work as
+   for the Assistant (Test 11 B and C) at any Branch, but there is no
+   «Registrar pago en efectivo». A Client without a Plan reads «La clienta
+   necesita un plan activo para reservar.».
+3. Perfil reads «Coordinación» and «Todas las sucursales».
+4. As the Administrator, Perfil → «Ver la app como…» lists her under
+   «Coordinación»; seeing the app as her shows the same stack under the
+   banner (Test 67).
+
+### C. The API
+
+Every endpoint has an explicit decision for the Administrator and the
+Coordinator in `apps/backend/test/database/authorization-matrix.ts`; the
+integration spec `authorization-matrix.integration-spec.ts` boots the API on
+a disposable database and checks each one (Test 8, integration tests). By
+hand, with her bearer token from Swagger (Test 3): `GET
+/api/v1/administrator/payments`, `GET /api/v1/administrator/reports/income`,
+and `GET /api/v1/assistant/clients/{id}/plan-quotes` answer `403`;
+`PATCH /api/v1/administrator/clients/{id}` with `{"name": "…", "phone":
+null}` answers the refreshed detail without `creditAvailableCentavos`, and
+`system.audit_records` gains `client.profile_corrected` with
+`actor_role = coordinator` and only the changed field names.
