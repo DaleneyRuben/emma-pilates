@@ -30,7 +30,7 @@ you are starting with no project knowledge.
 | Launch screen                | Cold-start either app on a Release build made locally and see the logo on the blush background until Login is drawn (Test 65) | Native: Expo Go cannot show it, and the store builds carry it only from REL-009's next round |
 | Promotions Consent           | Turn «Recibir promociones de Emma Pilates» on and off in Perfil, see it on AW35 as «Activa», stop it there, and close the Account with the box ticked (Test 60) | Live Clients' consent (ADR-0098); the closure part is permanent, so use a copy of the fixtures |
 | Impersonation                | As the Administrator, see and act in the Staff app as a Trainer, Assistant, or Nutritionist for 30 minutes from Perfil → «Ver la app como…», under the banner with «Salir», and the same through the API with its audit records and refused commands (Test 67) | Nothing is sent to the Staff Member |
-| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), and the notifications a studio change sends (Test 69) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
+| Worker and background jobs   | Watch the hourly Session and slot extension (Test 5 A), the empty-Session cancellation and Waitlist closures (Test 13), the retention sweep (Test 16), the pending-Account, image, and Purchase-Intent sweeps (Test 68), the Evaluation and Plan reminders (Test 7), the push receipts (Test 46 E), the email delivery and capture (Test 34), the notifications a studio change sends (Test 69), and the nightly studio facts recompute (Test 75) | Each sweep runs on its own interval; back-date a row to see it sooner, never on a database you keep |
 | Rules and problem codes      | Every rule a journey can break answers a stable code: registration (Test 4), limits (Tests 5 G–H, 63), Evaluations (Test 7), staff (Test 17), catalog (Test 21), Back Office (Test 22), closure (Test 35), bookings, payments, uploads, and the rest (Test 70) | Some codes need a race or an Account state the fixtures do not hold; Test 70 says which |
 | Screen states                | The mobile apps' load failures, action failures, offline banner, and link screens (Test 71); the admin web's empty studio, empty filters, load failures, the startup «Sin conexión» page, and the unknown address (Test 72) | The admin web's «No tienes permiso…» copies need a `403` an Administrator cannot provoke (Jest covers them) |
 | Operations                   | Release to staging and promote (Test 40), pause and resume staging, copy production into staging, personal data requests, incidents, secrets rotation, the monthly reminder, the restore drill, and the uptime monitors (Test 74); CI's audit, gitleaks, migrations-drift, and public-site jobs and Dependabot (Test 73); backups (Test 43); monitors and error reporting (Tests 37, 44, 47); production checks (Test 38); connections (Test 39) | Most steps touch the provider consoles the user holds; the guide names what to rehearse without production |
@@ -3344,7 +3344,10 @@ The following are not ready for manual product testing:
   know («Emma Pilates» / «Tienes una notificación nueva.», silent): nothing
   sends one until a new type ships;
 - real push delivery on iOS devices and the `InvalidCredentials` receipt
-  Expo answers for them until the APNs key is uploaded (gate 9, Test 46).
+  Expo answers for them until the APNs key is uploaded (gate 9, Test 46);
+- the studio facts panel and its charts (STU-003): Test 75 recomputes the
+  rows, and nothing displays them yet. Store-review rows are not excluded
+  until REL-016 marks them.
 
 Some underlying rules for these areas may already have unit tests or approved
 architecture, but that does not make the feature manually usable. The
@@ -5834,3 +5837,31 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 75: recompute the studio facts
+
+Studio Management keeps one fact row per Session and one per Client per
+month, recomputed from what Booking already recorded. Nothing here is a
+screen: the Administrator triggers it from Swagger, and the worker repeats
+the current month every night. Use a disposable database, never
+`pilates_dev_sim`.
+
+1. **On demand.** Log in as `paola.mendoza@example.com` (Test 3) and
+   `POST /api/v1/administrator/studio-facts/recompute` with
+   `{"month":"2026-10"}`. The answer names the month and the counts of
+   session and client-month rows written. Run it again: the counts stay
+   the same, and the rows' `updated_at` does not move when nothing
+   changed. An Assistant (`camila.rojas@example.com`) gets
+   `403 studio_access_denied`. A month that is not `YYYY-MM` gets
+   `400 invalid_request`.
+2. **The nightly pass.** Start the worker against the same database
+   (`pnpm --filter @pilates/backend start:worker`). It recomputes the
+   current Bolivia month once at startup and then every 24 hours; the log
+   names a failure `studio_facts_failed` and the worker keeps running.
+3. **What a row holds.** `studio.session_facts` has the Session's date,
+   Branch, Class Type, Trainer, capacity, bookings still booked, attended,
+   and no-shows. A Session with no Bookings still has a row, with zeros.
+   `studio.client_month_facts` has the Client, the month, the plan days
+   overlapping that month, classes booked, classes attended, and whether
+   she renewed. Cancelled Bookings are not counted. Store-review rows are
+   not marked yet (REL-016), so this pass excludes nothing.

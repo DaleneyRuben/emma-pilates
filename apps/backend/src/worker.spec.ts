@@ -135,15 +135,16 @@ describe('worker entrypoint', () => {
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(1);
 
     await jest.advanceTimersByTimeAsync(55 * 60 * 1_000);
+    expect(dependencies.studioFacts.execute).toHaveBeenCalledTimes(1);
     expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
     expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(2);
     expect(subscriptionReminders.execute).toHaveBeenCalledTimes(2);
 
+    await jest.advanceTimersByTimeAsync(23 * 60 * 60 * 1_000);
+    expect(dependencies.studioFacts.execute).toHaveBeenCalledTimes(2);
+
     await stopWorker();
-    await jest.advanceTimersByTimeAsync(60 * 60 * 1_000);
-    expect(pendingAccountCleanup.execute).toHaveBeenCalledTimes(2);
-    expect(imageUploadCleanup.execute).toHaveBeenCalledTimes(2);
-    expect(subscriptionReminders.execute).toHaveBeenCalledTimes(2);
+    expect(dependencies.studioFacts.execute).toHaveBeenCalledTimes(2);
   });
 
   it('emits a sanitized signal when subscription reminders fail', async () => {

@@ -14,6 +14,7 @@ import {
 import { BookingModule } from './booking/booking.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SystemIdentityModule } from './system-identity/system-identity.module';
+import { StudioModule } from './studio/studio.module';
 import { ObjectStorageModule } from './uploads/object-storage.module';
 import { UploadsModule } from './uploads/uploads.module';
 
@@ -26,6 +27,7 @@ import { UploadsModule } from './uploads/uploads.module';
     SystemIdentityModule,
     BookingModule,
     BackOfficeModule,
+    StudioModule,
     UploadsModule,
     NotificationsModule,
   ],

@@ -1,0 +1,38 @@
+// Studio Management facts (STU-001). Identifiers are copies of Booking's, not
+// foreign keys: this context reads Booking and writes only its own tables.
+
+model SessionFact {
+  sessionId              String    @id @map("session_id") @db.Uuid
+  sessionDate            DateTime  @map("session_date") @db.Date
+  branchId               String    @map("branch_id") @db.Uuid
+  classTypeId            String    @map("class_type_id") @db.Uuid
+  trainerStaffMemberId   String    @map("trainer_staff_member_id") @db.Uuid
+  capacity               Int       @db.SmallInt
+  bookingsAtWindowClose  Int       @map("bookings_at_window_close") @db.SmallInt
+  attended               Int       @db.SmallInt
+  noShows                Int       @map("no_shows") @db.SmallInt
+  createdAt              DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt              DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt              DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@index([sessionDate])
+  @@map("session_facts")
+  @@schema("studio")
+}
+
+model ClientMonthFact {
+  clientId         String    @map("client_id") @db.Uuid
+  month            DateTime  @db.Date
+  planDays         Int       @map("plan_days") @db.SmallInt
+  classesBooked    Int       @map("classes_booked") @db.SmallInt
+  classesAttended  Int       @map("classes_attended") @db.SmallInt
+  renewed          Boolean
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamptz(3)
+  deletedAt        DateTime? @map("deleted_at") @db.Timestamptz(3)
+
+  @@id([clientId, month])
+  @@index([month])
+  @@map("client_month_facts")
+  @@schema("studio")
+}

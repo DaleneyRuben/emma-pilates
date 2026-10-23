@@ -272,6 +272,8 @@ export * from "./staffProfileDto";
 export * from "./staffProfileDtoRole";
 export * from "./startClientRegistrationDto";
 export * from "./startImpersonationDto";
+export * from "./studioRecomputeDto";
+export * from "./studioRecomputeInputDto";
 export * from "./supplyChangeDto";
 export * from "./supplyInputDto";
 export * from "./supplyMovementDto";

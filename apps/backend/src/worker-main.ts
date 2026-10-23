@@ -23,6 +23,7 @@ import { cleanupAbandonedUploads } from './uploads/cleanup-abandoned-uploads';
 import { createObjectStorage } from './uploads/create-object-storage';
 import { createUploadCleanupGateway } from './uploads/prisma-upload-cleanup-gateway';
 import { createFinalizeUploadJobCommands } from './uploads/prisma-upload-commands';
+import { recomputeCurrentStudioMonth } from './studio/studio.module';
 import { startWorker } from './worker';
 
 async function bootstrap(): Promise<void> {
@@ -126,6 +127,7 @@ async function bootstrap(): Promise<void> {
       expoAccessToken: environment.EXPO_ACCESS_TOKEN,
       now,
     }),
+    studioFacts: { execute: () => recomputeCurrentStudioMonth(prisma) },
     retentionSweeps: createPrismaRetentionSweeps(prisma, { now }),
     serviceVersion: process.env.npm_package_version ?? 'local',
     emit,

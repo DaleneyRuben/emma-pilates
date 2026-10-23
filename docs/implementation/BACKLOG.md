@@ -901,7 +901,7 @@ ticked, and the income report shows Bs 0 before the first real sale.
 
 | ID | Priority | Surface | Work item | Depends on | Effort | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| STU-001 | P2 | Backend | Studio Management context: `studio` schema, `session_facts`, `client_month_facts`, nightly and on-demand recompute | DOC-008, REL-016 | 3–4 d | ready |
+| STU-001 | P2 | Backend | Studio Management context: `studio` schema, `session_facts`, `client_month_facts`, nightly and on-demand recompute | DOC-008, REL-016 | 3–4 d | done |
 | STU-002 | P2 | Backend/admin web | Accrued versus cash revenue by validity days, deferred revenue, classes still owed | STU-001, BKO-005 | 2–3 d | ready |
 | STU-003 | P3 | Admin web | KPI panel and charts v1 (Recharts); a counts-only version for the Coordinator | STU-001, STU-002 | 6–9 d | ready |
 | STU-004 | P3 | Package/admin web | `packages/studio-economics` and the simulator | BKO-005 | 3–4 d | ready |
@@ -925,6 +925,46 @@ As the diagnosis's part 3 describes, with these adjustments:
 Each item's acceptance criteria: the formulas are unit-tested against the
 diagnosis's worked examples, and every chart has its loading, empty, and error
 states.
+
+#### STU-001 · Evidence
+
+Done 2026-10-23. [Pull request #187](https://github.com/DaleneyRuben/emma-pilates/pull/187). Studio Management is a new context with schema `studio` and
+two fact tables, `session_facts` and `client_month_facts`. A recompute reads
+Booking by named query (no Booking import, no write back) and upserts its own
+rows; a second run with the same source leaves `updated_at` unchanged. The
+worker recomputes the current Bolivia month at startup and every 24 hours.
+`POST /api/v1/administrator/studio-facts/recompute` is Administrator only
+(`403 studio_access_denied` for an Assistant).
+
+Commits: red unit `acf25fa3`, green recompute `b8172aff`, red integration
+`4be61af8`, green persistence `27759f7a`, red endpoint `97867c36`, green
+endpoint and nightly job `99c28305`, schema tests `fa7e4576`, contract
+`7acbc342`, testing guide `4824b91e`.
+
+Decisions taken: fact columns are the backlog's set (date, branch, class type,
+trainer, capacity, bookings at window close, attended, no-shows; plan days,
+classes booked, classes attended, renewed), not the diagnosis's wider set,
+which later items own. Plan days are the overlap of the latest covering
+Subscription with the month. Renewed means a Subscription ending in the month
+has a later one starting within 7 days. Bookings still `booked` count;
+cancelled ones do not. A Session with no Bookings still gets a row. Store-review
+exclusion is a seam (`includeInAnalytics`) that takes a flag; REL-016 is not
+merged, so the flag is always false and nothing is excluded. Counts-only views
+and charts stay in STU-003.
+
+Migration `20261023240000_studio_facts` needs owner approval before it is
+applied anywhere but a disposable database. Applied only to `pilates_stu001_dev`
+and `pilates_test_stu001` on port 5433; both were dropped.
+
+Verified: unit 4/4 (`recompute-facts.spec.ts`) plus the worker schedule spec,
+e2e 2/2 (`studio-facts.e2e-spec.ts`), integration 1/1 facts plus foundation
+schema and soft-delete schema (13) on `pilates_test_stu001`. Curl against
+`pilates_stu001_dev` on port 3137: Administrator `200` twice (`sessions` 20,
+`clientMonths` 5; all 20 session facts had zero bookings, matching the fixture
+month), Assistant `403 studio_access_denied`. No browser and no Simulator: this
+item has no screen. The nightly pass was not run as a worker process; the
+worker unit test covers the 24-hour schedule. Open question: store-review
+exclusion waits for REL-016's flag.
 
 ### Summary (2026-10-23)
 
