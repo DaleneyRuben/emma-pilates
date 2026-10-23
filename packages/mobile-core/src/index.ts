@@ -1,3 +1,4 @@
+export * from "./acquisition/acquisition-channel-field";
 export * from "./account/change-password-screen";
 export * from "./account/email-change-link-screen";
 export * from "./account/initials";
