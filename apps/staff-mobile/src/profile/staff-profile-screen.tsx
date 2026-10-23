@@ -23,6 +23,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
+import appConfig from "../../app.json";
 import { useStaffFetcher } from "../staff-fetcher";
 import { branchesLabel, roleLabel } from "./staff-labels";
 
@@ -148,7 +149,9 @@ export function StaffProfileScreen() {
             </Text>
           )}
         </Pressable>
-        <BodyText style={styles.footer}>Emma Pilates Studio · versión 1.0</BodyText>
+        <BodyText style={styles.footer}>
+          {`Emma Pilates Studio · versión ${appConfig.expo.version}`}
+        </BodyText>
       </ScrollView>
       <LogoutConfirmationSheet
         logout={identity.logout}
