@@ -63,6 +63,7 @@ import {
 } from './purchase-eligibility';
 import { createFreezeCommands } from './prisma-freeze';
 import { createFreezeReads } from './prisma-freeze-reads';
+import { createFrontDeskTransfer } from './front-desk-transfer';
 import {
   allocateStartDate,
   endSubscriptionEarly,
@@ -1588,6 +1589,23 @@ export function createPrismaPaymentCommands(
     decideFreeze: freezes.decideFreeze,
     listRequestedFreezes: freezeReads.listRequestedFreezes,
     readFreezeReview: freezeReads.readFreezeReview,
+    recordFrontDeskTransfer: (
+      command: {
+        clientId: string;
+        planId: string;
+        branchId: string;
+        imageAssetId: string;
+        startsOn?: string;
+      },
+      principal: AuthenticatedPrincipal,
+      idempotencyKey: string,
+    ) =>
+      createFrontDeskTransfer(prisma, {
+        now: dependencies.now,
+        recordNotification,
+      })
+        .record(command, principal, idempotencyKey)
+        .then((stored) => readPaymentView(stored.id)),
     completeCreditPurchase,
     readOpenPurchaseIntent,
     readCurrentPayment,

@@ -187,6 +187,7 @@ describe('Administrator Payment list (PostgreSQL)', () => {
       method: 'transfer',
       invoiceData: null,
       invoiceIssued: null,
+      voidReason: null,
     });
     expect(page.items[2]).toMatchObject({
       clientName: 'Mariana Paz',

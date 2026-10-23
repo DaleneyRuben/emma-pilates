@@ -18,6 +18,8 @@ import {
 } from "@pilates/api-contracts";
 import { randomUUID } from "expo-crypto";
 
+import { photographTransferReceipt } from "./front-desk-receipt-upload";
+
 // Failures keep the stable Problem Details code so screens can word them.
 export class AssistantApiError extends Error {
   constructor(
@@ -45,6 +47,14 @@ export type AssistantApi = {
     invoiceData: InvoiceDataDto | null,
     startsOn?: string,
   ) => Promise<AssistantCashPaymentDto>;
+  photographTransferReceipt: () => Promise<{ imageAssetId: string } | null>;
+  recordFrontDeskTransfer: (
+    clientId: string,
+    planId: string,
+    branchId: string,
+    imageAssetId: string,
+    startsOn?: string,
+  ) => Promise<{ id: string; state: string }>;
   rescheduleBooking: (bookingId: string, targetSessionId: string) => Promise<{ id: string }>;
   resendInvitation: (clientId: string) => Promise<ClientInvitationDto>;
   sendVerification: (clientId: string) => Promise<void>;
@@ -110,6 +120,26 @@ export function createAssistantApi(fetcher: typeof globalThis.fetch): AssistantA
     },
     async leaveWaitlist(waitlistEntryId) {
       requireSuccess(await leaveWaitlist(waitlistEntryId, undefined, fetcher));
+    },
+    photographTransferReceipt() {
+      return photographTransferReceipt(fetcher);
+    },
+    async recordFrontDeskTransfer(clientId, planId, branchId, imageAssetId, startsOn) {
+      const response = await fetcher(`/api/v1/assistant/clients/${clientId}/transfer-payments`, {
+        method: "POST",
+        headers: idempotent(),
+        body: JSON.stringify({
+          planId,
+          branchId,
+          imageAssetId,
+          ...(startsOn === undefined ? {} : { startsOn }),
+        }),
+      });
+      return requireSuccess({
+        status: response.status,
+        data: await response.json().catch(() => null),
+        headers: response.headers,
+      }) as { id: string; state: string };
     },
     async recordCashPayment(clientId, planId, branchId, invoiceData, startsOn) {
       const response = await recordAssistantCashPayment(

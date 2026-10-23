@@ -10,6 +10,7 @@ enum BookingCancellationCause {
   CLIENT_REQUEST    @map("client_request")
   SESSION_CANCELLED @map("session_cancelled")
   ACCOUNT_CLOSED    @map("account_closed")
+  PAYMENT_VOIDED    @map("payment_voided")
 
   @@schema("booking")
 }

@@ -199,6 +199,7 @@ model Account {
   decidedPayments           Payment[]               @relation("PaymentDecidedBy")
   invoiceIssuedPayments     Payment[]               @relation("PaymentInvoiceIssuedBy")
   decidedFreezes            Freeze[]                @relation("FreezeDecidedBy")
+  voidedPayments            Payment[]               @relation("PaymentVoidedBy")
   creditLedgerEntries       CreditLedgerEntry[]     @relation("CreditLedgerActor")
   createdAvailabilityBlocks AvailabilityBlock[]     @relation("AvailabilityBlockCreatedBy")
   endedAvailabilityBlocks   AvailabilityBlock[]     @relation("AvailabilityBlockEndedBy")

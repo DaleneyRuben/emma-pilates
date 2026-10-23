@@ -473,7 +473,7 @@ wait for Google, Apple, and testers.
 | PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | ready |
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | done |
 | BKM-011 | P0 | All surfaces | Acquisition channel («¿Cómo nos conociste?») and referral codes for Clients and Trainers; the code wins | DOC-008 | 2.5–3 d | done (6f8f47df registration, de271070 Assistant flow, bc106c51 + bcee395d correction and Trainer codes, d8a6008a + 3a7f3b96 apps, cab4a4b0 admin web, 3a77ac3c design export; see the notes under «BKM-011») |
-| PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | ready |
+| PAY-006 | P0 | All surfaces | Payment controls: transfer receipt uploaded at the front desk, void a sale (Administrator only), and admin-only courtesies and class returns | BKM-006, BKM-008 | 3–4 d | done |
 | PAY-007 | P0 | All surfaces | Invoice data on every sale (NIT or CI, name), the «Factura emitida» mark, and the unbilled filter | DOC-008 | 2–2.5 d | done (cd03688c storage and mark, fcc8fabd API, bad49a81 Staff app, 6fc42238 Client app, 73534ba8 AW28, caf26876 design 145–147; evidence below) |
 | BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | done (22c81c81; evidence below). Schema `e8390f9d`; admin-web session red `4b83f3e7` → `91f12934`; staff red `6684d0df` → `56eebbde`; operations red `fd06a8ad` → `db534ca6`; schedule red `0534aa8c` → `05fd60c0`; profile endpoint red `7fcb5de5` → `722ad126`; authorization matrix `41f5e250`; contracts `329a9415`; admin web red `0843bbd1`/`8073598e`/`ebbb2d6a` → `30d676c0`/`0f96e7b9`/`950bbabc`; Playwright `cc200115`; Staff app red `ec115e2e` → `e1511505`; Maestro `c357c97c`; testing guide Test 75 `e8938f7a`. Verified: backend unit 975, e2e 268, integration 92 suites / 367 tests (6 skipped, pre-existing), the matrix over all 170 endpoints for both Roles; `check:api` and `check:api-compat` clean; admin-web Jest 531, Playwright 19/19 (new coordinator journey finds no «Bs»); staff-mobile Jest 155, mobile-core 116; lint, Prettier, tsc clean. Browser walk at 1440 and 420 px as Carolina (Horario edit panel, money URL notice, Clientes «Editar perfil» saved, no «Bs», Personal read-only, drawer) and as Paola (Coordinador role option with implicit Branches). API curl as Carolina: Client search 200, payments 403. Walked on 2026-10-23 as Carolina on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator: Client search, a Client's overview without cash or «Nuevo cliente», and «Cancelar clase». Decisions: counts-only statistics deferred to STU-003 (ADR-0103 rejects on-the-fly indicators); Coordinator reads Staff but never invites or changes Roles/Branches; reads Branches and Class Types, not the Plan list; Assistant overview sends her Credit 0 (ADR-0016), the admin detail omits it; Evaluations oversight stays with the Administrator until NUT-003. Open questions: should the Coordinator see AW25 Evaluations and correct pending staff emails? development-fixtures.ts (oversized) grew by one staff entry.) |
@@ -798,6 +798,38 @@ Evidence (2026-10-23): `booking.client_acquisitions` keeps the answer (`declared
 Acceptance criteria: denial tests prove that the Assistant, Coordinator,
 Trainer, and Nutritionist get 403 on void and courtesy. A voided sale leaves the
 income report and stays visible with its reason.
+
+Evidence (PAY-006, 2026-10-23, branch `feature/pay-006-payment-controls`). This branch merges BKM-006 (`feature/bkm-006-start-date`, PR #169) and BKM-008 (`feature/bkm-008-extra-classes`, PR #170) at `1c0f2bad`. The testing guide and this backlog will collide with BKM-007's Test 78 and BKM-015's Test 78.
+
+Decisions:
+
+- A void is its own use case, controller, provider, and Prisma module. `prisma-payment-commands.ts` and `administrator.controller.ts` were already too large to grow. The front-desk transfer is likewise its own module, with a thin method on the payment commands.
+- PostgreSQL cannot use a new enum value in the transaction that adds it, so the void is two migrations: `20261023190000_void_payment_values` and `20261023190100_void_payment`. Both need owner approval. They were applied only to disposable databases and those databases are dropped at the end of the item.
+- A void is a state, never a DELETE (ADR-0086). The foreign key on `voided_by_account_id` is ON DELETE RESTRICT. `protect_payment` allows exactly one transition, confirmed to voided, and only the three void columns move. A voided cash, credit-only, or courtesy Payment still satisfies the method check. A voided Payment keeps its Subscription: the consistency trigger requires exactly one for confirmed and for voided.
+- The Subscription ends by setting `ends_on` to yesterday in America/La_Paz and `ended_by_void` to true. Its state stays active. `ended_by_void` exists because `subscriptions_values_check` requires `ends_on >= starts_on` and a CHECK cannot read the Payment. A void that ends a Plan before it started would fail that check otherwise.
+- Future Bookings are cancelled inside the void transaction with cause `payment_voided`, using the account-closure future-booking query and the existing waitlist promotion. The existing `cancelBooking` command cannot be that path: it is Client-only, restores a class, and refuses an Administrator. Attendance rows stay. No money is returned and no credit is released. A pending Payment is not voidable. A second void is refused.
+- The income report sums confirmed Payments only. A voided sale in the window is returned on an additive `voided` list with its reason and leaves the totals.
+- The Administrator's payment list stays a transfer queue. A voided cash sale would never appear there, so the voided filter and the unfiltered list also include voided sales of every method, with the reason.
+- The Coordinator Role does not exist on this branch (IDN-009). Void and courtesy deny every principal who is not an Administrator. The denial tests cover a coordinator by casting a principal the use case rejects, matching BKM-008.
+- The invoice card on S10 matches PAY-007's fields (NIT or CI, name or business name, both optional, «Sin factura» allowed). It is not an import of PAY-007's component, and this branch does not add the invoice columns, the «Factura emitida» mark, the CSV, or the filter. Those stay PAY-007's. Reconcile the card with PAY-007's component when both merge.
+- A front-desk transfer is `POST /api/v1/assistant/clients/{clientId}/transfer-payments`. It creates a pending transfer Payment with a receipt the Assistant owns, notifies Administrators with the existing `payment_submitted` push, and is approved on the existing review. It does not set `collected_at_branch_id` (the method check forbids that on a transfer); the Branch is audit metadata. Cash confirmation stays as it was. Older builds omit the new fields and still confirm cash.
+- Courtesy and class return reuse `POST /api/v1/administrator/clients/{clientId}/allowance-adjustments`. PAY-006 adds the admin form only. The 403 tests already exist in `allowance-adjustments.e2e-spec.ts`.
+
+Open questions:
+
+- The invoice fields on a front-desk receipt are not stored. PAY-007 owns `invoiceTaxId` and `invoiceName`. When both branches merge, the card must send those fields and the cash and transfer commands must persist them.
+- The Coordinator denial is a cast principal. IDN-009 should replace that cast with the real role.
+- The void does not go through `cancelBooking`. That command restores a class and refuses an Administrator. The void cancels future Bookings in its own transaction and does not restore a class, because a void corrects a mistake.
+
+Migrations needing owner approval: `20261023190000_void_payment_values`, `20261023190100_void_payment`.
+
+Verified (2026-10-23, API on 3129 over `pilates_pay006_dev`, admin web on 5173 because the API trusts `http://localhost:5173`):
+
+- **API.** Camila's cash confirmation of Lucía answered `201` with a confirmed Payment and the gift class. The same Payment voided by Paola answered `200`. A blank reason answered `400` `void_reason_required`. A second void answered `409` `payment_already_voided`. Camila, Emma (Trainer), and Gabriela (Nutritionist) got `403` on the void. Camila got `403` on courtesy. Paola's class return answered `201`. The voided filter lists the sale with its reason.
+- **Admin web**, Chromium at 1440 px and 420 px. Pagos filtered to Anulado shows the reason. Lucía's detail shows «Agregar clase de cortesía» and «Devolver una clase». At 420 px the sidebar opens from «Abrir menú».
+- **Staff devices.** Not walked. The simulator lock was free, and the iPhone, iPad, and Android emulator were not started: the front-desk photograph needs a camera and a READY upload, which the integration test and the card spec cover. Metro was not started.
+
+Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/174.
 
 #### PAY-007 · Invoice data
 

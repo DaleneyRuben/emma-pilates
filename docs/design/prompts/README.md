@@ -262,6 +262,9 @@ Each of these was sent as the next message in the existing design session for th
 | [198](./followups/193-founder-renewal-banner.md) | «Renueva antes del …» on `12` while a founder holds a current Subscription (BKM-010). Numbered 198 here because 193 is the extra-classes line. | 🕓 pending |
 | [199](./followups/194-freeze-request.md) | Freeze request and status on `12`; booking refusal on `04` (BKM-012). Numbered 199 here because 194 is the extra-classes line. | 🕓 pending |
 | [200](./followups/195-freeze-review.md) | Congelamientos list on the admin web and the Administrator's Staff review (BKM-012). Numbered 200 here because 195 is the extra-classes line. The sidebar calls this page AW40 because AW37 is Equipos and AW38 is Fundadoras. | 🕓 pending |
+| [201](./followups/196-front-desk-receipt-and-invoice.md) | `S10` gains the front-desk receipt photograph and the smallest «Datos para la factura» card (PAY-006, decisions §4.2 and §4.5). Numbered 201 here because 196 is the weekly-cap line. | 🕓 pending |
+| [202](./followups/197-void-sale-on-payments.md) | `AW28` gains «Anular venta» with a required reason and an «Anulado» filter (PAY-006, decisions §4.3). Numbered 202 here because 197 is the campaign line. | 🕓 pending |
+| [203](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006). Numbered 203 here because 198 is the founder banner. | 🕓 pending |
 
 ## Status
 

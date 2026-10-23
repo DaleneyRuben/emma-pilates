@@ -19,6 +19,7 @@ import { PaymentReviewPanel } from "./payment-review-panel";
 import type { PaymentSearch, PaymentStatusFilter } from "./payment-search";
 import { PaymentStatePill } from "./payment-state-pill";
 import { methodLabels, paymentsCsv, paymentsCsvName } from "./payments-csv";
+import { VoidSaleAction } from "./void-sale-action";
 
 type InvoiceFilter = "all" | "unissued";
 
@@ -32,6 +33,7 @@ const statusOptions: { value: PaymentStatusFilter; label: string }[] = [
   { value: "pending", label: "Pendiente" },
   { value: "confirmed", label: "Confirmado" },
   { value: "rejected", label: "Rechazado" },
+  { value: "voided", label: "Anulado" },
 ];
 
 const nouns: Record<PaymentStatusFilter, [string, string]> = {
@@ -39,6 +41,7 @@ const nouns: Record<PaymentStatusFilter, [string, string]> = {
   pending: ["pago pendiente", "pagos pendientes"],
   confirmed: ["pago confirmado", "pagos confirmados"],
   rejected: ["pago rechazado", "pagos rechazados"],
+  voided: ["venta anulada", "ventas anuladas"],
 };
 
 const waiting = (count: number) =>
@@ -53,6 +56,7 @@ const empty: Record<PaymentStatusFilter, [string, string?]> = {
   ],
   confirmed: ["Todavía no hay pagos confirmados."],
   rejected: ["Todavía no hay pagos rechazados."],
+  voided: ["Todavía no hay ventas anuladas."],
   all: ["Todavía no hay pagos."],
 };
 
@@ -149,7 +153,22 @@ const paymentColumns = (open: (row: AdminPaymentDto) => void) => [
   }),
   columns.accessor("state", {
     header: "Estado",
-    cell: ({ getValue }) => <PaymentStatePill state={getValue()} />,
+    cell: ({ row }) => (
+      <span className="inline-flex flex-col gap-1">
+        <PaymentStatePill state={row.original.state} />
+        {row.original.voidReason ? (
+          <span className="text-ayuda text-texto-tenue">
+            {row.original.voidReason}
+          </span>
+        ) : null}
+        {row.original.state === "confirmed" ? (
+          <VoidSaleAction
+            paymentId={row.original.id}
+            clientName={row.original.clientName}
+          />
+        ) : null}
+      </span>
+    ),
   }),
   columns.display({
     id: "invoice",

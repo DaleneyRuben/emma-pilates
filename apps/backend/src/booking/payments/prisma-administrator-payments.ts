@@ -25,6 +25,7 @@ type PaymentRow = {
   invoice_name: string | null;
   invoice_issued_at: Date | null;
   invoice_issued_by_name: string | null;
+  void_reason: string | null;
 };
 
 const stateCondition = (status: AdministratorPaymentStatusFilter) =>
@@ -70,6 +71,7 @@ const toRow = (row: PaymentRow): AdministratorPaymentRow => ({
           issuedAt: row.invoice_issued_at,
           issuedByName: row.invoice_issued_by_name ?? '',
         },
+  voidReason: row.void_reason,
 });
 
 // WEB-005 (AW28): every transfer and, since PAY-007, every cash sale of the
@@ -81,7 +83,14 @@ export const createPrismaAdministratorPayments = (
   prisma: PrismaClient,
 ): AdministratorPaymentLedger => ({
   list: async ({ page, pageSize, status, invoice, query }) => {
-    const where = Prisma.sql`WHERE p.method IN ('transfer', 'cash')
+    // Transfers and cash sales stay on the accountant's list (PAY-007). A
+    // voided cash sale is a mistake the Administrator must still see
+    // (PAY-006), so the voided filter and the unfiltered list include it.
+    const method =
+      status === 'voided' || status === 'all'
+        ? Prisma.sql`p.method IN ('transfer', 'cash')`
+        : Prisma.sql`(p.method IN ('transfer', 'cash') OR p.state = 'voided')`;
+    const where = Prisma.sql`WHERE ${method}
       ${stateCondition(status)} ${invoiceCondition(invoice)}
       ${searchCondition(query)}`;
     const [rows, [counted], pendingCount] = await Promise.all([
@@ -91,6 +100,7 @@ export const createPrismaAdministratorPayments = (
           p.plan_price_centavos, p.credit_applied_centavos,
           p.amount_due_centavos, p.state::text AS state, p.submitted_at,
           p.decided_at,
+          p.void_reason,
           (receipt.id IS NOT NULL AND receipt.deleted_at IS NULL)
             AS receipt_available,
           p.invoice_tax_id, p.invoice_name, p.invoice_issued_at,

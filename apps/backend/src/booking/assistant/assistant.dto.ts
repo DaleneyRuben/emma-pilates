@@ -133,6 +133,41 @@ export const parseRecordCashPayment = (
   return result.success ? result.data : null;
 };
 
+export class RecordFrontDeskTransferDto {
+  @ApiProperty({ format: 'uuid' })
+  planId!: string;
+
+  @ApiProperty({ format: 'uuid', description: 'Branch of the front desk' })
+  branchId!: string;
+
+  @ApiProperty({
+    format: 'uuid',
+    description: 'The photographed transfer receipt, already READY',
+  })
+  imageAssetId!: string;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
+}
+
+export const parseRecordFrontDeskTransfer = (
+  value: unknown,
+): RecordFrontDeskTransferDto | null => {
+  const result = z
+    .strictObject({
+      planId: uuid,
+      branchId: uuid,
+      imageAssetId: uuid,
+      startsOn: z.iso.date().optional(),
+    })
+    .safeParse(value);
+  return result.success ? result.data : null;
+};
+
 export class AssistantCashPaymentDto {
   @ApiProperty({ type: PaymentDto })
   payment!: PaymentDto;

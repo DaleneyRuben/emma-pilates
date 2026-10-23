@@ -28,6 +28,7 @@ export const paymentRow = (
   method: "transfer",
   invoiceData: null,
   invoiceIssued: null,
+  voidReason: null,
   ...extra,
 });
 

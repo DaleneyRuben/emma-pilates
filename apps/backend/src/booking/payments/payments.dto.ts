@@ -122,8 +122,8 @@ export class PaymentDto {
   @ApiProperty({ enum: ['transfer', 'cash', 'credit_only', 'courtesy'] })
   method!: 'transfer' | 'cash' | 'credit_only' | 'courtesy';
 
-  @ApiProperty({ enum: ['pending', 'confirmed', 'rejected'] })
-  state!: 'pending' | 'confirmed' | 'rejected';
+  @ApiProperty({ enum: ['pending', 'confirmed', 'rejected', 'voided'] })
+  state!: 'pending' | 'confirmed' | 'rejected' | 'voided';
 
   @ApiProperty({ format: 'uuid' })
   planId!: string;

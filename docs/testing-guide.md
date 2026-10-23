@@ -48,7 +48,7 @@ can be found by its design name.
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 80 |
 | 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 81, 85, 86 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
-| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77, 81, 82, 84 |
+| 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77, 81, 82, 84, 87 |
 | 12 Mi plan | 5, 18, 71, 76, 77, 81, 82, 84, 86 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Mis referidos, 17 Mi crédito | 10, 18 |
@@ -61,8 +61,8 @@ can be found by its design name.
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
 | S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 77 |
 | S26 Reportar una falla (Entrenadora) | 77 |
-| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 78, 79, 80, 81, 82, 85 |
-| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 81, 84 |
+| S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54, 78, 79, 80, 81, 82, 85, 87 |
+| S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19, 76, 81, 84, 87 |
 | S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20, 78 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
@@ -83,13 +83,13 @@ can be found by its design name.
 | AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72 |
 | AW16 Reporte de ingresos y gastos | 30, 31 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
-| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 78, 80, 82, 83 |
+| AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 78, 80, 82, 83, 87 |
 | AW38 Fundadoras | 84 |
 | AW39 Para contactar | 79 |
 | AW40 Congelamientos | 86 |
 | AW23–AW24 Personal | 26, 31, 72, 78, 80 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
-| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
+| AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72, 79, 87 |
 
 ## Before you begin
 
@@ -6496,3 +6496,40 @@ D. **The founder.** A founder whose Subscription was frozen is not ended by
 E. **Who decides.** An Assistant, a Trainer, a Nutritionist, and a Client
    get `403` on the decision. A Coordinator principal is rejected too;
    IDN-009 makes that role real. The sidebar calls this page AW40 because AW37 is Equipos and AW38 is Fundadoras.
+
+## Test 87: payment controls (PAY-006)
+
+A sale stays as it was recorded. The Assistant cannot edit or delete a
+Payment. Only the Administrator voids one, and only with a reason
+([decisions §4.3](./decisiones-emma-pilates.md),
+[booking ADR-0012](../booking/docs/adr/0012-sales-controls-and-invoice-data.md)).
+A void corrects a mistake: no money is returned. Run the API and the
+fixtures as in Tests 2 and 5. Paola is the Administrator and Camila the
+Assistant.
+
+A. **Front-desk receipt.** As Camila, open a Client and **Confirmar pago en
+   efectivo** (S10). **Fotografiar comprobante** sends the receipt. The
+   Payment stays pending. As Paola, the same receipt appears on **Revisar
+   pago** (S12) and on **Pagos** (AW28). Approving it uses that existing
+   review. Cash still confirms on the spot with **Confirmar pago recibido**,
+   and an older build that omits the new fields still confirms cash.
+B. **Invoice card.** On that same S10 screen, **Datos para la factura**
+   starts on **Sin factura**. **Con factura** asks for **NIT o CI** and
+   **Nombre o razón social**. Both can stay empty. This branch does not
+   store them; PAY-007 owns the columns and the «Factura emitida» mark.
+C. **Anular venta.** As Paola, on **Pagos**, filter **Confirmado** and press
+   **Anular venta**. The button stays disabled until **Motivo** has text.
+   After the void the row is **Anulado** and shows the reason. The income
+   report drops that amount from the totals and lists the sale under
+   **Ventas anuladas** with the same reason. The Subscription no longer
+   covers today, future Bookings are cancelled, and Attendance already
+   taken stays. A second void is refused.
+D. **Courtesy.** On the Client detail (AW22), with an active Plan,
+   **Agregar clase de cortesía** and **Devolver una clase** record one
+   class. Camila, a Trainer, and a Nutritionist get `403` on that endpoint
+   and on the void. The Coordinator Role is not on this branch; the denial
+   covers a cast principal the use case rejects.
+
+The migrations `20261023190000_void_payment_values` and
+`20261023190100_void_payment` need owner approval before they run on a
+shared database.

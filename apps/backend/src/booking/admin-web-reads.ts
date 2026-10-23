@@ -8,6 +8,8 @@ import { allowanceAdjustmentProvider } from './payments/allowance-adjustment-pro
 import { AllowanceAdjustmentController } from './payments/allowance-adjustment.controller';
 import { campaignGrantProvider } from './payments/campaign-grant-provider';
 import { CampaignController } from './payments/campaign.controller';
+import { VoidSaleController } from './payments/void-sale.controller';
+import { voidSaleProvider } from './payments/void-sale-provider';
 import { CourtesyAccessController } from './payments/courtesy-access.controller';
 
 // The admin web's oversight reads (WEB-004 Clients, WEB-005 Payments) and the
@@ -20,6 +22,7 @@ export const adminWebReads = {
     CourtesyAccessController,
     AllowanceAdjustmentController,
     CampaignController,
+    VoidSaleController,
   ],
   providers: (prismaToken: symbol): Provider[] => [
     administratorClientProvider(prismaToken),
@@ -27,5 +30,6 @@ export const adminWebReads = {
     courtesyAccessProvider(prismaToken),
     allowanceAdjustmentProvider(prismaToken),
     ...campaignGrantProvider(prismaToken),
+    voidSaleProvider(prismaToken),
   ],
 };

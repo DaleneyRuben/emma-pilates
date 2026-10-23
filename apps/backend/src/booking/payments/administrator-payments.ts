@@ -5,7 +5,8 @@ import type {
   InvoiceIssuedView,
 } from './invoice-data/invoice-data';
 
-export type AdministratorPaymentState = 'pending' | 'confirmed' | 'rejected';
+export type AdministratorPaymentState =
+  'pending' | 'confirmed' | 'rejected' | 'voided';
 export type AdministratorPaymentStatusFilter =
   AdministratorPaymentState | 'all';
 
@@ -30,6 +31,8 @@ export type AdministratorPaymentRow = {
   receiptAvailable: boolean;
   invoiceData: InvoiceData | null;
   invoiceIssued: InvoiceIssuedView['invoiceIssued'];
+  /** Present only on a voided sale (PAY-006). */
+  voidReason: string | null;
 };
 
 export type AdministratorPaymentPage = {

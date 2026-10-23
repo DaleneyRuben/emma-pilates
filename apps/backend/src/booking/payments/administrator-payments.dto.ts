@@ -15,6 +15,7 @@ const paymentStates = [
   'pending',
   'confirmed',
   'rejected',
+  'voided',
 ] as const satisfies readonly AdministratorPaymentState[];
 export const paymentStatusFilters = [
   'all',
@@ -79,6 +80,13 @@ export class AdminPaymentDto {
     description: 'The «Factura emitida» mark: who and when',
   })
   invoiceIssued!: InvoiceIssuedMarkDto | null;
+
+  @ApiProperty({
+    type: String,
+    nullable: true,
+    description: 'Why the sale was voided; null unless the state is voided',
+  })
+  voidReason!: string | null;
 }
 
 export class AdminPaymentPageDto {

@@ -12,4 +12,5 @@ export const PaymentReviewDtoState = {
   pending: "pending",
   confirmed: "confirmed",
   rejected: "rejected",
+  voided: "voided",
 } as const;
