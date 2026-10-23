@@ -95,4 +95,57 @@ describe("Staff notification destinations", () => {
       "22222222-2222-4222-8222-222222222222",
     );
   });
+
+  it("opens the Client from an Assistant's client notice", async () => {
+    const clientId = "33333333-3333-4333-8333-333333333333";
+    const fetcher = routeFetcher({
+      "/api/v1/staff-members/current": () =>
+        jsonResponse({
+          id: "staff-3",
+          name: "Camila Rojas",
+          email: "camila.rojas@example.com",
+          phone: null,
+          role: "assistant",
+          branches: [{ id: "branch-centro", name: "Centro" }],
+        }),
+      "/api/v1/notifications/unread-count": () => jsonResponse({ unread: 1 }),
+      "/api/v1/notifications": () =>
+        jsonResponse(
+          notice("client", "Nuevo pago en efectivo confirmado para Lucía Fernández.", clientId),
+        ),
+      [`/api/v1/assistant/clients/${clientId}`]: () =>
+        jsonResponse({
+          client: {
+            id: clientId,
+            name: "Lucía Fernández",
+            email: "lucia@example.com",
+            phone: null,
+            accountStatus: "active",
+          },
+          subscription: { status: "none", subscription: null },
+          nextBooking: null,
+          recentHistory: [],
+          creditAvailableCentavos: 0,
+        }),
+    });
+    const screen = await render(<App runtime={createStaffRuntime(fetcher, "assistant")} />);
+    await waitFor(
+      () => expect(screen.getByRole("button", { name: /^Tu cuenta/ })).toBeOnTheScreen(),
+      { timeout: 10_000 },
+    );
+    await fireEvent.press(screen.getByRole("button", { name: /^Tu cuenta/ }));
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /Notificaciones/ })).toBeOnTheScreen(),
+    );
+    await fireEvent.press(screen.getByRole("button", { name: /Notificaciones/ }));
+    await waitFor(() =>
+      expect(
+        screen.getByText("Nuevo pago en efectivo confirmado para Lucía Fernández."),
+      ).toBeOnTheScreen(),
+    );
+    await fireEvent.press(screen.getByText("Nuevo pago en efectivo confirmado para Lucía Fernández."));
+
+    await waitFor(() => expect(screen.getByLabelText("Lucía Fernández")).toBeOnTheScreen());
+    expect(screen.queryByText("Nuevo pago en efectivo confirmado para Lucía Fernández.")).toBeNull();
+  });
 });
