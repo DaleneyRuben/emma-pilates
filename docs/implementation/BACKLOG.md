@@ -468,7 +468,7 @@ wait for Google, Apple, and testers.
 | BKM-005 | P0 | All surfaces | Plans by days (30/60/90) with a weekly cap field, and the eight real Plans | DOC-008, BKM-004 | 3–4 d | done (`6541a63a` days, `0b2a0633` AW04, `14fb2000` tester Plan; evidence below) |
 | BKM-006 | P0 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | ready |
 | BKM-008 | P0 | All surfaces | Extra classes as `AllowanceAdjustment` with a reason and author, and the automatic gift class on a Client's first Plan | BKM-005 | 2.5–3.5 d | done |
-| BKM-007 | P0 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | ready |
+| BKM-007 | P0 | All surfaces | Weekly cap at booking, «Te quedan N clases esta semana» | BKM-005, BKM-008 | 2.5–3 d | done |
 | BKM-009 | P0 | Backend/apps | Minimum of 2 bookings checked 3 h before, replacing the zero-booking check, and the booking snapshot at the window close | BKM-004 | 2–2.5 d | ready |
 | PAY-005 | P0 | All surfaces | Remove the Bs 60 referral credit and everything that only exists for it | DOC-008 | 2–3 d | ready |
 | BKM-010 | P0 | All surfaces | Founder membership: 40 places, 15 %, lost after a gap of more than 7 days | BKM-006, PAY-005 | 3–4 d | ready |
@@ -616,6 +616,34 @@ Open questions:
 Acceptance criteria: a fourth booking in the same week on a cap-3 Plan is
 refused with its own message unless an extra class is left, and so is joining
 that week's waitlist. The waitlist test proves the skip.
+
+Evidence (BKM-007, 2026-10-23, branch `feature/bkm-007-weekly-cap`, stacked on BKM-008 at `246055c2`).
+
+Commits: `319b3a4e` failing week and copy tests, `71ee0f72` the Bolivia week and the classes left, `8ce5e268` failing booking and waitlist tests, `d4117d08` the refusal, `8f015cac` failing persistence tests, `6400a603` the count and the refusal on a persisted booking, `bfa57695` the classes-left field and the problem code, `5ac895fa` the line on Reservar and the Session detail.
+
+Decisions:
+
+- The week is Monday–Sunday in America/La_Paz, from the existing Bolivia time helpers. A null `weeklyClassCapSnapshot` means no cap. The count is confirmed Bookings in that week whose id no live consumption adjustment names.
+- Past the cap, `fundBooking` calls `chooseAllowanceSource` with a base of zero. An extra class, when one is left, writes a negative `consumption` row and then `linkConsumptionToBooking` sets its `booking_id`. That booking does not itself use a place in the cap.
+- The problem code is `weekly_cap_reached`. The detail is «Ya usaste tus clases de esta semana.» The number stays on `classesLeftThisWeek`, so a client branches on the code. One class on a screen reads «Te queda 1 clase esta semana»; zero stays «Te quedan 0 clases esta semana» even when an extra class remains.
+- `classesLeftThisWeek` is optional on the Session list, the Session detail, and the current subscription summary. It is omitted for a caller who is not a Client, and null when the Plan has no cap. The list uses the week of the query's `from`.
+- A Reschedule stays eligible inside the same Bolivia week, not only the same day, and the released Booking is excluded from the count, so a same-week move at the cap succeeds. A move into another week is still `reschedule_target_ineligible`.
+- Migration `20261023160000_weekly_cap` adds a nullable unique `booking_id` on `booking.allowance_adjustments`. It was applied only to `pilates_bkm007_dev` and the `pilates_test_bkm007` databases this session created. It needs owner approval before any shared, staging, or production database.
+
+Verified (2026-10-23, API on 3126 over `pilates_bkm007_dev`, then dropped):
+
+- **API.** Lucía on a cap-3 Plan booked three Sessions in the week of 26 October. The fourth answered `409 weekly_cap_reached`. Paola's courtesy class let the fourth through (`201`), and the consumption row names that Booking. A fifth was refused again. Joining that week's full Session's Waitlist answered the same code. Camila booking Lucía into a Centro Session answered the same code. After Lucía joined a Waitlist and then reached the cap, cancelling the holder promoted Isabel and left Lucía queued. The Session list and the Session detail returned `classesLeftThisWeek: 0` for that week.
+
+The mobile surfaces were not walked on a device in this session: another item owns the simulators. Follow-up 196 is pending because the design export was not run. No admin-web UI was added.
+
+Open questions:
+
+- A Reschedule into a different week is refused as ineligible, not as `weekly_cap_reached`. The cap check runs only once the destination is in the same week, where the released Booking makes the move cap-neutral.
+- Cancelling a Booking funded by an extra class still restores the class to the base pool (BKM-008). The consumption row stays, so the cancelled Booking no longer counts toward the cap.
+- The problem detail does not include N. The screen line does, from `classesLeftThisWeek`.
+- The displayed count is the cap minus base-funded Bookings. It is not also limited by `remainingClassAllowance`.
+- The Session list attaches one count for the query's `from`, not one per Session, so a range that crosses a week shows the first week's remainder.
+- `linkConsumptionToBooking` updates every live unlinked consumption row of the Subscription. Two Bookings that both spend the last extra class (BKM-008) can then fail the unique `booking_id`.
 
 #### BKM-009 · Minimum bookings
 
