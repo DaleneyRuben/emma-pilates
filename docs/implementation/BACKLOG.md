@@ -480,7 +480,7 @@ wait for Google, Apple, and testers.
 | NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
 | BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | ready |
 | BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | ready |
-| BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | ready |
+| BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | done |
 | BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | done (c0bf32ec; evidence below) |
 | BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | done (640306cc, 60f50324, 2ef9df18, d8798346, 830ece53; evidence below) |
 | BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | ready |
@@ -631,6 +631,42 @@ Open questions:
 - Cancelling a Booking funded by an extra class restores the class to the base pool, not the extra pool. A `consumed_from` column was not added; the mandated migration is the one file above.
 - Waitlist promotion still spends only the base allowance. A Client whose only remaining class is extra is not promoted.
 - Two Bookings in one serializable transaction cannot both spend the last base class. Two that both read a positive extra sum can each write a negative row. No check keeps the live sum at zero or above.
+
+#### BKM-015 · Campaign extra classes
+
+- One command grants reason `campaign` to every Client with a live Subscription. A Client without one is skipped and named. A retry with the same idempotency key writes nothing again.
+- Only the Administrator creates one. Never a price discount.
+- The admin web opens the grant from Clientes (AW21). The campaign name lives in the audit; there is no campaign table.
+
+Acceptance criteria:
+
+- An Administrator grants a campaign of 1 class to every Client with a live Subscription; each gets one `campaign` adjustment and one audit record; a Client without a live Subscription is skipped and named in the result.
+- The same call as an Assistant returns 403 and writes nothing.
+- A retry with the same idempotency key grants nothing more.
+- No Payment row changes (no discount).
+- The admin page submits the command and shows the granted and skipped counts.
+
+Evidence (BKM-015, 2026-10-23, branch `feature/bkm-015-campaigns`, stacked on BKM-008 at `246055c2`, [PR #171](https://github.com/DaleneyRuben/emma-pilates/pull/171)).
+
+Commits: `2cf7b502` failing grant tests, `4a9d5c0c` failing database grant, `1db51660` failing endpoint, `fffdcc74` failing page, `5e4bf813` the bulk grant, `ea71b9db` failing skipped copy, `5905c772` the verb that agrees.
+
+Decisions:
+
+- No campaign table. The name lives in the audit metadata of each `allowance_adjustment.recorded` row, and the adjustments are the record. A later list of past campaigns would need the smallest table and owner approval for its migration.
+- One command, `POST /api/v1/administrator/campaigns`, takes a name, a class count of 1 to 4, and an idempotency key. It writes one `campaign` adjustment per Client whose live Subscription covers today in America/La_Paz, plus one audit record per grant, in one transaction. A Client with an Account and no live Subscription is skipped and named. A retry of the same key returns the stored result.
+- The page is a sub-page of Clientes (AW21), not a new screen and not a sidebar entry. Follow-up 196 stays pending. The extra-class line already reads «Campaña»; it was not rebuilt.
+- Reused `recordAllowanceAdjustment`. The campaign name is an optional audit field, so a gift and a courtesy write the same audit they wrote before.
+
+Verified (2026-10-23, API on 3127 over `pilates_bkm015_dev`, admin web on 5196):
+
+- **Admin web**, Chromium at 1440 px and 420 px. Paola opens Clientes, presses «Dar clases de campaña», and the page reads «3 clientas la recibirán.» and names Mariana Peña and Sofía Guzmán. «Vacaciones» with 2 classes answers «3 clientas recibieron 2 clases extra. 2 clientas no tienen un plan vigente: Mariana Peña, Sofía Guzmán.» Lucía's detail reads «Clases extra: 3 · Campaña». At 420 px the page opens from «Abrir menú».
+- **API.** The e2e answers 403 for an Assistant, a Trainer, a Nutritionist, and a coordinator principal, and writes nothing. The integration test proves the retry and that no Payment row changes.
+
+Open questions:
+
+- The Coordinator Role does not exist (IDN-009). The endpoint denies every principal who is not an Administrator, and the e2e covers a coordinator only by casting a principal the use case rejects. The denial becomes a real role when IDN-009 adds it.
+- A Client with two live Subscriptions receives the campaign on the one activated latest. The directory shows one active Plan, so the page and the grant agree; two overlapping live Plans are not a case the studio creates.
+- There is no list of past campaigns. The audit rows are the record.
 
 #### BKM-007 · Weekly cap
 

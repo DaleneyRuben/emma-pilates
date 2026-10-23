@@ -31,6 +31,17 @@ const contactAlertsRoute = createRoute({
   ),
 });
 
+// AW21 (BKM-015): the campaign grant, opened from Clientes, not its own
+// sidebar entry.
+const campaignRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/clientes/campana",
+  component: lazyRouteComponent(
+    () => import("../campaigns/campaign-route"),
+    "CampaignRoute",
+  ),
+});
+
 const staffRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/personal",
@@ -116,6 +127,7 @@ const expenseCategoriesRoute = createRoute({
 export const backOfficeRoutes = [
   clientsRoute,
   contactAlertsRoute,
+  campaignRoute,
   paymentsRoute,
   suppliesRoute,
   withdrawalsRoute,

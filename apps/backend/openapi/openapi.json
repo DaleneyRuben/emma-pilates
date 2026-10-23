@@ -4577,6 +4577,80 @@
         ]
       }
     },
+    "/api/v1/administrator/campaigns/preview": {
+      "get": {
+        "operationId": "previewCampaign",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignPreviewDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Campaign"
+        ]
+      }
+    },
+    "/api/v1/administrator/campaigns": {
+      "post": {
+        "operationId": "grantCampaign",
+        "parameters": [
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantCampaignDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CampaignResultDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "Campaign"
+        ]
+      }
+    },
     "/api/v1/accounts/current/closure": {
       "post": {
         "operationId": "closeCurrentClientAccount",
@@ -11875,6 +11949,87 @@
           "id",
           "classes",
           "reason"
+        ]
+      },
+      "CampaignClientDto": {
+        "type": "object",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "clientId",
+          "name"
+        ]
+      },
+      "CampaignPreviewDto": {
+        "type": "object",
+        "properties": {
+          "recipientCount": {
+            "type": "number"
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignClientDto"
+            }
+          }
+        },
+        "required": [
+          "recipientCount",
+          "skipped"
+        ]
+      },
+      "GrantCampaignDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The campaign name, kept in the audit"
+          },
+          "classes": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 4
+          }
+        },
+        "required": [
+          "name",
+          "classes"
+        ]
+      },
+      "CampaignResultDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "classes": {
+            "type": "number"
+          },
+          "granted": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignClientDto"
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CampaignClientDto"
+            }
+          }
+        },
+        "required": [
+          "name",
+          "classes",
+          "granted",
+          "skipped"
         ]
       },
       "CloseAccountRequestDto": {
