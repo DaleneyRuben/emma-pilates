@@ -463,7 +463,7 @@ wait for Google, Apple, and testers.
 
 | ID | Priority | Surface | Work item | Depends on | Effort | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| DOC-008 | P0 | Docs | Record Emma's rules in the glossaries and ADRs before any code changes | — | 1.5–2 d | ready |
+| DOC-008 | P0 | Docs | Record Emma's rules in the glossaries and ADRs before any code changes | — | 1.5–2 d | done (44b47adc; booking ADR-0005 to ADR-0012, ADR-0101 to ADR-0106, Studio Management glossary) |
 | BKM-004 | P0 | Backend/admin web/apps | `StudioSettings`: one versioned row for the configurable rules, a «Reglas del estudio» page for the Administrator, and a public rules endpoint that replaces the hard-coded copy in the apps | DOC-008 | 2.5–3.5 d | ready |
 | BKM-005 | P0 | All surfaces | Plans by days (30/60/90) with a weekly cap field, and the eight real Plans | DOC-008, BKM-004 | 3–4 d | ready |
 | BKM-006 | P0 | All surfaces | Start date chosen at purchase (today up to +14 days) and early renewal | BKM-005 | 3.5–4.5 d | ready |
