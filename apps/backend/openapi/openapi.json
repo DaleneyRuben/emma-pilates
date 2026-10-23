@@ -3994,6 +3994,157 @@
         ]
       }
     },
+    "/api/v1/administrator/freezes": {
+      "get": {
+        "operationId": "listRequestedFreezes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/FreezeReviewDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFreezes"
+        ]
+      }
+    },
+    "/api/v1/administrator/freezes/{freezeId}": {
+      "get": {
+        "operationId": "getFreezeReview",
+        "parameters": [
+          {
+            "name": "freezeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeReviewDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFreezes"
+        ]
+      }
+    },
+    "/api/v1/administrator/freezes/{freezeId}/decision": {
+      "post": {
+        "operationId": "decideFreeze",
+        "parameters": [
+          {
+            "name": "freezeId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecideFreezeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeDecisionDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "AdministratorFreezes"
+        ]
+      }
+    },
+    "/api/v1/freezes": {
+      "post": {
+        "operationId": "requestFreeze",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestFreezeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FreezeRequestDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "ClientFreezes"
+        ]
+      }
+    },
     "/api/v1/administrator/sessions/{sessionId}/cancel": {
       "post": {
         "operationId": "cancelSession",
@@ -8079,6 +8230,37 @@
           "endsOn"
         ]
       },
+      "ClientFreezeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "requested",
+              "approved",
+              "refused"
+            ]
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date"
+          }
+        },
+        "required": [
+          "id",
+          "state",
+          "startsOn",
+          "endsOn"
+        ]
+      },
       "ClientSubscriptionDto": {
         "type": "object",
         "properties": {
@@ -8114,6 +8296,20 @@
             "type": "object",
             "format": "date",
             "description": "A founder renews before this date. Absent when she is not a founder or has no current Subscription."
+          },
+          "freeze": {
+            "nullable": true,
+            "description": "The one Freeze of the current Subscription. Absent when there is none.",
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ClientFreezeDto"
+              }
+            ]
+          },
+          "canRequestFreeze": {
+            "type": "boolean",
+            "description": "True when the current Plan lasts 90 days or more and has no Freeze yet."
           }
         },
         "required": [
@@ -10263,6 +10459,126 @@
         },
         "required": [
           "reason"
+        ]
+      },
+      "FreezeReviewDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "clientName": {
+            "type": "string"
+          },
+          "planName": {
+            "type": "string"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "requested",
+              "approved",
+              "refused"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "clientName",
+          "planName",
+          "startsOn",
+          "endsOn",
+          "reason",
+          "state"
+        ]
+      },
+      "DecideFreezeDto": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "refused"
+            ]
+          }
+        },
+        "required": [
+          "decision"
+        ]
+      },
+      "FreezeDecisionDto": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "approved",
+              "refused"
+            ]
+          }
+        },
+        "required": [
+          "state"
+        ]
+      },
+      "RequestFreezeDto": {
+        "type": "object",
+        "properties": {
+          "subscriptionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "startsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "endsOn": {
+            "type": "string",
+            "format": "date"
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "subscriptionId",
+          "startsOn",
+          "endsOn",
+          "reason"
+        ]
+      },
+      "FreezeRequestDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "state": {
+            "type": "string",
+            "enum": [
+              "requested"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "state"
         ]
       },
       "AdministratorSessionAvailabilityDto": {

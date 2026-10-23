@@ -146,6 +146,8 @@ describe('Assistant Client overview', () => {
         subscription,
         nextSubscription: null,
         founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
       },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),

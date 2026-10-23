@@ -64,6 +64,8 @@ describe('ClientProfileController', () => {
       status: 'expiring_soon',
       nextSubscription: null,
       founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
       subscription: {
         id: 'subscription-id',
         planName: 'Paquete de 8 clases',
@@ -81,12 +83,16 @@ describe('ClientProfileController', () => {
       subscription: null,
       nextSubscription: null,
       founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
     });
 
     await expect(controller.subscription(bearer)).resolves.toEqual({
       status: 'none',
       nextSubscription: null,
       founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
       subscription: null,
     });
   });
