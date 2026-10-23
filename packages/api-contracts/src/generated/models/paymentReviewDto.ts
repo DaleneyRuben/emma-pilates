@@ -11,6 +11,7 @@ import type { PaymentReviewDtoState } from "./paymentReviewDtoState";
 
 export interface PaymentReviewDto {
   id: string;
+  /** `courtesy` is a Bs 0 Courtesy Access grant (REL-011). */
   method: PaymentReviewDtoMethod;
   state: PaymentReviewDtoState;
   planId: string;

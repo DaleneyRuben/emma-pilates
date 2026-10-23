@@ -4405,6 +4405,62 @@
         ]
       }
     },
+    "/api/v1/administrator/clients/{clientId}/courtesy-access": {
+      "post": {
+        "operationId": "grantCourtesyAccess",
+        "parameters": [
+          {
+            "name": "clientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "idempotency-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantCourtesyAccessDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PaymentDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "",
+        "tags": [
+          "CourtesyAccess"
+        ]
+      }
+    },
     "/api/v1/accounts/current/closure": {
       "post": {
         "operationId": "closeCurrentClientAccount",
@@ -9477,8 +9533,10 @@
             "enum": [
               "transfer",
               "cash",
-              "credit_only"
-            ]
+              "credit_only",
+              "courtesy"
+            ],
+            "description": "`courtesy` is a Bs 0 Courtesy Access grant (REL-011)."
           },
           "state": {
             "type": "string",
@@ -9764,8 +9822,10 @@
             "enum": [
               "transfer",
               "cash",
-              "credit_only"
-            ]
+              "credit_only",
+              "courtesy"
+            ],
+            "description": "`courtesy` is a Bs 0 Courtesy Access grant (REL-011)."
           },
           "state": {
             "type": "string",
@@ -10491,6 +10551,19 @@
           "pageSize",
           "totalItems",
           "pendingCount"
+        ]
+      },
+      "GrantCourtesyAccessDto": {
+        "type": "object",
+        "properties": {
+          "endsOn": {
+            "type": "string",
+            "format": "date",
+            "description": "Bolivia civil date of the last day of access: today up to one year ahead."
+          }
+        },
+        "required": [
+          "endsOn"
         ]
       },
       "CloseAccountRequestDto": {
