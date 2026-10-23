@@ -62,6 +62,7 @@ beyond what the table below names.
 | `session.cancelled` | Booking & Membership | An Administrator cancels a Session with Bookings (last resort) | Administrator | `session` | Session Branch | `cause`, `cancelledBookings`, `closedWaitlistEntries` |
 | `session.created` | Booking & Membership | An Administrator creates a one-off Session («Una sola vez», follow-up 39 §1) outside any Session Schedule | Administrator | `session` | Session Branch | `classTypeId`, `trainerStaffMemberId`, `startsAt`, `durationMinutes`, `capacity` |
 | `session.updated` | Booking & Membership | An Administrator edits one Session (Trainer swap, new start, or capacity) | Administrator | `session` | Session Branch | previous and new `trainerStaffMemberId`, `startsAt`, `capacity` (only those changed) |
+| `attendance.corrected` | Booking & Membership | The assigned Trainer changes an Attendance outcome already saved for a Booking (the first complete roster save is not a correction) | Staff Account and Role | `booking` | Session Branch | `previousOutcome`, `outcome` (`attended` / `no_show`) |
 | `evaluation.cancelled_by_staff` | Booking & Membership | The Nutritionist or an Administrator cancels a booked Evaluation | Staff Account and Role | `evaluation` | Slot Branch | `cause`, `insideClientWindow` |
 | `promotion.created` | Booking & Membership | An Administrator saves a new Promotion (a draft, with or without its image) | Administrator | `promotion` | — | `hasImage` |
 | `promotion.updated` | Booking & Membership | An Administrator edits a Promotion's copy, display window, or image (a changed image unpublishes it, follow-up 39) | Administrator | `promotion` | — | `imageChanged`, `unpublished` |
@@ -99,7 +100,7 @@ window.
 | Client registration and email verification | Routine self-service; the Account row records the timestamps. |
 | Session Schedule create, replace, end (cancelling unbooked Sessions as `schedule_changed`) | The schedule rows keep their effective range and the cancelled Sessions record the actor; no booked class changes. |
 | Client Booking, cancellation, Reschedule, Waitlist join/leave | Routine Client activity (ADR-0055); `created_by`/`cancelled_by`/`rescheduled_by` Account columns keep who acted, including an Assistant acting for a Client. |
-| Trainer Attendance | A reporting record with `recorded_by` and no money or access effect. |
+| Trainer Attendance, first roster save | A reporting record with `recorded_by` and no money or access effect. A later correction of an outcome writes `attendance.corrected` above, because that outcome can decide instructor pay. |
 | Automatic empty-Session cancellation, Waitlist closure, Purchase Intent expiry | System sweeps with no human actor; the rows record cause and time (BOOK-001, BOOK-004, PAY-002). |
 | Client Evaluation booking and cancellation | Routine Client activity; the Evaluation row records creator, canceller, and cause. |
 | Availability Block create, replace, end | The Nutritionist manages their own schedule; the block row records `created_by`/`ended_by`, and booked Evaluations are never changed by it. |
