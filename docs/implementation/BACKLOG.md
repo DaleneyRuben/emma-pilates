@@ -729,7 +729,7 @@ Verified (2026-10-23, API on 3129 over `pilates_pay006_dev`, admin web on 5173 b
 - **Admin web**, Chromium at 1440 px and 420 px. Pagos filtered to Anulado shows the reason. Lucía's detail shows «Agregar clase de cortesía» and «Devolver una clase». At 420 px the sidebar opens from «Abrir menú».
 - **Staff devices.** Not walked. The simulator lock was free, and the iPhone, iPad, and Android emulator were not started: the front-desk photograph needs a camera and a READY upload, which the integration test and the card spec cover. Metro was not started.
 
-The pull request URL is recorded in a follow-up commit.
+Pull request: https://github.com/DaleneyRuben/emma-pilates/pull/174.
 
 #### PAY-007 · Invoice data
 
