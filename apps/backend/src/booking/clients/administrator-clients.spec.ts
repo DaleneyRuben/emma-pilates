@@ -149,6 +149,8 @@ describe('Administrator Client detail', () => {
         subscription,
         nextSubscription: null,
         founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
       },
       creditAvailableCentavos: 105_000,
       closure: outlook,
@@ -183,6 +185,8 @@ describe('Administrator Client detail', () => {
         subscription: expired,
         nextSubscription: null,
         founderRenewalDeadline: null,
+        freeze: null,
+        canRequestFreeze: false,
       },
       creditAvailableCentavos: 0,
     });

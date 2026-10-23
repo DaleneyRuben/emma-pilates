@@ -34,6 +34,8 @@ describe('loadClientSubscription', () => {
       subscription: active,
       nextSubscription: null,
       founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
     });
   });
 
@@ -54,6 +56,8 @@ describe('loadClientSubscription', () => {
       subscription: expiring,
       nextSubscription: null,
       founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
     });
     expect(findActiveSubscription).toHaveBeenCalledWith('client-id', today);
   });
@@ -75,6 +79,8 @@ describe('loadClientSubscription', () => {
       subscription: expired,
       nextSubscription: null,
       founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
     });
     expect(findLatestSubscription).toHaveBeenCalledWith('client-id');
   });
@@ -93,6 +99,8 @@ describe('loadClientSubscription', () => {
       subscription: null,
       nextSubscription: null,
       founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
     });
   });
 
@@ -113,6 +121,8 @@ describe('loadClientSubscription', () => {
       subscription: active,
       nextSubscription: next,
       founderRenewalDeadline: null,
+      freeze: null,
+      canRequestFreeze: false,
     });
   });
 
@@ -133,6 +143,8 @@ describe('loadClientSubscription', () => {
       subscription: active,
       nextSubscription: null,
       founderRenewalDeadline: '2026-10-02',
+      freeze: null,
+      canRequestFreeze: false,
     });
   });
 

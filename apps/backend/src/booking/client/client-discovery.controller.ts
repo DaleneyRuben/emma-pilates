@@ -182,6 +182,8 @@ export class ClientProfileController {
               endsOn: civilDate(view.nextSubscription.endsOn),
             },
       founderRenewalDeadline: view.founderRenewalDeadline ?? null,
+      freeze: view.freeze ?? null,
+      canRequestFreeze: view.canRequestFreeze ?? false,
       subscription:
         view.subscription === null
           ? null

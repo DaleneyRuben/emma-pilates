@@ -16,7 +16,9 @@ import {
 
 import { CancelClassScreen } from "./administrator/cancel-class-screen";
 import { CancelSessionScreen } from "./administrator/cancel-session-screen";
+import { FreezesScreen } from "./administrator/freezes-screen";
 import { PendingPaymentsScreen } from "./administrator/pending-payments-screen";
+import { ReviewFreezeScreen } from "./administrator/review-freeze-screen";
 import { ReviewPaymentScreen } from "./administrator/review-payment-screen";
 import { AssistantWorkspaceProvider } from "./assistant/assistant-workspace";
 import { createCoordinatorStack } from "./coordinator/coordinator-stack";
@@ -93,6 +95,8 @@ const AdministratorStack = createNativeStackNavigator({
   screens: {
     Payments: PendingPaymentsScreen,
     ReviewPayment: ReviewPaymentScreen,
+    Freezes: FreezesScreen,
+    ReviewFreeze: ReviewFreezeScreen,
     CancelClass: CancelClassScreen,
     CancelSession: CancelSessionScreen,
     ViewAs: ViewAsScreen,

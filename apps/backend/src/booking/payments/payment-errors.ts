@@ -19,7 +19,8 @@ export type PaymentRuleCode =
   | 'payment_confirmation_conflict'
   | 'courtesy_end_date_invalid'
   | 'start_date_out_of_window'
-  | 'future_subscription_exists';
+  | 'future_subscription_exists'
+  | 'freeze_not_allowed';
 
 const statuses: Record<PaymentRuleCode, number> = {
   subscription_not_expired: 409,
@@ -43,6 +44,7 @@ const statuses: Record<PaymentRuleCode, number> = {
   courtesy_end_date_invalid: 400,
   start_date_out_of_window: 400,
   future_subscription_exists: 409,
+  freeze_not_allowed: 409,
 };
 
 export class PaymentRuleError extends Error {

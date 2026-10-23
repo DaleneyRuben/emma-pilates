@@ -99,6 +99,7 @@ import type {
   CreatedBookingDto,
   CreditDto,
   CurrentAuthenticationPrincipalDto,
+  DecideFreezeDto,
   DeviceDeactivationDto,
   DeviceRegistrationDto,
   EmailChangeCompletionResultDto,
@@ -119,6 +120,9 @@ import type {
   ExpenseReportDto,
   FinalizedUploadDto,
   FounderMembershipPageDto,
+  FreezeDecisionDto,
+  FreezeRequestDto,
+  FreezeReviewDto,
   GetAdminPromotionImageParams,
   GetCurrentClientPhotoParams,
   GetExpenseReportParams,
@@ -186,6 +190,7 @@ import type {
   ReferralsDto,
   RejectPaymentDto,
   RequestEmailChangeDto,
+  RequestFreezeDto,
   RequestPasswordRecoveryDto,
   SalaryPaymentInputDto,
   SearchAssistantClientsParams,
@@ -15563,6 +15568,620 @@ export const useRejectPayment = <TError = unknown, TContext = unknown>(
   TContext
 > => {
   return useMutation(getRejectPaymentMutationOptions(options), queryClient);
+};
+
+export type listRequestedFreezesResponse200 = {
+  data: FreezeReviewDto[];
+  status: 200;
+};
+
+export type listRequestedFreezesResponseSuccess =
+  listRequestedFreezesResponse200 & {
+    headers: Headers;
+  };
+export type listRequestedFreezesResponse = listRequestedFreezesResponseSuccess;
+
+export const getListRequestedFreezesUrl = () => {
+  return `/api/v1/administrator/freezes`;
+};
+
+export const listRequestedFreezes = async (
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<listRequestedFreezesResponse> => {
+  const res = await (fetchFn ?? fetch)(getListRequestedFreezesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listRequestedFreezesResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listRequestedFreezesResponse;
+};
+
+export const getListRequestedFreezesQueryKey = () => {
+  return [`/api/v1/administrator/freezes`] as const;
+};
+
+export const getListRequestedFreezesQueryOptions = <
+  TData = Awaited<ReturnType<typeof listRequestedFreezes>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof listRequestedFreezes>>,
+      TError,
+      TData
+    >
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListRequestedFreezesQueryKey();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listRequestedFreezes>>
+  > = ({ signal }) =>
+    listRequestedFreezes({ signal, ...fetchOptions }, fetcherFn);
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listRequestedFreezes>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type ListRequestedFreezesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listRequestedFreezes>>
+>;
+export type ListRequestedFreezesQueryError = unknown;
+
+export function useListRequestedFreezes<
+  TData = Awaited<ReturnType<typeof listRequestedFreezes>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRequestedFreezes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listRequestedFreezes>>,
+          TError,
+          Awaited<ReturnType<typeof listRequestedFreezes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListRequestedFreezes<
+  TData = Awaited<ReturnType<typeof listRequestedFreezes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRequestedFreezes>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof listRequestedFreezes>>,
+          TError,
+          Awaited<ReturnType<typeof listRequestedFreezes>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useListRequestedFreezes<
+  TData = Awaited<ReturnType<typeof listRequestedFreezes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRequestedFreezes>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useListRequestedFreezes<
+  TData = Awaited<ReturnType<typeof listRequestedFreezes>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof listRequestedFreezes>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getListRequestedFreezesQueryOptions(options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type getFreezeReviewResponse200 = {
+  data: FreezeReviewDto;
+  status: 200;
+};
+
+export type getFreezeReviewResponseSuccess = getFreezeReviewResponse200 & {
+  headers: Headers;
+};
+export type getFreezeReviewResponse = getFreezeReviewResponseSuccess;
+
+export const getGetFreezeReviewUrl = (freezeId: string) => {
+  return `/api/v1/administrator/freezes/${freezeId}`;
+};
+
+export const getFreezeReview = async (
+  freezeId: string,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<getFreezeReviewResponse> => {
+  const res = await (fetchFn ?? fetch)(getGetFreezeReviewUrl(freezeId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getFreezeReviewResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getFreezeReviewResponse;
+};
+
+export const getGetFreezeReviewQueryKey = (freezeId: string) => {
+  return [`/api/v1/administrator/freezes/${freezeId}`] as const;
+};
+
+export const getGetFreezeReviewQueryOptions = <
+  TData = Awaited<ReturnType<typeof getFreezeReview>>,
+  TError = unknown,
+>(
+  freezeId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getFreezeReview>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+) => {
+  const {
+    query: queryOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getGetFreezeReviewQueryKey(freezeId);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getFreezeReview>>> = ({
+    signal,
+  }) => getFreezeReview(freezeId, { signal, ...fetchOptions }, fetcherFn);
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: freezeId !== null && freezeId !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getFreezeReview>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type GetFreezeReviewQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getFreezeReview>>
+>;
+export type GetFreezeReviewQueryError = unknown;
+
+export function useGetFreezeReview<
+  TData = Awaited<ReturnType<typeof getFreezeReview>>,
+  TError = unknown,
+>(
+  freezeId: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getFreezeReview>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFreezeReview>>,
+          TError,
+          Awaited<ReturnType<typeof getFreezeReview>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetFreezeReview<
+  TData = Awaited<ReturnType<typeof getFreezeReview>>,
+  TError = unknown,
+>(
+  freezeId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getFreezeReview>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getFreezeReview>>,
+          TError,
+          Awaited<ReturnType<typeof getFreezeReview>>
+        >,
+        "initialData"
+      >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useGetFreezeReview<
+  TData = Awaited<ReturnType<typeof getFreezeReview>>,
+  TError = unknown,
+>(
+  freezeId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getFreezeReview>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+
+export function useGetFreezeReview<
+  TData = Awaited<ReturnType<typeof getFreezeReview>>,
+  TError = unknown,
+>(
+  freezeId: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof getFreezeReview>>,
+        TError,
+        TData
+      >
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getGetFreezeReviewQueryOptions(freezeId, options);
+
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+export type decideFreezeResponse200 = {
+  data: FreezeDecisionDto;
+  status: 200;
+};
+
+export type decideFreezeResponseSuccess = decideFreezeResponse200 & {
+  headers: Headers;
+};
+export type decideFreezeResponse = decideFreezeResponseSuccess;
+
+export const getDecideFreezeUrl = (freezeId: string) => {
+  return `/api/v1/administrator/freezes/${freezeId}/decision`;
+};
+
+export const decideFreeze = async (
+  freezeId: string,
+  decideFreezeDto: DecideFreezeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<decideFreezeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getDecideFreezeUrl(freezeId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(decideFreezeDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: decideFreezeResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as decideFreezeResponse;
+};
+
+export const getDecideFreezeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof decideFreeze>>,
+    TError,
+    DecideFreezeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof decideFreeze>>,
+  TError,
+  DecideFreezeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["decideFreeze"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof decideFreeze>>,
+    DecideFreezeMutationVariables
+  > = (props) => {
+    const { freezeId, data } = props ?? {};
+
+    return decideFreeze(freezeId, data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type DecideFreezeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof decideFreeze>>
+>;
+export type DecideFreezeMutationBody = DecideFreezeDto;
+export type DecideFreezeMutationError = unknown;
+export type DecideFreezeMutationVariables = {
+  freezeId: string;
+  data: DecideFreezeDto;
+};
+
+export const useDecideFreeze = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof decideFreeze>>,
+      TError,
+      DecideFreezeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof decideFreeze>>,
+  TError,
+  DecideFreezeMutationVariables,
+  TContext
+> => {
+  return useMutation(getDecideFreezeMutationOptions(options), queryClient);
+};
+
+export type requestFreezeResponse201 = {
+  data: FreezeRequestDto;
+  status: 201;
+};
+
+export type requestFreezeResponseSuccess = requestFreezeResponse201 & {
+  headers: Headers;
+};
+export type requestFreezeResponse = requestFreezeResponseSuccess;
+
+export const getRequestFreezeUrl = () => {
+  return `/api/v1/freezes`;
+};
+
+export const requestFreeze = async (
+  requestFreezeDto: RequestFreezeDto,
+  options?: RequestInit,
+  fetchFn?: typeof globalThis.fetch,
+): Promise<requestFreezeResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+  const res = await (fetchFn ?? fetch)(getRequestFreezeUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(requestFreezeDto),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: requestFreezeResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as requestFreezeResponse;
+};
+
+export const getRequestFreezeMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof requestFreeze>>,
+    TError,
+    RequestFreezeMutationVariables,
+    TContext
+  >;
+  fetch?: RequestInit;
+  fetcher?: typeof globalThis.fetch;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof requestFreeze>>,
+  TError,
+  RequestFreezeMutationVariables,
+  TContext
+> => {
+  const mutationKey = ["requestFreeze"];
+  const {
+    mutation: mutationOptions,
+    fetch: fetchOptions,
+    fetcher: fetcherFn,
+  } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, fetch: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof requestFreeze>>,
+    RequestFreezeMutationVariables
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return requestFreeze(data, fetchOptions, fetcherFn);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type RequestFreezeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof requestFreeze>>
+>;
+export type RequestFreezeMutationBody = RequestFreezeDto;
+export type RequestFreezeMutationError = unknown;
+export type RequestFreezeMutationVariables = { data: RequestFreezeDto };
+
+export const useRequestFreeze = <TError = unknown, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof requestFreeze>>,
+      TError,
+      RequestFreezeMutationVariables,
+      TContext
+    >;
+    fetch?: RequestInit;
+    fetcher?: typeof globalThis.fetch;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof requestFreeze>>,
+  TError,
+  RequestFreezeMutationVariables,
+  TContext
+> => {
+  return useMutation(getRequestFreezeMutationOptions(options), queryClient);
 };
 
 export type cancelSessionResponse200 = {

@@ -478,7 +478,7 @@ wait for Google, Apple, and testers.
 | BKO-003 | P0 | Staff app/admin web | Daily cash close | DOC-008 | 3–4 d | ready |
 | IDN-009 | P0 | All surfaces | Coordinator Role: operations yes, money no, on the admin web and the Staff app; Client profile editing | DOC-008 | 4–6 d | done (22c81c81; evidence below). Schema `e8390f9d`; admin-web session red `4b83f3e7` → `91f12934`; staff red `6684d0df` → `56eebbde`; operations red `fd06a8ad` → `db534ca6`; schedule red `0534aa8c` → `05fd60c0`; profile endpoint red `7fcb5de5` → `722ad126`; authorization matrix `41f5e250`; contracts `329a9415`; admin web red `0843bbd1`/`8073598e`/`ebbb2d6a` → `30d676c0`/`0f96e7b9`/`950bbabc`; Playwright `cc200115`; Staff app red `ec115e2e` → `e1511505`; Maestro `c357c97c`; testing guide Test 75 `e8938f7a`. Verified: backend unit 975, e2e 268, integration 92 suites / 367 tests (6 skipped, pre-existing), the matrix over all 170 endpoints for both Roles; `check:api` and `check:api-compat` clean; admin-web Jest 531, Playwright 19/19 (new coordinator journey finds no «Bs»); staff-mobile Jest 155, mobile-core 116; lint, Prettier, tsc clean. Browser walk at 1440 and 420 px as Carolina (Horario edit panel, money URL notice, Clientes «Editar perfil» saved, no «Bs», Personal read-only, drawer) and as Paola (Coordinador role option with implicit Branches). API curl as Carolina: Client search 200, payments 403. Walked on 2026-10-23 as Carolina on the iPhone 16 Pro, the iPad Pro 11-inch (M4), and the Android emulator: Client search, a Client's overview without cash or «Nuevo cliente», and «Cancelar clase». Decisions: counts-only statistics deferred to STU-003 (ADR-0103 rejects on-the-fly indicators); Coordinator reads Staff but never invites or changes Roles/Branches; reads Branches and Class Types, not the Plan list; Assistant overview sends her Credit 0 (ADR-0016), the admin detail omits it; Evaluations oversight stays with the Administrator until NUT-003. Open questions: should the Coordinator see AW25 Evaluations and correct pending staff emails? development-fixtures.ts (oversized) grew by one staff entry.) |
 | NUT-003 | P0 | All surfaces | Nutritionist rules: a free consultation only with quarterly Plans, Bs 70 otherwise, and Bs 50 to the Nutritionist as a cost | BKM-005, PAY-006 | 4–5 d | ready |
-| BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | ready |
+| BKM-012 | P0 | All surfaces | Freeze: quarterly Plans only, once, up to 15 days, requested in the app and approved by the Administrator | BKM-006, BKM-010 | 3.5–4.5 d | done |
 | BKM-014 | P0 | All surfaces | Invita a una amiga: guest pass once in a lifetime, one invite a month, +1 class when she buys | PAY-005, BKM-008, BKM-011 | 4–5 d | ready |
 | BKM-015 | P0 | Backend/admin web | Campaign extra classes in bulk (start of year, holidays) | BKM-008 | 1–1.5 d | done |
 | BKM-013 | P0 | All surfaces | First 90 days: day 2, week 1, day 30, day 90 messages; 7-day and <4-classes alerts; «Para contactar» | IDN-009 | 4–5 d | done (c0bf32ec; evidence below) |
@@ -889,6 +889,37 @@ Acceptance criteria:
 
 Acceptance criteria: a 10-day Freeze moves the end 10 days, and a second
 request is refused. Booking during the Freeze is refused with its own message.
+
+Evidence (BKM-012, 2026-10-23, branch `feature/bkm-012-freeze`, stacked on `feature/bkm-010-founder-membership` at `57fae76a`, [PR #175](https://github.com/DaleneyRuben/emma-pilates/pull/175)). Rules red `c6a92ad2`, rules green `196e9fbf`, booking block red `028c3a8e`, booking block green `a16c00e9`, decision `66e2303d`, schema and persistence `a4c32d7a`, contract `a3a9d2c6`, screens `d21aac95`.
+
+Decisions taken:
+
+- A Freeze is once per Subscription. A refused request still counts, so a second ask is `freeze_not_allowed`.
+- Inclusive days: the start and the end both count. Ten days is `2026-11-01` through `2026-11-10`.
+- A start in the past is compared as a Bolivia civil date, not as a UTC timestamp.
+- `freeze_not_allowed` answers `409` with «Este plan no se puede congelar.» `booking_during_freeze` answers `409` with «Tu plan está congelado hasta el {fecha}.» Clients branch on the code.
+- Approval stays with the Administrator. Assistant, Trainer, Nutritionist, and Client get `403` `freeze_access_denied`. A Coordinator principal is rejected. IDN-009 makes that role real.
+- Approving cancels Bookings whose Session falls inside the window with the existing cancellation fields and returns the class the same way a cancellation does. It does not promote the waitlist.
+- The stored Subscription end moves by exactly the frozen days. The founder nightly job is unchanged and already counts that stored end.
+- A Freeze changes no Payment.
+- The Administrator is told with `freeze_requested`. The Client is told with `freeze_approved` or `freeze_refused`.
+- Audits: `freeze.requested`, `freeze.approved`, `freeze.refused`.
+- Follow-ups 194 and 195, and screen AW38, stay pending. No export was run. The admin page was built to the AW38 prompt.
+
+Verified:
+
+- Integration (`pilates_test_bkm012`): a 10-day Freeze moves the end 10 days; a second request, a 60-day Plan, more than 15 days, and a start in the past are refused; a Booking inside the window is cancelled and the allowance returns; a Booking during the Freeze throws its own message; a founder whose Subscription was frozen is not ended; an Assistant is refused the decision and the Client is notified.
+- API on 3130 over `pilates_bkm012_dev` (dropped after). Camila's cash sale of Trimestral 36 clases for Lucía answered `201`. Lucía's 10-day request answered `201`. A second request answered `409` `freeze_not_allowed`. Paola's list named Lucía, the Plan, the dates, and the reason, and her inbox held `freeze_requested`. Camila's decision answered `403` `freeze_access_denied`.
+- Admin web on 5199, Playwright Chromium. At 1440 px Aprobar left the list empty and the subtitle read «Congelamiento aprobado». At 420 px the empty list sits behind «Abrir menú». The stored end moved from `2027-02-10` to `2027-02-20`. Lucía's inbox held `freeze_approved`, «Tu plan está congelado hasta el 2026-11-29.»
+
+Open:
+
+- The unique `subscription_id` is not partial on `deleted_at`, so a soft-deleted request still blocks a new one.
+- A missing Freeze review answers `409` `freeze_not_allowed` rather than `404`.
+- Class return reuses cancellation and does not promote the waitlist.
+- IDN-009 makes Coordinator a real role for the decision.
+- The Client app and the Staff app were not walked on a device. PAY-006 may be walking the devices, and this item did not take the simulator lock.
+- Migration `20261023200000_freezes` needs the owner's approval before any shared database. It was applied only to disposable databases created for this item.
 
 #### BKM-014 · Invita a una amiga
 

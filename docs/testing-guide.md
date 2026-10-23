@@ -46,10 +46,10 @@ can be found by its design name.
 | Client app | Tests |
 | --- | --- |
 | 01 Iniciar sesión / Registrarse, «Revisa tu correo», «El registro venció» | 1, 4, 5, 19, 49, 50, 52, 80 |
-| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 81, 85 |
+| 02 Inicio, 03 Reservar, 04 Detalle de sesión | 5, 18, 46, 54, 69, 71, 75, 81, 85, 86 |
 | 05 Mis reservas, 06 Reprogramar, 07 Historial de clases | 5, 12, 19, 61, 69 |
 | 08 Elige tu plan, 09 Detalle del plan, 10 Pago, 11 Estado del pago | 10, 19, 41, 51, 53, 70, 75, 76, 77, 81, 82, 84 |
-| 12 Mi plan | 5, 18, 71, 76, 77, 81, 82, 84 |
+| 12 Mi plan | 5, 18, 71, 76, 77, 81, 82, 84, 86 |
 | 13 Evaluación nutricional, 14 Confirmar evaluación, 15 Mis evaluaciones | 15, 18, 19, 54 |
 | 16 Mis referidos, 17 Mi crédito | 10, 18 |
 | 18 Perfil, 19 Notificaciones | 9, 18, 46, 54, 60, 79, 81 |
@@ -86,6 +86,7 @@ can be found by its design name.
 | AW21–AW22 Clientes, Detalle de cliente, the campaign grant | 26, 31, 35, 72, 78, 80, 82, 83 |
 | AW38 Fundadoras | 84 |
 | AW39 Para contactar | 79 |
+| AW40 Congelamientos | 86 |
 | AW23–AW24 Personal | 26, 31, 72, 78, 80 |
 | AW25 Evaluaciones nutricionales, AW26 Referidos, AW27 Créditos | 29, 72 |
 | AW28–AW29 Pagos, Revisar pago | 27, 31, 62, 72 |
@@ -6427,7 +6428,7 @@ A. **The page (AW21).** Log in as `paola.mendoza@example.com` /
 B. **The denial.** The same `POST /api/v1/administrator/campaigns` as Camila
    answers `403` and writes nothing. The header `Idempotency-Key` is a UUID;
    sending the same call again grants nothing more.
-=======
+
 ## Test 84: founder membership (BKM-010)
 
 The first 40 Clients whose first real Payment is confirmed hold a Founder
@@ -6466,3 +6467,32 @@ F. **Fundadoras (AW37).** As Paola, open **Back Office → Fundadoras**. The
    the day (`dd/mm/aaaa`), and **Activa** or **Perdida**. There is no
    create action. At 420 px each membership is a card. An empty studio
    reads «Todavía no hay fundadoras.» The sidebar calls this page AW38 because AW37 is Equipos.
+
+## Test 86: the freeze (BKM-012)
+
+A Plan of 90 days or more may be frozen once, for up to 15 days, never
+starting in the past
+([booking ADR-0010](../booking/docs/adr/0010-freeze-quarterly-subscriptions.md)).
+The Client asks; Paola approves or refuses. Run the API and the fixtures as
+in Tests 2 and 5. The Client app and the Staff app were not walked on a
+device for this item. The admin approval is the browser check.
+
+A. **The request (12).** As a Client with **Trimestral 36 clases**, open
+   **Mi plan**. The form asks for a start, an end, and a reason. A 10-day
+   request is accepted and the screen says it is in review. A 30-day or
+   60-day Plan, a second request, more than 15 days, or a start in the past
+   answers `409` `freeze_not_allowed` and «Este plan no se puede congelar.»
+B. **The decision.** Paola opens **Back Office → Congelamientos**. The card
+   names the Client, the Plan, the dates, and the reason, with **Aprobar**
+   and **Rechazar**. Approving moves the Subscription end by exactly the
+   frozen days and cancels Bookings already inside the window; the class
+   returns the same way a cancellation does. The Payment amount does not
+   change. The Client receives a push and an inbox notification.
+C. **The booking.** A Session inside an approved Freeze answers `409`
+   `booking_during_freeze` and «Tu plan está congelado hasta el {fecha}.»
+   A Session outside it books as before.
+D. **The founder.** A founder whose Subscription was frozen is not ended by
+   the nightly job: the stored end already includes the frozen days.
+E. **Who decides.** An Assistant, a Trainer, a Nutritionist, and a Client
+   get `403` on the decision. A Coordinator principal is rejected too;
+   IDN-009 makes that role real. The sidebar calls this page AW40 because AW37 is Equipos and AW38 is Fundadoras.

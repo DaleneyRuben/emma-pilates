@@ -164,6 +164,7 @@ model Subscription {
   bookings                Booking[]
   evaluations             Evaluation[]
   allowanceAdjustments    AllowanceAdjustment[]
+  freezes                 Freeze[]
 
   @@unique([id, clientId])
   @@index([clientId, startsOn])

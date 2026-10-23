@@ -108,6 +108,7 @@ For fixes to **already-generated** screens, use [`followups/`](./followups/) ins
 | [AW37](./admin-web/37-equipos.md) | Equipos | `AW37` | ✅ applied (Claude Design canvas, 2026-10-23, `db041514`; the canvas could not be deleted from the agent session, see BKO-004) |
 | [AW38](./admin-web/37-fundadoras.md) | Fundadoras | `AW38` | not yet generated (BKM-010; the prompt file is still `37-fundadoras.md`; the sidebar uses AW38 because AW37 is Equipos) |
 | [AW39](./admin-web/39-para-contactar.md) | Para contactar | `AW39` | ✅ applied (Claude Design canvas, 2026-10-23; the canvas waits for the owner to delete it) |
+| [AW40](./admin-web/38-congelamientos.md) | Congelamientos | `AW40` | not yet generated (BKM-012; the prompt file is still `38-congelamientos.md`; the sidebar uses AW40 because AW37 is Equipos and AW38 is Fundadoras) |
 
 ## Follow-ups (`followups/`)
 
@@ -259,6 +260,8 @@ Each of these was sent as the next message in the existing design session for th
 | [196](./followups/196-weekly-cap-classes-left.md) | `03` and `04` show «Te quedan N clases esta semana» from `classesLeftThisWeek`; absent without a cap; zero stays honest when an extra class remains (BKM-007) | 🕓 pending |
 | [197](./followups/196-admin-campaign-grant.md) | `AW21` gains «Dar clases de campaña», opening the campaign grant on the same screen's address; no new screen and no sidebar entry (BKM-015, decisions §5.4). Numbered 197 here because 196 is the weekly-cap line. | 🕓 pending |
 | [198](./followups/193-founder-renewal-banner.md) | «Renueva antes del …» on `12` while a founder holds a current Subscription (BKM-010). Numbered 198 here because 193 is the extra-classes line. | 🕓 pending |
+| [199](./followups/194-freeze-request.md) | Freeze request and status on `12`; booking refusal on `04` (BKM-012). Numbered 199 here because 194 is the extra-classes line. | 🕓 pending |
+| [200](./followups/195-freeze-review.md) | Congelamientos list on the admin web and the Administrator's Staff review (BKM-012). Numbered 200 here because 195 is the extra-classes line. The sidebar calls this page AW40 because AW37 is Equipos and AW38 is Fundadoras. | 🕓 pending |
 
 ## Status
 
