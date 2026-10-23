@@ -156,7 +156,11 @@ describe("AW37 Equipos on a desktop browser", () => {
     const { user } = renderAdmin("/back-office/equipos");
     const faults = await sectionOf(/^Fallas/);
     await user.click(
-      within(faults).getAllByRole("button", { name: "Marcar resuelta" })[0]!,
+      (
+        await within(faults).findAllByRole("button", {
+          name: "Marcar resuelta",
+        })
+      )[0]!,
     );
     const confirm = await screen.findByRole("alertdialog", {
       name: "¿Marcar resuelta la falla de Reformer 5?",

@@ -34,6 +34,7 @@ describe("admin shell", () => {
         "Clientes",
         "Pagos",
         "Insumos",
+        "Equipos",
         "Evaluaciones nutricionales",
         "Personal",
         "Nómina",

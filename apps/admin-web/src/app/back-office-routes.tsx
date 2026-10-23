@@ -63,6 +63,16 @@ const withdrawalsRoute = createRoute({
   ),
 });
 
+// AW37 (BKO-004): one Branch's Equipment on one page, so no list search.
+const equipmentRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: "/back-office/equipos",
+  component: lazyRouteComponent(
+    () => import("../back-office/equipment/equipment-page"),
+    "EquipmentPage",
+  ),
+});
+
 const payrollRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: "/back-office/nomina",
@@ -99,6 +109,7 @@ export const backOfficeRoutes = [
   paymentsRoute,
   suppliesRoute,
   withdrawalsRoute,
+  equipmentRoute,
   staffRoute,
   payrollRoute,
   expensesRoute,
