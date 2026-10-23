@@ -181,6 +181,25 @@ describe('admin-web Authentication Sessions (e2e)', () => {
       );
     });
 
+    it('keeps the browser session of a Coordinator (ADR-0102)', async () => {
+      const coordinator = {
+        kind: 'staff',
+        staffMemberId: 'staff-member-id',
+        role: 'coordinator',
+        branchIds: [],
+      } as const;
+      resolvePrincipal.mockResolvedValue({
+        ...administrator,
+        identity: coordinator,
+      });
+
+      await request(app.getHttpServer())
+        .get('/api/v1/admin-web/authentication-sessions/current')
+        .set('Cookie', sessionCookie)
+        .expect(200)
+        .expect({ accountId: 'account-id', identity: coordinator });
+    });
+
     it('treats a browser session whose Account is no longer an Administrator as signed out', async () => {
       resolvePrincipal.mockResolvedValue({
         ...administrator,
