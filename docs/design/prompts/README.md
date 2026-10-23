@@ -239,6 +239,7 @@ Each of these was sent as the next message in the existing design session for th
 | [198](./followups/198-courtesy-form-on-client-detail.md) | `AW22` gains courtesy and class-return buttons; amends 195, which said not to add the form (PAY-006) | 🕓 pending |
 | [199](./followups/199-evaluation-price-and-history.md) | `13` and `14` name an included Evaluation or the settings price; `15` stops saying every past Evaluation is «Realizada» (NUT-003) | 🕓 pending |
 | [200](./followups/200-evaluation-income-apart.md) | `AW16` splits Plan income and Evaluation income under the method line (NUT-003) | 🕓 pending |
+| [201](./followups/201-aw16-finanzas-tab.md) | `AW16` gains Reporte and Finanzas tabs; Finanzas shows the month's cash income, tax, budget against actual, Nutritionist cost, result, and break-even (BKO-005) | 🕓 pending |
 
 ## Status
 
