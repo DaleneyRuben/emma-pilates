@@ -491,7 +491,7 @@ wait for Google, Apple, and testers.
 | BKO-004 | P0 | Staff app/admin web | Equipment (8 reformers, 8 cadillacs, mat) and the failure log | DOC-008 | 2–3 d | ready |
 | BKO-005 | P0 | Backend/admin web | Taxes (16 %), the fixed-cost budget, and the simple monthly result (cash view) | BKM-004, NUT-003 | 3–4 d | done |
 | BKO-006 | P0 | All surfaces | Trainer pay statements and «Mis pagos» | BKM-009, BKM-011, BKO-005 | 4–6 d | done |
-| BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | ready |
+| BKO-007 | P0 | Backend/admin web | Coordinator pay statement and the renewal bonus | BKO-006, IDN-009 | 2.5–3.5 d | done |
 | BKM-016 | P0 | Client app | Catering benefit card in Mi plan | — | 0.5–1 d | blocked |
 
 #### Closed-test enablement
@@ -893,6 +893,18 @@ Evidence: the hand-checked September is 32,200 centavos (3 students 6,500, 6 stu
 
 Acceptance criteria: the renewal-rate unit tests cover the 7-day edge and the
 month-of-operation targets.
+
+Decisions (blanket approval, 2026-10-23):
+
+- The statement reuses BKO-006's `PayStatement`, draft, approval, and `SalaryPayment`. A migration adds the line kinds `base`, `new_client`, and `bonus`. The base, the Bs 50, the Bs 80, and the Bs 400 are the decisions' figures, in centavos, not a new rate table: the renewal targets already live on `StudioSettingsVersion`.
+- A new Client is the first confirmed Plan Payment of her life whose `decidedAt` falls in the month, paid by transfer or cash. A 30-day Plan pays Bs 50. A 60- or 90-day Plan pays Bs 80. A Plan of one class (the single class) pays nothing, and so does a Client whose live acquisition names a Trainer. A gift class and an invited friend are not a Plan Payment, so they pay nothing. Courtesy and Evaluation Payments are not a new Client.
+- «Renewed» is a Subscription of at least 30 days that ends in the month and whose next Subscription for the same Client starts on or before the end plus 7 days. The rate is renewed over ending, rounded. A month with nothing ending has no rate and no bonus. The bonus lands at the target and not one point below. The target is the settings column for the month of operation: the Opening Date's month is month 1. With no Opening Date the month being drafted is month 1, so the target is 80 %.
+- The worker drafts the Coordinator in the same hourly pass as the Trainers, for the previous Bolivia month and the current one, and only when a Coordinator exists. A draft is replaced while it is a draft. Approval freezes it and creates the Salary Payment. Approving twice creates nothing more.
+- Only the Administrator lists and approves. `GET /api/v1/coordinator/pay-statements` denies the Coordinator, and so do the Administrator's list and the approval. The admin page has no `coordinator` flag, so typing the address returns her to Horario.
+
+Open question: none. Follow-up 203 stays pending.
+
+Evidence: the hand-checked December is 403,000 centavos (base 350,000, one 30-day new Client 5,000, one 60-day 8,000, a single class 0, a Client a Trainer brought 0, and the bonus at 100 % against an 80 % month-1 target 40,000). A second approval creates no second Salary Payment. Carolina is denied the list, her own endpoint, and the approval. Migration `20261023230200_coordinator_pay_line_kinds` needs owner approval. Follow-up 203 stays pending.
 
 #### REL-011 · Tester access on production
 

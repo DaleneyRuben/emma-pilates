@@ -86,7 +86,7 @@ can be found by its design name.
 | AW02 Horario, AW03 Formulario de sesión | 25, 31, 50, 64, 69 |
 | AW04–AW07 Planes, Tipos de clase and their forms; AW19–AW20 Sucursales | 25, 70, 72, 76 |
 | AW08–AW10 Insumos, AW31 Retiros e insumos consumidos | 28, 72 |
-| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 83 |
+| AW11–AW12 Nómina, AW13–AW15 Gastos and Categorías de gasto | 28, 31, 62, 72, 83, 84 |
 | AW16 Reporte de ingresos y gastos | 30, 31, 80, 81 |
 | AW17–AW18 Promociones, AW35 Contactos para promociones | 31, 33, 59, 60, 72 |
 | AW21–AW22 Clientes, Detalle de cliente | 26, 31, 35, 72, 78, 79 |
@@ -3374,7 +3374,8 @@ The following are not ready for manual product testing:
 - the Coordinator correcting a Client's «¿Cómo nos conociste?» on AW22:
   the Role arrives with IDN-009, so today only the Administrator can (Test 75);
 - «Mis pagos» in the Staff app: the API answers a Trainer (Test 83), but
-  the screen waits on follow-up 202, which stays pending;
+  the screen waits on follow-up 202, which stays pending. The Coordinator
+  has no such screen: only the Administrator sees her statement (Test 84);
 
 - opening an emailed link on iOS: Universal Links need the Apple Developer
   team (gate 9), so on the iOS Simulator paste the captured token into
@@ -6321,6 +6322,44 @@ the Administrator is denied. The migration
 `20261023230100_trainer_pay_statements` needs owner approval before it runs
 on a shared database. Pull request:
 https://github.com/DaleneyRuben/emma-pilates/pull/186.
+
+## Test 84: coordinator pay (BKO-007)
+
+The Coordinator is paid a base of Bs 3.500,00, plus Bs 50,00 for each new
+Client on a 30-day Plan and Bs 80,00 on a 60- or 90-day Plan, and a bonus of
+Bs 400,00 when the month's renewal rate reaches the target in Reglas del
+estudio: 80 % in months 1 to 6 from the Opening Date, 85 % in months 7 to
+12, and 90 % from month 13. A Client renewed when she bought another Plan
+before hers ended or within 7 days after. A single class, a gift class, an
+invited friend, and a Client a Trainer brought pay nothing. Only Paola sees
+it. Carolina, the Coordinator, does not, not even her own. Log in as Test
+24 describes.
+
+1. **Open the page.** In the admin web as Paola open **Pago a la
+   coordinadora** (under Pagos a instructoras). The month stepper cannot go
+   past the current month. The card names Carolina, «Borrador» or
+   «Aprobado», the total (`Bs 4.030,00`, never centavos), and a table of
+   Concepto, Detalle, and Monto. An empty month says «Este mes no tiene un
+   pago calculado.» There is no Calcular mes: the worker drafts it.
+2. **Approve once.** Press **Aprobar**. The card reads «Aprobado» and
+   Nómina gains one Salary Payment for that total. Pressing again does not
+   add a second payment.
+3. **The figures.** A new Client on a 30-day Plan is Bs 50,00. One on a
+   60- or 90-day Plan is Bs 80,00. A single class, a gift class, and a
+   Client a Trainer brought do not appear. The bonus of Bs 400,00 appears
+   when the rate reaches the target and not one point below.
+4. **She cannot see it.** Sign in as `carolina.rivas@example.com`. The
+   sidebar has no **Pago a la coordinadora**. Typing
+   `/back-office/pago-coordinadora` returns to Horario with «Esa sección es
+   solo para administración.» `GET /api/v1/coordinator/pay-statements` and
+   `GET /api/v1/administrator/pay-statements?month=2026-12` answer `403`
+   `back_office_access_denied`, and so does approval.
+5. **Narrow browser.** At 420 px the card stacks and the line table becomes
+   labelled cards. The sidebar opens from **Abrir menú**.
+
+Follow-up 203 stays pending. The migration
+`20261023230200_coordinator_pay_line_kinds` needs owner approval before it
+runs on a shared database.
 ## Test 75: work as the Coordinator (IDN-009)
 
 The Coordinator runs the studio's operation without seeing money
