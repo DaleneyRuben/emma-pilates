@@ -19,11 +19,11 @@ export function InvoiceCell({ payment }: { payment: AdminPaymentDto }) {
   };
 
   return (
-    <span className="flex min-w-0 flex-col gap-1">
+    <span className="flex min-w-0 flex-col gap-1 max-md:items-end max-md:text-right">
       {payment.invoiceData === null ? (
         <span className="text-nota text-texto-tenue">Sin factura</span>
       ) : (
-        <span className="flex min-w-0 flex-col">
+        <span className="flex min-w-0 flex-col max-md:items-end">
           <span className="text-nota text-texto tabular">
             {payment.invoiceData.taxId}
           </span>
@@ -36,7 +36,7 @@ export function InvoiceCell({ payment }: { payment: AdminPaymentDto }) {
         <Button
           variant="link"
           size="sm"
-          className="self-start"
+          className="self-start px-0"
           aria-label={`Marcar emitida: ${payment.clientName}`}
           busy={mark.isPending}
           onClick={toggle}
@@ -44,7 +44,7 @@ export function InvoiceCell({ payment }: { payment: AdminPaymentDto }) {
           Marcar emitida
         </Button>
       ) : (
-        <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
+        <span className="flex flex-wrap items-center gap-x-2 gap-y-1 max-md:justify-end">
           <StatusPill tone="exito">Emitida</StatusPill>
           <span className="text-ayuda text-texto-tenue">
             {`por ${issued.issuedByName} · ${formatCivilDate(boliviaParts(issued.issuedAt).date)}`}
@@ -52,6 +52,7 @@ export function InvoiceCell({ payment }: { payment: AdminPaymentDto }) {
           <Button
             variant="link"
             size="sm"
+            className="px-0"
             aria-label={`Deshacer: ${payment.clientName}`}
             busy={mark.isPending}
             onClick={toggle}
