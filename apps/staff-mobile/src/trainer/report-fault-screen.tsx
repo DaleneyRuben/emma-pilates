@@ -10,6 +10,7 @@ import {
   colors,
   EmptyState,
   FormField,
+  FormScrollView,
   fontFamilies,
   formatTimeRange,
   Heading,
@@ -23,7 +24,7 @@ import {
 } from "@pilates/mobile-core";
 import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { useIsTablet } from "../ui/use-is-tablet";
@@ -129,7 +130,9 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
         <View style={styles.sent}>
           <Text style={styles.check}>✓</Text>
           <Text style={styles.sentTitle}>Gracias por avisar</Text>
-          <BodyText>{`Administración ya puede ver la falla de ${sent}.`}</BodyText>
+          <BodyText
+            style={styles.sentLine}
+          >{`Administración ya puede ver la falla de ${sent}.`}</BodyText>
         </View>
         <PrimaryButton label="Volver a la lista" onPress={() => navigation.goBack()} />
       </Screen>
@@ -188,7 +191,25 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
   return (
     <Screen style={column}>
       {header}
-      <ScrollView contentContainerStyle={styles.form} keyboardShouldPersistTaps="handled">
+      <FormScrollView
+        contentContainerStyle={styles.form}
+        footer={
+          <View style={styles.footer}>
+            {failed ? (
+              <BodyText accessibilityRole="alert">
+                No pudimos enviar el reporte. Inténtalo de nuevo.
+              </BodyText>
+            ) : null}
+            <PrimaryButton
+              busy={busy}
+              disabled={!ready}
+              label="Enviar reporte"
+              onPress={() => void send()}
+              testID="report-fault-send"
+            />
+          </View>
+        }
+      >
         <Text style={styles.eyebrow}>¿Qué equipo?</Text>
         {groupsOf(items).map((group) => (
           <View key={group.kind} style={styles.group}>
@@ -212,22 +233,11 @@ export function ReportFaultScreen({ route }: { route: { params: { sessionId: str
           onChangeText={setDescription}
           placeholder="Ej.: el resorte rojo se soltó"
           style={styles.textArea}
+          testID="report-fault-description"
           value={description}
         />
         <Checkbox checked={outOfService} onPress={() => setOutOfService((value) => !value)} />
-      </ScrollView>
-      {failed ? (
-        <BodyText accessibilityRole="alert">
-          No pudimos enviar el reporte. Inténtalo de nuevo.
-        </BodyText>
-      ) : null}
-      <PrimaryButton
-        busy={busy}
-        disabled={!ready}
-        label="Enviar reporte"
-        onPress={() => void send()}
-        testID="report-fault-send"
-      />
+      </FormScrollView>
     </Screen>
   );
 }
@@ -269,12 +279,14 @@ const styles = StyleSheet.create({
     letterSpacing: 1.7,
     textTransform: "uppercase",
   },
+  footer: { gap: spacing.sm, paddingTop: spacing.sm },
   form: { gap: spacing.lg, paddingBottom: spacing.lg },
   group: { gap: spacing.sm },
   groupLabel: { color: colors.textMuted, fontFamily: fontFamilies.body, fontSize: typography.note },
   helper: { color: colors.textSubtle, fontFamily: fontFamilies.body, fontSize: typography.note },
   screen: { gap: spacing.md },
   sent: { alignItems: "center", flex: 1, gap: spacing.md, justifyContent: "center" },
+  sentLine: { textAlign: "center" },
   sentTitle: { color: colors.text, fontFamily: fontFamilies.heading, fontSize: 21 },
   tablet: { alignSelf: "center", maxWidth: 560, width: "100%" },
   textArea: { minHeight: 104, textAlignVertical: "top" },
