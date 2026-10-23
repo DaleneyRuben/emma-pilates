@@ -58,13 +58,13 @@ can be found by its design name.
 | Staff app | Tests |
 | --- | --- |
 | S01 Iniciar sesión, S18 Recuperar contraseña, S19 Crea tu contraseña | 1, 5, 50, 52, 57, 71 |
-| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69 |
+| S02 Mi agenda, S03 Lista de asistentes (Entrenadora) | 12, 13, 19, 61, 69, 75 |
 | S04 Buscar cliente, S05 Nuevo cliente, S06 Resumen del cliente | 5 H, 11, 19, 49, 54 |
 | S07 Reservar una clase, S08 Detalle de sesión, S09 Elegir plan, S10 Confirmar pago en efectivo | 11, 19 |
-| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51 |
+| S11 Pagos pendientes, S12 Revisar pago | 10, 19, 46, 49, 51, 75 |
 | S13 Cancelar una clase, S14 Cancelar sesión | 10, 19, 20 |
 | S15 Mi agenda, S16 Mi disponibilidad, S17 Formulario de horario (Nutricionista) | 15, 19 |
-| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67 |
+| S20 Notificaciones, S23 Perfil | 9, 18, 46, 67, 75 |
 | S21 Reservas de la clienta, S22 Historial de la clienta | 11, 54 |
 | S24 Ver la app como…, the impersonation banner | 67, 71 |
 
@@ -1614,7 +1614,9 @@ notificaciones sin leer"); tap it to open
 administración.", **Rol** (`Entrenadora`), **Sucursales** (`Centro, Equipetrol,
 Urubó`), the **Notificaciones** row (with the unread count) and the
 **Cambiar contraseña** row, both ending in the quiet chevron of 18, the
-outlined **Cerrar sesión** button, and the version footer. Log in as
+outlined **Cerrar sesión** button, and the version footer «Emma Pilates
+Studio · versión 1.0.1» (the value in the Staff app's `app.json`, Test 75).
+Log in as
 `paola.mendoza@example.com` to see **Administración** with "Todas las
 sucursales". The staff inbox draws the same bare empty state as the Client's
 (quiet bell, Lora title) with the line "Te avisaremos aquí cuando haya algo
@@ -1720,7 +1722,10 @@ transferencia nueva.".
 Tap Sofía's card. **Revisar pago** shows name and Plan, **Monto a verificar**
 with `Bs 500`, the **Pendiente** badge, "Transferencia · enviado el 22 de
 septiembre, 14:05", and the **Comprobante** image loaded through the
-authenticated API. **Ampliar** (or tapping the image) opens it full screen
+authenticated API. If that download fails the screen says «No pudimos
+mostrar el comprobante.» with **Reintentar**, and **Confirmar pago** stays
+disabled until the image is on screen (Test 75); **Rechazar** stays
+available. **Ampliar** (or tapping the image) opens it full screen
 with pinch zoom; close it with the ✕ in the top-right corner, below the status
 bar. Scroll down: **Confirmar pago** returns to the list with a two-second
 "Pago confirmado" notice and the card gone. **Rechazar**, under it, does not
@@ -1959,7 +1964,10 @@ Load the fixtures (Test 5A) and start the backend. Open the Staff app (Test
 The same data is available through Swagger as `GET
 /api/v1/trainer/sessions?on=YYYY-MM-DD`, `GET
 /api/v1/trainer/sessions/{sessionId}/roster`, and `POST
-/api/v1/sessions/{sessionId}/attendance`; other Roles get `403`.
+/api/v1/sessions/{sessionId}/attendance`; other Roles get `403`. A `403`
+or `500` on Mi agenda or the roster shows «No pudimos cargar tu agenda.» or
+«No pudimos cargar la lista de asistencia.» with **Reintentar**, and a later
+success loads the screen (Test 75).
 
 ## Test 13: watch the worker cancel an empty Session and close a Waitlist
 
@@ -2169,7 +2177,8 @@ In the Client app as `lucia@example.com`:
    opens the payment status, and a Plan notice opens Mi plan.
 
 In the Staff app, a Trainer's "Tu clase … se canceló" notice and a
-Nutritionist's Evaluation notices open **Mi agenda**. The Staff roots (Mi
+Nutritionist's Evaluation notices open **Mi agenda**. An Assistant notice
+that names a Client opens that Client (Test 75). The Staff roots (Mi
 agenda, the results of Buscar cliente, Pagos pendientes, the Nutritionist's
 agenda, Mi disponibilidad) and both apps' Notificaciones refresh when they
 regain focus (closing the roster, a review, or a client refetches the list
@@ -5589,7 +5598,9 @@ both apps, with the API on `pilates_dev_sim` and the fixtures.
    Trainer's root «No pudimos cargar tu agenda.», the roster «No pudimos
    cargar la lista de asistencia.», the Administrator's root «No pudimos
    cargar los pagos pendientes.», and the Nutritionist's **Mi
-   disponibilidad** «No pudimos cargar tus horarios.».
+   disponibilidad** «No pudimos cargar tus horarios.». A Trainer answer of
+   `403` or `500` shows the same **Reintentar** instead of «Algo salió
+   mal», and a later success loads the screen (Test 75).
 2. **An action failure.** With the API stopped, tap an action instead: a
    refused command shows its own line and keeps the form, in the pattern
    «No pudimos … Inténtalo de nuevo.» (Test 10 D's «No pudimos cancelar la
@@ -5834,3 +5845,33 @@ touching production.
    rehearsed through Tests 19, 45, 46, 48, and 55; the runbook adds the
    EAS Update path for a JavaScript-only fix and the «confirm a Client's
    email by hand» command of Test 48 C.
+
+## Test 75: the Staff app's diagnosis fixes
+
+The five Staff findings from the diagnosis (STAFF-005). The automated
+specs cover them; a device walk was not part of that check, so walk them
+here on the iPhone 16 Pro, the iPad Pro 11, and the Android emulator when
+a person is at the simulators. Do not take `/private/tmp/pilates-sim.lock`
+for an automated pass.
+
+1. **Trainer HTTP errors (S02, S03).** As `emma.vargas@example.com`, stop
+   the API and open Mi agenda: «No pudimos cargar tu agenda.» and
+   **Reintentar**, not «Algo salió mal». Start the API and tap
+   **Reintentar**: today's classes, or «No tienes clases este día.», load.
+   Open a roster, stop the API, and pull to refresh: «No pudimos cargar la
+   lista de asistencia.» and **Reintentar**, then the list once the API is
+   back.
+2. **A failed receipt (S12).** As `paola.mendoza@example.com`, open a
+   pending transfer and stop the API before the image arrives: «No pudimos
+   mostrar el comprobante.» and **Reintentar**. **Confirmar pago** stays
+   disabled. **Rechazar** still unfolds. Start the API, tap **Reintentar**,
+   and confirm only once **Comprobante de transferencia** is on screen.
+3. **An Assistant notice (S20).** As `camila.rojas@example.com`, open
+   **Notificaciones**. A notice that names a Client opens that Client's
+   overview (on the iPad, the right panel). A notice that names nobody
+   stays on the inbox. The backend does not send the Assistant a cash
+   confirmation today, so this step needs a row whose destination is that
+   Client; the automated spec plants one.
+4. **The version (S23).** Perfil's footer reads «Emma Pilates Studio ·
+   versión 1.0.1», the `expo.version` in `apps/staff-mobile/app.json`. The
+   Client app's own «versión 1.0» is a different item.

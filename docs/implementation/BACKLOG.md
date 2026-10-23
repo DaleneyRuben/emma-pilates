@@ -787,7 +787,7 @@ Acceptance criteria: at least 12 testers opted in on the day REL-006's closed re
 | --- | --- | --- | --- | --- | --- | --- |
 | BE-027 | P1 | Backend | Diagnosis fixes: promote the waitlist when capacity rises; audit Attendance corrections | — | 1 d | ready |
 | MOB-070 | P1 | Client app | Diagnosis fixes in the Client app: Reschedule idempotency, the waitlist offered inside the window, specific rejection messages, phone validation, hard-coded copy | BKM-004 | 1.5–2 d | ready |
-| STAFF-005 | P1 | Staff app | Diagnosis fixes in the Staff app: HTTP errors on the Trainer screens, a failed receipt download, notification taps for the Assistant, the version label | — | 1.5–2 d | ready |
+| STAFF-005 | P1 | Staff app | Diagnosis fixes in the Staff app: HTTP errors on the Trainer screens, a failed receipt download, notification taps for the Assistant, the version label | — | 1.5–2 d | done |
 | UX-003, UX-004 | P1 | Apps | *Existing rows.* Early refusals for the Assistant, refetch on focus | UX-001 | 1–2 d left | ready |
 | NOT-003 | P1 | Backend/apps | Class reminders 24 h and 2 h before; fix the exact-date expiry reminder | — | 1–2 d | ready |
 | REL-014 | P1 | Mobile release | Apple Developer Program as an individual (gate 9), bundle IDs, APNs key, App Store Connect records | — | 0.5 d + Apple's wait | ready |
@@ -807,6 +807,8 @@ apply after the decisions. The credit and report findings go away with PAY-005.
 - **BE-027:** raising a Session's capacity promotes the waitlist, and an Attendance correction writes an audit record with the previous outcome.
 - **MOB-070:** Reschedule sends an Idempotency-Key. The app stops offering the waitlist inside the window. Business rejections get their own messages (window, destination not eligible, full, weekly cap, before the start date). Phone numbers are validated as Bolivian mobile numbers. «Paquetes desde» comes from the catalog, and «versión» from the app config.
 - **STAFF-005:** both Trainer screens check the HTTP status and show «Reintentar». A failed receipt download shows an error, and the Administrator cannot confirm without seeing the receipt. The Assistant's notifications open the Client. «versión» comes from the app config. The attendance screen moves out of `navigation.tsx`.
+
+**Evidence.** Done 2026-10-23 on `feature/staff-005-staff-fixes` (pull request URL recorded after the pull request exists). Red `2236f5af`; trainer retry `f778aab1`; receipt failure `56d3ec19`; Assistant destination `0fe571ad`; version `78354696`; roster extraction `cbb0f5d9`. Both Trainer screens reject a non-200 body in a screen-local query function (`requireOk`) so **Reintentar** refetches, and still guard the status before reading the body. A failed receipt download is its own query: «No pudimos mostrar el comprobante.» with **Reintentar**, and **Confirmar pago** stays disabled until the image is on screen; **Rechazar** stays available. An Assistant notice whose destination type is `client` and whose destination id is present opens `ClientOverview`; a notice that names no Client opens nothing. No backend producer was added. The footer reads `expo.version` from `apps/staff-mobile/app.json` (`1.0.1`). The attendance screen lives in `apps/staff-mobile/src/trainer/trainer-roster-screen.tsx`; `navigation.tsx` is 225 lines. Follow-up 116 stays pending. Devices were not walked and Maestro was not run. Test 75 records the manual walk.
 
 Acceptance criteria: one test per finding, red before the fix.
 
