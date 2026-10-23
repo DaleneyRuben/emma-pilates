@@ -51,7 +51,11 @@ describe('trainer pay', () => {
     });
 
     expect(pay.lines).toEqual([
-      { kind: 'minimum_not_met', detail: 'Mínimo no alcanzado', amountCentavos: 2_500 },
+      {
+        kind: 'minimum_not_met',
+        detail: 'Mínimo no alcanzado',
+        amountCentavos: 2_500,
+      },
     ]);
     expect(pay.totalCentavos).toBe(2_500);
   });
