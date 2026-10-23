@@ -13,8 +13,6 @@ ALTER TABLE "booking"."evaluations"
 
 CREATE UNIQUE INDEX "evaluations_payment_id_key"
   ON "booking"."evaluations" ("payment_id");
-CREATE INDEX "evaluations_payment_id_idx"
-  ON "booking"."evaluations" ("payment_id");
 
 ALTER TABLE "booking"."evaluations"
   ADD CONSTRAINT "evaluations_payment_id_fkey"
