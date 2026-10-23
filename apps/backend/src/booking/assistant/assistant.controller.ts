@@ -78,7 +78,12 @@ export type AssistantClientOperations = {
     principal: AuthenticatedPrincipal,
   ) => Promise<PlanQuotes>;
   recordCashPayment: (
-    command: { clientId: string; planId: string; branchId: string },
+    command: {
+      clientId: string;
+      planId: string;
+      branchId: string;
+      startsOn?: string;
+    },
     principal: AuthenticatedPrincipal,
     idempotencyKey: string,
   ) => Promise<AssistantCashPaymentResult>;
@@ -188,6 +193,9 @@ export class AssistantClientsController {
       subscription: {
         status: overview.subscription.status,
         subscription: toSubscriptionDto(overview.subscription.subscription),
+        nextSubscription: toSubscriptionDto(
+          overview.subscription.nextSubscription,
+        ),
       },
     };
   }
@@ -277,7 +285,14 @@ export class AssistantClientsController {
     const principal = await this.authenticate(authorization);
     const result = await run(() =>
       this.operations.recordCashPayment(
-        { clientId: id, planId: parsed.planId, branchId: parsed.branchId },
+        {
+          clientId: id,
+          planId: parsed.planId,
+          branchId: parsed.branchId,
+          ...(parsed.startsOn === undefined
+            ? {}
+            : { startsOn: parsed.startsOn }),
+        },
         principal,
         key,
       ),

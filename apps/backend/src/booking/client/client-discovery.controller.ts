@@ -161,6 +161,19 @@ export class ClientProfileController {
 
     return {
       status: view.status,
+      nextSubscription:
+        view.nextSubscription === null
+          ? null
+          : {
+              id: view.nextSubscription.id,
+              planName: view.nextSubscription.planName,
+              originalClassAllowance:
+                view.nextSubscription.originalClassAllowance,
+              remainingClassAllowance:
+                view.nextSubscription.remainingClassAllowance,
+              startsOn: civilDate(view.nextSubscription.startsOn),
+              endsOn: civilDate(view.nextSubscription.endsOn),
+            },
       subscription:
         view.subscription === null
           ? null

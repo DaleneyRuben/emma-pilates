@@ -33,6 +33,7 @@ const intent = {
   receiptAttached: false,
   createdAt: new Date('2026-09-21T15:00:00.000Z'),
   expiresAt: new Date('2026-09-22T15:00:00.000Z'),
+  startsOn: '2026-09-21',
 };
 const payment = {
   id: '44444444-4444-4444-8444-444444444444',
@@ -46,6 +47,7 @@ const payment = {
   planPriceCentavos: 56_000,
   creditAppliedCentavos: 0,
   amountDueCentavos: 56_000,
+  startsOn: '2026-09-21',
   submittedAt: new Date('2026-09-21T16:00:00.000Z'),
   decidedAt: null,
   rejectionReason: null,

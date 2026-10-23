@@ -3,15 +3,26 @@ import { z } from 'zod';
 
 const uuid = z.uuid();
 
+const civilDate = z.iso.date();
+
 export class CreatePurchaseIntentDto {
   @ApiProperty({ format: 'uuid' })
   planId!: string;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description:
+      'Chosen Start Date (booking ADR-0005). Omitted means today. Older builds omit it.',
+  })
+  startsOn?: string;
 }
 
 export const parseCreatePurchaseIntent = (
   value: unknown,
 ): CreatePurchaseIntentDto | null => {
-  const result = z.strictObject({ planId: uuid }).safeParse(value);
+  const result = z
+    .strictObject({ planId: uuid, startsOn: civilDate.optional() })
+    .safeParse(value);
   return result.success ? result.data : null;
 };
 
@@ -71,6 +82,12 @@ export class PurchaseIntentDto {
 
   @ApiProperty({ format: 'date-time' })
   expiresAt!: Date;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description: 'Chosen Start Date. Absent on responses older builds ignore.',
+  })
+  startsOn?: string;
 }
 
 export class PaymentDto {
@@ -110,6 +127,12 @@ export class PaymentDto {
 
   @ApiProperty({ minimum: 0 })
   amountDueCentavos!: number;
+
+  @ApiPropertyOptional({
+    format: 'date',
+    description: 'Chosen Start Date. Absent on responses older builds ignore.',
+  })
+  startsOn?: string;
 
   @ApiProperty({ format: 'date-time' })
   submittedAt!: Date;

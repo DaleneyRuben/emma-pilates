@@ -137,6 +137,7 @@ export const startPaymentWorld = async () => {
           planPriceCentavos: plan.priceCentavos,
           creditAppliedCentavos: 0,
           amountDueCentavos: plan.priceCentavos,
+          startsOn: today,
           method: 'CASH',
           state: 'CONFIRMED',
           collectedAtBranchId: fixtures.branches[0].id,

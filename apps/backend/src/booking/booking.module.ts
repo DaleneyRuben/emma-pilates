@@ -467,6 +467,10 @@ import { clientPhotoWiring } from './client/client-photo-wiring';
               repository
                 .findLatestSubscription(clientId)
                 .then((found) => (found === null ? null : toSummary(found))),
+            findFutureSubscription: (clientId, after) =>
+              repository
+                .findFutureSubscription(clientId, after)
+                .then((found) => (found === null ? null : toSummary(found))),
           });
         },
     },

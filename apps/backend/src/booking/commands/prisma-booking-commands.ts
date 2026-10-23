@@ -17,7 +17,6 @@ import {
   type NotificationRecorder,
 } from '../../notifications/prisma-notification-store';
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
-import { boliviaDate } from '../../time/bolivia-time';
 import { createBooking } from './create-booking';
 import { cancelBooking } from './cancel-booking';
 import {
@@ -33,6 +32,10 @@ import {
 import { rescheduleBooking } from './reschedule-booking';
 import { recordAttendance } from './record-attendance';
 import { readCancellationWindowMinutes } from '../studio-settings/prisma-studio-settings';
+import {
+  findCoveringSubscription,
+  findNotYetStartedSubscription,
+} from './eligible-subscription';
 import { retrySerializable } from '../../database/retry-serializable';
 
 export class PrismaBookingCommands {
@@ -753,15 +756,13 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        transaction.subscription.findFirst({
-          where: {
-            clientId,
-            state: 'ACTIVE',
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-          },
-          select: { id: true },
+        findCoveringSubscription(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: false,
         }),
+      findNotYetStartedSubscription: ({ clientId, onDate }) =>
+        findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasLiveBooking: ({ sessionId, clientId }) =>
         transaction.booking
           .findFirst({
@@ -800,16 +801,13 @@ export class PrismaBookingCommands {
           where: { sessionId, state: 'BOOKED' },
         }),
       findEligibleSubscription: ({ clientId, onDate }) =>
-        transaction.subscription.findFirst({
-          where: {
-            clientId,
-            state: 'ACTIVE',
-            startsOn: { lte: boliviaDate(onDate) },
-            endsOn: { gte: boliviaDate(onDate) },
-            remainingClassAllowance: { gt: 0 },
-          },
-          select: { id: true },
+        findCoveringSubscription(transaction, {
+          clientId,
+          onDate,
+          needsAllowance: true,
         }),
+      findNotYetStartedSubscription: ({ clientId, onDate }) =>
+        findNotYetStartedSubscription(transaction, { clientId, onDate }),
       hasOverlappingBooking: ({ clientId, startsAt, endsAt }) =>
         transaction.booking
           .findFirst({

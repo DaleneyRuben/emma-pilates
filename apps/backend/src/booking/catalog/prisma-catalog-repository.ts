@@ -331,6 +331,12 @@ export function createCatalogRepository(
         orderBy: [{ endsOn: 'desc' }, { id: 'desc' }],
         select: subscriptionSelect,
       }),
+    findFutureSubscription: (clientId, after) =>
+      prisma.subscription.findFirst({
+        where: { clientId, state: 'ACTIVE', startsOn: { gt: after } },
+        orderBy: [{ startsOn: 'asc' }, { id: 'asc' }],
+        select: subscriptionSelect,
+      }),
     listPublishedPromotions: (onDate) =>
       prisma.promotion.findMany({
         where: {

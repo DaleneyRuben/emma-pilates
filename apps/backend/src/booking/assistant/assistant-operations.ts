@@ -28,6 +28,10 @@ export const createAssistantClientOperations = (input: {
       catalog
         .findActiveSubscription(clientId, onDate)
         .then(toSubscriptionSummary),
+    findFutureSubscription: (clientId: string, after: Date) =>
+      catalog
+        .findFutureSubscription(clientId, after)
+        .then(toSubscriptionSummary),
     findLatestSubscription: (clientId: string) =>
       catalog.findLatestSubscription(clientId).then(toSubscriptionSummary),
   };

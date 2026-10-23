@@ -85,6 +85,7 @@ export type DevelopmentFixtures = {
     planPriceCentavos: number;
     creditAppliedCentavos: number;
     amountDueCentavos: number;
+    startsOn: Date;
     method: 'cash';
     state: 'confirmed';
     collectedAtBranchId: string;
@@ -627,6 +628,7 @@ export const buildDevelopmentFixtures = (input: {
         planPriceCentavos: plan.priceCentavos,
         creditAppliedCentavos: 0,
         amountDueCentavos: plan.priceCentavos,
+        startsOn: subscription.startsOn,
         method: 'cash',
         state: 'confirmed',
         collectedAtBranchId: branchId(definition.branch),

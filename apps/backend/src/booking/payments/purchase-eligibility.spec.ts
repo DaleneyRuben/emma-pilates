@@ -7,6 +7,7 @@ const baseline = {
   today,
   plan,
   activeSubscription: null,
+  futureSubscriptionId: null,
   openPurchaseIntentId: null,
   pendingPaymentId: null,
 };
@@ -68,39 +69,36 @@ describe('evaluatePurchaseEligibility', () => {
     ).toBe('payment_pending_exists');
   });
 
-  it('refuses while the active subscription is still effective', () => {
+  it('allows a renewal while the active subscription is still effective', () => {
     const effective = {
       id: 'subscription-1',
+      startsOn: new Date('2026-09-01T00:00:00.000Z'),
       endsOn: new Date('2026-10-01T00:00:00.000Z'),
       remainingClassAllowance: 0,
       futureBookedCount: 1,
     };
 
     expect(
-      codeOf(() =>
-        evaluatePurchaseEligibility({
-          ...baseline,
-          activeSubscription: effective,
-        }),
-      ),
-    ).toBe('subscription_not_expired');
+      evaluatePurchaseEligibility({
+        ...baseline,
+        activeSubscription: effective,
+      }),
+    ).toEqual({ subscriptionIdToExpire: null });
     expect(
       codeOf(() =>
         evaluatePurchaseEligibility({
           ...baseline,
-          activeSubscription: {
-            ...effective,
-            remainingClassAllowance: 3,
-            futureBookedCount: 0,
-          },
+          activeSubscription: effective,
+          futureSubscriptionId: 'queued',
         }),
       ),
-    ).toBe('subscription_not_expired');
+    ).toBe('future_subscription_exists');
   });
 
   it('asks the transaction to expire a subscription that no longer holds', () => {
     const byDate = {
       id: 'subscription-1',
+      startsOn: new Date('2026-08-22T00:00:00.000Z'),
       endsOn: new Date('2026-09-21T00:00:00.000Z'),
       remainingClassAllowance: 5,
       futureBookedCount: 0,

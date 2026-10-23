@@ -1,4 +1,5 @@
 import type { AuthenticatedPrincipal } from '../../system-identity/authentication/resolve-authenticated-principal';
+import { bookingBeforeStartMessage } from './booking-before-start';
 
 export class BookingAccessDeniedError extends Error {
   constructor() {
@@ -23,6 +24,10 @@ type CreateBookingDependencies = {
     clientId: string;
     onDate: Date;
   }): Promise<{ id: string } | null>;
+  findNotYetStartedSubscription?(input: {
+    clientId: string;
+    onDate: Date;
+  }): Promise<{ startsOn: Date } | null>;
   hasOverlappingBooking(input: {
     clientId: string;
     startsAt: Date;
@@ -95,6 +100,15 @@ export const createBooking = async (
   });
 
   if (subscription === null) {
+    const pending = dependencies.findNotYetStartedSubscription
+      ? await dependencies.findNotYetStartedSubscription({
+          clientId,
+          onDate: session.startsAt,
+        })
+      : null;
+    if (pending !== null) {
+      throw new Error(bookingBeforeStartMessage(pending.startsOn));
+    }
     throw new Error('No eligible Subscription');
   }
 
