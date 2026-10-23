@@ -133,7 +133,7 @@ describe('Administrator Client directory', () => {
 });
 
 describe('Administrator Client detail', () => {
-  it('summarizes contact, the current Plan, Credit, and referrals', async () => {
+  it('summarizes contact, the current Plan, and referrals, with Credit retired to zero (PAY-005)', async () => {
     const clients = directory();
 
     await expect(
@@ -144,7 +144,7 @@ describe('Administrator Client detail', () => {
     ).resolves.toEqual({
       ...lucia,
       subscription: { status: 'active', subscription },
-      creditAvailableCentavos: 105_000,
+      creditAvailableCentavos: 0,
       closure: outlook,
     });
     expect(clients.findActiveSubscription).toHaveBeenCalledWith(

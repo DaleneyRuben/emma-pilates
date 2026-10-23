@@ -133,7 +133,7 @@ describe('Assistant Client overview', () => {
     readAvailableCredit: jest.fn().mockResolvedValue(6_000),
   };
 
-  it('composes the Client, Subscription state, next Booking, last two attended classes, and Credit', async () => {
+  it('composes the Client, Subscription state, next Booking, last two attended classes, and no Credit (PAY-005)', async () => {
     await expect(
       readClientOverview({ clientId: 'client-id' }, dependencies),
     ).resolves.toEqual({
@@ -141,7 +141,7 @@ describe('Assistant Client overview', () => {
       subscription: { status: 'active', subscription },
       nextBooking: upcoming[0],
       recentHistory: history.slice(0, 2),
-      creditAvailableCentavos: 6_000,
+      creditAvailableCentavos: 0,
     });
     expect(dependencies.findActiveSubscription).toHaveBeenCalledWith(
       'client-id',
@@ -234,7 +234,7 @@ describe('Assistant Client Bookings and history', () => {
 });
 
 describe('Assistant Plan quotes and cash Payment', () => {
-  it('applies the available Credit to every visible Plan in display order', async () => {
+  it('quotes every visible Plan at its full price in display order, since Credit is retired (PAY-005)', async () => {
     await expect(
       quotePlansForClient(
         { clientId: 'client-id' },
@@ -246,17 +246,17 @@ describe('Assistant Plan quotes and cash Payment', () => {
         },
       ),
     ).resolves.toEqual({
-      creditAvailableCentavos: 6_000,
+      creditAvailableCentavos: 0,
       plans: [
         {
           ...plans[1],
-          creditAppliedCentavos: 5_000,
-          amountDueCentavos: 0,
+          creditAppliedCentavos: 0,
+          amountDueCentavos: plans[1].priceCentavos,
         },
         {
           ...plans[0],
-          creditAppliedCentavos: 6_000,
-          amountDueCentavos: 50_000,
+          creditAppliedCentavos: 0,
+          amountDueCentavos: plans[0].priceCentavos,
         },
       ],
     });
