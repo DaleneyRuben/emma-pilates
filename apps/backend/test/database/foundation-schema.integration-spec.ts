@@ -37,6 +37,7 @@ describe('foundation migration', () => {
       'booking.bookings',
       'booking.branches',
       'booking.class_types',
+      'booking.client_acquisitions',
       'booking.client_promotions_consents',
       'booking.clients',
       'booking.credit_ledger_entries',
