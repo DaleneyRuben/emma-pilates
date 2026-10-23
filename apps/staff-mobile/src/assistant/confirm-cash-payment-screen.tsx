@@ -1,5 +1,6 @@
 import {
   getGetAssistantClientOverviewQueryKey,
+  useGetAssistantClientInvoiceData,
   useGetCurrentStaffMemberProfile,
   useListBranches,
   type AssistantCashPaymentDto,
@@ -11,7 +12,12 @@ import {
   colors,
   describePlanTerms,
   formatBolivianos,
+  FormScrollView,
   Heading,
+  InvoiceDataCard,
+  invoiceChoiceFrom,
+  invoiceDataPayload,
+  type InvoiceChoice,
   PrimaryButton,
   radii,
   Screen,
@@ -22,7 +28,7 @@ import {
 import { useNavigation } from "@react-navigation/native";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useStaffFetcher } from "../staff-fetcher";
 import { CenteredCard } from "./assistant-layout";
@@ -91,13 +97,22 @@ export function ConfirmCashPaymentScreen({
   const [submitting, setSubmitting] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const [result, setResult] = useState<AssistantCashPaymentDto | null>(null);
+  // PAY-007: prefilled from the Client's last sale; a failed read leaves «Sin factura».
+  const lastInvoice = useGetAssistantClientInvoiceData(clientId, { fetcher });
+  const [invoiceEdit, setInvoiceEdit] = useState<InvoiceChoice | null>(null);
+  const invoice =
+    invoiceEdit ??
+    invoiceChoiceFrom(
+      lastInvoice.data?.status === 200 ? (lastInvoice.data.data.invoiceData ?? null) : null,
+    );
+  const invoiceData = invoiceDataPayload(invoice);
 
   const confirm = async () => {
-    if (branchId === null) return;
+    if (branchId === null || invoiceData === "incomplete") return;
     setSubmitting(true);
     setFailure(null);
     try {
-      const recorded = await api.recordCashPayment(clientId, quote.id, branchId);
+      const recorded = await api.recordCashPayment(clientId, quote.id, branchId, invoiceData);
       await queryClient.invalidateQueries({
         queryKey: getGetAssistantClientOverviewQueryKey(clientId),
       });
@@ -163,7 +178,7 @@ export function ConfirmCashPaymentScreen({
           Confirmar pago en efectivo
         </Heading>
         <ClientBanner action="Registrando pago para" clientName={clientName} />
-        <ScrollView contentContainerStyle={styles.content}>
+        <FormScrollView contentContainerStyle={styles.content}>
           <View style={styles.card}>
             <Text style={styles.cardTitle}>{quote.name}</Text>
             <BodyText>{describePlanTerms(quote)}</BodyText>
@@ -206,6 +221,13 @@ export function ConfirmCashPaymentScreen({
               </View>
             </View>
           ) : null}
+          <InvoiceDataCard
+            noInvoiceNote="La venta se registra sin datos de factura."
+            onChange={setInvoiceEdit}
+            prefilledNote="Datos de su última compra. Confírmalos con la clienta."
+            raised
+            value={invoice}
+          />
           <BodyText style={styles.muted}>
             Confirma solo cuando tengas el efectivo en mano. El plan se activa al instante.
           </BodyText>
@@ -216,12 +238,12 @@ export function ConfirmCashPaymentScreen({
           ) : null}
           <PrimaryButton
             busy={submitting}
-            disabled={branchId === null}
+            disabled={branchId === null || invoiceData === "incomplete"}
             label="Confirmar pago recibido"
             onPress={() => void confirm()}
             testID="cash-confirm"
           />
-        </ScrollView>
+        </FormScrollView>
       </CenteredCard>
     </Screen>
   );

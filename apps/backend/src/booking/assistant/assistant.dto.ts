@@ -7,6 +7,11 @@ import {
   ClientSubscriptionSummaryDto,
   PlanDto,
 } from '../client/client-discovery.dto';
+import type { InvoiceData } from '../payments/invoice-data/invoice-data';
+import {
+  InvoiceDataDto,
+  invoiceDataField,
+} from '../payments/invoice-data/invoice-data.dto';
 import { PaymentDto } from '../payments/payments.dto';
 import type { ClientAccountStatus } from './assistant-clients';
 
@@ -92,13 +97,29 @@ export class RecordCashPaymentDto {
     description: 'Branch where the cash was collected',
   })
   branchId!: string;
+
+  @ApiPropertyOptional({
+    type: InvoiceDataDto,
+    nullable: true,
+    description:
+      'PAY-007: the NIT or CI and name for the invoice; absent or null is «Sin factura»',
+  })
+  invoiceData?: InvoiceDataDto | null;
 }
 
 export const parseRecordCashPayment = (
   value: unknown,
-): RecordCashPaymentDto | null => {
+): {
+  planId: string;
+  branchId: string;
+  invoiceData: InvoiceData | null;
+} | null => {
   const result = z
-    .strictObject({ planId: uuid, branchId: uuid })
+    .strictObject({
+      planId: uuid,
+      branchId: uuid,
+      invoiceData: invoiceDataField,
+    })
     .safeParse(value);
   return result.success ? result.data : null;
 };

@@ -261,7 +261,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `07` | Historial de clases | Past classes |
 | `08` | Elegir plan | Plan catalog |
 | `09` | Detalle del plan | Plan detail; the total is the price drawn minus the Credit applied, never below zero |
-| `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash); the QR is the only transfer instruction, drawn whole and tappable, with «Ampliar» and «Guardar QR» under it and a light full-screen «QR ampliado» view |
+| `10` | Pago | Payment — transfer to the studio QR + receipt upload (no cash); the QR is the only transfer instruction, drawn whole and tappable, with «Ampliar» and «Guardar QR» under it and a light full-screen «QR ampliado» view; a «Datos para la factura» card before «Enviar comprobante» chooses «Con factura» (NIT o CI and nombre o razón social, prefilled from her last sale) or «Sin factura» (PAY-007) |
 | `11` | Estado del pago | Pending/confirmed/rejected states |
 | `12` | Mi plan | Active plan, sessions left, expiry («Vence el …») |
 | `13` | Evaluación nutricional | Book a nutrition assessment: only days of months not yet used in the next 30 days, the Branch (and Nutritionist) per turno when there are several, turnos close 3 h before they start; used-month state only when no unused month has turnos, and a no-active-plan state with «Ver planes» (`08`); the used-month title names the used month («de este mes» or «de septiembre») |
@@ -290,7 +290,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `S07` | Reservar una clase | Front desk (on behalf of a client); the Session she already holds a Booking in carries the neutral «Ya reservada» pill instead of the seat count (UX-003) |
 | `S08` | Detalle de sesión | Front desk; a Session she already booked shows «La clienta ya tiene esta clase reservada.» in place of «Reservar» (UX-003) |
 | `S09` | Elegir plan | Front desk |
-| `S10` | Confirmar pago en efectivo | Front desk |
+| `S10` | Confirmar pago en efectivo | Front desk; a «Datos para la factura» card («Con factura» with NIT o CI and nombre, prefilled from the client's last sale, or «Sin factura») before the cash is confirmed (PAY-007) |
 | `S11` | Pagos pendientes | Administration |
 | `S12` | Revisar pago | Administration — approve/reject |
 | `S13` | Cancelar una clase | Administration |
@@ -339,7 +339,7 @@ Panels are **408px** wide, absolutely positioned over the dimmed (`rgba(74,58,48
 | `AW25` | Evaluaciones nutricionales | Read-only list, date range + nutritionist filter, no status column; empty state; follows the top-bar Branch; Horario's week stepper; «Primera evaluación» / «Seguimiento»; one labelled card per Evaluation at 420 px |
 | `AW26` | Referidos | Read-only, 4 columns, Crédito otorgado / Pendiente pill; studio-wide counts whatever the search; no-results state |
 | `AW27` | Créditos | Read-only, 3 columns, right-aligned tabular amounts, total row; four movements (Crédito ganado · Reservado para un pago · Usado en un pago · Devuelto al saldo); the total shows only without a search; empty and no-results states |
-| `AW28` | Pagos | Studio-wide transfers; search + status filter (default Pendiente); pending row → `AW29`; a Payment reduced by Credit shows «con Bs 60,00 de crédito» under the amount; empty («No hay pagos pendientes.») and no-results frames |
+| `AW28` | Pagos | Every transfer and cash sale of the studio (not branch-scoped), with «Estado» and «Factura» filters («Sin factura emitida»), a «Método» column, a «Factura» column with «Marcar emitida» / «Emitida» + «Deshacer» on confirmed sales, and «Exportar CSV» of the filtered rows (PAY-007); a Pendiente row opens `AW29`; a Payment reduced by Credit shows «con Bs 60,00 de crédito» under the amount; empty («No hay pagos pendientes.») and no-results frames |
 | `AW29` | Revisar pago | Review panel: summary, large receipt, Confirmar pago / Rechazar (+ mandatory reason); Precio del plan and Crédito aplicado under the amount when Credit applied; «Confirmar pago» asks first; already-decided, active-plan refusal, and receipt-unavailable/unloaded states; the viewer is captioned «Comprobante · JPG» |
 | `AW30` | Recuperar contraseña | Request a reset link + neutral "link sent" and temporary-limit states |
 | `AW31` | Retiros e insumos consumidos | Withdrawal history behind `AW08`; «Volver a Insumos», month arrows (forward disabled on the current month), archived Supplies in the filter, «Consumo del mes» |
