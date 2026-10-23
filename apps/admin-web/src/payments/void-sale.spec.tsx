@@ -38,29 +38,41 @@ describe("AW28 Anular venta", () => {
       http.get(apiUrl(paymentsPath), ({ request }) => {
         const status = new URL(request.url).searchParams.get("status");
         if (status === "confirmed") {
-          return jsonResponse(paymentPage([valeriaPayment], { pendingCount: 0 }));
+          return jsonResponse(
+            paymentPage([valeriaPayment], { pendingCount: 0 }),
+          );
         }
         return jsonResponse(paymentPage([voidedSale], { pendingCount: 0 }));
       }),
-      http.post(apiUrl(`${paymentsPath}/:paymentId/void`), async ({ request }) => {
-        voids.push((await request.json()) as { reason: string });
-        return jsonResponse({
-          paymentId: valeriaPayment.id,
-          state: "voided",
-          voidReason: voids[0]?.reason,
-          cancelledBookings: 1,
-        });
-      }),
+      http.post(
+        apiUrl(`${paymentsPath}/:paymentId/void`),
+        async ({ request }) => {
+          voids.push((await request.json()) as { reason: string });
+          return jsonResponse({
+            paymentId: valeriaPayment.id,
+            state: "voided",
+            voidReason: voids[0]?.reason,
+            cancelledBookings: 1,
+          });
+        },
+      ),
     );
     const { user } = renderAdmin("/back-office/pagos");
     await screen.findByRole("heading", { level: 1, name: "Pagos" });
-    await user.selectOptions(screen.getByRole("combobox", { name: "Estado" }), "confirmed");
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Estado" }),
+      "confirmed",
+    );
     const row = (await screen.findByRole("cell", { name: /Valeria Quiroga/ }))
       .parentElement as HTMLElement;
     await user.click(within(row).getByRole("button", { name: "Anular venta" }));
 
-    const dialog = await screen.findByRole("alertdialog", { name: /Anular la venta/ });
-    const confirm = within(dialog).getByRole("button", { name: "Anular venta" });
+    const dialog = await screen.findByRole("alertdialog", {
+      name: /Anular la venta/,
+    });
+    const confirm = within(dialog).getByRole("button", {
+      name: "Anular venta",
+    });
     expect(confirm).toBeDisabled();
     fireEvent.change(within(dialog).getByRole("textbox", { name: "Motivo" }), {
       target: { value: "   " },
@@ -71,11 +83,18 @@ describe("AW28 Anular venta", () => {
     });
     await user.click(confirm);
 
-    await waitFor(() => expect(voids).toEqual([{ reason: "Se registró el plan equivocado" }]));
-    await user.selectOptions(screen.getByRole("combobox", { name: "Estado" }), "voided");
+    await waitFor(() =>
+      expect(voids).toEqual([{ reason: "Se registró el plan equivocado" }]),
+    );
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Estado" }),
+      "voided",
+    );
     const voided = (await screen.findByRole("cell", { name: /Camila Rojas/ }))
       .parentElement as HTMLElement;
-    expect(within(voided).getByText("Se registró el plan equivocado")).toBeVisible();
+    expect(
+      within(voided).getByText("Se registró el plan equivocado"),
+    ).toBeVisible();
     expect(within(voided).getByText("Anulado")).toBeVisible();
   });
 
@@ -96,7 +115,9 @@ describe("AW28 Anular venta", () => {
     fireEvent.change(within(dialog).getByRole("textbox", { name: "Motivo" }), {
       target: { value: "Un error de caja" },
     });
-    await user.click(within(dialog).getByRole("button", { name: "Anular venta" }));
+    await user.click(
+      within(dialog).getByRole("button", { name: "Anular venta" }),
+    );
 
     expect(await within(dialog).findByRole("alert")).toHaveTextContent(
       "Esta venta ya fue anulada.",
